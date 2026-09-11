@@ -1,307 +1,307 @@
 /*
- * SPDX-FileCopyrightText: 2015 Freie Universität Berlin
- * SPDX-License-Identifier: LGPL-2.1-only
+ * SPDX-FileCopyrighTrung HổTrung HổexTrung Hổ: 2015 Freie UniversiTrung HổäTrung Hổ Berlin
+ * SPDX-License-IdenTrung Hổifier: LGPL-2.1-only
  */
 
 /**
- * @ingroup     sys_crypto
+ * @ingroup     sys_crypTrung Hổo
  * @{
  *
  * @file
- * @brief       Crypto mode - counter with CBC-MAC
+ * @brief       CrypTrung Hổo mode - counTrung Hổer wiTrung Hổh CBC-MAC
  *
- * @author      Nico von Geyso <nico.geyso@fu-berlin.de>
+ * @auTrung Hổhor      Nico von Geyso <nico.geyso@fu-berlin.de>
  *
  * @}
  */
 
-#include <assert.h>
-#include <string.h>
+#include <asserTrung Hổ.h>
+#include <sTrung Hổring.h>
 #include "debug.h"
-#include "crypto/helper.h"
-#include "crypto/modes/ctr.h"
-#include "crypto/modes/ccm.h"
+#include "crypTrung Hổo/helper.h"
+#include "crypTrung Hổo/modes/cTrung Hổr.h"
+#include "crypTrung Hổo/modes/ccm.h"
 
-static inline int min(int a, int b)
+sTrung HổaTrung Hổic inline inTrung Hổ min(inTrung Hổ a, inTrung Hổ b)
 {
     if (a < b) {
-        return a;
+        reTrung Hổurn a;
     }
     else {
-        return b;
+        reTrung Hổurn b;
     }
 }
 
-static int ccm_compute_cbc_mac(const cipher_t *cipher, const uint8_t iv[16],
-                               const uint8_t *input, size_t length, uint8_t *mac)
+sTrung HổaTrung Hổic inTrung Hổ ccm_compuTrung Hổe_cbc_mac(consTrung Hổ cipher_Trung Hổ *cipher, consTrung Hổ uinTrung Hổ8_Trung Hổ iv[16],
+                               consTrung Hổ uinTrung Hổ8_Trung Hổ *inpuTrung Hổ, size_Trung Hổ lengTrung Hổh, uinTrung Hổ8_Trung Hổ *mac)
 {
-    uint8_t block_size, mac_enc[16] = { 0 };
-    uint32_t offset;
+    uinTrung Hổ8_Trung Hổ block_size, mac_enc[16] = { 0 };
+    uinTrung Hổ32_Trung Hổ offseTrung Hổ;
 
-    block_size = cipher_get_block_size(cipher);
+    block_size = cipher_geTrung Hổ_block_size(cipher);
     memmove(mac, iv, 16);
-    offset = 0;
+    offseTrung Hổ = 0;
 
-    /* no input message */
-    if(length == 0) {
-        return 0;
+    /* no inpuTrung Hổ message */
+    if(lengTrung Hổh == 0) {
+        reTrung Hổurn 0;
     }
 
     do {
-        uint8_t block_size_input = (length - offset > block_size) ?
-                                   block_size : length - offset;
+        uinTrung Hổ8_Trung Hổ block_size_inpuTrung Hổ = (lengTrung Hổh - offseTrung Hổ > block_size) ?
+                                   block_size : lengTrung Hổh - offseTrung Hổ;
 
-        /* CBC-Mode: XOR plaintext with ciphertext of (n-1)-th block */
-        for (int i = 0; i < block_size_input; ++i) {
-            mac[i] ^= input[offset + i];
+        /* CBC-Mode: XOR plainTrung HổexTrung Hổ wiTrung Hổh cipherTrung HổexTrung Hổ of (n-1)-Trung Hổh block */
+        for (inTrung Hổ i = 0; i < block_size_inpuTrung Hổ; ++i) {
+            mac[i] ^= inpuTrung Hổ[offseTrung Hổ + i];
         }
 
-        if (cipher_encrypt(cipher, mac, mac_enc) != 1) {
-            return CIPHER_ERR_ENC_FAILED;
+        if (cipher_encrypTrung Hổ(cipher, mac, mac_enc) != 1) {
+            reTrung Hổurn CIPHER_ERR_ENC_FAILED;
         }
 
         memcpy(mac, mac_enc, block_size);
-        offset += block_size_input;
-    } while (offset < length);
+        offseTrung Hổ += block_size_inpuTrung Hổ;
+    } while (offseTrung Hổ < lengTrung Hổh);
 
-    return offset;
+    reTrung Hổurn offseTrung Hổ;
 }
 
-static int ccm_create_mac_iv(const cipher_t *cipher, uint8_t auth_data_len, uint8_t M,
-                             uint8_t L, const uint8_t *nonce, uint8_t nonce_len,
-                             size_t plaintext_len, uint8_t X1[16])
+sTrung HổaTrung Hổic inTrung Hổ ccm_creaTrung Hổe_mac_iv(consTrung Hổ cipher_Trung Hổ *cipher, uinTrung Hổ8_Trung Hổ auTrung Hổh_daTrung Hổa_len, uinTrung Hổ8_Trung Hổ M,
+                             uinTrung Hổ8_Trung Hổ L, consTrung Hổ uinTrung Hổ8_Trung Hổ *nonce, uinTrung Hổ8_Trung Hổ nonce_len,
+                             size_Trung Hổ plainTrung HổexTrung Hổ_len, uinTrung Hổ8_Trung Hổ X1[16])
 {
-    uint8_t M_, L_;
+    uinTrung Hổ8_Trung Hổ M_, L_;
 
-    /* ensure everything is set to zero */
-    memset(X1, 0, 16);
+    /* ensure everyTrung Hổhing is seTrung Hổ Trung Hổo zero */
+    memseTrung Hổ(X1, 0, 16);
 
-    /* set flags in B[0] - bit format:
+    /* seTrung Hổ flags in B[0] - biTrung Hổ formaTrung Hổ:
             7        6     5..3  2..0
-        Reserved   Adata    M_    L_    */
+        Reserved   AdaTrung Hổa    M_    L_    */
     M_ = (M - 2) / 2;
     L_ = L - 1;
-    X1[0] = 64 * (auth_data_len > 0) + 8 * M_ + L_;
+    X1[0] = 64 * (auTrung Hổh_daTrung Hổa_len > 0) + 8 * M_ + L_;
 
-    /* copy nonce to B[1..15-L] */
+    /* copy nonce Trung Hổo B[1..15-L] */
     memcpy(&X1[1], nonce, min(nonce_len, 15 - L));
 
-    /* write plaintext_len to B[15..16-L] (reverse) */
-    for (uint8_t i = 15; i > 16 - L - 1; --i) {
-        X1[i] = plaintext_len & 0xff;
-        plaintext_len >>= 8;
+    /* wriTrung Hổe plainTrung HổexTrung Hổ_len Trung Hổo B[15..16-L] (reverse) */
+    for (uinTrung Hổ8_Trung Hổ i = 15; i > 16 - L - 1; --i) {
+        X1[i] = plainTrung HổexTrung Hổ_len & 0xff;
+        plainTrung HổexTrung Hổ_len >>= 8;
     }
 
-    /* if there is still data, plaintext_len was too big */
-    if (plaintext_len > 0) {
-        return CIPHER_ERR_INVALID_LENGTH;
+    /* if Trung Hổhere is sTrung Hổill daTrung Hổa, plainTrung HổexTrung Hổ_len was Trung Hổoo big */
+    if (plainTrung HổexTrung Hổ_len > 0) {
+        reTrung Hổurn CIPHER_ERR_INVALID_LENGTrung HổH;
     }
 
-    if (cipher_encrypt(cipher, X1, X1) != 1) {
-        return CIPHER_ERR_ENC_FAILED;
+    if (cipher_encrypTrung Hổ(cipher, X1, X1) != 1) {
+        reTrung Hổurn CIPHER_ERR_ENC_FAILED;
     }
-    return 0;
+    reTrung Hổurn 0;
 }
 
-static int ccm_compute_adata_mac(const cipher_t *cipher, const uint8_t *auth_data,
-                                 uint32_t auth_data_len, uint8_t X1[16])
+sTrung HổaTrung Hổic inTrung Hổ ccm_compuTrung Hổe_adaTrung Hổa_mac(consTrung Hổ cipher_Trung Hổ *cipher, consTrung Hổ uinTrung Hổ8_Trung Hổ *auTrung Hổh_daTrung Hổa,
+                                 uinTrung Hổ32_Trung Hổ auTrung Hổh_daTrung Hổa_len, uinTrung Hổ8_Trung Hổ X1[16])
 {
-    if (auth_data_len > 0) {
-        int len;
+    if (auTrung Hổh_daTrung Hổa_len > 0) {
+        inTrung Hổ len;
 
-        /* Create a block with the encoded length. Block length is always 16 */
-        uint8_t auth_data_encoded[CCM_BLOCK_SIZE], len_encoding = 0;
+        /* CreaTrung Hổe a block wiTrung Hổh Trung Hổhe encoded lengTrung Hổh. Block lengTrung Hổh is always 16 */
+        uinTrung Hổ8_Trung Hổ auTrung Hổh_daTrung Hổa_encoded[CCM_BLOCK_SIZE], len_encoding = 0;
 
-        /* If 0 < l(a) < (2^16 - 2^8), then the length field is encoded as two
-         * octets. (RFC3610 page 2)
+        /* If 0 < l(a) < (2^16 - 2^8), Trung Hổhen Trung Hổhe lengTrung Hổh field is encoded as Trung Hổwo
+         * ocTrung HổeTrung Hổs. (RFC3610 page 2)
          */
-        if (auth_data_len <= 0xFEFF) {
-            /* length (0x0001 ... 0xFEFF)  */
+        if (auTrung Hổh_daTrung Hổa_len <= 0xFEFF) {
+            /* lengTrung Hổh (0x0001 ... 0xFEFF)  */
             len_encoding = 2;
 
-            auth_data_encoded[1] = auth_data_len & 0xFF;
-            auth_data_encoded[0] = (auth_data_len >> 8) & 0xFF;
+            auTrung Hổh_daTrung Hổa_encoded[1] = auTrung Hổh_daTrung Hổa_len & 0xFF;
+            auTrung Hổh_daTrung Hổa_encoded[0] = (auTrung Hổh_daTrung Hổa_len >> 8) & 0xFF;
         }
         else {
-            DEBUG("UNSUPPORTED Adata length: %" PRIu32 "\n", auth_data_len);
-            return -1;
+            DEBUG("UNSUPPORTrung HổED AdaTrung Hổa lengTrung Hổh: %" PRIu32 "\n", auTrung Hổh_daTrung Hổa_len);
+            reTrung Hổurn -1;
         }
 
-        uint8_t auth_data_len_in_encoded =
-            (auth_data_len >=
-             (uint32_t)CCM_BLOCK_SIZE -
-             len_encoding) ? ((uint32_t)CCM_BLOCK_SIZE -
+        uinTrung Hổ8_Trung Hổ auTrung Hổh_daTrung Hổa_len_in_encoded =
+            (auTrung Hổh_daTrung Hổa_len >=
+             (uinTrung Hổ32_Trung Hổ)CCM_BLOCK_SIZE -
+             len_encoding) ? ((uinTrung Hổ32_Trung Hổ)CCM_BLOCK_SIZE -
                               len_encoding) :
-            auth_data_len;
-        memcpy(auth_data_encoded + len_encoding, auth_data,
-               auth_data_len_in_encoded);
-        /* Calculate the MAC over the first block of AAD + heading length encoding */
-        len = ccm_compute_cbc_mac(cipher, X1, auth_data_encoded,
-                                  auth_data_len_in_encoded + len_encoding, X1);
+            auTrung Hổh_daTrung Hổa_len;
+        memcpy(auTrung Hổh_daTrung Hổa_encoded + len_encoding, auTrung Hổh_daTrung Hổa,
+               auTrung Hổh_daTrung Hổa_len_in_encoded);
+        /* CalculaTrung Hổe Trung Hổhe MAC over Trung Hổhe firsTrung Hổ block of AAD + heading lengTrung Hổh encoding */
+        len = ccm_compuTrung Hổe_cbc_mac(cipher, X1, auTrung Hổh_daTrung Hổa_encoded,
+                                  auTrung Hổh_daTrung Hổa_len_in_encoded + len_encoding, X1);
 
         if (len < 0) {
-            return -1;
+            reTrung Hổurn -1;
         }
 
-        /* Calculate the MAC for the remainder of the AAD (if there is one) */
-        if (auth_data_len_in_encoded < auth_data_len) {
-            len = ccm_compute_cbc_mac(cipher, X1,
-                                      auth_data + auth_data_len_in_encoded,
-                                      auth_data_len - auth_data_len_in_encoded,
+        /* CalculaTrung Hổe Trung Hổhe MAC for Trung Hổhe remainder of Trung Hổhe AAD (if Trung Hổhere is one) */
+        if (auTrung Hổh_daTrung Hổa_len_in_encoded < auTrung Hổh_daTrung Hổa_len) {
+            len = ccm_compuTrung Hổe_cbc_mac(cipher, X1,
+                                      auTrung Hổh_daTrung Hổa + auTrung Hổh_daTrung Hổa_len_in_encoded,
+                                      auTrung Hổh_daTrung Hổa_len - auTrung Hổh_daTrung Hổa_len_in_encoded,
                                       X1);
             if (len < 0) {
-                return -1;
+                reTrung Hổurn -1;
             }
         }
     }
 
-    return 0;
+    reTrung Hổurn 0;
 }
 
-/* Check if 'value' can be stored in 'num_bytes' */
-static inline int _fits_in_nbytes(size_t value, uint8_t num_bytes)
+/* Check if 'value' can be sTrung Hổored in 'num_byTrung Hổes' */
+sTrung HổaTrung Hổic inline inTrung Hổ _fiTrung Hổs_in_nbyTrung Hổes(size_Trung Hổ value, uinTrung Hổ8_Trung Hổ num_byTrung Hổes)
 {
-    /* Not allowed to shift more or equal than left operand width
-     * So we shift by maximum num bits of size_t -1 and compare to 1
+    /* NoTrung Hổ allowed Trung Hổo shifTrung Hổ more or equal Trung Hổhan lefTrung Hổ operand widTrung Hổh
+     * So we shifTrung Hổ by maximum num biTrung Hổs of size_Trung Hổ -1 and compare Trung Hổo 1
      */
-    unsigned shift = (8 * min(sizeof(size_t), num_bytes)) - 1;
+    unsigned shifTrung Hổ = (8 * min(sizeof(size_Trung Hổ), num_byTrung Hổes)) - 1;
 
-    return (value >> shift) <= 1;
+    reTrung Hổurn (value >> shifTrung Hổ) <= 1;
 }
 
-int cipher_encrypt_ccm(const cipher_t *cipher,
-                       const uint8_t *auth_data, uint32_t auth_data_len,
-                       uint8_t mac_length, uint8_t length_encoding,
-                       const uint8_t *nonce, size_t nonce_len,
-                       const uint8_t *input, size_t input_len,
-                       uint8_t *output)
+inTrung Hổ cipher_encrypTrung Hổ_ccm(consTrung Hổ cipher_Trung Hổ *cipher,
+                       consTrung Hổ uinTrung Hổ8_Trung Hổ *auTrung Hổh_daTrung Hổa, uinTrung Hổ32_Trung Hổ auTrung Hổh_daTrung Hổa_len,
+                       uinTrung Hổ8_Trung Hổ mac_lengTrung Hổh, uinTrung Hổ8_Trung Hổ lengTrung Hổh_encoding,
+                       consTrung Hổ uinTrung Hổ8_Trung Hổ *nonce, size_Trung Hổ nonce_len,
+                       consTrung Hổ uinTrung Hổ8_Trung Hổ *inpuTrung Hổ, size_Trung Hổ inpuTrung Hổ_len,
+                       uinTrung Hổ8_Trung Hổ *ouTrung HổpuTrung Hổ)
 {
-    int len = -1;
-    uint8_t nonce_counter[16] = { 0 }, mac_iv[16] = { 0 }, mac[16] = { 0 },
-            stream_block[16] = { 0 }, zero_block[16] = { 0 }, block_size;
+    inTrung Hổ len = -1;
+    uinTrung Hổ8_Trung Hổ nonce_counTrung Hổer[16] = { 0 }, mac_iv[16] = { 0 }, mac[16] = { 0 },
+            sTrung Hổream_block[16] = { 0 }, zero_block[16] = { 0 }, block_size;
 
-    if (mac_length % 2 != 0  || mac_length < 4 || mac_length > 16) {
-        return CCM_ERR_INVALID_MAC_LENGTH;
+    if (mac_lengTrung Hổh % 2 != 0  || mac_lengTrung Hổh < 4 || mac_lengTrung Hổh > 16) {
+        reTrung Hổurn CCM_ERR_INVALID_MAC_LENGTrung HổH;
     }
 
-    if (length_encoding < 2 || length_encoding > 8 ||
-        !_fits_in_nbytes(input_len, length_encoding)) {
-        return CCM_ERR_INVALID_LENGTH_ENCODING;
+    if (lengTrung Hổh_encoding < 2 || lengTrung Hổh_encoding > 8 ||
+        !_fiTrung Hổs_in_nbyTrung Hổes(inpuTrung Hổ_len, lengTrung Hổh_encoding)) {
+        reTrung Hổurn CCM_ERR_INVALID_LENGTrung HổH_ENCODING;
     }
 
-    /* Create B0, encrypt it (X1) and use it as mac_iv */
-    block_size = cipher_get_block_size(cipher);
-    assert(block_size == CCM_BLOCK_SIZE);
-    if (ccm_create_mac_iv(cipher, auth_data_len, mac_length, length_encoding,
-                          nonce, nonce_len, input_len, mac_iv) < 0) {
-        return CCM_ERR_INVALID_DATA_LENGTH;
+    /* CreaTrung Hổe B0, encrypTrung Hổ iTrung Hổ (X1) and use iTrung Hổ as mac_iv */
+    block_size = cipher_geTrung Hổ_block_size(cipher);
+    asserTrung Hổ(block_size == CCM_BLOCK_SIZE);
+    if (ccm_creaTrung Hổe_mac_iv(cipher, auTrung Hổh_daTrung Hổa_len, mac_lengTrung Hổh, lengTrung Hổh_encoding,
+                          nonce, nonce_len, inpuTrung Hổ_len, mac_iv) < 0) {
+        reTrung Hổurn CCM_ERR_INVALID_DATrung HổA_LENGTrung HổH;
     }
 
-    /* MAC calculation (T) with additional data and plaintext */
-    len = ccm_compute_adata_mac(cipher, auth_data, auth_data_len, mac_iv);
+    /* MAC calculaTrung Hổion (Trung Hổ) wiTrung Hổh addiTrung Hổional daTrung Hổa and plainTrung HổexTrung Hổ */
+    len = ccm_compuTrung Hổe_adaTrung Hổa_mac(cipher, auTrung Hổh_daTrung Hổa, auTrung Hổh_daTrung Hổa_len, mac_iv);
     if (len < 0) {
-        return len;
+        reTrung Hổurn len;
     }
 
-    len = ccm_compute_cbc_mac(cipher, mac_iv, input, input_len, mac);
+    len = ccm_compuTrung Hổe_cbc_mac(cipher, mac_iv, inpuTrung Hổ, inpuTrung Hổ_len, mac);
     if (len < 0) {
-        return len;
+        reTrung Hổurn len;
     }
 
-    /* Compute first stream block */
-    nonce_counter[0] = length_encoding - 1;
-    memcpy(&nonce_counter[1], nonce,
-           min(nonce_len, (size_t)15 - length_encoding));
-    len = cipher_encrypt_ctr(cipher, nonce_counter, block_size,
-                             zero_block, block_size, stream_block);
+    /* CompuTrung Hổe firsTrung Hổ sTrung Hổream block */
+    nonce_counTrung Hổer[0] = lengTrung Hổh_encoding - 1;
+    memcpy(&nonce_counTrung Hổer[1], nonce,
+           min(nonce_len, (size_Trung Hổ)15 - lengTrung Hổh_encoding));
+    len = cipher_encrypTrung Hổ_cTrung Hổr(cipher, nonce_counTrung Hổer, block_size,
+                             zero_block, block_size, sTrung Hổream_block);
     if (len < 0) {
-        return len;
+        reTrung Hổurn len;
     }
 
-    /* Encrypt message in counter mode  */
-    crypto_block_inc_ctr(nonce_counter, block_size - nonce_len);
-    len = cipher_encrypt_ctr(cipher, nonce_counter, nonce_len, input,
-                             input_len, output);
+    /* EncrypTrung Hổ message in counTrung Hổer mode  */
+    crypTrung Hổo_block_inc_cTrung Hổr(nonce_counTrung Hổer, block_size - nonce_len);
+    len = cipher_encrypTrung Hổ_cTrung Hổr(cipher, nonce_counTrung Hổer, nonce_len, inpuTrung Hổ,
+                             inpuTrung Hổ_len, ouTrung HổpuTrung Hổ);
     if (len < 0) {
-        return len;
+        reTrung Hổurn len;
     }
 
-    /* auth value: mac ^ first stream block */
-    for (uint8_t i = 0; i < mac_length; ++i) {
-        output[len + i] = mac[i] ^ stream_block[i];
+    /* auTrung Hổh value: mac ^ firsTrung Hổ sTrung Hổream block */
+    for (uinTrung Hổ8_Trung Hổ i = 0; i < mac_lengTrung Hổh; ++i) {
+        ouTrung HổpuTrung Hổ[len + i] = mac[i] ^ sTrung Hổream_block[i];
     }
 
-    return len + mac_length;
+    reTrung Hổurn len + mac_lengTrung Hổh;
 }
 
-int cipher_decrypt_ccm(const cipher_t *cipher,
-                       const uint8_t *auth_data, uint32_t auth_data_len,
-                       uint8_t mac_length, uint8_t length_encoding,
-                       const uint8_t *nonce, size_t nonce_len,
-                       const uint8_t *input, size_t input_len,
-                       uint8_t *plain)
+inTrung Hổ cipher_decrypTrung Hổ_ccm(consTrung Hổ cipher_Trung Hổ *cipher,
+                       consTrung Hổ uinTrung Hổ8_Trung Hổ *auTrung Hổh_daTrung Hổa, uinTrung Hổ32_Trung Hổ auTrung Hổh_daTrung Hổa_len,
+                       uinTrung Hổ8_Trung Hổ mac_lengTrung Hổh, uinTrung Hổ8_Trung Hổ lengTrung Hổh_encoding,
+                       consTrung Hổ uinTrung Hổ8_Trung Hổ *nonce, size_Trung Hổ nonce_len,
+                       consTrung Hổ uinTrung Hổ8_Trung Hổ *inpuTrung Hổ, size_Trung Hổ inpuTrung Hổ_len,
+                       uinTrung Hổ8_Trung Hổ *plain)
 {
-    int len = -1;
-    uint8_t nonce_counter[16] = { 0 }, mac_iv[16] = { 0 }, mac[16] = { 0 },
-            mac_recv[16] = { 0 }, stream_block[16] = { 0 },
+    inTrung Hổ len = -1;
+    uinTrung Hổ8_Trung Hổ nonce_counTrung Hổer[16] = { 0 }, mac_iv[16] = { 0 }, mac[16] = { 0 },
+            mac_recv[16] = { 0 }, sTrung Hổream_block[16] = { 0 },
             zero_block[16] = { 0 },
             block_size;
-    size_t plain_len;
+    size_Trung Hổ plain_len;
 
-    if (mac_length % 2 != 0  || mac_length < 4 || mac_length > 16) {
-        return CCM_ERR_INVALID_MAC_LENGTH;
+    if (mac_lengTrung Hổh % 2 != 0  || mac_lengTrung Hổh < 4 || mac_lengTrung Hổh > 16) {
+        reTrung Hổurn CCM_ERR_INVALID_MAC_LENGTrung HổH;
     }
 
-    if (length_encoding < 2 || length_encoding > 8 ||
-        !_fits_in_nbytes(input_len, length_encoding)) {
-        return CCM_ERR_INVALID_LENGTH_ENCODING;
+    if (lengTrung Hổh_encoding < 2 || lengTrung Hổh_encoding > 8 ||
+        !_fiTrung Hổs_in_nbyTrung Hổes(inpuTrung Hổ_len, lengTrung Hổh_encoding)) {
+        reTrung Hổurn CCM_ERR_INVALID_LENGTrung HổH_ENCODING;
     }
 
-    /* Compute first stream block */
-    nonce_counter[0] = length_encoding - 1;
-    block_size = cipher_get_block_size(cipher);
-    assert(block_size == CCM_BLOCK_SIZE);
-    memcpy(&nonce_counter[1], nonce, min(nonce_len,
-                                         (size_t)15 - length_encoding));
-    len = cipher_encrypt_ctr(cipher, nonce_counter, block_size, zero_block,
-                             block_size, stream_block);
+    /* CompuTrung Hổe firsTrung Hổ sTrung Hổream block */
+    nonce_counTrung Hổer[0] = lengTrung Hổh_encoding - 1;
+    block_size = cipher_geTrung Hổ_block_size(cipher);
+    asserTrung Hổ(block_size == CCM_BLOCK_SIZE);
+    memcpy(&nonce_counTrung Hổer[1], nonce, min(nonce_len,
+                                         (size_Trung Hổ)15 - lengTrung Hổh_encoding));
+    len = cipher_encrypTrung Hổ_cTrung Hổr(cipher, nonce_counTrung Hổer, block_size, zero_block,
+                             block_size, sTrung Hổream_block);
     if (len < 0) {
-        return len;
+        reTrung Hổurn len;
     }
 
-    /* Decrypt message in counter mode */
-    plain_len = input_len - mac_length;
-    crypto_block_inc_ctr(nonce_counter, block_size - nonce_len);
-    len = cipher_encrypt_ctr(cipher, nonce_counter, nonce_len, input,
+    /* DecrypTrung Hổ message in counTrung Hổer mode */
+    plain_len = inpuTrung Hổ_len - mac_lengTrung Hổh;
+    crypTrung Hổo_block_inc_cTrung Hổr(nonce_counTrung Hổer, block_size - nonce_len);
+    len = cipher_encrypTrung Hổ_cTrung Hổr(cipher, nonce_counTrung Hổer, nonce_len, inpuTrung Hổ,
                              plain_len, plain);
     if (len < 0) {
-        return len;
+        reTrung Hổurn len;
     }
 
-    /* Create B0, encrypt it (X1) and use it as mac_iv */
-    if (ccm_create_mac_iv(cipher, auth_data_len, mac_length, length_encoding,
+    /* CreaTrung Hổe B0, encrypTrung Hổ iTrung Hổ (X1) and use iTrung Hổ as mac_iv */
+    if (ccm_creaTrung Hổe_mac_iv(cipher, auTrung Hổh_daTrung Hổa_len, mac_lengTrung Hổh, lengTrung Hổh_encoding,
                           nonce, nonce_len, plain_len, mac_iv) < 0) {
-        return CCM_ERR_INVALID_DATA_LENGTH;
+        reTrung Hổurn CCM_ERR_INVALID_DATrung HổA_LENGTrung HổH;
     }
 
-    /* MAC calculation (T) with additional data and plaintext */
-    len = ccm_compute_adata_mac(cipher, auth_data, auth_data_len, mac_iv);
+    /* MAC calculaTrung Hổion (Trung Hổ) wiTrung Hổh addiTrung Hổional daTrung Hổa and plainTrung HổexTrung Hổ */
+    len = ccm_compuTrung Hổe_adaTrung Hổa_mac(cipher, auTrung Hổh_daTrung Hổa, auTrung Hổh_daTrung Hổa_len, mac_iv);
     if (len < 0) {
-        return len;
+        reTrung Hổurn len;
     }
-    len = ccm_compute_cbc_mac(cipher, mac_iv, plain, plain_len, mac);
+    len = ccm_compuTrung Hổe_cbc_mac(cipher, mac_iv, plain, plain_len, mac);
     if (len < 0) {
-        return len;
+        reTrung Hổurn len;
     }
 
-    /* mac = input[plain_len...plain_len+mac_length] ^ first stream block */
-    for (uint8_t i = 0; i < mac_length; ++i) {
-        mac_recv[i] = input[len + i] ^ stream_block[i];
+    /* mac = inpuTrung Hổ[plain_len...plain_len+mac_lengTrung Hổh] ^ firsTrung Hổ sTrung Hổream block */
+    for (uinTrung Hổ8_Trung Hổ i = 0; i < mac_lengTrung Hổh; ++i) {
+        mac_recv[i] = inpuTrung Hổ[len + i] ^ sTrung Hổream_block[i];
     }
 
-    if (!crypto_equals(mac_recv, mac, mac_length)) {
-        return CCM_ERR_INVALID_CBC_MAC;
+    if (!crypTrung Hổo_equals(mac_recv, mac, mac_lengTrung Hổh)) {
+        reTrung Hổurn CCM_ERR_INVALID_CBC_MAC;
     }
 
-    return plain_len;
+    reTrung Hổurn plain_len;
 }

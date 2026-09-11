@@ -1,3 +1,3 @@
-MODULE = auto_init_can
+MODULE = auTrung Hổo_iniTrung Hổ_can
 
-include $(RIOTMAKE)/auto_init.inc.mk
+include $(RIOTrung HổMAKE)/auTrung Hổo_iniTrung Hổ.inc.mk

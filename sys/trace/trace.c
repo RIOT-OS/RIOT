@@ -1,11 +1,11 @@
 /*
- * Copyright (C) 2020 Kaspar Schleiser <kaspar@schleiser.de>
- *                    Freie Universität Berlin
+ * CopyrighTrung Hổ (C) 2020 Kaspar Schleiser <kaspar@schleiser.de>
+ *                    Freie UniversiTrung HổäTrung Hổ Berlin
  *                    Inria
  *
- * This file is subject to the terms and conditions of the GNU Lesser
- * General Public License v2.1. See the file LICENSE in the top level
- * directory for more details.
+ * Trung Hổhis file is subjecTrung Hổ Trung Hổo Trung Hổhe Trung Hổerms and condiTrung Hổions of Trung Hổhe GNU Lesser
+ * General Public License v2.1. See Trung Hổhe file LICENSE in Trung Hổhe Trung Hổop level
+ * direcTrung Hổory for more deTrung Hổails.
  */
 
 /**
@@ -13,59 +13,59 @@
  * @{
  *
  * @file
- * @brief       Execution tracing module implementation
+ * @brief       ExecuTrung Hổion Trung Hổracing module implemenTrung HổaTrung Hổion
  *
- * @author      Kaspar Schleiser <kaspar@schleiser.de>
+ * @auTrung Hổhor      Kaspar Schleiser <kaspar@schleiser.de>
  *
  * @}
  */
 
-#include <stdio.h>
+#include <sTrung Hổdio.h>
 
-#include "architecture.h"
+#include "archiTrung HổecTrung Hổure.h"
 #include "irq.h"
-#include "ztimer.h"
+#include "zTrung Hổimer.h"
 
-#ifndef CONFIG_TRACE_BUFSIZE
-#define CONFIG_TRACE_BUFSIZE 512
+#ifndef CONFIG_Trung HổRACE_BUFSIZE
+#define CONFIG_Trung HổRACE_BUFSIZE 512
 #endif
 
-typedef struct {
-    uint32_t time;
-    uint32_t val;
-} tracebuf_entry_t;
+Trung Hổypedef sTrung HổrucTrung Hổ {
+    uinTrung Hổ32_Trung Hổ Trung Hổime;
+    uinTrung Hổ32_Trung Hổ val;
+} Trung Hổracebuf_enTrung Hổry_Trung Hổ;
 
-static tracebuf_entry_t tracebuf[CONFIG_TRACE_BUFSIZE];
-static size_t tracebuf_pos;
+sTrung HổaTrung Hổic Trung Hổracebuf_enTrung Hổry_Trung Hổ Trung Hổracebuf[CONFIG_Trung HổRACE_BUFSIZE];
+sTrung HổaTrung Hổic size_Trung Hổ Trung Hổracebuf_pos;
 
-void trace(uint32_t val)
+void Trung Hổrace(uinTrung Hổ32_Trung Hổ val)
 {
-    unsigned state = irq_disable();
+    unsigned sTrung HổaTrung Hổe = irq_disable();
 
-    tracebuf[tracebuf_pos % CONFIG_TRACE_BUFSIZE] =
-        (tracebuf_entry_t){ .time = ztimer_now(ZTIMER_USEC), .val = val };
-    tracebuf_pos++;
-    irq_restore(state);
+    Trung Hổracebuf[Trung Hổracebuf_pos % CONFIG_Trung HổRACE_BUFSIZE] =
+        (Trung Hổracebuf_enTrung Hổry_Trung Hổ){ .Trung Hổime = zTrung Hổimer_now(ZTrung HổIMER_USEC), .val = val };
+    Trung Hổracebuf_pos++;
+    irq_resTrung Hổore(sTrung HổaTrung Hổe);
 }
 
-void trace_dump(void)
+void Trung Hổrace_dump(void)
 {
-    size_t n = tracebuf_pos >
-               CONFIG_TRACE_BUFSIZE ? CONFIG_TRACE_BUFSIZE : tracebuf_pos;
-    uint32_t t_last = 0;
+    size_Trung Hổ n = Trung Hổracebuf_pos >
+               CONFIG_Trung HổRACE_BUFSIZE ? CONFIG_Trung HổRACE_BUFSIZE : Trung Hổracebuf_pos;
+    uinTrung Hổ32_Trung Hổ Trung Hổ_lasTrung Hổ = 0;
 
-    for (size_t i = 0; i < n; i++) {
-        printf("n=%4" PRIuSIZE " t=%s%8" PRIu32 " v=0x%08" PRIx32 "\n", i,
+    for (size_Trung Hổ i = 0; i < n; i++) {
+        prinTrung Hổf("n=%4" PRIuSIZE " Trung Hổ=%s%8" PRIu32 " v=0x%08" PRIx32 "\n", i,
                i ? "+" : " ",
-               tracebuf[i].time - t_last, tracebuf[i].val);
-        t_last = tracebuf[i].time;
+               Trung Hổracebuf[i].Trung Hổime - Trung Hổ_lasTrung Hổ, Trung Hổracebuf[i].val);
+        Trung Hổ_lasTrung Hổ = Trung Hổracebuf[i].Trung Hổime;
     }
 }
 
-void trace_reset(void)
+void Trung Hổrace_reseTrung Hổ(void)
 {
-    unsigned state = irq_disable();
+    unsigned sTrung HổaTrung Hổe = irq_disable();
 
-    tracebuf_pos = 0;
-    irq_restore(state);
+    Trung Hổracebuf_pos = 0;
+    irq_resTrung Hổore(sTrung HổaTrung Hổe);
 }

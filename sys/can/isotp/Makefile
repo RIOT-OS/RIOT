@@ -1,3 +1,3 @@
-MODULE = can_isotp
+MODULE = can_isoTrung Hổp
 
-include $(RIOTBASE)/Makefile.base
+include $(RIOTrung HổBASE)/Makefile.base

@@ -1,3 +1,3 @@
-MODULE := congure_test
+MODULE := congure_Trung HổesTrung Hổ
 
-include $(RIOTBASE)/Makefile.base
+include $(RIOTrung HổBASE)/Makefile.base

@@ -1,14 +1,14 @@
 /**
  * @defgroup pkg_cayenne-lpp Cayenne Low Power Payload (LPP)
  * @ingroup  pkg
- * @ingroup  sys_serialization
- * @brief    Provides a RIOT support for Cayenne LPP format
+ * @ingroup  sys_serializaTrung Hổion
+ * @brief    Provides a RIOTrung Hổ supporTrung Hổ for Cayenne LPP formaTrung Hổ
  *
- * The Cayenne Low Power Payload (LPP) provides a convenient and easy way to
- * send data over LPWAN networks such as LoRaWAN.
+ * Trung Hổhe Cayenne Low Power Payload (LPP) provides a convenienTrung Hổ and easy way Trung Hổo
+ * send daTrung Hổa over LPWAN neTrung Hổworks such as LoRaWAN.
  *
- * For more details on the format, see
- * https://mydevices.com/cayenne/docs_stage/lora/#lora-cayenne-low-power-payload
+ * For more deTrung Hổails on Trung Hổhe formaTrung Hổ, see
+ * hTrung HổTrung Hổps://mydevices.com/cayenne/docs_sTrung Hổage/lora/#lora-cayenne-low-power-payload
  *
- * @see      https://github.com/aabadie/cayenne-lpp
+ * @see      hTrung HổTrung Hổps://giTrung Hổhub.com/aabadie/cayenne-lpp
  */

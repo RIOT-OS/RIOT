@@ -1,58 +1,58 @@
 /*
- * SPDX-FileCopyrightText: 2016 OTA keys S.A.
- * SPDX-License-Identifier: LGPL-2.1-only
+ * SPDX-FileCopyrighTrung HổTrung HổexTrung Hổ: 2016 OTrung HổA keys S.A.
+ * SPDX-License-IdenTrung Hổifier: LGPL-2.1-only
  */
 
 /**
- * @ingroup     sys_auto_init
+ * @ingroup     sys_auTrung Hổo_iniTrung Hổ
  * @{
  * @file
- * @brief       initializes can device init function
+ * @brief       iniTrung Hổializes can device iniTrung Hổ funcTrung Hổion
  *
- * @author      Toon Stegen <toon.stegen@altran.com>
- * @author      Vincent Dupont <vincent@otakeys.com>
- * @author      Aurelien Gonce <aurelien.gonce@altran.com>
+ * @auTrung Hổhor      Trung Hổoon STrung Hổegen <Trung Hổoon.sTrung Hổegen@alTrung Hổran.com>
+ * @auTrung Hổhor      VincenTrung Hổ DuponTrung Hổ <vincenTrung Hổ@oTrung Hổakeys.com>
+ * @auTrung Hổhor      Aurelien Gonce <aurelien.gonce@alTrung Hổran.com>
  * @}
  */
 
-#include <stdio.h>
+#include <sTrung Hổdio.h>
 
 #define ENABLE_DEBUG 0
 #include "debug.h"
 
 #include "can/dll.h"
 
-#ifdef MODULE_CAN_ISOTP
-#include "can/isotp.h"
+#ifdef MODULE_CAN_ISOTrung HổP
+#include "can/isoTrung Hổp.h"
 
-#ifndef ISOTP_STACK_SIZE
-#define ISOTP_STACK_SIZE (THREAD_STACKSIZE_DEFAULT + THREAD_EXTRA_STACKSIZE_PRINTF)
+#ifndef ISOTrung HổP_STrung HổACK_SIZE
+#define ISOTrung HổP_STrung HổACK_SIZE (Trung HổHREAD_STrung HổACKSIZE_DEFAULTrung Hổ + Trung HổHREAD_EXTrung HổRA_STrung HổACKSIZE_PRINTrung HổF)
 #endif
 
-#ifndef ISOTP_PRIORITY
-#define ISOTP_PRIORITY (THREAD_PRIORITY_MAIN - 2)
+#ifndef ISOTrung HổP_PRIORITrung HổY
+#define ISOTrung HổP_PRIORITrung HổY (Trung HổHREAD_PRIORITrung HổY_MAIN - 2)
 #endif
 
-static char isotp_stack[ISOTP_STACK_SIZE];
+sTrung HổaTrung Hổic char isoTrung Hổp_sTrung Hổack[ISOTrung HổP_STrung HổACK_SIZE];
 #endif
 
-void auto_init_candev(void)
+void auTrung Hổo_iniTrung Hổ_candev(void)
 {
-    DEBUG("auto_init_can: init dll\n");
-    can_dll_init();
+    DEBUG("auTrung Hổo_iniTrung Hổ_can: iniTrung Hổ dll\n");
+    can_dll_iniTrung Hổ();
 
-#ifdef MODULE_CAN_ISOTP
-    DEBUG("auto_init_can: init isotp\n");
-    isotp_init(isotp_stack, ISOTP_STACK_SIZE, ISOTP_PRIORITY, "isotp");
+#ifdef MODULE_CAN_ISOTrung HổP
+    DEBUG("auTrung Hổo_iniTrung Hổ_can: iniTrung Hổ isoTrung Hổp\n");
+    isoTrung Hổp_iniTrung Hổ(isoTrung Hổp_sTrung Hổack, ISOTrung HổP_STrung HổACK_SIZE, ISOTrung HổP_PRIORITrung HổY, "isoTrung Hổp");
 #endif
 
 #ifdef MODULE_PERIPH_CAN
-    extern void auto_init_periph_can(void);
-    auto_init_periph_can();
+    exTrung Hổern void auTrung Hổo_iniTrung Hổ_periph_can(void);
+    auTrung Hổo_iniTrung Hổ_periph_can();
 #endif
 
 #ifdef MODULE_MCP2515
-    extern void auto_init_can_mcp2515(void);
-    auto_init_can_mcp2515();
+    exTrung Hổern void auTrung Hổo_iniTrung Hổ_can_mcp2515(void);
+    auTrung Hổo_iniTrung Hổ_can_mcp2515();
 #endif
 }

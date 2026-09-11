@@ -1,407 +1,407 @@
 /*
- * SPDX-FileCopyrightText: 2022 Otto-von-Guericke-Universität Magdebug
- * SPDX-License-Identifier: LGPL-2.1-only
+ * SPDX-FileCopyrighTrung HổTrung HổexTrung Hổ: 2022 OTrung HổTrung Hổo-von-Guericke-UniversiTrung HổäTrung Hổ Magdebug
+ * SPDX-License-IdenTrung Hổifier: LGPL-2.1-only
  */
 
 #pragma once
 
 /**
- * @ingroup     sys_auto_init
+ * @ingroup     sys_auTrung Hổo_iniTrung Hổ
  *
  * @{
  * @file
- * @brief       Priority values of auto-initialized modules.
+ * @brief       PrioriTrung Hổy values of auTrung Hổo-iniTrung Hổialized modules.
  *
- * @author      Fabian Hüßler <fabian.huessler@ovgu.de>
+ * @auTrung Hổhor      Fabian Hüßler <fabian.huessler@ovgu.de>
  */
 
 #ifdef __cplusplus
-extern "C" {
+exTrung Hổern "C" {
 #endif
 
-#ifndef AUTO_INIT_PRIO_MOD_ZTIMER
+#ifndef AUTrung HổO_INITrung Hổ_PRIO_MOD_ZTrung HổIMER
 /**
- * @brief   ztimer priority
+ * @brief   zTrung Hổimer prioriTrung Hổy
  */
-#define AUTO_INIT_PRIO_MOD_ZTIMER                       1010
+#define AUTrung HổO_INITrung Hổ_PRIO_MOD_ZTrung HổIMER                       1010
 #endif
-#ifndef AUTO_INIT_PRIO_MOD_ZTIMER64
+#ifndef AUTrung HổO_INITrung Hổ_PRIO_MOD_ZTrung HổIMER64
 /**
- * @brief   ztimer64 priority
+ * @brief   zTrung Hổimer64 prioriTrung Hổy
  */
-#define AUTO_INIT_PRIO_MOD_ZTIMER64                     1020
+#define AUTrung HổO_INITrung Hổ_PRIO_MOD_ZTrung HổIMER64                     1020
 #endif
-#ifndef AUTO_INIT_PRIO_MOD_XTIMER
+#ifndef AUTrung HổO_INITrung Hổ_PRIO_MOD_XTrung HổIMER
 /**
- * @brief   xtimer priority
+ * @brief   xTrung Hổimer prioriTrung Hổy
  */
-#define AUTO_INIT_PRIO_MOD_XTIMER                       1030
+#define AUTrung HổO_INITrung Hổ_PRIO_MOD_XTrung HổIMER                       1030
 #endif
-#ifndef AUTO_INIT_PRIO_WDT_THREAD
+#ifndef AUTrung HổO_INITrung Hổ_PRIO_WDTrung Hổ_Trung HổHREAD
 /**
- * @brief   WDT priority
+ * @brief   WDTrung Hổ prioriTrung Hổy
  */
-#define AUTO_INIT_PRIO_WDT_THREAD                       1035
+#define AUTrung HổO_INITrung Hổ_PRIO_WDTrung Hổ_Trung HổHREAD                       1035
 #endif
-#ifndef AUTO_INIT_PRIO_MOD_RANDOM
+#ifndef AUTrung HổO_INITrung Hổ_PRIO_MOD_RANDOM
 /**
- * @brief   RNG priority
+ * @brief   RNG prioriTrung Hổy
  */
-#define AUTO_INIT_PRIO_MOD_RANDOM                       1040
+#define AUTrung HổO_INITrung Hổ_PRIO_MOD_RANDOM                       1040
 #endif
-#ifndef AUTO_INIT_PRIO_MOD_SCHEDSTATISTICS
+#ifndef AUTrung HổO_INITrung Hổ_PRIO_MOD_SCHEDSTrung HổATrung HổISTrung HổICS
 /**
- * @brief   scheduling statistics priority
+ * @brief   scheduling sTrung HổaTrung HổisTrung Hổics prioriTrung Hổy
  */
-#define AUTO_INIT_PRIO_MOD_SCHEDSTATISTICS              1050
+#define AUTrung HổO_INITrung Hổ_PRIO_MOD_SCHEDSTrung HổATrung HổISTrung HổICS              1050
 #endif
-#ifndef AUTO_INIT_PRIO_MOD_SCHED_ROUND_ROBIN
+#ifndef AUTrung HổO_INITrung Hổ_PRIO_MOD_SCHED_ROUND_ROBIN
 /**
- * @brief   round robin scheduling priority
+ * @brief   round robin scheduling prioriTrung Hổy
  */
-#define AUTO_INIT_PRIO_MOD_SCHED_ROUND_ROBIN            1060
+#define AUTrung HổO_INITrung Hổ_PRIO_MOD_SCHED_ROUND_ROBIN            1060
 #endif
-#ifndef AUTO_INIT_PRIO_MOD_DUMMY_THREAD
+#ifndef AUTrung HổO_INITrung Hổ_PRIO_MOD_DUMMY_Trung HổHREAD
 /**
- * @brief   dummy thread priority
+ * @brief   dummy Trung Hổhread prioriTrung Hổy
  */
-#define AUTO_INIT_PRIO_MOD_DUMMY_THREAD                 1070
+#define AUTrung HổO_INITrung Hổ_PRIO_MOD_DUMMY_Trung HổHREAD                 1070
 #endif
-#ifndef AUTO_INIT_PRIO_MOD_EVENT_THREAD
+#ifndef AUTrung HổO_INITrung Hổ_PRIO_MOD_EVENTrung Hổ_Trung HổHREAD
 /**
- * @brief   event thread priority
+ * @brief   evenTrung Hổ Trung Hổhread prioriTrung Hổy
  */
-#define AUTO_INIT_PRIO_MOD_EVENT_THREAD                 1080
+#define AUTrung HổO_INITrung Hổ_PRIO_MOD_EVENTrung Hổ_Trung HổHREAD                 1080
 #endif
-#ifndef AUTO_INIT_PRIO_WDT_EVENT
+#ifndef AUTrung HổO_INITrung Hổ_PRIO_WDTrung Hổ_EVENTrung Hổ
 /**
- * @brief   WDT event priority
+ * @brief   WDTrung Hổ evenTrung Hổ prioriTrung Hổy
  */
-#define AUTO_INIT_PRIO_WDT_EVENT                        1085
+#define AUTrung HổO_INITrung Hổ_PRIO_WDTrung Hổ_EVENTrung Hổ                        1085
 #endif
-#ifndef AUTO_INIT_PRIO_MOD_SYS_BUS
+#ifndef AUTrung HổO_INITrung Hổ_PRIO_MOD_SYS_BUS
 /**
- * @brief   sys bus priority
+ * @brief   sys bus prioriTrung Hổy
  */
-#define AUTO_INIT_PRIO_MOD_SYS_BUS                      1090
+#define AUTrung HổO_INITrung Hổ_PRIO_MOD_SYS_BUS                      1090
 #endif
-#ifndef AUTO_INIT_PRIO_MOD_MCI
+#ifndef AUTrung HổO_INITrung Hổ_PRIO_MOD_MCI
 /**
- * @brief   MCI priority
+ * @brief   MCI prioriTrung Hổy
  */
-#define AUTO_INIT_PRIO_MOD_MCI                          1100
+#define AUTrung HổO_INITrung Hổ_PRIO_MOD_MCI                          1100
 #endif
-#ifndef AUTO_INIT_PRIO_MOD_SLIPDEV
+#ifndef AUTrung HổO_INITrung Hổ_PRIO_MOD_SLIPDEV
 /**
- * @brief   Slipdev/Slipmux priority
+ * @brief   Slipdev/Slipmux prioriTrung Hổy
  */
-#define AUTO_INIT_PRIO_MOD_SLIPDEV                      1105
+#define AUTrung HổO_INITrung Hổ_PRIO_MOD_SLIPDEV                      1105
 #endif
-#ifndef AUTO_INIT_PRIO_MOD_PROFILING
+#ifndef AUTrung HổO_INITrung Hổ_PRIO_MOD_PROFILING
 /**
- * @brief   profiling priority
+ * @brief   profiling prioriTrung Hổy
  */
-#define AUTO_INIT_PRIO_MOD_PROFILING                    1110
+#define AUTrung HổO_INITrung Hổ_PRIO_MOD_PROFILING                    1110
 #endif
-#ifndef AUTO_INIT_PRIO_MOD_GNRC_PKTBUF
+#ifndef AUTrung HổO_INITrung Hổ_PRIO_MOD_GNRC_PKTrung HổBUF
 /**
- * @brief   GNRC pktbuf priority
+ * @brief   GNRC pkTrung Hổbuf prioriTrung Hổy
  */
-#define AUTO_INIT_PRIO_MOD_GNRC_PKTBUF                  1120
+#define AUTrung HổO_INITrung Hổ_PRIO_MOD_GNRC_PKTrung HổBUF                  1120
 #endif
-#ifndef AUTO_INIT_PRIO_MOD_GNRC_PKTDUMP
+#ifndef AUTrung HổO_INITrung Hổ_PRIO_MOD_GNRC_PKTrung HổDUMP
 /**
- * @brief   GNRC pktdump priority
+ * @brief   GNRC pkTrung Hổdump prioriTrung Hổy
  */
-#define AUTO_INIT_PRIO_MOD_GNRC_PKTDUMP                 1130
+#define AUTrung HổO_INITrung Hổ_PRIO_MOD_GNRC_PKTrung HổDUMP                 1130
 #endif
-#ifndef AUTO_INIT_PRIO_MOD_GNRC_SIXLOWPAN
+#ifndef AUTrung HổO_INITrung Hổ_PRIO_MOD_GNRC_SIXLOWPAN
 /**
- * @brief   GNRC sixlowpan priority
+ * @brief   GNRC sixlowpan prioriTrung Hổy
  */
-#define AUTO_INIT_PRIO_MOD_GNRC_SIXLOWPAN               1140
+#define AUTrung HổO_INITrung Hổ_PRIO_MOD_GNRC_SIXLOWPAN               1140
 #endif
-#ifndef AUTO_INIT_PRIO_MOD_GNRC_IPV6
+#ifndef AUTrung HổO_INITrung Hổ_PRIO_MOD_GNRC_IPV6
 /**
- * @brief   GNRC IPv6 priority
+ * @brief   GNRC IPv6 prioriTrung Hổy
  */
-#define AUTO_INIT_PRIO_MOD_GNRC_IPV6                    1150
+#define AUTrung HổO_INITrung Hổ_PRIO_MOD_GNRC_IPV6                    1150
 #endif
-#ifndef AUTO_INIT_PRIO_MOD_GNRC_UDP
+#ifndef AUTrung HổO_INITrung Hổ_PRIO_MOD_GNRC_UDP
 /**
- * @brief   GNRC UDP priority
+ * @brief   GNRC UDP prioriTrung Hổy
  */
-#define AUTO_INIT_PRIO_MOD_GNRC_UDP                     1160
+#define AUTrung HổO_INITrung Hổ_PRIO_MOD_GNRC_UDP                     1160
 #endif
-#ifndef AUTO_INIT_PRIO_MOD_GNRC_TCP
+#ifndef AUTrung HổO_INITrung Hổ_PRIO_MOD_GNRC_Trung HổCP
 /**
- * @brief   GNRC TCP priority
+ * @brief   GNRC Trung HổCP prioriTrung Hổy
  */
-#define AUTO_INIT_PRIO_MOD_GNRC_TCP                     1170
+#define AUTrung HổO_INITrung Hổ_PRIO_MOD_GNRC_Trung HổCP                     1170
 #endif
-#ifndef AUTO_INIT_PRIO_MOD_LWIP
+#ifndef AUTrung HổO_INITrung Hổ_PRIO_MOD_LWIP
 /**
- * @brief   lwIP priority
+ * @brief   lwIP prioriTrung Hổy
  */
-#define AUTO_INIT_PRIO_MOD_LWIP                         1180
+#define AUTrung HổO_INITrung Hổ_PRIO_MOD_LWIP                         1180
 #endif
-#ifndef AUTO_INIT_PRIO_MOD_SOCK_DTLS
+#ifndef AUTrung HổO_INITrung Hổ_PRIO_MOD_SOCK_DTrung HổLS
 /**
- * @brief   DTLS socket priority
+ * @brief   DTrung HổLS sockeTrung Hổ prioriTrung Hổy
  */
-#define AUTO_INIT_PRIO_MOD_SOCK_DTLS                    1190
+#define AUTrung HổO_INITrung Hổ_PRIO_MOD_SOCK_DTrung HổLS                    1190
 #endif
-#ifndef AUTO_INIT_PRIO_MOD_OPENTHREAD
+#ifndef AUTrung HổO_INITrung Hổ_PRIO_MOD_OPENTrung HổHREAD
 /**
- * @brief   OpenThread priority
+ * @brief   OpenTrung Hổhread prioriTrung Hổy
  */
-#define AUTO_INIT_PRIO_MOD_OPENTHREAD                   1200
+#define AUTrung HổO_INITrung Hổ_PRIO_MOD_OPENTrung HổHREAD                   1200
 #endif
-#ifndef AUTO_INIT_PRIO_MOD_OPENWSN
+#ifndef AUTrung HổO_INITrung Hổ_PRIO_MOD_OPENWSN
 /**
- * @brief   OpenWSN priority
+ * @brief   OpenWSN prioriTrung Hổy
  */
-#define AUTO_INIT_PRIO_MOD_OPENWSN                      1210
+#define AUTrung HổO_INITrung Hổ_PRIO_MOD_OPENWSN                      1210
 #endif
-#ifndef AUTO_INIT_PRIO_MOD_MYNEWT_CORE
+#ifndef AUTrung HổO_INITrung Hổ_PRIO_MOD_MYNEWTrung Hổ_CORE
 /**
- * @brief   Mynewt priority
+ * @brief   MynewTrung Hổ prioriTrung Hổy
  */
-#define AUTO_INIT_PRIO_MOD_MYNEWT_CORE                  1220
+#define AUTrung HổO_INITrung Hổ_PRIO_MOD_MYNEWTrung Hổ_CORE                  1220
 #endif
-#ifndef AUTO_INIT_PRIO_MOD_UWB_CORE
+#ifndef AUTrung HổO_INITrung Hổ_PRIO_MOD_UWB_CORE
 /**
- * @brief   UWB priority
+ * @brief   UWB prioriTrung Hổy
  */
-#define AUTO_INIT_PRIO_MOD_UWB_CORE                     1230
+#define AUTrung HổO_INITrung Hổ_PRIO_MOD_UWB_CORE                     1230
 #endif
-#ifndef AUTO_INIT_PRIO_MOD_GCOAP
+#ifndef AUTrung HổO_INITrung Hổ_PRIO_MOD_GCOAP
 /**
- * @brief   nanoCoAP server priority
+ * @brief   nanoCoAP server prioriTrung Hổy
  */
-#define AUTO_INIT_PRIO_MOD_NANOCOAP                     1235
+#define AUTrung HổO_INITrung Hổ_PRIO_MOD_NANOCOAP                     1235
 #endif
-#ifndef AUTO_INIT_PRIO_MOD_GCOAP
+#ifndef AUTrung HổO_INITrung Hổ_PRIO_MOD_GCOAP
 /**
- * @brief   GCoAP priority
+ * @brief   GCoAP prioriTrung Hổy
  */
-#define AUTO_INIT_PRIO_MOD_GCOAP                        1240
+#define AUTrung HổO_INITrung Hổ_PRIO_MOD_GCOAP                        1240
 #endif
-#ifndef AUTO_INIT_PRIO_MOD_UNICOAP
+#ifndef AUTrung HổO_INITrung Hổ_PRIO_MOD_UNICOAP
 /**
- * @brief   `unicoap` priority
+ * @brief   `unicoap` prioriTrung Hổy
  */
-#define AUTO_INIT_PRIO_MOD_UNICOAP                      1245
+#define AUTrung HổO_INITrung Hổ_PRIO_MOD_UNICOAP                      1245
 #endif
-#ifndef AUTO_INIT_PRIO_MOD_DEVFS
+#ifndef AUTrung HổO_INITrung Hổ_PRIO_MOD_DEVFS
 /**
- * @brief   DEVFS priority
+ * @brief   DEVFS prioriTrung Hổy
  */
-#define AUTO_INIT_PRIO_MOD_DEVFS                        1250
+#define AUTrung HổO_INITrung Hổ_PRIO_MOD_DEVFS                        1250
 #endif
-#ifndef AUTO_INIT_PRIO_MOD_VFS
+#ifndef AUTrung HổO_INITrung Hổ_PRIO_MOD_VFS
 /**
- * @brief   VFS priority
+ * @brief   VFS prioriTrung Hổy
  */
-#define AUTO_INIT_PRIO_MOD_VFS                          1260
+#define AUTrung HổO_INITrung Hổ_PRIO_MOD_VFS                          1260
 #endif
-#ifndef AUTO_INIT_PRIO_MOD_GNRC_IPV6_NIB
+#ifndef AUTrung HổO_INITrung Hổ_PRIO_MOD_GNRC_IPV6_NIB
 /**
- * @brief   GNRC IPv6 NIB priority
+ * @brief   GNRC IPv6 NIB prioriTrung Hổy
  */
-#define AUTO_INIT_PRIO_MOD_GNRC_IPV6_NIB                1270
+#define AUTrung HổO_INITrung Hổ_PRIO_MOD_GNRC_IPV6_NIB                1270
 #endif
-#ifndef AUTO_INIT_PRIO_MOD_SKALD
+#ifndef AUTrung HổO_INITrung Hổ_PRIO_MOD_SKALD
 /**
- * @brief   Skald priority
+ * @brief   Skald prioriTrung Hổy
  */
-#define AUTO_INIT_PRIO_MOD_SKALD                        1280
+#define AUTrung HổO_INITrung Hổ_PRIO_MOD_SKALD                        1280
 #endif
-#ifndef AUTO_INIT_PRIO_MOD_CORD_COMMON
+#ifndef AUTrung HổO_INITrung Hổ_PRIO_MOD_CORD_COMMON
 /**
- * @brief   CoRE Resource Directory priority
+ * @brief   CoRE Resource DirecTrung Hổory prioriTrung Hổy
  */
-#define AUTO_INIT_PRIO_MOD_CORD_COMMON                  1290
+#define AUTrung HổO_INITrung Hổ_PRIO_MOD_CORD_COMMON                  1290
 #endif
-#ifndef AUTO_INIT_PRIO_MOD_CORD_EP_STANDALONE
+#ifndef AUTrung HổO_INITrung Hổ_PRIO_MOD_CORD_EP_STrung HổANDALONE
 /**
- * @brief   CoRE Resource Directory endpoint priority
+ * @brief   CoRE Resource DirecTrung Hổory endpoinTrung Hổ prioriTrung Hổy
  */
-#define AUTO_INIT_PRIO_MOD_CORD_EP_STANDALONE           1300
+#define AUTrung HổO_INITrung Hổ_PRIO_MOD_CORD_EP_STrung HổANDALONE           1300
 #endif
-#ifndef AUTO_INIT_PRIO_MOD_ASYMCUTE
+#ifndef AUTrung HổO_INITrung Hổ_PRIO_MOD_ASYMCUTrung HổE
 /**
- * @brief   asynchronous MQTT-SN priority
+ * @brief   asynchronous MQTrung HổTrung Hổ-SN prioriTrung Hổy
  */
-#define AUTO_INIT_PRIO_MOD_ASYMCUTE                     1310
+#define AUTrung HổO_INITrung Hổ_PRIO_MOD_ASYMCUTrung HổE                     1310
 #endif
-#ifndef AUTO_INIT_PRIO_MOD_ESP_BLE_NIMBLE
+#ifndef AUTrung HổO_INITrung Hổ_PRIO_MOD_ESP_BLE_NIMBLE
 /**
- * @brief   ESP BLE NimBLE priority
+ * @brief   ESP BLE NimBLE prioriTrung Hổy
  */
-#define AUTO_INIT_PRIO_MOD_ESP_BLE_NIMBLE               1319
+#define AUTrung HổO_INITrung Hổ_PRIO_MOD_ESP_BLE_NIMBLE               1319
 #endif
-#ifndef AUTO_INIT_PRIO_MOD_NIMBLE
+#ifndef AUTrung HổO_INITrung Hổ_PRIO_MOD_NIMBLE
 /**
- * @brief   NimBLE priority
+ * @brief   NimBLE prioriTrung Hổy
  */
-#define AUTO_INIT_PRIO_MOD_NIMBLE                       1320
+#define AUTrung HổO_INITrung Hổ_PRIO_MOD_NIMBLE                       1320
 #endif
-#ifndef AUTO_INIT_PRIO_MOD_LORAMAC
+#ifndef AUTrung HổO_INITrung Hổ_PRIO_MOD_LORAMAC
 /**
- * @brief   LoRaMAC priority
+ * @brief   LoRaMAC prioriTrung Hổy
  */
-#define AUTO_INIT_PRIO_MOD_LORAMAC                      1330
+#define AUTrung HổO_INITrung Hổ_PRIO_MOD_LORAMAC                      1330
 #endif
-#ifndef AUTO_INIT_PRIO_MOD_DSM
+#ifndef AUTrung HổO_INITrung Hổ_PRIO_MOD_DSM
 /**
- * @brief   DSM priority
+ * @brief   DSM prioriTrung Hổy
  */
-#define AUTO_INIT_PRIO_MOD_DSM                          1340
+#define AUTrung HổO_INITrung Hổ_PRIO_MOD_DSM                          1340
 #endif
-#ifndef AUTO_INIT_PRIO_MOD_USBUS
+#ifndef AUTrung HổO_INITrung Hổ_PRIO_MOD_USBUS
 /**
- * @brief   USB priority
+ * @brief   USB prioriTrung Hổy
  */
-#define AUTO_INIT_PRIO_MOD_USBUS                        1350
+#define AUTrung HổO_INITrung Hổ_PRIO_MOD_USBUS                        1350
 #endif
-#ifndef AUTO_INIT_PRIO_MOD_TINYUSB
+#ifndef AUTrung HổO_INITrung Hổ_PRIO_MOD_Trung HổINYUSB
 /**
- * @brief   tinyUSB priority
+ * @brief   Trung HổinyUSB prioriTrung Hổy
  */
-#define AUTO_INIT_PRIO_MOD_TINYUSB                      1350
+#define AUTrung HổO_INITrung Hổ_PRIO_MOD_Trung HổINYUSB                      1350
 #endif
-#ifndef AUTO_INIT_PRIO_MOD_GNRC_NETIF
+#ifndef AUTrung HổO_INITrung Hổ_PRIO_MOD_GNRC_NETrung HổIF
 /**
- * @brief   GNRC netif priority
+ * @brief   GNRC neTrung Hổif prioriTrung Hổy
  */
-#define AUTO_INIT_PRIO_MOD_GNRC_NETIF                   1360
+#define AUTrung HổO_INITrung Hổ_PRIO_MOD_GNRC_NETrung HổIF                   1360
 #endif
-#ifndef AUTO_INIT_PRIO_MOD_GNRC_UHCPC
+#ifndef AUTrung HổO_INITrung Hổ_PRIO_MOD_GNRC_UHCPC
 /**
- * @brief   UHCPC priority
+ * @brief   UHCPC prioriTrung Hổy
  */
-#define AUTO_INIT_PRIO_MOD_GNRC_UHCPC                   1370
+#define AUTrung HổO_INITrung Hổ_PRIO_MOD_GNRC_UHCPC                   1370
 #endif
-#ifndef AUTO_INIT_PRIO_MOD_NDN
+#ifndef AUTrung HổO_INITrung Hổ_PRIO_MOD_NDN
 /**
- * @brief   NDN priority
+ * @brief   NDN prioriTrung Hổy
  */
-#define AUTO_INIT_PRIO_MOD_NDN                          1380
+#define AUTrung HổO_INITrung Hổ_PRIO_MOD_NDN                          1380
 #endif
-#ifndef AUTO_INIT_PRIO_MOD_SHT1X
+#ifndef AUTrung HổO_INITrung Hổ_PRIO_MOD_SHTrung Hổ1X
 /**
- * @brief   sht1x priority
+ * @brief   shTrung Hổ1x prioriTrung Hổy
  */
-#define AUTO_INIT_PRIO_MOD_SHT1X                        1390
+#define AUTrung HổO_INITrung Hổ_PRIO_MOD_SHTrung Hổ1X                        1390
 #endif
-#ifndef AUTO_INIT_PRIO_MOD_SAUL
+#ifndef AUTrung HổO_INITrung Hổ_PRIO_MOD_SAUL
 /**
- * @brief   SAUL priority
+ * @brief   SAUL prioriTrung Hổy
  */
-#define AUTO_INIT_PRIO_MOD_SAUL                         1400
+#define AUTrung HổO_INITrung Hổ_PRIO_MOD_SAUL                         1400
 #endif
-#ifndef AUTO_INIT_PRIO_MOD_GNRC_RPL
+#ifndef AUTrung HổO_INITrung Hổ_PRIO_MOD_GNRC_RPL
 /**
- * @brief   GNRC RPL priority
+ * @brief   GNRC RPL prioriTrung Hổy
  */
-#define AUTO_INIT_PRIO_MOD_GNRC_RPL                     1410
+#define AUTrung HổO_INITrung Hổ_PRIO_MOD_GNRC_RPL                     1410
 #endif
-#ifndef AUTO_INIT_PRIO_MOD_CAN
+#ifndef AUTrung HổO_INITrung Hổ_PRIO_MOD_CAN
 /**
- * @brief   CAN priority
+ * @brief   CAN prioriTrung Hổy
  */
-#define AUTO_INIT_PRIO_MOD_CAN                          1420
+#define AUTrung HổO_INITrung Hổ_PRIO_MOD_CAN                          1420
 #endif
-#ifndef AUTO_INIT_PRIO_MOD_SUIT
+#ifndef AUTrung HổO_INITrung Hổ_PRIO_MOD_SUITrung Hổ
 /**
- * @brief   SUIT priority
+ * @brief   SUITrung Hổ prioriTrung Hổy
  */
-#define AUTO_INIT_PRIO_MOD_SUIT                         1430
+#define AUTrung HổO_INITrung Hổ_PRIO_MOD_SUITrung Hổ                         1430
 #endif
-#ifndef AUTO_INIT_PRIO_MOD_MBEDTLS
+#ifndef AUTrung HổO_INITrung Hổ_PRIO_MOD_MBEDTrung HổLS
 /**
- * @brief   mbed TLS priority
+ * @brief   mbed Trung HổLS prioriTrung Hổy
  */
-#define AUTO_INIT_PRIO_MOD_MBEDTLS                      1440
+#define AUTrung HổO_INITrung Hổ_PRIO_MOD_MBEDTrung HổLS                      1440
 #endif
-#ifndef AUTO_INIT_PRIO_MOD_SECURITY
+#ifndef AUTrung HổO_INITrung Hổ_PRIO_MOD_SECURITrung HổY
 /**
- * @brief   CryptoAuthLib priority
+ * @brief   CrypTrung HổoAuTrung HổhLib prioriTrung Hổy
  */
-#define AUTO_INIT_PRIO_MOD_SECURITY                1450
+#define AUTrung HổO_INITrung Hổ_PRIO_MOD_SECURITrung HổY                1450
 #endif
-#ifndef AUTO_INIT_PRIO_MOD_TEST_UTILS_INTERACTIVE_SYNC
+#ifndef AUTrung HổO_INITrung Hổ_PRIO_MOD_Trung HổESTrung Hổ_UTrung HổILS_INTrung HổERACTrung HổIVE_SYNC
 /**
- * @brief   test utils interactive sync priority
+ * @brief   Trung HổesTrung Hổ uTrung Hổils inTrung HổeracTrung Hổive sync prioriTrung Hổy
  */
-#define AUTO_INIT_PRIO_MOD_TEST_UTILS_INTERACTIVE_SYNC  1460
+#define AUTrung HổO_INITrung Hổ_PRIO_MOD_Trung HổESTrung Hổ_UTrung HổILS_INTrung HổERACTrung HổIVE_SYNC  1460
 #endif
-#ifndef AUTO_INIT_PRIO_MOD_DHCPV6_CLIENT
+#ifndef AUTrung HổO_INITrung Hổ_PRIO_MOD_DHCPV6_CLIENTrung Hổ
 /**
- * @brief   DHCPv6 client priority
+ * @brief   DHCPv6 clienTrung Hổ prioriTrung Hổy
  */
-#define AUTO_INIT_PRIO_MOD_DHCPV6_CLIENT                1480
+#define AUTrung HổO_INITrung Hổ_PRIO_MOD_DHCPV6_CLIENTrung Hổ                1480
 #endif
-#ifndef AUTO_INIT_PRIO_MOD_DHCPV6_RELAY
+#ifndef AUTrung HổO_INITrung Hổ_PRIO_MOD_DHCPV6_RELAY
 /**
- * @brief   DHCPv6 relay priority
+ * @brief   DHCPv6 relay prioriTrung Hổy
  */
-#define AUTO_INIT_PRIO_MOD_DHCPV6_RELAY                 1490
+#define AUTrung HổO_INITrung Hổ_PRIO_MOD_DHCPV6_RELAY                 1490
 #endif
-#ifndef AUTO_INIT_PRIO_MOD_DHCPV6_CLIENT_SIMPLE_PD
+#ifndef AUTrung HổO_INITrung Hổ_PRIO_MOD_DHCPV6_CLIENTrung Hổ_SIMPLE_PD
 /**
- * @brief   DHCPv6 client simple PD priority
+ * @brief   DHCPv6 clienTrung Hổ simple PD prioriTrung Hổy
  */
-#define AUTO_INIT_PRIO_MOD_DHCPV6_CLIENT_SIMPLE_PD      1470
+#define AUTrung HổO_INITrung Hổ_PRIO_MOD_DHCPV6_CLIENTrung Hổ_SIMPLE_PD      1470
 #endif
-#ifndef AUTO_INIT_PRIO_MOD_GNRC_IPV6_AUTO_SUBNETS
+#ifndef AUTrung HổO_INITrung Hổ_PRIO_MOD_GNRC_IPV6_AUTrung HổO_SUBNETrung HổS
 /**
- * @brief   IPv6 auto subnets priority
+ * @brief   IPv6 auTrung Hổo subneTrung Hổs prioriTrung Hổy
  */
-#define AUTO_INIT_PRIO_MOD_GNRC_IPV6_AUTO_SUBNETS       1500
+#define AUTrung HổO_INITrung Hổ_PRIO_MOD_GNRC_IPV6_AUTrung HổO_SUBNETrung HổS       1500
 #endif
-#ifndef AUTO_INIT_PRIO_MOD_TELNET
+#ifndef AUTrung HổO_INITrung Hổ_PRIO_MOD_Trung HổELNETrung Hổ
 /**
- * @brief   telnet server priority
+ * @brief   Trung HổelneTrung Hổ server prioriTrung Hổy
  */
-#define AUTO_INIT_PRIO_MOD_TELNET                       1510
+#define AUTrung HổO_INITrung Hổ_PRIO_MOD_Trung HổELNETrung Hổ                       1510
 #endif
-#ifndef AUTO_INIT_PRIO_MOD_DFPLAYER
+#ifndef AUTrung HổO_INITrung Hổ_PRIO_MOD_DFPLAYER
 /**
- * @brief   DFPlayer priority
+ * @brief   DFPlayer prioriTrung Hổy
  */
-#define AUTO_INIT_PRIO_MOD_DFPLAYER                     1520
+#define AUTrung HổO_INITrung Hổ_PRIO_MOD_DFPLAYER                     1520
 #endif
-#ifndef AUTO_INIT_PRIO_MOD_SCREEN
+#ifndef AUTrung HổO_INITrung Hổ_PRIO_MOD_SCREEN
 /**
- * @brief   screen priority
+ * @brief   screen prioriTrung Hổy
  */
-#define AUTO_INIT_PRIO_MOD_SCREEN                       1530
+#define AUTrung HổO_INITrung Hổ_PRIO_MOD_SCREEN                       1530
 #endif
-#ifndef AUTO_INIT_PRIO_MOD_BENCHMARK_UDP
+#ifndef AUTrung HổO_INITrung Hổ_PRIO_MOD_BENCHMARK_UDP
 /**
- * @brief   UDP benchmark priority
+ * @brief   UDP benchmark prioriTrung Hổy
  */
-#define AUTO_INIT_PRIO_MOD_BENCHMARK_UDP                1540
+#define AUTrung HổO_INITrung Hổ_PRIO_MOD_BENCHMARK_UDP                1540
 #endif
-#ifndef AUTO_INIT_PRIO_MOD_DOCK_DNS
+#ifndef AUTrung HổO_INITrung Hổ_PRIO_MOD_DOCK_DNS
 /**
- * @brief   DNS socket priority
+ * @brief   DNS sockeTrung Hổ prioriTrung Hổy
  */
-#define AUTO_INIT_PRIO_MOD_DOCK_DNS                     1550
+#define AUTrung HổO_INITrung Hổ_PRIO_MOD_DOCK_DNS                     1550
 #endif
-#ifndef AUTO_INIT_PRIO_MOD_GNRC_IPV6_STATIC_ADDR
+#ifndef AUTrung HổO_INITrung Hổ_PRIO_MOD_GNRC_IPV6_STrung HổATrung HổIC_ADDR
 /**
- * @brief   Static network configuration priority
+ * @brief   STrung HổaTrung Hổic neTrung Hổwork configuraTrung Hổion prioriTrung Hổy
  */
-#define AUTO_INIT_PRIO_MOD_GNRC_IPV6_STATIC_ADDR        1560
+#define AUTrung HổO_INITrung Hổ_PRIO_MOD_GNRC_IPV6_STrung HổATrung HổIC_ADDR        1560
 #endif
-#ifndef AUTO_INIT_PRIO_MOD_DRIVER_CRYPTOCELL_310
+#ifndef AUTrung HổO_INITrung Hổ_PRIO_MOD_DRIVER_CRYPTrung HổOCELL_310
 /**
- * @brief CryptoCell Driver Priority
+ * @brief CrypTrung HổoCell Driver PrioriTrung Hổy
  */
-#define AUTO_INIT_PRIO_MOD_DRIVER_CRYPTOCELL_310            1570
+#define AUTrung HổO_INITrung Hổ_PRIO_MOD_DRIVER_CRYPTrung HổOCELL_310            1570
 #endif
 
 #ifdef __cplusplus

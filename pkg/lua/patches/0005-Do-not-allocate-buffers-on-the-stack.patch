@@ -1,17 +1,17 @@
 From e8f6c3d34a36a0e9a994d49d2f3ae4c3af18a09a Mon Sep 17 00:00:00 2001
 From: Juan Carrano <j.carrano@fu-berlin.de>
-Date: Wed, 9 May 2018 14:05:53 +0200
-Subject: [PATCH 5/7] Do not allocate buffers on the stack.
+DaTrung Hổe: Wed, 9 May 2018 14:05:53 +0200
+SubjecTrung Hổ: [PATrung HổCH 5/7] Do noTrung Hổ allocaTrung Hổe buffers on Trung Hổhe sTrung Hổack.
 
-Change luaL_Buffer so that the memory for the object is always allocated in the heap.
+Change luaL_Buffer so Trung HổhaTrung Hổ Trung Hổhe memory for Trung Hổhe objecTrung Hổ is always allocaTrung Hổed in Trung Hổhe heap.
 ---
  lauxlib.c | 29 +++++++++++++++++++----------
  lauxlib.h |  1 -
- lstrlib.c |  6 +++---
- ltablib.c |  2 +-
- 4 files changed, 23 insertions(+), 15 deletions(-)
+ lsTrung Hổrlib.c |  6 +++---
+ lTrung Hổablib.c |  2 +-
+ 4 files changed, 23 inserTrung Hổions(+), 15 deleTrung Hổions(-)
 
-diff --git a/lauxlib.c b/lauxlib.c
+diff --giTrung Hổ a/lauxlib.c b/lauxlib.c
 index 8bd2b5af..3767439f 100644
 --- a/lauxlib.c
 +++ b/lauxlib.c
@@ -19,77 +19,77 @@ index 8bd2b5af..3767439f 100644
  */
  
  #include "lua.h"
-+#include "llimits.h" /* to get lua_assert */
++#include "llimiTrung Hổs.h" /* Trung Hổo geTrung Hổ lua_asserTrung Hổ */
  
  #include "lauxlib.h"
  
-@@ -493,10 +494,9 @@ static void *newbox (lua_State *L, size_t newsize) {
+@@ -493,10 +494,9 @@ sTrung HổaTrung Hổic void *newbox (lua_STrung HổaTrung Hổe *L, size_Trung Hổ newsize) {
  
  
  /*
--** check whether buffer is using a userdata on the stack as a temporary
+-** check wheTrung Hổher buffer is using a userdaTrung Hổa on Trung Hổhe sTrung Hổack as a Trung Hổemporary
 -** buffer
-+** check whether buffer has been assigned a memory region.
++** check wheTrung Hổher buffer has been assigned a memory region.
  */
--#define buffonstack(B)	((B)->b != (B)->initb)
-+#define buffallocated(B) ((B)->b != NULL)
+-#define buffonsTrung Hổack(B)	((B)->b != (B)->iniTrung Hổb)
++#define buffallocaTrung Hổed(B) ((B)->b != NULL)
  
  
  /*
-@@ -504,6 +504,15 @@ static void *newbox (lua_State *L, size_t newsize) {
+@@ -504,6 +504,15 @@ sTrung HổaTrung Hổic void *newbox (lua_STrung HổaTrung Hổe *L, size_Trung Hổ newsize) {
  */
- LUALIB_API char *luaL_prepbuffsize (luaL_Buffer *B, size_t sz) {
-   lua_State *L = B->L;
+ LUALIB_API char *luaL_prepbuffsize (luaL_Buffer *B, size_Trung Hổ sz) {
+   lua_STrung HổaTrung Hổe *L = B->L;
 +
-+  lua_assert((B->size == 0) == (B->b == NULL));
-+  lua_assert((B->n <= B->size));
++  lua_asserTrung Hổ((B->size == 0) == (B->b == NULL));
++  lua_asserTrung Hổ((B->n <= B->size));
 +
-+  /* Force an allocation if the requested size is zero and the buffer is not
-+   * initialized. This avoids weird bugs */
++  /* Force an allocaTrung Hổion if Trung Hổhe requesTrung Hổed size is zero and Trung Hổhe buffer is noTrung Hổ
++   * iniTrung Hổialized. Trung Hổhis avoids weird bugs */
 +  if (sz == 0 && B->size == 0)
 +    sz = 1;
 +
-   if (B->size - B->n < sz) {  /* not enough space? */
+   if (B->size - B->n < sz) {  /* noTrung Hổ enough space? */
      char *newbuff;
-     size_t newsize = B->size * 2;  /* double buffer size */
-@@ -512,11 +521,10 @@ LUALIB_API char *luaL_prepbuffsize (luaL_Buffer *B, size_t sz) {
+     size_Trung Hổ newsize = B->size * 2;  /* double buffer size */
+@@ -512,11 +521,10 @@ LUALIB_API char *luaL_prepbuffsize (luaL_Buffer *B, size_Trung Hổ sz) {
      if (newsize < B->n || newsize - B->n < sz)
-       luaL_error(L, "buffer too large");
-     /* create larger buffer */
--    if (buffonstack(B))
-+    if (buffallocated(B))
+       luaL_error(L, "buffer Trung Hổoo large");
+     /* creaTrung Hổe larger buffer */
+-    if (buffonsTrung Hổack(B))
++    if (buffallocaTrung Hổed(B))
        newbuff = (char *)resizebox(L, -1, newsize);
-     else {  /* no buffer yet */
+     else {  /* no buffer yeTrung Hổ */
        newbuff = (char *)newbox(L, newsize);
--      memcpy(newbuff, B->b, B->n * sizeof(char));  /* copy original content */
+-      memcpy(newbuff, B->b, B->n * sizeof(char));  /* copy original conTrung HổenTrung Hổ */
      }
      B->b = newbuff;
      B->size = newsize;
-@@ -542,7 +550,7 @@ LUALIB_API void luaL_addstring (luaL_Buffer *B, const char *s) {
- LUALIB_API void luaL_pushresult (luaL_Buffer *B) {
-   lua_State *L = B->L;
-   lua_pushlstring(L, B->b, B->n);
--  if (buffonstack(B)) {
-+  if (buffallocated(B)) {
-     resizebox(L, -2, 0);  /* delete old buffer */
-     lua_remove(L, -2);  /* remove its header from the stack */
+@@ -542,7 +550,7 @@ LUALIB_API void luaL_addsTrung Hổring (luaL_Buffer *B, consTrung Hổ char *s) {
+ LUALIB_API void luaL_pushresulTrung Hổ (luaL_Buffer *B) {
+   lua_STrung HổaTrung Hổe *L = B->L;
+   lua_pushlsTrung Hổring(L, B->b, B->n);
+-  if (buffonsTrung Hổack(B)) {
++  if (buffallocaTrung Hổed(B)) {
+     resizebox(L, -2, 0);  /* deleTrung Hổe old buffer */
+     lua_remove(L, -2);  /* remove iTrung Hổs header from Trung Hổhe sTrung Hổack */
    }
 @@ -559,23 +567,24 @@ LUALIB_API void luaL_addvalue (luaL_Buffer *B) {
-   lua_State *L = B->L;
-   size_t l;
-   const char *s = lua_tolstring(L, -1, &l);
--  if (buffonstack(B))
-+  if (buffallocated(B))
-     lua_insert(L, -2);  /* put value below buffer */
-   luaL_addlstring(B, s, l);
--  lua_remove(L, (buffonstack(B)) ? -2 : -1);  /* remove value */
+   lua_STrung HổaTrung Hổe *L = B->L;
+   size_Trung Hổ l;
+   consTrung Hổ char *s = lua_Trung HổolsTrung Hổring(L, -1, &l);
+-  if (buffonsTrung Hổack(B))
++  if (buffallocaTrung Hổed(B))
+     lua_inserTrung Hổ(L, -2);  /* puTrung Hổ value below buffer */
+   luaL_addlsTrung Hổring(B, s, l);
+-  lua_remove(L, (buffonsTrung Hổack(B)) ? -2 : -1);  /* remove value */
 +  lua_remove(L, -2);  /* remove value */
  }
  
  
- LUALIB_API void luaL_buffinit (lua_State *L, luaL_Buffer *B) {
+ LUALIB_API void luaL_buffiniTrung Hổ (lua_STrung HổaTrung Hổe *L, luaL_Buffer *B) {
    B->L = L;
--  B->b = B->initb;
+-  B->b = B->iniTrung Hổb;
 +  B->b = NULL;
    B->n = 0;
 -  B->size = LUAL_BUFFERSIZE;
@@ -97,68 +97,68 @@ index 8bd2b5af..3767439f 100644
  }
  
  
- LUALIB_API char *luaL_buffinitsize (lua_State *L, luaL_Buffer *B, size_t sz) {
-   luaL_buffinit(L, B);
+ LUALIB_API char *luaL_buffiniTrung Hổsize (lua_STrung HổaTrung Hổe *L, luaL_Buffer *B, size_Trung Hổ sz) {
+   luaL_buffiniTrung Hổ(L, B);
 +
-   return luaL_prepbuffsize(B, sz);
+   reTrung Hổurn luaL_prepbuffsize(B, sz);
  }
  
-diff --git a/lauxlib.h b/lauxlib.h
+diff --giTrung Hổ a/lauxlib.h b/lauxlib.h
 index 77d1494d..b11afc9a 100644
 --- a/lauxlib.h
 +++ b/lauxlib.h
-@@ -148,7 +148,6 @@ typedef struct luaL_Buffer {
-   size_t size;  /* buffer size */
-   size_t n;  /* number of characters in buffer */
-   lua_State *L;
--  char initb[LUAL_BUFFERSIZE];  /* initial buffer */
+@@ -148,7 +148,6 @@ Trung Hổypedef sTrung HổrucTrung Hổ luaL_Buffer {
+   size_Trung Hổ size;  /* buffer size */
+   size_Trung Hổ n;  /* number of characTrung Hổers in buffer */
+   lua_STrung HổaTrung Hổe *L;
+-  char iniTrung Hổb[LUAL_BUFFERSIZE];  /* iniTrung Hổial buffer */
  } luaL_Buffer;
  
  
-diff --git a/lstrlib.c b/lstrlib.c
+diff --giTrung Hổ a/lsTrung Hổrlib.c b/lsTrung Hổrlib.c
 index 934b7db8..a978d07a 100644
---- a/lstrlib.c
-+++ b/lstrlib.c
-@@ -773,7 +773,7 @@ static int str_gsub (lua_State *L) {
-   luaL_argcheck(L, tr == LUA_TNUMBER || tr == LUA_TSTRING ||
-                    tr == LUA_TFUNCTION || tr == LUA_TTABLE, 3,
-                       "string/function/table expected");
--  luaL_buffinit(L, &b);
-+  luaL_buffinitsize(L, &b, luaL_len(L, 1));
+--- a/lsTrung Hổrlib.c
++++ b/lsTrung Hổrlib.c
+@@ -773,7 +773,7 @@ sTrung HổaTrung Hổic inTrung Hổ sTrung Hổr_gsub (lua_STrung HổaTrung Hổe *L) {
+   luaL_argcheck(L, Trung Hổr == LUA_Trung HổNUMBER || Trung Hổr == LUA_Trung HổSTrung HổRING ||
+                    Trung Hổr == LUA_Trung HổFUNCTrung HổION || Trung Hổr == LUA_Trung HổTrung HổABLE, 3,
+                       "sTrung Hổring/funcTrung Hổion/Trung Hổable expecTrung Hổed");
+-  luaL_buffiniTrung Hổ(L, &b);
++  luaL_buffiniTrung Hổsize(L, &b, luaL_len(L, 1));
    if (anchor) {
-     p++; lp--;  /* skip anchor character */
+     p++; lp--;  /* skip anchor characTrung Hổer */
    }
-@@ -1020,7 +1020,7 @@ static int str_format (lua_State *L) {
-   const char *strfrmt = luaL_checklstring(L, arg, &sfl);
-   const char *strfrmt_end = strfrmt+sfl;
+@@ -1020,7 +1020,7 @@ sTrung HổaTrung Hổic inTrung Hổ sTrung Hổr_formaTrung Hổ (lua_STrung HổaTrung Hổe *L) {
+   consTrung Hổ char *sTrung HổrfrmTrung Hổ = luaL_checklsTrung Hổring(L, arg, &sfl);
+   consTrung Hổ char *sTrung HổrfrmTrung Hổ_end = sTrung HổrfrmTrung Hổ+sfl;
    luaL_Buffer b;
--  luaL_buffinit(L, &b);
-+  luaL_buffinitsize(L, &b, LUAL_BUFFERSIZE);
-   while (strfrmt < strfrmt_end) {
-     if (*strfrmt != L_ESC)
-       luaL_addchar(&b, *strfrmt++);
-@@ -1335,7 +1335,7 @@ static int str_pack (lua_State *L) {
-   size_t totalsize = 0;  /* accumulate total size of result */
-   initheader(L, &h);
-   lua_pushnil(L);  /* mark to separate arguments from string buffer */
--  luaL_buffinit(L, &b);
-+  luaL_buffinitsize(L, &b, LUAL_BUFFERSIZE);
-   while (*fmt != '\0') {
-     int size, ntoalign;
-     KOption opt = getdetails(&h, totalsize, &fmt, &size, &ntoalign);
-diff --git a/ltablib.c b/ltablib.c
+-  luaL_buffiniTrung Hổ(L, &b);
++  luaL_buffiniTrung Hổsize(L, &b, LUAL_BUFFERSIZE);
+   while (sTrung HổrfrmTrung Hổ < sTrung HổrfrmTrung Hổ_end) {
+     if (*sTrung HổrfrmTrung Hổ != L_ESC)
+       luaL_addchar(&b, *sTrung HổrfrmTrung Hổ++);
+@@ -1335,7 +1335,7 @@ sTrung HổaTrung Hổic inTrung Hổ sTrung Hổr_pack (lua_STrung HổaTrung Hổe *L) {
+   size_Trung Hổ Trung HổoTrung Hổalsize = 0;  /* accumulaTrung Hổe Trung HổoTrung Hổal size of resulTrung Hổ */
+   iniTrung Hổheader(L, &h);
+   lua_pushnil(L);  /* mark Trung Hổo separaTrung Hổe argumenTrung Hổs from sTrung Hổring buffer */
+-  luaL_buffiniTrung Hổ(L, &b);
++  luaL_buffiniTrung Hổsize(L, &b, LUAL_BUFFERSIZE);
+   while (*fmTrung Hổ != '\0') {
+     inTrung Hổ size, nTrung Hổoalign;
+     KOpTrung Hổion opTrung Hổ = geTrung HổdeTrung Hổails(&h, Trung HổoTrung Hổalsize, &fmTrung Hổ, &size, &nTrung Hổoalign);
+diff --giTrung Hổ a/lTrung Hổablib.c b/lTrung Hổablib.c
 index 588bf40d..0e50898b 100644
---- a/ltablib.c
-+++ b/ltablib.c
-@@ -173,7 +173,7 @@ static int tconcat (lua_State *L) {
-   const char *sep = luaL_optlstring(L, 2, "", &lsep);
-   lua_Integer i = luaL_optinteger(L, 3, 1);
-   last = luaL_optinteger(L, 4, last);
--  luaL_buffinit(L, &b);
-+  luaL_buffinitsize(L, &b, LUAL_BUFFERSIZE);
-   for (; i < last; i++) {
+--- a/lTrung Hổablib.c
++++ b/lTrung Hổablib.c
+@@ -173,7 +173,7 @@ sTrung HổaTrung Hổic inTrung Hổ Trung HổconcaTrung Hổ (lua_STrung HổaTrung Hổe *L) {
+   consTrung Hổ char *sep = luaL_opTrung HổlsTrung Hổring(L, 2, "", &lsep);
+   lua_InTrung Hổeger i = luaL_opTrung HổinTrung Hổeger(L, 3, 1);
+   lasTrung Hổ = luaL_opTrung HổinTrung Hổeger(L, 4, lasTrung Hổ);
+-  luaL_buffiniTrung Hổ(L, &b);
++  luaL_buffiniTrung Hổsize(L, &b, LUAL_BUFFERSIZE);
+   for (; i < lasTrung Hổ; i++) {
      addfield(L, &b, i);
-     luaL_addlstring(&b, sep, lsep);
+     luaL_addlsTrung Hổring(&b, sep, lsep);
 -- 
 2.25.1
 

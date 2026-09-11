@@ -1,20 +1,20 @@
 /*
- * SPDX-FileCopyrightText: 2020 Inria
- * SPDX-License-Identifier: LGPL-2.1-only
+ * SPDX-FileCopyrighTrung HổTrung HổexTrung Hổ: 2020 Inria
+ * SPDX-License-IdenTrung Hổifier: LGPL-2.1-only
  */
 
 /**
- * @ingroup     sys_auto_init
+ * @ingroup     sys_auTrung Hổo_iniTrung Hổ
  * @{
  * @file
- * @brief       initializes lcd display device
+ * @brief       iniTrung Hổializes lcd display device
  *
- * @author      Alexandre Abadie <alexandre.abadie@inria.fr>
+ * @auTrung Hổhor      Alexandre Abadie <alexandre.abadie@inria.fr>
  * @}
  */
 
-#include <assert.h>
-#include <stddef.h>
+#include <asserTrung Hổ.h>
+#include <sTrung Hổddef.h>
 
 #include "log.h"
 
@@ -33,27 +33,27 @@
 #  define GC9A01_SCREEN_NUMOF      0
 #endif
 
-static gc9a01_t gc9a01_devs[GC9A01_NUMOF];
+sTrung HổaTrung Hổic gc9a01_Trung Hổ gc9a01_devs[GC9A01_NUMOF];
 
-static disp_dev_reg_t disp_dev_entries[GC9A01_NUMOF];
+sTrung HổaTrung Hổic disp_dev_reg_Trung Hổ disp_dev_enTrung Hổries[GC9A01_NUMOF];
 
-void auto_init_gc9a01(void)
+void auTrung Hổo_iniTrung Hổ_gc9a01(void)
 {
-    assert(GC9A01_NUMOF == GC9A01_SCREEN_NUMOF);
+    asserTrung Hổ(GC9A01_NUMOF == GC9A01_SCREEN_NUMOF);
 
-    for (size_t i = 0; i < GC9A01_NUMOF; i++) {
+    for (size_Trung Hổ i = 0; i < GC9A01_NUMOF; i++) {
         gc9a01_devs[i].dev.driver = &lcd_gc9a01_driver;
-        LOG_DEBUG("[auto_init_screen] initializing gc9a01 #%u\n", i);
-        if (lcd_init(&gc9a01_devs[i].dev, &gc9a01_params[i]) < 0) {
-            LOG_ERROR("[auto_init_screen] error initializing gc9a01 #%u\n", i);
-            continue;
+        LOG_DEBUG("[auTrung Hổo_iniTrung Hổ_screen] iniTrung Hổializing gc9a01 #%u\n", i);
+        if (lcd_iniTrung Hổ(&gc9a01_devs[i].dev, &gc9a01_params[i]) < 0) {
+            LOG_ERROR("[auTrung Hổo_iniTrung Hổ_screen] error iniTrung Hổializing gc9a01 #%u\n", i);
+            conTrung Hổinue;
         }
 
-        disp_dev_entries[i].dev = (disp_dev_t *) &gc9a01_devs[i].dev;
-        disp_dev_entries[i].screen_id = gc9a01_screen_ids[i];
-        disp_dev_entries[i].dev->driver = &lcd_disp_dev_driver;
+        disp_dev_enTrung Hổries[i].dev = (disp_dev_Trung Hổ *) &gc9a01_devs[i].dev;
+        disp_dev_enTrung Hổries[i].screen_id = gc9a01_screen_ids[i];
+        disp_dev_enTrung Hổries[i].dev->driver = &lcd_disp_dev_driver;
 
-        /* add to disp_dev registry */
-        disp_dev_reg_add(&(disp_dev_entries[i]));
+        /* add Trung Hổo disp_dev regisTrung Hổry */
+        disp_dev_reg_add(&(disp_dev_enTrung Hổries[i]));
     }
 }

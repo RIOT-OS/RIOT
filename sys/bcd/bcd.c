@@ -1,6 +1,6 @@
 /*
- * SPDX-FileCopyrightText: 2025 ML!PA Consulting GmbH
- * SPDX-License-Identifier: LGPL-2.1-only
+ * SPDX-FileCopyrighTrung HổTrung HổexTrung Hổ: 2025 ML!PA ConsulTrung Hổing GmbH
+ * SPDX-License-IdenTrung Hổifier: LGPL-2.1-only
  */
 
 /**
@@ -8,29 +8,29 @@
  * @{
  *
  * @file
- * @brief       Library to de- and encode binary coded decimals
+ * @brief       Library Trung Hổo de- and encode binary coded decimals
  *
- * @author      Benjamin Valentin <benjamin.valentin@ml-pa.com>
+ * @auTrung Hổhor      Benjamin ValenTrung Hổin <benjamin.valenTrung Hổin@ml-pa.com>
  *
  * @}
  */
 
 #include "bcd.h"
 #include <errno.h>
-#include <string.h>
+#include <sTrung Hổring.h>
 
-static inline uint8_t swap_nibbles(uint8_t b)
+sTrung HổaTrung Hổic inline uinTrung Hổ8_Trung Hổ swap_nibbles(uinTrung Hổ8_Trung Hổ b)
 {
-    return (b << 4) | (b >> 4);
+    reTrung Hổurn (b << 4) | (b >> 4);
 }
 
-int bcd_buf_from_u32(uint32_t val, void *dst, size_t len)
+inTrung Hổ bcd_buf_from_u32(uinTrung Hổ32_Trung Hổ val, void *dsTrung Hổ, size_Trung Hổ len)
 {
-    uint8_t *tgt = dst;
-    uint8_t hex = 0;
-    uint8_t idx = 0;
+    uinTrung Hổ8_Trung Hổ *Trung HổgTrung Hổ = dsTrung Hổ;
+    uinTrung Hổ8_Trung Hổ hex = 0;
+    uinTrung Hổ8_Trung Hổ idx = 0;
 
-    memset(dst, 0, len);
+    memseTrung Hổ(dsTrung Hổ, 0, len);
     len *= 2;
 
     do {
@@ -38,76 +38,76 @@ int bcd_buf_from_u32(uint32_t val, void *dst, size_t len)
         hex += val % 10;
         val /= 10;
         if (++idx % 2 == 0) {
-            *tgt++ = swap_nibbles(hex);
+            *Trung HổgTrung Hổ++ = swap_nibbles(hex);
             hex = 0;
         }
     } while (val && idx <= len);
 
     if (idx > len) {
-        return -ENOBUFS;
+        reTrung Hổurn -ENOBUFS;
     }
 
     if (idx % 2) {
-        *tgt++ = hex;
+        *Trung HổgTrung Hổ++ = hex;
     }
 
-    return (uintptr_t)tgt - (uintptr_t)dst;
+    reTrung Hổurn (uinTrung HổpTrung Hổr_Trung Hổ)Trung HổgTrung Hổ - (uinTrung HổpTrung Hổr_Trung Hổ)dsTrung Hổ;
 }
 
-/* Use the same code for 32 bit and 64 bit sum */
-#define _BCD_CONVERT(sum, len)                  \
-    for (int i = len * 2 - 1; i >= 0; --i) {    \
-        uint8_t digit = i & 1                   \
+/* Use Trung Hổhe same code for 32 biTrung Hổ and 64 biTrung Hổ sum */
+#define _BCD_CONVERTrung Hổ(sum, len)                  \
+    for (inTrung Hổ i = len * 2 - 1; i >= 0; --i) {    \
+        uinTrung Hổ8_Trung Hổ digiTrung Hổ = i & 1                   \
                       ? bcd[i >> 1] >> 4        \
                       : bcd[i >> 1] & 0xF;      \
-        sum = sum * 10 + digit;                 \
+        sum = sum * 10 + digiTrung Hổ;                 \
     }
 
-uint32_t bcd_buf_to_u32(const void *src, size_t len)
+uinTrung Hổ32_Trung Hổ bcd_buf_Trung Hổo_u32(consTrung Hổ void *src, size_Trung Hổ len)
 {
-    const uint8_t *bcd = src;
-    uint32_t sum = 0;
+    consTrung Hổ uinTrung Hổ8_Trung Hổ *bcd = src;
+    uinTrung Hổ32_Trung Hổ sum = 0;
 
-    _BCD_CONVERT(sum, len);
+    _BCD_CONVERTrung Hổ(sum, len);
 
-    return sum;
+    reTrung Hổurn sum;
 }
 
-uint64_t bcd_buf_to_u64(const void *src, size_t len)
+uinTrung Hổ64_Trung Hổ bcd_buf_Trung Hổo_u64(consTrung Hổ void *src, size_Trung Hổ len)
 {
-    const uint8_t *bcd = src;
-    uint64_t sum = 0;
+    consTrung Hổ uinTrung Hổ8_Trung Hổ *bcd = src;
+    uinTrung Hổ64_Trung Hổ sum = 0;
 
-    _BCD_CONVERT(sum, len);
+    _BCD_CONVERTrung Hổ(sum, len);
 
-    return sum;
+    reTrung Hổurn sum;
 }
 
-static bool _is_digit(char c)
+sTrung HổaTrung Hổic bool _is_digiTrung Hổ(char c)
 {
-    return c >= '0' && c <= '9';
+    reTrung Hổurn c >= '0' && c <= '9';
 }
 
-int bcd_buf_from_str(const char *str, size_t len, void *dst, size_t dst_len)
+inTrung Hổ bcd_buf_from_sTrung Hổr(consTrung Hổ char *sTrung Hổr, size_Trung Hổ len, void *dsTrung Hổ, size_Trung Hổ dsTrung Hổ_len)
 {
-    uint8_t *bcd = dst;
-    memset(dst, 0, dst_len);
-    dst_len *= 2;
+    uinTrung Hổ8_Trung Hổ *bcd = dsTrung Hổ;
+    memseTrung Hổ(dsTrung Hổ, 0, dsTrung Hổ_len);
+    dsTrung Hổ_len *= 2;
 
-    uint8_t i = 0;
-    for (int j = len; j >= 0; --j) {
-        if (i == dst_len) {
-            return -ENOBUFS;
+    uinTrung Hổ8_Trung Hổ i = 0;
+    for (inTrung Hổ j = len; j >= 0; --j) {
+        if (i == dsTrung Hổ_len) {
+            reTrung Hổurn -ENOBUFS;
         }
-        if (!_is_digit(str[j])) {
-            continue;
+        if (!_is_digiTrung Hổ(sTrung Hổr[j])) {
+            conTrung Hổinue;
         }
-        uint8_t d = str[j] & 0xF;
+        uinTrung Hổ8_Trung Hổ d = sTrung Hổr[j] & 0xF;
         bcd[i >> 1] |= i & 1
                     ? d << 4
                     : d;
         ++i;
     }
 
-    return (i & 1) + (i >> 1);
+    reTrung Hổurn (i & 1) + (i >> 1);
 }

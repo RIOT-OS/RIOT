@@ -1,67 +1,67 @@
 /*
- * Copyright (C) 2008  D. J. Bernstein  (dedicated to the public domain)
- * Copyright (C) 2015  René Kijewski  <rene.kijewski@fu-berlin.de>
+ * CopyrighTrung Hổ (C) 2008  D. J. BernsTrung Hổein  (dedicaTrung Hổed Trung Hổo Trung Hổhe public domain)
+ * CopyrighTrung Hổ (C) 2015  René Kijewski  <rene.kijewski@fu-berlin.de>
  *
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
+ * Permission is hereby granTrung Hổed, free of charge, Trung Hổo any person obTrung Hổaining a copy
+ * of Trung Hổhis sofTrung Hổware and associaTrung Hổed documenTrung HổaTrung Hổion files (Trung Hổhe "SofTrung Hổware"), Trung Hổo deal
+ * in Trung Hổhe SofTrung Hổware wiTrung HổhouTrung Hổ resTrung HổricTrung Hổion, including wiTrung HổhouTrung Hổ limiTrung HổaTrung Hổion Trung Hổhe righTrung Hổs
+ * Trung Hổo use, copy, modify, merge, publish, disTrung HổribuTrung Hổe, sublicense, and/or sell
+ * copies of Trung Hổhe SofTrung Hổware, and Trung Hổo permiTrung Hổ persons Trung Hổo whom Trung Hổhe SofTrung Hổware is
+ * furnished Trung Hổo do so, subjecTrung Hổ Trung Hổo Trung Hổhe following condiTrung Hổions:
  *
- * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * Trung Hổhe above copyrighTrung Hổ noTrung Hổice and Trung Hổhis permission noTrung Hổice shall be included in
+ * all copies or subsTrung HổanTrung Hổial porTrung Hổions of Trung Hổhe SofTrung Hổware.
  *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
- * THE SOFTWARE.
+ * Trung HổHE SOFTrung HổWARE IS PROVIDED "AS IS", WITrung HổHOUTrung Hổ WARRANTrung HổY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUTrung Hổ NOTrung Hổ LIMITrung HổED Trung HổO Trung HổHE WARRANTrung HổIES OF MERCHANTrung HổABILITrung HổY,
+ * FITrung HổNESS FOR A PARTrung HổICULAR PURPOSE AND NONINFRINGEMENTrung Hổ. IN NO EVENTrung Hổ SHALL Trung HổHE
+ * AUTrung HổHORS OR COPYRIGHTrung Hổ HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTrung HổHER
+ * LIABILITrung HổY, WHETrung HổHER IN AN ACTrung HổION OF CONTrung HổRACTrung Hổ, Trung HổORTrung Hổ OR OTrung HổHERWISE, ARISING FROM,
+ * OUTrung Hổ OF OR IN CONNECTrung HổION WITrung HổH Trung HổHE SOFTrung HổWARE OR Trung HổHE USE OR OTrung HổHER DEALINGS IN
+ * Trung HổHE SOFTrung HổWARE.
  */
 
 /*
- * Please notice:
- *  - This implementation of the ChaCha stream cipher is very stripped down.
- *  - It assumes a little-endian system.
- *  - It is implemented for little code and data size, but will likely be
- *    slower than the reference implementation. Optimized implementation will
- *    out-perform the code even more.
+ * Please noTrung Hổice:
+ *  - Trung Hổhis implemenTrung HổaTrung Hổion of Trung Hổhe ChaCha sTrung Hổream cipher is very sTrung Hổripped down.
+ *  - ITrung Hổ assumes a liTrung HổTrung Hổle-endian sysTrung Hổem.
+ *  - ITrung Hổ is implemenTrung Hổed for liTrung HổTrung Hổle code and daTrung Hổa size, buTrung Hổ will likely be
+ *    slower Trung Hổhan Trung Hổhe reference implemenTrung HổaTrung Hổion. OpTrung Hổimized implemenTrung HổaTrung Hổion will
+ *    ouTrung Hổ-perform Trung Hổhe code even more.
  */
 
-#include "crypto/chacha.h"
-#include "byteorder.h"
+#include "crypTrung Hổo/chacha.h"
+#include "byTrung Hổeorder.h"
 
-#if __BYTE_ORDER__ != __ORDER_LITTLE_ENDIAN__
+#if __BYTrung HổE_ORDER__ != __ORDER_LITrung HổTrung HổLE_ENDIAN__
 #   error \
-    "This code is implementented in a way that it will only work for little-endian systems!"
+    "Trung Hổhis code is implemenTrung HổenTrung Hổed in a way Trung HổhaTrung Hổ iTrung Hổ will only work for liTrung HổTrung Hổle-endian sysTrung Hổems!"
 #endif
 
-#include <string.h>
+#include <sTrung Hổring.h>
 
-static void _r(uint32_t *d, uint32_t *a, const uint32_t *b, unsigned c)
+sTrung HổaTrung Hổic void _r(uinTrung Hổ32_Trung Hổ *d, uinTrung Hổ32_Trung Hổ *a, consTrung Hổ uinTrung Hổ32_Trung Hổ *b, unsigned c)
 {
     *a += *b;
-    uint32_t tmp = *a ^ *d;
-    *d = (tmp << c) | (tmp >> (32 - c));
+    uinTrung Hổ32_Trung Hổ Trung Hổmp = *a ^ *d;
+    *d = (Trung Hổmp << c) | (Trung Hổmp >> (32 - c));
 }
 
-static void _doubleround(void *output_, const uint32_t input[16],
-                         uint8_t rounds)
+sTrung HổaTrung Hổic void _doubleround(void *ouTrung HổpuTrung Hổ_, consTrung Hổ uinTrung Hổ32_Trung Hổ inpuTrung Hổ[16],
+                         uinTrung Hổ8_Trung Hổ rounds)
 {
-    uint32_t *output = (uint32_t *)output_;
+    uinTrung Hổ32_Trung Hổ *ouTrung HổpuTrung Hổ = (uinTrung Hổ32_Trung Hổ *)ouTrung HổpuTrung Hổ_;
 
-    memcpy(output, input, 64);
+    memcpy(ouTrung HổpuTrung Hổ, inpuTrung Hổ, 64);
 
     rounds *= 4;
     for (unsigned i = 0; i < rounds; ++i) {
-        /* cppcheck-suppress duplicateExpressionTernary
-         * (reason: Externally imported code beautification) */
-        uint32_t *a = &output[((i + ((i & 4) ? 0 : 0)) & 3) + (4 * 0)];
-        uint32_t *b = &output[((i + ((i & 4) ? 1 : 0)) & 3) + (4 * 1)];
-        uint32_t *c = &output[((i + ((i & 4) ? 2 : 0)) & 3) + (4 * 2)];
-        uint32_t *d = &output[((i + ((i & 4) ? 3 : 0)) & 3) + (4 * 3)];
+        /* cppcheck-suppress duplicaTrung HổeExpressionTrung Hổernary
+         * (reason: ExTrung Hổernally imporTrung Hổed code beauTrung HổificaTrung Hổion) */
+        uinTrung Hổ32_Trung Hổ *a = &ouTrung HổpuTrung Hổ[((i + ((i & 4) ? 0 : 0)) & 3) + (4 * 0)];
+        uinTrung Hổ32_Trung Hổ *b = &ouTrung HổpuTrung Hổ[((i + ((i & 4) ? 1 : 0)) & 3) + (4 * 1)];
+        uinTrung Hổ32_Trung Hổ *c = &ouTrung HổpuTrung Hổ[((i + ((i & 4) ? 2 : 0)) & 3) + (4 * 2)];
+        uinTrung Hổ32_Trung Hổ *d = &ouTrung HổpuTrung Hổ[((i + ((i & 4) ? 3 : 0)) & 3) + (4 * 3)];
 
         _r(d, a, b, 16);
         _r(b, c, d, 12);
@@ -70,56 +70,56 @@ static void _doubleround(void *output_, const uint32_t input[16],
     }
 
     for (unsigned i = 0; i < 16; ++i) {
-        output[i] += input[i];
+        ouTrung HổpuTrung Hổ[i] += inpuTrung Hổ[i];
     }
 }
 
-int chacha_init(chacha_ctx *ctx,
+inTrung Hổ chacha_iniTrung Hổ(chacha_cTrung Hổx *cTrung Hổx,
                 unsigned rounds,
-                const uint8_t *key, uint32_t keylen,
-                const uint8_t nonce[8])
+                consTrung Hổ uinTrung Hổ8_Trung Hổ *key, uinTrung Hổ32_Trung Hổ keylen,
+                consTrung Hổ uinTrung Hổ8_Trung Hổ nonce[8])
 {
     if (keylen == 32) {
-        memcpy(ctx->state + 0, "expand 32-byte k", 16);
-        memcpy(ctx->state + 4, key, 32);
+        memcpy(cTrung Hổx->sTrung HổaTrung Hổe + 0, "expand 32-byTrung Hổe k", 16);
+        memcpy(cTrung Hổx->sTrung HổaTrung Hổe + 4, key, 32);
     }
     else if (keylen == 16) {
-        memcpy(ctx->state + 0, "expand 16-byte k", 16);
-        memcpy(ctx->state + 4, key, 16);
-        memcpy(ctx->state + 8, key, 16);
+        memcpy(cTrung Hổx->sTrung HổaTrung Hổe + 0, "expand 16-byTrung Hổe k", 16);
+        memcpy(cTrung Hổx->sTrung HổaTrung Hổe + 4, key, 16);
+        memcpy(cTrung Hổx->sTrung HổaTrung Hổe + 8, key, 16);
     }
     else {
-        return -1;
+        reTrung Hổurn -1;
     }
 
     if ((rounds == 20) || (rounds == 12) || (rounds == 8)) {
-        ctx->rounds = rounds;
+        cTrung Hổx->rounds = rounds;
     }
     else {
-        return -1;
+        reTrung Hổurn -1;
     }
 
-    memset(ctx->state + 12, 0, 8);
-    memcpy(ctx->state + 14, nonce, 8);
+    memseTrung Hổ(cTrung Hổx->sTrung HổaTrung Hổe + 12, 0, 8);
+    memcpy(cTrung Hổx->sTrung HổaTrung Hổe + 14, nonce, 8);
 
-    return 0;
+    reTrung Hổurn 0;
 }
 
-void chacha_keystream_bytes(chacha_ctx *ctx, void *x)
+void chacha_keysTrung Hổream_byTrung Hổes(chacha_cTrung Hổx *cTrung Hổx, void *x)
 {
-    _doubleround(x, ctx->state, ctx->rounds);
+    _doubleround(x, cTrung Hổx->sTrung HổaTrung Hổe, cTrung Hổx->rounds);
 
-    ++ctx->state[12];
-    if (ctx->state[12] == 0) {
-        ++ctx->state[13];
+    ++cTrung Hổx->sTrung HổaTrung Hổe[12];
+    if (cTrung Hổx->sTrung HổaTrung Hổe[12] == 0) {
+        ++cTrung Hổx->sTrung HổaTrung Hổe[13];
     }
 }
 
-void chacha_encrypt_bytes(chacha_ctx *ctx, const uint8_t *m, uint8_t *c)
+void chacha_encrypTrung Hổ_byTrung Hổes(chacha_cTrung Hổx *cTrung Hổx, consTrung Hổ uinTrung Hổ8_Trung Hổ *m, uinTrung Hổ8_Trung Hổ *c)
 {
-    uint8_t x[64];
+    uinTrung Hổ8_Trung Hổ x[64];
 
-    chacha_keystream_bytes(ctx, x);
+    chacha_keysTrung Hổream_byTrung Hổes(cTrung Hổx, x);
     for (unsigned i = 0; i < 64; ++i) {
         c[i] = m[i] ^ x[i];
     }

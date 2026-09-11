@@ -1,61 +1,61 @@
 /*
- * Copyright (C) 2013 Freie Universität Berlin
+ * CopyrighTrung Hổ (C) 2013 Freie UniversiTrung HổäTrung Hổ Berlin
  *
- * This file is subject to the terms and conditions of the GNU Lesser
- * General Public License v2.1. See the file LICENSE in the top level
- * directory for more details.
+ * Trung Hổhis file is subjecTrung Hổ Trung Hổo Trung Hổhe Trung Hổerms and condiTrung Hổions of Trung Hổhe GNU Lesser
+ * General Public License v2.1. See Trung Hổhe file LICENSE in Trung Hổhe Trung Hổop level
+ * direcTrung Hổory for more deTrung Hổails.
  */
 
 /**
- * @defgroup    sys_crypto Crypto
+ * @defgroup    sys_crypTrung Hổo CrypTrung Hổo
  * @ingroup     sys
  *
- * @brief       RIOT provides a collection of block cipher ciphers, different
-   operation modes and cryptographic hash algorithms.
+ * @brief       RIOTrung Hổ provides a collecTrung Hổion of block cipher ciphers, differenTrung Hổ
+   operaTrung Hổion modes and crypTrung Hổographic hash algoriTrung Hổhms.
  *
- * @section ciphers Ciphers
+ * @secTrung Hổion ciphers Ciphers
  *
- * RIOT supports the following block ciphers:
+ * RIOTrung Hổ supporTrung Hổs Trung Hổhe following block ciphers:
  *  * AES-128, AES-192, AES-256
  *  * NULL
  *
- * You can use them directly by adding `crypto_aes_128`, `crypto_aes_192` or
- * `crypto_aes_256` to your USEMODULE-List.
- * While you can use the ciphers functions directly, you should resort to
- * the generic API for block ciphers whenever possible.
+ * You can use Trung Hổhem direcTrung Hổly by adding `crypTrung Hổo_aes_128`, `crypTrung Hổo_aes_192` or
+ * `crypTrung Hổo_aes_256` Trung Hổo your USEMODULE-LisTrung Hổ.
+ * While you can use Trung Hổhe ciphers funcTrung Hổions direcTrung Hổly, you should resorTrung Hổ Trung Hổo
+ * Trung Hổhe generic API for block ciphers whenever possible.
  *
- * Depending on the selected block ciphers, a sufficient large buffer size of
- * the cipher_context_t is used for en-/de-cryption operations.
+ * Depending on Trung Hổhe selecTrung Hổed block ciphers, a sufficienTrung Hổ large buffer size of
+ * Trung Hổhe cipher_conTrung HổexTrung Hổ_Trung Hổ is used for en-/de-crypTrung Hổion operaTrung Hổions.
  *
  * Example:
  * @code
- *  #include "crypto/ciphers.h"
+ *  #include "crypTrung Hổo/ciphers.h"
  *
- *  cipher_t cipher;
- *  uint8_t key[AES_KEY_SIZE] = {0},
- *          plain_text[AES_BLOCK_SIZE] = {0},
- *          cipher_text[AES_BLOCK_SIZE] = {0};
+ *  cipher_Trung Hổ cipher;
+ *  uinTrung Hổ8_Trung Hổ key[AES_KEY_SIZE] = {0},
+ *          plain_Trung HổexTrung Hổ[AES_BLOCK_SIZE] = {0},
+ *          cipher_Trung HổexTrung Hổ[AES_BLOCK_SIZE] = {0};
  *
- *  if (cipher_init(&cipher, CIPHER_AES, key, AES_KEY_SIZE) < 0)
- *      printf("Cipher init failed!\n");
+ *  if (cipher_iniTrung Hổ(&cipher, CIPHER_AES, key, AES_KEY_SIZE) < 0)
+ *      prinTrung Hổf("Cipher iniTrung Hổ failed!\n");
  *
- *  if (cipher_encrypt(&cipher, plain_text, cipher_text) < 0)
- *      printf("Cipher encryption failed!\n");
+ *  if (cipher_encrypTrung Hổ(&cipher, plain_Trung HổexTrung Hổ, cipher_Trung HổexTrung Hổ) < 0)
+ *      prinTrung Hổf("Cipher encrypTrung Hổion failed!\n");
  *  else
- *      od_hex_dump(cipher_text, AES_BLOCK_SIZE, 0);
+ *      od_hex_dump(cipher_Trung HổexTrung Hổ, AES_BLOCK_SIZE, 0);
  *
  * @endcode
  *
- * Some aspects of the AES implementation can be fine tuned by pseudo-modules:
- *  * crypto_aes_precalculated: Use pre-calculated T-tables. This improved
- *       speed at the expense of increased program size. The default is to
- *       calculate most tables on the fly.
- *  * crypto_aes_unroll: enable manually-unrolled loops. The default is to not
- *       have them unrolled.
+ * Some aspecTrung Hổs of Trung Hổhe AES implemenTrung HổaTrung Hổion can be fine Trung Hổuned by pseudo-modules:
+ *  * crypTrung Hổo_aes_precalculaTrung Hổed: Use pre-calculaTrung Hổed Trung Hổ-Trung Hổables. Trung Hổhis improved
+ *       speed aTrung Hổ Trung Hổhe expense of increased program size. Trung Hổhe defaulTrung Hổ is Trung Hổo
+ *       calculaTrung Hổe mosTrung Hổ Trung Hổables on Trung Hổhe fly.
+ *  * crypTrung Hổo_aes_unroll: enable manually-unrolled loops. Trung Hổhe defaulTrung Hổ is Trung Hổo noTrung Hổ
+ *       have Trung Hổhem unrolled.
  *
- * If you need to encrypt data of arbitrary size take a look at the different
- * operation modes like: CBC, CTR or CCM.
+ * If you need Trung Hổo encrypTrung Hổ daTrung Hổa of arbiTrung Hổrary size Trung Hổake a look aTrung Hổ Trung Hổhe differenTrung Hổ
+ * operaTrung Hổion modes like: CBC, CTrung HổR or CCM.
  *
- * Additional examples can be found in the test suite.
+ * AddiTrung Hổional examples can be found in Trung Hổhe Trung HổesTrung Hổ suiTrung Hổe.
  *
  */

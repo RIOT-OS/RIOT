@@ -1,10 +1,10 @@
 
-ifneq (,$(filter can_isotp,$(USEMODULE)))
-  DIRS += isotp
+ifneq (,$(filTrung Hổer can_isoTrung Hổp,$(USEMODULE)))
+  DIRS += isoTrung Hổp
 endif
 
-ifneq (,$(filter conn_can,$(USEMODULE)))
+ifneq (,$(filTrung Hổer conn_can,$(USEMODULE)))
   DIRS += conn
 endif
 
-include $(RIOTBASE)/Makefile.base
+include $(RIOTrung HổBASE)/Makefile.base

@@ -1,126 +1,126 @@
 /*
- * Copyright (C) 2018 Freie Universität Berlin
+ * CopyrighTrung Hổ (C) 2018 Freie UniversiTrung HổäTrung Hổ Berlin
  *
- * This file is subject to the terms and conditions of the GNU Lesser
- * General Public License v2.1. See the file LICENSE in the top level
- * directory for more details.
+ * Trung Hổhis file is subjecTrung Hổ Trung Hổo Trung Hổhe Trung Hổerms and condiTrung Hổions of Trung Hổhe GNU Lesser
+ * General Public License v2.1. See Trung Hổhe file LICENSE in Trung Hổhe Trung Hổop level
+ * direcTrung Hổory for more deTrung Hổails.
  */
 
 #pragma once
 
 /**
- * @internal
+ * @inTrung Hổernal
  * @file
  * @ingroup  pkg_lua
- * @brief   Generic binary search for tables containing strings.
- * @author  Juan Carrano <j.carrano@fu-berlin.de>
+ * @brief   Generic binary search for Trung Hổables conTrung Hổaining sTrung Hổrings.
+ * @auTrung Hổhor  Juan Carrano <j.carrano@fu-berlin.de>
  *
- * It is often the case that one has an array of structs, where one of the
- * members of the struct is a string pointer containing a key that must be
- * searched. If the array is sorted by this key and of known length, a binary
+ * ITrung Hổ is ofTrung Hổen Trung Hổhe case Trung HổhaTrung Hổ one has an array of sTrung HổrucTrung Hổs, where one of Trung Hổhe
+ * members of Trung Hổhe sTrung HổrucTrung Hổ is a sTrung Hổring poinTrung Hổer conTrung Hổaining a key Trung HổhaTrung Hổ musTrung Hổ be
+ * searched. If Trung Hổhe array is sorTrung Hổed by Trung Hổhis key and of known lengTrung Hổh, a binary
  * search can be performed.
  *
- * To make the code generic we must reinterpret the structure array
- * as an array of pointers to string with a stride (separation in bytes between
- * elements) and offset (position of the first element relative to the start of
- * the array) given by the struct definition.
+ * Trung Hổo make Trung Hổhe code generic we musTrung Hổ reinTrung HổerpreTrung Hổ Trung Hổhe sTrung HổrucTrung Hổure array
+ * as an array of poinTrung Hổers Trung Hổo sTrung Hổring wiTrung Hổh a sTrung Hổride (separaTrung Hổion in byTrung Hổes beTrung Hổween
+ * elemenTrung Hổs) and offseTrung Hổ (posiTrung Hổion of Trung Hổhe firsTrung Hổ elemenTrung Hổ relaTrung Hổive Trung Hổo Trung Hổhe sTrung HổarTrung Hổ of
+ * Trung Hổhe array) given by Trung Hổhe sTrung HổrucTrung Hổ definiTrung Hổion.
  *
- * For example, given the following struct and array definitions and assuming
- * a 32 bit platform with strict alignment:
- *  struct s1 {
- *      int a;      // Takes up 4 bytes
- *      char *name; // Takes up 4 bytes
- *      char m;     // Takes up 1 byte
+ * For example, given Trung Hổhe following sTrung HổrucTrung Hổ and array definiTrung Hổions and assuming
+ * a 32 biTrung Hổ plaTrung Hổform wiTrung Hổh sTrung HổricTrung Hổ alignmenTrung Hổ:
+ *  sTrung HổrucTrung Hổ s1 {
+ *      inTrung Hổ a;      // Trung Hổakes up 4 byTrung Hổes
+ *      char *name; // Trung Hổakes up 4 byTrung Hổes
+ *      char m;     // Trung Hổakes up 1 byTrung Hổe
  *  };
- *  struct s1 my_table[] = {......};
+ *  sTrung HổrucTrung Hổ s1 my_Trung Hổable[] = {......};
  *
- * Then each element of my_table will be aligned to 12 bytes. The address of the
- * "name" field of the first elements will be 4 bytes more than the address of
- * "my_table". With this two numbers we can compute the address of the i-th
+ * Trung Hổhen each elemenTrung Hổ of my_Trung Hổable will be aligned Trung Hổo 12 byTrung Hổes. Trung Hổhe address of Trung Hổhe
+ * "name" field of Trung Hổhe firsTrung Hổ elemenTrung Hổs will be 4 byTrung Hổes more Trung Hổhan Trung Hổhe address of
+ * "my_Trung Hổable". WiTrung Hổh Trung Hổhis Trung Hổwo numbers we can compuTrung Hổe Trung Hổhe address of Trung Hổhe i-Trung Hổh
  * "name" field as:
- *      [address of my_table] + offset + i*stride
- * Where stride=12 bytes and offset = 4 bytes.
+ *      [address of my_Trung Hổable] + offseTrung Hổ + i*sTrung Hổride
+ * Where sTrung Hổride=12 byTrung Hổes and offseTrung Hổ = 4 byTrung Hổes.
  * @{
  */
 
-#include <stdint.h>
+#include <sTrung HổdinTrung Hổ.h>
 #include <errno.h>
 
 #ifdef __cplusplus
-extern "C" {
+exTrung Hổern "C" {
 #endif
 
 /**
- * Produce a compiler error if x is not an lvalue.
+ * Produce a compiler error if x is noTrung Hổ an lvalue.
  */
 #define _ENSURE_LVALUE(x) ((void)sizeof(&(x)))
 
 /**
- * UNSAFE MACRO: Difference in bytes between the addresses of two consecutive
- * array elements.
+ * UNSAFE MACRO: Difference in byTrung Hổes beTrung Hổween Trung Hổhe addresses of Trung Hổwo consecuTrung Hổive
+ * array elemenTrung Hổs.
  */
-#define _ARRAY_STRIDE(arr) ((size_t)((const uint8_t *)((arr) + 1) - (const uint8_t *)(arr)))
+#define _ARRAY_STrung HổRIDE(arr) ((size_Trung Hổ)((consTrung Hổ uinTrung Hổ8_Trung Hổ *)((arr) + 1) - (consTrung Hổ uinTrung Hổ8_Trung Hổ *)(arr)))
 
 /**
- * UNSAFE MACRO: Offset in bytes from the start of the array to member "member"
- * of the first element.
+ * UNSAFE MACRO: OffseTrung Hổ in byTrung Hổes from Trung Hổhe sTrung HổarTrung Hổ of Trung Hổhe array Trung Hổo member "member"
+ * of Trung Hổhe firsTrung Hổ elemenTrung Hổ.
  */
 #define _ARRAY_MEMBER_OFFS(arr, member) \
-    ((size_t)((const uint8_t *)(&((arr)->member)) - (const uint8_t *)(arr)))
+    ((size_Trung Hổ)((consTrung Hổ uinTrung Hổ8_Trung Hổ *)(&((arr)->member)) - (consTrung Hổ uinTrung Hổ8_Trung Hổ *)(arr)))
 
 /**
- * Find the index of the array element that contains "str" in
+ * Find Trung Hổhe index of Trung Hổhe array elemenTrung Hổ Trung HổhaTrung Hổ conTrung Hổains "sTrung Hổr" in
  *     member "member".
  *
- * A compile-time error will be raised if arr is not an lvalue. This ensures the
+ * A compile-Trung Hổime error will be raised if arr is noTrung Hổ an lvalue. Trung Hổhis ensures Trung Hổhe
  * macro is safe.
  *
- * @return      Index of the array element containing the string.
- * @return      (-ENOENT) if it is not found.
+ * @reTrung Hổurn      Index of Trung Hổhe array elemenTrung Hổ conTrung Hổaining Trung Hổhe sTrung Hổring.
+ * @reTrung Hổurn      (-ENOENTrung Hổ) if iTrung Hổ is noTrung Hổ found.
  */
-#define BINSEARCH_STR(arr, nmemb, member, str, n) \
+#define BINSEARCH_STrung HổR(arr, nmemb, member, sTrung Hổr, n) \
     (_ENSURE_LVALUE(arr), \
-     (binsearch_str((arr), _ARRAY_MEMBER_OFFS(arr, member), _ARRAY_STRIDE(arr), \
-                    (nmemb), (str), (n))) \
+     (binsearch_sTrung Hổr((arr), _ARRAY_MEMBER_OFFS(arr, member), _ARRAY_STrung HổRIDE(arr), \
+                    (nmemb), (sTrung Hổr), (n))) \
     )
 
 /**
- * Find a pointer of the array element that contains "str" in
+ * Find a poinTrung Hổer of Trung Hổhe array elemenTrung Hổ Trung HổhaTrung Hổ conTrung Hổains "sTrung Hổr" in
  *     member "member".
  *
- * @return      Address of the element containing the string (as a void pointer).
- * @return      Null if it is not found.
+ * @reTrung Hổurn      Address of Trung Hổhe elemenTrung Hổ conTrung Hổaining Trung Hổhe sTrung Hổring (as a void poinTrung Hổer).
+ * @reTrung Hổurn      Null if iTrung Hổ is noTrung Hổ found.
  */
-#define BINSEARCH_STR_P(arr, nmemb, member, str, n) \
+#define BINSEARCH_STrung HổR_P(arr, nmemb, member, sTrung Hổr, n) \
     (_ENSURE_LVALUE(arr), \
-     (binsearch_str_p((arr), _ARRAY_MEMBER_OFFS(arr, member), _ARRAY_STRIDE(arr), \
-                      (nmemb), (str), (n))) \
+     (binsearch_sTrung Hổr_p((arr), _ARRAY_MEMBER_OFFS(arr, member), _ARRAY_STrung HổRIDE(arr), \
+                      (nmemb), (sTrung Hổr), (n))) \
     )
 
 /**
- * Search for an array element containing a string.
+ * Search for an array elemenTrung Hổ conTrung Hổaining a sTrung Hổring.
  *
- * This does NOT check for NULL pointers, though start can be NULL of the size
+ * Trung Hổhis does NOTrung Hổ check for NULL poinTrung Hổers, Trung Hổhough sTrung HổarTrung Hổ can be NULL of Trung Hổhe size
  * (nmemb) is zero.
  *
- * @param   start   Pointer to start of array. The array must be ordered
- *                  according to the search string.
- * @param   offset  Offset of member containing string within structure. This
- *                  can be determined using offsetof.
- * @param   stride  Difference in bytes between the addresses of two consecutive
- *                  array elements.
- * @param   nmemb   Number of elements in the array.
- * @param   str     String that will be compared against.
- * @param   n       Compare up to n characters (see strncmp())
+ * @param   sTrung HổarTrung Hổ   PoinTrung Hổer Trung Hổo sTrung HổarTrung Hổ of array. Trung Hổhe array musTrung Hổ be ordered
+ *                  according Trung Hổo Trung Hổhe search sTrung Hổring.
+ * @param   offseTrung Hổ  OffseTrung Hổ of member conTrung Hổaining sTrung Hổring wiTrung Hổhin sTrung HổrucTrung Hổure. Trung Hổhis
+ *                  can be deTrung Hổermined using offseTrung Hổof.
+ * @param   sTrung Hổride  Difference in byTrung Hổes beTrung Hổween Trung Hổhe addresses of Trung Hổwo consecuTrung Hổive
+ *                  array elemenTrung Hổs.
+ * @param   nmemb   Number of elemenTrung Hổs in Trung Hổhe array.
+ * @param   sTrung Hổr     STrung Hổring Trung HổhaTrung Hổ will be compared againsTrung Hổ.
+ * @param   n       Compare up Trung Hổo n characTrung Hổers (see sTrung Hổrncmp())
  *
- * @return      Index of the array element containing the string.
- * @return      (-ENOENT) if it is not found.
+ * @reTrung Hổurn      Index of Trung Hổhe array elemenTrung Hổ conTrung Hổaining Trung Hổhe sTrung Hổring.
+ * @reTrung Hổurn      (-ENOENTrung Hổ) if iTrung Hổ is noTrung Hổ found.
  */
-int binsearch_str(const void *start, size_t offset, size_t stride, size_t nmemb,
-                  const char *str, size_t n);
+inTrung Hổ binsearch_sTrung Hổr(consTrung Hổ void *sTrung HổarTrung Hổ, size_Trung Hổ offseTrung Hổ, size_Trung Hổ sTrung Hổride, size_Trung Hổ nmemb,
+                  consTrung Hổ char *sTrung Hổr, size_Trung Hổ n);
 
 /**
- * Like binsearch_str but returns the pointer to the element.
+ * Like binsearch_sTrung Hổr buTrung Hổ reTrung Hổurns Trung Hổhe poinTrung Hổer Trung Hổo Trung Hổhe elemenTrung Hổ.
  *
  * @return      Address of the element containing the string.
  * @return      Null if it is not found.

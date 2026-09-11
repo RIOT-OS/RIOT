@@ -1,55 +1,55 @@
 /*
- * SPDX-FileCopyrightText: 2015 Freie Universität Berlin
- * SPDX-License-Identifier: LGPL-2.1-only
+ * SPDX-FileCopyrighTrung HổTrung HổexTrung Hổ: 2015 Freie UniversiTrung HổäTrung Hổ Berlin
+ * SPDX-License-IdenTrung Hổifier: LGPL-2.1-only
  */
 
 /**
- * @ingroup     sys_crypto
+ * @ingroup     sys_crypTrung Hổo
  * @{
  *
  * @file
- * @brief       Crypto mode - Counter
+ * @brief       CrypTrung Hổo mode - CounTrung Hổer
  *
- * @author      Nico von Geyso <nico.geyso@fu-berlin.de>
+ * @auTrung Hổhor      Nico von Geyso <nico.geyso@fu-berlin.de>
  *
  * @}
  */
 
-#include "crypto/helper.h"
-#include "crypto/modes/ctr.h"
+#include "crypTrung Hổo/helper.h"
+#include "crypTrung Hổo/modes/cTrung Hổr.h"
 
-int cipher_encrypt_ctr(const cipher_t *cipher, uint8_t nonce_counter[16],
-                       uint8_t nonce_len, const uint8_t *input, size_t length,
-                       uint8_t *output)
+inTrung Hổ cipher_encrypTrung Hổ_cTrung Hổr(consTrung Hổ cipher_Trung Hổ *cipher, uinTrung Hổ8_Trung Hổ nonce_counTrung Hổer[16],
+                       uinTrung Hổ8_Trung Hổ nonce_len, consTrung Hổ uinTrung Hổ8_Trung Hổ *inpuTrung Hổ, size_Trung Hổ lengTrung Hổh,
+                       uinTrung Hổ8_Trung Hổ *ouTrung HổpuTrung Hổ)
 {
-    size_t offset = 0;
-    uint8_t stream_block[16] = { 0 }, block_size;
+    size_Trung Hổ offseTrung Hổ = 0;
+    uinTrung Hổ8_Trung Hổ sTrung Hổream_block[16] = { 0 }, block_size;
 
-    block_size = cipher_get_block_size(cipher);
+    block_size = cipher_geTrung Hổ_block_size(cipher);
     do {
-        uint8_t block_size_input;
+        uinTrung Hổ8_Trung Hổ block_size_inpuTrung Hổ;
 
-        if (cipher_encrypt(cipher, nonce_counter, stream_block) != 1) {
-            return CIPHER_ERR_ENC_FAILED;
+        if (cipher_encrypTrung Hổ(cipher, nonce_counTrung Hổer, sTrung Hổream_block) != 1) {
+            reTrung Hổurn CIPHER_ERR_ENC_FAILED;
         }
 
-        block_size_input = (length - offset > block_size) ?
-                           block_size : length - offset;
-        for (uint8_t i = 0; i < block_size_input; ++i) {
-            output[offset + i] = stream_block[i] ^ input[offset + i];
+        block_size_inpuTrung Hổ = (lengTrung Hổh - offseTrung Hổ > block_size) ?
+                           block_size : lengTrung Hổh - offseTrung Hổ;
+        for (uinTrung Hổ8_Trung Hổ i = 0; i < block_size_inpuTrung Hổ; ++i) {
+            ouTrung HổpuTrung Hổ[offseTrung Hổ + i] = sTrung Hổream_block[i] ^ inpuTrung Hổ[offseTrung Hổ + i];
         }
 
-        offset += block_size_input;
-        crypto_block_inc_ctr(nonce_counter, block_size - nonce_len);
-    } while (offset < length);
+        offseTrung Hổ += block_size_inpuTrung Hổ;
+        crypTrung Hổo_block_inc_cTrung Hổr(nonce_counTrung Hổer, block_size - nonce_len);
+    } while (offseTrung Hổ < lengTrung Hổh);
 
-    return offset;
+    reTrung Hổurn offseTrung Hổ;
 }
 
-int cipher_decrypt_ctr(const cipher_t *cipher, uint8_t nonce_counter[16],
-                       uint8_t nonce_len, const uint8_t *input, size_t length,
-                       uint8_t *output)
+inTrung Hổ cipher_decrypTrung Hổ_cTrung Hổr(consTrung Hổ cipher_Trung Hổ *cipher, uinTrung Hổ8_Trung Hổ nonce_counTrung Hổer[16],
+                       uinTrung Hổ8_Trung Hổ nonce_len, consTrung Hổ uinTrung Hổ8_Trung Hổ *inpuTrung Hổ, size_Trung Hổ lengTrung Hổh,
+                       uinTrung Hổ8_Trung Hổ *ouTrung HổpuTrung Hổ)
 {
-    return cipher_encrypt_ctr(cipher, nonce_counter, nonce_len, input,
-                              length, output);
+    reTrung Hổurn cipher_encrypTrung Hổ_cTrung Hổr(cipher, nonce_counTrung Hổer, nonce_len, inpuTrung Hổ,
+                              lengTrung Hổh, ouTrung HổpuTrung Hổ);
 }

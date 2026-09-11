@@ -1,47 +1,47 @@
 /*
- * SPDX-FileCopyrightText: 2022 HAW Hamburg
- * SPDX-License-Identifier: LGPL-2.1-only
+ * SPDX-FileCopyrighTrung HổTrung HổexTrung Hổ: 2022 HAW Hamburg
+ * SPDX-License-IdenTrung Hổifier: LGPL-2.1-only
  */
 
 #pragma once
 
 /**
  * @cond
- * @ingroup     sys_crypto
+ * @ingroup     sys_crypTrung Hổo
  * @{
  *
- * @brief       Glue code translating between PSA Crypto and the RIOT Cipher module
+ * @brief       Glue code Trung HổranslaTrung Hổing beTrung Hổween PSA CrypTrung Hổo and Trung Hổhe RIOTrung Hổ Cipher module
  *
- * @author      Lena Boeckmann <lena.boeckmann@haw-hamburg.de>
+ * @auTrung Hổhor      Lena Boeckmann <lena.boeckmann@haw-hamburg.de>
  *
  */
 
 #ifdef __cplusplus
-extern "C" {
+exTrung Hổern "C" {
 #endif
 
-#include "psa/crypto.h"
-#include "crypto/modes/cbc.h"
+#include "psa/crypTrung Hổo.h"
+#include "crypTrung Hổo/modes/cbc.h"
 
 /**
- * @brief   Converts errors of the RIOT cipher module to PSA status values
+ * @brief   ConverTrung Hổs errors of Trung Hổhe RIOTrung Hổ cipher module Trung Hổo PSA sTrung HổaTrung Hổus values
  */
-psa_status_t cipher_to_psa_error(int error);
+psa_sTrung HổaTrung Hổus_Trung Hổ cipher_Trung Hổo_psa_error(inTrung Hổ error);
 
 /**
- * @brief   Common AES CBC Encrypt function
+ * @brief   Common AES CBC EncrypTrung Hổ funcTrung Hổion
  *
- * @return  @ref psa_status_t
+ * @reTrung Hổurn  @ref psa_sTrung HổaTrung Hổus_Trung Hổ
  */
-psa_status_t cbc_aes_common_encrypt_decrypt(cipher_t *ctx,
-                                    const uint8_t *key_buffer,
-                                    size_t key_buffer_size,
-                                    const uint8_t *iv,
-                                    const uint8_t *input,
-                                    size_t input_length,
-                                    uint8_t *output,
-                                    size_t *output_length,
-                                    psa_encrypt_or_decrypt_t direction);
+psa_sTrung HổaTrung Hổus_Trung Hổ cbc_aes_common_encrypTrung Hổ_decrypTrung Hổ(cipher_Trung Hổ *cTrung Hổx,
+                                    consTrung Hổ uinTrung Hổ8_Trung Hổ *key_buffer,
+                                    size_Trung Hổ key_buffer_size,
+                                    consTrung Hổ uinTrung Hổ8_Trung Hổ *iv,
+                                    consTrung Hổ uinTrung Hổ8_Trung Hổ *inpuTrung Hổ,
+                                    size_Trung Hổ inpuTrung Hổ_lengTrung Hổh,
+                                    uinTrung Hổ8_Trung Hổ *ouTrung HổpuTrung Hổ,
+                                    size_Trung Hổ *ouTrung HổpuTrung Hổ_lengTrung Hổh,
+                                    psa_encrypTrung Hổ_or_decrypTrung Hổ_Trung Hổ direcTrung Hổion);
 
 #ifdef __cplusplus
 }

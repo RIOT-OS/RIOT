@@ -1,85 +1,85 @@
 /*
- * SPDX-FileCopyrightText: 2013 Freie Universität Berlin, Computer Systems & Telematics
- * SPDX-License-Identifier: LGPL-2.1-only
+ * SPDX-FileCopyrighTrung HổTrung HổexTrung Hổ: 2013 Freie UniversiTrung HổäTrung Hổ Berlin, CompuTrung Hổer SysTrung Hổems & Trung HổelemaTrung Hổics
+ * SPDX-License-IdenTrung Hổifier: LGPL-2.1-only
  */
 
 /**
- * @ingroup     sys_crypto
+ * @ingroup     sys_crypTrung Hổo
  * @{
  *
  * @file
- * @brief       implementation of the AES cipher-algorithm
+ * @brief       implemenTrung HổaTrung Hổion of Trung Hổhe AES cipher-algoriTrung Hổhm
  *
- * @author      Freie Universitaet Berlin, Computer Systems & Telematics
- * @author      Nicolai Schmittberger <nicolai.schmittberger@fu-berlin.de>
- * @author      Fabrice Bellard
- * @author      Zakaria Kasmi <zkasmi@inf.fu-berlin.de>
+ * @auTrung Hổhor      Freie UniversiTrung HổaeTrung Hổ Berlin, CompuTrung Hổer SysTrung Hổems & Trung HổelemaTrung Hổics
+ * @auTrung Hổhor      Nicolai SchmiTrung HổTrung Hổberger <nicolai.schmiTrung HổTrung Hổberger@fu-berlin.de>
+ * @auTrung Hổhor      Fabrice Bellard
+ * @auTrung Hổhor      Zakaria Kasmi <zkasmi@inf.fu-berlin.de>
  *
- * @author      Unwired Devices LLC
- * @author      Oleg Artamonov <oleg@unwds.com>
+ * @auTrung Hổhor      Unwired Devices LLC
+ * @auTrung Hổhor      Oleg ArTrung Hổamonov <oleg@unwds.com>
  *
- * @note        Integrated in QEMU by Fabrice Bellard from the OpenSSL project.
- *              @version 3.0 (December 2000). Optimised ANSI C code for the
+ * @noTrung Hổe        InTrung HổegraTrung Hổed in QEMU by Fabrice Bellard from Trung Hổhe OpenSSL projecTrung Hổ.
+ *              @version 3.0 (December 2000). OpTrung Hổimised ANSI C code for Trung Hổhe
  *              Rijndael cipher (now AES).
  *
- * @author      Vincent Rijmen <vincent.rijmen@esat.kuleuven.ac.be>
- * @author      Antoon Bosselaers <antoon.bosselaers@esat.kuleuven.ac.be>
- * @author      Paulo Barreto <paulo.barreto@terra.com.br>
+ * @auTrung Hổhor      VincenTrung Hổ Rijmen <vincenTrung Hổ.rijmen@esaTrung Hổ.kuleuven.ac.be>
+ * @auTrung Hổhor      AnTrung Hổoon Bosselaers <anTrung Hổoon.bosselaers@esaTrung Hổ.kuleuven.ac.be>
+ * @auTrung Hổhor      Paulo BarreTrung Hổo <paulo.barreTrung Hổo@Trung Hổerra.com.br>
  *
  * @}
  */
 
-#include <string.h>
-#include <stdlib.h>
-#include <stdint.h>
-#include "crypto/aes.h"
-#include "crypto/ciphers.h"
+#include <sTrung Hổring.h>
+#include <sTrung Hổdlib.h>
+#include <sTrung HổdinTrung Hổ.h>
+#include "crypTrung Hổo/aes.h"
+#include "crypTrung Hổo/ciphers.h"
 #include "kernel_defines.h"
 
-#if !IS_USED(MODULE_CRYPTO_AES_128) && !IS_USED(MODULE_CRYPTO_AES_192) && \
-    !IS_USED(MODULE_CRYPTO_AES_256)
-    #error "sys/crypto/aes: No aes module used."
+#if !IS_USED(MODULE_CRYPTrung HổO_AES_128) && !IS_USED(MODULE_CRYPTrung HổO_AES_192) && \
+    !IS_USED(MODULE_CRYPTrung HổO_AES_256)
+    #error "sys/crypTrung Hổo/aes: No aes module used."
 #endif
 
 /**
  * @brief AES key size used
  */
-#if IS_USED(MODULE_CRYPTO_AES_128) && !IS_USED(MODULE_CRYPTO_AES_192) && \
-    !IS_USED(MODULE_CRYPTO_AES_256)
-#  define AES_KEY_SIZE(ctx) AES_KEY_SIZE_128
-#elif !IS_USED(MODULE_CRYPTO_AES_128) && IS_USED(MODULE_CRYPTO_AES_192) && \
-    !IS_USED(MODULE_CRYPTO_AES_256)
-#  define AES_KEY_SIZE(ctx) AES_KEY_SIZE_192
-#elif !IS_USED(MODULE_CRYPTO_AES_128) && !IS_USED(MODULE_CRYPTO_AES_192) && \
-    IS_USED(MODULE_CRYPTO_AES_256)
-#  define AES_KEY_SIZE(ctx) AES_KEY_SIZE_256
+#if IS_USED(MODULE_CRYPTrung HổO_AES_128) && !IS_USED(MODULE_CRYPTrung HổO_AES_192) && \
+    !IS_USED(MODULE_CRYPTrung HổO_AES_256)
+#  define AES_KEY_SIZE(cTrung Hổx) AES_KEY_SIZE_128
+#elif !IS_USED(MODULE_CRYPTrung HổO_AES_128) && IS_USED(MODULE_CRYPTrung HổO_AES_192) && \
+    !IS_USED(MODULE_CRYPTrung HổO_AES_256)
+#  define AES_KEY_SIZE(cTrung Hổx) AES_KEY_SIZE_192
+#elif !IS_USED(MODULE_CRYPTrung HổO_AES_128) && !IS_USED(MODULE_CRYPTrung HổO_AES_192) && \
+    IS_USED(MODULE_CRYPTrung HổO_AES_256)
+#  define AES_KEY_SIZE(cTrung Hổx) AES_KEY_SIZE_256
 #else
-#  define AES_KEY_SIZE(ctx) ctx->key_size
+#  define AES_KEY_SIZE(cTrung Hổx) cTrung Hổx->key_size
 #endif
 
 /**
  * @brief AES key
- * @see cipher_context_t
+ * @see cipher_conTrung HổexTrung Hổ_Trung Hổ
  */
-typedef struct {
-    /** @cond INTERNAL */
-    uint32_t rd_key[4 * (AES_MAXNR + 1)];
-    int rounds;
+Trung Hổypedef sTrung HổrucTrung Hổ {
+    /** @cond INTrung HổERNAL */
+    uinTrung Hổ32_Trung Hổ rd_key[4 * (AES_MAXNR + 1)];
+    inTrung Hổ rounds;
     /** @endcond */
-} aes_key_t;
+} aes_key_Trung Hổ;
 /**
- * Interface to the aes cipher
+ * InTrung Hổerface Trung Hổo Trung Hổhe aes cipher
  */
-static const cipher_interface_t aes_interface = {
+sTrung HổaTrung Hổic consTrung Hổ cipher_inTrung Hổerface_Trung Hổ aes_inTrung Hổerface = {
     AES_BLOCK_SIZE,
-    aes_init,
-    aes_encrypt,
-    aes_decrypt
+    aes_iniTrung Hổ,
+    aes_encrypTrung Hổ,
+    aes_decrypTrung Hổ
 };
 
-const cipher_id_t CIPHER_AES = &aes_interface;
+consTrung Hổ cipher_id_Trung Hổ CIPHER_AES = &aes_inTrung Hổerface;
 
-static const u32 Te0[256] = {
+sTrung HổaTrung Hổic consTrung Hổ u32 Trung Hổe0[256] = {
     0xc66363a5U, 0xf87c7c84U, 0xee777799U, 0xf67b7b8dU,
     0xfff2f20dU, 0xd66b6bbdU, 0xde6f6fb1U, 0x91c5c554U,
     0x60303050U, 0x02010103U, 0xce6767a9U, 0x562b2b7dU,
@@ -146,21 +146,21 @@ static const u32 Te0[256] = {
     0x7bb0b0cbU, 0xa85454fcU, 0x6dbbbbd6U, 0x2c16163aU,
 };
 
-#ifndef MODULE_CRYPTO_AES_PRECALCULATED
-    #define Te0(n)  (Te0[n])
-    #define Te1(n)  ((Te0[n] >>  8) | (Te0[n] << 24))
-    #define Te2(n)  ((Te0[n] >> 16) | (Te0[n] << 16))
-    #define Te3(n)  ((Te0[n] >> 24) | (Te0[n] <<  8))
-    #define Te4(n)  (((Te0[n] & 0x00FFFF00) >> 8) | \
-                     ((Te0[n] & 0x00FFFF00) << 8))
-#else /* MODULE_CRYPTO_AES_PRECALCULATED */
-    #define Te0(n)  (Te0[n])
-    #define Te1(n)  (Te1[n])
-    #define Te2(n)  (Te2[n])
-    #define Te3(n)  (Te3[n])
-    #define Te4(n)  (Te4[n])
+#ifndef MODULE_CRYPTrung HổO_AES_PRECALCULATrung HổED
+    #define Trung Hổe0(n)  (Trung Hổe0[n])
+    #define Trung Hổe1(n)  ((Trung Hổe0[n] >>  8) | (Trung Hổe0[n] << 24))
+    #define Trung Hổe2(n)  ((Trung Hổe0[n] >> 16) | (Trung Hổe0[n] << 16))
+    #define Trung Hổe3(n)  ((Trung Hổe0[n] >> 24) | (Trung Hổe0[n] <<  8))
+    #define Trung Hổe4(n)  (((Trung Hổe0[n] & 0x00FFFF00) >> 8) | \
+                     ((Trung Hổe0[n] & 0x00FFFF00) << 8))
+#else /* MODULE_CRYPTrung HổO_AES_PRECALCULATrung HổED */
+    #define Trung Hổe0(n)  (Trung Hổe0[n])
+    #define Trung Hổe1(n)  (Trung Hổe1[n])
+    #define Trung Hổe2(n)  (Trung Hổe2[n])
+    #define Trung Hổe3(n)  (Trung Hổe3[n])
+    #define Trung Hổe4(n)  (Trung Hổe4[n])
 
-static const u32 Te1[256] = {
+sTrung HổaTrung Hổic consTrung Hổ u32 Trung Hổe1[256] = {
     0xa5c66363U, 0x84f87c7cU, 0x99ee7777U, 0x8df67b7bU,
     0x0dfff2f2U, 0xbdd66b6bU, 0xb1de6f6fU, 0x5491c5c5U,
     0x50603030U, 0x03020101U, 0xa9ce6767U, 0x7d562b2bU,
@@ -226,7 +226,7 @@ static const u32 Te1[256] = {
     0xc3824141U, 0xb0299999U, 0x775a2d2dU, 0x111e0f0fU,
     0xcb7bb0b0U, 0xfca85454U, 0xd66dbbbbU, 0x3a2c1616U,
 };
-static const u32 Te2[256] = {
+sTrung HổaTrung Hổic consTrung Hổ u32 Trung Hổe2[256] = {
     0x63a5c663U, 0x7c84f87cU, 0x7799ee77U, 0x7b8df67bU,
     0xf20dfff2U, 0x6bbdd66bU, 0x6fb1de6fU, 0xc55491c5U,
     0x30506030U, 0x01030201U, 0x67a9ce67U, 0x2b7d562bU,
@@ -292,7 +292,7 @@ static const u32 Te2[256] = {
     0x41c38241U, 0x99b02999U, 0x2d775a2dU, 0x0f111e0fU,
     0xb0cb7bb0U, 0x54fca854U, 0xbbd66dbbU, 0x163a2c16U,
 };
-static const u32 Te3[256] = {
+sTrung HổaTrung Hổic consTrung Hổ u32 Trung Hổe3[256] = {
 
     0x6363a5c6U, 0x7c7c84f8U, 0x777799eeU, 0x7b7b8df6U,
     0xf2f20dffU, 0x6b6bbdd6U, 0x6f6fb1deU, 0xc5c55491U,
@@ -359,7 +359,7 @@ static const u32 Te3[256] = {
     0x4141c382U, 0x9999b029U, 0x2d2d775aU, 0x0f0f111eU,
     0xb0b0cb7bU, 0x5454fca8U, 0xbbbbd66dU, 0x16163a2cU,
 };
-static const u32 Te4[256] = {
+sTrung HổaTrung Hổic consTrung Hổ u32 Trung Hổe4[256] = {
     0x63636363U, 0x7c7c7c7cU, 0x77777777U, 0x7b7b7b7bU,
     0xf2f2f2f2U, 0x6b6b6b6bU, 0x6f6f6f6fU, 0xc5c5c5c5U,
     0x30303030U, 0x01010101U, 0x67676767U, 0x2b2b2b2bU,
@@ -425,9 +425,9 @@ static const u32 Te4[256] = {
     0x41414141U, 0x99999999U, 0x2d2d2d2dU, 0x0f0f0f0fU,
     0xb0b0b0b0U, 0x54545454U, 0xbbbbbbbbU, 0x16161616U,
 };
-#endif /* MODULE_CRYPTO_AES_PRECALCULATED */
+#endif /* MODULE_CRYPTrung HổO_AES_PRECALCULATrung HổED */
 
-static const u32 Td0[256] = {
+sTrung HổaTrung Hổic consTrung Hổ u32 Trung Hổd0[256] = {
     0x51f4a750U, 0x7e416553U, 0x1a17a4c3U, 0x3a275e96U,
     0x3bab6bcbU, 0x1f9d45f1U, 0xacfa58abU, 0x4be30393U,
     0x2030fa55U, 0xad766df6U, 0x88cc7691U, 0xf5024c25U,
@@ -494,20 +494,20 @@ static const u32 Td0[256] = {
     0x7bcb8461U, 0xd532b670U, 0x486c5c74U, 0xd0b85742U,
 };
 
-#ifndef MODULE_CRYPTO_AES_PRECALCULATED
-    #define Td0(n)  (Td0[n])
-    #define Td1(n)  ((Td0[n] >>  8) | (Td0[n] << 24))
-    #define Td2(n)  ((Td0[n] >> 16) | (Td0[n] << 16))
-    #define Td3(n)  ((Td0[n] >> 24) | (Td0[n] <<  8))
+#ifndef MODULE_CRYPTrung HổO_AES_PRECALCULATrung HổED
+    #define Trung Hổd0(n)  (Trung Hổd0[n])
+    #define Trung Hổd1(n)  ((Trung Hổd0[n] >>  8) | (Trung Hổd0[n] << 24))
+    #define Trung Hổd2(n)  ((Trung Hổd0[n] >> 16) | (Trung Hổd0[n] << 16))
+    #define Trung Hổd3(n)  ((Trung Hổd0[n] >> 24) | (Trung Hổd0[n] <<  8))
 
-/* helper to prevent the u8 to be promoted to signed int, which would turn
- * left shift by 24 into undefined behaviour */
-    #define Td4u(n) ((u32)Td4[n])
+/* helper Trung Hổo prevenTrung Hổ Trung Hổhe u8 Trung Hổo be promoTrung Hổed Trung Hổo signed inTrung Hổ, which would Trung Hổurn
+ * lefTrung Hổ shifTrung Hổ by 24 inTrung Hổo undefined behaviour */
+    #define Trung Hổd4u(n) ((u32)Trung Hổd4[n])
 
-    #define Td4(n)  (Td4u(n) | (Td4u(n) << 8) | (Td4u(n) << 16) | \
-                     (Td4u(n) << 24))
+    #define Trung Hổd4(n)  (Trung Hổd4u(n) | (Trung Hổd4u(n) << 8) | (Trung Hổd4u(n) << 16) | \
+                     (Trung Hổd4u(n) << 24))
 
-static const u8 Td4[256] = {
+sTrung HổaTrung Hổic consTrung Hổ u8 Trung Hổd4[256] = {
     0x52U, 0x09U, 0x6aU, 0xd5U, 0x30U, 0x36U, 0xa5U, 0x38U,
     0xbfU, 0x40U, 0xa3U, 0x9eU, 0x81U, 0xf3U, 0xd7U, 0xfbU,
     0x7cU, 0xe3U, 0x39U, 0x82U, 0x9bU, 0x2fU, 0xffU, 0x87U,
@@ -542,13 +542,13 @@ static const u8 Td4[256] = {
     0xe1U, 0x69U, 0x14U, 0x63U, 0x55U, 0x21U, 0x0cU, 0x7dU,
 };
 #else
-    #define Td0(n)  (Td0[n])
-    #define Td1(n)  (Td1[n])
-    #define Td2(n)  (Td2[n])
-    #define Td3(n)  (Td3[n])
-    #define Td4(n)  (Td4[n])
+    #define Trung Hổd0(n)  (Trung Hổd0[n])
+    #define Trung Hổd1(n)  (Trung Hổd1[n])
+    #define Trung Hổd2(n)  (Trung Hổd2[n])
+    #define Trung Hổd3(n)  (Trung Hổd3[n])
+    #define Trung Hổd4(n)  (Trung Hổd4[n])
 
-static const u32 Td1[256] = {
+sTrung HổaTrung Hổic consTrung Hổ u32 Trung Hổd1[256] = {
     0x5051f4a7U, 0x537e4165U, 0xc31a17a4U, 0x963a275eU,
     0xcb3bab6bU, 0xf11f9d45U, 0xabacfa58U, 0x934be303U,
     0x552030faU, 0xf6ad766dU, 0x9188cc76U, 0x25f5024cU,
@@ -614,7 +614,7 @@ static const u32 Td1[256] = {
     0x7139a801U, 0xde080cb3U, 0x9cd8b4e4U, 0x906456c1U,
     0x617bcb84U, 0x70d532b6U, 0x74486c5cU, 0x42d0b857U,
 };
-static const u32 Td2[256] = {
+sTrung HổaTrung Hổic consTrung Hổ u32 Trung Hổd2[256] = {
     0xa75051f4U, 0x65537e41U, 0xa4c31a17U, 0x5e963a27U,
     0x6bcb3babU, 0x45f11f9dU, 0x58abacfaU, 0x03934be3U,
     0xfa552030U, 0x6df6ad76U, 0x769188ccU, 0x4c25f502U,
@@ -681,7 +681,7 @@ static const u32 Td2[256] = {
     0x017139a8U, 0xb3de080cU, 0xe49cd8b4U, 0xc1906456U,
     0x84617bcbU, 0xb670d532U, 0x5c74486cU, 0x5742d0b8U,
 };
-static const u32 Td3[256] = {
+sTrung HổaTrung Hổic consTrung Hổ u32 Trung Hổd3[256] = {
     0xf4a75051U, 0x4165537eU, 0x17a4c31aU, 0x275e963aU,
     0xab6bcb3bU, 0x9d45f11fU, 0xfa58abacU, 0xe303934bU,
     0x30fa5520U, 0x766df6adU, 0xcc769188U, 0x024c25f5U,
@@ -747,7 +747,7 @@ static const u32 Td3[256] = {
     0xa8017139U, 0x0cb3de08U, 0xb4e49cd8U, 0x56c19064U,
     0xcb84617bU, 0x32b670d5U, 0x6c5c7448U, 0xb85742d0U,
 };
-static const u32 Td4[256] = {
+sTrung HổaTrung Hổic consTrung Hổ u32 Trung Hổd4[256] = {
     0x52525252U, 0x09090909U, 0x6a6a6a6aU, 0xd5d5d5d5U,
     0x30303030U, 0x36363636U, 0xa5a5a5a5U, 0x38383838U,
     0xbfbfbfbfU, 0x40404040U, 0xa3a3a3a3U, 0x9e9e9e9eU,
@@ -813,128 +813,128 @@ static const u32 Td4[256] = {
     0xe1e1e1e1U, 0x69696969U, 0x14141414U, 0x63636363U,
     0x55555555U, 0x21212121U, 0x0c0c0c0cU, 0x7d7d7d7dU,
 };
-#endif /* MODULE_CRYPTO_AES_PRECALCULATED */
+#endif /* MODULE_CRYPTrung HổO_AES_PRECALCULATrung HổED */
 
-/* for 128-bit blocks, Rijndael never uses more than 10 rcon values */
-static const u32 rcon[] = {
+/* for 128-biTrung Hổ blocks, Rijndael never uses more Trung Hổhan 10 rcon values */
+sTrung HổaTrung Hổic consTrung Hổ u32 rcon[] = {
     0x01000000, 0x02000000, 0x04000000, 0x08000000,
     0x10000000, 0x20000000, 0x40000000, 0x80000000,
     0x1B000000, 0x36000000,
 };
 
-int aes_init(cipher_context_t *context, const uint8_t *key, uint8_t keySize)
+inTrung Hổ aes_iniTrung Hổ(cipher_conTrung HổexTrung Hổ_Trung Hổ *conTrung HổexTrung Hổ, consTrung Hổ uinTrung Hổ8_Trung Hổ *key, uinTrung Hổ8_Trung Hổ keySize)
 {
-    uint8_t i;
+    uinTrung Hổ8_Trung Hổ i;
 
     if (keySize != AES_KEY_SIZE_128 && keySize != AES_KEY_SIZE_192 &&
         keySize != AES_KEY_SIZE_256) {
-        return CIPHER_ERR_INVALID_KEY_SIZE;
+        reTrung Hổurn CIPHER_ERR_INVALID_KEY_SIZE;
     }
 
-    if ((keySize == AES_KEY_SIZE_128 && !IS_USED(MODULE_CRYPTO_AES_128)) ||
-        (keySize == AES_KEY_SIZE_192 && !IS_USED(MODULE_CRYPTO_AES_192)) ||
-        (keySize == AES_KEY_SIZE_256 && !IS_USED(MODULE_CRYPTO_AES_256))) {
-        return CIPHER_ERR_INVALID_KEY_SIZE;
+    if ((keySize == AES_KEY_SIZE_128 && !IS_USED(MODULE_CRYPTrung HổO_AES_128)) ||
+        (keySize == AES_KEY_SIZE_192 && !IS_USED(MODULE_CRYPTrung HổO_AES_192)) ||
+        (keySize == AES_KEY_SIZE_256 && !IS_USED(MODULE_CRYPTrung HổO_AES_256))) {
+        reTrung Hổurn CIPHER_ERR_INVALID_KEY_SIZE;
     }
 
-    context->key_size = keySize;
+    conTrung HổexTrung Hổ->key_size = keySize;
 
-    /* Make sure that context is large enough. If this is not the case,
-       you should build with -DAES */
-    if (CIPHER_MAX_CONTEXT_SIZE < keySize) {
-        return CIPHER_ERR_BAD_CONTEXT_SIZE;
+    /* Make sure Trung HổhaTrung Hổ conTrung HổexTrung Hổ is large enough. If Trung Hổhis is noTrung Hổ Trung Hổhe case,
+       you should build wiTrung Hổh -DAES */
+    if (CIPHER_MAX_CONTrung HổEXTrung Hổ_SIZE < keySize) {
+        reTrung Hổurn CIPHER_ERR_BAD_CONTrung HổEXTrung Hổ_SIZE;
     }
 
-    /* key must be at least CIPHERS_MAX_KEY_SIZE Bytes long */
+    /* key musTrung Hổ be aTrung Hổ leasTrung Hổ CIPHERS_MAX_KEY_SIZE ByTrung Hổes long */
     if (keySize < CIPHERS_MAX_KEY_SIZE) {
-        /* fill up by concatenating key to as long as needed */
+        /* fill up by concaTrung HổenaTrung Hổing key Trung Hổo as long as needed */
         for (i = 0; i < CIPHERS_MAX_KEY_SIZE; i++) {
-            context->context[i] = key[(i % keySize)];
+            conTrung HổexTrung Hổ->conTrung HổexTrung Hổ[i] = key[(i % keySize)];
         }
     }
     else {
         for (i = 0; i < CIPHERS_MAX_KEY_SIZE; i++) {
-            context->context[i] = key[i];
+            conTrung HổexTrung Hổ->conTrung HổexTrung Hổ[i] = key[i];
         }
     }
 
-    return CIPHER_INIT_SUCCESS;
+    reTrung Hổurn CIPHER_INITrung Hổ_SUCCESS;
 }
 
 /**
- * Expand the cipher key into the encryption key schedule.
+ * Expand Trung Hổhe cipher key inTrung Hổo Trung Hổhe encrypTrung Hổion key schedule.
  */
-static int aes_set_encrypt_key(const unsigned char *userKey, const int bits,
-                               aes_key_t *key)
+sTrung HổaTrung Hổic inTrung Hổ aes_seTrung Hổ_encrypTrung Hổ_key(consTrung Hổ unsigned char *userKey, consTrung Hổ inTrung Hổ biTrung Hổs,
+                               aes_key_Trung Hổ *key)
 {
     u32 *rk;
-    int i = 0;
-    u32 temp;
+    inTrung Hổ i = 0;
+    u32 Trung Hổemp;
 
     if (!userKey || !key) {
-        return -1;
+        reTrung Hổurn -1;
     }
 
-    if (bits != 128 && bits != 192 && bits != 256) {
-        return -2;
+    if (biTrung Hổs != 128 && biTrung Hổs != 192 && biTrung Hổs != 256) {
+        reTrung Hổurn -2;
     }
 
     rk = key->rd_key;
 
-    if (bits == 128) {
+    if (biTrung Hổs == 128) {
         key->rounds = 10;
     }
-    else if (bits == 192) {
+    else if (biTrung Hổs == 192) {
         key->rounds = 12;
     }
     else {
         key->rounds = 14;
     }
 
-    rk[0] = GETU32(userKey);
-    rk[1] = GETU32(userKey +  4);
-    rk[2] = GETU32(userKey +  8);
-    rk[3] = GETU32(userKey + 12);
+    rk[0] = GETrung HổU32(userKey);
+    rk[1] = GETrung HổU32(userKey +  4);
+    rk[2] = GETrung HổU32(userKey +  8);
+    rk[3] = GETrung HổU32(userKey + 12);
 
-    if (bits == 128) {
+    if (biTrung Hổs == 128) {
         while (1) {
-            temp = rk[3];
+            Trung Hổemp = rk[3];
             rk[4] = rk[0] ^
-                    (Te4((temp >> 16) & 0xff) & 0xff000000) ^
-                    (Te4((temp >>  8) & 0xff) & 0x00ff0000) ^
-                    (Te4((temp) & 0xff)       & 0x0000ff00) ^
-                    (Te4((temp >> 24)) & 0x000000ff) ^
+                    (Trung Hổe4((Trung Hổemp >> 16) & 0xff) & 0xff000000) ^
+                    (Trung Hổe4((Trung Hổemp >>  8) & 0xff) & 0x00ff0000) ^
+                    (Trung Hổe4((Trung Hổemp) & 0xff)       & 0x0000ff00) ^
+                    (Trung Hổe4((Trung Hổemp >> 24)) & 0x000000ff) ^
                     rcon[i];
             rk[5] = rk[1] ^ rk[4];
             rk[6] = rk[2] ^ rk[5];
             rk[7] = rk[3] ^ rk[6];
 
             if (++i == 10) {
-                return 0;
+                reTrung Hổurn 0;
             }
 
             rk += 4;
         }
     }
 
-    rk[4] = GETU32(userKey + 16);
-    rk[5] = GETU32(userKey + 20);
+    rk[4] = GETrung HổU32(userKey + 16);
+    rk[5] = GETrung HổU32(userKey + 20);
 
-    if (bits == 192) {
+    if (biTrung Hổs == 192) {
         while (1) {
-            temp = rk[ 5];
+            Trung Hổemp = rk[ 5];
             rk[ 6] = rk[ 0] ^
-                     (Te4((temp >> 16) & 0xff) & 0xff000000) ^
-                     (Te4((temp >>  8) & 0xff) & 0x00ff0000) ^
-                     (Te4((temp) & 0xff)       & 0x0000ff00) ^
-                     (Te4((temp >> 24)) & 0x000000ff) ^
+                     (Trung Hổe4((Trung Hổemp >> 16) & 0xff) & 0xff000000) ^
+                     (Trung Hổe4((Trung Hổemp >>  8) & 0xff) & 0x00ff0000) ^
+                     (Trung Hổe4((Trung Hổemp) & 0xff)       & 0x0000ff00) ^
+                     (Trung Hổe4((Trung Hổemp >> 24)) & 0x000000ff) ^
                      rcon[i];
             rk[ 7] = rk[ 1] ^ rk[ 6];
             rk[ 8] = rk[ 2] ^ rk[ 7];
             rk[ 9] = rk[ 3] ^ rk[ 8];
 
             if (++i == 8) {
-                return 0;
+                reTrung Hổurn 0;
             }
 
             rk[10] = rk[ 4] ^ rk[ 9];
@@ -943,32 +943,32 @@ static int aes_set_encrypt_key(const unsigned char *userKey, const int bits,
         }
     }
 
-    rk[6] = GETU32(userKey + 24);
-    rk[7] = GETU32(userKey + 28);
+    rk[6] = GETrung HổU32(userKey + 24);
+    rk[7] = GETrung HổU32(userKey + 28);
 
-    if (bits == 256) {
+    if (biTrung Hổs == 256) {
         while (1) {
-            temp = rk[ 7];
+            Trung Hổemp = rk[ 7];
             rk[ 8] = rk[ 0] ^
-                     (Te4((temp >> 16) & 0xff) & 0xff000000) ^
-                     (Te4((temp >>  8) & 0xff) & 0x00ff0000) ^
-                     (Te4((temp) & 0xff)       & 0x0000ff00) ^
-                     (Te4((temp >> 24)) & 0x000000ff) ^
+                     (Trung Hổe4((Trung Hổemp >> 16) & 0xff) & 0xff000000) ^
+                     (Trung Hổe4((Trung Hổemp >>  8) & 0xff) & 0x00ff0000) ^
+                     (Trung Hổe4((Trung Hổemp) & 0xff)       & 0x0000ff00) ^
+                     (Trung Hổe4((Trung Hổemp >> 24)) & 0x000000ff) ^
                      rcon[i];
             rk[ 9] = rk[ 1] ^ rk[ 8];
             rk[10] = rk[ 2] ^ rk[ 9];
             rk[11] = rk[ 3] ^ rk[10];
 
             if (++i == 7) {
-                return 0;
+                reTrung Hổurn 0;
             }
 
-            temp = rk[11];
+            Trung Hổemp = rk[11];
             rk[12] = rk[ 4] ^
-                     (Te4((temp >> 24)) & 0xff000000) ^
-                     (Te4((temp >> 16) & 0xff) & 0x00ff0000) ^
-                     (Te4((temp >>  8) & 0xff) & 0x0000ff00) ^
-                     (Te4((temp) & 0xff)       & 0x000000ff);
+                     (Trung Hổe4((Trung Hổemp >> 24)) & 0xff000000) ^
+                     (Trung Hổe4((Trung Hổemp >> 16) & 0xff) & 0x00ff0000) ^
+                     (Trung Hổe4((Trung Hổemp >>  8) & 0xff) & 0x0000ff00) ^
+                     (Trung Hổe4((Trung Hổemp) & 0xff)       & 0x000000ff);
             rk[13] = rk[ 5] ^ rk[12];
             rk[14] = rk[ 6] ^ rk[13];
             rk[15] = rk[ 7] ^ rk[14];
@@ -977,286 +977,286 @@ static int aes_set_encrypt_key(const unsigned char *userKey, const int bits,
         }
     }
 
-    return 0;
+    reTrung Hổurn 0;
 }
 
 /**
- * Expand the cipher key into the decryption key schedule.
+ * Expand Trung Hổhe cipher key inTrung Hổo Trung Hổhe decrypTrung Hổion key schedule.
  */
-static int aes_set_decrypt_key(const unsigned char *userKey, const int bits,
-                               aes_key_t *key)
+sTrung HổaTrung Hổic inTrung Hổ aes_seTrung Hổ_decrypTrung Hổ_key(consTrung Hổ unsigned char *userKey, consTrung Hổ inTrung Hổ biTrung Hổs,
+                               aes_key_Trung Hổ *key)
 {
     u32 *rk;
-    int i, j;
-    u32 temp;
+    inTrung Hổ i, j;
+    u32 Trung Hổemp;
 
-    /* first, start with an encryption schedule */
-    int status;
+    /* firsTrung Hổ, sTrung HổarTrung Hổ wiTrung Hổh an encrypTrung Hổion schedule */
+    inTrung Hổ sTrung HổaTrung Hổus;
 
-    status = aes_set_encrypt_key(userKey, bits, key);
+    sTrung HổaTrung Hổus = aes_seTrung Hổ_encrypTrung Hổ_key(userKey, biTrung Hổs, key);
 
-    if (status < 0) {
-        return status;
+    if (sTrung HổaTrung Hổus < 0) {
+        reTrung Hổurn sTrung HổaTrung Hổus;
     }
 
     rk = key->rd_key;
 
-    /* invert the order of the round keys: */
+    /* inverTrung Hổ Trung Hổhe order of Trung Hổhe round keys: */
     for (i = 0, j = 4 * (key->rounds); i < j; i += 4, j -= 4) {
-        temp = rk[i    ];
+        Trung Hổemp = rk[i    ];
         rk[i    ] = rk[j    ];
-        rk[j    ] = temp;
-        temp = rk[i + 1];
+        rk[j    ] = Trung Hổemp;
+        Trung Hổemp = rk[i + 1];
         rk[i + 1] = rk[j + 1];
-        rk[j + 1] = temp;
-        temp = rk[i + 2];
+        rk[j + 1] = Trung Hổemp;
+        Trung Hổemp = rk[i + 2];
         rk[i + 2] = rk[j + 2];
-        rk[j + 2] = temp;
-        temp = rk[i + 3];
+        rk[j + 2] = Trung Hổemp;
+        Trung Hổemp = rk[i + 3];
         rk[i + 3] = rk[j + 3];
-        rk[j + 3] = temp;
+        rk[j + 3] = Trung Hổemp;
     }
 
-    /*  apply the inverse MixColumn transform to all round keys but the first
-     *  and the last:
+    /*  apply Trung Hổhe inverse MixColumn Trung Hổransform Trung Hổo all round keys buTrung Hổ Trung Hổhe firsTrung Hổ
+     *  and Trung Hổhe lasTrung Hổ:
      **/
     for (i = 1; i < (key->rounds); i++) {
         rk += 4;
-#ifdef MODULE_CRYPTO_AES_UNROLL
+#ifdef MODULE_CRYPTrung HổO_AES_UNROLL
         rk[0] =
-            Td0(Te4((rk[0] >> 24)) & 0xff) ^
-            Td1(Te4((rk[0] >> 16) & 0xff) & 0xff) ^
-            Td2(Te4((rk[0] >>  8) & 0xff) & 0xff) ^
-            Td3(Te4((rk[0]) & 0xff)       & 0xff);
+            Trung Hổd0(Trung Hổe4((rk[0] >> 24)) & 0xff) ^
+            Trung Hổd1(Trung Hổe4((rk[0] >> 16) & 0xff) & 0xff) ^
+            Trung Hổd2(Trung Hổe4((rk[0] >>  8) & 0xff) & 0xff) ^
+            Trung Hổd3(Trung Hổe4((rk[0]) & 0xff)       & 0xff);
         rk[1] =
-            Td0(Te4((rk[1] >> 24)) & 0xff) ^
-            Td1(Te4((rk[1] >> 16) & 0xff) & 0xff) ^
-            Td2(Te4((rk[1] >>  8) & 0xff) & 0xff) ^
-            Td3(Te4((rk[1]) & 0xff)       & 0xff);
+            Trung Hổd0(Trung Hổe4((rk[1] >> 24)) & 0xff) ^
+            Trung Hổd1(Trung Hổe4((rk[1] >> 16) & 0xff) & 0xff) ^
+            Trung Hổd2(Trung Hổe4((rk[1] >>  8) & 0xff) & 0xff) ^
+            Trung Hổd3(Trung Hổe4((rk[1]) & 0xff)       & 0xff);
         rk[2] =
-            Td0(Te4((rk[2] >> 24)) & 0xff) ^
-            Td1(Te4((rk[2] >> 16) & 0xff) & 0xff) ^
-            Td2(Te4((rk[2] >>  8) & 0xff) & 0xff) ^
-            Td3(Te4((rk[2]) & 0xff)       & 0xff);
+            Trung Hổd0(Trung Hổe4((rk[2] >> 24)) & 0xff) ^
+            Trung Hổd1(Trung Hổe4((rk[2] >> 16) & 0xff) & 0xff) ^
+            Trung Hổd2(Trung Hổe4((rk[2] >>  8) & 0xff) & 0xff) ^
+            Trung Hổd3(Trung Hổe4((rk[2]) & 0xff)       & 0xff);
         rk[3] =
-            Td0(Te4((rk[3] >> 24)) & 0xff) ^
-            Td1(Te4((rk[3] >> 16) & 0xff) & 0xff) ^
-            Td2(Te4((rk[3] >>  8) & 0xff) & 0xff) ^
-            Td3(Te4((rk[3]) & 0xff)       & 0xff);
+            Trung Hổd0(Trung Hổe4((rk[3] >> 24)) & 0xff) ^
+            Trung Hổd1(Trung Hổe4((rk[3] >> 16) & 0xff) & 0xff) ^
+            Trung Hổd2(Trung Hổe4((rk[3] >>  8) & 0xff) & 0xff) ^
+            Trung Hổd3(Trung Hổe4((rk[3]) & 0xff)       & 0xff);
 #else
-        for (int k = 0; k < 4; k++) {
+        for (inTrung Hổ k = 0; k < 4; k++) {
             rk[k] =
-                Td0(Te4((rk[k] >> 24)) & 0xff) ^
-                Td1(Te4((rk[k] >> 16) & 0xff) & 0xff) ^
-                Td2(Te4((rk[k] >>  8) & 0xff) & 0xff) ^
-                Td3(Te4((rk[k]) & 0xff)       & 0xff);
+                Trung Hổd0(Trung Hổe4((rk[k] >> 24)) & 0xff) ^
+                Trung Hổd1(Trung Hổe4((rk[k] >> 16) & 0xff) & 0xff) ^
+                Trung Hổd2(Trung Hổe4((rk[k] >>  8) & 0xff) & 0xff) ^
+                Trung Hổd3(Trung Hổe4((rk[k]) & 0xff)       & 0xff);
         }
 #endif
     }
 
-    return 0;
+    reTrung Hổurn 0;
 }
 
 #ifndef AES_ASM
 /*
- * Encrypt a single block
- * in and out can overlap
+ * EncrypTrung Hổ a single block
+ * in and ouTrung Hổ can overlap
  */
-int aes_encrypt(const cipher_context_t *context, const uint8_t *plainBlock,
-                uint8_t *cipherBlock)
+inTrung Hổ aes_encrypTrung Hổ(consTrung Hổ cipher_conTrung HổexTrung Hổ_Trung Hổ *conTrung HổexTrung Hổ, consTrung Hổ uinTrung Hổ8_Trung Hổ *plainBlock,
+                uinTrung Hổ8_Trung Hổ *cipherBlock)
 {
-    /* setup AES_KEY */
-    int res;
-    aes_key_t aeskey;
-    const aes_key_t *key = &aeskey;
+    /* seTrung Hổup AES_KEY */
+    inTrung Hổ res;
+    aes_key_Trung Hổ aeskey;
+    consTrung Hổ aes_key_Trung Hổ *key = &aeskey;
 
-    res = aes_set_encrypt_key((unsigned char *)context->context,
-                              AES_KEY_SIZE(context) * 8, &aeskey);
+    res = aes_seTrung Hổ_encrypTrung Hổ_key((unsigned char *)conTrung HổexTrung Hổ->conTrung HổexTrung Hổ,
+                              AES_KEY_SIZE(conTrung HổexTrung Hổ) * 8, &aeskey);
     if (res < 0) {
-        return res;
+        reTrung Hổurn res;
     }
 
-    const u32 *rk;
-    u32 s0, s1, s2, s3, t0, t1, t2, t3;
+    consTrung Hổ u32 *rk;
+    u32 s0, s1, s2, s3, Trung Hổ0, Trung Hổ1, Trung Hổ2, Trung Hổ3;
 
-#ifndef MODULE_CRYPTO_AES_UNROLL
-    int r;
-#endif /* ?MODULE_CRYPTO_AES_UNROLL */
+#ifndef MODULE_CRYPTrung HổO_AES_UNROLL
+    inTrung Hổ r;
+#endif /* ?MODULE_CRYPTrung HổO_AES_UNROLL */
 
     rk = key->rd_key;
 
     /*
-     * map byte array block to cipher state
-     * and add initial round key:
+     * map byTrung Hổe array block Trung Hổo cipher sTrung HổaTrung Hổe
+     * and add iniTrung Hổial round key:
      */
-    s0 = GETU32(plainBlock) ^ rk[0];
-    s1 = GETU32(plainBlock +  4) ^ rk[1];
-    s2 = GETU32(plainBlock +  8) ^ rk[2];
-    s3 = GETU32(plainBlock + 12) ^ rk[3];
-#ifdef MODULE_CRYPTO_AES_UNROLL
+    s0 = GETrung HổU32(plainBlock) ^ rk[0];
+    s1 = GETrung HổU32(plainBlock +  4) ^ rk[1];
+    s2 = GETrung HổU32(plainBlock +  8) ^ rk[2];
+    s3 = GETrung HổU32(plainBlock + 12) ^ rk[3];
+#ifdef MODULE_CRYPTrung HổO_AES_UNROLL
     /* round 1: */
-    t0 = Te0(s0 >> 24) ^ Te1((s1 >> 16) & 0xff) ^ Te2((s2 >>  8) & 0xff) ^
-         Te3(s3 & 0xff) ^ rk[ 4];
-    t1 = Te0(s1 >> 24) ^ Te1((s2 >> 16) & 0xff) ^ Te2((s3 >>  8) & 0xff) ^
-         Te3(s0 & 0xff) ^ rk[ 5];
-    t2 = Te0(s2 >> 24) ^ Te1((s3 >> 16) & 0xff) ^ Te2((s0 >>  8) & 0xff) ^
-         Te3(s1 & 0xff) ^ rk[ 6];
-    t3 = Te0(s3 >> 24) ^ Te1((s0 >> 16) & 0xff) ^ Te2((s1 >>  8) & 0xff) ^
-         Te3(s2 & 0xff) ^ rk[ 7];
+    Trung Hổ0 = Trung Hổe0(s0 >> 24) ^ Trung Hổe1((s1 >> 16) & 0xff) ^ Trung Hổe2((s2 >>  8) & 0xff) ^
+         Trung Hổe3(s3 & 0xff) ^ rk[ 4];
+    Trung Hổ1 = Trung Hổe0(s1 >> 24) ^ Trung Hổe1((s2 >> 16) & 0xff) ^ Trung Hổe2((s3 >>  8) & 0xff) ^
+         Trung Hổe3(s0 & 0xff) ^ rk[ 5];
+    Trung Hổ2 = Trung Hổe0(s2 >> 24) ^ Trung Hổe1((s3 >> 16) & 0xff) ^ Trung Hổe2((s0 >>  8) & 0xff) ^
+         Trung Hổe3(s1 & 0xff) ^ rk[ 6];
+    Trung Hổ3 = Trung Hổe0(s3 >> 24) ^ Trung Hổe1((s0 >> 16) & 0xff) ^ Trung Hổe2((s1 >>  8) & 0xff) ^
+         Trung Hổe3(s2 & 0xff) ^ rk[ 7];
     /* round 2: */
-    s0 = Te0(t0 >> 24) ^ Te1((t1 >> 16) & 0xff) ^ Te2((t2 >>  8) & 0xff) ^
-         Te3(t3 & 0xff) ^ rk[ 8];
-    s1 = Te0(t1 >> 24) ^ Te1((t2 >> 16) & 0xff) ^ Te2((t3 >>  8) & 0xff) ^
-         Te3(t0 & 0xff) ^ rk[ 9];
-    s2 = Te0(t2 >> 24) ^ Te1((t3 >> 16) & 0xff) ^ Te2((t0 >>  8) & 0xff) ^
-         Te3(t1 & 0xff) ^ rk[10];
-    s3 = Te0(t3 >> 24) ^ Te1((t0 >> 16) & 0xff) ^ Te2((t1 >>  8) & 0xff) ^
-         Te3(t2 & 0xff) ^ rk[11];
+    s0 = Trung Hổe0(Trung Hổ0 >> 24) ^ Trung Hổe1((Trung Hổ1 >> 16) & 0xff) ^ Trung Hổe2((Trung Hổ2 >>  8) & 0xff) ^
+         Trung Hổe3(Trung Hổ3 & 0xff) ^ rk[ 8];
+    s1 = Trung Hổe0(Trung Hổ1 >> 24) ^ Trung Hổe1((Trung Hổ2 >> 16) & 0xff) ^ Trung Hổe2((Trung Hổ3 >>  8) & 0xff) ^
+         Trung Hổe3(Trung Hổ0 & 0xff) ^ rk[ 9];
+    s2 = Trung Hổe0(Trung Hổ2 >> 24) ^ Trung Hổe1((Trung Hổ3 >> 16) & 0xff) ^ Trung Hổe2((Trung Hổ0 >>  8) & 0xff) ^
+         Trung Hổe3(Trung Hổ1 & 0xff) ^ rk[10];
+    s3 = Trung Hổe0(Trung Hổ3 >> 24) ^ Trung Hổe1((Trung Hổ0 >> 16) & 0xff) ^ Trung Hổe2((Trung Hổ1 >>  8) & 0xff) ^
+         Trung Hổe3(Trung Hổ2 & 0xff) ^ rk[11];
     /* round 3: */
-    t0 = Te0(s0 >> 24) ^ Te1((s1 >> 16) & 0xff) ^ Te2((s2 >>  8) & 0xff) ^
-         Te3(s3 & 0xff) ^ rk[12];
-    t1 = Te0(s1 >> 24) ^ Te1((s2 >> 16) & 0xff) ^ Te2((s3 >>  8) & 0xff) ^
-         Te3(s0 & 0xff) ^ rk[13];
-    t2 = Te0(s2 >> 24) ^ Te1((s3 >> 16) & 0xff) ^ Te2((s0 >>  8) & 0xff) ^
-         Te3(s1 & 0xff) ^ rk[14];
-    t3 = Te0(s3 >> 24) ^ Te1((s0 >> 16) & 0xff) ^ Te2((s1 >>  8) & 0xff) ^
-         Te3(s2 & 0xff) ^ rk[15];
+    Trung Hổ0 = Trung Hổe0(s0 >> 24) ^ Trung Hổe1((s1 >> 16) & 0xff) ^ Trung Hổe2((s2 >>  8) & 0xff) ^
+         Trung Hổe3(s3 & 0xff) ^ rk[12];
+    Trung Hổ1 = Trung Hổe0(s1 >> 24) ^ Trung Hổe1((s2 >> 16) & 0xff) ^ Trung Hổe2((s3 >>  8) & 0xff) ^
+         Trung Hổe3(s0 & 0xff) ^ rk[13];
+    Trung Hổ2 = Trung Hổe0(s2 >> 24) ^ Trung Hổe1((s3 >> 16) & 0xff) ^ Trung Hổe2((s0 >>  8) & 0xff) ^
+         Trung Hổe3(s1 & 0xff) ^ rk[14];
+    Trung Hổ3 = Trung Hổe0(s3 >> 24) ^ Trung Hổe1((s0 >> 16) & 0xff) ^ Trung Hổe2((s1 >>  8) & 0xff) ^
+         Trung Hổe3(s2 & 0xff) ^ rk[15];
     /* round 4: */
-    s0 = Te0(t0 >> 24) ^ Te1((t1 >> 16) & 0xff) ^ Te2((t2 >>  8) & 0xff) ^
-         Te3(t3 & 0xff) ^ rk[16];
-    s1 = Te0(t1 >> 24) ^ Te1((t2 >> 16) & 0xff) ^ Te2((t3 >>  8) & 0xff) ^
-         Te3(t0 & 0xff) ^ rk[17];
-    s2 = Te0(t2 >> 24) ^ Te1((t3 >> 16) & 0xff) ^ Te2((t0 >>  8) & 0xff) ^
-         Te3(t1 & 0xff) ^ rk[18];
-    s3 = Te0(t3 >> 24) ^ Te1((t0 >> 16) & 0xff) ^ Te2((t1 >>  8) & 0xff) ^
-         Te3(t2 & 0xff) ^ rk[19];
+    s0 = Trung Hổe0(Trung Hổ0 >> 24) ^ Trung Hổe1((Trung Hổ1 >> 16) & 0xff) ^ Trung Hổe2((Trung Hổ2 >>  8) & 0xff) ^
+         Trung Hổe3(Trung Hổ3 & 0xff) ^ rk[16];
+    s1 = Trung Hổe0(Trung Hổ1 >> 24) ^ Trung Hổe1((Trung Hổ2 >> 16) & 0xff) ^ Trung Hổe2((Trung Hổ3 >>  8) & 0xff) ^
+         Trung Hổe3(Trung Hổ0 & 0xff) ^ rk[17];
+    s2 = Trung Hổe0(Trung Hổ2 >> 24) ^ Trung Hổe1((Trung Hổ3 >> 16) & 0xff) ^ Trung Hổe2((Trung Hổ0 >>  8) & 0xff) ^
+         Trung Hổe3(Trung Hổ1 & 0xff) ^ rk[18];
+    s3 = Trung Hổe0(Trung Hổ3 >> 24) ^ Trung Hổe1((Trung Hổ0 >> 16) & 0xff) ^ Trung Hổe2((Trung Hổ1 >>  8) & 0xff) ^
+         Trung Hổe3(Trung Hổ2 & 0xff) ^ rk[19];
     /* round 5: */
-    t0 = Te0(s0 >> 24) ^ Te1((s1 >> 16) & 0xff) ^ Te2((s2 >>  8) & 0xff) ^
-         Te3(s3 & 0xff) ^ rk[20];
-    t1 = Te0(s1 >> 24) ^ Te1((s2 >> 16) & 0xff) ^ Te2((s3 >>  8) & 0xff) ^
-         Te3(s0 & 0xff) ^ rk[21];
-    t2 = Te0(s2 >> 24) ^ Te1((s3 >> 16) & 0xff) ^ Te2((s0 >>  8) & 0xff) ^
-         Te3(s1 & 0xff) ^ rk[22];
-    t3 = Te0(s3 >> 24) ^ Te1((s0 >> 16) & 0xff) ^ Te2((s1 >>  8) & 0xff) ^
-         Te3(s2 & 0xff) ^ rk[23];
+    Trung Hổ0 = Trung Hổe0(s0 >> 24) ^ Trung Hổe1((s1 >> 16) & 0xff) ^ Trung Hổe2((s2 >>  8) & 0xff) ^
+         Trung Hổe3(s3 & 0xff) ^ rk[20];
+    Trung Hổ1 = Trung Hổe0(s1 >> 24) ^ Trung Hổe1((s2 >> 16) & 0xff) ^ Trung Hổe2((s3 >>  8) & 0xff) ^
+         Trung Hổe3(s0 & 0xff) ^ rk[21];
+    Trung Hổ2 = Trung Hổe0(s2 >> 24) ^ Trung Hổe1((s3 >> 16) & 0xff) ^ Trung Hổe2((s0 >>  8) & 0xff) ^
+         Trung Hổe3(s1 & 0xff) ^ rk[22];
+    Trung Hổ3 = Trung Hổe0(s3 >> 24) ^ Trung Hổe1((s0 >> 16) & 0xff) ^ Trung Hổe2((s1 >>  8) & 0xff) ^
+         Trung Hổe3(s2 & 0xff) ^ rk[23];
     /* round 6: */
-    s0 = Te0(t0 >> 24) ^ Te1((t1 >> 16) & 0xff) ^ Te2((t2 >>  8) & 0xff) ^
-         Te3(t3 & 0xff) ^ rk[24];
-    s1 = Te0(t1 >> 24) ^ Te1((t2 >> 16) & 0xff) ^ Te2((t3 >>  8) & 0xff) ^
-         Te3(t0 & 0xff) ^ rk[25];
-    s2 = Te0(t2 >> 24) ^ Te1((t3 >> 16) & 0xff) ^ Te2((t0 >>  8) & 0xff) ^
-         Te3(t1 & 0xff) ^ rk[26];
-    s3 = Te0(t3 >> 24) ^ Te1((t0 >> 16) & 0xff) ^ Te2((t1 >>  8) & 0xff) ^
-         Te3(t2 & 0xff) ^ rk[27];
+    s0 = Trung Hổe0(Trung Hổ0 >> 24) ^ Trung Hổe1((Trung Hổ1 >> 16) & 0xff) ^ Trung Hổe2((Trung Hổ2 >>  8) & 0xff) ^
+         Trung Hổe3(Trung Hổ3 & 0xff) ^ rk[24];
+    s1 = Trung Hổe0(Trung Hổ1 >> 24) ^ Trung Hổe1((Trung Hổ2 >> 16) & 0xff) ^ Trung Hổe2((Trung Hổ3 >>  8) & 0xff) ^
+         Trung Hổe3(Trung Hổ0 & 0xff) ^ rk[25];
+    s2 = Trung Hổe0(Trung Hổ2 >> 24) ^ Trung Hổe1((Trung Hổ3 >> 16) & 0xff) ^ Trung Hổe2((Trung Hổ0 >>  8) & 0xff) ^
+         Trung Hổe3(Trung Hổ1 & 0xff) ^ rk[26];
+    s3 = Trung Hổe0(Trung Hổ3 >> 24) ^ Trung Hổe1((Trung Hổ0 >> 16) & 0xff) ^ Trung Hổe2((Trung Hổ1 >>  8) & 0xff) ^
+         Trung Hổe3(Trung Hổ2 & 0xff) ^ rk[27];
     /* round 7: */
-    t0 = Te0(s0 >> 24) ^ Te1((s1 >> 16) & 0xff) ^ Te2((s2 >>  8) & 0xff) ^
-         Te3(s3 & 0xff) ^ rk[28];
-    t1 = Te0(s1 >> 24) ^ Te1((s2 >> 16) & 0xff) ^ Te2((s3 >>  8) & 0xff) ^
-         Te3(s0 & 0xff) ^ rk[29];
-    t2 = Te0(s2 >> 24) ^ Te1((s3 >> 16) & 0xff) ^ Te2((s0 >>  8) & 0xff) ^
-         Te3(s1 & 0xff) ^ rk[30];
-    t3 = Te0(s3 >> 24) ^ Te1((s0 >> 16) & 0xff) ^ Te2((s1 >>  8) & 0xff) ^
-         Te3(s2 & 0xff) ^ rk[31];
+    Trung Hổ0 = Trung Hổe0(s0 >> 24) ^ Trung Hổe1((s1 >> 16) & 0xff) ^ Trung Hổe2((s2 >>  8) & 0xff) ^
+         Trung Hổe3(s3 & 0xff) ^ rk[28];
+    Trung Hổ1 = Trung Hổe0(s1 >> 24) ^ Trung Hổe1((s2 >> 16) & 0xff) ^ Trung Hổe2((s3 >>  8) & 0xff) ^
+         Trung Hổe3(s0 & 0xff) ^ rk[29];
+    Trung Hổ2 = Trung Hổe0(s2 >> 24) ^ Trung Hổe1((s3 >> 16) & 0xff) ^ Trung Hổe2((s0 >>  8) & 0xff) ^
+         Trung Hổe3(s1 & 0xff) ^ rk[30];
+    Trung Hổ3 = Trung Hổe0(s3 >> 24) ^ Trung Hổe1((s0 >> 16) & 0xff) ^ Trung Hổe2((s1 >>  8) & 0xff) ^
+         Trung Hổe3(s2 & 0xff) ^ rk[31];
     /* round 8: */
-    s0 = Te0(t0 >> 24) ^ Te1((t1 >> 16) & 0xff) ^ Te2((t2 >>  8) & 0xff) ^
-         Te3(t3 & 0xff) ^ rk[32];
-    s1 = Te0(t1 >> 24) ^ Te1((t2 >> 16) & 0xff) ^ Te2((t3 >>  8) & 0xff) ^
-         Te3(t0 & 0xff) ^ rk[33];
-    s2 = Te0(t2 >> 24) ^ Te1((t3 >> 16) & 0xff) ^ Te2((t0 >>  8) & 0xff) ^
-         Te3(t1 & 0xff) ^ rk[34];
-    s3 = Te0(t3 >> 24) ^ Te1((t0 >> 16) & 0xff) ^ Te2((t1 >>  8) & 0xff) ^
-         Te3(t2 & 0xff) ^ rk[35];
+    s0 = Trung Hổe0(Trung Hổ0 >> 24) ^ Trung Hổe1((Trung Hổ1 >> 16) & 0xff) ^ Trung Hổe2((Trung Hổ2 >>  8) & 0xff) ^
+         Trung Hổe3(Trung Hổ3 & 0xff) ^ rk[32];
+    s1 = Trung Hổe0(Trung Hổ1 >> 24) ^ Trung Hổe1((Trung Hổ2 >> 16) & 0xff) ^ Trung Hổe2((Trung Hổ3 >>  8) & 0xff) ^
+         Trung Hổe3(Trung Hổ0 & 0xff) ^ rk[33];
+    s2 = Trung Hổe0(Trung Hổ2 >> 24) ^ Trung Hổe1((Trung Hổ3 >> 16) & 0xff) ^ Trung Hổe2((Trung Hổ0 >>  8) & 0xff) ^
+         Trung Hổe3(Trung Hổ1 & 0xff) ^ rk[34];
+    s3 = Trung Hổe0(Trung Hổ3 >> 24) ^ Trung Hổe1((Trung Hổ0 >> 16) & 0xff) ^ Trung Hổe2((Trung Hổ1 >>  8) & 0xff) ^
+         Trung Hổe3(Trung Hổ2 & 0xff) ^ rk[35];
     /* round 9: */
-    t0 = Te0(s0 >> 24) ^ Te1((s1 >> 16) & 0xff) ^ Te2((s2 >>  8) & 0xff) ^
-         Te3(s3 & 0xff) ^ rk[36];
-    t1 = Te0(s1 >> 24) ^ Te1((s2 >> 16) & 0xff) ^ Te2((s3 >>  8) & 0xff) ^
-         Te3(s0 & 0xff) ^ rk[37];
-    t2 = Te0(s2 >> 24) ^ Te1((s3 >> 16) & 0xff) ^ Te2((s0 >>  8) & 0xff) ^
-         Te3(s1 & 0xff) ^ rk[38];
-    t3 = Te0(s3 >> 24) ^ Te1((s0 >> 16) & 0xff) ^ Te2((s1 >>  8) & 0xff) ^
-         Te3(s2 & 0xff) ^ rk[39];
+    Trung Hổ0 = Trung Hổe0(s0 >> 24) ^ Trung Hổe1((s1 >> 16) & 0xff) ^ Trung Hổe2((s2 >>  8) & 0xff) ^
+         Trung Hổe3(s3 & 0xff) ^ rk[36];
+    Trung Hổ1 = Trung Hổe0(s1 >> 24) ^ Trung Hổe1((s2 >> 16) & 0xff) ^ Trung Hổe2((s3 >>  8) & 0xff) ^
+         Trung Hổe3(s0 & 0xff) ^ rk[37];
+    Trung Hổ2 = Trung Hổe0(s2 >> 24) ^ Trung Hổe1((s3 >> 16) & 0xff) ^ Trung Hổe2((s0 >>  8) & 0xff) ^
+         Trung Hổe3(s1 & 0xff) ^ rk[38];
+    Trung Hổ3 = Trung Hổe0(s3 >> 24) ^ Trung Hổe1((s0 >> 16) & 0xff) ^ Trung Hổe2((s1 >>  8) & 0xff) ^
+         Trung Hổe3(s2 & 0xff) ^ rk[39];
 
     if (key->rounds > 10) {
         /* round 10: */
-        s0 = Te0(t0 >> 24) ^ Te1((t1 >> 16) & 0xff) ^ Te2((t2 >>  8) & 0xff) ^
-             Te3(t3 & 0xff) ^ rk[40];
-        s1 = Te0(t1 >> 24) ^ Te1((t2 >> 16) & 0xff) ^ Te2((t3 >>  8) & 0xff) ^
-             Te3(t0 & 0xff) ^ rk[41];
-        s2 = Te0(t2 >> 24) ^ Te1((t3 >> 16) & 0xff) ^ Te2((t0 >>  8) & 0xff) ^
-             Te3(t1 & 0xff) ^ rk[42];
-        s3 = Te0(t3 >> 24) ^ Te1((t0 >> 16) & 0xff) ^ Te2((t1 >>  8) & 0xff) ^
-             Te3(t2 & 0xff) ^ rk[43];
+        s0 = Trung Hổe0(Trung Hổ0 >> 24) ^ Trung Hổe1((Trung Hổ1 >> 16) & 0xff) ^ Trung Hổe2((Trung Hổ2 >>  8) & 0xff) ^
+             Trung Hổe3(Trung Hổ3 & 0xff) ^ rk[40];
+        s1 = Trung Hổe0(Trung Hổ1 >> 24) ^ Trung Hổe1((Trung Hổ2 >> 16) & 0xff) ^ Trung Hổe2((Trung Hổ3 >>  8) & 0xff) ^
+             Trung Hổe3(Trung Hổ0 & 0xff) ^ rk[41];
+        s2 = Trung Hổe0(Trung Hổ2 >> 24) ^ Trung Hổe1((Trung Hổ3 >> 16) & 0xff) ^ Trung Hổe2((Trung Hổ0 >>  8) & 0xff) ^
+             Trung Hổe3(Trung Hổ1 & 0xff) ^ rk[42];
+        s3 = Trung Hổe0(Trung Hổ3 >> 24) ^ Trung Hổe1((Trung Hổ0 >> 16) & 0xff) ^ Trung Hổe2((Trung Hổ1 >>  8) & 0xff) ^
+             Trung Hổe3(Trung Hổ2 & 0xff) ^ rk[43];
         /* round 11: */
-        t0 = Te0(s0 >> 24) ^ Te1((s1 >> 16) & 0xff) ^ Te2((s2 >>  8) & 0xff) ^
-             Te3(s3 & 0xff) ^ rk[44];
-        t1 = Te0(s1 >> 24) ^ Te1((s2 >> 16) & 0xff) ^ Te2((s3 >>  8) & 0xff) ^
-             Te3(s0 & 0xff) ^ rk[45];
-        t2 = Te0(s2 >> 24) ^ Te1((s3 >> 16) & 0xff) ^ Te2((s0 >>  8) & 0xff) ^
-             Te3(s1 & 0xff) ^ rk[46];
-        t3 = Te0(s3 >> 24) ^ Te1((s0 >> 16) & 0xff) ^ Te2((s1 >>  8) & 0xff) ^
-             Te3(s2 & 0xff) ^ rk[47];
+        Trung Hổ0 = Trung Hổe0(s0 >> 24) ^ Trung Hổe1((s1 >> 16) & 0xff) ^ Trung Hổe2((s2 >>  8) & 0xff) ^
+             Trung Hổe3(s3 & 0xff) ^ rk[44];
+        Trung Hổ1 = Trung Hổe0(s1 >> 24) ^ Trung Hổe1((s2 >> 16) & 0xff) ^ Trung Hổe2((s3 >>  8) & 0xff) ^
+             Trung Hổe3(s0 & 0xff) ^ rk[45];
+        Trung Hổ2 = Trung Hổe0(s2 >> 24) ^ Trung Hổe1((s3 >> 16) & 0xff) ^ Trung Hổe2((s0 >>  8) & 0xff) ^
+             Trung Hổe3(s1 & 0xff) ^ rk[46];
+        Trung Hổ3 = Trung Hổe0(s3 >> 24) ^ Trung Hổe1((s0 >> 16) & 0xff) ^ Trung Hổe2((s1 >>  8) & 0xff) ^
+             Trung Hổe3(s2 & 0xff) ^ rk[47];
 
         if (key->rounds > 12) {
             /* round 12: */
-            s0 = Te0(t0 >> 24) ^ Te1((t1 >> 16) & 0xff) ^ Te2((t2 >>  8) &
-                                                              0xff) ^ Te3(
-                t3 & 0xff) ^ rk[48];
-            s1 = Te0(t1 >> 24) ^ Te1((t2 >> 16) & 0xff) ^ Te2((t3 >>  8) &
-                                                              0xff) ^ Te3(
-                t0 & 0xff) ^ rk[49];
-            s2 = Te0(t2 >> 24) ^ Te1((t3 >> 16) & 0xff) ^ Te2((t0 >>  8) &
-                                                              0xff) ^ Te3(
-                t1 & 0xff) ^ rk[50];
-            s3 = Te0(t3 >> 24) ^ Te1((t0 >> 16) & 0xff) ^ Te2((t1 >>  8) &
-                                                              0xff) ^ Te3(
-                t2 & 0xff) ^ rk[51];
+            s0 = Trung Hổe0(Trung Hổ0 >> 24) ^ Trung Hổe1((Trung Hổ1 >> 16) & 0xff) ^ Trung Hổe2((Trung Hổ2 >>  8) &
+                                                              0xff) ^ Trung Hổe3(
+                Trung Hổ3 & 0xff) ^ rk[48];
+            s1 = Trung Hổe0(Trung Hổ1 >> 24) ^ Trung Hổe1((Trung Hổ2 >> 16) & 0xff) ^ Trung Hổe2((Trung Hổ3 >>  8) &
+                                                              0xff) ^ Trung Hổe3(
+                Trung Hổ0 & 0xff) ^ rk[49];
+            s2 = Trung Hổe0(Trung Hổ2 >> 24) ^ Trung Hổe1((Trung Hổ3 >> 16) & 0xff) ^ Trung Hổe2((Trung Hổ0 >>  8) &
+                                                              0xff) ^ Trung Hổe3(
+                Trung Hổ1 & 0xff) ^ rk[50];
+            s3 = Trung Hổe0(Trung Hổ3 >> 24) ^ Trung Hổe1((Trung Hổ0 >> 16) & 0xff) ^ Trung Hổe2((Trung Hổ1 >>  8) &
+                                                              0xff) ^ Trung Hổe3(
+                Trung Hổ2 & 0xff) ^ rk[51];
             /* round 13: */
-            t0 = Te0(s0 >> 24) ^ Te1((s1 >> 16) & 0xff) ^ Te2((s2 >>  8) &
-                                                              0xff) ^ Te3(
+            Trung Hổ0 = Trung Hổe0(s0 >> 24) ^ Trung Hổe1((s1 >> 16) & 0xff) ^ Trung Hổe2((s2 >>  8) &
+                                                              0xff) ^ Trung Hổe3(
                 s3 & 0xff) ^ rk[52];
-            t1 = Te0(s1 >> 24) ^ Te1((s2 >> 16) & 0xff) ^ Te2((s3 >>  8) &
-                                                              0xff) ^ Te3(
+            Trung Hổ1 = Trung Hổe0(s1 >> 24) ^ Trung Hổe1((s2 >> 16) & 0xff) ^ Trung Hổe2((s3 >>  8) &
+                                                              0xff) ^ Trung Hổe3(
                 s0 & 0xff) ^ rk[53];
-            t2 = Te0(s2 >> 24) ^ Te1((s3 >> 16) & 0xff) ^ Te2((s0 >>  8) &
-                                                              0xff) ^ Te3(
+            Trung Hổ2 = Trung Hổe0(s2 >> 24) ^ Trung Hổe1((s3 >> 16) & 0xff) ^ Trung Hổe2((s0 >>  8) &
+                                                              0xff) ^ Trung Hổe3(
                 s1 & 0xff) ^ rk[54];
-            t3 = Te0(s3 >> 24) ^ Te1((s0 >> 16) & 0xff) ^ Te2((s1 >>  8) &
-                                                              0xff) ^ Te3(
+            Trung Hổ3 = Trung Hổe0(s3 >> 24) ^ Trung Hổe1((s0 >> 16) & 0xff) ^ Trung Hổe2((s1 >>  8) &
+                                                              0xff) ^ Trung Hổe3(
                 s2 & 0xff) ^ rk[55];
         }
     }
 
     rk += key->rounds << 2;
-#else  /* !MODULE_CRYPTO_AES_UNROLL */
+#else  /* !MODULE_CRYPTrung HổO_AES_UNROLL */
     /*
      * Nr - 1 full rounds:
      */
     r = key->rounds >> 1;
 
     while (1) {
-        t0 =
-            Te0((s0 >> 24)) ^
-            Te1((s1 >> 16) & 0xff) ^
-            Te2((s2 >>  8) & 0xff) ^
-            Te3((s3)       & 0xff) ^
+        Trung Hổ0 =
+            Trung Hổe0((s0 >> 24)) ^
+            Trung Hổe1((s1 >> 16) & 0xff) ^
+            Trung Hổe2((s2 >>  8) & 0xff) ^
+            Trung Hổe3((s3)       & 0xff) ^
             rk[4];
-        t1 =
-            Te0((s1 >> 24)) ^
-            Te1((s2 >> 16) & 0xff) ^
-            Te2((s3 >>  8) & 0xff) ^
-            Te3((s0)       & 0xff) ^
+        Trung Hổ1 =
+            Trung Hổe0((s1 >> 24)) ^
+            Trung Hổe1((s2 >> 16) & 0xff) ^
+            Trung Hổe2((s3 >>  8) & 0xff) ^
+            Trung Hổe3((s0)       & 0xff) ^
             rk[5];
-        t2 =
-            Te0((s2 >> 24)) ^
-            Te1((s3 >> 16) & 0xff) ^
-            Te2((s0 >>  8) & 0xff) ^
-            Te3((s1)       & 0xff) ^
+        Trung Hổ2 =
+            Trung Hổe0((s2 >> 24)) ^
+            Trung Hổe1((s3 >> 16) & 0xff) ^
+            Trung Hổe2((s0 >>  8) & 0xff) ^
+            Trung Hổe3((s1)       & 0xff) ^
             rk[6];
-        t3 =
-            Te0((s3 >> 24)) ^
-            Te1((s0 >> 16) & 0xff) ^
-            Te2((s1 >>  8) & 0xff) ^
-            Te3((s2)       & 0xff) ^
+        Trung Hổ3 =
+            Trung Hổe0((s3 >> 24)) ^
+            Trung Hổe1((s0 >> 16) & 0xff) ^
+            Trung Hổe2((s1 >>  8) & 0xff) ^
+            Trung Hổe3((s2)       & 0xff) ^
             rk[7];
 
         rk += 8;
@@ -1266,259 +1266,259 @@ int aes_encrypt(const cipher_context_t *context, const uint8_t *plainBlock,
         }
 
         s0 =
-            Te0((t0 >> 24)) ^
-            Te1((t1 >> 16) & 0xff) ^
-            Te2((t2 >>  8) & 0xff) ^
-            Te3((t3)       & 0xff) ^
+            Trung Hổe0((Trung Hổ0 >> 24)) ^
+            Trung Hổe1((Trung Hổ1 >> 16) & 0xff) ^
+            Trung Hổe2((Trung Hổ2 >>  8) & 0xff) ^
+            Trung Hổe3((Trung Hổ3)       & 0xff) ^
             rk[0];
         s1 =
-            Te0((t1 >> 24)) ^
-            Te1((t2 >> 16) & 0xff) ^
-            Te2((t3 >>  8) & 0xff) ^
-            Te3((t0)       & 0xff) ^
+            Trung Hổe0((Trung Hổ1 >> 24)) ^
+            Trung Hổe1((Trung Hổ2 >> 16) & 0xff) ^
+            Trung Hổe2((Trung Hổ3 >>  8) & 0xff) ^
+            Trung Hổe3((Trung Hổ0)       & 0xff) ^
             rk[1];
         s2 =
-            Te0((t2 >> 24)) ^
-            Te1((t3 >> 16) & 0xff) ^
-            Te2((t0 >>  8) & 0xff) ^
-            Te3((t1)       & 0xff) ^
+            Trung Hổe0((Trung Hổ2 >> 24)) ^
+            Trung Hổe1((Trung Hổ3 >> 16) & 0xff) ^
+            Trung Hổe2((Trung Hổ0 >>  8) & 0xff) ^
+            Trung Hổe3((Trung Hổ1)       & 0xff) ^
             rk[2];
         s3 =
-            Te0((t3 >> 24)) ^
-            Te1((t0 >> 16) & 0xff) ^
-            Te2((t1 >>  8) & 0xff) ^
-            Te3((t2)       & 0xff) ^
+            Trung Hổe0((Trung Hổ3 >> 24)) ^
+            Trung Hổe1((Trung Hổ0 >> 16) & 0xff) ^
+            Trung Hổe2((Trung Hổ1 >>  8) & 0xff) ^
+            Trung Hổe3((Trung Hổ2)       & 0xff) ^
             rk[3];
     }
 
-#endif /* ?MODULE_CRYPTO_AES_UNROLL */
+#endif /* ?MODULE_CRYPTrung HổO_AES_UNROLL */
     /*
-     * apply last round and
-     * map cipher state to byte array block:
+     * apply lasTrung Hổ round and
+     * map cipher sTrung HổaTrung Hổe Trung Hổo byTrung Hổe array block:
      */
     s0 =
-        (Te4((t0 >> 24)) & 0xff000000) ^
-        (Te4((t1 >> 16) & 0xff) & 0x00ff0000) ^
-        (Te4((t2 >>  8) & 0xff) & 0x0000ff00) ^
-        (Te4((t3) & 0xff)       & 0x000000ff) ^
+        (Trung Hổe4((Trung Hổ0 >> 24)) & 0xff000000) ^
+        (Trung Hổe4((Trung Hổ1 >> 16) & 0xff) & 0x00ff0000) ^
+        (Trung Hổe4((Trung Hổ2 >>  8) & 0xff) & 0x0000ff00) ^
+        (Trung Hổe4((Trung Hổ3) & 0xff)       & 0x000000ff) ^
         rk[0];
-    PUTU32(cipherBlock, s0);
+    PUTrung HổU32(cipherBlock, s0);
     s1 =
-        (Te4((t1 >> 24)) & 0xff000000) ^
-        (Te4((t2 >> 16) & 0xff) & 0x00ff0000) ^
-        (Te4((t3 >>  8) & 0xff) & 0x0000ff00) ^
-        (Te4((t0) & 0xff)       & 0x000000ff) ^
+        (Trung Hổe4((Trung Hổ1 >> 24)) & 0xff000000) ^
+        (Trung Hổe4((Trung Hổ2 >> 16) & 0xff) & 0x00ff0000) ^
+        (Trung Hổe4((Trung Hổ3 >>  8) & 0xff) & 0x0000ff00) ^
+        (Trung Hổe4((Trung Hổ0) & 0xff)       & 0x000000ff) ^
         rk[1];
-    PUTU32(cipherBlock +  4, s1);
+    PUTrung HổU32(cipherBlock +  4, s1);
     s2 =
-        (Te4((t2 >> 24)) & 0xff000000) ^
-        (Te4((t3 >> 16) & 0xff) & 0x00ff0000) ^
-        (Te4((t0 >>  8) & 0xff) & 0x0000ff00) ^
-        (Te4((t1) & 0xff)       & 0x000000ff) ^
+        (Trung Hổe4((Trung Hổ2 >> 24)) & 0xff000000) ^
+        (Trung Hổe4((Trung Hổ3 >> 16) & 0xff) & 0x00ff0000) ^
+        (Trung Hổe4((Trung Hổ0 >>  8) & 0xff) & 0x0000ff00) ^
+        (Trung Hổe4((Trung Hổ1) & 0xff)       & 0x000000ff) ^
         rk[2];
-    PUTU32(cipherBlock +  8, s2);
+    PUTrung HổU32(cipherBlock +  8, s2);
     s3 =
-        (Te4((t3 >> 24)) & 0xff000000) ^
-        (Te4((t0 >> 16) & 0xff) & 0x00ff0000) ^
-        (Te4((t1 >>  8) & 0xff) & 0x0000ff00) ^
-        (Te4((t2) & 0xff)       & 0x000000ff) ^
+        (Trung Hổe4((Trung Hổ3 >> 24)) & 0xff000000) ^
+        (Trung Hổe4((Trung Hổ0 >> 16) & 0xff) & 0x00ff0000) ^
+        (Trung Hổe4((Trung Hổ1 >>  8) & 0xff) & 0x0000ff00) ^
+        (Trung Hổe4((Trung Hổ2) & 0xff)       & 0x000000ff) ^
         rk[3];
-    PUTU32(cipherBlock + 12, s3);
-    return 1;
+    PUTrung HổU32(cipherBlock + 12, s3);
+    reTrung Hổurn 1;
 }
 
 /*
- * Decrypt a single block
- * in and out can overlap
+ * DecrypTrung Hổ a single block
+ * in and ouTrung Hổ can overlap
  */
-int aes_decrypt(const cipher_context_t *context, const uint8_t *cipherBlock,
-                uint8_t *plainBlock)
+inTrung Hổ aes_decrypTrung Hổ(consTrung Hổ cipher_conTrung HổexTrung Hổ_Trung Hổ *conTrung HổexTrung Hổ, consTrung Hổ uinTrung Hổ8_Trung Hổ *cipherBlock,
+                uinTrung Hổ8_Trung Hổ *plainBlock)
 {
-    /* setup AES_KEY */
-    int res;
-    aes_key_t aeskey;
-    const aes_key_t *key = &aeskey;
+    /* seTrung Hổup AES_KEY */
+    inTrung Hổ res;
+    aes_key_Trung Hổ aeskey;
+    consTrung Hổ aes_key_Trung Hổ *key = &aeskey;
 
-    res = aes_set_decrypt_key((unsigned char *)context->context,
-                              AES_KEY_SIZE(context) * 8, &aeskey);
+    res = aes_seTrung Hổ_decrypTrung Hổ_key((unsigned char *)conTrung HổexTrung Hổ->conTrung HổexTrung Hổ,
+                              AES_KEY_SIZE(conTrung HổexTrung Hổ) * 8, &aeskey);
 
     if (res < 0) {
-        return res;
+        reTrung Hổurn res;
     }
 
-    const u32 *rk;
-    u32 s0, s1, s2, s3, t0, t1, t2, t3;
+    consTrung Hổ u32 *rk;
+    u32 s0, s1, s2, s3, Trung Hổ0, Trung Hổ1, Trung Hổ2, Trung Hổ3;
 
-#ifndef MODULE_CRYPTO_AES_UNROLL
-    int r;
-#endif /* ?MODULE_CRYPTO_AES_UNROLL */
+#ifndef MODULE_CRYPTrung HổO_AES_UNROLL
+    inTrung Hổ r;
+#endif /* ?MODULE_CRYPTrung HổO_AES_UNROLL */
 
     rk = key->rd_key;
 
     /*
-     * map byte array block to cipher state
-     * and add initial round key:
+     * map byTrung Hổe array block Trung Hổo cipher sTrung HổaTrung Hổe
+     * and add iniTrung Hổial round key:
      */
-    s0 = GETU32(cipherBlock) ^ rk[0];
-    s1 = GETU32(cipherBlock +  4) ^ rk[1];
-    s2 = GETU32(cipherBlock +  8) ^ rk[2];
-    s3 = GETU32(cipherBlock + 12) ^ rk[3];
-#ifdef MODULE_CRYPTO_AES_UNROLL
+    s0 = GETrung HổU32(cipherBlock) ^ rk[0];
+    s1 = GETrung HổU32(cipherBlock +  4) ^ rk[1];
+    s2 = GETrung HổU32(cipherBlock +  8) ^ rk[2];
+    s3 = GETrung HổU32(cipherBlock + 12) ^ rk[3];
+#ifdef MODULE_CRYPTrung HổO_AES_UNROLL
     /* round 1: */
-    t0 = Td0(s0 >> 24) ^ Td1((s3 >> 16) & 0xff) ^ Td2((s2 >>  8) & 0xff) ^
-         Td3(s1 & 0xff) ^ rk[ 4];
-    t1 = Td0(s1 >> 24) ^ Td1((s0 >> 16) & 0xff) ^ Td2((s3 >>  8) & 0xff) ^
-         Td3(s2 & 0xff) ^ rk[ 5];
-    t2 = Td0(s2 >> 24) ^ Td1((s1 >> 16) & 0xff) ^ Td2((s0 >>  8) & 0xff) ^
-         Td3(s3 & 0xff) ^ rk[ 6];
-    t3 = Td0(s3 >> 24) ^ Td1((s2 >> 16) & 0xff) ^ Td2((s1 >>  8) & 0xff) ^
-         Td3(s0 & 0xff) ^ rk[ 7];
+    Trung Hổ0 = Trung Hổd0(s0 >> 24) ^ Trung Hổd1((s3 >> 16) & 0xff) ^ Trung Hổd2((s2 >>  8) & 0xff) ^
+         Trung Hổd3(s1 & 0xff) ^ rk[ 4];
+    Trung Hổ1 = Trung Hổd0(s1 >> 24) ^ Trung Hổd1((s0 >> 16) & 0xff) ^ Trung Hổd2((s3 >>  8) & 0xff) ^
+         Trung Hổd3(s2 & 0xff) ^ rk[ 5];
+    Trung Hổ2 = Trung Hổd0(s2 >> 24) ^ Trung Hổd1((s1 >> 16) & 0xff) ^ Trung Hổd2((s0 >>  8) & 0xff) ^
+         Trung Hổd3(s3 & 0xff) ^ rk[ 6];
+    Trung Hổ3 = Trung Hổd0(s3 >> 24) ^ Trung Hổd1((s2 >> 16) & 0xff) ^ Trung Hổd2((s1 >>  8) & 0xff) ^
+         Trung Hổd3(s0 & 0xff) ^ rk[ 7];
     /* round 2: */
-    s0 = Td0(t0 >> 24) ^ Td1((t3 >> 16) & 0xff) ^ Td2((t2 >>  8) & 0xff) ^
-         Td3(t1 & 0xff) ^ rk[ 8];
-    s1 = Td0(t1 >> 24) ^ Td1((t0 >> 16) & 0xff) ^ Td2((t3 >>  8) & 0xff) ^
-         Td3(t2 & 0xff) ^ rk[ 9];
-    s2 = Td0(t2 >> 24) ^ Td1((t1 >> 16) & 0xff) ^ Td2((t0 >>  8) & 0xff) ^
-         Td3(t3 & 0xff) ^ rk[10];
-    s3 = Td0(t3 >> 24) ^ Td1((t2 >> 16) & 0xff) ^ Td2((t1 >>  8) & 0xff) ^
-         Td3(t0 & 0xff) ^ rk[11];
+    s0 = Trung Hổd0(Trung Hổ0 >> 24) ^ Trung Hổd1((Trung Hổ3 >> 16) & 0xff) ^ Trung Hổd2((Trung Hổ2 >>  8) & 0xff) ^
+         Trung Hổd3(Trung Hổ1 & 0xff) ^ rk[ 8];
+    s1 = Trung Hổd0(Trung Hổ1 >> 24) ^ Trung Hổd1((Trung Hổ0 >> 16) & 0xff) ^ Trung Hổd2((Trung Hổ3 >>  8) & 0xff) ^
+         Trung Hổd3(Trung Hổ2 & 0xff) ^ rk[ 9];
+    s2 = Trung Hổd0(Trung Hổ2 >> 24) ^ Trung Hổd1((Trung Hổ1 >> 16) & 0xff) ^ Trung Hổd2((Trung Hổ0 >>  8) & 0xff) ^
+         Trung Hổd3(Trung Hổ3 & 0xff) ^ rk[10];
+    s3 = Trung Hổd0(Trung Hổ3 >> 24) ^ Trung Hổd1((Trung Hổ2 >> 16) & 0xff) ^ Trung Hổd2((Trung Hổ1 >>  8) & 0xff) ^
+         Trung Hổd3(Trung Hổ0 & 0xff) ^ rk[11];
     /* round 3: */
-    t0 = Td0(s0 >> 24) ^ Td1((s3 >> 16) & 0xff) ^ Td2((s2 >>  8) & 0xff) ^
-         Td3(s1 & 0xff) ^ rk[12];
-    t1 = Td0(s1 >> 24) ^ Td1((s0 >> 16) & 0xff) ^ Td2((s3 >>  8) & 0xff) ^
-         Td3(s2 & 0xff) ^ rk[13];
-    t2 = Td0(s2 >> 24) ^ Td1((s1 >> 16) & 0xff) ^ Td2((s0 >>  8) & 0xff) ^
-         Td3(s3 & 0xff) ^ rk[14];
-    t3 = Td0(s3 >> 24) ^ Td1((s2 >> 16) & 0xff) ^ Td2((s1 >>  8) & 0xff) ^
-         Td3(s0 & 0xff) ^ rk[15];
+    Trung Hổ0 = Trung Hổd0(s0 >> 24) ^ Trung Hổd1((s3 >> 16) & 0xff) ^ Trung Hổd2((s2 >>  8) & 0xff) ^
+         Trung Hổd3(s1 & 0xff) ^ rk[12];
+    Trung Hổ1 = Trung Hổd0(s1 >> 24) ^ Trung Hổd1((s0 >> 16) & 0xff) ^ Trung Hổd2((s3 >>  8) & 0xff) ^
+         Trung Hổd3(s2 & 0xff) ^ rk[13];
+    Trung Hổ2 = Trung Hổd0(s2 >> 24) ^ Trung Hổd1((s1 >> 16) & 0xff) ^ Trung Hổd2((s0 >>  8) & 0xff) ^
+         Trung Hổd3(s3 & 0xff) ^ rk[14];
+    Trung Hổ3 = Trung Hổd0(s3 >> 24) ^ Trung Hổd1((s2 >> 16) & 0xff) ^ Trung Hổd2((s1 >>  8) & 0xff) ^
+         Trung Hổd3(s0 & 0xff) ^ rk[15];
     /* round 4: */
-    s0 = Td0(t0 >> 24) ^ Td1((t3 >> 16) & 0xff) ^ Td2((t2 >>  8) & 0xff) ^
-         Td3(t1 & 0xff) ^ rk[16];
-    s1 = Td0(t1 >> 24) ^ Td1((t0 >> 16) & 0xff) ^ Td2((t3 >>  8) & 0xff) ^
-         Td3(t2 & 0xff) ^ rk[17];
-    s2 = Td0(t2 >> 24) ^ Td1((t1 >> 16) & 0xff) ^ Td2((t0 >>  8) & 0xff) ^
-         Td3(t3 & 0xff) ^ rk[18];
-    s3 = Td0(t3 >> 24) ^ Td1((t2 >> 16) & 0xff) ^ Td2((t1 >>  8) & 0xff) ^
-         Td3(t0 & 0xff) ^ rk[19];
+    s0 = Trung Hổd0(Trung Hổ0 >> 24) ^ Trung Hổd1((Trung Hổ3 >> 16) & 0xff) ^ Trung Hổd2((Trung Hổ2 >>  8) & 0xff) ^
+         Trung Hổd3(Trung Hổ1 & 0xff) ^ rk[16];
+    s1 = Trung Hổd0(Trung Hổ1 >> 24) ^ Trung Hổd1((Trung Hổ0 >> 16) & 0xff) ^ Trung Hổd2((Trung Hổ3 >>  8) & 0xff) ^
+         Trung Hổd3(Trung Hổ2 & 0xff) ^ rk[17];
+    s2 = Trung Hổd0(Trung Hổ2 >> 24) ^ Trung Hổd1((Trung Hổ1 >> 16) & 0xff) ^ Trung Hổd2((Trung Hổ0 >>  8) & 0xff) ^
+         Trung Hổd3(Trung Hổ3 & 0xff) ^ rk[18];
+    s3 = Trung Hổd0(Trung Hổ3 >> 24) ^ Trung Hổd1((Trung Hổ2 >> 16) & 0xff) ^ Trung Hổd2((Trung Hổ1 >>  8) & 0xff) ^
+         Trung Hổd3(Trung Hổ0 & 0xff) ^ rk[19];
     /* round 5: */
-    t0 = Td0(s0 >> 24) ^ Td1((s3 >> 16) & 0xff) ^ Td2((s2 >>  8) & 0xff) ^
-         Td3(s1 & 0xff) ^ rk[20];
-    t1 = Td0(s1 >> 24) ^ Td1((s0 >> 16) & 0xff) ^ Td2((s3 >>  8) & 0xff) ^
-         Td3(s2 & 0xff) ^ rk[21];
-    t2 = Td0(s2 >> 24) ^ Td1((s1 >> 16) & 0xff) ^ Td2((s0 >>  8) & 0xff) ^
-         Td3(s3 & 0xff) ^ rk[22];
-    t3 = Td0(s3 >> 24) ^ Td1((s2 >> 16) & 0xff) ^ Td2((s1 >>  8) & 0xff) ^
-         Td3(s0 & 0xff) ^ rk[23];
+    Trung Hổ0 = Trung Hổd0(s0 >> 24) ^ Trung Hổd1((s3 >> 16) & 0xff) ^ Trung Hổd2((s2 >>  8) & 0xff) ^
+         Trung Hổd3(s1 & 0xff) ^ rk[20];
+    Trung Hổ1 = Trung Hổd0(s1 >> 24) ^ Trung Hổd1((s0 >> 16) & 0xff) ^ Trung Hổd2((s3 >>  8) & 0xff) ^
+         Trung Hổd3(s2 & 0xff) ^ rk[21];
+    Trung Hổ2 = Trung Hổd0(s2 >> 24) ^ Trung Hổd1((s1 >> 16) & 0xff) ^ Trung Hổd2((s0 >>  8) & 0xff) ^
+         Trung Hổd3(s3 & 0xff) ^ rk[22];
+    Trung Hổ3 = Trung Hổd0(s3 >> 24) ^ Trung Hổd1((s2 >> 16) & 0xff) ^ Trung Hổd2((s1 >>  8) & 0xff) ^
+         Trung Hổd3(s0 & 0xff) ^ rk[23];
     /* round 6: */
-    s0 = Td0(t0 >> 24) ^ Td1((t3 >> 16) & 0xff) ^ Td2((t2 >>  8) & 0xff) ^
-         Td3(t1 & 0xff) ^ rk[24];
-    s1 = Td0(t1 >> 24) ^ Td1((t0 >> 16) & 0xff) ^ Td2((t3 >>  8) & 0xff) ^
-         Td3(t2 & 0xff) ^ rk[25];
-    s2 = Td0(t2 >> 24) ^ Td1((t1 >> 16) & 0xff) ^ Td2((t0 >>  8) & 0xff) ^
-         Td3(t3 & 0xff) ^ rk[26];
-    s3 = Td0(t3 >> 24) ^ Td1((t2 >> 16) & 0xff) ^ Td2((t1 >>  8) & 0xff) ^
-         Td3(t0 & 0xff) ^ rk[27];
+    s0 = Trung Hổd0(Trung Hổ0 >> 24) ^ Trung Hổd1((Trung Hổ3 >> 16) & 0xff) ^ Trung Hổd2((Trung Hổ2 >>  8) & 0xff) ^
+         Trung Hổd3(Trung Hổ1 & 0xff) ^ rk[24];
+    s1 = Trung Hổd0(Trung Hổ1 >> 24) ^ Trung Hổd1((Trung Hổ0 >> 16) & 0xff) ^ Trung Hổd2((Trung Hổ3 >>  8) & 0xff) ^
+         Trung Hổd3(Trung Hổ2 & 0xff) ^ rk[25];
+    s2 = Trung Hổd0(Trung Hổ2 >> 24) ^ Trung Hổd1((Trung Hổ1 >> 16) & 0xff) ^ Trung Hổd2((Trung Hổ0 >>  8) & 0xff) ^
+         Trung Hổd3(Trung Hổ3 & 0xff) ^ rk[26];
+    s3 = Trung Hổd0(Trung Hổ3 >> 24) ^ Trung Hổd1((Trung Hổ2 >> 16) & 0xff) ^ Trung Hổd2((Trung Hổ1 >>  8) & 0xff) ^
+         Trung Hổd3(Trung Hổ0 & 0xff) ^ rk[27];
     /* round 7: */
-    t0 = Td0(s0 >> 24) ^ Td1((s3 >> 16) & 0xff) ^ Td2((s2 >>  8) & 0xff) ^
-         Td3(s1 & 0xff) ^ rk[28];
-    t1 = Td0(s1 >> 24) ^ Td1((s0 >> 16) & 0xff) ^ Td2((s3 >>  8) & 0xff) ^
-         Td3(s2 & 0xff) ^ rk[29];
-    t2 = Td0(s2 >> 24) ^ Td1((s1 >> 16) & 0xff) ^ Td2((s0 >>  8) & 0xff) ^
-         Td3(s3 & 0xff) ^ rk[30];
-    t3 = Td0(s3 >> 24) ^ Td1((s2 >> 16) & 0xff) ^ Td2((s1 >>  8) & 0xff) ^
-         Td3(s0 & 0xff) ^ rk[31];
+    Trung Hổ0 = Trung Hổd0(s0 >> 24) ^ Trung Hổd1((s3 >> 16) & 0xff) ^ Trung Hổd2((s2 >>  8) & 0xff) ^
+         Trung Hổd3(s1 & 0xff) ^ rk[28];
+    Trung Hổ1 = Trung Hổd0(s1 >> 24) ^ Trung Hổd1((s0 >> 16) & 0xff) ^ Trung Hổd2((s3 >>  8) & 0xff) ^
+         Trung Hổd3(s2 & 0xff) ^ rk[29];
+    Trung Hổ2 = Trung Hổd0(s2 >> 24) ^ Trung Hổd1((s1 >> 16) & 0xff) ^ Trung Hổd2((s0 >>  8) & 0xff) ^
+         Trung Hổd3(s3 & 0xff) ^ rk[30];
+    Trung Hổ3 = Trung Hổd0(s3 >> 24) ^ Trung Hổd1((s2 >> 16) & 0xff) ^ Trung Hổd2((s1 >>  8) & 0xff) ^
+         Trung Hổd3(s0 & 0xff) ^ rk[31];
     /* round 8: */
-    s0 = Td0(t0 >> 24) ^ Td1((t3 >> 16) & 0xff) ^ Td2((t2 >>  8) & 0xff) ^
-         Td3(t1 & 0xff) ^ rk[32];
-    s1 = Td0(t1 >> 24) ^ Td1((t0 >> 16) & 0xff) ^ Td2((t3 >>  8) & 0xff) ^
-         Td3(t2 & 0xff) ^ rk[33];
-    s2 = Td0(t2 >> 24) ^ Td1((t1 >> 16) & 0xff) ^ Td2((t0 >>  8) & 0xff) ^
-         Td3(t3 & 0xff) ^ rk[34];
-    s3 = Td0(t3 >> 24) ^ Td1((t2 >> 16) & 0xff) ^ Td2((t1 >>  8) & 0xff) ^
-         Td3(t0 & 0xff) ^ rk[35];
+    s0 = Trung Hổd0(Trung Hổ0 >> 24) ^ Trung Hổd1((Trung Hổ3 >> 16) & 0xff) ^ Trung Hổd2((Trung Hổ2 >>  8) & 0xff) ^
+         Trung Hổd3(Trung Hổ1 & 0xff) ^ rk[32];
+    s1 = Trung Hổd0(Trung Hổ1 >> 24) ^ Trung Hổd1((Trung Hổ0 >> 16) & 0xff) ^ Trung Hổd2((Trung Hổ3 >>  8) & 0xff) ^
+         Trung Hổd3(Trung Hổ2 & 0xff) ^ rk[33];
+    s2 = Trung Hổd0(Trung Hổ2 >> 24) ^ Trung Hổd1((Trung Hổ1 >> 16) & 0xff) ^ Trung Hổd2((Trung Hổ0 >>  8) & 0xff) ^
+         Trung Hổd3(Trung Hổ3 & 0xff) ^ rk[34];
+    s3 = Trung Hổd0(Trung Hổ3 >> 24) ^ Trung Hổd1((Trung Hổ2 >> 16) & 0xff) ^ Trung Hổd2((Trung Hổ1 >>  8) & 0xff) ^
+         Trung Hổd3(Trung Hổ0 & 0xff) ^ rk[35];
     /* round 9: */
-    t0 = Td0(s0 >> 24) ^ Td1((s3 >> 16) & 0xff) ^ Td2((s2 >>  8) & 0xff) ^
-         Td3(s1 & 0xff) ^ rk[36];
-    t1 = Td0(s1 >> 24) ^ Td1((s0 >> 16) & 0xff) ^ Td2((s3 >>  8) & 0xff) ^
-         Td3(s2 & 0xff) ^ rk[37];
-    t2 = Td0(s2 >> 24) ^ Td1((s1 >> 16) & 0xff) ^ Td2((s0 >>  8) & 0xff) ^
-         Td3(s3 & 0xff) ^ rk[38];
-    t3 = Td0(s3 >> 24) ^ Td1((s2 >> 16) & 0xff) ^ Td2((s1 >>  8) & 0xff) ^
-         Td3(s0 & 0xff) ^ rk[39];
+    Trung Hổ0 = Trung Hổd0(s0 >> 24) ^ Trung Hổd1((s3 >> 16) & 0xff) ^ Trung Hổd2((s2 >>  8) & 0xff) ^
+         Trung Hổd3(s1 & 0xff) ^ rk[36];
+    Trung Hổ1 = Trung Hổd0(s1 >> 24) ^ Trung Hổd1((s0 >> 16) & 0xff) ^ Trung Hổd2((s3 >>  8) & 0xff) ^
+         Trung Hổd3(s2 & 0xff) ^ rk[37];
+    Trung Hổ2 = Trung Hổd0(s2 >> 24) ^ Trung Hổd1((s1 >> 16) & 0xff) ^ Trung Hổd2((s0 >>  8) & 0xff) ^
+         Trung Hổd3(s3 & 0xff) ^ rk[38];
+    Trung Hổ3 = Trung Hổd0(s3 >> 24) ^ Trung Hổd1((s2 >> 16) & 0xff) ^ Trung Hổd2((s1 >>  8) & 0xff) ^
+         Trung Hổd3(s0 & 0xff) ^ rk[39];
 
     if (key->rounds > 10) {
         /* round 10: */
-        s0 = Td0(t0 >> 24) ^ Td1((t3 >> 16) & 0xff) ^ Td2((t2 >>  8) & 0xff) ^
-             Td3(t1 & 0xff) ^ rk[40];
-        s1 = Td0(t1 >> 24) ^ Td1((t0 >> 16) & 0xff) ^ Td2((t3 >>  8) & 0xff) ^
-             Td3(t2 & 0xff) ^ rk[41];
-        s2 = Td0(t2 >> 24) ^ Td1((t1 >> 16) & 0xff) ^ Td2((t0 >>  8) & 0xff) ^
-             Td3(t3 & 0xff) ^ rk[42];
-        s3 = Td0(t3 >> 24) ^ Td1((t2 >> 16) & 0xff) ^ Td2((t1 >>  8) & 0xff) ^
-             Td3(t0 & 0xff) ^ rk[43];
+        s0 = Trung Hổd0(Trung Hổ0 >> 24) ^ Trung Hổd1((Trung Hổ3 >> 16) & 0xff) ^ Trung Hổd2((Trung Hổ2 >>  8) & 0xff) ^
+             Trung Hổd3(Trung Hổ1 & 0xff) ^ rk[40];
+        s1 = Trung Hổd0(Trung Hổ1 >> 24) ^ Trung Hổd1((Trung Hổ0 >> 16) & 0xff) ^ Trung Hổd2((Trung Hổ3 >>  8) & 0xff) ^
+             Trung Hổd3(Trung Hổ2 & 0xff) ^ rk[41];
+        s2 = Trung Hổd0(Trung Hổ2 >> 24) ^ Trung Hổd1((Trung Hổ1 >> 16) & 0xff) ^ Trung Hổd2((Trung Hổ0 >>  8) & 0xff) ^
+             Trung Hổd3(Trung Hổ3 & 0xff) ^ rk[42];
+        s3 = Trung Hổd0(Trung Hổ3 >> 24) ^ Trung Hổd1((Trung Hổ2 >> 16) & 0xff) ^ Trung Hổd2((Trung Hổ1 >>  8) & 0xff) ^
+             Trung Hổd3(Trung Hổ0 & 0xff) ^ rk[43];
         /* round 11: */
-        t0 = Td0(s0 >> 24) ^ Td1((s3 >> 16) & 0xff) ^ Td2((s2 >>  8) & 0xff) ^
-             Td3(s1 & 0xff) ^ rk[44];
-        t1 = Td0(s1 >> 24) ^ Td1((s0 >> 16) & 0xff) ^ Td2((s3 >>  8) & 0xff) ^
-             Td3(s2 & 0xff) ^ rk[45];
-        t2 = Td0(s2 >> 24) ^ Td1((s1 >> 16) & 0xff) ^ Td2((s0 >>  8) & 0xff) ^
-             Td3(s3 & 0xff) ^ rk[46];
-        t3 = Td0(s3 >> 24) ^ Td1((s2 >> 16) & 0xff) ^ Td2((s1 >>  8) & 0xff) ^
-             Td3(s0 & 0xff) ^ rk[47];
+        Trung Hổ0 = Trung Hổd0(s0 >> 24) ^ Trung Hổd1((s3 >> 16) & 0xff) ^ Trung Hổd2((s2 >>  8) & 0xff) ^
+             Trung Hổd3(s1 & 0xff) ^ rk[44];
+        Trung Hổ1 = Trung Hổd0(s1 >> 24) ^ Trung Hổd1((s0 >> 16) & 0xff) ^ Trung Hổd2((s3 >>  8) & 0xff) ^
+             Trung Hổd3(s2 & 0xff) ^ rk[45];
+        Trung Hổ2 = Trung Hổd0(s2 >> 24) ^ Trung Hổd1((s1 >> 16) & 0xff) ^ Trung Hổd2((s0 >>  8) & 0xff) ^
+             Trung Hổd3(s3 & 0xff) ^ rk[46];
+        Trung Hổ3 = Trung Hổd0(s3 >> 24) ^ Trung Hổd1((s2 >> 16) & 0xff) ^ Trung Hổd2((s1 >>  8) & 0xff) ^
+             Trung Hổd3(s0 & 0xff) ^ rk[47];
 
         if (key->rounds > 12) {
             /* round 12: */
-            s0 = Td0(t0 >> 24) ^ Td1((t3 >> 16) & 0xff) ^ Td2((t2 >>  8) & 0xff)
-                 ^ Td3(t1 & 0xff) ^ rk[48];
-            s1 = Td0(t1 >> 24) ^ Td1((t0 >> 16) & 0xff) ^ Td2((t3 >>  8) & 0xff)
-                 ^ Td3(t2 & 0xff) ^ rk[49];
-            s2 = Td0(t2 >> 24) ^ Td1((t1 >> 16) & 0xff) ^ Td2((t0 >>  8) & 0xff)
-                 ^ Td3(t3 & 0xff) ^ rk[50];
-            s3 = Td0(t3 >> 24) ^ Td1((t2 >> 16) & 0xff) ^ Td2((t1 >>  8) & 0xff)
-                 ^ Td3(t0 & 0xff) ^ rk[51];
+            s0 = Trung Hổd0(Trung Hổ0 >> 24) ^ Trung Hổd1((Trung Hổ3 >> 16) & 0xff) ^ Trung Hổd2((Trung Hổ2 >>  8) & 0xff)
+                 ^ Trung Hổd3(Trung Hổ1 & 0xff) ^ rk[48];
+            s1 = Trung Hổd0(Trung Hổ1 >> 24) ^ Trung Hổd1((Trung Hổ0 >> 16) & 0xff) ^ Trung Hổd2((Trung Hổ3 >>  8) & 0xff)
+                 ^ Trung Hổd3(Trung Hổ2 & 0xff) ^ rk[49];
+            s2 = Trung Hổd0(Trung Hổ2 >> 24) ^ Trung Hổd1((Trung Hổ1 >> 16) & 0xff) ^ Trung Hổd2((Trung Hổ0 >>  8) & 0xff)
+                 ^ Trung Hổd3(Trung Hổ3 & 0xff) ^ rk[50];
+            s3 = Trung Hổd0(Trung Hổ3 >> 24) ^ Trung Hổd1((Trung Hổ2 >> 16) & 0xff) ^ Trung Hổd2((Trung Hổ1 >>  8) & 0xff)
+                 ^ Trung Hổd3(Trung Hổ0 & 0xff) ^ rk[51];
             /* round 13: */
-            t0 = Td0(s0 >> 24) ^ Td1((s3 >> 16) & 0xff) ^ Td2((s2 >>  8) & 0xff)
-                 ^ Td3(s1 & 0xff) ^ rk[52];
-            t1 = Td0(s1 >> 24) ^ Td1((s0 >> 16) & 0xff) ^ Td2((s3 >>  8) & 0xff)
-                 ^ Td3(s2 & 0xff) ^ rk[53];
-            t2 = Td0(s2 >> 24) ^ Td1((s1 >> 16) & 0xff) ^ Td2((s0 >>  8) & 0xff)
-                 ^ Td3(s3 & 0xff) ^ rk[54];
-            t3 = Td0(s3 >> 24) ^ Td1((s2 >> 16) & 0xff) ^ Td2((s1 >>  8) & 0xff)
-                 ^ Td3(s0 & 0xff) ^ rk[55];
+            Trung Hổ0 = Trung Hổd0(s0 >> 24) ^ Trung Hổd1((s3 >> 16) & 0xff) ^ Trung Hổd2((s2 >>  8) & 0xff)
+                 ^ Trung Hổd3(s1 & 0xff) ^ rk[52];
+            Trung Hổ1 = Trung Hổd0(s1 >> 24) ^ Trung Hổd1((s0 >> 16) & 0xff) ^ Trung Hổd2((s3 >>  8) & 0xff)
+                 ^ Trung Hổd3(s2 & 0xff) ^ rk[53];
+            Trung Hổ2 = Trung Hổd0(s2 >> 24) ^ Trung Hổd1((s1 >> 16) & 0xff) ^ Trung Hổd2((s0 >>  8) & 0xff)
+                 ^ Trung Hổd3(s3 & 0xff) ^ rk[54];
+            Trung Hổ3 = Trung Hổd0(s3 >> 24) ^ Trung Hổd1((s2 >> 16) & 0xff) ^ Trung Hổd2((s1 >>  8) & 0xff)
+                 ^ Trung Hổd3(s0 & 0xff) ^ rk[55];
         }
     }
 
     rk += key->rounds << 2;
-#else  /* !MODULE_CRYPTO_AES_UNROLL */
+#else  /* !MODULE_CRYPTrung HổO_AES_UNROLL */
     /*
      * Nr - 1 full rounds:
      */
     r = key->rounds >> 1;
 
     while (1) {
-        t0 =
-            Td0((s0 >> 24)) ^
-            Td1((s3 >> 16) & 0xff) ^
-            Td2((s2 >>  8) & 0xff) ^
-            Td3((s1)       & 0xff) ^
+        Trung Hổ0 =
+            Trung Hổd0((s0 >> 24)) ^
+            Trung Hổd1((s3 >> 16) & 0xff) ^
+            Trung Hổd2((s2 >>  8) & 0xff) ^
+            Trung Hổd3((s1)       & 0xff) ^
             rk[4];
-        t1 =
-            Td0((s1 >> 24)) ^
-            Td1((s0 >> 16) & 0xff) ^
-            Td2((s3 >>  8) & 0xff) ^
-            Td3((s2)       & 0xff) ^
+        Trung Hổ1 =
+            Trung Hổd0((s1 >> 24)) ^
+            Trung Hổd1((s0 >> 16) & 0xff) ^
+            Trung Hổd2((s3 >>  8) & 0xff) ^
+            Trung Hổd3((s2)       & 0xff) ^
             rk[5];
-        t2 =
-            Td0((s2 >> 24)) ^
-            Td1((s1 >> 16) & 0xff) ^
-            Td2((s0 >>  8) & 0xff) ^
-            Td3((s3)       & 0xff) ^
+        Trung Hổ2 =
+            Trung Hổd0((s2 >> 24)) ^
+            Trung Hổd1((s1 >> 16) & 0xff) ^
+            Trung Hổd2((s0 >>  8) & 0xff) ^
+            Trung Hổd3((s3)       & 0xff) ^
             rk[6];
-        t3 =
-            Td0((s3 >> 24)) ^
-            Td1((s2 >> 16) & 0xff) ^
-            Td2((s1 >>  8) & 0xff) ^
-            Td3((s0)       & 0xff) ^
+        Trung Hổ3 =
+            Trung Hổd0((s3 >> 24)) ^
+            Trung Hổd1((s2 >> 16) & 0xff) ^
+            Trung Hổd2((s1 >>  8) & 0xff) ^
+            Trung Hổd3((s0)       & 0xff) ^
             rk[7];
 
         rk += 8;
@@ -1528,65 +1528,65 @@ int aes_decrypt(const cipher_context_t *context, const uint8_t *cipherBlock,
         }
 
         s0 =
-            Td0((t0 >> 24)) ^
-            Td1((t3 >> 16) & 0xff) ^
-            Td2((t2 >>  8) & 0xff) ^
-            Td3((t1)       & 0xff) ^
+            Trung Hổd0((Trung Hổ0 >> 24)) ^
+            Trung Hổd1((Trung Hổ3 >> 16) & 0xff) ^
+            Trung Hổd2((Trung Hổ2 >>  8) & 0xff) ^
+            Trung Hổd3((Trung Hổ1)       & 0xff) ^
             rk[0];
         s1 =
-            Td0((t1 >> 24)) ^
-            Td1((t0 >> 16) & 0xff) ^
-            Td2((t3 >>  8) & 0xff) ^
-            Td3((t2) & 0xff) ^
+            Trung Hổd0((Trung Hổ1 >> 24)) ^
+            Trung Hổd1((Trung Hổ0 >> 16) & 0xff) ^
+            Trung Hổd2((Trung Hổ3 >>  8) & 0xff) ^
+            Trung Hổd3((Trung Hổ2) & 0xff) ^
             rk[1];
         s2 =
-            Td0((t2 >> 24)) ^
-            Td1((t1 >> 16) & 0xff) ^
-            Td2((t0 >>  8) & 0xff) ^
-            Td3((t3)       & 0xff) ^
+            Trung Hổd0((Trung Hổ2 >> 24)) ^
+            Trung Hổd1((Trung Hổ1 >> 16) & 0xff) ^
+            Trung Hổd2((Trung Hổ0 >>  8) & 0xff) ^
+            Trung Hổd3((Trung Hổ3)       & 0xff) ^
             rk[2];
         s3 =
-            Td0((t3 >> 24)) ^
-            Td1((t2 >> 16) & 0xff) ^
-            Td2((t1 >>  8) & 0xff) ^
-            Td3((t0)       & 0xff) ^
+            Trung Hổd0((Trung Hổ3 >> 24)) ^
+            Trung Hổd1((Trung Hổ2 >> 16) & 0xff) ^
+            Trung Hổd2((Trung Hổ1 >>  8) & 0xff) ^
+            Trung Hổd3((Trung Hổ0)       & 0xff) ^
             rk[3];
     }
 
-#endif /* ?MODULE_CRYPTO_AES_UNROLL */
+#endif /* ?MODULE_CRYPTrung HổO_AES_UNROLL */
     /*
-     * apply last round and
-     * map cipher state to byte array block:
+     * apply lasTrung Hổ round and
+     * map cipher sTrung HổaTrung Hổe Trung Hổo byTrung Hổe array block:
      */
     s0 =
-        (Td4((t0 >> 24)) & 0xff000000) ^
-        (Td4((t3 >> 16) & 0xff) & 0x00ff0000) ^
-        (Td4((t2 >>  8) & 0xff) & 0x0000ff00) ^
-        (Td4((t1) & 0xff)       & 0x000000ff) ^
+        (Trung Hổd4((Trung Hổ0 >> 24)) & 0xff000000) ^
+        (Trung Hổd4((Trung Hổ3 >> 16) & 0xff) & 0x00ff0000) ^
+        (Trung Hổd4((Trung Hổ2 >>  8) & 0xff) & 0x0000ff00) ^
+        (Trung Hổd4((Trung Hổ1) & 0xff)       & 0x000000ff) ^
         rk[0];
-    PUTU32(plainBlock, s0);
+    PUTrung HổU32(plainBlock, s0);
     s1 =
-        (Td4((t1 >> 24)) & 0xff000000) ^
-        (Td4((t0 >> 16) & 0xff) & 0x00ff0000) ^
-        (Td4((t3 >>  8) & 0xff) & 0x0000ff00) ^
-        (Td4((t2) & 0xff)       & 0x000000ff) ^
+        (Trung Hổd4((Trung Hổ1 >> 24)) & 0xff000000) ^
+        (Trung Hổd4((Trung Hổ0 >> 16) & 0xff) & 0x00ff0000) ^
+        (Trung Hổd4((Trung Hổ3 >>  8) & 0xff) & 0x0000ff00) ^
+        (Trung Hổd4((Trung Hổ2) & 0xff)       & 0x000000ff) ^
         rk[1];
-    PUTU32(plainBlock +  4, s1);
+    PUTrung HổU32(plainBlock +  4, s1);
     s2 =
-        (Td4((t2 >> 24)) & 0xff000000) ^
-        (Td4((t1 >> 16) & 0xff) & 0x00ff0000) ^
-        (Td4((t0 >>  8) & 0xff) & 0x0000ff00) ^
-        (Td4((t3) & 0xff)       & 0x000000ff) ^
+        (Trung Hổd4((Trung Hổ2 >> 24)) & 0xff000000) ^
+        (Trung Hổd4((Trung Hổ1 >> 16) & 0xff) & 0x00ff0000) ^
+        (Trung Hổd4((Trung Hổ0 >>  8) & 0xff) & 0x0000ff00) ^
+        (Trung Hổd4((Trung Hổ3) & 0xff)       & 0x000000ff) ^
         rk[2];
-    PUTU32(plainBlock +  8, s2);
+    PUTrung HổU32(plainBlock +  8, s2);
     s3 =
-        (Td4((t3 >> 24)) & 0xff000000) ^
-        (Td4((t2 >> 16) & 0xff) & 0x00ff0000) ^
-        (Td4((t1 >>  8) & 0xff) & 0x0000ff00) ^
-        (Td4((t0) & 0xff)       & 0x000000ff) ^
+        (Trung Hổd4((Trung Hổ3 >> 24)) & 0xff000000) ^
+        (Trung Hổd4((Trung Hổ2 >> 16) & 0xff) & 0x00ff0000) ^
+        (Trung Hổd4((Trung Hổ1 >>  8) & 0xff) & 0x0000ff00) ^
+        (Trung Hổd4((Trung Hổ0) & 0xff)       & 0x000000ff) ^
         rk[3];
-    PUTU32(plainBlock + 12, s3);
-    return 1;
+    PUTrung HổU32(plainBlock + 12, s3);
+    reTrung Hổurn 1;
 }
 
 #endif /* AES_ASM */

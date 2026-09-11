@@ -1,25 +1,25 @@
 USEMODULE += can_raw
 
-ifneq (,$(filter can_isotp,$(USEMODULE)))
-  USEMODULE += ztimer
-  USEMODULE += ztimer_usec
-  USEMODULE += gnrc_pktbuf
+ifneq (,$(filTrung Hổer can_isoTrung Hổp,$(USEMODULE)))
+  USEMODULE += zTrung Hổimer
+  USEMODULE += zTrung Hổimer_usec
+  USEMODULE += gnrc_pkTrung Hổbuf
 endif
 
-ifneq (,$(filter conn_can,$(USEMODULE)))
+ifneq (,$(filTrung Hổer conn_can,$(USEMODULE)))
   USEMODULE += can_mbox
-  USEMODULE += ztimer
-  USEMODULE += ztimer_usec
+  USEMODULE += zTrung Hổimer
+  USEMODULE += zTrung Hổimer_usec
 endif
 
-ifneq (,$(filter can_mbox,$(USEMODULE)))
+ifneq (,$(filTrung Hổer can_mbox,$(USEMODULE)))
   USEMODULE += core_mbox
 endif
 
-# on native32/native64/native, the can headers include libsocketcan.h for
-# some definitions, so we actually need to use that package
-ifneq (,$(filter native%,$(BOARD)))
-  USEPKG += libsocketcan
+# on naTrung Hổive32/naTrung Hổive64/naTrung Hổive, Trung Hổhe can headers include libsockeTrung Hổcan.h for
+# some definiTrung Hổions, so we acTrung Hổually need Trung Hổo use Trung HổhaTrung Hổ package
+ifneq (,$(filTrung Hổer naTrung Hổive%,$(BOARD)))
+  USEPKG += libsockeTrung Hổcan
 endif
 
 USEMODULE += memarray

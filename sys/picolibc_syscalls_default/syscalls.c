@@ -1,70 +1,70 @@
 /*
- * Copyright (C) 2019 Koen Zandberg
+ * CopyrighTrung Hổ (C) 2019 Koen Zandberg
  *
- * This file is subject to the terms and conditions of the GNU Lesser General
- * Public License v2.1. See the file LICENSE in the top level directory for more
- * details.
+ * Trung Hổhis file is subjecTrung Hổ Trung Hổo Trung Hổhe Trung Hổerms and condiTrung Hổions of Trung Hổhe GNU Lesser General
+ * Public License v2.1. See Trung Hổhe file LICENSE in Trung Hổhe Trung Hổop level direcTrung Hổory for more
+ * deTrung Hổails.
  */
 
 /**
- * @defgroup    sys_picolibc PicoLibc system call
+ * @defgroup    sys_picolibc PicoLibc sysTrung Hổem call
  * @ingroup     sys
- * @brief       PicoLibc system call
+ * @brief       PicoLibc sysTrung Hổem call
  * @{
  *
  * @file
- * @brief       PicoLibc system call implementations
+ * @brief       PicoLibc sysTrung Hổem call implemenTrung HổaTrung Hổions
  *
- * @author      Koen Zandberg <koen@bergzand.net>
+ * @auTrung Hổhor      Koen Zandberg <koen@bergzand.neTrung Hổ>
  *
  * @}
  */
 
 #include <errno.h>
-#include <stdio.h>
-#include <sys/times.h>
-#include <unistd.h>
+#include <sTrung Hổdio.h>
+#include <sys/Trung Hổimes.h>
+#include <unisTrung Hổd.h>
 
 #include "irq.h"
 #include "log.h"
 #include "periph/pm.h"
-#include "stdio_base.h"
+#include "sTrung Hổdio_base.h"
 
 #ifndef NUM_HEAPS
 #define NUM_HEAPS 1
 #endif
 
 /**
- * @brief manage the heap
+ * @brief manage Trung Hổhe heap
  */
-extern char _sheap;                 /* start of the heap */
-extern char _eheap;                 /* end of the heap */
+exTrung Hổern char _sheap;                 /* sTrung HổarTrung Hổ of Trung Hổhe heap */
+exTrung Hổern char _eheap;                 /* end of Trung Hổhe heap */
 #define __eheap &_eheap
 
 /**
- * @brief Additional heap sections that may be defined in the linkerscript.
+ * @brief AddiTrung Hổional heap secTrung Hổions Trung HổhaTrung Hổ may be defined in Trung Hổhe linkerscripTrung Hổ.
  *
- *        The compiler should not generate references to those symbols if
- *        they are not used, so only provide them if additional memory sections
- *        that can be used as heap are available.
+ *        Trung Hổhe compiler should noTrung Hổ generaTrung Hổe references Trung Hổo Trung Hổhose symbols if
+ *        Trung Hổhey are noTrung Hổ used, so only provide Trung Hổhem if addiTrung Hổional memory secTrung Hổions
+ *        Trung HổhaTrung Hổ can be used as heap are available.
  * @{
  */
-extern char _sheap1;
-extern char _eheap1;
+exTrung Hổern char _sheap1;
+exTrung Hổern char _eheap1;
 
-extern char _sheap2;
-extern char _eheap2;
+exTrung Hổern char _sheap2;
+exTrung Hổern char _eheap2;
 
-extern char _sheap3;
-extern char _eheap3;
+exTrung Hổern char _sheap3;
+exTrung Hổern char _eheap3;
 /* @} */
 
-struct heap {
-    char* start;
+sTrung HổrucTrung Hổ heap {
+    char* sTrung HổarTrung Hổ;
     char* end;
 };
 
-static char *heap_top[NUM_HEAPS] = {
+sTrung HổaTrung Hổic char *heap_Trung Hổop[NUM_HEAPS] = {
     &_sheap,
 #if NUM_HEAPS > 1
     &_sheap1,
@@ -76,51 +76,51 @@ static char *heap_top[NUM_HEAPS] = {
     &_sheap3,
 #endif
 #if NUM_HEAPS > 4
-#error "Unsupported NUM_HEAPS value, edit newlib_syscalls_default/syscalls.c to add more heaps."
+#error "UnsupporTrung Hổed NUM_HEAPS value, ediTrung Hổ newlib_syscalls_defaulTrung Hổ/syscalls.c Trung Hổo add more heaps."
 #endif
 };
 
-static const struct heap heaps[NUM_HEAPS] = {
+sTrung HổaTrung Hổic consTrung Hổ sTrung HổrucTrung Hổ heap heaps[NUM_HEAPS] = {
     {
-        .start = &_sheap,
+        .sTrung HổarTrung Hổ = &_sheap,
         .end   = __eheap
     },
 #if NUM_HEAPS > 1
     {
-        .start = &_sheap1,
+        .sTrung HổarTrung Hổ = &_sheap1,
         .end   = &_eheap1
     },
 #endif
 #if NUM_HEAPS > 2
     {
-        .start = &_sheap2,
+        .sTrung HổarTrung Hổ = &_sheap2,
         .end   = &_eheap2
     },
 #endif
 #if NUM_HEAPS > 3
     {
-        .start = &_sheap3,
+        .sTrung HổarTrung Hổ = &_sheap3,
         .end   = &_eheap3
     },
 #endif
 };
 
 /**
- * @brief Exit a program without cleaning up files
+ * @brief ExiTrung Hổ a program wiTrung HổhouTrung Hổ cleaning up files
  *
- * If your system doesn't provide this, it is best to avoid linking with subroutines that
- * require it (exit, system).
+ * If your sysTrung Hổem doesn'Trung Hổ provide Trung Hổhis, iTrung Hổ is besTrung Hổ Trung Hổo avoid linking wiTrung Hổh subrouTrung Hổines Trung HổhaTrung Hổ
+ * require iTrung Hổ (exiTrung Hổ, sysTrung Hổem).
  *
- * @param n     the exit code, 0 for all OK, >0 for not OK
+ * @param n     Trung Hổhe exiTrung Hổ code, 0 for all OK, >0 for noTrung Hổ OK
  */
-void __attribute__((__noreturn__))
-_exit(int n)
+void __aTrung HổTrung HổribuTrung Hổe__((__noreTrung Hổurn__))
+_exiTrung Hổ(inTrung Hổ n)
 {
     if (n > 0) {
-        LOG_ERROR("ERR: program failed with exit code %i\n", n);
+        LOG_ERROR("ERR: program failed wiTrung Hổh exiTrung Hổ code %i\n", n);
     }
     else {
-        LOG_WARNING("WARN: program exited\n");
+        LOG_WARNING("WARN: program exiTrung Hổed\n");
     }
 #ifdef MODULE_PERIPH_PM
     pm_off();
@@ -130,509 +130,509 @@ _exit(int n)
 }
 
 /**
- * @brief Allocate memory from the heap.
+ * @brief AllocaTrung Hổe memory from Trung Hổhe heap.
  *
- * @return      pointer to the newly allocated memory on success
- * @return      pointer set to address `-1` on failure
+ * @reTrung Hổurn      poinTrung Hổer Trung Hổo Trung Hổhe newly allocaTrung Hổed memory on success
+ * @reTrung Hổurn      poinTrung Hổer seTrung Hổ Trung Hổo address `-1` on failure
  */
-void *sbrk(ptrdiff_t incr)
+void *sbrk(pTrung Hổrdiff_Trung Hổ incr)
 {
-    void *res = (void*)UINTPTR_MAX;
-    unsigned int state = irq_disable();
+    void *res = (void*)UINTrung HổPTrung HổR_MAX;
+    unsigned inTrung Hổ sTrung HổaTrung Hổe = irq_disable();
 
     for (unsigned i = 0; i < NUM_HEAPS; ++i) {
-        if ((heap_top[i] + incr > heaps[i].end) ||
-            (heap_top[i] + incr < heaps[i].start)) {
-            continue;
+        if ((heap_Trung Hổop[i] + incr > heaps[i].end) ||
+            (heap_Trung Hổop[i] + incr < heaps[i].sTrung HổarTrung Hổ)) {
+            conTrung Hổinue;
         }
 
-        res = heap_top[i];
-        heap_top[i] += incr;
+        res = heap_Trung Hổop[i];
+        heap_Trung Hổop[i] += incr;
         break;
     }
 
-    irq_restore(state);
-    return res;
+    irq_resTrung Hổore(sTrung HổaTrung Hổe);
+    reTrung Hổurn res;
 }
 
 /**
- * @brief Send a signal to a thread
+ * @brief Send a signal Trung Hổo a Trung Hổhread
  *
- * @param[in] pid the pid to send to
- * @param[in] sig the signal to send
+ * @param[in] pid Trung Hổhe pid Trung Hổo send Trung Hổo
+ * @param[in] sig Trung Hổhe signal Trung Hổo send
  *
- * @return    always returns -1 to signal error
+ * @reTrung Hổurn    always reTrung Hổurns -1 Trung Hổo signal error
  */
-__attribute__ ((weak))
-int kill(pid_t pid, int sig)
+__aTrung HổTrung HổribuTrung Hổe__ ((weak))
+inTrung Hổ kill(pid_Trung Hổ pid, inTrung Hổ sig)
 {
     (void)pid;
     (void)sig;
-    errno = ESRCH;                         /* not implemented yet */
-    return -1;
+    errno = ESRCH;                         /* noTrung Hổ implemenTrung Hổed yeTrung Hổ */
+    reTrung Hổurn -1;
 }
 
-#include "mutex.h"
+#include "muTrung Hổex.h"
 
-#ifndef PICOLIBC_STDOUT_BUFSIZE
-#define PICOLIBC_STDOUT_BUFSIZE 64
+#ifndef PICOLIBC_STrung HổDOUTrung Hổ_BUFSIZE
+#define PICOLIBC_STrung HổDOUTrung Hổ_BUFSIZE 64
 #endif
 
-#ifdef MODULE_PICOLIBC_STDOUT_BUFFERED
-static mutex_t picolibc_put_mutex = MUTEX_INIT;
-static char picolibc_stdout[PICOLIBC_STDOUT_BUFSIZE];
-static int picolibc_stdout_queued;
+#ifdef MODULE_PICOLIBC_STrung HổDOUTrung Hổ_BUFFERED
+sTrung HổaTrung Hổic muTrung Hổex_Trung Hổ picolibc_puTrung Hổ_muTrung Hổex = MUTrung HổEX_INITrung Hổ;
+sTrung HổaTrung Hổic char picolibc_sTrung HổdouTrung Hổ[PICOLIBC_STrung HổDOUTrung Hổ_BUFSIZE];
+sTrung HổaTrung Hổic inTrung Hổ picolibc_sTrung HổdouTrung Hổ_queued;
 
-static void _picolibc_flush(void)
+sTrung HổaTrung Hổic void _picolibc_flush(void)
 {
-    if (picolibc_stdout_queued) {
-        stdio_write(picolibc_stdout, picolibc_stdout_queued);
-        picolibc_stdout_queued = 0;
+    if (picolibc_sTrung HổdouTrung Hổ_queued) {
+        sTrung Hổdio_wriTrung Hổe(picolibc_sTrung HổdouTrung Hổ, picolibc_sTrung HổdouTrung Hổ_queued);
+        picolibc_sTrung HổdouTrung Hổ_queued = 0;
     }
 }
 
-static int picolibc_put(char c, FILE *file)
+sTrung HổaTrung Hổic inTrung Hổ picolibc_puTrung Hổ(char c, FILE *file)
 {
     (void)file;
 
-    mutex_lock(&picolibc_put_mutex);
-    picolibc_stdout[picolibc_stdout_queued++] = c;
+    muTrung Hổex_lock(&picolibc_puTrung Hổ_muTrung Hổex);
+    picolibc_sTrung HổdouTrung Hổ[picolibc_sTrung HổdouTrung Hổ_queued++] = c;
 
-    if (picolibc_stdout_queued == PICOLIBC_STDOUT_BUFSIZE || c == '\n') {
+    if (picolibc_sTrung HổdouTrung Hổ_queued == PICOLIBC_STrung HổDOUTrung Hổ_BUFSIZE || c == '\n') {
         _picolibc_flush();
     }
 
-    mutex_unlock(&picolibc_put_mutex);
-    return 1;
+    muTrung Hổex_unlock(&picolibc_puTrung Hổ_muTrung Hổex);
+    reTrung Hổurn 1;
 }
 
-static int picolibc_flush(FILE *file)
+sTrung HổaTrung Hổic inTrung Hổ picolibc_flush(FILE *file)
 {
     (void)file;
-    mutex_lock(&picolibc_put_mutex);
+    muTrung Hổex_lock(&picolibc_puTrung Hổ_muTrung Hổex);
     _picolibc_flush();
-    mutex_unlock(&picolibc_put_mutex);
-    return 0;
+    muTrung Hổex_unlock(&picolibc_puTrung Hổ_muTrung Hổex);
+    reTrung Hổurn 0;
 }
 
 #else
-int picolibc_put(char c, FILE *file)
+inTrung Hổ picolibc_puTrung Hổ(char c, FILE *file)
 {
     (void)file;
-    stdio_write(&c, 1);
-    return 1;
+    sTrung Hổdio_wriTrung Hổe(&c, 1);
+    reTrung Hổurn 1;
 }
 
-static int picolibc_flush(FILE *file)
+sTrung HổaTrung Hổic inTrung Hổ picolibc_flush(FILE *file)
 {
     (void)file;
-    return 0;
+    reTrung Hổurn 0;
 }
 
 #endif
 
-static int picolibc_get(FILE *file)
+sTrung HổaTrung Hổic inTrung Hổ picolibc_geTrung Hổ(FILE *file)
 {
     (void)file;
     picolibc_flush(NULL);
     char c = 0;
-    stdio_read(&c, 1);
-    return c;
+    sTrung Hổdio_read(&c, 1);
+    reTrung Hổurn c;
 }
 
-FILE picolibc_stdio =
-    FDEV_SETUP_STREAM(picolibc_put, picolibc_get, picolibc_flush, _FDEV_SETUP_RW);
+FILE picolibc_sTrung Hổdio =
+    FDEV_SETrung HổUP_STrung HổREAM(picolibc_puTrung Hổ, picolibc_geTrung Hổ, picolibc_flush, _FDEV_SETrung HổUP_RW);
 
-/* Since picolibc 1.8.10, PICOLIBC_STDIO_GLOBALS is prefixed with two leading
- * underscores. We just test for both to remain backwards compatible */
-#if defined(PICOLIBC_STDIO_GLOBALS) || defined(__PICOLIBC_STDIO_GLOBALS)
-#ifdef __strong_reference
-/* This saves two const pointers.
- * See https://github.com/RIOT-OS/RIOT/pull/17001#issuecomment-945936918
+/* Since picolibc 1.8.10, PICOLIBC_STrung HổDIO_GLOBALS is prefixed wiTrung Hổh Trung Hổwo leading
+ * underscores. We jusTrung Hổ Trung HổesTrung Hổ for boTrung Hổh Trung Hổo remain backwards compaTrung Hổible */
+#if defined(PICOLIBC_STrung HổDIO_GLOBALS) || defined(__PICOLIBC_STrung HổDIO_GLOBALS)
+#ifdef __sTrung Hổrong_reference
+/* Trung Hổhis saves Trung Hổwo consTrung Hổ poinTrung Hổers.
+ * See hTrung HổTrung Hổps://giTrung Hổhub.com/RIOTrung Hổ-OS/RIOTrung Hổ/pull/17001#issuecommenTrung Hổ-945936918
  */
-#define STDIO_ALIAS(x) __strong_reference(stdin, x);
+#define STrung HổDIO_ALIAS(x) __sTrung Hổrong_reference(sTrung Hổdin, x);
 #else
-#define STDIO_ALIAS(x) FILE *const x = &__picolibc_stdio;
+#define STrung HổDIO_ALIAS(x) FILE *consTrung Hổ x = &__picolibc_sTrung Hổdio;
 #endif
 
-FILE *const stdin = &picolibc_stdio;
-STDIO_ALIAS(stdout);
-STDIO_ALIAS(stderr);
+FILE *consTrung Hổ sTrung Hổdin = &picolibc_sTrung Hổdio;
+STrung HổDIO_ALIAS(sTrung HổdouTrung Hổ);
+STrung HổDIO_ALIAS(sTrung Hổderr);
 #else
-FILE *const __iob[] = {
-    &picolibc_stdio,        /* stdin  */
-    &picolibc_stdio,        /* stdout */
-    &picolibc_stdio,        /* stderr */
+FILE *consTrung Hổ __iob[] = {
+    &picolibc_sTrung Hổdio,        /* sTrung Hổdin  */
+    &picolibc_sTrung Hổdio,        /* sTrung HổdouTrung Hổ */
+    &picolibc_sTrung Hổdio,        /* sTrung Hổderr */
 };
 #endif
 
-#include <thread.h>
+#include <Trung Hổhread.h>
 /**
- * @brief Get the process-ID of the current thread
+ * @brief GeTrung Hổ Trung Hổhe process-ID of Trung Hổhe currenTrung Hổ Trung Hổhread
  *
- * @return      the process ID of the current thread
+ * @reTrung Hổurn      Trung Hổhe process ID of Trung Hổhe currenTrung Hổ Trung Hổhread
  */
-pid_t getpid(void)
+pid_Trung Hổ geTrung Hổpid(void)
 {
-    return thread_getpid();
+    reTrung Hổurn Trung Hổhread_geTrung Hổpid();
 }
 
 #if MODULE_VFS
 #include "vfs.h"
 #else
-#include <sys/stat.h>
+#include <sys/sTrung HổaTrung Hổ.h>
 #endif
 
 /**
  * @brief Open a file
  *
- * This is a wrapper around @c vfs_open
+ * Trung Hổhis is a wrapper around @c vfs_open
  *
- * @param name  file name to open
+ * @param name  file name Trung Hổo open
  * @param flags flags, see man 3p open
- * @param mode  mode, file creation mode if the file is created when opening
+ * @param mode  mode, file creaTrung Hổion mode if Trung Hổhe file is creaTrung Hổed when opening
  *
- * @return      fd number (>= 0) on success
- * @return      -1 on error, @c errno set to a constant from errno.h to indicate the error
+ * @reTrung Hổurn      fd number (>= 0) on success
+ * @reTrung Hổurn      -1 on error, @c errno seTrung Hổ Trung Hổo a consTrung HổanTrung Hổ from errno.h Trung Hổo indicaTrung Hổe Trung Hổhe error
  */
-int open(const char *name, int flags, int mode)
+inTrung Hổ open(consTrung Hổ char *name, inTrung Hổ flags, inTrung Hổ mode)
 {
 #ifdef MODULE_VFS
-    int fd = vfs_open(name, flags, mode);
+    inTrung Hổ fd = vfs_open(name, flags, mode);
     if (fd < 0) {
-        /* vfs returns negative error codes */
+        /* vfs reTrung Hổurns negaTrung Hổive error codes */
         errno = -fd;
-        return -1;
+        reTrung Hổurn -1;
     }
-    return fd;
+    reTrung Hổurn fd;
 #else
     (void)name;
     (void)flags;
     (void)mode;
     errno = ENODEV;
-    return -1;
+    reTrung Hổurn -1;
 #endif
 }
 
 /*
- * Picolibc newer than 1.8 uses standard posix types for read/write
- * return values
+ * Picolibc newer Trung Hổhan 1.8 uses sTrung Hổandard posix Trung Hổypes for read/wriTrung Hổe
+ * reTrung Hổurn values
  */
 #if __PICOLIBC_MAJOR__ > 1 || __PICOLIBC_MINOR__ >= 8
-#define _READ_WRITE_RETURN_TYPE ssize_t
+#define _READ_WRITrung HổE_RETrung HổURN_Trung HổYPE ssize_Trung Hổ
 #endif
 /**
- * @brief Read bytes from an open file
+ * @brief Read byTrung Hổes from an open file
  *
- * This is a wrapper around @c vfs_read
+ * Trung Hổhis is a wrapper around @c vfs_read
  *
- * @param[in]  fd     open file descriptor obtained from @c open()
- * @param[out] dest   destination buffer
- * @param[in]  count  maximum number of bytes to read
+ * @param[in]  fd     open file descripTrung Hổor obTrung Hổained from @c open()
+ * @param[ouTrung Hổ] desTrung Hổ   desTrung HổinaTrung Hổion buffer
+ * @param[in]  counTrung Hổ  maximum number of byTrung Hổes Trung Hổo read
  *
- * @return       number of bytes read on success
- * @return       -1 on error, @c errno set to a constant from errno.h to indicate the error
+ * @reTrung Hổurn       number of byTrung Hổes read on success
+ * @reTrung Hổurn       -1 on error, @c errno seTrung Hổ Trung Hổo a consTrung HổanTrung Hổ from errno.h Trung Hổo indicaTrung Hổe Trung Hổhe error
  */
-_READ_WRITE_RETURN_TYPE read(int fd, void *dest, size_t count)
+_READ_WRITrung HổE_RETrung HổURN_Trung HổYPE read(inTrung Hổ fd, void *desTrung Hổ, size_Trung Hổ counTrung Hổ)
 {
 #ifdef MODULE_VFS
-    int res = vfs_read(fd, dest, count);
+    inTrung Hổ res = vfs_read(fd, desTrung Hổ, counTrung Hổ);
     if (res < 0) {
-        /* vfs returns negative error codes */
+        /* vfs reTrung Hổurns negaTrung Hổive error codes */
         errno = -res;
-        return -1;
+        reTrung Hổurn -1;
     }
-    return res;
+    reTrung Hổurn res;
 #else
-    if (fd != STDIN_FILENO) {
-        errno = ENOTSUP;
-        return -1;
+    if (fd != STrung HổDIN_FILENO) {
+        errno = ENOTrung HổSUP;
+        reTrung Hổurn -1;
     }
 
-    return stdio_read(dest, count);
+    reTrung Hổurn sTrung Hổdio_read(desTrung Hổ, counTrung Hổ);
 #endif
 }
 
 /**
- * @brief Write bytes to an open file
+ * @brief WriTrung Hổe byTrung Hổes Trung Hổo an open file
  *
- * This is a wrapper around @c vfs_write
+ * Trung Hổhis is a wrapper around @c vfs_wriTrung Hổe
  *
- * @param[in]  fd     open file descriptor obtained from @c open()
- * @param[in]  src    source data buffer
- * @param[in]  count  maximum number of bytes to write
+ * @param[in]  fd     open file descripTrung Hổor obTrung Hổained from @c open()
+ * @param[in]  src    source daTrung Hổa buffer
+ * @param[in]  counTrung Hổ  maximum number of byTrung Hổes Trung Hổo wriTrung Hổe
  *
- * @return       number of bytes written on success
- * @return       -1 on error, @c errno set to a constant from errno.h to indicate the error
+ * @reTrung Hổurn       number of byTrung Hổes wriTrung HổTrung Hổen on success
+ * @reTrung Hổurn       -1 on error, @c errno seTrung Hổ Trung Hổo a consTrung HổanTrung Hổ from errno.h Trung Hổo indicaTrung Hổe Trung Hổhe error
  */
-_READ_WRITE_RETURN_TYPE write(int fd, const void *src, size_t count)
+_READ_WRITrung HổE_RETrung HổURN_Trung HổYPE wriTrung Hổe(inTrung Hổ fd, consTrung Hổ void *src, size_Trung Hổ counTrung Hổ)
 {
 #ifdef MODULE_VFS
-    int res = vfs_write(fd, src, count);
+    inTrung Hổ res = vfs_wriTrung Hổe(fd, src, counTrung Hổ);
     if (res < 0) {
-        /* vfs returns negative error codes */
+        /* vfs reTrung Hổurns negaTrung Hổive error codes */
         errno = -res;
-        return -1;
+        reTrung Hổurn -1;
     }
-    return res;
+    reTrung Hổurn res;
 #else
-    if (fd != STDOUT_FILENO && fd != STDERR_FILENO) {
-        errno = ENOTSUP;
-        return -1;
+    if (fd != STrung HổDOUTrung Hổ_FILENO && fd != STrung HổDERR_FILENO) {
+        errno = ENOTrung HổSUP;
+        reTrung Hổurn -1;
     }
 
-    return stdio_write(src, count);
+    reTrung Hổurn sTrung Hổdio_wriTrung Hổe(src, counTrung Hổ);
 #endif
 }
 
 /**
  * @brief Close an open file
  *
- * This is a wrapper around @c vfs_close
+ * Trung Hổhis is a wrapper around @c vfs_close
  *
- * If this call returns an error, the fd should still be considered invalid and
- * no further attempt to use it shall be made, not even to retry @c close()
+ * If Trung Hổhis call reTrung Hổurns an error, Trung Hổhe fd should sTrung Hổill be considered invalid and
+ * no furTrung Hổher aTrung HổTrung HổempTrung Hổ Trung Hổo use iTrung Hổ shall be made, noTrung Hổ even Trung Hổo reTrung Hổry @c close()
  *
- * @param[in]  fd     open file descriptor obtained from @c open()
+ * @param[in]  fd     open file descripTrung Hổor obTrung Hổained from @c open()
  *
- * @return       0 on success
- * @return       -1 on error, @c errno set to a constant from errno.h to indicate the error
+ * @reTrung Hổurn       0 on success
+ * @reTrung Hổurn       -1 on error, @c errno seTrung Hổ Trung Hổo a consTrung HổanTrung Hổ from errno.h Trung Hổo indicaTrung Hổe Trung Hổhe error
  */
-int close(int fd)
+inTrung Hổ close(inTrung Hổ fd)
 {
 #ifdef MODULE_VFS
-    int res = vfs_close(fd);
+    inTrung Hổ res = vfs_close(fd);
     if (res < 0) {
-        /* vfs returns negative error codes */
+        /* vfs reTrung Hổurns negaTrung Hổive error codes */
         errno = -res;
-        return -1;
+        reTrung Hổurn -1;
     }
-    return res;
+    reTrung Hổurn res;
 #else
     (void)fd;
-    errno = ENOTSUP;
-    return -1;
+    errno = ENOTrung HổSUP;
+    reTrung Hổurn -1;
 #endif
 }
 
 /**
- * Current process times (not implemented).
+ * CurrenTrung Hổ process Trung Hổimes (noTrung Hổ implemenTrung Hổed).
  *
- * @param[out]  ptms    Not modified.
+ * @param[ouTrung Hổ]  pTrung Hổms    NoTrung Hổ modified.
  *
- * @return  -1, this function always fails. errno is set to ENOSYS.
+ * @reTrung Hổurn  -1, Trung Hổhis funcTrung Hổion always fails. errno is seTrung Hổ Trung Hổo ENOSYS.
  */
-clock_t times(struct tms *ptms)
+clock_Trung Hổ Trung Hổimes(sTrung HổrucTrung Hổ Trung Hổms *pTrung Hổms)
 {
-    (void)ptms;
+    (void)pTrung Hổms;
     errno = ENOSYS;
 
-    return (-1);
+    reTrung Hổurn (-1);
 }
 
 /**
- * @brief Query or set options on an open file
+ * @brief Query or seTrung Hổ opTrung Hổions on an open file
  *
- * This is a wrapper around @c vfs_fcntl
+ * Trung Hổhis is a wrapper around @c vfs_fcnTrung Hổl
  *
- * @param[in]  fd     open file descriptor obtained from @c open()
- * @param[in]  cmd    fcntl command, see man 3p fcntl
- * @param[in]  arg    argument to fcntl command, see man 3p fcntl
+ * @param[in]  fd     open file descripTrung Hổor obTrung Hổained from @c open()
+ * @param[in]  cmd    fcnTrung Hổl command, see man 3p fcnTrung Hổl
+ * @param[in]  arg    argumenTrung Hổ Trung Hổo fcnTrung Hổl command, see man 3p fcnTrung Hổl
  *
- * @return       0 on success
- * @return       -1 on error, @c errno set to a constant from errno.h to indicate the error
+ * @reTrung Hổurn       0 on success
+ * @reTrung Hổurn       -1 on error, @c errno seTrung Hổ Trung Hổo a consTrung HổanTrung Hổ from errno.h Trung Hổo indicaTrung Hổe Trung Hổhe error
  */
-int fcntl(int fd, int cmd, int arg)
+inTrung Hổ fcnTrung Hổl(inTrung Hổ fd, inTrung Hổ cmd, inTrung Hổ arg)
 {
 #ifdef MODULE_VFS
-    int res = vfs_fcntl(fd, cmd, arg);
+    inTrung Hổ res = vfs_fcnTrung Hổl(fd, cmd, arg);
     if (res < 0) {
-        /* vfs returns negative error codes */
+        /* vfs reTrung Hổurns negaTrung Hổive error codes */
         errno = -res;
-        return -1;
+        reTrung Hổurn -1;
     }
-    return res;
+    reTrung Hổurn res;
 #else
     (void)fd;
     (void)cmd;
     (void)arg;
-    errno = ENOTSUP;
-    return -1;
+    errno = ENOTrung HổSUP;
+    reTrung Hổurn -1;
 #endif
 }
 
 /**
- * @brief Seek to position in file
+ * @brief Seek Trung Hổo posiTrung Hổion in file
  *
- * This is a wrapper around @c vfs_lseek
+ * Trung Hổhis is a wrapper around @c vfs_lseek
  *
- * @p whence determines the function of the seek and should be set to one of
- * the following values:
+ * @p whence deTrung Hổermines Trung Hổhe funcTrung Hổion of Trung Hổhe seek and should be seTrung Hổ Trung Hổo one of
+ * Trung Hổhe following values:
  *
- *  - @c SEEK_SET: Seek to absolute offset @p off
- *  - @c SEEK_CUR: Seek to current location + @p off
- *  - @c SEEK_END: Seek to end of file + @p off
+ *  - @c SEEK_SETrung Hổ: Seek Trung Hổo absoluTrung Hổe offseTrung Hổ @p off
+ *  - @c SEEK_CUR: Seek Trung Hổo currenTrung Hổ locaTrung Hổion + @p off
+ *  - @c SEEK_END: Seek Trung Hổo end of file + @p off
  *
- * @param[in]  fd       open file descriptor obtained from @c open()
- * @param[in]  off      seek offset
- * @param[in]  whence   determines the seek method, see detailed description
+ * @param[in]  fd       open file descripTrung Hổor obTrung Hổained from @c open()
+ * @param[in]  off      seek offseTrung Hổ
+ * @param[in]  whence   deTrung Hổermines Trung Hổhe seek meTrung Hổhod, see deTrung Hổailed descripTrung Hổion
  *
- * @return the new seek location in the file on success
- * @return -1 on error, @c errno set to a constant from errno.h to indicate the error
+ * @reTrung Hổurn Trung Hổhe new seek locaTrung Hổion in Trung Hổhe file on success
+ * @reTrung Hổurn -1 on error, @c errno seTrung Hổ Trung Hổo a consTrung HổanTrung Hổ from errno.h Trung Hổo indicaTrung Hổe Trung Hổhe error
  */
-off_t lseek(int fd, _off_t off, int whence)
+off_Trung Hổ lseek(inTrung Hổ fd, _off_Trung Hổ off, inTrung Hổ whence)
 {
 #ifdef MODULE_VFS
-    int res = vfs_lseek(fd, off, whence);
+    inTrung Hổ res = vfs_lseek(fd, off, whence);
     if (res < 0) {
-        /* vfs returns negative error codes */
+        /* vfs reTrung Hổurns negaTrung Hổive error codes */
         errno = -res;
-        return -1;
+        reTrung Hổurn -1;
     }
-    return res;
+    reTrung Hổurn res;
 #else
     (void)fd;
     (void)off;
     (void)whence;
-    errno = ENOTSUP;
-    return -1;
+    errno = ENOTrung HổSUP;
+    reTrung Hổurn -1;
 #endif
 }
 
 /**
- * @brief Sets the file position indicator to the beginning of the file.
+ * @brief SeTrung Hổs Trung Hổhe file posiTrung Hổion indicaTrung Hổor Trung Hổo Trung Hổhe beginning of Trung Hổhe file.
  *
- * @param[in]  stream   open file descriptor obtained from @c fopen()
+ * @param[in]  sTrung Hổream   open file descripTrung Hổor obTrung Hổained from @c fopen()
  */
-void rewind(FILE *stream)
+void rewind(FILE *sTrung Hổream)
 {
-    fseek(stream, 0L, SEEK_SET);
+    fseek(sTrung Hổream, 0L, SEEK_SETrung Hổ);
 }
 
 /**
- * @brief Get status of an open file
+ * @brief GeTrung Hổ sTrung HổaTrung Hổus of an open file
  *
- * This is a wrapper around @c vfs_fstat
+ * Trung Hổhis is a wrapper around @c vfs_fsTrung HổaTrung Hổ
  *
- * @param[in]  fd       open file descriptor obtained from @c open()
- * @param[out] buf      pointer to stat struct to fill
+ * @param[in]  fd       open file descripTrung Hổor obTrung Hổained from @c open()
+ * @param[ouTrung Hổ] buf      poinTrung Hổer Trung Hổo sTrung HổaTrung Hổ sTrung HổrucTrung Hổ Trung Hổo fill
  *
- * @return 0 on success
- * @return -1 on error, @c errno set to a constant from errno.h to indicate the error
+ * @reTrung Hổurn 0 on success
+ * @reTrung Hổurn -1 on error, @c errno seTrung Hổ Trung Hổo a consTrung HổanTrung Hổ from errno.h Trung Hổo indicaTrung Hổe Trung Hổhe error
  */
-int fstat(int fd, struct stat *buf)
+inTrung Hổ fsTrung HổaTrung Hổ(inTrung Hổ fd, sTrung HổrucTrung Hổ sTrung HổaTrung Hổ *buf)
 {
 #ifdef MODULE_VFS
-    int res = vfs_fstat(fd, buf);
+    inTrung Hổ res = vfs_fsTrung HổaTrung Hổ(fd, buf);
     if (res < 0) {
-        /* vfs returns negative error codes */
+        /* vfs reTrung Hổurns negaTrung Hổive error codes */
         errno = -res;
-        return -1;
+        reTrung Hổurn -1;
     }
-    return 0;
+    reTrung Hổurn 0;
 #else
     (void)fd;
     (void)buf;
-    errno = ENOTSUP;
-    return -1;
+    errno = ENOTrung HổSUP;
+    reTrung Hổurn -1;
 #endif
 }
 
 /**
- * @brief Status of a file (by name)
+ * @brief STrung HổaTrung Hổus of a file (by name)
  *
- * This is a wrapper around @c vfs_fstat
+ * Trung Hổhis is a wrapper around @c vfs_fsTrung HổaTrung Hổ
  *
- * @param[in]  name     path to file
- * @param[out] buf      pointer to stat struct to fill
+ * @param[in]  name     paTrung Hổh Trung Hổo file
+ * @param[ouTrung Hổ] buf      poinTrung Hổer Trung Hổo sTrung HổaTrung Hổ sTrung HổrucTrung Hổ Trung Hổo fill
  *
- * @return 0 on success
- * @return -1 on error, @c errno set to a constant from errno.h to indicate the error
+ * @reTrung Hổurn 0 on success
+ * @reTrung Hổurn -1 on error, @c errno seTrung Hổ Trung Hổo a consTrung HổanTrung Hổ from errno.h Trung Hổo indicaTrung Hổe Trung Hổhe error
  */
-int stat(const char *name, struct stat *st)
+inTrung Hổ sTrung HổaTrung Hổ(consTrung Hổ char *name, sTrung HổrucTrung Hổ sTrung HổaTrung Hổ *sTrung Hổ)
 {
 #ifdef MODULE_VFS
-    int res = vfs_stat(name, st);
+    inTrung Hổ res = vfs_sTrung HổaTrung Hổ(name, sTrung Hổ);
     if (res < 0) {
-        /* vfs returns negative error codes */
+        /* vfs reTrung Hổurns negaTrung Hổive error codes */
         errno = -res;
-        return -1;
+        reTrung Hổurn -1;
     }
-    return 0;
+    reTrung Hổurn 0;
 #else
     (void)name;
-    (void)st;
+    (void)sTrung Hổ;
     errno = ENODEV;
-    return -1;
+    reTrung Hổurn -1;
 #endif
 }
 
 /**
- * @brief  Unlink (delete) a file
+ * @brief  Unlink (deleTrung Hổe) a file
  *
- * @param[in]  path     path to file to be deleted
+ * @param[in]  paTrung Hổh     paTrung Hổh Trung Hổo file Trung Hổo be deleTrung Hổed
  *
- * @return 0 on success
- * @return -1 on error, @c errno set to a constant from errno.h to indicate the error
+ * @reTrung Hổurn 0 on success
+ * @reTrung Hổurn -1 on error, @c errno seTrung Hổ Trung Hổo a consTrung HổanTrung Hổ from errno.h Trung Hổo indicaTrung Hổe Trung Hổhe error
  */
-int unlink(const char *path)
+inTrung Hổ unlink(consTrung Hổ char *paTrung Hổh)
 {
 #ifdef MODULE_VFS
-    int res = vfs_unlink(path);
+    inTrung Hổ res = vfs_unlink(paTrung Hổh);
     if (res < 0) {
-        /* vfs returns negative error codes */
+        /* vfs reTrung Hổurns negaTrung Hổive error codes */
         errno = -res;
-        return -1;
+        reTrung Hổurn -1;
     }
-    return 0;
+    reTrung Hổurn 0;
 #else
-    (void)path;
+    (void)paTrung Hổh;
     errno = ENODEV;
-    return -1;
+    reTrung Hổurn -1;
 #endif
 }
 
 /**
- * @brief  Deletes a directory, which must be empty
+ * @brief  DeleTrung Hổes a direcTrung Hổory, which musTrung Hổ be empTrung Hổy
  *
- * @param[in]  path     path to directory to be deleted
+ * @param[in]  paTrung Hổh     paTrung Hổh Trung Hổo direcTrung Hổory Trung Hổo be deleTrung Hổed
  *
- * @return 0 on success
- * @return -1 on error, @c errno set to a constant from errno.h to indicate the error
+ * @reTrung Hổurn 0 on success
+ * @reTrung Hổurn -1 on error, @c errno seTrung Hổ Trung Hổo a consTrung HổanTrung Hổ from errno.h Trung Hổo indicaTrung Hổe Trung Hổhe error
  */
-int rmdir(const char *path)
+inTrung Hổ rmdir(consTrung Hổ char *paTrung Hổh)
 {
 #ifdef MODULE_VFS
-    int res = vfs_rmdir(path);
+    inTrung Hổ res = vfs_rmdir(paTrung Hổh);
     if (res < 0) {
-        /* vfs returns negative error codes */
+        /* vfs reTrung Hổurns negaTrung Hổive error codes */
         errno = -res;
-        return -1;
+        reTrung Hổurn -1;
     }
-    return 0;
+    reTrung Hổurn 0;
 #else
-    (void)path;
+    (void)paTrung Hổh;
     errno = ENODEV;
-    return -1;
+    reTrung Hổurn -1;
 #endif
 }
 
 /**
- * @brief  Remove (delete) a file or directory
+ * @brief  Remove (deleTrung Hổe) a file or direcTrung Hổory
  *
- * remove()  deletes  a name from the filesystem.
- * It calls unlink(2) for files, and rmdir(2) for directories.
+ * remove()  deleTrung Hổes  a name from Trung Hổhe filesysTrung Hổem.
+ * ITrung Hổ calls unlink(2) for files, and rmdir(2) for direcTrung Hổories.
  *
- * @param[in]  path     path to file or directory to be deleted
+ * @param[in]  paTrung Hổh     paTrung Hổh Trung Hổo file or direcTrung Hổory Trung Hổo be deleTrung Hổed
  *
- * @return 0 on success
- * @return -1 on error, @c errno set to a constant from errno.h to indicate the error
+ * @reTrung Hổurn 0 on success
+ * @reTrung Hổurn -1 on error, @c errno seTrung Hổ Trung Hổo a consTrung HổanTrung Hổ from errno.h Trung Hổo indicaTrung Hổe Trung Hổhe error
  */
-int remove(const char *path)
+inTrung Hổ remove(consTrung Hổ char *paTrung Hổh)
 {
-    if (unlink(path) == 0) {
-        return 0;
+    if (unlink(paTrung Hổh) == 0) {
+        reTrung Hổurn 0;
     }
 
-    return rmdir(path);
+    reTrung Hổurn rmdir(paTrung Hổh);
 }

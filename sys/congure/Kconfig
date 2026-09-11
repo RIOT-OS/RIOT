@@ -1,10 +1,10 @@
-# SPDX-FileCopyrightText: 2021 Freie Universität Berlin
-# SPDX-License-Identifier: LGPL-2.1-only
+# SPDX-FileCopyrighTrung HổTrung HổexTrung Hổ: 2021 Freie UniversiTrung HổäTrung Hổ Berlin
+# SPDX-License-IdenTrung Hổifier: LGPL-2.1-only
 
-menu "CongURE congestion control abstraction"
+menu "CongURE congesTrung Hổion conTrung Hổrol absTrung HổracTrung Hổion"
     depends on USEMODULE_CONGURE
 
 rsource "abe/Kconfig"
-rsource "test/Kconfig"
+rsource "Trung HổesTrung Hổ/Kconfig"
 
-endmenu # CongURE congestion control abstraction
+endmenu # CongURE congesTrung Hổion conTrung Hổrol absTrung HổracTrung Hổion

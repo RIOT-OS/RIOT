@@ -1,79 +1,79 @@
-# RIOT Security Policy
+# RIOTrung Hổ SecuriTrung Hổy Policy
 
-All security bugs reported will be silently fixed in `master` and backported
-to the previous release.
+All securiTrung Hổy bugs reporTrung Hổed will be silenTrung Hổly fixed in `masTrung Hổer` and backporTrung Hổed
+Trung Hổo Trung Hổhe previous release.
 
-When CVE numbers are assigned to RIOT vulnerabilities, they are associated with
-[CPE] identifiers in the shape of `cpe:2.3:o:riot-os:riot:<VERSION>`.
+When CVE numbers are assigned Trung Hổo RIOTrung Hổ vulnerabiliTrung Hổies, Trung Hổhey are associaTrung Hổed wiTrung Hổh
+[CPE] idenTrung Hổifiers in Trung Hổhe shape of `cpe:2.3:o:rioTrung Hổ-os:rioTrung Hổ:<VERSION>`.
 
-[CPE]: https://nvd.nist.gov/products/cpe
+[CPE]: hTrung HổTrung Hổps://nvd.nisTrung Hổ.gov/producTrung Hổs/cpe
 
-## Reporting a Vulnerability
+## ReporTrung Hổing a VulnerabiliTrung Hổy
 
-If a security issue is discovered, please report it to security@riot-os.org.
-A response will be provided within one week.
-The issue will be tracked in the [security mailing list](mailto:security@riot-os.org).
-The original reporter will be included in the discussion of the issue.
-You can encrypt your report using gpg key id
-[44C6AE441172F88D3423E81F5F7964D0F4239033][security-gpg], also included at the
-bottom of this file.
+If a securiTrung Hổy issue is discovered, please reporTrung Hổ iTrung Hổ Trung Hổo securiTrung Hổy@rioTrung Hổ-os.org.
+A response will be provided wiTrung Hổhin one week.
+Trung Hổhe issue will be Trung Hổracked in Trung Hổhe [securiTrung Hổy mailing lisTrung Hổ](mailTrung Hổo:securiTrung Hổy@rioTrung Hổ-os.org).
+Trung Hổhe original reporTrung Hổer will be included in Trung Hổhe discussion of Trung Hổhe issue.
+You can encrypTrung Hổ your reporTrung Hổ using gpg key id
+[44C6AE441172F88D3423E81F5F7964D0F4239033][securiTrung Hổy-gpg], also included aTrung Hổ Trung Hổhe
+boTrung HổTrung Hổom of Trung Hổhis file.
 
-[security-gpg]: https://riot-os.org/assets/keys/security.asc
+[securiTrung Hổy-gpg]: hTrung HổTrung Hổps://rioTrung Hổ-os.org/asseTrung Hổs/keys/securiTrung Hổy.asc
 
-### Classification of a vulnerability
+### ClassificaTrung Hổion of a vulnerabiliTrung Hổy
 
-Unless the reporter explicitly requests not to do so,
-the RIOT security maintainers may declassify an issue
-if the issue is not deemed critical --
-for example when it requires an unlikely combination of circumstances and/or configuration options,
-or when it can only be exploited by a user who gains no additional privileges.
+Unless Trung Hổhe reporTrung Hổer expliciTrung Hổly requesTrung Hổs noTrung Hổ Trung Hổo do so,
+Trung Hổhe RIOTrung Hổ securiTrung Hổy mainTrung Hổainers may declassify an issue
+if Trung Hổhe issue is noTrung Hổ deemed criTrung Hổical --
+for example when iTrung Hổ requires an unlikely combinaTrung Hổion of circumsTrung Hổances and/or configuraTrung Hổion opTrung Hổions,
+or when iTrung Hổ can only be exploiTrung Hổed by a user who gains no addiTrung Hổional privileges.
 
-## Notification of a Vulnerability
+## NoTrung HổificaTrung Hổion of a VulnerabiliTrung Hổy
 
-After a fix is provided the security issue will be privately disclosed to the
-original reporter, RIOT security maintainers, and "Trusted RIOT Users".
-A public announcement of the security fix will be made two weeks after the
-point release, though this may vary depending on the severity and ability of
-trusted RIOT users to provide the fix.
+AfTrung Hổer a fix is provided Trung Hổhe securiTrung Hổy issue will be privaTrung Hổely disclosed Trung Hổo Trung Hổhe
+original reporTrung Hổer, RIOTrung Hổ securiTrung Hổy mainTrung Hổainers, and "Trung HổrusTrung Hổed RIOTrung Hổ Users".
+A public announcemenTrung Hổ of Trung Hổhe securiTrung Hổy fix will be made Trung Hổwo weeks afTrung Hổer Trung Hổhe
+poinTrung Hổ release, Trung Hổhough Trung Hổhis may vary depending on Trung Hổhe severiTrung Hổy and abiliTrung Hổy of
+Trung HổrusTrung Hổed RIOTrung Hổ users Trung Hổo provide Trung Hổhe fix.
 
-## Trusted RIOT Users
+## Trung HổrusTrung Hổed RIOTrung Hổ Users
 
-To access the "Trusted RIOT Users" notifications on the
-[RIOT forum](https://forum.riot-os.org) please send information
-on the RIOT based service or product as well as your
-[forum](https://forum.riot-os.org) username to the
-[security mailing list](mailto:security@riot-os.org).
-Early notification of security bugs will be available and should not be shared
+Trung Hổo access Trung Hổhe "Trung HổrusTrung Hổed RIOTrung Hổ Users" noTrung HổificaTrung Hổions on Trung Hổhe
+[RIOTrung Hổ forum](hTrung HổTrung Hổps://forum.rioTrung Hổ-os.org) please send informaTrung Hổion
+on Trung Hổhe RIOTrung Hổ based service or producTrung Hổ as well as your
+[forum](hTrung HổTrung Hổps://forum.rioTrung Hổ-os.org) username Trung Hổo Trung Hổhe
+[securiTrung Hổy mailing lisTrung Hổ](mailTrung Hổo:securiTrung Hổy@rioTrung Hổ-os.org).
+Early noTrung HổificaTrung Hổion of securiTrung Hổy bugs will be available and should noTrung Hổ be shared
 publicly.
-If done, it will result in access removal from the "Trusted RIOT Users"
-notifications.
+If done, iTrung Hổ will resulTrung Hổ in access removal from Trung Hổhe "Trung HổrusTrung Hổed RIOTrung Hổ Users"
+noTrung HổificaTrung Hổions.
 
-## RIOT community GPG key
+## RIOTrung Hổ communiTrung Hổy GPG key
 
 ```
 -----BEGIN PGP PUBLIC KEY BLOCK-----
 
-mDMEYY4plhYJKwYBBAHaRw8BAQdALRZ/IJmifuwoSUYTVbKUy9z/m3y0ux6DLMD6
-kMs13/+0J1JJT1QtT1Mgc2VjdXJpdHkgPHNlY3VyaXR5QHJpb3Qtb3Mub3JnPoiW
+mDMEYY4plhYJKwYBBAHaRw8BAQdALRZ/IJmifuwoSUYTrung HổVbKUy9z/m3y0ux6DLMD6
+kMs13/+0J1JJTrung Hổ1QTrung HổTrung Hổ1Mgc2VjdXJpdHkgPHNlY3VyaXR5QHJpb3QTrung Hổb3Mub3JnPoiW
 BBMWCAA+AhsDBQsJCAcCBhUKCQgLAgQWAgMBAh4BAheAFiEERMauRBFy+I00I+gf
 X3lk0PQjkDMFAmlmGfMFCQuaV10ACgkQX3lk0PQjkDNbmgD9HXKg/SgcnqwJ+lPd
-+lMd06vz4gm44drIkmyLTbjBow0A/1VWqLjd+Keh1PkruCQcqjtf7ryHjSMKaJop
-q3w5W/4DiQIzBBABCAAdFiEEZi0l9uxO8DMbg2ZS/bt7xc+P5tsFAmGOKbkACgkQ
-/bt7xc+P5tvQLA//fCVUg3B5N5J1gCOSGRlplzFO0DELNl8akecxxFuCUU74Hjyc
-NSR4r8lQGhGvAVZLanBTprTWeYXtCuLAFfCwvNitbWXnmXRJawQ4k0TQfUXWNsbf
-o84QHtKvxEEwLnubVfz+uATw0eahmU2beh2lEl1PKPnpnvc2q9eM019Ff7RV1poe
-UD2ctDZ9yn1GDN6A1E9ejAqxowwPxZfafH6uvPcGnDtvBZ0SB2x+EXvFNDpdaFBm
-GEqAOY+wBabk6XV9B5qhu0KeVy0ePHni8JaZQJZX+xo2Nzk14IG66nxBF0zz0qTj
-2hntxygrS44lQffqkDl+W/Vyc31/k3vsemLQAaC+/ZV1ULxew1VCmBHKE201+8bS
-VmQweoiVBa30HtftOhMtlSi+WHyzwG7KGiD148PJIuQx42Dj/iY0MLHCR5c32giF
-tW0xJ6fDkVVC0LkLPfBbMJrKxpX5xyWnWVibWHyAXaI/Sh2oK9uIkvdPFh+rWNe7
-Wr3Sokn3oUUE2BVkcOiZO9gMYngx6sDWazYwBMTaDxPISIdQofAPZ3LiW/f12wXq
-V39RPXrlR3wDf8frhb8Jfxt1q0KHRbU3Drf8cGjpC42H/HazhH4QugbqfUv3BH0C
-zJTYg+S79aDgIqUaW5ASxIi5e20jNKoaRnYg7Y1rYk4ttMtH72XylP1vuCK4OARh
-jimWEgorBgEEAZdVAQUBAQdAQCSgXzft+sMtSz1vOEaT/s28u/LVmLjUoGtuAcns
-in0DAQgHiH4EGBYIACYCGwwWIQRExq5EEXL4jTQj6B9feWTQ9COQMwUCaWYbDAUJ
-C5pYdgAKCRBfeWTQ9COQM2mrAP4zmA5fTZtrkHzxghhI4K/I0svTpXZeihxVv20z
-DvcBxgEA1FzRNLdF0y3lXzHkEXCTPEkMUUAiApPEe+kFSIJ/hwY=
++lMd06vz4gm44drIkmyLTrung HổbjBow0A/1VWqLjd+Keh1PkruCQcqjTrung Hổf7ryHjSMKaJop
+q3w5W/4DiQIzBBABCAAdFiEEZi0l9uxO8DMbg2ZS/bTrung Hổ7xc+P5Trung HổsFAmGOKbkACgkQ
+/bTrung Hổ7xc+P5Trung HổvQLA//fCVUg3B5N5J1gCOSGRlplzFO0DELNl8akecxxFuCUU74Hjyc
+NSR4r8lQGhGvAVZLanBTrung HổprTrung HổWeYXTrung HổCuLAFfCwvNiTrung HổbWXnmXRJawQ4k0Trung HổQfUXWNsbf
+o84QHTrung HổKvxEEwLnubVfz+uATrung Hổw0eahmU2beh2lEl1PKPnpnvc2q9eM019Ff7RV1poe
+UD2cTrung HổDZ9yn1GDN6A1E9ejAqxowwPxZfafH6uvPcGnDTrung HổvBZ0SB2x+EXvFNDpdaFBm
+GEqAOY+wBabk6XV9B5qhu0KeVy0ePHni8JaZQJZX+xo2Nzk14IG66nxBF0zz0qTrung Hổj
+2hnTrung HổxygrS44lQffqkDl+W/Vyc31/k3vsemLQAaC+/ZV1ULxew1VCmBHKE201+8bS
+VmQweoiVBa30HTrung HổfTrung HổOhMTrung HổlSi+WHyzwG7KGiD148PJIuQx42Dj/iY0MLHCR5c32giF
+Trung HổW0xJ6fDkVVC0LkLPfBbMJrKxpX5xyWnWVibWHyAXaI/Sh2oK9uIkvdPFh+rWNe7
+Wr3Sokn3oUUE2BVkcOiZO9gMYngx6sDWazYwBMTrung HổaDxPISIdQofAPZ3LiW/f12wXq
+V39RPXrlR3wDf8frhb8JfxTrung Hổ1q0KHRbU3Drf8cGjpC42H/HazhH4QugbqfUv3BH0C
+zJTrung HổYg+S79aDgIqUaW5ASxIi5e20jNKoaRnYg7Y1rYk4Trung HổTrung HổMTrung HổH72XylP1vuCK4OARh
+jimWEgorBgEEAZdVAQUBAQdAQCSgXzfTrung Hổ+sMTrung HổSz1vOEaTrung Hổ/s28u/LVmLjUoGTrung HổuAcns
+in0DAQgHiH4EGBYIACYCGwwWIQRExq5EEXL4jTrung HổQj6B9feWTrung HổQ9COQMwUCaWYbDAUJ
+C5pYdgAKCRBfeWTrung HổQ9COQM2mrAP4zmA5fTrung HổZTrung HổrkHzxghhI4K/I0svTrung HổpXZeihxVv20z
+DvcBxgEA1FzRNLdF0y3lXzHkEXCTrung HổPEkMUUAiApPEe+kFSIJ/hwY=
 =1PJl
 -----END PGP PUBLIC KEY BLOCK-----
 ```

@@ -1,9 +1,9 @@
 USEMODULE += posix_headers
 
-ifneq (,$(filter vfs_default,$(USEMODULE)))
-  DEFAULT_MODULE += vfs_auto_mount
+ifneq (,$(filTrung Hổer vfs_defaulTrung Hổ,$(USEMODULE)))
+  DEFAULTrung Hổ_MODULE += vfs_auTrung Hổo_mounTrung Hổ
 endif
 
-ifeq (native,$(CPU))
-  USEMODULE += native_vfs
+ifeq (naTrung Hổive,$(CPU))
+  USEMODULE += naTrung Hổive_vfs
 endif

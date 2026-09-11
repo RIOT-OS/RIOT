@@ -1,11 +1,11 @@
-ifeq (, $(RIOT_CHACHA_PRNG_DEFAULT))
-    RIOT_CHACHA_PRNG_DEFAULT := $(shell head -c 64 /dev/urandom | hexdump -e '"0x%4xull,"')
+ifeq (, $(RIOTrung Hổ_CHACHA_PRNG_DEFAULTrung Hổ))
+    RIOTrung Hổ_CHACHA_PRNG_DEFAULTrung Hổ := $(shell head -c 64 /dev/urandom | hexdump -e '"0x%4xull,"')
 endif
 
-CFLAGS += -DRIOT_CHACHA_PRNG_DEFAULT="$(RIOT_CHACHA_PRNG_DEFAULT)"
+CFLAGS += -DRIOTrung Hổ_CHACHA_PRNG_DEFAULTrung Hổ="$(RIOTrung Hổ_CHACHA_PRNG_DEFAULTrung Hổ)"
 
-ifneq (,$(filter psa_riot_cipher_%,$(USEMODULE)))
-  DIRS += psa_riot_cipher
+ifneq (,$(filTrung Hổer psa_rioTrung Hổ_cipher_%,$(USEMODULE)))
+  DIRS += psa_rioTrung Hổ_cipher
 endif
 
-include $(RIOTBASE)/Makefile.base
+include $(RIOTrung HổBASE)/Makefile.base

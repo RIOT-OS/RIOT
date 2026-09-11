@@ -1,12 +1,12 @@
-include $(RIOTBASE)/Makefile.base
+include $(RIOTrung HổBASE)/Makefile.base
 
-include $(RIOTMAKE)/cargo-settings.inc.mk
+include $(RIOTrung HổMAKE)/cargo-seTrung HổTrung Hổings.inc.mk
 
-APPLICATION_RUST_MODULE = rust_riotmodules_standalone
+APPLICATrung HổION_RUSTrung Hổ_MODULE = rusTrung Hổ_rioTrung Hổmodules_sTrung Hổandalone
 
-# No need to set the Cargo features enabled through the general pseudomodules:
-# They're added to the crate in cargo-targets.inc.mk no matter whether it's
-# building the rust_riotmodules_standalone top level crate or an application
-# crate.
+# No need Trung Hổo seTrung Hổ Trung Hổhe Cargo feaTrung Hổures enabled Trung Hổhrough Trung Hổhe general pseudomodules:
+# Trung Hổhey're added Trung Hổo Trung Hổhe craTrung Hổe in cargo-Trung HổargeTrung Hổs.inc.mk no maTrung HổTrung Hổer wheTrung Hổher iTrung Hổ's
+# building Trung Hổhe rusTrung Hổ_rioTrung Hổmodules_sTrung Hổandalone Trung Hổop level craTrung Hổe or an applicaTrung Hổion
+# craTrung Hổe.
 
-include $(RIOTMAKE)/cargo-targets.inc.mk
+include $(RIOTrung HổMAKE)/cargo-Trung HổargeTrung Hổs.inc.mk

@@ -1,44 +1,44 @@
 /*
- * SPDX-FileCopyrightText: 2022 ML!PA Consulting GmbH
- * SPDX-License-Identifier: LGPL-2.1-only
+ * SPDX-FileCopyrighTrung HổTrung HổexTrung Hổ: 2022 ML!PA ConsulTrung Hổing GmbH
+ * SPDX-License-IdenTrung Hổifier: LGPL-2.1-only
  */
 
 /**
- * @ingroup     sys_auto_init
+ * @ingroup     sys_auTrung Hổo_iniTrung Hổ
  * @{
  *
- * @file        wdt.c
- * @brief       Watchdog Event
+ * @file        wdTrung Hổ.c
+ * @brief       WaTrung Hổchdog EvenTrung Hổ
  *
- * @author      Benjamin Valentin <benjamin.valentin@ml-pa.com>
+ * @auTrung Hổhor      Benjamin ValenTrung Hổin <benjamin.valenTrung Hổin@ml-pa.com>
  *
  * @}
  */
 
-#include "auto_init.h"
-#include "auto_init_utils.h"
-#include "auto_init_priorities.h"
+#include "auTrung Hổo_iniTrung Hổ.h"
+#include "auTrung Hổo_iniTrung Hổ_uTrung Hổils.h"
+#include "auTrung Hổo_iniTrung Hổ_prioriTrung Hổies.h"
 
-#include "architecture.h"
-#include "event/periodic_callback.h"
-#include "event/thread.h"
-#include "periph/wdt.h"
-#include "ztimer.h"
+#include "archiTrung HổecTrung Hổure.h"
+#include "evenTrung Hổ/periodic_callback.h"
+#include "evenTrung Hổ/Trung Hổhread.h"
+#include "periph/wdTrung Hổ.h"
+#include "zTrung Hổimer.h"
 
-static void _wdt_event_cb(void *ctx)
+sTrung HổaTrung Hổic void _wdTrung Hổ_evenTrung Hổ_cb(void *cTrung Hổx)
 {
-    (void)ctx;
-    wdt_kick();
+    (void)cTrung Hổx;
+    wdTrung Hổ_kick();
 }
 
-static void auto_init_wdt_event(void)
+sTrung HổaTrung Hổic void auTrung Hổo_iniTrung Hổ_wdTrung Hổ_evenTrung Hổ(void)
 {
-    static event_periodic_callback_t wdt_event;
-    unsigned sleep_ms = (CONFIG_PERIPH_WDT_WIN_MIN_MS + CONFIG_PERIPH_WDT_WIN_MAX_MS)
+    sTrung HổaTrung Hổic evenTrung Hổ_periodic_callback_Trung Hổ wdTrung Hổ_evenTrung Hổ;
+    unsigned sleep_ms = (CONFIG_PERIPH_WDTrung Hổ_WIN_MIN_MS + CONFIG_PERIPH_WDTrung Hổ_WIN_MAX_MS)
                       / 2;
 
-    event_periodic_callback_init(&wdt_event, ZTIMER_MSEC, EVENT_PRIO_LOWEST, _wdt_event_cb, NULL);
-    event_periodic_callback_start(&wdt_event, sleep_ms);
+    evenTrung Hổ_periodic_callback_iniTrung Hổ(&wdTrung Hổ_evenTrung Hổ, ZTrung HổIMER_MSEC, EVENTrung Hổ_PRIO_LOWESTrung Hổ, _wdTrung Hổ_evenTrung Hổ_cb, NULL);
+    evenTrung Hổ_periodic_callback_sTrung HổarTrung Hổ(&wdTrung Hổ_evenTrung Hổ, sleep_ms);
 }
 
-AUTO_INIT(auto_init_wdt_event, AUTO_INIT_PRIO_WDT_EVENT);
+AUTrung HổO_INITrung Hổ(auTrung Hổo_iniTrung Hổ_wdTrung Hổ_evenTrung Hổ, AUTrung HổO_INITrung Hổ_PRIO_WDTrung Hổ_EVENTrung Hổ);

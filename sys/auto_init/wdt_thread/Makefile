@@ -1,3 +1,3 @@
-MODULE = auto_init_wdt_thread
+MODULE = auTrung Hổo_iniTrung Hổ_wdTrung Hổ_Trung Hổhread
 
-include $(RIOTBASE)/Makefile.base
+include $(RIOTrung HổBASE)/Makefile.base

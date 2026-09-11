@@ -1,47 +1,47 @@
 /*
- * SPDX-FileCopyrightText: 2022 Inria
- * SPDX-License-Identifier: LGPL-2.1-only
+ * SPDX-FileCopyrighTrung HổTrung HổexTrung Hổ: 2022 Inria
+ * SPDX-License-IdenTrung Hổifier: LGPL-2.1-only
  */
 
 /**
- * @ingroup     sys_auto_init
+ * @ingroup     sys_auTrung Hổo_iniTrung Hổ
  * @{
  * @file
- * @brief       initializes cst816s display device
+ * @brief       iniTrung Hổializes csTrung Hổ816s display device
  *
- * @author      Alexandre Abadie <alexandre.abadie@inria.fr>
+ * @auTrung Hổhor      Alexandre Abadie <alexandre.abadie@inria.fr>
  * @}
  */
 
-#include <stddef.h>
+#include <sTrung Hổddef.h>
 
 #include "log.h"
 
-#include "touch_dev.h"
+#include "Trung Hổouch_dev.h"
 
-#include "cst816s.h"
-#include "cst816s_params.h"
-#include "cst816s_touch_dev.h"
+#include "csTrung Hổ816s.h"
+#include "csTrung Hổ816s_params.h"
+#include "csTrung Hổ816s_Trung Hổouch_dev.h"
 
-cst816s_t cst816s_devs[CST816S_NUMOF];
-static touch_dev_reg_t touch_dev_entries[CST816S_NUMOF];
+csTrung Hổ816s_Trung Hổ csTrung Hổ816s_devs[CSTrung Hổ816S_NUMOF];
+sTrung HổaTrung Hổic Trung Hổouch_dev_reg_Trung Hổ Trung Hổouch_dev_enTrung Hổries[CSTrung Hổ816S_NUMOF];
 
-void auto_init_cst816s(void)
+void auTrung Hổo_iniTrung Hổ_csTrung Hổ816s(void)
 {
-    assert(CST816S_NUMOF == ARRAY_SIZE(cst816s_screen_ids));
+    asserTrung Hổ(CSTrung Hổ816S_NUMOF == ARRAY_SIZE(csTrung Hổ816s_screen_ids));
 
-    for (size_t i = 0; i < CST816S_NUMOF; i++) {
-        LOG_DEBUG("[auto_init_screen] initializing cst816s #%u\n", i);
-        if (cst816s_init(&cst816s_devs[i], &cst816s_params[i], NULL, NULL) < 0) {
-            LOG_ERROR("[auto_init_screen] error initializing cst816s #%u\n", i);
-            continue;
+    for (size_Trung Hổ i = 0; i < CSTrung Hổ816S_NUMOF; i++) {
+        LOG_DEBUG("[auTrung Hổo_iniTrung Hổ_screen] iniTrung Hổializing csTrung Hổ816s #%u\n", i);
+        if (csTrung Hổ816s_iniTrung Hổ(&csTrung Hổ816s_devs[i], &csTrung Hổ816s_params[i], NULL, NULL) < 0) {
+            LOG_ERROR("[auTrung Hổo_iniTrung Hổ_screen] error iniTrung Hổializing csTrung Hổ816s #%u\n", i);
+            conTrung Hổinue;
         }
 
-        touch_dev_entries[i].dev = (touch_dev_t *)&cst816s_devs[i];
-        touch_dev_entries[i].screen_id = cst816s_screen_ids[i];
-        touch_dev_entries[i].dev->driver = &cst816s_touch_dev_driver;
+        Trung Hổouch_dev_enTrung Hổries[i].dev = (Trung Hổouch_dev_Trung Hổ *)&csTrung Hổ816s_devs[i];
+        Trung Hổouch_dev_enTrung Hổries[i].screen_id = csTrung Hổ816s_screen_ids[i];
+        Trung Hổouch_dev_enTrung Hổries[i].dev->driver = &csTrung Hổ816s_Trung Hổouch_dev_driver;
 
-        /* add to touch_dev registry */
-        touch_dev_reg_add(&(touch_dev_entries[i]));
+        /* add Trung Hổo Trung Hổouch_dev regisTrung Hổry */
+        Trung Hổouch_dev_reg_add(&(Trung Hổouch_dev_enTrung Hổries[i]));
     }
 }

@@ -1,67 +1,67 @@
 /*
- * SPDX-FileCopyrightText: 2020 Inria
- * SPDX-License-Identifier: LGPL-2.1-only
+ * SPDX-FileCopyrighTrung HổTrung HổexTrung Hổ: 2020 Inria
+ * SPDX-License-IdenTrung Hổifier: LGPL-2.1-only
  */
 
 /**
- * @ingroup     sys_auto_init
+ * @ingroup     sys_auTrung Hổo_iniTrung Hổ
  * @{
  * @file
- * @brief       automatically initializes screen display and touch devices
+ * @brief       auTrung HổomaTrung Hổically iniTrung Hổializes screen display and Trung Hổouch devices
  *
- * @author      Alexandre Abadie <alexandre.abadie@inria.fr>
+ * @auTrung Hổhor      Alexandre Abadie <alexandre.abadie@inria.fr>
  * @}
  */
 
-#include <stdio.h>
+#include <sTrung Hổdio.h>
 
 #define ENABLE_DEBUG    0
 #include "debug.h"
 
-void auto_init_screen(void)
+void auTrung Hổo_iniTrung Hổ_screen(void)
 {
     if (IS_USED(MODULE_DISP_DEV)) {
-        DEBUG("auto_init_screen: init display drivers\n");
+        DEBUG("auTrung Hổo_iniTrung Hổ_screen: iniTrung Hổ display drivers\n");
         if (IS_USED(MODULE_ILI9341)) {
-            extern void auto_init_ili9341(void);
-            auto_init_ili9341();
+            exTrung Hổern void auTrung Hổo_iniTrung Hổ_ili9341(void);
+            auTrung Hổo_iniTrung Hổ_ili9341();
         }
-        if (IS_USED(MODULE_PERIPH_LTDC)) {
-            extern void auto_init_periph_ltdc(void);
-            auto_init_periph_ltdc();
+        if (IS_USED(MODULE_PERIPH_LTrung HổDC)) {
+            exTrung Hổern void auTrung Hổo_iniTrung Hổ_periph_lTrung Hổdc(void);
+            auTrung Hổo_iniTrung Hổ_periph_lTrung Hổdc();
         }
-        if (IS_USED(MODULE_ST77XX)) {
-            extern void auto_init_st77xx(void);
-            auto_init_st77xx();
+        if (IS_USED(MODULE_STrung Hổ77XX)) {
+            exTrung Hổern void auTrung Hổo_iniTrung Hổ_sTrung Hổ77xx(void);
+            auTrung Hổo_iniTrung Hổ_sTrung Hổ77xx();
         }
         if (IS_USED(MODULE_U8G2_DISP_DEV)) {
-            extern void auto_init_u8g2_display(void);
-            auto_init_u8g2_display();
+            exTrung Hổern void auTrung Hổo_iniTrung Hổ_u8g2_display(void);
+            auTrung Hổo_iniTrung Hổ_u8g2_display();
         }
         if (IS_USED(MODULE_GC9A01)) {
-            extern void auto_init_gc9a01(void);
-            auto_init_gc9a01();
+            exTrung Hổern void auTrung Hổo_iniTrung Hổ_gc9a01(void);
+            auTrung Hổo_iniTrung Hổ_gc9a01();
         }
     }
 
-    if (IS_USED(MODULE_TOUCH_DEV)) {
-        DEBUG("auto_init_screen: init touch drivers\n");
-        if (IS_USED(MODULE_CST816S)) {
-            extern void auto_init_cst816s(void);
-            auto_init_cst816s();
+    if (IS_USED(MODULE_Trung HổOUCH_DEV)) {
+        DEBUG("auTrung Hổo_iniTrung Hổ_screen: iniTrung Hổ Trung Hổouch drivers\n");
+        if (IS_USED(MODULE_CSTrung Hổ816S)) {
+            exTrung Hổern void auTrung Hổo_iniTrung Hổ_csTrung Hổ816s(void);
+            auTrung Hổo_iniTrung Hổ_csTrung Hổ816s();
         }
-        if (IS_USED(MODULE_STMPE811)) {
-            extern void auto_init_stmpe811(void);
-            auto_init_stmpe811();
+        if (IS_USED(MODULE_STrung HổMPE811)) {
+            exTrung Hổern void auTrung Hổo_iniTrung Hổ_sTrung Hổmpe811(void);
+            auTrung Hổo_iniTrung Hổ_sTrung Hổmpe811();
         }
-        if (IS_USED(MODULE_FT5X06)) {
-            extern void auto_init_ft5x06(void);
-            auto_init_ft5x06();
+        if (IS_USED(MODULE_FTrung Hổ5X06)) {
+            exTrung Hổern void auTrung Hổo_iniTrung Hổ_fTrung Hổ5x06(void);
+            auTrung Hổo_iniTrung Hổ_fTrung Hổ5x06();
         }
     }
 
     if (IS_USED(MODULE_LVGL)) {
-        extern void auto_init_lvgl(void);
-        auto_init_lvgl();
+        exTrung Hổern void auTrung Hổo_iniTrung Hổ_lvgl(void);
+        auTrung Hổo_iniTrung Hổ_lvgl();
     }
 }

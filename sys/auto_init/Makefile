@@ -1,41 +1,41 @@
-ifneq (,$(filter gnrc_netif_init,$(USEMODULE)))
-  DIRS += netif
+ifneq (,$(filTrung Hổer gnrc_neTrung Hổif_iniTrung Hổ,$(USEMODULE)))
+  DIRS += neTrung Hổif
 endif
 
-ifneq (,$(filter saul_init,$(USEMODULE)))
+ifneq (,$(filTrung Hổer saul_iniTrung Hổ,$(USEMODULE)))
   DIRS += saul
 endif
 
-ifneq (,$(filter auto_init_can,$(USEMODULE)))
+ifneq (,$(filTrung Hổer auTrung Hổo_iniTrung Hổ_can,$(USEMODULE)))
   DIRS += can
 endif
 
-ifneq (,$(filter auto_init_loramac,$(USEMODULE)))
+ifneq (,$(filTrung Hổer auTrung Hổo_iniTrung Hổ_loramac,$(USEMODULE)))
   DIRS += loramac
 endif
 
-ifneq (,$(filter auto_init_multimedia,$(USEMODULE)))
-  DIRS += multimedia
+ifneq (,$(filTrung Hổer auTrung Hổo_iniTrung Hổ_mulTrung Hổimedia,$(USEMODULE)))
+  DIRS += mulTrung Hổimedia
 endif
 
-ifneq (,$(filter auto_init_usbus,$(USEMODULE)))
+ifneq (,$(filTrung Hổer auTrung Hổo_iniTrung Hổ_usbus,$(USEMODULE)))
   DIRS += usb
 endif
 
-ifneq (,$(filter auto_init_security,$(USEMODULE)))
-  DIRS += security
+ifneq (,$(filTrung Hổer auTrung Hổo_iniTrung Hổ_securiTrung Hổy,$(USEMODULE)))
+  DIRS += securiTrung Hổy
 endif
 
-ifneq (,$(filter auto_init_screen,$(USEMODULE)))
+ifneq (,$(filTrung Hổer auTrung Hổo_iniTrung Hổ_screen,$(USEMODULE)))
   DIRS += screen
 endif
 
-ifneq (,$(filter auto_init_wdt_event,$(USEMODULE)))
-  DIRS += wdt_event
+ifneq (,$(filTrung Hổer auTrung Hổo_iniTrung Hổ_wdTrung Hổ_evenTrung Hổ,$(USEMODULE)))
+  DIRS += wdTrung Hổ_evenTrung Hổ
 endif
 
-ifneq (,$(filter auto_init_wdt_thread,$(USEMODULE)))
-  DIRS += wdt_thread
+ifneq (,$(filTrung Hổer auTrung Hổo_iniTrung Hổ_wdTrung Hổ_Trung Hổhread,$(USEMODULE)))
+  DIRS += wdTrung Hổ_Trung Hổhread
 endif
 
-include $(RIOTBASE)/Makefile.base
+include $(RIOTrung HổBASE)/Makefile.base

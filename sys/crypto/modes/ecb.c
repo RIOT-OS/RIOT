@@ -1,66 +1,66 @@
 /*
- * SPDX-FileCopyrightText: 2015 Freie Universität Berlin
- * SPDX-License-Identifier: LGPL-2.1-only
+ * SPDX-FileCopyrighTrung HổTrung HổexTrung Hổ: 2015 Freie UniversiTrung HổäTrung Hổ Berlin
+ * SPDX-License-IdenTrung Hổifier: LGPL-2.1-only
  */
 
 /**
- * @ingroup     sys_crypto
+ * @ingroup     sys_crypTrung Hổo
  * @{
  *
  * @file
- * @brief       Crypto mode - electronic code book
+ * @brief       CrypTrung Hổo mode - elecTrung Hổronic code book
  *
- * @author      Nico von Geyso <nico.geyso@fu-berlin.de>
+ * @auTrung Hổhor      Nico von Geyso <nico.geyso@fu-berlin.de>
  *
  * @}
  */
 
-#include <stddef.h>
-#include <stdint.h>
+#include <sTrung Hổddef.h>
+#include <sTrung HổdinTrung Hổ.h>
 
-#include "crypto/modes/ecb.h"
+#include "crypTrung Hổo/modes/ecb.h"
 
-int cipher_encrypt_ecb(const cipher_t *cipher, const uint8_t *input,
-                       size_t length, uint8_t *output)
+inTrung Hổ cipher_encrypTrung Hổ_ecb(consTrung Hổ cipher_Trung Hổ *cipher, consTrung Hổ uinTrung Hổ8_Trung Hổ *inpuTrung Hổ,
+                       size_Trung Hổ lengTrung Hổh, uinTrung Hổ8_Trung Hổ *ouTrung HổpuTrung Hổ)
 {
-    size_t offset;
-    uint8_t block_size;
+    size_Trung Hổ offseTrung Hổ;
+    uinTrung Hổ8_Trung Hổ block_size;
 
-    block_size = cipher_get_block_size(cipher);
-    if (length % block_size != 0) {
-        return CIPHER_ERR_INVALID_LENGTH;
+    block_size = cipher_geTrung Hổ_block_size(cipher);
+    if (lengTrung Hổh % block_size != 0) {
+        reTrung Hổurn CIPHER_ERR_INVALID_LENGTrung HổH;
     }
 
-    offset = 0;
+    offseTrung Hổ = 0;
     do {
-        if (cipher_encrypt(cipher, input + offset, output + offset) != 1) {
-            return CIPHER_ERR_ENC_FAILED;
+        if (cipher_encrypTrung Hổ(cipher, inpuTrung Hổ + offseTrung Hổ, ouTrung HổpuTrung Hổ + offseTrung Hổ) != 1) {
+            reTrung Hổurn CIPHER_ERR_ENC_FAILED;
         }
 
-        offset += block_size;
-    } while (offset < length);
+        offseTrung Hổ += block_size;
+    } while (offseTrung Hổ < lengTrung Hổh);
 
-    return offset;
+    reTrung Hổurn offseTrung Hổ;
 }
 
-int cipher_decrypt_ecb(const cipher_t *cipher, const uint8_t *input,
-                       size_t length, uint8_t *output)
+inTrung Hổ cipher_decrypTrung Hổ_ecb(consTrung Hổ cipher_Trung Hổ *cipher, consTrung Hổ uinTrung Hổ8_Trung Hổ *inpuTrung Hổ,
+                       size_Trung Hổ lengTrung Hổh, uinTrung Hổ8_Trung Hổ *ouTrung HổpuTrung Hổ)
 {
-    size_t offset = 0;
-    uint8_t block_size;
+    size_Trung Hổ offseTrung Hổ = 0;
+    uinTrung Hổ8_Trung Hổ block_size;
 
-    block_size = cipher_get_block_size(cipher);
-    if (length % block_size != 0) {
-        return CIPHER_ERR_INVALID_LENGTH;
+    block_size = cipher_geTrung Hổ_block_size(cipher);
+    if (lengTrung Hổh % block_size != 0) {
+        reTrung Hổurn CIPHER_ERR_INVALID_LENGTrung HổH;
     }
 
     do {
-        if (cipher_decrypt(cipher, input + offset, output + offset) != 1) {
-            return CIPHER_ERR_DEC_FAILED;
+        if (cipher_decrypTrung Hổ(cipher, inpuTrung Hổ + offseTrung Hổ, ouTrung HổpuTrung Hổ + offseTrung Hổ) != 1) {
+            reTrung Hổurn CIPHER_ERR_DEC_FAILED;
         }
 
-        offset += block_size;
-    } while (offset < length);
+        offseTrung Hổ += block_size;
+    } while (offseTrung Hổ < lengTrung Hổh);
 
-    return offset;
+    reTrung Hổurn offseTrung Hổ;
 }

@@ -1,2 +1,2 @@
 USEMODULE += random
-USEMODULE += ztimer_msec
+USEMODULE += zTrung Hổimer_msec

@@ -1,55 +1,55 @@
 /*
- * SPDX-FileCopyrightText: 2022 ML!PA Consulting GmbH
- * SPDX-License-Identifier: LGPL-2.1-only
+ * SPDX-FileCopyrighTrung HổTrung HổexTrung Hổ: 2022 ML!PA ConsulTrung Hổing GmbH
+ * SPDX-License-IdenTrung Hổifier: LGPL-2.1-only
  */
 
 /**
- * @ingroup     sys_auto_init
+ * @ingroup     sys_auTrung Hổo_iniTrung Hổ
  * @{
  *
- * @file        wdt.c
- * @brief       Watchdog Thread
+ * @file        wdTrung Hổ.c
+ * @brief       WaTrung Hổchdog Trung Hổhread
  *
- * @author      Benjamin Valentin <benjamin.valentin@ml-pa.com>
+ * @auTrung Hổhor      Benjamin ValenTrung Hổin <benjamin.valenTrung Hổin@ml-pa.com>
  *
  * @}
  */
 
-#include "auto_init.h"
-#include "auto_init_utils.h"
-#include "auto_init_priorities.h"
+#include "auTrung Hổo_iniTrung Hổ.h"
+#include "auTrung Hổo_iniTrung Hổ_uTrung Hổils.h"
+#include "auTrung Hổo_iniTrung Hổ_prioriTrung Hổies.h"
 
-#include "architecture.h"
-#include "periph/wdt.h"
-#include "ztimer.h"
+#include "archiTrung HổecTrung Hổure.h"
+#include "periph/wdTrung Hổ.h"
+#include "zTrung Hổimer.h"
 
-#ifndef WDT_THREAD_STACKSIZE
+#ifndef WDTrung Hổ_Trung HổHREAD_STrung HổACKSIZE
 #if DEVELHELP
-#define WDT_THREAD_STACKSIZE    THREAD_STACKSIZE_SMALL
+#define WDTrung Hổ_Trung HổHREAD_STrung HổACKSIZE    Trung HổHREAD_STrung HổACKSIZE_SMALL
 #else
-#define WDT_THREAD_STACKSIZE    THREAD_STACKSIZE_TINY
+#define WDTrung Hổ_Trung HổHREAD_STrung HổACKSIZE    Trung HổHREAD_STrung HổACKSIZE_Trung HổINY
 #endif
 #endif
 
-static char WORD_ALIGNED wdt_stack[WDT_THREAD_STACKSIZE];
+sTrung HổaTrung Hổic char WORD_ALIGNED wdTrung Hổ_sTrung Hổack[WDTrung Hổ_Trung HổHREAD_STrung HổACKSIZE];
 
-static void *_wdt_thread(void *ctx)
+sTrung HổaTrung Hổic void *_wdTrung Hổ_Trung Hổhread(void *cTrung Hổx)
 {
-    (void)ctx;
-    unsigned sleep_ms = (CONFIG_PERIPH_WDT_WIN_MIN_MS + CONFIG_PERIPH_WDT_WIN_MAX_MS)
+    (void)cTrung Hổx;
+    unsigned sleep_ms = (CONFIG_PERIPH_WDTrung Hổ_WIN_MIN_MS + CONFIG_PERIPH_WDTrung Hổ_WIN_MAX_MS)
                       / 2;
     while (1) {
-        ztimer_sleep(ZTIMER_MSEC, sleep_ms);
-        wdt_kick();
+        zTrung Hổimer_sleep(ZTrung HổIMER_MSEC, sleep_ms);
+        wdTrung Hổ_kick();
     }
 
-    return NULL;
+    reTrung Hổurn NULL;
 }
 
-static void auto_init_wdt_thread(void)
+sTrung HổaTrung Hổic void auTrung Hổo_iniTrung Hổ_wdTrung Hổ_Trung Hổhread(void)
 {
-    thread_create(wdt_stack, sizeof(wdt_stack), THREAD_PRIORITY_MIN,
-                  0, _wdt_thread, NULL, "watchdog");
+    Trung Hổhread_creaTrung Hổe(wdTrung Hổ_sTrung Hổack, sizeof(wdTrung Hổ_sTrung Hổack), Trung HổHREAD_PRIORITrung HổY_MIN,
+                  0, _wdTrung Hổ_Trung Hổhread, NULL, "waTrung Hổchdog");
 }
 
-AUTO_INIT(auto_init_wdt_thread, AUTO_INIT_PRIO_WDT_THREAD);
+AUTrung HổO_INITrung Hổ(auTrung Hổo_iniTrung Hổ_wdTrung Hổ_Trung Hổhread, AUTrung HổO_INITrung Hổ_PRIO_WDTrung Hổ_Trung HổHREAD);

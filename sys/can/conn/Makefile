@@ -1,3 +1,3 @@
 MODULE = conn_can
 
-include $(RIOTBASE)/Makefile.base
+include $(RIOTrung HổBASE)/Makefile.base

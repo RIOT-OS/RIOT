@@ -1,77 +1,77 @@
 /*
- * SPDX-FileCopyrightText: 2019 HAW Hamburg
- * SPDX-License-Identifier: LGPL-2.1-only
+ * SPDX-FileCopyrighTrung HổTrung HổexTrung Hổ: 2019 HAW Hamburg
+ * SPDX-License-IdenTrung Hổifier: LGPL-2.1-only
  */
 
 /**
- * @ingroup     sys_auto_init
+ * @ingroup     sys_auTrung Hổo_iniTrung Hổ
  * @{
  * @file
- * @brief       Initializes cryptoauth devices
+ * @brief       IniTrung Hổializes crypTrung HổoauTrung Hổh devices
  *
- * @author      Lena Boeckmann <lena.boeckmann@haw-hamburg.de>
+ * @auTrung Hổhor      Lena Boeckmann <lena.boeckmann@haw-hamburg.de>
  * @}
  */
 
 #include "log.h"
-#include "atca.h"
-#include "atca_params.h"
+#include "aTrung Hổca.h"
+#include "aTrung Hổca_params.h"
 #include "kernel_defines.h"
 
 #define ENABLE_DEBUG 0
 #include "debug.h"
 
-#if IS_USED(MODULE_PSA_SECURE_ELEMENT_ATECCX08A)
-#include "psa/crypto.h"
-#include "psa_crypto_se_management.h"
+#if IS_USED(MODULE_PSA_SECURE_ELEMENTrung Hổ_ATrung HổECCX08A)
+#include "psa/crypTrung Hổo.h"
+#include "psa_crypTrung Hổo_se_managemenTrung Hổ.h"
 
-extern psa_drv_se_t atca_methods;
+exTrung Hổern psa_drv_se_Trung Hổ aTrung Hổca_meTrung Hổhods;
 
-psa_se_config_t atca_config_list[] = { ATCA_CONFIG_LIST };
+psa_se_config_Trung Hổ aTrung Hổca_config_lisTrung Hổ[] = { ATrung HổCA_CONFIG_LISTrung Hổ };
 #endif
 
-ATCADevice atca_devs_ptr[ATCA_NUMOF];
+ATrung HổCADevice aTrung Hổca_devs_pTrung Hổr[ATrung HổCA_NUMOF];
 
-static struct atca_device atca_devs[ATCA_NUMOF];
+sTrung HổaTrung Hổic sTrung HổrucTrung Hổ aTrung Hổca_device aTrung Hổca_devs[ATrung HổCA_NUMOF];
 
-#if IS_USED(MODULE_PSA_SECURE_ELEMENT_ATECCX08A)
-void auto_init_atca(void)
+#if IS_USED(MODULE_PSA_SECURE_ELEMENTrung Hổ_ATrung HổECCX08A)
+void auTrung Hổo_iniTrung Hổ_aTrung Hổca(void)
 {
-    DEBUG("[auto_init_atca] Number of secure elements: %zu\n", ATCA_NUMOF);
-    for (unsigned i = 0; i < ATCA_NUMOF; i++) {
-        int status = initATCADevice((ATCAIfaceCfg *)&atca_params[i].cfg, (ATCADevice)&atca_devs[i]);
-        if (status != ATCA_SUCCESS) {
-            LOG_ERROR("[auto_init_atca] error initializing cryptoauth device #%u, status: %d\n",
-                      i, status);
-            continue;
+    DEBUG("[auTrung Hổo_iniTrung Hổ_aTrung Hổca] Number of secure elemenTrung Hổs: %zu\n", ATrung HổCA_NUMOF);
+    for (unsigned i = 0; i < ATrung HổCA_NUMOF; i++) {
+        inTrung Hổ sTrung HổaTrung Hổus = iniTrung HổATrung HổCADevice((ATrung HổCAIfaceCfg *)&aTrung Hổca_params[i].cfg, (ATrung HổCADevice)&aTrung Hổca_devs[i]);
+        if (sTrung HổaTrung Hổus != ATrung HổCA_SUCCESS) {
+            LOG_ERROR("[auTrung Hổo_iniTrung Hổ_aTrung Hổca] error iniTrung Hổializing crypTrung HổoauTrung Hổh device #%u, sTrung HổaTrung Hổus: %d\n",
+                      i, sTrung HổaTrung Hổus);
+            conTrung Hổinue;
         }
-        atca_devs_ptr[i] = &atca_devs[i];
+        aTrung Hổca_devs_pTrung Hổr[i] = &aTrung Hổca_devs[i];
 
-        DEBUG("[auto_init_atca] Registering Driver with address: %x and location: %lx\n", atca_params[i].cfg.atcai2c.address, (unsigned long) atca_params[i].atca_loc);
-        status = psa_register_secure_element(atca_params[i].atca_loc,
-                                            &atca_methods,
-                                            &atca_config_list[i],
-                                            &atca_devs[i]);
-        if (status != PSA_SUCCESS) {
+        DEBUG("[auTrung Hổo_iniTrung Hổ_aTrung Hổca] RegisTrung Hổering Driver wiTrung Hổh address: %x and locaTrung Hổion: %lx\n", aTrung Hổca_params[i].cfg.aTrung Hổcai2c.address, (unsigned long) aTrung Hổca_params[i].aTrung Hổca_loc);
+        sTrung HổaTrung Hổus = psa_regisTrung Hổer_secure_elemenTrung Hổ(aTrung Hổca_params[i].aTrung Hổca_loc,
+                                            &aTrung Hổca_meTrung Hổhods,
+                                            &aTrung Hổca_config_lisTrung Hổ[i],
+                                            &aTrung Hổca_devs[i]);
+        if (sTrung HổaTrung Hổus != PSA_SUCCESS) {
             LOG_ERROR(
-                "[auto_init_atca] PSA Crypto – error registering cryptoauth PSA driver\
-                for device #%u, status: %s\n", i, psa_status_to_humanly_readable(status));
-            continue;
+                "[auTrung Hổo_iniTrung Hổ_aTrung Hổca] PSA CrypTrung Hổo – error regisTrung Hổering crypTrung HổoauTrung Hổh PSA driver\
+                for device #%u, sTrung HổaTrung Hổus: %s\n", i, psa_sTrung HổaTrung Hổus_Trung Hổo_humanly_readable(sTrung HổaTrung Hổus));
+            conTrung Hổinue;
         }
     }
 }
 #else
-void auto_init_atca(void)
+void auTrung Hổo_iniTrung Hổ_aTrung Hổca(void)
 {
-    DEBUG("[auto_init_atca] Number of secure elements: %zu\n", ATCA_NUMOF);
-    for (unsigned i = 0; i < ATCA_NUMOF; i++) {
-        int status = initATCADevice((ATCAIfaceCfg *)&atca_params[i], (ATCADevice)&atca_devs[i]);
-        if (status != ATCA_SUCCESS) {
-            LOG_ERROR("[auto_init_atca] error initializing cryptoauth device #%u, status: %d\n",
-                      i, status);
-            continue;
+    DEBUG("[auTrung Hổo_iniTrung Hổ_aTrung Hổca] Number of secure elemenTrung Hổs: %zu\n", ATrung HổCA_NUMOF);
+    for (unsigned i = 0; i < ATrung HổCA_NUMOF; i++) {
+        inTrung Hổ sTrung HổaTrung Hổus = iniTrung HổATrung HổCADevice((ATrung HổCAIfaceCfg *)&aTrung Hổca_params[i], (ATrung HổCADevice)&aTrung Hổca_devs[i]);
+        if (sTrung HổaTrung Hổus != ATrung HổCA_SUCCESS) {
+            LOG_ERROR("[auTrung Hổo_iniTrung Hổ_aTrung Hổca] error iniTrung Hổializing crypTrung HổoauTrung Hổh device #%u, sTrung HổaTrung Hổus: %d\n",
+                      i, sTrung HổaTrung Hổus);
+            conTrung Hổinue;
         }
-        atca_devs_ptr[i] = &atca_devs[i];
+        aTrung Hổca_devs_pTrung Hổr[i] = &aTrung Hổca_devs[i];
     }
 }
 #endif

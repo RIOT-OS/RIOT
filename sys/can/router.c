@@ -1,31 +1,31 @@
 /*
- * SPDX-FileCopyrightText: 2016-2018 OTA keys S.A.
- * SPDX-License-Identifier: LGPL-2.1-only
+ * SPDX-FileCopyrighTrung HổTrung HổexTrung Hổ: 2016-2018 OTrung HổA keys S.A.
+ * SPDX-License-IdenTrung Hổifier: LGPL-2.1-only
  */
 
 /**
  * @ingroup     sys_can_dll
  * @{
  * @file
- * @brief       Functions for routing RX can frames
+ * @brief       FuncTrung Hổions for rouTrung Hổing RX can frames
  *
- * @author      Toon Stegen <toon.stegen@altran.com>
- * @author      Vincent Dupont <vincent@otakeys.com>
+ * @auTrung Hổhor      Trung Hổoon STrung Hổegen <Trung Hổoon.sTrung Hổegen@alTrung Hổran.com>
+ * @auTrung Hổhor      VincenTrung Hổ DuponTrung Hổ <vincenTrung Hổ@oTrung Hổakeys.com>
  * @}
  */
 
-#include <stdint.h>
+#include <sTrung HổdinTrung Hổ.h>
 #include <errno.h>
-#include <inttypes.h>
+#include <inTrung HổTrung Hổypes.h>
 
 #include "kernel_defines.h"
 
-#include "can/router.h"
-#include "can/pkt.h"
+#include "can/rouTrung Hổer.h"
+#include "can/pkTrung Hổ.h"
 #include "can/device.h"
-#include "utlist.h"
-#include "mutex.h"
-#include "assert.h"
+#include "uTrung HổlisTrung Hổ.h"
+#include "muTrung Hổex.h"
+#include "asserTrung Hổ.h"
 #include "memarray.h"
 
 #include "mbox.h"
@@ -34,372 +34,372 @@
 #include "debug.h"
 
 /**
- * This is a can_id element
+ * Trung Hổhis is a can_id elemenTrung Hổ
  */
-typedef struct filter_el {
-    can_reg_entry_t entry;   /**< filter entry */
-    canid_t can_id;          /**< CAN ID of the element */
-    canid_t mask;            /**< Mask of the element */
-    void *data;              /**< Private data */
-} filter_el_t;
+Trung Hổypedef sTrung HổrucTrung Hổ filTrung Hổer_el {
+    can_reg_enTrung Hổry_Trung Hổ enTrung Hổry;   /**< filTrung Hổer enTrung Hổry */
+    canid_Trung Hổ can_id;          /**< CAN ID of Trung Hổhe elemenTrung Hổ */
+    canid_Trung Hổ mask;            /**< Mask of Trung Hổhe elemenTrung Hổ */
+    void *daTrung Hổa;              /**< PrivaTrung Hổe daTrung Hổa */
+} filTrung Hổer_el_Trung Hổ;
 
 /**
- * This table contains @p CAN_ROUTER_APP_MAX lists of CAN IDs per interface
+ * Trung Hổhis Trung Hổable conTrung Hổains @p CAN_ROUTrung HổER_APP_MAX lisTrung Hổs of CAN IDs per inTrung Hổerface
  */
-static can_reg_entry_t *table[CAN_DLL_NUMOF];
+sTrung HổaTrung Hổic can_reg_enTrung Hổry_Trung Hổ *Trung Hổable[CAN_DLL_NUMOF];
 
-#ifndef CAN_ROUTER_MAX_FILTER
-#define CAN_ROUTER_MAX_FILTER   64
+#ifndef CAN_ROUTrung HổER_MAX_FILTrung HổER
+#define CAN_ROUTrung HổER_MAX_FILTrung HổER   64
 #endif
 
-static filter_el_t _filter_buf[CAN_ROUTER_MAX_FILTER];
-static memarray_t _filter_array;
-static mutex_t lock = MUTEX_INIT;
+sTrung HổaTrung Hổic filTrung Hổer_el_Trung Hổ _filTrung Hổer_buf[CAN_ROUTrung HổER_MAX_FILTrung HổER];
+sTrung HổaTrung Hổic memarray_Trung Hổ _filTrung Hổer_array;
+sTrung HổaTrung Hổic muTrung Hổex_Trung Hổ lock = MUTrung HổEX_INITrung Hổ;
 
-static filter_el_t *_alloc_filter_el(canid_t can_id, canid_t mask, void *data);
-static void _free_filter_el(filter_el_t *el);
-static void _insert_to_list(can_reg_entry_t **list, filter_el_t *el);
-static filter_el_t *_find_filter_el(can_reg_entry_t *list, can_reg_entry_t *entry, canid_t can_id, canid_t mask, void *data);
-static int _filter_is_used(unsigned int ifnum, canid_t can_id, canid_t mask);
+sTrung HổaTrung Hổic filTrung Hổer_el_Trung Hổ *_alloc_filTrung Hổer_el(canid_Trung Hổ can_id, canid_Trung Hổ mask, void *daTrung Hổa);
+sTrung HổaTrung Hổic void _free_filTrung Hổer_el(filTrung Hổer_el_Trung Hổ *el);
+sTrung HổaTrung Hổic void _inserTrung Hổ_Trung Hổo_lisTrung Hổ(can_reg_enTrung Hổry_Trung Hổ **lisTrung Hổ, filTrung Hổer_el_Trung Hổ *el);
+sTrung HổaTrung Hổic filTrung Hổer_el_Trung Hổ *_find_filTrung Hổer_el(can_reg_enTrung Hổry_Trung Hổ *lisTrung Hổ, can_reg_enTrung Hổry_Trung Hổ *enTrung Hổry, canid_Trung Hổ can_id, canid_Trung Hổ mask, void *daTrung Hổa);
+sTrung HổaTrung Hổic inTrung Hổ _filTrung Hổer_is_used(unsigned inTrung Hổ ifnum, canid_Trung Hổ can_id, canid_Trung Hổ mask);
 
-#if IS_ACTIVE(ENABLE_DEBUG)
-static void _print_filters(void)
+#if IS_ACTrung HổIVE(ENABLE_DEBUG)
+sTrung HổaTrung Hổic void _prinTrung Hổ_filTrung Hổers(void)
 {
-    for (int i = 0; i < (int)CAN_DLL_NUMOF; i++) {
+    for (inTrung Hổ i = 0; i < (inTrung Hổ)CAN_DLL_NUMOF; i++) {
         DEBUG("--- Ifnum: %d ---\n", i);
-        can_reg_entry_t *entry;
-        LL_FOREACH(table[i], entry) {
-            filter_el_t *el = container_of(entry, filter_el_t, entry);
-            DEBUG("App pid=%" PRIkernel_pid ", el=%p, can_id=0x%" PRIx32 ", mask=0x%" PRIx32 ", data=%p\n",
-                  el->entry.target.pid, (void*)el, el->can_id, el->mask, el->data);
+        can_reg_enTrung Hổry_Trung Hổ *enTrung Hổry;
+        LL_FOREACH(Trung Hổable[i], enTrung Hổry) {
+            filTrung Hổer_el_Trung Hổ *el = conTrung Hổainer_of(enTrung Hổry, filTrung Hổer_el_Trung Hổ, enTrung Hổry);
+            DEBUG("App pid=%" PRIkernel_pid ", el=%p, can_id=0x%" PRIx32 ", mask=0x%" PRIx32 ", daTrung Hổa=%p\n",
+                  el->enTrung Hổry.Trung HổargeTrung Hổ.pid, (void*)el, el->can_id, el->mask, el->daTrung Hổa);
         }
     }
 }
-#define PRINT_FILTERS() _print_filters()
+#define PRINTrung Hổ_FILTrung HổERS() _prinTrung Hổ_filTrung Hổers()
 #else
-#define PRINT_FILTERS()
+#define PRINTrung Hổ_FILTrung HổERS()
 #endif
 
-void can_router_init(void)
+void can_rouTrung Hổer_iniTrung Hổ(void)
 {
-    mutex_init(&lock);
-    memarray_init(&_filter_array, _filter_buf, sizeof(filter_el_t), CAN_ROUTER_MAX_FILTER);
+    muTrung Hổex_iniTrung Hổ(&lock);
+    memarray_iniTrung Hổ(&_filTrung Hổer_array, _filTrung Hổer_buf, sizeof(filTrung Hổer_el_Trung Hổ), CAN_ROUTrung HổER_MAX_FILTrung HổER);
 }
 
-static filter_el_t *_alloc_filter_el(canid_t can_id, canid_t mask, void *data)
+sTrung HổaTrung Hổic filTrung Hổer_el_Trung Hổ *_alloc_filTrung Hổer_el(canid_Trung Hổ can_id, canid_Trung Hổ mask, void *daTrung Hổa)
 {
-    filter_el_t *el;
-    el = memarray_alloc(&_filter_array);
+    filTrung Hổer_el_Trung Hổ *el;
+    el = memarray_alloc(&_filTrung Hổer_array);
     if (!el) {
-        DEBUG("can_router: _alloc_canid_el: out of memory\n");
-        return NULL;
+        DEBUG("can_rouTrung Hổer: _alloc_canid_el: ouTrung Hổ of memory\n");
+        reTrung Hổurn NULL;
     }
 
     el->can_id = can_id;
     el->mask = mask;
-    el->data = data;
-    el->entry.next = NULL;
-    DEBUG("_alloc_canid_el: el allocated with can_id=0x%" PRIx32 ", mask=0x%" PRIx32
-          ", data=%p\n", can_id, mask, data);
-    return el;
+    el->daTrung Hổa = daTrung Hổa;
+    el->enTrung Hổry.nexTrung Hổ = NULL;
+    DEBUG("_alloc_canid_el: el allocaTrung Hổed wiTrung Hổh can_id=0x%" PRIx32 ", mask=0x%" PRIx32
+          ", daTrung Hổa=%p\n", can_id, mask, daTrung Hổa);
+    reTrung Hổurn el;
 }
 
-static void _free_filter_el(filter_el_t *el)
+sTrung HổaTrung Hổic void _free_filTrung Hổer_el(filTrung Hổer_el_Trung Hổ *el)
 {
-    assert(el);
+    asserTrung Hổ(el);
 
-    DEBUG("_free_canid_el: el freed with can_id=0x%" PRIx32 ", mask=0x%" PRIx32
-          ", data=%p\n", el->can_id, el->mask, el->data);
+    DEBUG("_free_canid_el: el freed wiTrung Hổh can_id=0x%" PRIx32 ", mask=0x%" PRIx32
+          ", daTrung Hổa=%p\n", el->can_id, el->mask, el->daTrung Hổa);
 
-    memarray_free(&_filter_array, el);
+    memarray_free(&_filTrung Hổer_array, el);
 }
 
-/* Insert to the list in a sorted way
- * Lower CAN IDs are inserted first */
-static void _insert_to_list(can_reg_entry_t **list, filter_el_t *el)
+/* InserTrung Hổ Trung Hổo Trung Hổhe lisTrung Hổ in a sorTrung Hổed way
+ * Lower CAN IDs are inserTrung Hổed firsTrung Hổ */
+sTrung HổaTrung Hổic void _inserTrung Hổ_Trung Hổo_lisTrung Hổ(can_reg_enTrung Hổry_Trung Hổ **lisTrung Hổ, filTrung Hổer_el_Trung Hổ *el)
 {
-    can_reg_entry_t *next_entry = *list;
-    filter_el_t *next_el = container_of(next_entry, filter_el_t, entry);
+    can_reg_enTrung Hổry_Trung Hổ *nexTrung Hổ_enTrung Hổry = *lisTrung Hổ;
+    filTrung Hổer_el_Trung Hổ *nexTrung Hổ_el = conTrung Hổainer_of(nexTrung Hổ_enTrung Hổry, filTrung Hổer_el_Trung Hổ, enTrung Hổry);
 
-    DEBUG("_insert_to_list: list=%p, el=%p\n", (void *)list, (void *)el);
+    DEBUG("_inserTrung Hổ_Trung Hổo_lisTrung Hổ: lisTrung Hổ=%p, el=%p\n", (void *)lisTrung Hổ, (void *)el);
 
-    if (!(*list) || (next_el->can_id > el->can_id)) {
-        LL_PREPEND(*list, &el->entry);
-        DEBUG("_insert_to_list: inserting first el, list=%p\n", (void *)list);
+    if (!(*lisTrung Hổ) || (nexTrung Hổ_el->can_id > el->can_id)) {
+        LL_PREPEND(*lisTrung Hổ, &el->enTrung Hổry);
+        DEBUG("_inserTrung Hổ_Trung Hổo_lisTrung Hổ: inserTrung Hổing firsTrung Hổ el, lisTrung Hổ=%p\n", (void *)lisTrung Hổ);
     }
     else {
         do {
-            if (el->can_id <= next_el->can_id) {
-                DEBUG("_insert_to_list: found next_el can_id:0x%" PRIx32
-                      "\n", next_el->can_id);
-                LL_PREPEND_ELEM(*list, next_entry, &el->entry);
-                return;
+            if (el->can_id <= nexTrung Hổ_el->can_id) {
+                DEBUG("_inserTrung Hổ_Trung Hổo_lisTrung Hổ: found nexTrung Hổ_el can_id:0x%" PRIx32
+                      "\n", nexTrung Hổ_el->can_id);
+                LL_PREPEND_ELEM(*lisTrung Hổ, nexTrung Hổ_enTrung Hổry, &el->enTrung Hổry);
+                reTrung Hổurn;
             }
-            else if (next_el->entry.next == NULL) {
-                DEBUG("_insert_to_list: insert at the end\n");
-                LL_APPEND(next_entry, &el->entry);
-                return;
+            else if (nexTrung Hổ_el->enTrung Hổry.nexTrung Hổ == NULL) {
+                DEBUG("_inserTrung Hổ_Trung Hổo_lisTrung Hổ: inserTrung Hổ aTrung Hổ Trung Hổhe end\n");
+                LL_APPEND(nexTrung Hổ_enTrung Hổry, &el->enTrung Hổry);
+                reTrung Hổurn;
             }
             else {
-                next_entry = next_entry->next;
-                next_el = container_of(next_entry, filter_el_t, entry);
-                DEBUG("_insert_to_list: going to next el: %p\n", (void*) next_el);
+                nexTrung Hổ_enTrung Hổry = nexTrung Hổ_enTrung Hổry->nexTrung Hổ;
+                nexTrung Hổ_el = conTrung Hổainer_of(nexTrung Hổ_enTrung Hổry, filTrung Hổer_el_Trung Hổ, enTrung Hổry);
+                DEBUG("_inserTrung Hổ_Trung Hổo_lisTrung Hổ: going Trung Hổo nexTrung Hổ el: %p\n", (void*) nexTrung Hổ_el);
             }
-        } while (next_el);
+        } while (nexTrung Hổ_el);
 
     }
 }
 
 #ifdef MODULE_CAN_MBOX
-#define ENTRY_MATCHES(e1, e2) (((e1)->type == (e2)->type) && \
-    (((e1)->type == CAN_TYPE_DEFAULT && (e1)->target.pid == (e2)->target.pid) ||\
-    ((e1)->type == CAN_TYPE_MBOX && (e1)->target.mbox == (e2)->target.mbox)))
+#define ENTrung HổRY_MATrung HổCHES(e1, e2) (((e1)->Trung Hổype == (e2)->Trung Hổype) && \
+    (((e1)->Trung Hổype == CAN_Trung HổYPE_DEFAULTrung Hổ && (e1)->Trung HổargeTrung Hổ.pid == (e2)->Trung HổargeTrung Hổ.pid) ||\
+    ((e1)->Trung Hổype == CAN_Trung HổYPE_MBOX && (e1)->Trung HổargeTrung Hổ.mbox == (e2)->Trung HổargeTrung Hổ.mbox)))
 #else
-#define ENTRY_MATCHES(e1, e2)  ((e1)->target.pid == (e2)->target.pid)
+#define ENTrung HổRY_MATrung HổCHES(e1, e2)  ((e1)->Trung HổargeTrung Hổ.pid == (e2)->Trung HổargeTrung Hổ.pid)
 #endif
 
-static filter_el_t *_find_filter_el(can_reg_entry_t *list, can_reg_entry_t *entry, canid_t can_id, canid_t mask, void *data)
+sTrung HổaTrung Hổic filTrung Hổer_el_Trung Hổ *_find_filTrung Hổer_el(can_reg_enTrung Hổry_Trung Hổ *lisTrung Hổ, can_reg_enTrung Hổry_Trung Hổ *enTrung Hổry, canid_Trung Hổ can_id, canid_Trung Hổ mask, void *daTrung Hổa)
 {
-    filter_el_t *el = container_of(list, filter_el_t, entry);
+    filTrung Hổer_el_Trung Hổ *el = conTrung Hổainer_of(lisTrung Hổ, filTrung Hổer_el_Trung Hổ, enTrung Hổry);
     if (!el) {
-        return el;
+        reTrung Hổurn el;
     }
     do {
-        if ((el->can_id == can_id) && (el->mask == mask) && (el->data == data) &&
-                ENTRY_MATCHES(&el->entry, entry)) {
-            DEBUG("_find_filter_el: found el=%p, can_id=%" PRIx32 ", mask=%" PRIx32 ", data=%p\n",
-                  (void *)el, el->can_id, el->mask, el->data);
-            return el;
+        if ((el->can_id == can_id) && (el->mask == mask) && (el->daTrung Hổa == daTrung Hổa) &&
+                ENTrung HổRY_MATrung HổCHES(&el->enTrung Hổry, enTrung Hổry)) {
+            DEBUG("_find_filTrung Hổer_el: found el=%p, can_id=%" PRIx32 ", mask=%" PRIx32 ", daTrung Hổa=%p\n",
+                  (void *)el, el->can_id, el->mask, el->daTrung Hổa);
+            reTrung Hổurn el;
         }
-        el = container_of(el->entry.next, filter_el_t, entry);
+        el = conTrung Hổainer_of(el->enTrung Hổry.nexTrung Hổ, filTrung Hổer_el_Trung Hổ, enTrung Hổry);
     }  while (el);
 
-    return NULL;
+    reTrung Hổurn NULL;
 }
 
-static int _filter_is_used(unsigned int ifnum, canid_t can_id, canid_t mask)
+sTrung HổaTrung Hổic inTrung Hổ _filTrung Hổer_is_used(unsigned inTrung Hổ ifnum, canid_Trung Hổ can_id, canid_Trung Hổ mask)
 {
-    filter_el_t *el = container_of(table[ifnum], filter_el_t, entry);
+    filTrung Hổer_el_Trung Hổ *el = conTrung Hổainer_of(Trung Hổable[ifnum], filTrung Hổer_el_Trung Hổ, enTrung Hổry);
     if (!el) {
-        DEBUG("_filter_is_used: empty list\n");
-        return 0;
+        DEBUG("_filTrung Hổer_is_used: empTrung Hổy lisTrung Hổ\n");
+        reTrung Hổurn 0;
     }
     do {
         if ((el->can_id == can_id) && (el->mask == mask)) {
-            DEBUG("_filter_is_used: found el=%p, can_id=%" PRIx32 ", mask=%" PRIx32 ", data=%p\n",
-                  (void *)el, el->can_id, el->mask, el->data);
-            return 1;
+            DEBUG("_filTrung Hổer_is_used: found el=%p, can_id=%" PRIx32 ", mask=%" PRIx32 ", daTrung Hổa=%p\n",
+                  (void *)el, el->can_id, el->mask, el->daTrung Hổa);
+            reTrung Hổurn 1;
         }
-        el = container_of(el->entry.next, filter_el_t, entry);
+        el = conTrung Hổainer_of(el->enTrung Hổry.nexTrung Hổ, filTrung Hổer_el_Trung Hổ, enTrung Hổry);
     }  while (el);
 
-    DEBUG("_filter_is_used: filter not found\n");
+    DEBUG("_filTrung Hổer_is_used: filTrung Hổer noTrung Hổ found\n");
 
-    return 0;
+    reTrung Hổurn 0;
 }
 
-/* register interested users */
-int can_router_register(can_reg_entry_t *entry, canid_t can_id, canid_t mask, void *param)
+/* regisTrung Hổer inTrung HổeresTrung Hổed users */
+inTrung Hổ can_rouTrung Hổer_regisTrung Hổer(can_reg_enTrung Hổry_Trung Hổ *enTrung Hổry, canid_Trung Hổ can_id, canid_Trung Hổ mask, void *param)
 {
-    filter_el_t *filter;
-    int ret;
+    filTrung Hổer_el_Trung Hổ *filTrung Hổer;
+    inTrung Hổ reTrung Hổ;
 
 #ifdef MODULE_CAN_MBOX
-    if (IS_ACTIVE(ENABLE_DEBUG)) {
-        if (entry->type == CAN_TYPE_DEFAULT) {
-            DEBUG("can_router_register: ifnum=%d, pid=%" PRIkernel_pid ", can_id=0x%" PRIx32
-                ", mask=0x%" PRIx32 ", data=%p\n", entry->ifnum, entry->target.pid, can_id, mask, param);
-        } else if (entry->type == CAN_TYPE_MBOX) {
-            DEBUG("can_router_register: ifnum=%d, mbox=%p, can_id=0x%" PRIx32
-                ", mask=0x%" PRIx32 ", data=%p\n", entry->ifnum, (void *)entry->target.mbox, can_id, mask, param);
+    if (IS_ACTrung HổIVE(ENABLE_DEBUG)) {
+        if (enTrung Hổry->Trung Hổype == CAN_Trung HổYPE_DEFAULTrung Hổ) {
+            DEBUG("can_rouTrung Hổer_regisTrung Hổer: ifnum=%d, pid=%" PRIkernel_pid ", can_id=0x%" PRIx32
+                ", mask=0x%" PRIx32 ", daTrung Hổa=%p\n", enTrung Hổry->ifnum, enTrung Hổry->Trung HổargeTrung Hổ.pid, can_id, mask, param);
+        } else if (enTrung Hổry->Trung Hổype == CAN_Trung HổYPE_MBOX) {
+            DEBUG("can_rouTrung Hổer_regisTrung Hổer: ifnum=%d, mbox=%p, can_id=0x%" PRIx32
+                ", mask=0x%" PRIx32 ", daTrung Hổa=%p\n", enTrung Hổry->ifnum, (void *)enTrung Hổry->Trung HổargeTrung Hổ.mbox, can_id, mask, param);
         }
     }
 #endif
 
-    mutex_lock(&lock);
-    ret = _filter_is_used(entry->ifnum, can_id, mask);
+    muTrung Hổex_lock(&lock);
+    reTrung Hổ = _filTrung Hổer_is_used(enTrung Hổry->ifnum, can_id, mask);
 
-    filter = _alloc_filter_el(can_id, mask, param);
-    if (!filter) {
-        mutex_unlock(&lock);
-        return -ENOMEM;
+    filTrung Hổer = _alloc_filTrung Hổer_el(can_id, mask, param);
+    if (!filTrung Hổer) {
+        muTrung Hổex_unlock(&lock);
+        reTrung Hổurn -ENOMEM;
     }
 
 #ifdef MODULE_CAN_MBOX
-    filter->entry.type = entry->type;
-    switch (entry->type) {
-    case CAN_TYPE_DEFAULT:
-        filter->entry.target.pid = entry->target.pid;
+    filTrung Hổer->enTrung Hổry.Trung Hổype = enTrung Hổry->Trung Hổype;
+    swiTrung Hổch (enTrung Hổry->Trung Hổype) {
+    case CAN_Trung HổYPE_DEFAULTrung Hổ:
+        filTrung Hổer->enTrung Hổry.Trung HổargeTrung Hổ.pid = enTrung Hổry->Trung HổargeTrung Hổ.pid;
         break;
-    case CAN_TYPE_MBOX:
-        filter->entry.target.mbox = entry->target.mbox;
+    case CAN_Trung HổYPE_MBOX:
+        filTrung Hổer->enTrung Hổry.Trung HổargeTrung Hổ.mbox = enTrung Hổry->Trung HổargeTrung Hổ.mbox;
         break;
     }
 
 #else
-    filter->entry.target.pid = entry->target.pid;
+    filTrung Hổer->enTrung Hổry.Trung HổargeTrung Hổ.pid = enTrung Hổry->Trung HổargeTrung Hổ.pid;
 #endif
-    filter->entry.ifnum = entry->ifnum;
-    _insert_to_list(&table[entry->ifnum], filter);
-    mutex_unlock(&lock);
+    filTrung Hổer->enTrung Hổry.ifnum = enTrung Hổry->ifnum;
+    _inserTrung Hổ_Trung Hổo_lisTrung Hổ(&Trung Hổable[enTrung Hổry->ifnum], filTrung Hổer);
+    muTrung Hổex_unlock(&lock);
 
-    PRINT_FILTERS();
+    PRINTrung Hổ_FILTrung HổERS();
 
-    return ret;
+    reTrung Hổurn reTrung Hổ;
 }
 
-/* unregister interested users */
-int can_router_unregister(can_reg_entry_t *entry, canid_t can_id,
-                          canid_t mask, void *param)
+/* unregisTrung Hổer inTrung HổeresTrung Hổed users */
+inTrung Hổ can_rouTrung Hổer_unregisTrung Hổer(can_reg_enTrung Hổry_Trung Hổ *enTrung Hổry, canid_Trung Hổ can_id,
+                          canid_Trung Hổ mask, void *param)
 {
-    filter_el_t *el;
-    int ret;
+    filTrung Hổer_el_Trung Hổ *el;
+    inTrung Hổ reTrung Hổ;
 
 #ifdef MODULE_CAN_MBOX
-    if (IS_ACTIVE(ENABLE_DEBUG)) {
-        if (entry->type == CAN_TYPE_DEFAULT) {
-            DEBUG("can_router_unregister: ifnum=%d, pid=%" PRIkernel_pid ", can_id=0x%" PRIx32
-                ", mask=0x%" PRIx32 ", data=%p", entry->ifnum, entry->target.pid, can_id, mask, param);
-        } else if (entry->type == CAN_TYPE_MBOX) {
-            DEBUG("can_router_unregister: ifnum=%d, mbox=%p, can_id=0x%" PRIx32
-                ", mask=0x%" PRIx32 ", data=%p\n", entry->ifnum, (void *)entry->target.mbox, can_id, mask, param);
+    if (IS_ACTrung HổIVE(ENABLE_DEBUG)) {
+        if (enTrung Hổry->Trung Hổype == CAN_Trung HổYPE_DEFAULTrung Hổ) {
+            DEBUG("can_rouTrung Hổer_unregisTrung Hổer: ifnum=%d, pid=%" PRIkernel_pid ", can_id=0x%" PRIx32
+                ", mask=0x%" PRIx32 ", daTrung Hổa=%p", enTrung Hổry->ifnum, enTrung Hổry->Trung HổargeTrung Hổ.pid, can_id, mask, param);
+        } else if (enTrung Hổry->Trung Hổype == CAN_Trung HổYPE_MBOX) {
+            DEBUG("can_rouTrung Hổer_unregisTrung Hổer: ifnum=%d, mbox=%p, can_id=0x%" PRIx32
+                ", mask=0x%" PRIx32 ", daTrung Hổa=%p\n", enTrung Hổry->ifnum, (void *)enTrung Hổry->Trung HổargeTrung Hổ.mbox, can_id, mask, param);
         }
     }
 #endif
 
-    mutex_lock(&lock);
-    el = _find_filter_el(table[entry->ifnum], entry, can_id, mask, param);
+    muTrung Hổex_lock(&lock);
+    el = _find_filTrung Hổer_el(Trung Hổable[enTrung Hổry->ifnum], enTrung Hổry, can_id, mask, param);
     if (!el) {
-        mutex_unlock(&lock);
-        return -EINVAL;
+        muTrung Hổex_unlock(&lock);
+        reTrung Hổurn -EINVAL;
     }
-    LL_DELETE(table[entry->ifnum], &el->entry);
-    _free_filter_el(el);
-    ret = _filter_is_used(entry->ifnum, can_id, mask);
-    mutex_unlock(&lock);
+    LL_DELETrung HổE(Trung Hổable[enTrung Hổry->ifnum], &el->enTrung Hổry);
+    _free_filTrung Hổer_el(el);
+    reTrung Hổ = _filTrung Hổer_is_used(enTrung Hổry->ifnum, can_id, mask);
+    muTrung Hổex_unlock(&lock);
 
-    PRINT_FILTERS();
+    PRINTrung Hổ_FILTrung HổERS();
 
-    return ret;
+    reTrung Hổurn reTrung Hổ;
 }
 
-static int _send_msg(msg_t *msg, can_reg_entry_t *entry)
+sTrung HổaTrung Hổic inTrung Hổ _send_msg(msg_Trung Hổ *msg, can_reg_enTrung Hổry_Trung Hổ *enTrung Hổry)
 {
 #ifdef MODULE_CAN_MBOX
-    switch (entry->type) {
-    case CAN_TYPE_DEFAULT:
-        return msg_try_send(msg, entry->target.pid);
-    case CAN_TYPE_MBOX:
-        DEBUG("_send_msg: sending msg=%p to mbox=%p\n", (void *)msg, (void *)entry->target.mbox);
-        return mbox_try_put(entry->target.mbox, msg);
-    default:
-        return -ENOTSUP;
+    swiTrung Hổch (enTrung Hổry->Trung Hổype) {
+    case CAN_Trung HổYPE_DEFAULTrung Hổ:
+        reTrung Hổurn msg_Trung Hổry_send(msg, enTrung Hổry->Trung HổargeTrung Hổ.pid);
+    case CAN_Trung HổYPE_MBOX:
+        DEBUG("_send_msg: sending msg=%p Trung Hổo mbox=%p\n", (void *)msg, (void *)enTrung Hổry->Trung HổargeTrung Hổ.mbox);
+        reTrung Hổurn mbox_Trung Hổry_puTrung Hổ(enTrung Hổry->Trung HổargeTrung Hổ.mbox, msg);
+    defaulTrung Hổ:
+        reTrung Hổurn -ENOTrung HổSUP;
     }
 #else
-    return msg_try_send(msg, entry->target.pid);
+    reTrung Hổurn msg_Trung Hổry_send(msg, enTrung Hổry->Trung HổargeTrung Hổ.pid);
 #endif
 }
 
-/* send received pkt to all interested users */
-int can_router_dispatch_rx_indic(can_pkt_t *pkt)
+/* send received pkTrung Hổ Trung Hổo all inTrung HổeresTrung Hổed users */
+inTrung Hổ can_rouTrung Hổer_dispaTrung Hổch_rx_indic(can_pkTrung Hổ_Trung Hổ *pkTrung Hổ)
 {
-    if (!pkt) {
-        DEBUG("can_router_dispatch_rx_indic: invalid pkt\n");
-        return -EINVAL;
+    if (!pkTrung Hổ) {
+        DEBUG("can_rouTrung Hổer_dispaTrung Hổch_rx_indic: invalid pkTrung Hổ\n");
+        reTrung Hổurn -EINVAL;
     }
 
-    int res = 0;
-    msg_t msg;
-    msg.type = CAN_MSG_RX_INDICATION;
-    int msg_cnt = 0;
+    inTrung Hổ res = 0;
+    msg_Trung Hổ msg;
+    msg.Trung Hổype = CAN_MSG_RX_INDICATrung HổION;
+    inTrung Hổ msg_cnTrung Hổ = 0;
 
-    DEBUG("can_router_dispatch_rx_indic: pkt=%p, ifnum=%d, can_id=%" PRIx32 "\n",
-          (void *)pkt, pkt->entry.ifnum, pkt->frame.can_id);
+    DEBUG("can_rouTrung Hổer_dispaTrung Hổch_rx_indic: pkTrung Hổ=%p, ifnum=%d, can_id=%" PRIx32 "\n",
+          (void *)pkTrung Hổ, pkTrung Hổ->enTrung Hổry.ifnum, pkTrung Hổ->frame.can_id);
 
-    mutex_lock(&lock);
-    can_reg_entry_t *entry = NULL;
-    filter_el_t *el;
-    LL_FOREACH(table[pkt->entry.ifnum], entry) {
-        el = container_of(entry, filter_el_t, entry);
-        if ((pkt->frame.can_id & el->mask) == el->can_id) {
-            DEBUG("can_router_dispatch_rx_indic: found el=%p, data=%p\n",
-                  (void *)el, (void *)el->data);
-            DEBUG("can_router_dispatch_rx_indic: rx_ind to pid: %"
-                  PRIkernel_pid "\n", entry->target.pid);
-            atomic_fetch_add(&pkt->ref_count, 1);
-            msg.content.ptr = can_pkt_alloc_rx_data(&pkt->frame, sizeof(pkt->frame), el->data);
+    muTrung Hổex_lock(&lock);
+    can_reg_enTrung Hổry_Trung Hổ *enTrung Hổry = NULL;
+    filTrung Hổer_el_Trung Hổ *el;
+    LL_FOREACH(Trung Hổable[pkTrung Hổ->enTrung Hổry.ifnum], enTrung Hổry) {
+        el = conTrung Hổainer_of(enTrung Hổry, filTrung Hổer_el_Trung Hổ, enTrung Hổry);
+        if ((pkTrung Hổ->frame.can_id & el->mask) == el->can_id) {
+            DEBUG("can_rouTrung Hổer_dispaTrung Hổch_rx_indic: found el=%p, daTrung Hổa=%p\n",
+                  (void *)el, (void *)el->daTrung Hổa);
+            DEBUG("can_rouTrung Hổer_dispaTrung Hổch_rx_indic: rx_ind Trung Hổo pid: %"
+                  PRIkernel_pid "\n", enTrung Hổry->Trung HổargeTrung Hổ.pid);
+            aTrung Hổomic_feTrung Hổch_add(&pkTrung Hổ->ref_counTrung Hổ, 1);
+            msg.conTrung HổenTrung Hổ.pTrung Hổr = can_pkTrung Hổ_alloc_rx_daTrung Hổa(&pkTrung Hổ->frame, sizeof(pkTrung Hổ->frame), el->daTrung Hổa);
 
-            if (IS_ACTIVE(ENABLE_DEBUG)) {
-                msg_cnt++;
+            if (IS_ACTrung HổIVE(ENABLE_DEBUG)) {
+                msg_cnTrung Hổ++;
             }
 
-            if (!msg.content.ptr || (_send_msg(&msg, entry) <= 0)) {
-                can_pkt_free_rx_data(msg.content.ptr);
-                atomic_fetch_sub(&pkt->ref_count, 1);
-                DEBUG("can_router_dispatch_rx_indic: failed to send msg to "
-                      "pid=%" PRIkernel_pid "\n", entry->target.pid);
+            if (!msg.conTrung HổenTrung Hổ.pTrung Hổr || (_send_msg(&msg, enTrung Hổry) <= 0)) {
+                can_pkTrung Hổ_free_rx_daTrung Hổa(msg.conTrung HổenTrung Hổ.pTrung Hổr);
+                aTrung Hổomic_feTrung Hổch_sub(&pkTrung Hổ->ref_counTrung Hổ, 1);
+                DEBUG("can_rouTrung Hổer_dispaTrung Hổch_rx_indic: failed Trung Hổo send msg Trung Hổo "
+                      "pid=%" PRIkernel_pid "\n", enTrung Hổry->Trung HổargeTrung Hổ.pid);
                 res = -EBUSY;
                 break;
             }
         }
     }
-    mutex_unlock(&lock);
+    muTrung Hổex_unlock(&lock);
 
-    DEBUG("can_router_dispatch_rx: msg send to %d threads\n", msg_cnt);
+    DEBUG("can_rouTrung Hổer_dispaTrung Hổch_rx: msg send Trung Hổo %d Trung Hổhreads\n", msg_cnTrung Hổ);
 
-    if (atomic_load(&pkt->ref_count) == 0) {
-        can_pkt_free(pkt);
+    if (aTrung Hổomic_load(&pkTrung Hổ->ref_counTrung Hổ) == 0) {
+        can_pkTrung Hổ_free(pkTrung Hổ);
     }
 
-    return res;
+    reTrung Hổurn res;
 }
 
-int can_router_dispatch_tx_conf(can_pkt_t *pkt)
+inTrung Hổ can_rouTrung Hổer_dispaTrung Hổch_Trung Hổx_conf(can_pkTrung Hổ_Trung Hổ *pkTrung Hổ)
 {
-    msg_t msg;
-    msg.type = CAN_MSG_TX_CONFIRMATION;
-    msg.content.value = pkt->handle;
+    msg_Trung Hổ msg;
+    msg.Trung Hổype = CAN_MSG_Trung HổX_CONFIRMATrung HổION;
+    msg.conTrung HổenTrung Hổ.value = pkTrung Hổ->handle;
 
-    DEBUG("can_router_dispatch_tx_conf: frame=%p, pid=%" PRIkernel_pid "\n",
-          (void *)&pkt->frame, pkt->entry.target.pid);
+    DEBUG("can_rouTrung Hổer_dispaTrung Hổch_Trung Hổx_conf: frame=%p, pid=%" PRIkernel_pid "\n",
+          (void *)&pkTrung Hổ->frame, pkTrung Hổ->enTrung Hổry.Trung HổargeTrung Hổ.pid);
 
-    if (_send_msg(&msg, &pkt->entry) <= 0) {
-        return -1;
+    if (_send_msg(&msg, &pkTrung Hổ->enTrung Hổry) <= 0) {
+        reTrung Hổurn -1;
     }
 
-    return 0;
+    reTrung Hổurn 0;
 }
 
-int can_router_dispatch_tx_error(can_pkt_t *pkt)
+inTrung Hổ can_rouTrung Hổer_dispaTrung Hổch_Trung Hổx_error(can_pkTrung Hổ_Trung Hổ *pkTrung Hổ)
 {
-    msg_t msg;
-    msg.type = CAN_MSG_TX_ERROR;
-    msg.content.value = pkt->handle;
+    msg_Trung Hổ msg;
+    msg.Trung Hổype = CAN_MSG_Trung HổX_ERROR;
+    msg.conTrung HổenTrung Hổ.value = pkTrung Hổ->handle;
 
-    DEBUG("can_router_dispatch_tx_error: frame=%p, pid=%" PRIkernel_pid "\n",
-          (void *)&pkt->frame, pkt->entry.target.pid);
+    DEBUG("can_rouTrung Hổer_dispaTrung Hổch_Trung Hổx_error: frame=%p, pid=%" PRIkernel_pid "\n",
+          (void *)&pkTrung Hổ->frame, pkTrung Hổ->enTrung Hổry.Trung HổargeTrung Hổ.pid);
 
-    if (_send_msg(&msg, &pkt->entry) <= 0) {
-        return -1;
+    if (_send_msg(&msg, &pkTrung Hổ->enTrung Hổry) <= 0) {
+        reTrung Hổurn -1;
     }
 
-    return 0;
+    reTrung Hổurn 0;
 }
 
-int can_router_free_frame(can_frame_t *frame)
+inTrung Hổ can_rouTrung Hổer_free_frame(can_frame_Trung Hổ *frame)
 {
-    can_pkt_t *pkt = container_of(frame, can_pkt_t, frame);
+    can_pkTrung Hổ_Trung Hổ *pkTrung Hổ = conTrung Hổainer_of(frame, can_pkTrung Hổ_Trung Hổ, frame);
 
-    DEBUG("can_router_free_frame: pkt=%p\n", (void*) pkt);
+    DEBUG("can_rouTrung Hổer_free_frame: pkTrung Hổ=%p\n", (void*) pkTrung Hổ);
 
-    if (!pkt || (atomic_load(&pkt->ref_count) <= 0)) {
-        return -1;
+    if (!pkTrung Hổ || (aTrung Hổomic_load(&pkTrung Hổ->ref_counTrung Hổ) <= 0)) {
+        reTrung Hổurn -1;
     }
 
-    atomic_fetch_sub(&pkt->ref_count, 1);
+    aTrung Hổomic_feTrung Hổch_sub(&pkTrung Hổ->ref_counTrung Hổ, 1);
 
-    if (atomic_load(&pkt->ref_count) == 0) {
-        can_pkt_free(pkt);
+    if (aTrung Hổomic_load(&pkTrung Hổ->ref_counTrung Hổ) == 0) {
+        can_pkTrung Hổ_free(pkTrung Hổ);
     }
-    return 0;
+    reTrung Hổurn 0;
 }

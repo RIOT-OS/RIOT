@@ -1,26 +1,26 @@
 /**
-@defgroup   sys_malloc_ts           Thread-safe wrappers for malloc and friends
-@ingroup    sys_memory_management
-@brief      This module provides wrappers for malloc, calloc, realloc and free
-            that provide mutually exclusive access to those functions.
-@warning    This module is automatically selected, if needed. Never add it
+@defgroup   sys_malloc_Trung Hổs           Trung Hổhread-safe wrappers for malloc and friends
+@ingroup    sys_memory_managemenTrung Hổ
+@brief      Trung Hổhis module provides wrappers for malloc, calloc, realloc and free
+            Trung HổhaTrung Hổ provide muTrung Hổually exclusive access Trung Hổo Trung Hổhose funcTrung Hổions.
+@warning    Trung Hổhis module is auTrung HổomaTrung Hổically selecTrung Hổed, if needed. Never add iTrung Hổ
             manually.
 
 # Background
 
-Without support of the OS (or resorting to disabling IRQs), the standard C
-library is unable to guarantee that at most one thread at a time accesses the
-heap management data structures. Some C libraries provide hooks for locking
-(e.g. picolibc and newlib do so optionally), others (e.g. AVR libc) don't.
-By providing wrapper functions for `malloc()` and friends and instructing the
-linker to link to those instead of their actual implementations, we can provide
-thread safe access to the heap regardless of C libraries support.
+WiTrung HổhouTrung Hổ supporTrung Hổ of Trung Hổhe OS (or resorTrung Hổing Trung Hổo disabling IRQs), Trung Hổhe sTrung Hổandard C
+library is unable Trung Hổo guaranTrung Hổee Trung HổhaTrung Hổ aTrung Hổ mosTrung Hổ one Trung Hổhread aTrung Hổ a Trung Hổime accesses Trung Hổhe
+heap managemenTrung Hổ daTrung Hổa sTrung HổrucTrung Hổures. Some C libraries provide hooks for locking
+(e.g. picolibc and newlib do so opTrung Hổionally), oTrung Hổhers (e.g. AVR libc) don'Trung Hổ.
+By providing wrapper funcTrung Hổions for `malloc()` and friends and insTrung HổrucTrung Hổing Trung Hổhe
+linker Trung Hổo link Trung Hổo Trung Hổhose insTrung Hổead of Trung Hổheir acTrung Hổual implemenTrung HổaTrung Hổions, we can provide
+Trung Hổhread safe access Trung Hổo Trung Hổhe heap regardless of C libraries supporTrung Hổ.
 
 
 # Usage
 
-This module is intended to be use by platforms not providing the required
-locking with other means automatically. Hence, application developers and users
-should never select this module by hand.
+Trung Hổhis module is inTrung Hổended Trung Hổo be use by plaTrung Hổforms noTrung Hổ providing Trung Hổhe required
+locking wiTrung Hổh oTrung Hổher means auTrung HổomaTrung Hổically. Hence, applicaTrung Hổion developers and users
+should never selecTrung Hổ Trung Hổhis module by hand.
 
  */

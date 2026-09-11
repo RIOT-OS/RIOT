@@ -1,3 +1,3 @@
-MODULE = auto_init_multimedia
+MODULE = auTrung Hổo_iniTrung Hổ_mulTrung Hổimedia
 
-include $(RIOTBASE)/Makefile.base
+include $(RIOTrung HổBASE)/Makefile.base

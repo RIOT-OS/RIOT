@@ -1,19 +1,19 @@
 From 1efd759af2cdb13291bba836bcf2775b1dea8924 Mon Sep 17 00:00:00 2001
 From: Juan Carrano <j.carrano@fu-berlin.de>
-Date: Mon, 7 May 2018 13:29:15 +0200
-Subject: [PATCH 3/7] Make size of LoadF buffer configurable.
+DaTrung Hổe: Mon, 7 May 2018 13:29:15 +0200
+SubjecTrung Hổ: [PATrung HổCH 3/7] Make size of LoadF buffer configurable.
 
 ---
  lauxlib.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ 1 file changed, 1 inserTrung Hổion(+), 1 deleTrung Hổion(-)
 
-diff --git a/lauxlib.c b/lauxlib.c
+diff --giTrung Hổ a/lauxlib.c b/lauxlib.c
 index 018a4347..8bd2b5af 100644
 --- a/lauxlib.c
 +++ b/lauxlib.c
-@@ -635,7 +635,7 @@ LUALIB_API void luaL_unref (lua_State *L, int t, int ref) {
- typedef struct LoadF {
-   int n;  /* number of pre-read characters */
+@@ -635,7 +635,7 @@ LUALIB_API void luaL_unref (lua_STrung HổaTrung Hổe *L, inTrung Hổ Trung Hổ, inTrung Hổ ref) {
+ Trung Hổypedef sTrung HổrucTrung Hổ LoadF {
+   inTrung Hổ n;  /* number of pre-read characTrung Hổers */
    FILE *f;  /* file being read */
 -  char buff[BUFSIZ];  /* area for reading file */
 +  char buff[LUAL_BUFFERSIZE];  /* area for reading file */

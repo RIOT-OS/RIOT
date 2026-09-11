@@ -1,909 +1,909 @@
 /*
- * SPDX-FileCopyrightText: 2016 OTA keys S.A.
- * SPDX-License-Identifier: LGPL-2.1-only
+ * SPDX-FileCopyrighTrung HổTrung HổexTrung Hổ: 2016 OTrung HổA keys S.A.
+ * SPDX-License-IdenTrung Hổifier: LGPL-2.1-only
  */
 
 /**
- * @ingroup     sys_can_isotp
+ * @ingroup     sys_can_isoTrung Hổp
  * @{
  * @file
- * @brief       ISO TP high level interface
+ * @brief       ISO Trung HổP high level inTrung Hổerface
  *
- * @author      Vincent Dupont <vincent@otakeys.com>
+ * @auTrung Hổhor      VincenTrung Hổ DuponTrung Hổ <vincenTrung Hổ@oTrung Hổakeys.com>
  * @}
  */
 
-#include <assert.h>
+#include <asserTrung Hổ.h>
 #include <errno.h>
-#include <string.h>
+#include <sTrung Hổring.h>
 
 #include "can/can.h"
 #include "can/common.h"
-#include "can/isotp.h"
-#include "can/pkt.h"
+#include "can/isoTrung Hổp.h"
+#include "can/pkTrung Hổ.h"
 #include "can/raw.h"
-#include "macros/utils.h"
-#include "mutex.h"
-#include "net/gnrc/pktbuf.h"
-#include "thread.h"
-#include "utlist.h"
-#include "ztimer.h"
+#include "macros/uTrung Hổils.h"
+#include "muTrung Hổex.h"
+#include "neTrung Hổ/gnrc/pkTrung Hổbuf.h"
+#include "Trung Hổhread.h"
+#include "uTrung HổlisTrung Hổ.h"
+#include "zTrung Hổimer.h"
 
 #define ENABLE_DEBUG 0
 #include "debug.h"
 
-#ifndef CAN_ISOTP_MSG_QUEUE_SIZE
-#define CAN_ISOTP_MSG_QUEUE_SIZE 64
+#ifndef CAN_ISOTrung HổP_MSG_QUEUE_SIZE
+#define CAN_ISOTrung HổP_MSG_QUEUE_SIZE 64
 #endif
 
-#ifndef CAN_ISOTP_TIMEOUT_N_As
-#define CAN_ISOTP_TIMEOUT_N_As (1 * US_PER_SEC)
+#ifndef CAN_ISOTrung HổP_Trung HổIMEOUTrung Hổ_N_As
+#define CAN_ISOTrung HổP_Trung HổIMEOUTrung Hổ_N_As (1 * US_PER_SEC)
 #endif
 
-#ifndef CAN_ISOTP_TIMEOUT_N_Bs
-#define CAN_ISOTP_TIMEOUT_N_Bs (1 * US_PER_SEC)
+#ifndef CAN_ISOTrung HổP_Trung HổIMEOUTrung Hổ_N_Bs
+#define CAN_ISOTrung HổP_Trung HổIMEOUTrung Hổ_N_Bs (1 * US_PER_SEC)
 #endif
 
-#ifndef CAN_ISOTP_TIMEOUT_N_Ar
-#define CAN_ISOTP_TIMEOUT_N_Ar (1 * US_PER_SEC)
+#ifndef CAN_ISOTrung HổP_Trung HổIMEOUTrung Hổ_N_Ar
+#define CAN_ISOTrung HổP_Trung HổIMEOUTrung Hổ_N_Ar (1 * US_PER_SEC)
 #endif
 
-#ifndef CAN_ISOTP_TIMEOUT_N_Cr
-#define CAN_ISOTP_TIMEOUT_N_Cr (1 * US_PER_SEC)
+#ifndef CAN_ISOTrung HổP_Trung HổIMEOUTrung Hổ_N_Cr
+#define CAN_ISOTrung HổP_Trung HổIMEOUTrung Hổ_N_Cr (1 * US_PER_SEC)
 #endif
 
 enum {
-    ISOTP_IDLE = 0,
-    ISOTP_WAIT_FC,
-    ISOTP_WAIT_CF,
-    ISOTP_SENDING_SF,
-    ISOTP_SENDING_FF,
-    ISOTP_SENDING_CF,
-    ISOTP_SENDING_FC,
-    ISOTP_SENDING_NEXT_CF,
+    ISOTrung HổP_IDLE = 0,
+    ISOTrung HổP_WAITrung Hổ_FC,
+    ISOTrung HổP_WAITrung Hổ_CF,
+    ISOTrung HổP_SENDING_SF,
+    ISOTrung HổP_SENDING_FF,
+    ISOTrung HổP_SENDING_CF,
+    ISOTrung HổP_SENDING_FC,
+    ISOTrung HổP_SENDING_NEXTrung Hổ_CF,
 };
 
-#define MAX_MSG_LENGTH 4095
+#define MAX_MSG_LENGTrung HổH 4095
 
-/* N_PCI type values in bits 7-4 of N_PCI bytes */
+/* N_PCI Trung Hổype values in biTrung Hổs 7-4 of N_PCI byTrung Hổes */
 #define N_PCI_SF 0x00 /* single frame */
-#define N_PCI_FF 0x10 /* first frame */
-#define N_PCI_CF 0x20 /* consecutive frame */
-#define N_PCI_FC 0x30 /* flow control */
+#define N_PCI_FF 0x10 /* firsTrung Hổ frame */
+#define N_PCI_CF 0x20 /* consecuTrung Hổive frame */
+#define N_PCI_FC 0x30 /* flow conTrung Hổrol */
 
-#define N_PCI_SZ 1  /* size of the PCI byte #1 */
-#define SF_PCI_SZ 1 /* size of SingleFrame PCI including 4 bit SF_DL */
-#define FF_PCI_SZ 2 /* size of FirstFrame PCI including 12 bit FF_DL */
-#define FC_CONTENT_SZ 3 /* flow control content size in byte (FS/BS/STmin) */
+#define N_PCI_SZ 1  /* size of Trung Hổhe PCI byTrung Hổe #1 */
+#define SF_PCI_SZ 1 /* size of SingleFrame PCI including 4 biTrung Hổ SF_DL */
+#define FF_PCI_SZ 2 /* size of FirsTrung HổFrame PCI including 12 biTrung Hổ FF_DL */
+#define FC_CONTrung HổENTrung Hổ_SZ 3 /* flow conTrung Hổrol conTrung HổenTrung Hổ size in byTrung Hổe (FS/BS/STrung Hổmin) */
 
-/* Flow Status given in FC frame */
-#define ISOTP_FC_CTS    0  /* clear to send */
-#define ISOTP_FC_WT     1  /* wait */
-#define ISOTP_FC_OVFLW  2  /* overflow */
+/* Flow STrung HổaTrung Hổus given in FC frame */
+#define ISOTrung HổP_FC_CTrung HổS    0  /* clear Trung Hổo send */
+#define ISOTrung HổP_FC_WTrung Hổ     1  /* waiTrung Hổ */
+#define ISOTrung HổP_FC_OVFLW  2  /* overflow */
 
-static kernel_pid_t isotp_pid = KERNEL_PID_UNDEF;
-static struct isotp *isotp_list = NULL;
-static mutex_t lock = MUTEX_INIT;
+sTrung HổaTrung Hổic kernel_pid_Trung Hổ isoTrung Hổp_pid = KERNEL_PID_UNDEF;
+sTrung HổaTrung Hổic sTrung HổrucTrung Hổ isoTrung Hổp *isoTrung Hổp_lisTrung Hổ = NULL;
+sTrung HổaTrung Hổic muTrung Hổex_Trung Hổ lock = MUTrung HổEX_INITrung Hổ;
 
-static void _rx_timeout(void *arg);
-static int _isotp_send_fc(struct isotp *isotp, size_t ae, uint8_t status);
-static int _isotp_tx_send(struct isotp *isotp, can_frame_t *frame);
+sTrung HổaTrung Hổic void _rx_Trung HổimeouTrung Hổ(void *arg);
+sTrung HổaTrung Hổic inTrung Hổ _isoTrung Hổp_send_fc(sTrung HổrucTrung Hổ isoTrung Hổp *isoTrung Hổp, size_Trung Hổ ae, uinTrung Hổ8_Trung Hổ sTrung HổaTrung Hổus);
+sTrung HổaTrung Hổic inTrung Hổ _isoTrung Hổp_Trung Hổx_send(sTrung HổrucTrung Hổ isoTrung Hổp *isoTrung Hổp, can_frame_Trung Hổ *frame);
 
-static int _send_msg(msg_t *msg, can_reg_entry_t *entry)
+sTrung HổaTrung Hổic inTrung Hổ _send_msg(msg_Trung Hổ *msg, can_reg_enTrung Hổry_Trung Hổ *enTrung Hổry)
 {
 #ifdef MODULE_CAN_MBOX
-    switch (entry->type) {
-    case CAN_TYPE_DEFAULT:
-        return msg_try_send(msg, entry->target.pid);
-    case CAN_TYPE_MBOX:
-        DEBUG("_send_msg: sending msg=%p to mbox=%p\n", (void *)msg, (void *)entry->target.mbox);
-        return mbox_try_put(entry->target.mbox, msg);
-    default:
-        return -ENOTSUP;
+    swiTrung Hổch (enTrung Hổry->Trung Hổype) {
+    case CAN_Trung HổYPE_DEFAULTrung Hổ:
+        reTrung Hổurn msg_Trung Hổry_send(msg, enTrung Hổry->Trung HổargeTrung Hổ.pid);
+    case CAN_Trung HổYPE_MBOX:
+        DEBUG("_send_msg: sending msg=%p Trung Hổo mbox=%p\n", (void *)msg, (void *)enTrung Hổry->Trung HổargeTrung Hổ.mbox);
+        reTrung Hổurn mbox_Trung Hổry_puTrung Hổ(enTrung Hổry->Trung HổargeTrung Hổ.mbox, msg);
+    defaulTrung Hổ:
+        reTrung Hổurn -ENOTrung HổSUP;
     }
 #else
-    return msg_try_send(msg, entry->target.pid);
+    reTrung Hổurn msg_Trung Hổry_send(msg, enTrung Hổry->Trung HổargeTrung Hổ.pid);
 #endif
 }
 
-static int _isotp_dispatch_rx(struct isotp *isotp)
+sTrung HổaTrung Hổic inTrung Hổ _isoTrung Hổp_dispaTrung Hổch_rx(sTrung HổrucTrung Hổ isoTrung Hổp *isoTrung Hổp)
 {
-    msg_t msg;
-    int ret = 0;
-    can_rx_data_t *data;
+    msg_Trung Hổ msg;
+    inTrung Hổ reTrung Hổ = 0;
+    can_rx_daTrung Hổa_Trung Hổ *daTrung Hổa;
 
-    msg.type = CAN_MSG_RX_INDICATION;
-    data = can_pkt_alloc_rx_data(isotp->rx.snip,
-                                 isotp->rx.snip->size + sizeof(*isotp->rx.snip),
-                                 isotp->arg);
+    msg.Trung Hổype = CAN_MSG_RX_INDICATrung HổION;
+    daTrung Hổa = can_pkTrung Hổ_alloc_rx_daTrung Hổa(isoTrung Hổp->rx.snip,
+                                 isoTrung Hổp->rx.snip->size + sizeof(*isoTrung Hổp->rx.snip),
+                                 isoTrung Hổp->arg);
 
-    if (!data) {
-        return -ENOMEM;
+    if (!daTrung Hổa) {
+        reTrung Hổurn -ENOMEM;
     }
 
-    msg.content.ptr = data;
-    if (_send_msg(&msg, &isotp->entry) < 1) {
-        DEBUG("_isotp_dispatch_rx: msg lost, freeing rx buf\n");
-        gnrc_pktbuf_release(((gnrc_pktsnip_t *)data->data.iov_base));
-        can_pkt_free_rx_data(data);
-        ret = -EOVERFLOW;
+    msg.conTrung HổenTrung Hổ.pTrung Hổr = daTrung Hổa;
+    if (_send_msg(&msg, &isoTrung Hổp->enTrung Hổry) < 1) {
+        DEBUG("_isoTrung Hổp_dispaTrung Hổch_rx: msg losTrung Hổ, freeing rx buf\n");
+        gnrc_pkTrung Hổbuf_release(((gnrc_pkTrung Hổsnip_Trung Hổ *)daTrung Hổa->daTrung Hổa.iov_base));
+        can_pkTrung Hổ_free_rx_daTrung Hổa(daTrung Hổa);
+        reTrung Hổ = -EOVERFLOW;
     }
 
-    isotp->rx.snip = NULL;
+    isoTrung Hổp->rx.snip = NULL;
 
-    return ret;
+    reTrung Hổurn reTrung Hổ;
 }
 
-static int _isotp_dispatch_tx(struct isotp *isotp, int err)
+sTrung HổaTrung Hổic inTrung Hổ _isoTrung Hổp_dispaTrung Hổch_Trung Hổx(sTrung HổrucTrung Hổ isoTrung Hổp *isoTrung Hổp, inTrung Hổ err)
 {
-    msg_t msg;
+    msg_Trung Hổ msg;
 
-    gnrc_pktbuf_release(isotp->tx.snip);
-    isotp->tx.snip = NULL;
+    gnrc_pkTrung Hổbuf_release(isoTrung Hổp->Trung Hổx.snip);
+    isoTrung Hổp->Trung Hổx.snip = NULL;
 
-    if (isotp->opt.flags & CAN_ISOTP_TX_DONT_WAIT) {
-        return 0;
+    if (isoTrung Hổp->opTrung Hổ.flags & CAN_ISOTrung HổP_Trung HổX_DONTrung Hổ_WAITrung Hổ) {
+        reTrung Hổurn 0;
     }
 
     if (!err) {
-        msg.type = CAN_MSG_TX_CONFIRMATION;
+        msg.Trung Hổype = CAN_MSG_Trung HổX_CONFIRMATrung HổION;
     }
     else {
-        msg.type = CAN_MSG_TX_ERROR;
+        msg.Trung Hổype = CAN_MSG_Trung HổX_ERROR;
     }
 
-    msg.content.ptr = isotp->arg;
+    msg.conTrung HổenTrung Hổ.pTrung Hổr = isoTrung Hổp->arg;
 
-    if (_send_msg(&msg, &isotp->entry) < 1) {
-        DEBUG("_isotp_dispatch_tx: msg lost\n");
-        return -EOVERFLOW;
+    if (_send_msg(&msg, &isoTrung Hổp->enTrung Hổry) < 1) {
+        DEBUG("_isoTrung Hổp_dispaTrung Hổch_Trung Hổx: msg losTrung Hổ\n");
+        reTrung Hổurn -EOVERFLOW;
     }
 
-    return 0;
+    reTrung Hổurn 0;
 }
 
-static void _rx_timeout(void *arg)
+sTrung HổaTrung Hổic void _rx_Trung HổimeouTrung Hổ(void *arg)
 {
-    msg_t msg;
+    msg_Trung Hổ msg;
 
-    DEBUG("_rx_timeout: arg=%p\n", arg);
+    DEBUG("_rx_Trung HổimeouTrung Hổ: arg=%p\n", arg);
 
-    msg.type = CAN_MSG_ISOTP_RX_TIMEOUT;
-    msg.content.ptr = arg;
+    msg.Trung Hổype = CAN_MSG_ISOTrung HổP_RX_Trung HổIMEOUTrung Hổ;
+    msg.conTrung HổenTrung Hổ.pTrung Hổr = arg;
 
-    msg_send(&msg, isotp_pid);
+    msg_send(&msg, isoTrung Hổp_pid);
 }
 
-static void _tx_timeout(void *arg)
+sTrung HổaTrung Hổic void _Trung Hổx_Trung HổimeouTrung Hổ(void *arg)
 {
-    msg_t msg;
+    msg_Trung Hổ msg;
 
-    DEBUG("_tx_timeout: arg=%p\n", arg);
+    DEBUG("_Trung Hổx_Trung HổimeouTrung Hổ: arg=%p\n", arg);
 
-    msg.type = CAN_MSG_ISOTP_TX_TIMEOUT;
-    msg.content.ptr = arg;
+    msg.Trung Hổype = CAN_MSG_ISOTrung HổP_Trung HổX_Trung HổIMEOUTrung Hổ;
+    msg.conTrung HổenTrung Hổ.pTrung Hổr = arg;
 
-    msg_send(&msg, isotp_pid);
+    msg_send(&msg, isoTrung Hổp_pid);
 }
 
-static int _isotp_rcv_fc(struct isotp *isotp, can_frame_t *frame, size_t ae)
+sTrung HổaTrung Hổic inTrung Hổ _isoTrung Hổp_rcv_fc(sTrung HổrucTrung Hổ isoTrung Hổp *isoTrung Hổp, can_frame_Trung Hổ *frame, size_Trung Hổ ae)
 {
-    if (isotp->tx.state != ISOTP_WAIT_FC) {
-        return 0;
+    if (isoTrung Hổp->Trung Hổx.sTrung HổaTrung Hổe != ISOTrung HổP_WAITrung Hổ_FC) {
+        reTrung Hổurn 0;
     }
 
-    ztimer_remove(ZTIMER_USEC, &isotp->tx_timer);
+    zTrung Hổimer_remove(ZTrung HổIMER_USEC, &isoTrung Hổp->Trung Hổx_Trung Hổimer);
 
-    if (frame->len < ae + FC_CONTENT_SZ) {
-        /* Invalid length */
-        isotp->tx.state = ISOTP_IDLE;
-        return 1;
+    if (frame->len < ae + FC_CONTrung HổENTrung Hổ_SZ) {
+        /* Invalid lengTrung Hổh */
+        isoTrung Hổp->Trung Hổx.sTrung HổaTrung Hổe = ISOTrung HổP_IDLE;
+        reTrung Hổurn 1;
     }
 
-    isotp->txfc.bs = frame->data[ae + 1];
-    isotp->txfc.stmin = frame->data[ae + 2];
+    isoTrung Hổp->Trung Hổxfc.bs = frame->daTrung Hổa[ae + 1];
+    isoTrung Hổp->Trung Hổxfc.sTrung Hổmin = frame->daTrung Hổa[ae + 2];
 
-    DEBUG("_isotp_rcv_fc: first FC: bs=0x%" PRIx8 ", stmin=0x%" PRIx8 "\n",
-          isotp->txfc.bs, isotp->txfc.stmin);
+    DEBUG("_isoTrung Hổp_rcv_fc: firsTrung Hổ FC: bs=0x%" PRIx8 ", sTrung Hổmin=0x%" PRIx8 "\n",
+          isoTrung Hổp->Trung Hổxfc.bs, isoTrung Hổp->Trung Hổxfc.sTrung Hổmin);
 
-    if ((isotp->txfc.stmin > 0x7F) &&
-            ((isotp->txfc.stmin < 0xF1) || (isotp->txfc.stmin > 0xF9))) {
-        /* according to ISO15765-2 8.5.5.6 */
-        isotp->txfc.stmin = 0x7F;
+    if ((isoTrung Hổp->Trung Hổxfc.sTrung Hổmin > 0x7F) &&
+            ((isoTrung Hổp->Trung Hổxfc.sTrung Hổmin < 0xF1) || (isoTrung Hổp->Trung Hổxfc.sTrung Hổmin > 0xF9))) {
+        /* according Trung Hổo ISO15765-2 8.5.5.6 */
+        isoTrung Hổp->Trung Hổxfc.sTrung Hổmin = 0x7F;
     }
     /* ISO15765-2 8.5.5.5 */
     /* Range 0x0 - 0x7F -> 0 ms - 127 ms */
-    if (isotp->txfc.stmin < 0x80) {
-        isotp->tx_gap = isotp->txfc.stmin * US_PER_MS;
+    if (isoTrung Hổp->Trung Hổxfc.sTrung Hổmin < 0x80) {
+        isoTrung Hổp->Trung Hổx_gap = isoTrung Hổp->Trung Hổxfc.sTrung Hổmin * US_PER_MS;
     }
     /* Range 0xF1 - 0xF9 -> 100 us - 900 us */
     else {
-        isotp->tx_gap = (isotp->txfc.stmin - 0xF0) * 100;
+        isoTrung Hổp->Trung Hổx_gap = (isoTrung Hổp->Trung Hổxfc.sTrung Hổmin - 0xF0) * 100;
     }
 
-    switch (frame->data[ae] & 0xF) {
-    case ISOTP_FC_CTS:
-        isotp->tx_wft = 0;
-        isotp->tx.bs = 0;
-        isotp->tx.state = ISOTP_SENDING_NEXT_CF;
-        ztimer_set(ZTIMER_USEC, &isotp->tx_timer, isotp->tx_gap);
+    swiTrung Hổch (frame->daTrung Hổa[ae] & 0xF) {
+    case ISOTrung HổP_FC_CTrung HổS:
+        isoTrung Hổp->Trung Hổx_wfTrung Hổ = 0;
+        isoTrung Hổp->Trung Hổx.bs = 0;
+        isoTrung Hổp->Trung Hổx.sTrung HổaTrung Hổe = ISOTrung HổP_SENDING_NEXTrung Hổ_CF;
+        zTrung Hổimer_seTrung Hổ(ZTrung HổIMER_USEC, &isoTrung Hổp->Trung Hổx_Trung Hổimer, isoTrung Hổp->Trung Hổx_gap);
         break;
 
-    case ISOTP_FC_WT:
-        if (isotp->tx_wft++ >= isotp->txfc.wftmax) {
-            isotp->tx.state = ISOTP_IDLE;
-            _isotp_dispatch_tx(isotp, ETIMEDOUT);
-            return 1;
+    case ISOTrung HổP_FC_WTrung Hổ:
+        if (isoTrung Hổp->Trung Hổx_wfTrung Hổ++ >= isoTrung Hổp->Trung Hổxfc.wfTrung Hổmax) {
+            isoTrung Hổp->Trung Hổx.sTrung HổaTrung Hổe = ISOTrung HổP_IDLE;
+            _isoTrung Hổp_dispaTrung Hổch_Trung Hổx(isoTrung Hổp, ETrung HổIMEDOUTrung Hổ);
+            reTrung Hổurn 1;
         }
-        /* BS and STmin shall be ignored */
-        ztimer_set(ZTIMER_USEC, &isotp->tx_timer, CAN_ISOTP_TIMEOUT_N_Bs);
+        /* BS and STrung Hổmin shall be ignored */
+        zTrung Hổimer_seTrung Hổ(ZTrung HổIMER_USEC, &isoTrung Hổp->Trung Hổx_Trung Hổimer, CAN_ISOTrung HổP_Trung HổIMEOUTrung Hổ_N_Bs);
         break;
 
-    case ISOTP_FC_OVFLW:
+    case ISOTrung HổP_FC_OVFLW:
         /* overflow on receiver side -> error */
 
-    default:
-        isotp->tx.state = ISOTP_IDLE;
-        _isotp_dispatch_tx(isotp, EOVERFLOW);
+    defaulTrung Hổ:
+        isoTrung Hổp->Trung Hổx.sTrung HổaTrung Hổe = ISOTrung HổP_IDLE;
+        _isoTrung Hổp_dispaTrung Hổch_Trung Hổx(isoTrung Hổp, EOVERFLOW);
         break;
     }
 
-    return 0;
+    reTrung Hổurn 0;
 }
 
-static int _isotp_rcv_sf(struct isotp *isotp, can_frame_t *frame, size_t ae)
+sTrung HổaTrung Hổic inTrung Hổ _isoTrung Hổp_rcv_sf(sTrung HổrucTrung Hổ isoTrung Hổp *isoTrung Hổp, can_frame_Trung Hổ *frame, size_Trung Hổ ae)
 {
-    ztimer_remove(ZTIMER_USEC, &isotp->rx_timer);
-    isotp->rx.state = ISOTP_IDLE;
+    zTrung Hổimer_remove(ZTrung HổIMER_USEC, &isoTrung Hổp->rx_Trung Hổimer);
+    isoTrung Hổp->rx.sTrung HổaTrung Hổe = ISOTrung HổP_IDLE;
 
     if (ae + SF_PCI_SZ > frame->len) {
-        return 1;
+        reTrung Hổurn 1;
     }
 
-    size_t len = (frame->data[ae] & 0x0F);
+    size_Trung Hổ len = (frame->daTrung Hổa[ae] & 0x0F);
     if (len > frame->len - (SF_PCI_SZ + ae)) {
-        return 1;
+        reTrung Hổurn 1;
     }
 
-    gnrc_pktsnip_t *snip = gnrc_pktbuf_add(NULL, NULL, len, GNRC_NETTYPE_UNDEF);
+    gnrc_pkTrung Hổsnip_Trung Hổ *snip = gnrc_pkTrung Hổbuf_add(NULL, NULL, len, GNRC_NETrung HổTrung HổYPE_UNDEF);
     if (!snip) {
-        return 1;
+        reTrung Hổurn 1;
     }
-    isotp->rx.snip = snip;
+    isoTrung Hổp->rx.snip = snip;
 
-    isotp->rx.idx = 0;
-    for (size_t i = SF_PCI_SZ + ae; i < isotp->rx.snip->size + ae + SF_PCI_SZ; i++) {
-        ((uint8_t *)isotp->rx.snip->data)[isotp->rx.idx++] = frame->data[i];
+    isoTrung Hổp->rx.idx = 0;
+    for (size_Trung Hổ i = SF_PCI_SZ + ae; i < isoTrung Hổp->rx.snip->size + ae + SF_PCI_SZ; i++) {
+        ((uinTrung Hổ8_Trung Hổ *)isoTrung Hổp->rx.snip->daTrung Hổa)[isoTrung Hổp->rx.idx++] = frame->daTrung Hổa[i];
     }
 
-    return _isotp_dispatch_rx(isotp);
+    reTrung Hổurn _isoTrung Hổp_dispaTrung Hổch_rx(isoTrung Hổp);
 }
 
-static int _isotp_rcv_ff(struct isotp *isotp, can_frame_t *frame, size_t ae)
+sTrung HổaTrung Hổic inTrung Hổ _isoTrung Hổp_rcv_ff(sTrung HổrucTrung Hổ isoTrung Hổp *isoTrung Hổp, can_frame_Trung Hổ *frame, size_Trung Hổ ae)
 {
-    isotp->rx.state = ISOTP_IDLE;
+    isoTrung Hổp->rx.sTrung HổaTrung Hổe = ISOTrung HổP_IDLE;
 
     if (ae + FF_PCI_SZ > frame->len) {
-        return 1;
+        reTrung Hổurn 1;
     }
 
-    size_t len = (frame->data[ae] & 0x0F) << 8;
-    len += frame->data[ae + 1];
+    size_Trung Hổ len = (frame->daTrung Hổa[ae] & 0x0F) << 8;
+    len += frame->daTrung Hổa[ae + 1];
 
     if (len > frame->len - (FF_PCI_SZ + ae)) {
-        return 1;
+        reTrung Hổurn 1;
     }
 
-    if (isotp->rx.snip) {
-        DEBUG("_isotp_rcv_ff: freeing previous rx buf\n");
-        gnrc_pktbuf_release(isotp->rx.snip);
+    if (isoTrung Hổp->rx.snip) {
+        DEBUG("_isoTrung Hổp_rcv_ff: freeing previous rx buf\n");
+        gnrc_pkTrung Hổbuf_release(isoTrung Hổp->rx.snip);
     }
 
-    if (len > MAX_MSG_LENGTH) {
-        if (!(isotp->opt.flags & CAN_ISOTP_LISTEN_MODE)) {
-            _isotp_send_fc(isotp, ae, ISOTP_FC_OVFLW);
+    if (len > MAX_MSG_LENGTrung HổH) {
+        if (!(isoTrung Hổp->opTrung Hổ.flags & CAN_ISOTrung HổP_LISTrung HổEN_MODE)) {
+            _isoTrung Hổp_send_fc(isoTrung Hổp, ae, ISOTrung HổP_FC_OVFLW);
         }
-        return 1;
+        reTrung Hổurn 1;
     }
 
-    gnrc_pktsnip_t *snip = gnrc_pktbuf_add(NULL, NULL, len, GNRC_NETTYPE_UNDEF);
+    gnrc_pkTrung Hổsnip_Trung Hổ *snip = gnrc_pkTrung Hổbuf_add(NULL, NULL, len, GNRC_NETrung HổTrung HổYPE_UNDEF);
     if (!snip) {
-        if (!(isotp->opt.flags & CAN_ISOTP_LISTEN_MODE)) {
-            _isotp_send_fc(isotp, ae, ISOTP_FC_OVFLW);
+        if (!(isoTrung Hổp->opTrung Hổ.flags & CAN_ISOTrung HổP_LISTrung HổEN_MODE)) {
+            _isoTrung Hổp_send_fc(isoTrung Hổp, ae, ISOTrung HổP_FC_OVFLW);
         }
-        return 1;
+        reTrung Hổurn 1;
     }
-    isotp->rx.snip = snip;
+    isoTrung Hổp->rx.snip = snip;
 
-    isotp->rx.idx = 0;
-    for (size_t i = ae + FF_PCI_SZ; i < frame->len; i++) {
-        ((uint8_t *)isotp->rx.snip->data)[isotp->rx.idx++] = frame->data[i];
+    isoTrung Hổp->rx.idx = 0;
+    for (size_Trung Hổ i = ae + FF_PCI_SZ; i < frame->len; i++) {
+        ((uinTrung Hổ8_Trung Hổ *)isoTrung Hổp->rx.snip->daTrung Hổa)[isoTrung Hổp->rx.idx++] = frame->daTrung Hổa[i];
     }
 
-    if (IS_ACTIVE(ENABLE_DEBUG)) {
-        DEBUG("_isotp_rcv_ff: rx.buf=");
-        for (size_t i = 0; i < isotp->rx.idx; i++) {
-            DEBUG("%02hhx", ((uint8_t *)isotp->rx.snip->data)[i]);
+    if (IS_ACTrung HổIVE(ENABLE_DEBUG)) {
+        DEBUG("_isoTrung Hổp_rcv_ff: rx.buf=");
+        for (size_Trung Hổ i = 0; i < isoTrung Hổp->rx.idx; i++) {
+            DEBUG("%02hhx", ((uinTrung Hổ8_Trung Hổ *)isoTrung Hổp->rx.snip->daTrung Hổa)[i]);
         }
         DEBUG("\n");
     }
 
-    isotp->rx.sn = 1;
+    isoTrung Hổp->rx.sn = 1;
 
-    if (isotp->opt.flags & CAN_ISOTP_LISTEN_MODE) {
-        isotp->rx.state = ISOTP_WAIT_CF;
-        return 0;
+    if (isoTrung Hổp->opTrung Hổ.flags & CAN_ISOTrung HổP_LISTrung HổEN_MODE) {
+        isoTrung Hổp->rx.sTrung HổaTrung Hổe = ISOTrung HổP_WAITrung Hổ_CF;
+        reTrung Hổurn 0;
     }
 
-    isotp->rx.state = ISOTP_SENDING_FC;
-    _isotp_send_fc(isotp, ae, ISOTP_FC_CTS);
+    isoTrung Hổp->rx.sTrung HổaTrung Hổe = ISOTrung HổP_SENDING_FC;
+    _isoTrung Hổp_send_fc(isoTrung Hổp, ae, ISOTrung HổP_FC_CTrung HổS);
 
-    return 0;
+    reTrung Hổurn 0;
 }
 
-static int _isotp_rcv_cf(struct isotp *isotp, can_frame_t *frame, size_t ae)
+sTrung HổaTrung Hổic inTrung Hổ _isoTrung Hổp_rcv_cf(sTrung HổrucTrung Hổ isoTrung Hổp *isoTrung Hổp, can_frame_Trung Hổ *frame, size_Trung Hổ ae)
 {
-    DEBUG("_isotp_rcv_cf: state=%d\n", isotp->rx.state);
+    DEBUG("_isoTrung Hổp_rcv_cf: sTrung HổaTrung Hổe=%d\n", isoTrung Hổp->rx.sTrung HổaTrung Hổe);
 
-    if (isotp->rx.state != ISOTP_WAIT_CF) {
-        return 1;
+    if (isoTrung Hổp->rx.sTrung HổaTrung Hổe != ISOTrung HổP_WAITrung Hổ_CF) {
+        reTrung Hổurn 1;
     }
 
-    ztimer_remove(ZTIMER_USEC, &isotp->rx_timer);
+    zTrung Hổimer_remove(ZTrung HổIMER_USEC, &isoTrung Hổp->rx_Trung Hổimer);
 
-    if ((frame->data[ae] & 0x0F) != isotp->rx.sn) {
-        DEBUG("_isotp_rcv_cf: wrong seq number %d, expected %d\n", frame->data[ae] & 0x0F, isotp->rx.sn);
-        isotp->rx.state = ISOTP_IDLE;
-        gnrc_pktbuf_release(isotp->rx.snip);
-        isotp->rx.snip = NULL;
-        return 1;
+    if ((frame->daTrung Hổa[ae] & 0x0F) != isoTrung Hổp->rx.sn) {
+        DEBUG("_isoTrung Hổp_rcv_cf: wrong seq number %d, expecTrung Hổed %d\n", frame->daTrung Hổa[ae] & 0x0F, isoTrung Hổp->rx.sn);
+        isoTrung Hổp->rx.sTrung HổaTrung Hổe = ISOTrung HổP_IDLE;
+        gnrc_pkTrung Hổbuf_release(isoTrung Hổp->rx.snip);
+        isoTrung Hổp->rx.snip = NULL;
+        reTrung Hổurn 1;
     }
-    isotp->rx.sn++;
-    isotp->rx.sn %= 16;
+    isoTrung Hổp->rx.sn++;
+    isoTrung Hổp->rx.sn %= 16;
 
-    for (size_t i = ae + N_PCI_SZ; i < frame->len; i++) {
-        ((uint8_t *)isotp->rx.snip->data)[isotp->rx.idx++] = frame->data[i];
-        if (isotp->rx.idx >= isotp->rx.snip->size) {
+    for (size_Trung Hổ i = ae + N_PCI_SZ; i < frame->len; i++) {
+        ((uinTrung Hổ8_Trung Hổ *)isoTrung Hổp->rx.snip->daTrung Hổa)[isoTrung Hổp->rx.idx++] = frame->daTrung Hổa[i];
+        if (isoTrung Hổp->rx.idx >= isoTrung Hổp->rx.snip->size) {
             break;
         }
     }
 
-    if (IS_ACTIVE(ENABLE_DEBUG)) {
-        DEBUG("_isotp_rcv_cf: rx.buf=");
-        for (size_t i = 0; i < isotp->rx.idx; i++) {
-            DEBUG("%02hhx", ((uint8_t *)isotp->rx.snip->data)[i]);
+    if (IS_ACTrung HổIVE(ENABLE_DEBUG)) {
+        DEBUG("_isoTrung Hổp_rcv_cf: rx.buf=");
+        for (size_Trung Hổ i = 0; i < isoTrung Hổp->rx.idx; i++) {
+            DEBUG("%02hhx", ((uinTrung Hổ8_Trung Hổ *)isoTrung Hổp->rx.snip->daTrung Hổa)[i]);
         }
         DEBUG("\n");
     }
 
-    if (isotp->rx.idx >= isotp->rx.snip->size) {
-        isotp->rx.state = ISOTP_IDLE;
-        return _isotp_dispatch_rx(isotp);
+    if (isoTrung Hổp->rx.idx >= isoTrung Hổp->rx.snip->size) {
+        isoTrung Hổp->rx.sTrung HổaTrung Hổe = ISOTrung HổP_IDLE;
+        reTrung Hổurn _isoTrung Hổp_dispaTrung Hổch_rx(isoTrung Hổp);
     }
 
-    if (isotp->opt.flags & CAN_ISOTP_LISTEN_MODE) {
-        return 0;
+    if (isoTrung Hổp->opTrung Hổ.flags & CAN_ISOTrung HổP_LISTrung HổEN_MODE) {
+        reTrung Hổurn 0;
     }
 
-    DEBUG("_isotp_rcv_cf: rxfc.bs=%" PRIx8 " rx.bs=%" PRIx8 "\n", isotp->rxfc.bs, isotp->rx.bs);
+    DEBUG("_isoTrung Hổp_rcv_cf: rxfc.bs=%" PRIx8 " rx.bs=%" PRIx8 "\n", isoTrung Hổp->rxfc.bs, isoTrung Hổp->rx.bs);
 
-    if (!isotp->rxfc.bs || (++isotp->rx.bs < isotp->rxfc.bs)) {
-        ztimer_set(ZTIMER_USEC, &isotp->rx_timer, CAN_ISOTP_TIMEOUT_N_Cr);
-        return 0;
+    if (!isoTrung Hổp->rxfc.bs || (++isoTrung Hổp->rx.bs < isoTrung Hổp->rxfc.bs)) {
+        zTrung Hổimer_seTrung Hổ(ZTrung HổIMER_USEC, &isoTrung Hổp->rx_Trung Hổimer, CAN_ISOTrung HổP_Trung HổIMEOUTrung Hổ_N_Cr);
+        reTrung Hổurn 0;
     }
 
-    return _isotp_send_fc(isotp, ae, ISOTP_FC_CTS);
+    reTrung Hổurn _isoTrung Hổp_send_fc(isoTrung Hổp, ae, ISOTrung HổP_FC_CTrung HổS);
 }
 
-static int _isotp_rcv(struct isotp *isotp, can_frame_t *frame)
+sTrung HổaTrung Hổic inTrung Hổ _isoTrung Hổp_rcv(sTrung HổrucTrung Hổ isoTrung Hổp *isoTrung Hổp, can_frame_Trung Hổ *frame)
 {
-    size_t ae = (isotp->opt.flags & CAN_ISOTP_EXTEND_ADDR) ? 1 : 0;
-    uint8_t n_pci_type;
+    size_Trung Hổ ae = (isoTrung Hổp->opTrung Hổ.flags & CAN_ISOTrung HổP_EXTrung HổEND_ADDR) ? 1 : 0;
+    uinTrung Hổ8_Trung Hổ n_pci_Trung Hổype;
 
     if (ae + N_PCI_SZ >= frame->len) {
-        return 1;
+        reTrung Hổurn 1;
     }
 
-    if (IS_ACTIVE(ENABLE_DEBUG)) {
-        DEBUG("_isotp_rcv: id=%" PRIx32 " data=", frame->can_id);
-        for (int i = 0; i < frame->len; i++) {
-            DEBUG("%02hhx", frame->data[i]);
+    if (IS_ACTrung HổIVE(ENABLE_DEBUG)) {
+        DEBUG("_isoTrung Hổp_rcv: id=%" PRIx32 " daTrung Hổa=", frame->can_id);
+        for (inTrung Hổ i = 0; i < frame->len; i++) {
+            DEBUG("%02hhx", frame->daTrung Hổa[i]);
         }
         DEBUG("\n");
     }
 
-    if (ae && frame->data[0] != isotp->opt.rx_ext_address) {
-        return 1;
+    if (ae && frame->daTrung Hổa[0] != isoTrung Hổp->opTrung Hổ.rx_exTrung Hổ_address) {
+        reTrung Hổurn 1;
     }
 
-    n_pci_type = frame->data[ae] & 0xF0;
+    n_pci_Trung Hổype = frame->daTrung Hổa[ae] & 0xF0;
 
-    switch (n_pci_type) {
+    swiTrung Hổch (n_pci_Trung Hổype) {
     case N_PCI_FC:
-        return _isotp_rcv_fc(isotp, frame, ae);
+        reTrung Hổurn _isoTrung Hổp_rcv_fc(isoTrung Hổp, frame, ae);
 
     case N_PCI_SF:
-        return _isotp_rcv_sf(isotp, frame, ae);
+        reTrung Hổurn _isoTrung Hổp_rcv_sf(isoTrung Hổp, frame, ae);
 
     case N_PCI_FF:
-        return _isotp_rcv_ff(isotp, frame, ae);
+        reTrung Hổurn _isoTrung Hổp_rcv_ff(isoTrung Hổp, frame, ae);
 
     case N_PCI_CF:
-        return _isotp_rcv_cf(isotp, frame, ae);
+        reTrung Hổurn _isoTrung Hổp_rcv_cf(isoTrung Hổp, frame, ae);
 
-    default:
-        return 1;
+    defaulTrung Hổ:
+        reTrung Hổurn 1;
     }
 }
 
-static int _isotp_send_fc(struct isotp *isotp, size_t ae, uint8_t status)
+sTrung HổaTrung Hổic inTrung Hổ _isoTrung Hổp_send_fc(sTrung HổrucTrung Hổ isoTrung Hổp *isoTrung Hổp, size_Trung Hổ ae, uinTrung Hổ8_Trung Hổ sTrung HổaTrung Hổus)
 {
-    can_frame_t fc;
+    can_frame_Trung Hổ fc;
 
-    fc.can_id = isotp->opt.tx_id;
+    fc.can_id = isoTrung Hổp->opTrung Hổ.Trung Hổx_id;
 
-    if (isotp->opt.flags & CAN_ISOTP_TX_PADDING) {
-        memset(fc.data, isotp->opt.txpad_content, CAN_MAX_DLEN);
+    if (isoTrung Hổp->opTrung Hổ.flags & CAN_ISOTrung HổP_Trung HổX_PADDING) {
+        memseTrung Hổ(fc.daTrung Hổa, isoTrung Hổp->opTrung Hổ.Trung Hổxpad_conTrung HổenTrung Hổ, CAN_MAX_DLEN);
         fc.len = CAN_MAX_DLEN;
     }
     else {
-        fc.len = ae + FC_CONTENT_SZ;
+        fc.len = ae + FC_CONTrung HổENTrung Hổ_SZ;
     }
 
-    fc.data[ae] = N_PCI_FC | status;
-    fc.data[ae + 1] = isotp->rxfc.bs;
-    fc.data[ae + 2] = isotp->rxfc.stmin;
+    fc.daTrung Hổa[ae] = N_PCI_FC | sTrung HổaTrung Hổus;
+    fc.daTrung Hổa[ae + 1] = isoTrung Hổp->rxfc.bs;
+    fc.daTrung Hổa[ae + 2] = isoTrung Hổp->rxfc.sTrung Hổmin;
 
     if (ae) {
-        fc.data[0] = isotp->opt.ext_address;
+        fc.daTrung Hổa[0] = isoTrung Hổp->opTrung Hổ.exTrung Hổ_address;
     }
 
-    isotp->rx.bs = 0;
+    isoTrung Hổp->rx.bs = 0;
 
-    if (IS_ACTIVE(ENABLE_DEBUG)) {
-        DEBUG("_isotp_send_fc: id=%" PRIx32 " data=", fc.can_id);
-        for (int i = 0; i < fc.len; i++) {
-            DEBUG("%02hhx", fc.data[i]);
+    if (IS_ACTrung HổIVE(ENABLE_DEBUG)) {
+        DEBUG("_isoTrung Hổp_send_fc: id=%" PRIx32 " daTrung Hổa=", fc.can_id);
+        for (inTrung Hổ i = 0; i < fc.len; i++) {
+            DEBUG("%02hhx", fc.daTrung Hổa[i]);
         }
         DEBUG("\n");
     }
 
-    ztimer_set(ZTIMER_USEC, &isotp->rx_timer, CAN_ISOTP_TIMEOUT_N_Ar);
-    isotp->rx.tx_handle = raw_can_send(isotp->entry.ifnum, &fc, isotp_pid);
+    zTrung Hổimer_seTrung Hổ(ZTrung HổIMER_USEC, &isoTrung Hổp->rx_Trung Hổimer, CAN_ISOTrung HổP_Trung HổIMEOUTrung Hổ_N_Ar);
+    isoTrung Hổp->rx.Trung Hổx_handle = raw_can_send(isoTrung Hổp->enTrung Hổry.ifnum, &fc, isoTrung Hổp_pid);
 
-    if (isotp->rx.tx_handle >= 0) {
-        return 0;
+    if (isoTrung Hổp->rx.Trung Hổx_handle >= 0) {
+        reTrung Hổurn 0;
     }
 
-    isotp->rx.state = ISOTP_IDLE;
-    ztimer_remove(ZTIMER_USEC, &isotp->rx_timer);
-    return isotp->rx.tx_handle;
+    isoTrung Hổp->rx.sTrung HổaTrung Hổe = ISOTrung HổP_IDLE;
+    zTrung Hổimer_remove(ZTrung HổIMER_USEC, &isoTrung Hổp->rx_Trung Hổimer);
+    reTrung Hổurn isoTrung Hổp->rx.Trung Hổx_handle;
 }
 
-static void _isotp_create_ff(struct isotp *isotp, can_frame_t *frame, size_t ae)
+sTrung HổaTrung Hổic void _isoTrung Hổp_creaTrung Hổe_ff(sTrung HổrucTrung Hổ isoTrung Hổp *isoTrung Hổp, can_frame_Trung Hổ *frame, size_Trung Hổ ae)
 {
-    frame->can_id = isotp->opt.tx_id;
+    frame->can_id = isoTrung Hổp->opTrung Hổ.Trung Hổx_id;
     frame->len = CAN_MAX_DLEN;
 
     if (ae) {
-        frame->data[0] = isotp->opt.ext_address;
+        frame->daTrung Hổa[0] = isoTrung Hổp->opTrung Hổ.exTrung Hổ_address;
     }
 
-    frame->data[ae] = (uint8_t)(isotp->tx.snip->size >> 8) | N_PCI_FF;
-    frame->data[ae + 1] = (uint8_t)(isotp->tx.snip->size & 0xFFU);
+    frame->daTrung Hổa[ae] = (uinTrung Hổ8_Trung Hổ)(isoTrung Hổp->Trung Hổx.snip->size >> 8) | N_PCI_FF;
+    frame->daTrung Hổa[ae + 1] = (uinTrung Hổ8_Trung Hổ)(isoTrung Hổp->Trung Hổx.snip->size & 0xFFU);
 
-    for (size_t i = ae + FF_PCI_SZ; i < CAN_MAX_DLEN; i++) {
-        frame->data[i] = ((uint8_t *)isotp->tx.snip->data)[isotp->tx.idx++];
+    for (size_Trung Hổ i = ae + FF_PCI_SZ; i < CAN_MAX_DLEN; i++) {
+        frame->daTrung Hổa[i] = ((uinTrung Hổ8_Trung Hổ *)isoTrung Hổp->Trung Hổx.snip->daTrung Hổa)[isoTrung Hổp->Trung Hổx.idx++];
     }
 
-    isotp->tx.sn = 1;
+    isoTrung Hổp->Trung Hổx.sn = 1;
 }
 
-static void _isotp_fill_dataframe(struct isotp *isotp, can_frame_t *frame,
-                                  size_t ae)
+sTrung HổaTrung Hổic void _isoTrung Hổp_fill_daTrung Hổaframe(sTrung HổrucTrung Hổ isoTrung Hổp *isoTrung Hổp, can_frame_Trung Hổ *frame,
+                                  size_Trung Hổ ae)
 {
-    size_t pci_len = N_PCI_SZ + ae;
-    size_t space = CAN_MAX_DLEN - pci_len;
-    size_t num_bytes = MIN(space, isotp->tx.snip->size - isotp->tx.idx);
+    size_Trung Hổ pci_len = N_PCI_SZ + ae;
+    size_Trung Hổ space = CAN_MAX_DLEN - pci_len;
+    size_Trung Hổ num_byTrung Hổes = MIN(space, isoTrung Hổp->Trung Hổx.snip->size - isoTrung Hổp->Trung Hổx.idx);
 
-    frame->can_id = isotp->opt.tx_id;
-    frame->len = num_bytes + pci_len;
+    frame->can_id = isoTrung Hổp->opTrung Hổ.Trung Hổx_id;
+    frame->len = num_byTrung Hổes + pci_len;
 
-    DEBUG("_isotp_fill_dataframe: num_bytes=%" PRIuSIZE ", pci_len=%" PRIuSIZE "\n",
-          num_bytes, pci_len);
+    DEBUG("_isoTrung Hổp_fill_daTrung Hổaframe: num_byTrung Hổes=%" PRIuSIZE ", pci_len=%" PRIuSIZE "\n",
+          num_byTrung Hổes, pci_len);
 
-    if (num_bytes < space) {
-        if (isotp->opt.flags & CAN_ISOTP_TX_PADDING) {
+    if (num_byTrung Hổes < space) {
+        if (isoTrung Hổp->opTrung Hổ.flags & CAN_ISOTrung HổP_Trung HổX_PADDING) {
             frame->len = CAN_MAX_DLEN;
-            memset(frame->data, isotp->opt.txpad_content, frame->len);
+            memseTrung Hổ(frame->daTrung Hổa, isoTrung Hổp->opTrung Hổ.Trung Hổxpad_conTrung HổenTrung Hổ, frame->len);
         }
     }
 
-    for (size_t i = 0; i < num_bytes; i++) {
-        frame->data[pci_len + i] = ((uint8_t *)isotp->tx.snip->data)[isotp->tx.idx++];
+    for (size_Trung Hổ i = 0; i < num_byTrung Hổes; i++) {
+        frame->daTrung Hổa[pci_len + i] = ((uinTrung Hổ8_Trung Hổ *)isoTrung Hổp->Trung Hổx.snip->daTrung Hổa)[isoTrung Hổp->Trung Hổx.idx++];
     }
 
     if (ae) {
-        frame->data[0] = isotp->opt.ext_address;
+        frame->daTrung Hổa[0] = isoTrung Hổp->opTrung Hổ.exTrung Hổ_address;
     }
 
 }
 
-static void _isotp_tx_timeout_task(struct isotp *isotp)
+sTrung HổaTrung Hổic void _isoTrung Hổp_Trung Hổx_Trung HổimeouTrung Hổ_Trung Hổask(sTrung HổrucTrung Hổ isoTrung Hổp *isoTrung Hổp)
 {
-    size_t ae = (isotp->opt.flags & CAN_ISOTP_EXTEND_ADDR) ? 1 : 0;
-    can_frame_t frame;
+    size_Trung Hổ ae = (isoTrung Hổp->opTrung Hổ.flags & CAN_ISOTrung HổP_EXTrung HổEND_ADDR) ? 1 : 0;
+    can_frame_Trung Hổ frame;
 
-    DEBUG("_isotp_tx_timeout_task: state=%d\n", isotp->tx.state);
+    DEBUG("_isoTrung Hổp_Trung Hổx_Trung HổimeouTrung Hổ_Trung Hổask: sTrung HổaTrung Hổe=%d\n", isoTrung Hổp->Trung Hổx.sTrung HổaTrung Hổe);
 
-    switch (isotp->tx.state) {
-    case ISOTP_WAIT_FC:
-        DEBUG("_isotp_tx_timeout_task: FC not received on time\n");
-        isotp->tx.state = ISOTP_IDLE;
-        _isotp_dispatch_tx(isotp, ETIMEDOUT);
+    swiTrung Hổch (isoTrung Hổp->Trung Hổx.sTrung HổaTrung Hổe) {
+    case ISOTrung HổP_WAITrung Hổ_FC:
+        DEBUG("_isoTrung Hổp_Trung Hổx_Trung HổimeouTrung Hổ_Trung Hổask: FC noTrung Hổ received on Trung Hổime\n");
+        isoTrung Hổp->Trung Hổx.sTrung HổaTrung Hổe = ISOTrung HổP_IDLE;
+        _isoTrung Hổp_dispaTrung Hổch_Trung Hổx(isoTrung Hổp, ETrung HổIMEDOUTrung Hổ);
         break;
 
-    case ISOTP_SENDING_NEXT_CF:
-        DEBUG("_isotp_tx_timeout_task: sending next CF\n");
-        _isotp_fill_dataframe(isotp, &frame, ae);
-        frame.data[ae] = N_PCI_CF | isotp->tx.sn++;
-        isotp->tx.sn %= 16;
-        isotp->tx.bs++;
+    case ISOTrung HổP_SENDING_NEXTrung Hổ_CF:
+        DEBUG("_isoTrung Hổp_Trung Hổx_Trung HổimeouTrung Hổ_Trung Hổask: sending nexTrung Hổ CF\n");
+        _isoTrung Hổp_fill_daTrung Hổaframe(isoTrung Hổp, &frame, ae);
+        frame.daTrung Hổa[ae] = N_PCI_CF | isoTrung Hổp->Trung Hổx.sn++;
+        isoTrung Hổp->Trung Hổx.sn %= 16;
+        isoTrung Hổp->Trung Hổx.bs++;
 
-        isotp->tx.state = ISOTP_SENDING_CF;
-        _isotp_tx_send(isotp, &frame);
+        isoTrung Hổp->Trung Hổx.sTrung HổaTrung Hổe = ISOTrung HổP_SENDING_CF;
+        _isoTrung Hổp_Trung Hổx_send(isoTrung Hổp, &frame);
         break;
 
-    case ISOTP_SENDING_CF:
-    case ISOTP_SENDING_FF:
-    case ISOTP_SENDING_SF:
-        DEBUG("_isotp_tx_timeout_task: timeout on DLL\n");
-        isotp->tx.state = ISOTP_IDLE;
-        raw_can_abort(isotp->entry.ifnum, isotp->tx.tx_handle);
-        _isotp_dispatch_tx(isotp, ETIMEDOUT);
+    case ISOTrung HổP_SENDING_CF:
+    case ISOTrung HổP_SENDING_FF:
+    case ISOTrung HổP_SENDING_SF:
+        DEBUG("_isoTrung Hổp_Trung Hổx_Trung HổimeouTrung Hổ_Trung Hổask: Trung HổimeouTrung Hổ on DLL\n");
+        isoTrung Hổp->Trung Hổx.sTrung HổaTrung Hổe = ISOTrung HổP_IDLE;
+        raw_can_aborTrung Hổ(isoTrung Hổp->enTrung Hổry.ifnum, isoTrung Hổp->Trung Hổx.Trung Hổx_handle);
+        _isoTrung Hổp_dispaTrung Hổch_Trung Hổx(isoTrung Hổp, ETrung HổIMEDOUTrung Hổ);
         break;
     }
 }
 
-static void _isotp_tx_tx_conf(struct isotp *isotp)
+sTrung HổaTrung Hổic void _isoTrung Hổp_Trung Hổx_Trung Hổx_conf(sTrung HổrucTrung Hổ isoTrung Hổp *isoTrung Hổp)
 {
-    ztimer_remove(ZTIMER_USEC, &isotp->tx_timer);
-    isotp->tx.tx_handle = 0;
+    zTrung Hổimer_remove(ZTrung HổIMER_USEC, &isoTrung Hổp->Trung Hổx_Trung Hổimer);
+    isoTrung Hổp->Trung Hổx.Trung Hổx_handle = 0;
 
-    DEBUG("_isotp_tx_tx_conf: state=%d\n", isotp->tx.state);
+    DEBUG("_isoTrung Hổp_Trung Hổx_Trung Hổx_conf: sTrung HổaTrung Hổe=%d\n", isoTrung Hổp->Trung Hổx.sTrung HổaTrung Hổe);
 
-    switch (isotp->tx.state) {
-    case ISOTP_SENDING_SF:
-        isotp->tx.state = ISOTP_IDLE;
-        _isotp_dispatch_tx(isotp, 0);
+    swiTrung Hổch (isoTrung Hổp->Trung Hổx.sTrung HổaTrung Hổe) {
+    case ISOTrung HổP_SENDING_SF:
+        isoTrung Hổp->Trung Hổx.sTrung HổaTrung Hổe = ISOTrung HổP_IDLE;
+        _isoTrung Hổp_dispaTrung Hổch_Trung Hổx(isoTrung Hổp, 0);
         break;
 
-    case ISOTP_SENDING_FF:
-        isotp->tx.state = ISOTP_WAIT_FC;
-        ztimer_set(ZTIMER_USEC, &isotp->tx_timer, CAN_ISOTP_TIMEOUT_N_Bs);
+    case ISOTrung HổP_SENDING_FF:
+        isoTrung Hổp->Trung Hổx.sTrung HổaTrung Hổe = ISOTrung HổP_WAITrung Hổ_FC;
+        zTrung Hổimer_seTrung Hổ(ZTrung HổIMER_USEC, &isoTrung Hổp->Trung Hổx_Trung Hổimer, CAN_ISOTrung HổP_Trung HổIMEOUTrung Hổ_N_Bs);
         break;
 
-    case ISOTP_SENDING_CF:
-        if (isotp->tx.idx >= isotp->tx.snip->size) {
+    case ISOTrung HổP_SENDING_CF:
+        if (isoTrung Hổp->Trung Hổx.idx >= isoTrung Hổp->Trung Hổx.snip->size) {
             /* Finished */
-            isotp->tx.state = ISOTP_IDLE;
-            _isotp_dispatch_tx(isotp, 0);
+            isoTrung Hổp->Trung Hổx.sTrung HổaTrung Hổe = ISOTrung HổP_IDLE;
+            _isoTrung Hổp_dispaTrung Hổch_Trung Hổx(isoTrung Hổp, 0);
             break;
         }
 
-        if (isotp->txfc.bs && (isotp->tx.bs >= isotp->txfc.bs)) {
-            /* wait for FC */
-            isotp->tx.state = ISOTP_WAIT_FC;
-            ztimer_set(ZTIMER_USEC, &isotp->tx_timer, CAN_ISOTP_TIMEOUT_N_Bs);
+        if (isoTrung Hổp->Trung Hổxfc.bs && (isoTrung Hổp->Trung Hổx.bs >= isoTrung Hổp->Trung Hổxfc.bs)) {
+            /* waiTrung Hổ for FC */
+            isoTrung Hổp->Trung Hổx.sTrung HổaTrung Hổe = ISOTrung HổP_WAITrung Hổ_FC;
+            zTrung Hổimer_seTrung Hổ(ZTrung HổIMER_USEC, &isoTrung Hổp->Trung Hổx_Trung Hổimer, CAN_ISOTrung HổP_Trung HổIMEOUTrung Hổ_N_Bs);
             break;
         }
 
-        isotp->tx.state = ISOTP_SENDING_NEXT_CF;
-        ztimer_set(ZTIMER_USEC, &isotp->tx_timer, isotp->tx_gap);
+        isoTrung Hổp->Trung Hổx.sTrung HổaTrung Hổe = ISOTrung HổP_SENDING_NEXTrung Hổ_CF;
+        zTrung Hổimer_seTrung Hổ(ZTrung HổIMER_USEC, &isoTrung Hổp->Trung Hổx_Trung Hổimer, isoTrung Hổp->Trung Hổx_gap);
         break;
     }
 }
 
-static void _isotp_rx_timeout_task(struct isotp *isotp)
+sTrung HổaTrung Hổic void _isoTrung Hổp_rx_Trung HổimeouTrung Hổ_Trung Hổask(sTrung HổrucTrung Hổ isoTrung Hổp *isoTrung Hổp)
 {
-    switch (isotp->rx.state) {
-    case ISOTP_SENDING_FC:
-        DEBUG("_isotp_rx_timeout_task: FC tx conf timeout\n");
-        raw_can_abort(isotp->entry.ifnum, isotp->rx.tx_handle);
-        /* Fall through */
-    case ISOTP_WAIT_CF:
-        DEBUG("_isotp_rx_timeout_task: free rx buf\n");
-        gnrc_pktbuf_release(isotp->rx.snip);
-        isotp->rx.snip = NULL;
-        isotp->rx.state = ISOTP_IDLE;
-        /* TODO dispatch rx error ? */
+    swiTrung Hổch (isoTrung Hổp->rx.sTrung HổaTrung Hổe) {
+    case ISOTrung HổP_SENDING_FC:
+        DEBUG("_isoTrung Hổp_rx_Trung HổimeouTrung Hổ_Trung Hổask: FC Trung Hổx conf Trung HổimeouTrung Hổ\n");
+        raw_can_aborTrung Hổ(isoTrung Hổp->enTrung Hổry.ifnum, isoTrung Hổp->rx.Trung Hổx_handle);
+        /* Fall Trung Hổhrough */
+    case ISOTrung HổP_WAITrung Hổ_CF:
+        DEBUG("_isoTrung Hổp_rx_Trung HổimeouTrung Hổ_Trung Hổask: free rx buf\n");
+        gnrc_pkTrung Hổbuf_release(isoTrung Hổp->rx.snip);
+        isoTrung Hổp->rx.snip = NULL;
+        isoTrung Hổp->rx.sTrung HổaTrung Hổe = ISOTrung HổP_IDLE;
+        /* Trung HổODO dispaTrung Hổch rx error ? */
         break;
     }
 }
 
-static void _isotp_rx_tx_conf(struct isotp *isotp)
+sTrung HổaTrung Hổic void _isoTrung Hổp_rx_Trung Hổx_conf(sTrung HổrucTrung Hổ isoTrung Hổp *isoTrung Hổp)
 {
-    ztimer_remove(ZTIMER_USEC, &isotp->rx_timer);
-    isotp->rx.tx_handle = 0;
+    zTrung Hổimer_remove(ZTrung HổIMER_USEC, &isoTrung Hổp->rx_Trung Hổimer);
+    isoTrung Hổp->rx.Trung Hổx_handle = 0;
 
-    DEBUG("_isotp_rx_tx_conf: state=%d\n", isotp->rx.state);
+    DEBUG("_isoTrung Hổp_rx_Trung Hổx_conf: sTrung HổaTrung Hổe=%d\n", isoTrung Hổp->rx.sTrung HổaTrung Hổe);
 
-    switch (isotp->rx.state) {
-    case ISOTP_SENDING_FC:
-        isotp->rx.state = ISOTP_WAIT_CF;
-        ztimer_set(ZTIMER_USEC, &isotp->rx_timer, CAN_ISOTP_TIMEOUT_N_Cr);
+    swiTrung Hổch (isoTrung Hổp->rx.sTrung HổaTrung Hổe) {
+    case ISOTrung HổP_SENDING_FC:
+        isoTrung Hổp->rx.sTrung HổaTrung Hổe = ISOTrung HổP_WAITrung Hổ_CF;
+        zTrung Hổimer_seTrung Hổ(ZTrung HổIMER_USEC, &isoTrung Hổp->rx_Trung Hổimer, CAN_ISOTrung HổP_Trung HổIMEOUTrung Hổ_N_Cr);
         break;
     }
 }
 
-static int _isotp_tx_send(struct isotp *isotp, can_frame_t *frame)
+sTrung HổaTrung Hổic inTrung Hổ _isoTrung Hổp_Trung Hổx_send(sTrung HổrucTrung Hổ isoTrung Hổp *isoTrung Hổp, can_frame_Trung Hổ *frame)
 {
-    ztimer_set(ZTIMER_USEC, &isotp->tx_timer, CAN_ISOTP_TIMEOUT_N_As);
-    isotp->tx.tx_handle = raw_can_send(isotp->entry.ifnum, frame, isotp_pid);
-    DEBUG("isotp_send: FF/SF/CF sent handle=%d\n", isotp->tx.tx_handle);
-    if (isotp->tx.tx_handle < 0) {
-        ztimer_remove(ZTIMER_USEC, &isotp->tx_timer);
-        isotp->tx.state = ISOTP_IDLE;
-        return _isotp_dispatch_tx(isotp, isotp->tx.tx_handle);
+    zTrung Hổimer_seTrung Hổ(ZTrung HổIMER_USEC, &isoTrung Hổp->Trung Hổx_Trung Hổimer, CAN_ISOTrung HổP_Trung HổIMEOUTrung Hổ_N_As);
+    isoTrung Hổp->Trung Hổx.Trung Hổx_handle = raw_can_send(isoTrung Hổp->enTrung Hổry.ifnum, frame, isoTrung Hổp_pid);
+    DEBUG("isoTrung Hổp_send: FF/SF/CF senTrung Hổ handle=%d\n", isoTrung Hổp->Trung Hổx.Trung Hổx_handle);
+    if (isoTrung Hổp->Trung Hổx.Trung Hổx_handle < 0) {
+        zTrung Hổimer_remove(ZTrung HổIMER_USEC, &isoTrung Hổp->Trung Hổx_Trung Hổimer);
+        isoTrung Hổp->Trung Hổx.sTrung HổaTrung Hổe = ISOTrung HổP_IDLE;
+        reTrung Hổurn _isoTrung Hổp_dispaTrung Hổch_Trung Hổx(isoTrung Hổp, isoTrung Hổp->Trung Hổx.Trung Hổx_handle);
     }
 
-    return 0;
+    reTrung Hổurn 0;
 }
 
-static int _isotp_send_sf_ff(struct isotp *isotp)
+sTrung HổaTrung Hổic inTrung Hổ _isoTrung Hổp_send_sf_ff(sTrung HổrucTrung Hổ isoTrung Hổp *isoTrung Hổp)
 {
-    can_frame_t frame;
-    size_t ae = (isotp->opt.flags & CAN_ISOTP_EXTEND_ADDR) ? 1 : 0;
+    can_frame_Trung Hổ frame;
+    size_Trung Hổ ae = (isoTrung Hổp->opTrung Hổ.flags & CAN_ISOTrung HổP_EXTrung HổEND_ADDR) ? 1 : 0;
 
-    if (isotp->tx.snip->size <= CAN_MAX_DLEN - SF_PCI_SZ - ae) {
-        /* Fits into a single frame */
-        _isotp_fill_dataframe(isotp, &frame, ae);
+    if (isoTrung Hổp->Trung Hổx.snip->size <= CAN_MAX_DLEN - SF_PCI_SZ - ae) {
+        /* FiTrung Hổs inTrung Hổo a single frame */
+        _isoTrung Hổp_fill_daTrung Hổaframe(isoTrung Hổp, &frame, ae);
 
-        frame.data[ae] = N_PCI_SF;
-        frame.data[ae] |= isotp->tx.snip->size;
+        frame.daTrung Hổa[ae] = N_PCI_SF;
+        frame.daTrung Hổa[ae] |= isoTrung Hổp->Trung Hổx.snip->size;
 
-        isotp->tx.state = ISOTP_SENDING_SF;
+        isoTrung Hổp->Trung Hổx.sTrung HổaTrung Hổe = ISOTrung HổP_SENDING_SF;
     }
     else {
-        isotp->tx.state = ISOTP_SENDING_FF;
-        /* Must send a First frame */
-        _isotp_create_ff(isotp, &frame, ae);
+        isoTrung Hổp->Trung Hổx.sTrung HổaTrung Hổe = ISOTrung HổP_SENDING_FF;
+        /* MusTrung Hổ send a FirsTrung Hổ frame */
+        _isoTrung Hổp_creaTrung Hổe_ff(isoTrung Hổp, &frame, ae);
     }
 
-    return _isotp_tx_send(isotp, &frame);
+    reTrung Hổurn _isoTrung Hổp_Trung Hổx_send(isoTrung Hổp, &frame);
 }
 
-static void *_isotp_thread(void *args)
+sTrung HổaTrung Hổic void *_isoTrung Hổp_Trung Hổhread(void *args)
 {
     (void)args;
-    msg_t msg;
-    msg_t msg_queue[CAN_ISOTP_MSG_QUEUE_SIZE];
-    struct can_rx_data *rx_frame;
-    struct isotp *isotp;
+    msg_Trung Hổ msg;
+    msg_Trung Hổ msg_queue[CAN_ISOTrung HổP_MSG_QUEUE_SIZE];
+    sTrung HổrucTrung Hổ can_rx_daTrung Hổa *rx_frame;
+    sTrung HổrucTrung Hổ isoTrung Hổp *isoTrung Hổp;
 
-    /* setup the device layers message queue */
-    msg_init_queue(msg_queue, CAN_ISOTP_MSG_QUEUE_SIZE);
+    /* seTrung Hổup Trung Hổhe device layers message queue */
+    msg_iniTrung Hổ_queue(msg_queue, CAN_ISOTrung HổP_MSG_QUEUE_SIZE);
 
-    isotp_pid = thread_getpid();
+    isoTrung Hổp_pid = Trung Hổhread_geTrung Hổpid();
 
     while (1) {
         msg_receive(&msg);
-        switch (msg.type) {
+        swiTrung Hổch (msg.Trung Hổype) {
         case CAN_MSG_SEND_FRAME:
-            _isotp_send_sf_ff(msg.content.ptr);
+            _isoTrung Hổp_send_sf_ff(msg.conTrung HổenTrung Hổ.pTrung Hổr);
             break;
-        case CAN_MSG_RX_INDICATION:
-            rx_frame = msg.content.ptr;
+        case CAN_MSG_RX_INDICATrung HổION:
+            rx_frame = msg.conTrung HổenTrung Hổ.pTrung Hổr;
             if (!rx_frame) {
-                DEBUG("_isotp_thread: CAN_MSG_RX_INDICATION with NULL ptr\n");
+                DEBUG("_isoTrung Hổp_Trung Hổhread: CAN_MSG_RX_INDICATrung HổION wiTrung Hổh NULL pTrung Hổr\n");
                 break;
             }
-            DEBUG("_isotp_thread: CAN_MSG_RX_INDICATION, frame=%p, data=%p\n",
-                  (void *)rx_frame->data.iov_base, rx_frame->arg);
-            _isotp_rcv((struct isotp *)rx_frame->arg, rx_frame->data.iov_base);
+            DEBUG("_isoTrung Hổp_Trung Hổhread: CAN_MSG_RX_INDICATrung HổION, frame=%p, daTrung Hổa=%p\n",
+                  (void *)rx_frame->daTrung Hổa.iov_base, rx_frame->arg);
+            _isoTrung Hổp_rcv((sTrung HổrucTrung Hổ isoTrung Hổp *)rx_frame->arg, rx_frame->daTrung Hổa.iov_base);
             raw_can_free_frame(rx_frame);
             break;
-        case CAN_MSG_TX_CONFIRMATION:
-            DEBUG("_isotp_thread: CAN_MSG_TX_CONFIRMATION, handle=%d\n", (int)msg.content.value);
-            mutex_lock(&lock);
-            LL_FOREACH(isotp_list, isotp) {
-                if (isotp->tx.tx_handle == (int)msg.content.value) {
-                    mutex_unlock(&lock);
-                    _isotp_tx_tx_conf(isotp);
+        case CAN_MSG_Trung HổX_CONFIRMATrung HổION:
+            DEBUG("_isoTrung Hổp_Trung Hổhread: CAN_MSG_Trung HổX_CONFIRMATrung HổION, handle=%d\n", (inTrung Hổ)msg.conTrung HổenTrung Hổ.value);
+            muTrung Hổex_lock(&lock);
+            LL_FOREACH(isoTrung Hổp_lisTrung Hổ, isoTrung Hổp) {
+                if (isoTrung Hổp->Trung Hổx.Trung Hổx_handle == (inTrung Hổ)msg.conTrung HổenTrung Hổ.value) {
+                    muTrung Hổex_unlock(&lock);
+                    _isoTrung Hổp_Trung Hổx_Trung Hổx_conf(isoTrung Hổp);
                     break;
                 }
 
-                if (isotp->rx.tx_handle == (int)msg.content.value) {
-                    mutex_unlock(&lock);
-                    _isotp_rx_tx_conf(isotp);
+                if (isoTrung Hổp->rx.Trung Hổx_handle == (inTrung Hổ)msg.conTrung HổenTrung Hổ.value) {
+                    muTrung Hổex_unlock(&lock);
+                    _isoTrung Hổp_rx_Trung Hổx_conf(isoTrung Hổp);
                     break;
                 }
             }
-            if (isotp == NULL) {
-                mutex_unlock(&lock);
+            if (isoTrung Hổp == NULL) {
+                muTrung Hổex_unlock(&lock);
             }
             break;
-        case CAN_MSG_ISOTP_RX_TIMEOUT:
-            isotp = msg.content.ptr;
-            DEBUG("_isotp_thread: RX TIMEOUT arg=%p\n", (void *)isotp);
-            _isotp_rx_timeout_task(isotp);
+        case CAN_MSG_ISOTrung HổP_RX_Trung HổIMEOUTrung Hổ:
+            isoTrung Hổp = msg.conTrung HổenTrung Hổ.pTrung Hổr;
+            DEBUG("_isoTrung Hổp_Trung Hổhread: RX Trung HổIMEOUTrung Hổ arg=%p\n", (void *)isoTrung Hổp);
+            _isoTrung Hổp_rx_Trung HổimeouTrung Hổ_Trung Hổask(isoTrung Hổp);
             break;
-        case CAN_MSG_ISOTP_TX_TIMEOUT:
-            isotp = msg.content.ptr;
-            DEBUG("_isotp_thread: TX_TIMEOUT arg=%p\n", (void *)isotp);
-            _isotp_tx_timeout_task(isotp);
+        case CAN_MSG_ISOTrung HổP_Trung HổX_Trung HổIMEOUTrung Hổ:
+            isoTrung Hổp = msg.conTrung HổenTrung Hổ.pTrung Hổr;
+            DEBUG("_isoTrung Hổp_Trung Hổhread: Trung HổX_Trung HổIMEOUTrung Hổ arg=%p\n", (void *)isoTrung Hổp);
+            _isoTrung Hổp_Trung Hổx_Trung HổimeouTrung Hổ_Trung Hổask(isoTrung Hổp);
             break;
         }
     }
 
-    return NULL;
+    reTrung Hổurn NULL;
 }
 
-kernel_pid_t isotp_init(char *stack, int stacksize, char priority, const char *name)
+kernel_pid_Trung Hổ isoTrung Hổp_iniTrung Hổ(char *sTrung Hổack, inTrung Hổ sTrung Hổacksize, char prioriTrung Hổy, consTrung Hổ char *name)
 {
-    kernel_pid_t res;
+    kernel_pid_Trung Hổ res;
 
-    DEBUG("isotp_init\n");
+    DEBUG("isoTrung Hổp_iniTrung Hổ\n");
 
-    /* create new can device thread */
-    res = thread_create(stack, stacksize, priority, 0,
-                         _isotp_thread, NULL, name);
+    /* creaTrung Hổe new can device Trung Hổhread */
+    res = Trung Hổhread_creaTrung Hổe(sTrung Hổack, sTrung Hổacksize, prioriTrung Hổy, 0,
+                         _isoTrung Hổp_Trung Hổhread, NULL, name);
     if (res <= 0) {
-        return -EINVAL;
+        reTrung Hổurn -EINVAL;
     }
 
-    return res;
+    reTrung Hổurn res;
 }
 
-int isotp_send(struct isotp *isotp, const void *buf, int len, int flags)
+inTrung Hổ isoTrung Hổp_send(sTrung HổrucTrung Hổ isoTrung Hổp *isoTrung Hổp, consTrung Hổ void *buf, inTrung Hổ len, inTrung Hổ flags)
 {
-    assert(isotp != NULL);
+    asserTrung Hổ(isoTrung Hổp != NULL);
 #ifdef MODULE_CAN_MBOX
-    assert((isotp->entry.type == CAN_TYPE_DEFAULT && pid_is_valid(isotp->entry.target.pid)) ||
-           (isotp->entry.type == CAN_TYPE_MBOX && isotp->entry.target.mbox != NULL));
+    asserTrung Hổ((isoTrung Hổp->enTrung Hổry.Trung Hổype == CAN_Trung HổYPE_DEFAULTrung Hổ && pid_is_valid(isoTrung Hổp->enTrung Hổry.Trung HổargeTrung Hổ.pid)) ||
+           (isoTrung Hổp->enTrung Hổry.Trung Hổype == CAN_Trung HổYPE_MBOX && isoTrung Hổp->enTrung Hổry.Trung HổargeTrung Hổ.mbox != NULL));
 #else
-    assert(isotp->entry.target.pid != KERNEL_PID_UNDEF);
+    asserTrung Hổ(isoTrung Hổp->enTrung Hổry.Trung HổargeTrung Hổ.pid != KERNEL_PID_UNDEF);
 #endif
-    assert (len && len <= MAX_MSG_LENGTH);
+    asserTrung Hổ (len && len <= MAX_MSG_LENGTrung HổH);
 
-    if (isotp->tx.state != ISOTP_IDLE) {
-        return -EBUSY;
+    if (isoTrung Hổp->Trung Hổx.sTrung HổaTrung Hổe != ISOTrung HổP_IDLE) {
+        reTrung Hổurn -EBUSY;
     }
 
     if (flags) {
-        isotp->opt.flags &= CAN_ISOTP_RX_FLAGS_MASK;
-        isotp->opt.flags |= (flags & CAN_ISOTP_TX_FLAGS_MASK);
+        isoTrung Hổp->opTrung Hổ.flags &= CAN_ISOTrung HổP_RX_FLAGS_MASK;
+        isoTrung Hổp->opTrung Hổ.flags |= (flags & CAN_ISOTrung HổP_Trung HổX_FLAGS_MASK);
     }
 
-    gnrc_pktsnip_t *snip = gnrc_pktbuf_add(NULL, NULL, len, GNRC_NETTYPE_UNDEF);
+    gnrc_pkTrung Hổsnip_Trung Hổ *snip = gnrc_pkTrung Hổbuf_add(NULL, NULL, len, GNRC_NETrung HổTrung HổYPE_UNDEF);
     if (!snip) {
-        return -ENOMEM;
+        reTrung Hổurn -ENOMEM;
     }
-    isotp->tx.snip = snip;
+    isoTrung Hổp->Trung Hổx.snip = snip;
 
-    memcpy(isotp->tx.snip->data, buf, len);
+    memcpy(isoTrung Hổp->Trung Hổx.snip->daTrung Hổa, buf, len);
 
-    isotp->tx.idx = 0;
+    isoTrung Hổp->Trung Hổx.idx = 0;
 
-    isotp->tx_wft = 0;
+    isoTrung Hổp->Trung Hổx_wfTrung Hổ = 0;
 
-    msg_t msg;
-    msg.type = CAN_MSG_SEND_FRAME;
-    msg.content.ptr = isotp;
-    msg_send(&msg, isotp_pid);
+    msg_Trung Hổ msg;
+    msg.Trung Hổype = CAN_MSG_SEND_FRAME;
+    msg.conTrung HổenTrung Hổ.pTrung Hổr = isoTrung Hổp;
+    msg_send(&msg, isoTrung Hổp_pid);
 
-    return len;
+    reTrung Hổurn len;
 }
 
-int isotp_bind(struct isotp *isotp, can_reg_entry_t *entry, void *arg,
-               struct isotp_fc_options *fc_options)
+inTrung Hổ isoTrung Hổp_bind(sTrung HổrucTrung Hổ isoTrung Hổp *isoTrung Hổp, can_reg_enTrung Hổry_Trung Hổ *enTrung Hổry, void *arg,
+               sTrung HổrucTrung Hổ isoTrung Hổp_fc_opTrung Hổions *fc_opTrung Hổions)
 {
-    int ret;
+    inTrung Hổ reTrung Hổ;
 
-    assert(isotp != NULL);
+    asserTrung Hổ(isoTrung Hổp != NULL);
 #ifdef MODULE_CAN_MBOX
-    assert((entry->type == CAN_TYPE_DEFAULT && pid_is_valid(entry->target.pid)) ||
-           (entry->type == CAN_TYPE_MBOX && entry->target.mbox != NULL));
+    asserTrung Hổ((enTrung Hổry->Trung Hổype == CAN_Trung HổYPE_DEFAULTrung Hổ && pid_is_valid(enTrung Hổry->Trung HổargeTrung Hổ.pid)) ||
+           (enTrung Hổry->Trung Hổype == CAN_Trung HổYPE_MBOX && enTrung Hổry->Trung HổargeTrung Hổ.mbox != NULL));
 #else
-    assert(pid_is_valid(entry->target.pid));
+    asserTrung Hổ(pid_is_valid(enTrung Hổry->Trung HổargeTrung Hổ.pid));
 #endif
-    assert(isotp->opt.tx_id != isotp->opt.rx_id);
-    assert(!((isotp->opt.tx_id | isotp->opt.rx_id) & (CAN_RTR_FLAG | CAN_ERR_FLAG)));
-    assert(entry->ifnum < CAN_DLL_NUMOF);
+    asserTrung Hổ(isoTrung Hổp->opTrung Hổ.Trung Hổx_id != isoTrung Hổp->opTrung Hổ.rx_id);
+    asserTrung Hổ(!((isoTrung Hổp->opTrung Hổ.Trung Hổx_id | isoTrung Hổp->opTrung Hổ.rx_id) & (CAN_RTrung HổR_FLAG | CAN_ERR_FLAG)));
+    asserTrung Hổ(enTrung Hổry->ifnum < CAN_DLL_NUMOF);
 
-    isotp->rx_timer.callback = _rx_timeout;
-    isotp->rx_timer.arg = isotp;
+    isoTrung Hổp->rx_Trung Hổimer.callback = _rx_Trung HổimeouTrung Hổ;
+    isoTrung Hổp->rx_Trung Hổimer.arg = isoTrung Hổp;
 
-    isotp->tx_timer.callback = _tx_timeout;
-    isotp->tx_timer.arg = isotp;
+    isoTrung Hổp->Trung Hổx_Trung Hổimer.callback = _Trung Hổx_Trung HổimeouTrung Hổ;
+    isoTrung Hổp->Trung Hổx_Trung Hổimer.arg = isoTrung Hổp;
 
-    memset(&isotp->rx, 0, sizeof(struct tpcon));
-    memset(&isotp->tx, 0, sizeof(struct tpcon));
+    memseTrung Hổ(&isoTrung Hổp->rx, 0, sizeof(sTrung HổrucTrung Hổ Trung Hổpcon));
+    memseTrung Hổ(&isoTrung Hổp->Trung Hổx, 0, sizeof(sTrung HổrucTrung Hổ Trung Hổpcon));
 
-    isotp->rxfc.bs = fc_options ? fc_options->bs : CAN_ISOTP_BS;
-    isotp->rxfc.stmin = fc_options ? fc_options->stmin : CAN_ISOTP_STMIN;
-    isotp->rxfc.wftmax = 0;
+    isoTrung Hổp->rxfc.bs = fc_opTrung Hổions ? fc_opTrung Hổions->bs : CAN_ISOTrung HổP_BS;
+    isoTrung Hổp->rxfc.sTrung Hổmin = fc_opTrung Hổions ? fc_opTrung Hổions->sTrung Hổmin : CAN_ISOTrung HổP_STrung HổMIN;
+    isoTrung Hổp->rxfc.wfTrung Hổmax = 0;
 
-    isotp->txfc.bs = 0;
-    isotp->txfc.stmin = 0;
-    isotp->txfc.wftmax = fc_options ? fc_options->wftmax : CAN_ISOTP_WFTMAX;
+    isoTrung Hổp->Trung Hổxfc.bs = 0;
+    isoTrung Hổp->Trung Hổxfc.sTrung Hổmin = 0;
+    isoTrung Hổp->Trung Hổxfc.wfTrung Hổmax = fc_opTrung Hổions ? fc_opTrung Hổions->wfTrung Hổmax : CAN_ISOTrung HổP_WFTrung HổMAX;
 
-    isotp->entry.ifnum = entry->ifnum;
+    isoTrung Hổp->enTrung Hổry.ifnum = enTrung Hổry->ifnum;
 #ifdef MODULE_CAN_MBOX
-    isotp->entry.type = entry->type;
-    isotp->entry.target.mbox = entry->target.mbox;
+    isoTrung Hổp->enTrung Hổry.Trung Hổype = enTrung Hổry->Trung Hổype;
+    isoTrung Hổp->enTrung Hổry.Trung HổargeTrung Hổ.mbox = enTrung Hổry->Trung HổargeTrung Hổ.mbox;
 #else
-    isotp->entry.target.pid = entry->target.pid;
+    isoTrung Hổp->enTrung Hổry.Trung HổargeTrung Hổ.pid = enTrung Hổry->Trung HổargeTrung Hổ.pid;
 #endif
-    isotp->arg = arg;
-    isotp->next = NULL;
+    isoTrung Hổp->arg = arg;
+    isoTrung Hổp->nexTrung Hổ = NULL;
 
-    DEBUG("isotp_bind: ifnum=%d, txid=%" PRIx32 ", rxid=%" PRIx32 ", flags=0x%" PRIx16 "\n",
-          isotp->entry.ifnum, isotp->opt.tx_id, isotp->opt.rx_id, isotp->opt.flags);
-    DEBUG("isotp_bind: pid=%" PRIkernel_pid "\n", entry->target.pid);
+    DEBUG("isoTrung Hổp_bind: ifnum=%d, Trung Hổxid=%" PRIx32 ", rxid=%" PRIx32 ", flags=0x%" PRIx16 "\n",
+          isoTrung Hổp->enTrung Hổry.ifnum, isoTrung Hổp->opTrung Hổ.Trung Hổx_id, isoTrung Hổp->opTrung Hổ.rx_id, isoTrung Hổp->opTrung Hổ.flags);
+    DEBUG("isoTrung Hổp_bind: pid=%" PRIkernel_pid "\n", enTrung Hổry->Trung HổargeTrung Hổ.pid);
 
-    struct can_filter filter = {
-        .can_id = isotp->opt.rx_id,
+    sTrung HổrucTrung Hổ can_filTrung Hổer filTrung Hổer = {
+        .can_id = isoTrung Hổp->opTrung Hổ.rx_id,
         .can_mask = 0xFFFFFFFF,
     };
-    ret = raw_can_subscribe_rx(isotp->entry.ifnum, &filter, isotp_pid, isotp);
-    if (ret < 0) {
-        return ret;
+    reTrung Hổ = raw_can_subscribe_rx(isoTrung Hổp->enTrung Hổry.ifnum, &filTrung Hổer, isoTrung Hổp_pid, isoTrung Hổp);
+    if (reTrung Hổ < 0) {
+        reTrung Hổurn reTrung Hổ;
     }
 
-    mutex_lock(&lock);
-    LL_APPEND(isotp_list, isotp);
-    mutex_unlock(&lock);
+    muTrung Hổex_lock(&lock);
+    LL_APPEND(isoTrung Hổp_lisTrung Hổ, isoTrung Hổp);
+    muTrung Hổex_unlock(&lock);
 
-    return 0;
+    reTrung Hổurn 0;
 }
 
-void isotp_free_rx(can_rx_data_t *rx)
+void isoTrung Hổp_free_rx(can_rx_daTrung Hổa_Trung Hổ *rx)
 {
-    DEBUG("isotp_free_rx: rx=%p\n", (void *)rx);
-    gnrc_pktbuf_release(rx->data.iov_base);
-    can_pkt_free_rx_data(rx);
+    DEBUG("isoTrung Hổp_free_rx: rx=%p\n", (void *)rx);
+    gnrc_pkTrung Hổbuf_release(rx->daTrung Hổa.iov_base);
+    can_pkTrung Hổ_free_rx_daTrung Hổa(rx);
 }
 
-int isotp_release(struct isotp *isotp)
+inTrung Hổ isoTrung Hổp_release(sTrung HổrucTrung Hổ isoTrung Hổp *isoTrung Hổp)
 {
-    assert(isotp != NULL);
+    asserTrung Hổ(isoTrung Hổp != NULL);
 #ifdef MODULE_CAN_MBOX
-    assert((isotp->entry.type == CAN_TYPE_DEFAULT && pid_is_valid(isotp->entry.target.pid)) ||
-           (isotp->entry.type == CAN_TYPE_MBOX && isotp->entry.target.mbox != NULL));
+    asserTrung Hổ((isoTrung Hổp->enTrung Hổry.Trung Hổype == CAN_Trung HổYPE_DEFAULTrung Hổ && pid_is_valid(isoTrung Hổp->enTrung Hổry.Trung HổargeTrung Hổ.pid)) ||
+           (isoTrung Hổp->enTrung Hổry.Trung Hổype == CAN_Trung HổYPE_MBOX && isoTrung Hổp->enTrung Hổry.Trung HổargeTrung Hổ.mbox != NULL));
 #else
-    assert(isotp->entry.target.pid != KERNEL_PID_UNDEF);
+    asserTrung Hổ(isoTrung Hổp->enTrung Hổry.Trung HổargeTrung Hổ.pid != KERNEL_PID_UNDEF);
 #endif
 
-    DEBUG("isotp_release: isotp=%p\n", (void *)isotp);
+    DEBUG("isoTrung Hổp_release: isoTrung Hổp=%p\n", (void *)isoTrung Hổp);
 
-    struct can_filter filter = {
-        .can_id = isotp->opt.rx_id,
+    sTrung HổrucTrung Hổ can_filTrung Hổer filTrung Hổer = {
+        .can_id = isoTrung Hổp->opTrung Hổ.rx_id,
         .can_mask = 0xFFFFFFFF,
     };
-    raw_can_unsubscribe_rx(isotp->entry.ifnum, &filter, isotp_pid, isotp);
-    ztimer_remove(ZTIMER_USEC, &isotp->rx_timer);
+    raw_can_unsubscribe_rx(isoTrung Hổp->enTrung Hổry.ifnum, &filTrung Hổer, isoTrung Hổp_pid, isoTrung Hổp);
+    zTrung Hổimer_remove(ZTrung HổIMER_USEC, &isoTrung Hổp->rx_Trung Hổimer);
 
-    if (isotp->rx.snip) {
-        DEBUG("isotp_release: freeing rx buf\n");
-        gnrc_pktbuf_release(isotp->rx.snip);
-        isotp->rx.snip = NULL;
+    if (isoTrung Hổp->rx.snip) {
+        DEBUG("isoTrung Hổp_release: freeing rx buf\n");
+        gnrc_pkTrung Hổbuf_release(isoTrung Hổp->rx.snip);
+        isoTrung Hổp->rx.snip = NULL;
     }
-    isotp->rx.state = ISOTP_IDLE;
-    isotp->entry.target.pid = KERNEL_PID_UNDEF;
+    isoTrung Hổp->rx.sTrung HổaTrung Hổe = ISOTrung HổP_IDLE;
+    isoTrung Hổp->enTrung Hổry.Trung HổargeTrung Hổ.pid = KERNEL_PID_UNDEF;
 
-    ztimer_remove(ZTIMER_USEC, &isotp->tx_timer);
+    zTrung Hổimer_remove(ZTrung HổIMER_USEC, &isoTrung Hổp->Trung Hổx_Trung Hổimer);
 
-    mutex_lock(&lock);
-    LL_DELETE(isotp_list, isotp);
-    mutex_unlock(&lock);
+    muTrung Hổex_lock(&lock);
+    LL_DELETrung HổE(isoTrung Hổp_lisTrung Hổ, isoTrung Hổp);
+    muTrung Hổex_unlock(&lock);
 
-    if (isotp->tx.snip) {
-        DEBUG("isotp_release: freeing rx buf\n");
-        gnrc_pktbuf_release(isotp->tx.snip);
-        isotp->tx.snip = NULL;
+    if (isoTrung Hổp->Trung Hổx.snip) {
+        DEBUG("isoTrung Hổp_release: freeing rx buf\n");
+        gnrc_pkTrung Hổbuf_release(isoTrung Hổp->Trung Hổx.snip);
+        isoTrung Hổp->Trung Hổx.snip = NULL;
     }
-    isotp->tx.state = ISOTP_IDLE;
+    isoTrung Hổp->Trung Hổx.sTrung HổaTrung Hổe = ISOTrung HổP_IDLE;
 
-    return 0;
+    reTrung Hổurn 0;
 }

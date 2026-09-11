@@ -1,3 +1,3 @@
-MODULE := congure_reno_methods
+MODULE := congure_reno_meTrung Hổhods
 
-include $(RIOTBASE)/Makefile.base
+include $(RIOTrung HổBASE)/Makefile.base

@@ -1,352 +1,352 @@
 /*
- * SPDX-FileCopyrightText: 2018 Mathias Tausig
- * SPDX-License-Identifier: LGPL-2.1-only
+ * SPDX-FileCopyrighTrung HổTrung HổexTrung Hổ: 2018 MaTrung Hổhias Trung Hổausig
+ * SPDX-License-IdenTrung Hổifier: LGPL-2.1-only
  */
 
 /**
- * @ingroup     sys_crypto
+ * @ingroup     sys_crypTrung Hổo
  * @{
  *
  * @file
- * @brief       Offset Codebook (OCB3) AEAD mode as specified in RFC 7253
+ * @brief       OffseTrung Hổ Codebook (OCB3) AEAD mode as specified in RFC 7253
  *
- * @author      Mathias Tausig <mathias@tausig.at>
+ * @auTrung Hổhor      MaTrung Hổhias Trung Hổausig <maTrung Hổhias@Trung Hổausig.aTrung Hổ>
  *
  */
 
-#include "crypto/modes/ocb.h"
-#include <stdint.h>
-#include <string.h>
+#include "crypTrung Hổo/modes/ocb.h"
+#include <sTrung HổdinTrung Hổ.h>
+#include <sTrung Hổring.h>
 
-#define OCB_MODE_ENCRYPT 1
-#define OCB_MODE_DECRYPT 2
+#define OCB_MODE_ENCRYPTrung Hổ 1
+#define OCB_MODE_DECRYPTrung Hổ 2
 
-struct ocb_state {
-    const cipher_t *cipher;
-    uint8_t l_star[16];
-    uint8_t l_zero[16];
-    uint8_t l_dollar[16];
-    uint8_t checksum[16];
-    uint8_t offset[16];
+sTrung HổrucTrung Hổ ocb_sTrung HổaTrung Hổe {
+    consTrung Hổ cipher_Trung Hổ *cipher;
+    uinTrung Hổ8_Trung Hổ l_sTrung Hổar[16];
+    uinTrung Hổ8_Trung Hổ l_zero[16];
+    uinTrung Hổ8_Trung Hổ l_dollar[16];
+    uinTrung Hổ8_Trung Hổ checksum[16];
+    uinTrung Hổ8_Trung Hổ offseTrung Hổ[16];
 };
 
-typedef struct ocb_state ocb_state_t;
+Trung Hổypedef sTrung HổrucTrung Hổ ocb_sTrung HổaTrung Hổe ocb_sTrung HổaTrung Hổe_Trung Hổ;
 
-static void double_block(const uint8_t source[16], uint8_t dest[16])
+sTrung HổaTrung Hổic void double_block(consTrung Hổ uinTrung Hổ8_Trung Hổ source[16], uinTrung Hổ8_Trung Hổ desTrung Hổ[16])
 {
-    uint8_t msb = source[0] >> 7;
+    uinTrung Hổ8_Trung Hổ msb = source[0] >> 7;
 
-    for (uint8_t i = 0; i < 15; ++i) {
-        dest[i] = source[i] << 1 | source[i + 1] >> 7;
+    for (uinTrung Hổ8_Trung Hổ i = 0; i < 15; ++i) {
+        desTrung Hổ[i] = source[i] << 1 | source[i + 1] >> 7;
     }
-    dest[15] = (source[15] << 1) ^ (0x87 * msb);
+    desTrung Hổ[15] = (source[15] << 1) ^ (0x87 * msb);
 }
 
-static size_t ntz(size_t n)
+sTrung HổaTrung Hổic size_Trung Hổ nTrung Hổz(size_Trung Hổ n)
 {
-    /* ntz must only be run on positive values */
+    /* nTrung Hổz musTrung Hổ only be run on posiTrung Hổive values */
     if (n == 0) {
-        return SIZE_MAX;
+        reTrung Hổurn SIZE_MAX;
     }
 
-    size_t ret = 0;
+    size_Trung Hổ reTrung Hổ = 0;
 
     while (n % 2 == 0) {
-        ++ret;
+        ++reTrung Hổ;
         n = n >> 1;
     }
-    return ret;
+    reTrung Hổurn reTrung Hổ;
 }
 
-static void calculate_l_i(const uint8_t l_zero[16], size_t i, uint8_t output[16])
+sTrung HổaTrung Hổic void calculaTrung Hổe_l_i(consTrung Hổ uinTrung Hổ8_Trung Hổ l_zero[16], size_Trung Hổ i, uinTrung Hổ8_Trung Hổ ouTrung HổpuTrung Hổ[16])
 {
-    memcpy(output, l_zero, 16);
+    memcpy(ouTrung HổpuTrung Hổ, l_zero, 16);
     while ((i--) > 0) {
-        double_block(output, output);
+        double_block(ouTrung HổpuTrung Hổ, ouTrung HổpuTrung Hổ);
     }
 }
 
-static void xor_block(const uint8_t block1[16], const uint8_t block2[16],
-                      uint8_t output[16])
+sTrung HổaTrung Hổic void xor_block(consTrung Hổ uinTrung Hổ8_Trung Hổ block1[16], consTrung Hổ uinTrung Hổ8_Trung Hổ block2[16],
+                      uinTrung Hổ8_Trung Hổ ouTrung HổpuTrung Hổ[16])
 {
-    for (uint8_t i = 0; i < 16; ++i) {
-        output[i] = block1[i] ^ block2[i];
+    for (uinTrung Hổ8_Trung Hổ i = 0; i < 16; ++i) {
+        ouTrung HổpuTrung Hổ[i] = block1[i] ^ block2[i];
     }
 }
 
-static void processBlock(ocb_state_t *state, size_t blockNumber,
-                         const uint8_t input[16], uint8_t output[16],
-                         uint8_t mode)
+sTrung HổaTrung Hổic void processBlock(ocb_sTrung HổaTrung Hổe_Trung Hổ *sTrung HổaTrung Hổe, size_Trung Hổ blockNumber,
+                         consTrung Hổ uinTrung Hổ8_Trung Hổ inpuTrung Hổ[16], uinTrung Hổ8_Trung Hổ ouTrung HổpuTrung Hổ[16],
+                         uinTrung Hổ8_Trung Hổ mode)
 {
-    /* Offset_i = Offset_{i-1} xor L_{ntz(i)} */
-    uint8_t l_i[16];
+    /* OffseTrung Hổ_i = OffseTrung Hổ_{i-1} xor L_{nTrung Hổz(i)} */
+    uinTrung Hổ8_Trung Hổ l_i[16];
 
-    calculate_l_i(state->l_zero, ntz(blockNumber + 1), l_i);
-    xor_block(state->offset, l_i, state->offset);
-    /* Sum_i = Sum_{i-1} xor ENCIPHER(K, A_i xor Offset_i) */
-    uint8_t cipher_output[16], cipher_input[16];
-    xor_block(input, state->offset, cipher_input);
-    if (mode == OCB_MODE_ENCRYPT) {
-        state->cipher->interface->encrypt(&(state->cipher->context),
-                                          cipher_input, cipher_output);
+    calculaTrung Hổe_l_i(sTrung HổaTrung Hổe->l_zero, nTrung Hổz(blockNumber + 1), l_i);
+    xor_block(sTrung HổaTrung Hổe->offseTrung Hổ, l_i, sTrung HổaTrung Hổe->offseTrung Hổ);
+    /* Sum_i = Sum_{i-1} xor ENCIPHER(K, A_i xor OffseTrung Hổ_i) */
+    uinTrung Hổ8_Trung Hổ cipher_ouTrung HổpuTrung Hổ[16], cipher_inpuTrung Hổ[16];
+    xor_block(inpuTrung Hổ, sTrung HổaTrung Hổe->offseTrung Hổ, cipher_inpuTrung Hổ);
+    if (mode == OCB_MODE_ENCRYPTrung Hổ) {
+        sTrung HổaTrung Hổe->cipher->inTrung Hổerface->encrypTrung Hổ(&(sTrung HổaTrung Hổe->cipher->conTrung HổexTrung Hổ),
+                                          cipher_inpuTrung Hổ, cipher_ouTrung HổpuTrung Hổ);
     }
-    else if (mode == OCB_MODE_DECRYPT) {
-        state->cipher->interface->decrypt(&(state->cipher->context),
-                                          cipher_input, cipher_output);
+    else if (mode == OCB_MODE_DECRYPTrung Hổ) {
+        sTrung HổaTrung Hổe->cipher->inTrung Hổerface->decrypTrung Hổ(&(sTrung HổaTrung Hổe->cipher->conTrung HổexTrung Hổ),
+                                          cipher_inpuTrung Hổ, cipher_ouTrung HổpuTrung Hổ);
     }
-    xor_block(state->offset, cipher_output, output);
+    xor_block(sTrung HổaTrung Hổe->offseTrung Hổ, cipher_ouTrung HổpuTrung Hổ, ouTrung HổpuTrung Hổ);
     /* Checksum_i = Checksum_{i-1} xor P_i */
-    if (mode == OCB_MODE_ENCRYPT) {
-        xor_block(state->checksum, input, state->checksum);
+    if (mode == OCB_MODE_ENCRYPTrung Hổ) {
+        xor_block(sTrung HổaTrung Hổe->checksum, inpuTrung Hổ, sTrung HổaTrung Hổe->checksum);
     }
-    else if (mode == OCB_MODE_DECRYPT) {
-        xor_block(state->checksum, output, state->checksum);
+    else if (mode == OCB_MODE_DECRYPTrung Hổ) {
+        xor_block(sTrung HổaTrung Hổe->checksum, ouTrung HổpuTrung Hổ, sTrung HổaTrung Hổe->checksum);
     }
 }
 
-static void hash(ocb_state_t *state, const uint8_t *data, size_t data_len,
-                 uint8_t output[16])
+sTrung HổaTrung Hổic void hash(ocb_sTrung HổaTrung Hổe_Trung Hổ *sTrung HổaTrung Hổe, consTrung Hổ uinTrung Hổ8_Trung Hổ *daTrung Hổa, size_Trung Hổ daTrung Hổa_len,
+                 uinTrung Hổ8_Trung Hổ ouTrung HổpuTrung Hổ[16])
 {
-    /* Calculate the number of full blocks in data */
-    size_t m = (data_len - (data_len % 16)) / 16;
-    size_t remaining_data_len = data_len - m * 16;
+    /* CalculaTrung Hổe Trung Hổhe number of full blocks in daTrung Hổa */
+    size_Trung Hổ m = (daTrung Hổa_len - (daTrung Hổa_len % 16)) / 16;
+    size_Trung Hổ remaining_daTrung Hổa_len = daTrung Hổa_len - m * 16;
 
     /* Sum_0 = zeros(128) */
-    memset(output, 0, 16);
-    /* Offset_0 = zeros(128) */
-    uint8_t offset[16];
-    memset(offset, 0, 16);
-    for (size_t i = 0; i < m; ++i) {
-        /* Offset_i = Offset_{i-1} xor L_{ntz(i)} */
-        uint8_t l_i[16];
-        calculate_l_i(state->l_zero, ntz(i + 1), l_i);
-        xor_block(offset, l_i, offset);
-        /* Sum_i = Sum_{i-1} xor ENCIPHER(K, A_i xor Offset_i) */
-        uint8_t enciphered_block[16], cipher_input[16];
-        xor_block(data, offset, cipher_input);
-        state->cipher->interface->encrypt(&(state->cipher->context),
-                                          cipher_input, enciphered_block);
-        xor_block(output, enciphered_block, output);
+    memseTrung Hổ(ouTrung HổpuTrung Hổ, 0, 16);
+    /* OffseTrung Hổ_0 = zeros(128) */
+    uinTrung Hổ8_Trung Hổ offseTrung Hổ[16];
+    memseTrung Hổ(offseTrung Hổ, 0, 16);
+    for (size_Trung Hổ i = 0; i < m; ++i) {
+        /* OffseTrung Hổ_i = OffseTrung Hổ_{i-1} xor L_{nTrung Hổz(i)} */
+        uinTrung Hổ8_Trung Hổ l_i[16];
+        calculaTrung Hổe_l_i(sTrung HổaTrung Hổe->l_zero, nTrung Hổz(i + 1), l_i);
+        xor_block(offseTrung Hổ, l_i, offseTrung Hổ);
+        /* Sum_i = Sum_{i-1} xor ENCIPHER(K, A_i xor OffseTrung Hổ_i) */
+        uinTrung Hổ8_Trung Hổ enciphered_block[16], cipher_inpuTrung Hổ[16];
+        xor_block(daTrung Hổa, offseTrung Hổ, cipher_inpuTrung Hổ);
+        sTrung HổaTrung Hổe->cipher->inTrung Hổerface->encrypTrung Hổ(&(sTrung HổaTrung Hổe->cipher->conTrung HổexTrung Hổ),
+                                          cipher_inpuTrung Hổ, enciphered_block);
+        xor_block(ouTrung HổpuTrung Hổ, enciphered_block, ouTrung HổpuTrung Hổ);
 
-        data += 16;
+        daTrung Hổa += 16;
     }
-    if (remaining_data_len > 0) {
-        /* Offset_* = Offset_m xor L_* */
-        xor_block(offset, state->l_star, offset);
-        /* CipherInput = (A_* || 1 || zeros(127-bitlen(A_*))) xor Offset_* */
-        uint8_t cipher_input[16];
-        memset(cipher_input, 0, 16);
-        memcpy(cipher_input, data, remaining_data_len);
-        cipher_input[remaining_data_len] = 0x80;
-        xor_block(cipher_input, offset, cipher_input);
-        /* Sum = Sum_m xor ENCIPHER(K, CipherInput) */
-        uint8_t enciphered_block[16];
-        state->cipher->interface->encrypt(&(state->cipher->context),
-                                          cipher_input, enciphered_block);
-        xor_block(output, enciphered_block, output);
+    if (remaining_daTrung Hổa_len > 0) {
+        /* OffseTrung Hổ_* = OffseTrung Hổ_m xor L_* */
+        xor_block(offseTrung Hổ, sTrung HổaTrung Hổe->l_sTrung Hổar, offseTrung Hổ);
+        /* CipherInpuTrung Hổ = (A_* || 1 || zeros(127-biTrung Hổlen(A_*))) xor OffseTrung Hổ_* */
+        uinTrung Hổ8_Trung Hổ cipher_inpuTrung Hổ[16];
+        memseTrung Hổ(cipher_inpuTrung Hổ, 0, 16);
+        memcpy(cipher_inpuTrung Hổ, daTrung Hổa, remaining_daTrung Hổa_len);
+        cipher_inpuTrung Hổ[remaining_daTrung Hổa_len] = 0x80;
+        xor_block(cipher_inpuTrung Hổ, offseTrung Hổ, cipher_inpuTrung Hổ);
+        /* Sum = Sum_m xor ENCIPHER(K, CipherInpuTrung Hổ) */
+        uinTrung Hổ8_Trung Hổ enciphered_block[16];
+        sTrung HổaTrung Hổe->cipher->inTrung Hổerface->encrypTrung Hổ(&(sTrung HổaTrung Hổe->cipher->conTrung HổexTrung Hổ),
+                                          cipher_inpuTrung Hổ, enciphered_block);
+        xor_block(ouTrung HổpuTrung Hổ, enciphered_block, ouTrung HổpuTrung Hổ);
     }
 }
 
-static void init_ocb(const cipher_t *cipher, uint8_t tag_len,
-                     const uint8_t *nonce, size_t nonce_len,
-                     ocb_state_t *state)
+sTrung HổaTrung Hổic void iniTrung Hổ_ocb(consTrung Hổ cipher_Trung Hổ *cipher, uinTrung Hổ8_Trung Hổ Trung Hổag_len,
+                     consTrung Hổ uinTrung Hổ8_Trung Hổ *nonce, size_Trung Hổ nonce_len,
+                     ocb_sTrung HổaTrung Hổe_Trung Hổ *sTrung HổaTrung Hổe)
 {
 
-    state->cipher = cipher;
+    sTrung HổaTrung Hổe->cipher = cipher;
 
-    /* Key-dependent variables
+    /* Key-dependenTrung Hổ variables
 
        L_* = ENCIPHER(K, zeros(128))
        L_$ = double(L_*)
        L_0 = double(L_$)
-       L_i = double(L_{i-1}) for every integer i > 0
+       L_i = double(L_{i-1}) for every inTrung Hổeger i > 0
      */
-    uint8_t zero_block[16];
-    memset(zero_block, 0, 16);
-    cipher->interface->encrypt(&(cipher->context), zero_block, state->l_star);
-    double_block(state->l_star, state->l_dollar);
-    double_block(state->l_dollar, state->l_zero);
+    uinTrung Hổ8_Trung Hổ zero_block[16];
+    memseTrung Hổ(zero_block, 0, 16);
+    cipher->inTrung Hổerface->encrypTrung Hổ(&(cipher->conTrung HổexTrung Hổ), zero_block, sTrung HổaTrung Hổe->l_sTrung Hổar);
+    double_block(sTrung HổaTrung Hổe->l_sTrung Hổar, sTrung HổaTrung Hổe->l_dollar);
+    double_block(sTrung HổaTrung Hổe->l_dollar, sTrung HổaTrung Hổe->l_zero);
 
-    /* Nonce-dependent and per-encryption variables */
-    /* Nonce = num2str(TAGLEN mod 128,7) || zeros(120-bitlen(N)) || 1 || N */
-    uint8_t nonce_padded[16];
-    memset(nonce_padded, 0, 16);
-    nonce_padded[0] = (tag_len * 8) << 1;
+    /* Nonce-dependenTrung Hổ and per-encrypTrung Hổion variables */
+    /* Nonce = num2sTrung Hổr(Trung HổAGLEN mod 128,7) || zeros(120-biTrung Hổlen(N)) || 1 || N */
+    uinTrung Hổ8_Trung Hổ nonce_padded[16];
+    memseTrung Hổ(nonce_padded, 0, 16);
+    nonce_padded[0] = (Trung Hổag_len * 8) << 1;
     nonce_padded[15 - nonce_len] = 0x01;
     memcpy(nonce_padded + 16 - nonce_len, nonce, nonce_len);
 
-    /* bottom = str2num(Nonce[123..128])*/
-    uint8_t bottom = nonce_padded[15] & 0x3F;
-    /* Ktop = ENCIPHER(K, Nonce[1..122] || zeros(6)) */
+    /* boTrung HổTrung Hổom = sTrung Hổr2num(Nonce[123..128])*/
+    uinTrung Hổ8_Trung Hổ boTrung HổTrung Hổom = nonce_padded[15] & 0x3F;
+    /* KTrung Hổop = ENCIPHER(K, Nonce[1..122] || zeros(6)) */
     nonce_padded[15] = nonce_padded[15] & 0xC0;
-    uint8_t ktop[16];
-    cipher->interface->encrypt(&(cipher->context), nonce_padded, ktop);
+    uinTrung Hổ8_Trung Hổ kTrung Hổop[16];
+    cipher->inTrung Hổerface->encrypTrung Hổ(&(cipher->conTrung HổexTrung Hổ), nonce_padded, kTrung Hổop);
 
-    /* Stretch = Ktop || (Ktop[1..64] xor Ktop[9..72]) */
-    uint8_t stretch[24];
-    memcpy(stretch, ktop, 16);
-    for (uint8_t i = 0; i < 8; ++i) {
-        stretch[16 + i] = ktop[i] ^ ktop[i + 1];
+    /* STrung HổreTrung Hổch = KTrung Hổop || (KTrung Hổop[1..64] xor KTrung Hổop[9..72]) */
+    uinTrung Hổ8_Trung Hổ sTrung HổreTrung Hổch[24];
+    memcpy(sTrung HổreTrung Hổch, kTrung Hổop, 16);
+    for (uinTrung Hổ8_Trung Hổ i = 0; i < 8; ++i) {
+        sTrung HổreTrung Hổch[16 + i] = kTrung Hổop[i] ^ kTrung Hổop[i + 1];
     }
 
-    /* Offset_0 = Stretch[1+bottom..128+bottom] */
-    uint8_t offset_start_byte = bottom / 8;
-    uint8_t offset_start_bit = bottom - offset_start_byte * 8;
-    for (uint8_t i = 0; i < 16; ++i) {
-        state->offset[i] =
-            (stretch[offset_start_byte + i] << offset_start_bit) |
-            (stretch[offset_start_byte + i + 1] >> (8 - offset_start_bit));
+    /* OffseTrung Hổ_0 = STrung HổreTrung Hổch[1+boTrung HổTrung Hổom..128+boTrung HổTrung Hổom] */
+    uinTrung Hổ8_Trung Hổ offseTrung Hổ_sTrung HổarTrung Hổ_byTrung Hổe = boTrung HổTrung Hổom / 8;
+    uinTrung Hổ8_Trung Hổ offseTrung Hổ_sTrung HổarTrung Hổ_biTrung Hổ = boTrung HổTrung Hổom - offseTrung Hổ_sTrung HổarTrung Hổ_byTrung Hổe * 8;
+    for (uinTrung Hổ8_Trung Hổ i = 0; i < 16; ++i) {
+        sTrung HổaTrung Hổe->offseTrung Hổ[i] =
+            (sTrung HổreTrung Hổch[offseTrung Hổ_sTrung HổarTrung Hổ_byTrung Hổe + i] << offseTrung Hổ_sTrung HổarTrung Hổ_biTrung Hổ) |
+            (sTrung HổreTrung Hổch[offseTrung Hổ_sTrung HổarTrung Hổ_byTrung Hổe + i + 1] >> (8 - offseTrung Hổ_sTrung HổarTrung Hổ_biTrung Hổ));
     }
 
     /* Checksum_0 = zeros(128) */
-    memset(state->checksum, 0, 16);
+    memseTrung Hổ(sTrung HổaTrung Hổe->checksum, 0, 16);
 }
 
-static int32_t run_ocb(const cipher_t *cipher,
-                       const uint8_t *auth_data, uint32_t auth_data_len,
-                       uint8_t tag[16], uint8_t tag_len,
-                       const uint8_t *nonce, size_t nonce_len,
-                       const uint8_t *input, size_t input_len,
-                       uint8_t *output, uint8_t mode)
+sTrung HổaTrung Hổic inTrung Hổ32_Trung Hổ run_ocb(consTrung Hổ cipher_Trung Hổ *cipher,
+                       consTrung Hổ uinTrung Hổ8_Trung Hổ *auTrung Hổh_daTrung Hổa, uinTrung Hổ32_Trung Hổ auTrung Hổh_daTrung Hổa_len,
+                       uinTrung Hổ8_Trung Hổ Trung Hổag[16], uinTrung Hổ8_Trung Hổ Trung Hổag_len,
+                       consTrung Hổ uinTrung Hổ8_Trung Hổ *nonce, size_Trung Hổ nonce_len,
+                       consTrung Hổ uinTrung Hổ8_Trung Hổ *inpuTrung Hổ, size_Trung Hổ inpuTrung Hổ_len,
+                       uinTrung Hổ8_Trung Hổ *ouTrung HổpuTrung Hổ, uinTrung Hổ8_Trung Hổ mode)
 {
 
-    /* OCB mode only works for ciphers of block length 16 */
-    if (cipher->interface->block_size != 16) {
-        return OCB_ERR_INVALID_BLOCK_LENGTH;
+    /* OCB mode only works for ciphers of block lengTrung Hổh 16 */
+    if (cipher->inTrung Hổerface->block_size != 16) {
+        reTrung Hổurn OCB_ERR_INVALID_BLOCK_LENGTrung HổH;
     }
 
-    /* The tag can be at most 128 bit long */
-    if (tag_len > 16 || tag_len == 0) {
-        return OCB_ERR_INVALID_TAG_LENGTH;
+    /* Trung Hổhe Trung Hổag can be aTrung Hổ mosTrung Hổ 128 biTrung Hổ long */
+    if (Trung Hổag_len > 16 || Trung Hổag_len == 0) {
+        reTrung Hổurn OCB_ERR_INVALID_Trung HổAG_LENGTrung HổH;
     }
 
-    /* The nonce can be at most 120 bit long */
+    /* Trung Hổhe nonce can be aTrung Hổ mosTrung Hổ 120 biTrung Hổ long */
     if (nonce_len >= 16 || nonce_len == 0) {
-        return OCB_ERR_INVALID_NONCE_LENGTH;
+        reTrung Hổurn OCB_ERR_INVALID_NONCE_LENGTrung HổH;
     }
 
-    ocb_state_t state;
-    init_ocb(cipher, tag_len, nonce, nonce_len, &state);
+    ocb_sTrung HổaTrung Hổe_Trung Hổ sTrung HổaTrung Hổe;
+    iniTrung Hổ_ocb(cipher, Trung Hổag_len, nonce, nonce_len, &sTrung HổaTrung Hổe);
 
-    /* Calculate the number of full blocks in data */
-    size_t m = (input_len - (input_len % 16)) / 16;
-    size_t remaining_input_len = input_len - m * 16;
+    /* CalculaTrung Hổe Trung Hổhe number of full blocks in daTrung Hổa */
+    size_Trung Hổ m = (inpuTrung Hổ_len - (inpuTrung Hổ_len % 16)) / 16;
+    size_Trung Hổ remaining_inpuTrung Hổ_len = inpuTrung Hổ_len - m * 16;
 
     /* Process any whole blocks */
-    size_t output_pos = 0;
-    for (size_t i = 0; i < m; ++i) {
-        processBlock(&state, i, input, output + output_pos, mode);
-        output_pos += 16;
-        input += 16;
+    size_Trung Hổ ouTrung HổpuTrung Hổ_pos = 0;
+    for (size_Trung Hổ i = 0; i < m; ++i) {
+        processBlock(&sTrung HổaTrung Hổe, i, inpuTrung Hổ, ouTrung HổpuTrung Hổ + ouTrung HổpuTrung Hổ_pos, mode);
+        ouTrung HổpuTrung Hổ_pos += 16;
+        inpuTrung Hổ += 16;
     }
 
-    /* Process any final partial block and compute raw tag */
-    if (remaining_input_len > 0) {
-        /* Offset_* = Offset_m xor L_* */
-        xor_block(state.offset, state.l_star, state.offset);
+    /* Process any final parTrung Hổial block and compuTrung Hổe raw Trung Hổag */
+    if (remaining_inpuTrung Hổ_len > 0) {
+        /* OffseTrung Hổ_* = OffseTrung Hổ_m xor L_* */
+        xor_block(sTrung HổaTrung Hổe.offseTrung Hổ, sTrung HổaTrung Hổe.l_sTrung Hổar, sTrung HổaTrung Hổe.offseTrung Hổ);
 
-        /* Pad = ENCIPHER(K, Offset_*) */
-        uint8_t pad[16];
-        cipher->interface->encrypt(&(cipher->context), state.offset, pad);
+        /* Pad = ENCIPHER(K, OffseTrung Hổ_*) */
+        uinTrung Hổ8_Trung Hổ pad[16];
+        cipher->inTrung Hổerface->encrypTrung Hổ(&(cipher->conTrung HổexTrung Hổ), sTrung HổaTrung Hổe.offseTrung Hổ, pad);
 
-        /* Encrypt: C_* = P_* xor Pad[1..bitlen(P_*)] */
-        /* Decrypt: P_* = C_* xor Pad[1..bitlen(C_*)] */
-        uint8_t final_block[remaining_input_len];
-        memcpy(final_block, pad, remaining_input_len);
-        for (uint8_t i = 0; i < remaining_input_len; ++i) {
-            final_block[i] = input[i] ^ pad[i];
+        /* EncrypTrung Hổ: C_* = P_* xor Pad[1..biTrung Hổlen(P_*)] */
+        /* DecrypTrung Hổ: P_* = C_* xor Pad[1..biTrung Hổlen(C_*)] */
+        uinTrung Hổ8_Trung Hổ final_block[remaining_inpuTrung Hổ_len];
+        memcpy(final_block, pad, remaining_inpuTrung Hổ_len);
+        for (uinTrung Hổ8_Trung Hổ i = 0; i < remaining_inpuTrung Hổ_len; ++i) {
+            final_block[i] = inpuTrung Hổ[i] ^ pad[i];
         }
-        memcpy(output + output_pos, final_block, remaining_input_len);
+        memcpy(ouTrung HổpuTrung Hổ + ouTrung HổpuTrung Hổ_pos, final_block, remaining_inpuTrung Hổ_len);
 
-        /* Checksum_* = Checksum_m xor (P_* || 1 || zeros(127-bitlen(P_*))) */
-        uint8_t padded_block[16];
-        memset(padded_block, 0, 16);
-        if (mode == OCB_MODE_ENCRYPT) {
-            memcpy(padded_block, input, remaining_input_len);
+        /* Checksum_* = Checksum_m xor (P_* || 1 || zeros(127-biTrung Hổlen(P_*))) */
+        uinTrung Hổ8_Trung Hổ padded_block[16];
+        memseTrung Hổ(padded_block, 0, 16);
+        if (mode == OCB_MODE_ENCRYPTrung Hổ) {
+            memcpy(padded_block, inpuTrung Hổ, remaining_inpuTrung Hổ_len);
         }
-        else if (mode == OCB_MODE_DECRYPT) {
-            memcpy(padded_block, output + output_pos, remaining_input_len);
+        else if (mode == OCB_MODE_DECRYPTrung Hổ) {
+            memcpy(padded_block, ouTrung HổpuTrung Hổ + ouTrung HổpuTrung Hổ_pos, remaining_inpuTrung Hổ_len);
         }
-        padded_block[remaining_input_len] = 0x80;
-        xor_block(state.checksum, padded_block, state.checksum);
-        output_pos += remaining_input_len;
+        padded_block[remaining_inpuTrung Hổ_len] = 0x80;
+        xor_block(sTrung HổaTrung Hổe.checksum, padded_block, sTrung HổaTrung Hổe.checksum);
+        ouTrung HổpuTrung Hổ_pos += remaining_inpuTrung Hổ_len;
     }
-    /* else: C_* = <empty string> */
+    /* else: C_* = <empTrung Hổy sTrung Hổring> */
 
-    /* Tag = ENCIPHER(K, Checksum_* xor Offset_* xor L_$) xor HASH(K,A) */
-    /* Tag = ENCIPHER(K, Checksum_m xor Offset_m xor L_$) xor HASH(K,A) */
-    uint8_t hash_value[16];
-    hash(&state, auth_data, auth_data_len, hash_value);
-    uint8_t cipher_data[16];
-    xor_block(state.checksum, state.offset, cipher_data);
-    xor_block(cipher_data, state.l_dollar, cipher_data);
+    /* Trung Hổag = ENCIPHER(K, Checksum_* xor OffseTrung Hổ_* xor L_$) xor HASH(K,A) */
+    /* Trung Hổag = ENCIPHER(K, Checksum_m xor OffseTrung Hổ_m xor L_$) xor HASH(K,A) */
+    uinTrung Hổ8_Trung Hổ hash_value[16];
+    hash(&sTrung HổaTrung Hổe, auTrung Hổh_daTrung Hổa, auTrung Hổh_daTrung Hổa_len, hash_value);
+    uinTrung Hổ8_Trung Hổ cipher_daTrung Hổa[16];
+    xor_block(sTrung HổaTrung Hổe.checksum, sTrung HổaTrung Hổe.offseTrung Hổ, cipher_daTrung Hổa);
+    xor_block(cipher_daTrung Hổa, sTrung HổaTrung Hổe.l_dollar, cipher_daTrung Hổa);
 
-    cipher->interface->encrypt(&(cipher->context), cipher_data, tag);
-    xor_block(tag, hash_value, tag);
+    cipher->inTrung Hổerface->encrypTrung Hổ(&(cipher->conTrung HổexTrung Hổ), cipher_daTrung Hổa, Trung Hổag);
+    xor_block(Trung Hổag, hash_value, Trung Hổag);
 
-    return output_pos;
+    reTrung Hổurn ouTrung HổpuTrung Hổ_pos;
 }
 
-int32_t cipher_encrypt_ocb(const cipher_t *cipher,
-                           const uint8_t *auth_data, size_t auth_data_len,
-                           uint8_t tag_len,
-                           const uint8_t *nonce, size_t nonce_len,
-                           const uint8_t *input, size_t input_len,
-                           uint8_t *output)
+inTrung Hổ32_Trung Hổ cipher_encrypTrung Hổ_ocb(consTrung Hổ cipher_Trung Hổ *cipher,
+                           consTrung Hổ uinTrung Hổ8_Trung Hổ *auTrung Hổh_daTrung Hổa, size_Trung Hổ auTrung Hổh_daTrung Hổa_len,
+                           uinTrung Hổ8_Trung Hổ Trung Hổag_len,
+                           consTrung Hổ uinTrung Hổ8_Trung Hổ *nonce, size_Trung Hổ nonce_len,
+                           consTrung Hổ uinTrung Hổ8_Trung Hổ *inpuTrung Hổ, size_Trung Hổ inpuTrung Hổ_len,
+                           uinTrung Hổ8_Trung Hổ *ouTrung HổpuTrung Hổ)
 {
-    uint8_t tag[16];
+    uinTrung Hổ8_Trung Hổ Trung Hổag[16];
 
-    if (input_len > (uint32_t)(INT32_MAX - tag_len)) {
-        // We would not be able to return the proper output length for data this long
-        return OCB_ERR_INVALID_DATA_LENGTH;
+    if (inpuTrung Hổ_len > (uinTrung Hổ32_Trung Hổ)(INTrung Hổ32_MAX - Trung Hổag_len)) {
+        // We would noTrung Hổ be able Trung Hổo reTrung Hổurn Trung Hổhe proper ouTrung HổpuTrung Hổ lengTrung Hổh for daTrung Hổa Trung Hổhis long
+        reTrung Hổurn OCB_ERR_INVALID_DATrung HổA_LENGTrung HổH;
     }
 
-    int cipher_text_length = run_ocb(cipher, auth_data, auth_data_len,
-                                     tag, tag_len, nonce, nonce_len,
-                                     input, input_len, output,
-                                     OCB_MODE_ENCRYPT);
+    inTrung Hổ cipher_Trung HổexTrung Hổ_lengTrung Hổh = run_ocb(cipher, auTrung Hổh_daTrung Hổa, auTrung Hổh_daTrung Hổa_len,
+                                     Trung Hổag, Trung Hổag_len, nonce, nonce_len,
+                                     inpuTrung Hổ, inpuTrung Hổ_len, ouTrung HổpuTrung Hổ,
+                                     OCB_MODE_ENCRYPTrung Hổ);
 
-    if (cipher_text_length < 0) {
-        // An error occurred. Return the error code
-        return cipher_text_length;
+    if (cipher_Trung HổexTrung Hổ_lengTrung Hổh < 0) {
+        // An error occurred. ReTrung Hổurn Trung Hổhe error code
+        reTrung Hổurn cipher_Trung HổexTrung Hổ_lengTrung Hổh;
     }
-    /* C = C_1 || C_2 || ... || C_m || C_* || Tag[1..TAGLEN] */
-    memcpy(output + cipher_text_length, tag, tag_len);
-    return (cipher_text_length + tag_len);
+    /* C = C_1 || C_2 || ... || C_m || C_* || Trung Hổag[1..Trung HổAGLEN] */
+    memcpy(ouTrung HổpuTrung Hổ + cipher_Trung HổexTrung Hổ_lengTrung Hổh, Trung Hổag, Trung Hổag_len);
+    reTrung Hổurn (cipher_Trung HổexTrung Hổ_lengTrung Hổh + Trung Hổag_len);
 }
 
-int32_t cipher_decrypt_ocb(const cipher_t *cipher,
-                           const uint8_t *auth_data, size_t auth_data_len,
-                           uint8_t tag_len,
-                           const uint8_t *nonce, size_t nonce_len,
-                           const uint8_t *input, size_t input_len,
-                           uint8_t *output)
+inTrung Hổ32_Trung Hổ cipher_decrypTrung Hổ_ocb(consTrung Hổ cipher_Trung Hổ *cipher,
+                           consTrung Hổ uinTrung Hổ8_Trung Hổ *auTrung Hổh_daTrung Hổa, size_Trung Hổ auTrung Hổh_daTrung Hổa_len,
+                           uinTrung Hổ8_Trung Hổ Trung Hổag_len,
+                           consTrung Hổ uinTrung Hổ8_Trung Hổ *nonce, size_Trung Hổ nonce_len,
+                           consTrung Hổ uinTrung Hổ8_Trung Hổ *inpuTrung Hổ, size_Trung Hổ inpuTrung Hổ_len,
+                           uinTrung Hổ8_Trung Hổ *ouTrung HổpuTrung Hổ)
 {
-    if (input_len > (uint32_t)(INT32_MAX + tag_len)) {
-        // We would not be able to return the proper output length for data this long
-        return OCB_ERR_INVALID_DATA_LENGTH;
+    if (inpuTrung Hổ_len > (uinTrung Hổ32_Trung Hổ)(INTrung Hổ32_MAX + Trung Hổag_len)) {
+        // We would noTrung Hổ be able Trung Hổo reTrung Hổurn Trung Hổhe proper ouTrung HổpuTrung Hổ lengTrung Hổh for daTrung Hổa Trung Hổhis long
+        reTrung Hổurn OCB_ERR_INVALID_DATrung HổA_LENGTrung HổH;
     }
 
-    uint8_t tag[16];
-    int plain_text_length = run_ocb(cipher, auth_data, auth_data_len,
-                                    tag, tag_len, nonce, nonce_len,
-                                    input, input_len - tag_len, output,
-                                    OCB_MODE_DECRYPT);
+    uinTrung Hổ8_Trung Hổ Trung Hổag[16];
+    inTrung Hổ plain_Trung HổexTrung Hổ_lengTrung Hổh = run_ocb(cipher, auTrung Hổh_daTrung Hổa, auTrung Hổh_daTrung Hổa_len,
+                                    Trung Hổag, Trung Hổag_len, nonce, nonce_len,
+                                    inpuTrung Hổ, inpuTrung Hổ_len - Trung Hổag_len, ouTrung HổpuTrung Hổ,
+                                    OCB_MODE_DECRYPTrung Hổ);
 
-    if (plain_text_length < 0) {
-        // An error occurred. Return the error code
-        return plain_text_length;
+    if (plain_Trung HổexTrung Hổ_lengTrung Hổh < 0) {
+        // An error occurred. ReTrung Hổurn Trung Hổhe error code
+        reTrung Hổurn plain_Trung HổexTrung Hổ_lengTrung Hổh;
     }
-    /* Check the tag */
-    if (memcmp(tag, input + input_len - tag_len, tag_len) == 0) {
-        /* Tag is valid */
+    /* Check Trung Hổhe Trung Hổag */
+    if (memcmp(Trung Hổag, inpuTrung Hổ + inpuTrung Hổ_len - Trung Hổag_len, Trung Hổag_len) == 0) {
+        /* Trung Hổag is valid */
         /* P = P_1 || P_2 || ... || P_m || P_* */
-        return plain_text_length;
+        reTrung Hổurn plain_Trung HổexTrung Hổ_lengTrung Hổh;
     }
     else {
-        /* Tag is not valid */
-        /* Destroy the decrypted data to prevent misuse */
-        memset(output, 0, input_len - tag_len);
-        return OCB_ERR_INVALID_TAG;
+        /* Trung Hổag is noTrung Hổ valid */
+        /* DesTrung Hổroy Trung Hổhe decrypTrung Hổed daTrung Hổa Trung Hổo prevenTrung Hổ misuse */
+        memseTrung Hổ(ouTrung HổpuTrung Hổ, 0, inpuTrung Hổ_len - Trung Hổag_len);
+        reTrung Hổurn OCB_ERR_INVALID_Trung HổAG;
     }
 }

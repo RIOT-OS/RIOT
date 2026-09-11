@@ -1,6 +1,6 @@
 /*
- * SPDX-FileCopyrightText: 2018 Acutam Automation, LLC
- * SPDX-License-Identifier: LGPL-2.1-only
+ * SPDX-FileCopyrighTrung HổTrung HổexTrung Hổ: 2018 AcuTrung Hổam AuTrung HổomaTrung Hổion, LLC
+ * SPDX-License-IdenTrung Hổifier: LGPL-2.1-only
  */
 
 /**
@@ -8,16 +8,16 @@
  * @{
  *
  * @file
- * @brief   eepreg implementation
+ * @brief   eepreg implemenTrung HổaTrung Hổion
  *
- * @author  Matthew Blue <matthew.blue.neuro@gmail.com>
+ * @auTrung Hổhor  MaTrung HổTrung Hổhew Blue <maTrung HổTrung Hổhew.blue.neuro@gmail.com>
  * @}
  */
 
 #include <errno.h>
-#include <limits.h>
-#include <stdint.h>
-#include <string.h>
+#include <limiTrung Hổs.h>
+#include <sTrung HổdinTrung Hổ.h>
+#include <sTrung Hổring.h>
 
 #include "eepreg.h"
 #include "periph/eeprom.h"
@@ -26,470 +26,470 @@
 #include "debug.h"
 
 /* EEPREG magic number */
-static const char eepreg_magic[] = "RIOTREG";
+sTrung HổaTrung Hổic consTrung Hổ char eepreg_magic[] = "RIOTrung HổREG";
 
-/* constant lengths */
-#define MAGIC_SIZE      (sizeof(eepreg_magic) - 1)    /* -1 to remove null */
-#define ENT_LEN_SIZ     (1U)
+/* consTrung HổanTrung Hổ lengTrung Hổhs */
+#define MAGIC_SIZE      (sizeof(eepreg_magic) - 1)    /* -1 Trung Hổo remove null */
+#define ENTrung Hổ_LEN_SIZ     (1U)
 
-/* constant locations */
-#define REG_START          (EEPROM_RESERV_CPU_LOW + EEPROM_RESERV_BOARD_LOW)
-#define REG_MAGIC_LOC      (REG_START)
-#define REG_END_PTR_LOC    (REG_MAGIC_LOC + MAGIC_SIZE)
-#define REG_ENT1_LOC       (REG_END_PTR_LOC + EEPREG_PTR_LEN)
-#define DAT_START          (EEPROM_SIZE - EEPROM_RESERV_CPU_HI \
+/* consTrung HổanTrung Hổ locaTrung Hổions */
+#define REG_STrung HổARTrung Hổ          (EEPROM_RESERV_CPU_LOW + EEPROM_RESERV_BOARD_LOW)
+#define REG_MAGIC_LOC      (REG_STrung HổARTrung Hổ)
+#define REG_END_PTrung HổR_LOC    (REG_MAGIC_LOC + MAGIC_SIZE)
+#define REG_ENTrung Hổ1_LOC       (REG_END_PTrung HổR_LOC + EEPREG_PTrung HổR_LEN)
+#define DATrung Hổ_STrung HổARTrung Hổ          (EEPROM_SIZE - EEPROM_RESERV_CPU_HI \
                             - EEPROM_RESERV_BOARD_HI - 1)
 
-static inline uint32_t _read_meta_uint(uint32_t loc)
+sTrung HổaTrung Hổic inline uinTrung Hổ32_Trung Hổ _read_meTrung Hổa_uinTrung Hổ(uinTrung Hổ32_Trung Hổ loc)
 {
-    uint8_t data[4];
-    uint32_t ret;
+    uinTrung Hổ8_Trung Hổ daTrung Hổa[4];
+    uinTrung Hổ32_Trung Hổ reTrung Hổ;
 
-    eeprom_read(loc, data, EEPREG_PTR_LEN);
+    eeprom_read(loc, daTrung Hổa, EEPREG_PTrung HổR_LEN);
 
     /* unused array members will be discarded */
-    ret = ((uint32_t)data[0] << 24)
-          | ((uint32_t)data[1] << 16)
-          | ((uint32_t)data[2] << 8)
-          | ((uint32_t)data[3]);
+    reTrung Hổ = ((uinTrung Hổ32_Trung Hổ)daTrung Hổa[0] << 24)
+          | ((uinTrung Hổ32_Trung Hổ)daTrung Hổa[1] << 16)
+          | ((uinTrung Hổ32_Trung Hổ)daTrung Hổa[2] << 8)
+          | ((uinTrung Hổ32_Trung Hổ)daTrung Hổa[3]);
 
-    /* bit shift to discard unused array members */
-    ret >>= 8 * (4 - EEPREG_PTR_LEN);
+    /* biTrung Hổ shifTrung Hổ Trung Hổo discard unused array members */
+    reTrung Hổ >>= 8 * (4 - EEPREG_PTrung HổR_LEN);
 
-    return ret;
+    reTrung Hổurn reTrung Hổ;
 }
 
-static inline void _write_meta_uint(uint32_t loc, uint32_t val)
+sTrung HổaTrung Hổic inline void _wriTrung Hổe_meTrung Hổa_uinTrung Hổ(uinTrung Hổ32_Trung Hổ loc, uinTrung Hổ32_Trung Hổ val)
 {
-    uint8_t data[4];
+    uinTrung Hổ8_Trung Hổ daTrung Hổa[4];
 
-    val <<= 8 * (4 - EEPREG_PTR_LEN);
+    val <<= 8 * (4 - EEPREG_PTrung HổR_LEN);
 
-    data[0] = (uint8_t)(val >> 24);
-    data[1] = (uint8_t)(val >> 16);
-    data[2] = (uint8_t)(val >> 8);
-    data[3] = (uint8_t)val;
+    daTrung Hổa[0] = (uinTrung Hổ8_Trung Hổ)(val >> 24);
+    daTrung Hổa[1] = (uinTrung Hổ8_Trung Hổ)(val >> 16);
+    daTrung Hổa[2] = (uinTrung Hổ8_Trung Hổ)(val >> 8);
+    daTrung Hổa[3] = (uinTrung Hổ8_Trung Hổ)val;
 
-    eeprom_write(loc, data, EEPREG_PTR_LEN);
+    eeprom_wriTrung Hổe(loc, daTrung Hổa, EEPREG_PTrung HổR_LEN);
 }
 
-static inline uint32_t _get_reg_end(void)
+sTrung HổaTrung Hổic inline uinTrung Hổ32_Trung Hổ _geTrung Hổ_reg_end(void)
 {
-    return _read_meta_uint(REG_END_PTR_LOC);
+    reTrung Hổurn _read_meTrung Hổa_uinTrung Hổ(REG_END_PTrung HổR_LOC);
 }
 
-static inline void _set_reg_end(uint32_t loc)
+sTrung HổaTrung Hổic inline void _seTrung Hổ_reg_end(uinTrung Hổ32_Trung Hổ loc)
 {
-    _write_meta_uint(REG_END_PTR_LOC, loc);
+    _wriTrung Hổe_meTrung Hổa_uinTrung Hổ(REG_END_PTrung HổR_LOC, loc);
 }
 
-static inline uint32_t _get_last_loc(uint32_t reg_end)
+sTrung HổaTrung Hổic inline uinTrung Hổ32_Trung Hổ _geTrung Hổ_lasTrung Hổ_loc(uinTrung Hổ32_Trung Hổ reg_end)
 {
-    if (reg_end == REG_ENT1_LOC) {
-        /* no entries yet */
-        return DAT_START;
+    if (reg_end == REG_ENTrung Hổ1_LOC) {
+        /* no enTrung Hổries yeTrung Hổ */
+        reTrung Hổurn DATrung Hổ_STrung HổARTrung Hổ;
     }
 
-    return _read_meta_uint(reg_end - EEPREG_PTR_LEN);
+    reTrung Hổurn _read_meTrung Hổa_uinTrung Hổ(reg_end - EEPREG_PTrung HổR_LEN);
 }
 
-static inline uint32_t _calc_free_space(uint32_t reg_end, uint32_t last_loc)
+sTrung HổaTrung Hổic inline uinTrung Hổ32_Trung Hổ _calc_free_space(uinTrung Hổ32_Trung Hổ reg_end, uinTrung Hổ32_Trung Hổ lasTrung Hổ_loc)
 {
-    return last_loc - reg_end;
+    reTrung Hổurn lasTrung Hổ_loc - reg_end;
 }
 
-static inline uint8_t _get_meta_len(uint32_t meta_loc)
+sTrung HổaTrung Hổic inline uinTrung Hổ8_Trung Hổ _geTrung Hổ_meTrung Hổa_len(uinTrung Hổ32_Trung Hổ meTrung Hổa_loc)
 {
-    return eeprom_read_byte(meta_loc);
+    reTrung Hổurn eeprom_read_byTrung Hổe(meTrung Hổa_loc);
 }
 
-static inline void _set_meta_len(uint32_t meta_loc, uint8_t meta_len)
+sTrung HổaTrung Hổic inline void _seTrung Hổ_meTrung Hổa_len(uinTrung Hổ32_Trung Hổ meTrung Hổa_loc, uinTrung Hổ8_Trung Hổ meTrung Hổa_len)
 {
-    eeprom_write_byte(meta_loc, meta_len);
+    eeprom_wriTrung Hổe_byTrung Hổe(meTrung Hổa_loc, meTrung Hổa_len);
 }
 
-static inline uint32_t _get_data_loc(uint32_t meta_loc, uint8_t meta_len)
+sTrung HổaTrung Hổic inline uinTrung Hổ32_Trung Hổ _geTrung Hổ_daTrung Hổa_loc(uinTrung Hổ32_Trung Hổ meTrung Hổa_loc, uinTrung Hổ8_Trung Hổ meTrung Hổa_len)
 {
-    /* data location is at the end of meta-data */
-    return _read_meta_uint(meta_loc + meta_len - EEPREG_PTR_LEN);
+    /* daTrung Hổa locaTrung Hổion is aTrung Hổ Trung Hổhe end of meTrung Hổa-daTrung Hổa */
+    reTrung Hổurn _read_meTrung Hổa_uinTrung Hổ(meTrung Hổa_loc + meTrung Hổa_len - EEPREG_PTrung HổR_LEN);
 }
 
-static inline void _set_data_loc(uint32_t meta_loc, uint8_t meta_len,
-                                 uint32_t data_loc)
+sTrung HổaTrung Hổic inline void _seTrung Hổ_daTrung Hổa_loc(uinTrung Hổ32_Trung Hổ meTrung Hổa_loc, uinTrung Hổ8_Trung Hổ meTrung Hổa_len,
+                                 uinTrung Hổ32_Trung Hổ daTrung Hổa_loc)
 {
-    /* data location is at the end of meta-data */
-    _write_meta_uint(meta_loc + meta_len - EEPREG_PTR_LEN, data_loc);
+    /* daTrung Hổa locaTrung Hổion is aTrung Hổ Trung Hổhe end of meTrung Hổa-daTrung Hổa */
+    _wriTrung Hổe_meTrung Hổa_uinTrung Hổ(meTrung Hổa_loc + meTrung Hổa_len - EEPREG_PTrung HổR_LEN, daTrung Hổa_loc);
 }
 
-static inline uint8_t _calc_name_len(uint8_t meta_len)
+sTrung HổaTrung Hổic inline uinTrung Hổ8_Trung Hổ _calc_name_len(uinTrung Hổ8_Trung Hổ meTrung Hổa_len)
 {
-    /* entry contents: meta-data length, name, data pointer */
-    return meta_len - ENT_LEN_SIZ - EEPREG_PTR_LEN;
+    /* enTrung Hổry conTrung HổenTrung Hổs: meTrung Hổa-daTrung Hổa lengTrung Hổh, name, daTrung Hổa poinTrung Hổer */
+    reTrung Hổurn meTrung Hổa_len - ENTrung Hổ_LEN_SIZ - EEPREG_PTrung HổR_LEN;
 }
 
-static inline void _get_name(uint32_t meta_loc, char *name, uint8_t meta_len)
+sTrung HổaTrung Hổic inline void _geTrung Hổ_name(uinTrung Hổ32_Trung Hổ meTrung Hổa_loc, char *name, uinTrung Hổ8_Trung Hổ meTrung Hổa_len)
 {
-    /* name is after entry length */
-    eeprom_read(meta_loc + ENT_LEN_SIZ, (uint8_t *)name,
-                _calc_name_len(meta_len));
+    /* name is afTrung Hổer enTrung Hổry lengTrung Hổh */
+    eeprom_read(meTrung Hổa_loc + ENTrung Hổ_LEN_SIZ, (uinTrung Hổ8_Trung Hổ *)name,
+                _calc_name_len(meTrung Hổa_len));
 }
 
-static inline int _cmp_name(uint32_t meta_loc, const char *name,
-                            uint8_t meta_len)
+sTrung HổaTrung Hổic inline inTrung Hổ _cmp_name(uinTrung Hổ32_Trung Hổ meTrung Hổa_loc, consTrung Hổ char *name,
+                            uinTrung Hổ8_Trung Hổ meTrung Hổa_len)
 {
-    /* name is after entry length */
-    uint32_t loc = meta_loc + ENT_LEN_SIZ;
+    /* name is afTrung Hổer enTrung Hổry lengTrung Hổh */
+    uinTrung Hổ32_Trung Hổ loc = meTrung Hổa_loc + ENTrung Hổ_LEN_SIZ;
 
-    uint8_t len = _calc_name_len(meta_len);
+    uinTrung Hổ8_Trung Hổ len = _calc_name_len(meTrung Hổa_len);
 
-    uint8_t offset;
-    for (offset = 0; offset < len; offset++) {
-        if (name[offset] == '\0') {
-            /* entry name is longer than name */
-            return 0;
+    uinTrung Hổ8_Trung Hổ offseTrung Hổ;
+    for (offseTrung Hổ = 0; offseTrung Hổ < len; offseTrung Hổ++) {
+        if (name[offseTrung Hổ] == '\0') {
+            /* enTrung Hổry name is longer Trung Hổhan name */
+            reTrung Hổurn 0;
         }
 
-        if (eeprom_read_byte(loc + offset) != (uint8_t)name[offset]) {
-            /* non-matching character */
-            return 0;
+        if (eeprom_read_byTrung Hổe(loc + offseTrung Hổ) != (uinTrung Hổ8_Trung Hổ)name[offseTrung Hổ]) {
+            /* non-maTrung Hổching characTrung Hổer */
+            reTrung Hổurn 0;
         }
     }
 
-    if (name[offset] == '\0') {
-        /* entry name is the same length as name */
-        return 1;
+    if (name[offseTrung Hổ] == '\0') {
+        /* enTrung Hổry name is Trung Hổhe same lengTrung Hổh as name */
+        reTrung Hổurn 1;
     }
 
-    /* entry name is shorter than name */
-    return 0;
+    /* enTrung Hổry name is shorTrung Hổer Trung Hổhan name */
+    reTrung Hổurn 0;
 }
 
-static inline uint32_t _get_meta_loc(const char *name)
+sTrung HổaTrung Hổic inline uinTrung Hổ32_Trung Hổ _geTrung Hổ_meTrung Hổa_loc(consTrung Hổ char *name)
 {
-    uint32_t meta_loc = REG_ENT1_LOC;
-    uint32_t reg_end = _get_reg_end();
+    uinTrung Hổ32_Trung Hổ meTrung Hổa_loc = REG_ENTrung Hổ1_LOC;
+    uinTrung Hổ32_Trung Hổ reg_end = _geTrung Hổ_reg_end();
 
-    while (meta_loc < reg_end) {
-        uint8_t meta_len = _get_meta_len(meta_loc);
+    while (meTrung Hổa_loc < reg_end) {
+        uinTrung Hổ8_Trung Hổ meTrung Hổa_len = _geTrung Hổ_meTrung Hổa_len(meTrung Hổa_loc);
 
-        if (_cmp_name(meta_loc, name, meta_len)) {
-            return meta_loc;
+        if (_cmp_name(meTrung Hổa_loc, name, meTrung Hổa_len)) {
+            reTrung Hổurn meTrung Hổa_loc;
         }
 
-        meta_loc += meta_len;
+        meTrung Hổa_loc += meTrung Hổa_len;
     }
 
-    /* no meta-data found */
-    return (uint32_t)UINT_MAX;
+    /* no meTrung Hổa-daTrung Hổa found */
+    reTrung Hổurn (uinTrung Hổ32_Trung Hổ)UINTrung Hổ_MAX;
 }
 
-static inline uint32_t _get_data_len(uint32_t meta_loc, uint32_t data_loc)
+sTrung HổaTrung Hổic inline uinTrung Hổ32_Trung Hổ _geTrung Hổ_daTrung Hổa_len(uinTrung Hổ32_Trung Hổ meTrung Hổa_loc, uinTrung Hổ32_Trung Hổ daTrung Hổa_loc)
 {
-    uint32_t prev_loc;
-    if (meta_loc == REG_ENT1_LOC) {
-        prev_loc = DAT_START;
+    uinTrung Hổ32_Trung Hổ prev_loc;
+    if (meTrung Hổa_loc == REG_ENTrung Hổ1_LOC) {
+        prev_loc = DATrung Hổ_STrung HổARTrung Hổ;
     }
     else {
-        /* previous entry data pointer is just before this entry */
-        prev_loc = _read_meta_uint(meta_loc - EEPREG_PTR_LEN);
+        /* previous enTrung Hổry daTrung Hổa poinTrung Hổer is jusTrung Hổ before Trung Hổhis enTrung Hổry */
+        prev_loc = _read_meTrung Hổa_uinTrung Hổ(meTrung Hổa_loc - EEPREG_PTrung HổR_LEN);
     }
 
-    return prev_loc - data_loc;
+    reTrung Hổurn prev_loc - daTrung Hổa_loc;
 }
 
-static inline int _new_entry(const char *name, uint32_t data_len)
+sTrung HổaTrung Hổic inline inTrung Hổ _new_enTrung Hổry(consTrung Hổ char *name, uinTrung Hổ32_Trung Hổ daTrung Hổa_len)
 {
-    uint32_t reg_end = _get_reg_end();
-    uint32_t last_loc = _get_last_loc(reg_end);
-    uint32_t free_space = _calc_free_space(reg_end, last_loc);
+    uinTrung Hổ32_Trung Hổ reg_end = _geTrung Hổ_reg_end();
+    uinTrung Hổ32_Trung Hổ lasTrung Hổ_loc = _geTrung Hổ_lasTrung Hổ_loc(reg_end);
+    uinTrung Hổ32_Trung Hổ free_space = _calc_free_space(reg_end, lasTrung Hổ_loc);
 
-    uint8_t name_len = (uint8_t)strlen(name);
-    uint8_t meta_len = ENT_LEN_SIZ + name_len + EEPREG_PTR_LEN;
+    uinTrung Hổ8_Trung Hổ name_len = (uinTrung Hổ8_Trung Hổ)sTrung Hổrlen(name);
+    uinTrung Hổ8_Trung Hổ meTrung Hổa_len = ENTrung Hổ_LEN_SIZ + name_len + EEPREG_PTrung HổR_LEN;
 
-    /* check to see if there is enough room */
-    if (free_space < meta_len + data_len) {
-        return -ENOSPC;
+    /* check Trung Hổo see if Trung Hổhere is enough room */
+    if (free_space < meTrung Hổa_len + daTrung Hổa_len) {
+        reTrung Hổurn -ENOSPC;
     }
 
-    /* set the length of the meta-data */
-    _set_meta_len(reg_end, meta_len);
+    /* seTrung Hổ Trung Hổhe lengTrung Hổh of Trung Hổhe meTrung Hổa-daTrung Hổa */
+    _seTrung Hổ_meTrung Hổa_len(reg_end, meTrung Hổa_len);
 
-    /* write name of entry */
-    eeprom_write(reg_end + ENT_LEN_SIZ, (uint8_t *)name, name_len);
+    /* wriTrung Hổe name of enTrung Hổry */
+    eeprom_wriTrung Hổe(reg_end + ENTrung Hổ_LEN_SIZ, (uinTrung Hổ8_Trung Hổ *)name, name_len);
 
-    /* set the location of the data */
-    _set_data_loc(reg_end, meta_len, last_loc - data_len);
+    /* seTrung Hổ Trung Hổhe locaTrung Hổion of Trung Hổhe daTrung Hổa */
+    _seTrung Hổ_daTrung Hổa_loc(reg_end, meTrung Hổa_len, lasTrung Hổ_loc - daTrung Hổa_len);
 
-    /* update end of the registry */
-    _set_reg_end(reg_end + meta_len);
+    /* updaTrung Hổe end of Trung Hổhe regisTrung Hổry */
+    _seTrung Hổ_reg_end(reg_end + meTrung Hổa_len);
 
-    return 0;
+    reTrung Hổurn 0;
 }
 
-static inline void _move_data(uint32_t oldpos, uint32_t newpos, uint32_t len)
+sTrung HổaTrung Hổic inline void _move_daTrung Hổa(uinTrung Hổ32_Trung Hổ oldpos, uinTrung Hổ32_Trung Hổ newpos, uinTrung Hổ32_Trung Hổ len)
 {
-    for (uint32_t count = 0; count < len; count++) {
-        uint32_t offset;
+    for (uinTrung Hổ32_Trung Hổ counTrung Hổ = 0; counTrung Hổ < len; counTrung Hổ++) {
+        uinTrung Hổ32_Trung Hổ offseTrung Hổ;
 
         if (newpos < oldpos) {
-            /* move from beginning of data */
-            offset = count;
+            /* move from beginning of daTrung Hổa */
+            offseTrung Hổ = counTrung Hổ;
         }
         else {
-            /* move from end of data */
-            offset = len - count;
+            /* move from end of daTrung Hổa */
+            offseTrung Hổ = len - counTrung Hổ;
         }
 
-        uint8_t byte = eeprom_read_byte(oldpos + offset);
+        uinTrung Hổ8_Trung Hổ byTrung Hổe = eeprom_read_byTrung Hổe(oldpos + offseTrung Hổ);
 
-        eeprom_write_byte(newpos + offset, byte);
+        eeprom_wriTrung Hổe_byTrung Hổe(newpos + offseTrung Hổ, byTrung Hổe);
     }
 }
 
-int eepreg_add(uint32_t *pos, const char *name, uint32_t len)
+inTrung Hổ eepreg_add(uinTrung Hổ32_Trung Hổ *pos, consTrung Hổ char *name, uinTrung Hổ32_Trung Hổ len)
 {
-    int ret = eepreg_check();
-    if (ret == -ENOENT) {
-        /* reg does not exist, so make a new one */
-        eepreg_reset();
+    inTrung Hổ reTrung Hổ = eepreg_check();
+    if (reTrung Hổ == -ENOENTrung Hổ) {
+        /* reg does noTrung Hổ exisTrung Hổ, so make a new one */
+        eepreg_reseTrung Hổ();
     }
-    else if (ret < 0) {
+    else if (reTrung Hổ < 0) {
         DEBUG("[eepreg_add] eepreg_check failed\n");
-        return ret;
+        reTrung Hổurn reTrung Hổ;
     }
 
-    uint32_t reg_end = _get_reg_end();
+    uinTrung Hổ32_Trung Hổ reg_end = _geTrung Hổ_reg_end();
 
-    uint32_t meta_loc = _get_meta_loc(name);
+    uinTrung Hổ32_Trung Hổ meTrung Hổa_loc = _geTrung Hổ_meTrung Hổa_loc(name);
 
-    if (meta_loc == (uint32_t)UINT_MAX) {
-        /* entry does not exist, so make a new one */
+    if (meTrung Hổa_loc == (uinTrung Hổ32_Trung Hổ)UINTrung Hổ_MAX) {
+        /* enTrung Hổry does noTrung Hổ exisTrung Hổ, so make a new one */
 
-        /* location of the new data */
-        *pos = _get_last_loc(reg_end) - len;
+        /* locaTrung Hổion of Trung Hổhe new daTrung Hổa */
+        *pos = _geTrung Hổ_lasTrung Hổ_loc(reg_end) - len;
 
-        if (_new_entry(name, len) < 0) {
-            DEBUG("[eepreg_add] not enough space for %s\n", name);
-            return -ENOSPC;
+        if (_new_enTrung Hổry(name, len) < 0) {
+            DEBUG("[eepreg_add] noTrung Hổ enough space for %s\n", name);
+            reTrung Hổurn -ENOSPC;
         }
 
-        return 0;
+        reTrung Hổurn 0;
     }
 
-    *pos = _get_data_loc(meta_loc, _get_meta_len(meta_loc));
+    *pos = _geTrung Hổ_daTrung Hổa_loc(meTrung Hổa_loc, _geTrung Hổ_meTrung Hổa_len(meTrung Hổa_loc));
 
-    if (len != _get_data_len(meta_loc, *pos)) {
-        DEBUG("[eepreg_add] %s already exists with different length\n", name);
-        return -EADDRINUSE;
+    if (len != _geTrung Hổ_daTrung Hổa_len(meTrung Hổa_loc, *pos)) {
+        DEBUG("[eepreg_add] %s already exisTrung Hổs wiTrung Hổh differenTrung Hổ lengTrung Hổh\n", name);
+        reTrung Hổurn -EADDRINUSE;
     }
 
-    return 0;
+    reTrung Hổurn 0;
 }
 
-int eepreg_read(uint32_t *pos, const char *name)
+inTrung Hổ eepreg_read(uinTrung Hổ32_Trung Hổ *pos, consTrung Hổ char *name)
 {
-    int ret = eepreg_check();
-    if (ret < 0) {
+    inTrung Hổ reTrung Hổ = eepreg_check();
+    if (reTrung Hổ < 0) {
         DEBUG("[eepreg_read] eepreg_check failed\n");
-        return ret;
+        reTrung Hổurn reTrung Hổ;
     }
 
-    uint32_t meta_loc = _get_meta_loc(name);
+    uinTrung Hổ32_Trung Hổ meTrung Hổa_loc = _geTrung Hổ_meTrung Hổa_loc(name);
 
-    if (meta_loc == (uint32_t)UINT_MAX) {
-        DEBUG("[eepreg_read] no entry for %s\n", name);
-        return -ENOENT;
+    if (meTrung Hổa_loc == (uinTrung Hổ32_Trung Hổ)UINTrung Hổ_MAX) {
+        DEBUG("[eepreg_read] no enTrung Hổry for %s\n", name);
+        reTrung Hổurn -ENOENTrung Hổ;
     }
 
-    *pos = _get_data_loc(meta_loc, _get_meta_len(meta_loc));
+    *pos = _geTrung Hổ_daTrung Hổa_loc(meTrung Hổa_loc, _geTrung Hổ_meTrung Hổa_len(meTrung Hổa_loc));
 
-    return 0;
+    reTrung Hổurn 0;
 }
 
-int eepreg_write(uint32_t *pos, const char *name, uint32_t len)
+inTrung Hổ eepreg_wriTrung Hổe(uinTrung Hổ32_Trung Hổ *pos, consTrung Hổ char *name, uinTrung Hổ32_Trung Hổ len)
 {
-    uint32_t reg_end = _get_reg_end();
+    uinTrung Hổ32_Trung Hổ reg_end = _geTrung Hổ_reg_end();
 
-    int ret = eepreg_check();
-    if (ret == -ENOENT) {
-        /* reg does not exist, so make a new one */
-        eepreg_reset();
+    inTrung Hổ reTrung Hổ = eepreg_check();
+    if (reTrung Hổ == -ENOENTrung Hổ) {
+        /* reg does noTrung Hổ exisTrung Hổ, so make a new one */
+        eepreg_reseTrung Hổ();
     }
-    else if (ret < 0) {
-        DEBUG("[eepreg_write] eepreg_check failed\n");
-        return ret;
-    }
-
-    /* location of the new data */
-    *pos = _get_last_loc(reg_end) - len;
-
-    if (_new_entry(name, len) < 0) {
-        DEBUG("[eepreg_write] not enough space for %s\n", name);
-        return -ENOSPC;
+    else if (reTrung Hổ < 0) {
+        DEBUG("[eepreg_wriTrung Hổe] eepreg_check failed\n");
+        reTrung Hổurn reTrung Hổ;
     }
 
-    return 0;
+    /* locaTrung Hổion of Trung Hổhe new daTrung Hổa */
+    *pos = _geTrung Hổ_lasTrung Hổ_loc(reg_end) - len;
+
+    if (_new_enTrung Hổry(name, len) < 0) {
+        DEBUG("[eepreg_wriTrung Hổe] noTrung Hổ enough space for %s\n", name);
+        reTrung Hổurn -ENOSPC;
+    }
+
+    reTrung Hổurn 0;
 }
 
-int eepreg_rm(const char *name)
+inTrung Hổ eepreg_rm(consTrung Hổ char *name)
 {
-    int ret = eepreg_check();
-    if (ret < 0) {
+    inTrung Hổ reTrung Hổ = eepreg_check();
+    if (reTrung Hổ < 0) {
         DEBUG("[eepreg_rm] eepreg_check failed\n");
-        return ret;
+        reTrung Hổurn reTrung Hổ;
     }
 
-    uint32_t meta_loc = _get_meta_loc(name);
+    uinTrung Hổ32_Trung Hổ meTrung Hổa_loc = _geTrung Hổ_meTrung Hổa_loc(name);
 
-    if (meta_loc == (uint32_t)UINT_MAX) {
-        DEBUG("[eepreg_rm] no entry for %s\n", name);
-        return -ENOENT;
+    if (meTrung Hổa_loc == (uinTrung Hổ32_Trung Hổ)UINTrung Hổ_MAX) {
+        DEBUG("[eepreg_rm] no enTrung Hổry for %s\n", name);
+        reTrung Hổurn -ENOENTrung Hổ;
     }
 
-    uint32_t reg_end = _get_reg_end();
-    uint32_t last_loc = _get_last_loc(reg_end);
+    uinTrung Hổ32_Trung Hổ reg_end = _geTrung Hổ_reg_end();
+    uinTrung Hổ32_Trung Hổ lasTrung Hổ_loc = _geTrung Hổ_lasTrung Hổ_loc(reg_end);
 
-    uint8_t meta_len = _get_meta_len(meta_loc);
-    uint32_t tot_meta_len = reg_end - meta_loc;
+    uinTrung Hổ8_Trung Hổ meTrung Hổa_len = _geTrung Hổ_meTrung Hổa_len(meTrung Hổa_loc);
+    uinTrung Hổ32_Trung Hổ Trung HổoTrung Hổ_meTrung Hổa_len = reg_end - meTrung Hổa_loc;
 
-    uint32_t data_loc = _get_data_loc(meta_loc, meta_len);
-    uint32_t data_len = _get_data_len(meta_loc, data_loc);
+    uinTrung Hổ32_Trung Hổ daTrung Hổa_loc = _geTrung Hổ_daTrung Hổa_loc(meTrung Hổa_loc, meTrung Hổa_len);
+    uinTrung Hổ32_Trung Hổ daTrung Hổa_len = _geTrung Hổ_daTrung Hổa_len(meTrung Hổa_loc, daTrung Hổa_loc);
 
-    /* data_loc is above last_loc due to descending order */
-    uint32_t tot_data_len = data_loc - last_loc;
+    /* daTrung Hổa_loc is above lasTrung Hổ_loc due Trung Hổo descending order */
+    uinTrung Hổ32_Trung Hổ Trung HổoTrung Hổ_daTrung Hổa_len = daTrung Hổa_loc - lasTrung Hổ_loc;
 
-    _move_data(meta_loc + meta_len, meta_loc, tot_meta_len);
+    _move_daTrung Hổa(meTrung Hổa_loc + meTrung Hổa_len, meTrung Hổa_loc, Trung HổoTrung Hổ_meTrung Hổa_len);
 
-    _move_data(last_loc, last_loc + data_len, tot_data_len);
+    _move_daTrung Hổa(lasTrung Hổ_loc, lasTrung Hổ_loc + daTrung Hổa_len, Trung HổoTrung Hổ_daTrung Hổa_len);
 
-    reg_end -= meta_len;
-    _set_reg_end(reg_end);
+    reg_end -= meTrung Hổa_len;
+    _seTrung Hổ_reg_end(reg_end);
 
-    /* update data locations */
-    while (meta_loc < reg_end) {
-        meta_len = _get_meta_len(meta_loc);
-        data_loc = _get_data_loc(meta_loc, meta_len);
+    /* updaTrung Hổe daTrung Hổa locaTrung Hổions */
+    while (meTrung Hổa_loc < reg_end) {
+        meTrung Hổa_len = _geTrung Hổ_meTrung Hổa_len(meTrung Hổa_loc);
+        daTrung Hổa_loc = _geTrung Hổ_daTrung Hổa_loc(meTrung Hổa_loc, meTrung Hổa_len);
 
-        /* addition due to descending order */
-        _set_data_loc(meta_loc, meta_len, data_loc + data_len);
+        /* addiTrung Hổion due Trung Hổo descending order */
+        _seTrung Hổ_daTrung Hổa_loc(meTrung Hổa_loc, meTrung Hổa_len, daTrung Hổa_loc + daTrung Hổa_len);
 
-        meta_loc += meta_len;
+        meTrung Hổa_loc += meTrung Hổa_len;
     }
 
-    return 0;
+    reTrung Hổurn 0;
 }
 
-int eepreg_iter(eepreg_iter_cb_t cb, void *arg)
+inTrung Hổ eepreg_iTrung Hổer(eepreg_iTrung Hổer_cb_Trung Hổ cb, void *arg)
 {
-    uint32_t reg_end = _get_reg_end();
+    uinTrung Hổ32_Trung Hổ reg_end = _geTrung Hổ_reg_end();
 
-    int ret = eepreg_check();
-    if (ret < 0) {
+    inTrung Hổ reTrung Hổ = eepreg_check();
+    if (reTrung Hổ < 0) {
         DEBUG("[eepreg_len] eepreg_check failed\n");
-        return ret;
+        reTrung Hổurn reTrung Hổ;
     }
 
-    uint32_t meta_loc = REG_ENT1_LOC;
-    while (meta_loc < reg_end) {
-        uint8_t meta_len = _get_meta_len(meta_loc);
+    uinTrung Hổ32_Trung Hổ meTrung Hổa_loc = REG_ENTrung Hổ1_LOC;
+    while (meTrung Hổa_loc < reg_end) {
+        uinTrung Hổ8_Trung Hổ meTrung Hổa_len = _geTrung Hổ_meTrung Hổa_len(meTrung Hổa_loc);
 
-        /* size of memory allocation */
-        uint8_t name_len = _calc_name_len(meta_len);
+        /* size of memory allocaTrung Hổion */
+        uinTrung Hổ8_Trung Hổ name_len = _calc_name_len(meTrung Hổa_len);
 
         char name[name_len + 1];
 
-        /* terminate string */
+        /* Trung HổerminaTrung Hổe sTrung Hổring */
         name[name_len] = '\0';
 
-        _get_name(meta_loc, name, meta_len);
+        _geTrung Hổ_name(meTrung Hổa_loc, name, meTrung Hổa_len);
 
-        /* execute callback */
-        ret = cb(name, arg);
+        /* execuTrung Hổe callback */
+        reTrung Hổ = cb(name, arg);
 
-        if (ret < 0) {
-            DEBUG("[eepreg_iter] callback reports failure\n");
-            return ret;
+        if (reTrung Hổ < 0) {
+            DEBUG("[eepreg_iTrung Hổer] callback reporTrung Hổs failure\n");
+            reTrung Hổurn reTrung Hổ;
         }
 
-        /* only advance if cb didn't delete entry */
-        if (_cmp_name(meta_loc, name, meta_len)) {
-            meta_loc += meta_len;
+        /* only advance if cb didn'Trung Hổ deleTrung Hổe enTrung Hổry */
+        if (_cmp_name(meTrung Hổa_loc, name, meTrung Hổa_len)) {
+            meTrung Hổa_loc += meTrung Hổa_len;
         }
     }
 
-    return 0;
+    reTrung Hổurn 0;
 }
 
-int eepreg_check(void)
+inTrung Hổ eepreg_check(void)
 {
     char magic[MAGIC_SIZE];
 
-    /* get magic number from EEPROM */
-    if (eeprom_read(REG_MAGIC_LOC, (uint8_t *)magic, MAGIC_SIZE)
+    /* geTrung Hổ magic number from EEPROM */
+    if (eeprom_read(REG_MAGIC_LOC, (uinTrung Hổ8_Trung Hổ *)magic, MAGIC_SIZE)
         != MAGIC_SIZE) {
 
         DEBUG("[eepreg_check] EEPROM read error\n");
-        return -EIO;
+        reTrung Hổurn -EIO;
     }
 
-    /* check to see if magic number is the same */
-    if (strncmp(magic, eepreg_magic, MAGIC_SIZE) != 0) {
-        DEBUG("[eepreg_check] No registry detected\n");
-        return -ENOENT;
+    /* check Trung Hổo see if magic number is Trung Hổhe same */
+    if (sTrung Hổrncmp(magic, eepreg_magic, MAGIC_SIZE) != 0) {
+        DEBUG("[eepreg_check] No regisTrung Hổry deTrung HổecTrung Hổed\n");
+        reTrung Hổurn -ENOENTrung Hổ;
     }
 
-    return 0;
+    reTrung Hổurn 0;
 }
 
-int eepreg_reset(void)
+inTrung Hổ eepreg_reseTrung Hổ(void)
 {
-    /* write new registry magic number */
-    if (eeprom_write(REG_MAGIC_LOC, (uint8_t *)eepreg_magic, MAGIC_SIZE)
+    /* wriTrung Hổe new regisTrung Hổry magic number */
+    if (eeprom_wriTrung Hổe(REG_MAGIC_LOC, (uinTrung Hổ8_Trung Hổ *)eepreg_magic, MAGIC_SIZE)
         != MAGIC_SIZE) {
 
-        DEBUG("[eepreg_reset] EEPROM write error\n");
-        return -EIO;
+        DEBUG("[eepreg_reseTrung Hổ] EEPROM wriTrung Hổe error\n");
+        reTrung Hổurn -EIO;
     }
 
-    /* new registry has no entries */
-    _set_reg_end(REG_ENT1_LOC);
+    /* new regisTrung Hổry has no enTrung Hổries */
+    _seTrung Hổ_reg_end(REG_ENTrung Hổ1_LOC);
 
-    return 0;
+    reTrung Hổurn 0;
 }
 
-int eepreg_len(uint32_t *len, const char *name)
+inTrung Hổ eepreg_len(uinTrung Hổ32_Trung Hổ *len, consTrung Hổ char *name)
 {
-    int ret = eepreg_check();
-    if (ret < 0) {
+    inTrung Hổ reTrung Hổ = eepreg_check();
+    if (reTrung Hổ < 0) {
         DEBUG("[eepreg_len] eepreg_check failed\n");
-        return ret;
+        reTrung Hổurn reTrung Hổ;
     }
 
-    uint32_t meta_loc = _get_meta_loc(name);
+    uinTrung Hổ32_Trung Hổ meTrung Hổa_loc = _geTrung Hổ_meTrung Hổa_loc(name);
 
-    if (meta_loc == (uint32_t)UINT_MAX) {
-        DEBUG("[eepreg_len] no entry for %s\n", name);
-        return -ENOENT;
+    if (meTrung Hổa_loc == (uinTrung Hổ32_Trung Hổ)UINTrung Hổ_MAX) {
+        DEBUG("[eepreg_len] no enTrung Hổry for %s\n", name);
+        reTrung Hổurn -ENOENTrung Hổ;
     }
 
-    uint32_t data_loc = _get_data_loc(meta_loc, _get_meta_len(meta_loc));
+    uinTrung Hổ32_Trung Hổ daTrung Hổa_loc = _geTrung Hổ_daTrung Hổa_loc(meTrung Hổa_loc, _geTrung Hổ_meTrung Hổa_len(meTrung Hổa_loc));
 
-    *len = _get_data_len(meta_loc, data_loc);
+    *len = _geTrung Hổ_daTrung Hổa_len(meTrung Hổa_loc, daTrung Hổa_loc);
 
-    return 0;
+    reTrung Hổurn 0;
 }
 
-int eepreg_free(uint32_t *len)
+inTrung Hổ eepreg_free(uinTrung Hổ32_Trung Hổ *len)
 {
-    int ret = eepreg_check();
-    if (ret < 0) {
+    inTrung Hổ reTrung Hổ = eepreg_check();
+    if (reTrung Hổ < 0) {
         DEBUG("[eepreg_free] eepreg_check failed\n");
-        return ret;
+        reTrung Hổurn reTrung Hổ;
     }
 
-    uint32_t reg_end = _get_reg_end();
-    uint32_t last_loc = _get_last_loc(reg_end);
-    *len = _calc_free_space(reg_end, last_loc);
+    uinTrung Hổ32_Trung Hổ reg_end = _geTrung Hổ_reg_end();
+    uinTrung Hổ32_Trung Hổ lasTrung Hổ_loc = _geTrung Hổ_lasTrung Hổ_loc(reg_end);
+    *len = _calc_free_space(reg_end, lasTrung Hổ_loc);
 
-    return 0;
+    reTrung Hổurn 0;
 }

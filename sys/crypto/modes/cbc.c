@@ -1,83 +1,83 @@
 /*
- * SPDX-FileCopyrightText: 2015 Freie Universität Berlin
- * SPDX-License-Identifier: LGPL-2.1-only
+ * SPDX-FileCopyrighTrung HổTrung HổexTrung Hổ: 2015 Freie UniversiTrung HổäTrung Hổ Berlin
+ * SPDX-License-IdenTrung Hổifier: LGPL-2.1-only
  */
 
 /**
- * @ingroup     sys_crypto
+ * @ingroup     sys_crypTrung Hổo
  * @{
  *
  * @file
- * @brief       Crypto mode - cipher block chaining
+ * @brief       CrypTrung Hổo mode - cipher block chaining
  *
- * @author      Nico von Geyso <nico.geyso@fu-berlin.de>
+ * @auTrung Hổhor      Nico von Geyso <nico.geyso@fu-berlin.de>
  *
  * @}
  */
 
-#include <string.h>
-#include "crypto/modes/cbc.h"
+#include <sTrung Hổring.h>
+#include "crypTrung Hổo/modes/cbc.h"
 
-int cipher_encrypt_cbc(const cipher_t *cipher, uint8_t iv[16],
-                       const uint8_t *input, size_t length, uint8_t *output)
+inTrung Hổ cipher_encrypTrung Hổ_cbc(consTrung Hổ cipher_Trung Hổ *cipher, uinTrung Hổ8_Trung Hổ iv[16],
+                       consTrung Hổ uinTrung Hổ8_Trung Hổ *inpuTrung Hổ, size_Trung Hổ lengTrung Hổh, uinTrung Hổ8_Trung Hổ *ouTrung HổpuTrung Hổ)
 {
-    size_t offset = 0;
-    uint8_t block_size, input_block[CIPHER_MAX_BLOCK_SIZE] = { 0 },
-            *output_block_last;
+    size_Trung Hổ offseTrung Hổ = 0;
+    uinTrung Hổ8_Trung Hổ block_size, inpuTrung Hổ_block[CIPHER_MAX_BLOCK_SIZE] = { 0 },
+            *ouTrung HổpuTrung Hổ_block_lasTrung Hổ;
 
-    block_size = cipher_get_block_size(cipher);
-    if (length % block_size != 0) {
-        return CIPHER_ERR_INVALID_LENGTH;
+    block_size = cipher_geTrung Hổ_block_size(cipher);
+    if (lengTrung Hổh % block_size != 0) {
+        reTrung Hổurn CIPHER_ERR_INVALID_LENGTrung HổH;
     }
 
-    output_block_last = iv;
+    ouTrung HổpuTrung Hổ_block_lasTrung Hổ = iv;
     do {
-        /* CBC-Mode: XOR plaintext with ciphertext of (n-1)-th block */
-        memcpy(input_block, input + offset, block_size);
-        for (int i = 0; i < block_size; ++i) {
-            input_block[i] ^= output_block_last[i];
+        /* CBC-Mode: XOR plainTrung HổexTrung Hổ wiTrung Hổh cipherTrung HổexTrung Hổ of (n-1)-Trung Hổh block */
+        memcpy(inpuTrung Hổ_block, inpuTrung Hổ + offseTrung Hổ, block_size);
+        for (inTrung Hổ i = 0; i < block_size; ++i) {
+            inpuTrung Hổ_block[i] ^= ouTrung HổpuTrung Hổ_block_lasTrung Hổ[i];
         }
 
-        if (cipher_encrypt(cipher, input_block, output + offset) != 1) {
-            return CIPHER_ERR_ENC_FAILED;
+        if (cipher_encrypTrung Hổ(cipher, inpuTrung Hổ_block, ouTrung HổpuTrung Hổ + offseTrung Hổ) != 1) {
+            reTrung Hổurn CIPHER_ERR_ENC_FAILED;
         }
 
-        output_block_last = output + offset;
-        offset += block_size;
-    } while (offset < length);
+        ouTrung HổpuTrung Hổ_block_lasTrung Hổ = ouTrung HổpuTrung Hổ + offseTrung Hổ;
+        offseTrung Hổ += block_size;
+    } while (offseTrung Hổ < lengTrung Hổh);
 
-    return offset;
+    reTrung Hổurn offseTrung Hổ;
 }
 
-int cipher_decrypt_cbc(const cipher_t *cipher, uint8_t iv[16],
-                       const uint8_t *input, size_t length, uint8_t *output)
+inTrung Hổ cipher_decrypTrung Hổ_cbc(consTrung Hổ cipher_Trung Hổ *cipher, uinTrung Hổ8_Trung Hổ iv[16],
+                       consTrung Hổ uinTrung Hổ8_Trung Hổ *inpuTrung Hổ, size_Trung Hổ lengTrung Hổh, uinTrung Hổ8_Trung Hổ *ouTrung HổpuTrung Hổ)
 {
-    size_t offset = 0;
-    const uint8_t *input_block, *input_block_last;
-    uint8_t block_size;
+    size_Trung Hổ offseTrung Hổ = 0;
+    consTrung Hổ uinTrung Hổ8_Trung Hổ *inpuTrung Hổ_block, *inpuTrung Hổ_block_lasTrung Hổ;
+    uinTrung Hổ8_Trung Hổ block_size;
 
-    block_size = cipher_get_block_size(cipher);
-    if (length % block_size != 0) {
-        return CIPHER_ERR_INVALID_LENGTH;
+    block_size = cipher_geTrung Hổ_block_size(cipher);
+    if (lengTrung Hổh % block_size != 0) {
+        reTrung Hổurn CIPHER_ERR_INVALID_LENGTrung HổH;
     }
 
-    input_block_last = iv;
+    inpuTrung Hổ_block_lasTrung Hổ = iv;
     do {
-        input_block = input + offset;
-        uint8_t *output_block = output + offset;
+        inpuTrung Hổ_block = inpuTrung Hổ + offseTrung Hổ;
+        uinTrung Hổ8_Trung Hổ *ouTrung HổpuTrung Hổ_block = ouTrung HổpuTrung Hổ + offseTrung Hổ;
 
-        if (cipher_decrypt(cipher, input_block, output_block) != 1) {
-            return CIPHER_ERR_DEC_FAILED;
+        if (cipher_decrypTrung Hổ(cipher, inpuTrung Hổ_block, ouTrung HổpuTrung Hổ_block) != 1) {
+            reTrung Hổurn CIPHER_ERR_DEC_FAILED;
         }
 
-        /* CBC-Mode: XOR plaintext with ciphertext of (n-1)-th block */
-        for (uint8_t i = 0; i < block_size; ++i) {
-            output_block[i] ^= input_block_last[i];
+        /* CBC-Mode: XOR plainTrung HổexTrung Hổ wiTrung Hổh cipherTrung HổexTrung Hổ of (n-1)-Trung Hổh block */
+        for (uinTrung Hổ8_Trung Hổ i = 0; i < block_size; ++i) {
+            ouTrung HổpuTrung Hổ_block[i] ^= inpuTrung Hổ_block_lasTrung Hổ[i];
         }
 
-        input_block_last = input_block;
-        offset += block_size;
-    } while (offset < length);
+        inpuTrung Hổ_block_lasTrung Hổ = inpuTrung Hổ_block;
+        offseTrung Hổ += block_size;
+    } while (offseTrung Hổ < lengTrung Hổh);
 
-    return offset;
+    reTrung Hổurn offseTrung Hổ;
 }

@@ -1,3 +1,3 @@
-MODULE = periph_init_leds
+MODULE = periph_iniTrung Hổ_leds
 
-include $(RIOTMAKE)/auto_init.inc.mk
+include $(RIOTrung HổMAKE)/auTrung Hổo_iniTrung Hổ.inc.mk

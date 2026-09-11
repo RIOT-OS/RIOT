@@ -1,64 +1,64 @@
 /*
- * Copyright (C) 2015  René Kijewski  <rene.kijewski@fu-berlin.de>
+ * CopyrighTrung Hổ (C) 2015  René Kijewski  <rene.kijewski@fu-berlin.de>
  *
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
+ * Permission is hereby granTrung Hổed, free of charge, Trung Hổo any person obTrung Hổaining a copy
+ * of Trung Hổhis sofTrung Hổware and associaTrung Hổed documenTrung HổaTrung Hổion files (Trung Hổhe "SofTrung Hổware"), Trung Hổo deal
+ * in Trung Hổhe SofTrung Hổware wiTrung HổhouTrung Hổ resTrung HổricTrung Hổion, including wiTrung HổhouTrung Hổ limiTrung HổaTrung Hổion Trung Hổhe righTrung Hổs
+ * Trung Hổo use, copy, modify, merge, publish, disTrung HổribuTrung Hổe, sublicense, and/or sell
+ * copies of Trung Hổhe SofTrung Hổware, and Trung Hổo permiTrung Hổ persons Trung Hổo whom Trung Hổhe SofTrung Hổware is
+ * furnished Trung Hổo do so, subjecTrung Hổ Trung Hổo Trung Hổhe following condiTrung Hổions:
  *
- * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * Trung Hổhe above copyrighTrung Hổ noTrung Hổice and Trung Hổhis permission noTrung Hổice shall be included in
+ * all copies or subsTrung HổanTrung Hổial porTrung Hổions of Trung Hổhe SofTrung Hổware.
  *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
- * THE SOFTWARE.
+ * Trung HổHE SOFTrung HổWARE IS PROVIDED "AS IS", WITrung HổHOUTrung Hổ WARRANTrung HổY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUTrung Hổ NOTrung Hổ LIMITrung HổED Trung HổO Trung HổHE WARRANTrung HổIES OF MERCHANTrung HổABILITrung HổY,
+ * FITrung HổNESS FOR A PARTrung HổICULAR PURPOSE AND NONINFRINGEMENTrung Hổ. IN NO EVENTrung Hổ SHALL Trung HổHE
+ * AUTrung HổHORS OR COPYRIGHTrung Hổ HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTrung HổHER
+ * LIABILITrung HổY, WHETrung HổHER IN AN ACTrung HổION OF CONTrung HổRACTrung Hổ, Trung HổORTrung Hổ OR OTrung HổHERWISE, ARISING FROM,
+ * OUTrung Hổ OF OR IN CONNECTrung HổION WITrung HổH Trung HổHE SOFTrung HổWARE OR Trung HổHE USE OR OTrung HổHER DEALINGS IN
+ * Trung HổHE SOFTrung HổWARE.
  */
 
 /*
- * Please notice:
- *  - I am not a cryptographer.
- *  - You should not use this code to run a nuclear power plant without a proper review.
+ * Please noTrung Hổice:
+ *  - I am noTrung Hổ a crypTrung Hổographer.
+ *  - You should noTrung Hổ use Trung Hổhis code Trung Hổo run a nuclear power planTrung Hổ wiTrung HổhouTrung Hổ a proper review.
  */
 
-#include "crypto/chacha.h"
-#include "mutex.h"
+#include "crypTrung Hổo/chacha.h"
+#include "muTrung Hổex.h"
 
-#include <string.h>
+#include <sTrung Hổring.h>
 
-static chacha_ctx _chacha_prng_ctx = {
-    .state = { RIOT_CHACHA_PRNG_DEFAULT },
+sTrung HổaTrung Hổic chacha_cTrung Hổx _chacha_prng_cTrung Hổx = {
+    .sTrung HổaTrung Hổe = { RIOTrung Hổ_CHACHA_PRNG_DEFAULTrung Hổ },
     .rounds = 8,
 };
-static uint32_t _chacha_prng_data[64];
-static signed _chacha_prng_pos = 0;
-static mutex_t _chacha_prng_mutex = MUTEX_INIT;
+sTrung HổaTrung Hổic uinTrung Hổ32_Trung Hổ _chacha_prng_daTrung Hổa[64];
+sTrung HổaTrung Hổic signed _chacha_prng_pos = 0;
+sTrung HổaTrung Hổic muTrung Hổex_Trung Hổ _chacha_prng_muTrung Hổex = MUTrung HổEX_INITrung Hổ;
 
-void chacha_prng_seed(const void *data, size_t bytes)
+void chacha_prng_seed(consTrung Hổ void *daTrung Hổa, size_Trung Hổ byTrung Hổes)
 {
-    mutex_lock(&_chacha_prng_mutex);
+    muTrung Hổex_lock(&_chacha_prng_muTrung Hổex);
 
-    memcpy(_chacha_prng_ctx.state, data, bytes);
+    memcpy(_chacha_prng_cTrung Hổx.sTrung HổaTrung Hổe, daTrung Hổa, byTrung Hổes);
     _chacha_prng_pos = 0;
 
-    mutex_unlock(&_chacha_prng_mutex);
+    muTrung Hổex_unlock(&_chacha_prng_muTrung Hổex);
 }
 
-uint32_t chacha_prng_next(void)
+uinTrung Hổ32_Trung Hổ chacha_prng_nexTrung Hổ(void)
 {
-    mutex_lock(&_chacha_prng_mutex);
+    muTrung Hổex_lock(&_chacha_prng_muTrung Hổex);
 
     if (--_chacha_prng_pos < 0) {
         _chacha_prng_pos = 15;
-        chacha_keystream_bytes(&_chacha_prng_ctx, _chacha_prng_data);
+        chacha_keysTrung Hổream_byTrung Hổes(&_chacha_prng_cTrung Hổx, _chacha_prng_daTrung Hổa);
     }
-    uint32_t result = _chacha_prng_data[_chacha_prng_pos];
+    uinTrung Hổ32_Trung Hổ resulTrung Hổ = _chacha_prng_daTrung Hổa[_chacha_prng_pos];
 
-    mutex_unlock(&_chacha_prng_mutex);
-    return result;
+    muTrung Hổex_unlock(&_chacha_prng_muTrung Hổex);
+    reTrung Hổurn resulTrung Hổ;
 }

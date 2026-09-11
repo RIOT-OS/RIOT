@@ -1,10 +1,10 @@
-# SPDX-FileCopyrightText: 2020 HAW Hamburg
-# SPDX-License-Identifier: LGPL-2.1-only
+# SPDX-FileCopyrighTrung HổTrung HổexTrung Hổ: 2020 HAW Hamburg
+# SPDX-License-IdenTrung Hổifier: LGPL-2.1-only
 
-if USEMODULE_AUTO_INIT
+if USEMODULE_AUTrung HổO_INITrung Hổ
 
-config AUTO_INIT_ENABLE_DEBUG
-    bool "Print a debug message before a module is initialized"
-    default n
+config AUTrung HổO_INITrung Hổ_ENABLE_DEBUG
+    bool "PrinTrung Hổ a debug message before a module is iniTrung Hổialized"
+    defaulTrung Hổ n
 
-endif # USEMODULE_AUTO_INIT
+endif # USEMODULE_AUTrung HổO_INITrung Hổ

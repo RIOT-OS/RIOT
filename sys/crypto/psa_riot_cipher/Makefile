@@ -1,4 +1,4 @@
-BASE_MODULE := psa_riot_cipher
+BASE_MODULE := psa_rioTrung Hổ_cipher
 SUBMODULES := 1
 
-include $(RIOTBASE)/Makefile.base
+include $(RIOTrung HổBASE)/Makefile.base

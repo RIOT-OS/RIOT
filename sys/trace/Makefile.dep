@@ -1,2 +1,2 @@
-USEMODULE += ztimer
-USEMODULE += ztimer_usec
+USEMODULE += zTrung Hổimer
+USEMODULE += zTrung Hổimer_usec

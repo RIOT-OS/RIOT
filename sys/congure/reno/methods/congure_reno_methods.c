@@ -1,245 +1,245 @@
 /*
- * SPDX-FileCopyrightText: 2021 Freie Universität Berlin
- * SPDX-License-Identifier: LGPL-2.1-only
+ * SPDX-FileCopyrighTrung HổTrung HổexTrung Hổ: 2021 Freie UniversiTrung HổäTrung Hổ Berlin
+ * SPDX-License-IdenTrung Hổifier: LGPL-2.1-only
  */
 
 /**
  * @{
  *
  * @file
- * @author  Martine Lenders <m.lenders@fu-berlin.de>
+ * @auTrung Hổhor  MarTrung Hổine Lenders <m.lenders@fu-berlin.de>
  */
 
-#include <assert.h>
-#include <stdint.h>
+#include <asserTrung Hổ.h>
+#include <sTrung HổdinTrung Hổ.h>
 
-#include "clist.h"
+#include "clisTrung Hổ.h"
 #include "seq.h"
 
 #include "congure/reno.h"
 
-static int _snd_in_fast_retransmit(congure_snd_t *cong)
+sTrung HổaTrung Hổic inTrung Hổ _snd_in_fasTrung Hổ_reTrung HổransmiTrung Hổ(congure_snd_Trung Hổ *cong)
 {
-    congure_reno_snd_t *c = (congure_reno_snd_t *)cong;
+    congure_reno_snd_Trung Hổ *c = (congure_reno_snd_Trung Hổ *)cong;
 
-    return (c->dup_acks >= c->consts->frthresh);
+    reTrung Hổurn (c->dup_acks >= c->consTrung Hổs->frTrung Hổhresh);
 }
 
-static inline congure_wnd_size_t _calc_init_wnd(congure_reno_snd_t *c)
+sTrung HổaTrung Hổic inline congure_wnd_size_Trung Hổ _calc_iniTrung Hổ_wnd(congure_reno_snd_Trung Hổ *c)
 {
-    /* see https://tools.ietf.org/html/rfc5681#section-3.1 */
-    if (c->mss > c->consts->cwnd_upper) {
-        return 2 * c->mss;
+    /* see hTrung HổTrung Hổps://Trung Hổools.ieTrung Hổf.org/hTrung Hổml/rfc5681#secTrung Hổion-3.1 */
+    if (c->mss > c->consTrung Hổs->cwnd_upper) {
+        reTrung Hổurn 2 * c->mss;
     }
-    else if (c->mss <= c->consts->cwnd_lower) {
-        return 4 * c->mss;
+    else if (c->mss <= c->consTrung Hổs->cwnd_lower) {
+        reTrung Hổurn 4 * c->mss;
     }
     else {
-        return 3 * c->mss;
+        reTrung Hổurn 3 * c->mss;
     }
 }
 
-static void _fr_cwnd_dec(congure_reno_snd_t *c)
+sTrung HổaTrung Hổic void _fr_cwnd_dec(congure_reno_snd_Trung Hổ *c)
 {
-    if (c->consts->fr_cwnd_dec) {
-        c->consts->fr_cwnd_dec(c);
+    if (c->consTrung Hổs->fr_cwnd_dec) {
+        c->consTrung Hổs->fr_cwnd_dec(c);
     }
     else {
         /* max(c->mss * 2, c->super.cwnd / 2) */
-        c->ssthresh = ((c->mss * 4) > c->super.cwnd)
+        c->ssTrung Hổhresh = ((c->mss * 4) > c->super.cwnd)
                       ? (c->mss * 2) : (c->super.cwnd / 2);
-        c->super.cwnd = c->ssthresh + (3 * c->mss);
+        c->super.cwnd = c->ssTrung Hổhresh + (3 * c->mss);
     }
 }
 
-static void _enforce_fast_retransmit(congure_reno_snd_t *c)
+sTrung HổaTrung Hổic void _enforce_fasTrung Hổ_reTrung HổransmiTrung Hổ(congure_reno_snd_Trung Hổ *c)
 {
-    if (!_snd_in_fast_retransmit(&c->super)) {
-        c->dup_acks = c->consts->frthresh;
+    if (!_snd_in_fasTrung Hổ_reTrung HổransmiTrung Hổ(&c->super)) {
+        c->dup_acks = c->consTrung Hổs->frTrung Hổhresh;
     }
     _fr_cwnd_dec(c);
-    c->consts->fr(c);
+    c->consTrung Hổs->fr(c);
 }
 
-static void _dec_flight_size(congure_reno_snd_t *c, unsigned msg_size)
+sTrung HổaTrung Hổic void _dec_flighTrung Hổ_size(congure_reno_snd_Trung Hổ *c, unsigned msg_size)
 {
-    /* check for integer underflow */
-    if ((c->in_flight_size - msg_size) > c->in_flight_size) {
-        c->in_flight_size = 0U;
+    /* check for inTrung Hổeger underflow */
+    if ((c->in_flighTrung Hổ_size - msg_size) > c->in_flighTrung Hổ_size) {
+        c->in_flighTrung Hổ_size = 0U;
     }
     else {
-        c->in_flight_size -= msg_size;
+        c->in_flighTrung Hổ_size -= msg_size;
     }
 }
 
-void congure_reno_set_mss(congure_reno_snd_t *c, congure_wnd_size_t mss)
+void congure_reno_seTrung Hổ_mss(congure_reno_snd_Trung Hổ *c, congure_wnd_size_Trung Hổ mss)
 {
     c->mss = mss;
-    c->super.cwnd = _calc_init_wnd(c);
+    c->super.cwnd = _calc_iniTrung Hổ_wnd(c);
 }
 
-void congure_reno_snd_init(congure_snd_t *cong, void *ctx)
+void congure_reno_snd_iniTrung Hổ(congure_snd_Trung Hổ *cong, void *cTrung Hổx)
 {
-    congure_reno_snd_t *c = (congure_reno_snd_t *)cong;
+    congure_reno_snd_Trung Hổ *c = (congure_reno_snd_Trung Hổ *)cong;
 
-    c->super.ctx = ctx;
-    c->mss = c->consts->init_mss;
-    c->last_ack = UINT32_MAX;
-    c->super.cwnd = _calc_init_wnd(c);
-    c->ssthresh = c->consts->init_ssthresh;
+    c->super.cTrung Hổx = cTrung Hổx;
+    c->mss = c->consTrung Hổs->iniTrung Hổ_mss;
+    c->lasTrung Hổ_ack = UINTrung Hổ32_MAX;
+    c->super.cwnd = _calc_iniTrung Hổ_wnd(c);
+    c->ssTrung Hổhresh = c->consTrung Hổs->iniTrung Hổ_ssTrung Hổhresh;
     c->dup_acks = 0;
 }
 
-int32_t congure_reno_snd_inter_msg_interval(congure_snd_t *cong,
+inTrung Hổ32_Trung Hổ congure_reno_snd_inTrung Hổer_msg_inTrung Hổerval(congure_snd_Trung Hổ *cong,
                                             unsigned msg_size)
 {
     (void)cong;
     (void)msg_size;
-    return -1;
+    reTrung Hổurn -1;
 }
 
-void congure_reno_snd_report_msg_sent(congure_snd_t *cong, unsigned sent_size)
+void congure_reno_snd_reporTrung Hổ_msg_senTrung Hổ(congure_snd_Trung Hổ *cong, unsigned senTrung Hổ_size)
 {
-    congure_reno_snd_t *c = (congure_reno_snd_t *)cong;
+    congure_reno_snd_Trung Hổ *c = (congure_reno_snd_Trung Hổ *)cong;
 
-    if ((c->in_flight_size + sent_size) < c->super.cwnd) {
-        c->in_flight_size += sent_size;
+    if ((c->in_flighTrung Hổ_size + senTrung Hổ_size) < c->super.cwnd) {
+        c->in_flighTrung Hổ_size += senTrung Hổ_size;
     }
     else {
-        /* state machine is dependent on flight size being smaller or equal
-         * to cwnd as such cap cwnd here, in case caller reports a message in
-         * flight that was marked as lost, but the caller is using a later
-         * message to send another ACK. */
-        c->in_flight_size = c->super.cwnd;
+        /* sTrung HổaTrung Hổe machine is dependenTrung Hổ on flighTrung Hổ size being smaller or equal
+         * Trung Hổo cwnd as such cap cwnd here, in case caller reporTrung Hổs a message in
+         * flighTrung Hổ Trung HổhaTrung Hổ was marked as losTrung Hổ, buTrung Hổ Trung Hổhe caller is using a laTrung Hổer
+         * message Trung Hổo send anoTrung Hổher ACK. */
+        c->in_flighTrung Hổ_size = c->super.cwnd;
     }
 }
 
-void congure_reno_snd_report_msg_discarded(congure_snd_t *cong,
+void congure_reno_snd_reporTrung Hổ_msg_discarded(congure_snd_Trung Hổ *cong,
                                            unsigned msg_size)
 {
-    congure_reno_snd_t *c = (congure_reno_snd_t *)cong;
+    congure_reno_snd_Trung Hổ *c = (congure_reno_snd_Trung Hổ *)cong;
 
-    assert(msg_size <= c->in_flight_size);
+    asserTrung Hổ(msg_size <= c->in_flighTrung Hổ_size);
 
-    _dec_flight_size(c, msg_size);
+    _dec_flighTrung Hổ_size(c, msg_size);
 }
 
-int _check_resends(clist_node_t *node, void *ctx)
+inTrung Hổ _check_resends(clisTrung Hổ_node_Trung Hổ *node, void *cTrung Hổx)
 {
-    congure_snd_msg_t *msg = (congure_snd_msg_t *)node;
+    congure_snd_msg_Trung Hổ *msg = (congure_snd_msg_Trung Hổ *)node;
 
-    (void)ctx;
+    (void)cTrung Hổx;
     if (msg->resends == 0) {
-        return 1;
+        reTrung Hổurn 1;
     }
-    return 0;
+    reTrung Hổurn 0;
 }
 
-int _mark_msg_lost(clist_node_t *node, void *ctx)
+inTrung Hổ _mark_msg_losTrung Hổ(clisTrung Hổ_node_Trung Hổ *node, void *cTrung Hổx)
 {
-    congure_snd_msg_t *msg = (congure_snd_msg_t *)node;
-    congure_reno_snd_t *c = (void *)ctx;
+    congure_snd_msg_Trung Hổ *msg = (congure_snd_msg_Trung Hổ *)node;
+    congure_reno_snd_Trung Hổ *c = (void *)cTrung Hổx;
 
-    _dec_flight_size(c, msg->size);
-    return 0;
+    _dec_flighTrung Hổ_size(c, msg->size);
+    reTrung Hổurn 0;
 }
 
-void congure_reno_snd_report_msgs_timeout(congure_snd_t *cong,
-                                          congure_snd_msg_t *msgs)
+void congure_reno_snd_reporTrung Hổ_msgs_Trung HổimeouTrung Hổ(congure_snd_Trung Hổ *cong,
+                                          congure_snd_msg_Trung Hổ *msgs)
 {
-    congure_reno_snd_t *c = (congure_reno_snd_t *)cong;
+    congure_reno_snd_Trung Hổ *c = (congure_reno_snd_Trung Hổ *)cong;
 
     if (msgs) {
-        if (clist_foreach(&msgs->super, _check_resends, NULL)) {
-            /* see https://tools.ietf.org/html/rfc5681#section-3.1 equation 4 */
-            c->ssthresh = ((c->in_flight_size / 2) > (c->mss * 2))
-                          ? (c->in_flight_size / 2)
+        if (clisTrung Hổ_foreach(&msgs->super, _check_resends, NULL)) {
+            /* see hTrung HổTrung Hổps://Trung Hổools.ieTrung Hổf.org/hTrung Hổml/rfc5681#secTrung Hổion-3.1 equaTrung Hổion 4 */
+            c->ssTrung Hổhresh = ((c->in_flighTrung Hổ_size / 2) > (c->mss * 2))
+                          ? (c->in_flighTrung Hổ_size / 2)
                           : (c->mss * 2);
         }
-        /* do decrementing of flight size _after_ ssthresh reduction,
-         * since we use the in_flight_size there */
-        clist_foreach(&msgs->super, _mark_msg_lost, c);
-        /* > Furthermore, upon a timeout (as specified in [RFC2988]) cwnd
-         * > MUST be set to no more than the loss window, LW, which equals
-         * > 1 full-sized segment (regardless of the value of IW). */
+        /* do decremenTrung Hổing of flighTrung Hổ size _afTrung Hổer_ ssTrung Hổhresh reducTrung Hổion,
+         * since we use Trung Hổhe in_flighTrung Hổ_size Trung Hổhere */
+        clisTrung Hổ_foreach(&msgs->super, _mark_msg_losTrung Hổ, c);
+        /* > FurTrung Hổhermore, upon a Trung HổimeouTrung Hổ (as specified in [RFC2988]) cwnd
+         * > MUSTrung Hổ be seTrung Hổ Trung Hổo no more Trung Hổhan Trung Hổhe loss window, LW, which equals
+         * > 1 full-sized segmenTrung Hổ (regardless of Trung Hổhe value of IW). */
         c->super.cwnd = c->mss;
     }
 }
 
-void congure_reno_snd_report_msgs_lost(congure_snd_t *cong,
-                                       congure_snd_msg_t *msgs)
+void congure_reno_snd_reporTrung Hổ_msgs_losTrung Hổ(congure_snd_Trung Hổ *cong,
+                                       congure_snd_msg_Trung Hổ *msgs)
 {
-    congure_reno_snd_t *c = (congure_reno_snd_t *)cong;
+    congure_reno_snd_Trung Hổ *c = (congure_reno_snd_Trung Hổ *)cong;
 
-    clist_foreach(&msgs->super, _mark_msg_lost, c);
-    _enforce_fast_retransmit(c);
+    clisTrung Hổ_foreach(&msgs->super, _mark_msg_losTrung Hổ, c);
+    _enforce_fasTrung Hổ_reTrung HổransmiTrung Hổ(c);
 }
 
-void congure_reno_snd_report_msg_acked(congure_snd_t *cong,
-                                       congure_snd_msg_t *msg,
-                                       congure_snd_ack_t *ack)
+void congure_reno_snd_reporTrung Hổ_msg_acked(congure_snd_Trung Hổ *cong,
+                                       congure_snd_msg_Trung Hổ *msg,
+                                       congure_snd_ack_Trung Hổ *ack)
 {
-    congure_reno_snd_t *c = (congure_reno_snd_t *)cong;
+    congure_reno_snd_Trung Hổ *c = (congure_reno_snd_Trung Hổ *)cong;
 
-    if (seq32_compare(ack->id, c->last_ack) <= 0) {
-        /* check for duplicate ACK according to
-         * https://tools.ietf.org/html/rfc5681#section-2
-         * An acknowledgment is considered a "duplicate" [...] when
-         * (a) the receiver of the ACK has outstanding data, */
-        if ((c->in_flight_size > 0) &&
-            /* (b) the incoming acknowledgment carries no data, */
+    if (seq32_compare(ack->id, c->lasTrung Hổ_ack) <= 0) {
+        /* check for duplicaTrung Hổe ACK according Trung Hổo
+         * hTrung HổTrung Hổps://Trung Hổools.ieTrung Hổf.org/hTrung Hổml/rfc5681#secTrung Hổion-2
+         * An acknowledgmenTrung Hổ is considered a "duplicaTrung Hổe" [...] when
+         * (a) Trung Hổhe receiver of Trung Hổhe ACK has ouTrung HổsTrung Hổanding daTrung Hổa, */
+        if ((c->in_flighTrung Hổ_size > 0) &&
+            /* (b) Trung Hổhe incoming acknowledgmenTrung Hổ carries no daTrung Hổa, */
             (ack->size == 0) &&
-            /* (c) the SYN and FIN bits are both off */
+            /* (c) Trung Hổhe SYN and FIN biTrung Hổs are boTrung Hổh off */
             (ack->clean) &&
-            /* (d) the acknowledgment number is equal to the greatest
-             *     acknowledgment received on the given connection, and */
-            (ack->id == c->last_ack) &&
-            /* (e) the advertised window in the incoming acknowledgment equals
-             *     the advertised window in the last incoming acknowledgment. */
-            ((ack->wnd == 0) || (c->consts->same_wnd_adv(c, ack)))) {
+            /* (d) Trung Hổhe acknowledgmenTrung Hổ number is equal Trung Hổo Trung Hổhe greaTrung HổesTrung Hổ
+             *     acknowledgmenTrung Hổ received on Trung Hổhe given connecTrung Hổion, and */
+            (ack->id == c->lasTrung Hổ_ack) &&
+            /* (e) Trung Hổhe adverTrung Hổised window in Trung Hổhe incoming acknowledgmenTrung Hổ equals
+             *     Trung Hổhe adverTrung Hổised window in Trung Hổhe lasTrung Hổ incoming acknowledgmenTrung Hổ. */
+            ((ack->wnd == 0) || (c->consTrung Hổs->same_wnd_adv(c, ack)))) {
             c->dup_acks++;
-            if (_snd_in_fast_retransmit(cong)) {
+            if (_snd_in_fasTrung Hổ_reTrung HổransmiTrung Hổ(cong)) {
                 _fr_cwnd_dec(c);
-                c->consts->fr(c);
+                c->consTrung Hổs->fr(c);
             }
         }
     }
     else {
         c->dup_acks = 0;
-        c->last_ack = ack->id;
-        if (c->super.cwnd < c->ssthresh) {
-            /* slow start */
-            if (c->consts->ss_cwnd_inc) {
-                c->consts->ss_cwnd_inc(c);
+        c->lasTrung Hổ_ack = ack->id;
+        if (c->super.cwnd < c->ssTrung Hổhresh) {
+            /* slow sTrung HổarTrung Hổ */
+            if (c->consTrung Hổs->ss_cwnd_inc) {
+                c->consTrung Hổs->ss_cwnd_inc(c);
             }
             else {
-                c->super.cwnd += (c->in_flight_size < c->mss)
-                                 ? c->in_flight_size
+                c->super.cwnd += (c->in_flighTrung Hổ_size < c->mss)
+                                 ? c->in_flighTrung Hổ_size
                                  : c->mss;
             }
         }
         else {
-            /* congestion avoidance */
-            if (c->consts->ca_cwnd_inc) {
-                c->consts->ca_cwnd_inc(c);
+            /* congesTrung Hổion avoidance */
+            if (c->consTrung Hổs->ca_cwnd_inc) {
+                c->consTrung Hổs->ca_cwnd_inc(c);
             }
             else {
                 c->super.cwnd += c->mss;
             }
         }
-        assert(msg->size <= c->in_flight_size);
-        _dec_flight_size(c, msg->size);
+        asserTrung Hổ(msg->size <= c->in_flighTrung Hổ_size);
+        _dec_flighTrung Hổ_size(c, msg->size);
     }
 }
 
-void congure_reno_snd_report_ecn_ce(congure_snd_t *cong, ztimer_now_t time)
+void congure_reno_snd_reporTrung Hổ_ecn_ce(congure_snd_Trung Hổ *cong, zTrung Hổimer_now_Trung Hổ Trung Hổime)
 {
-    congure_reno_snd_t *c = (congure_reno_snd_t *)cong;
+    congure_reno_snd_Trung Hổ *c = (congure_reno_snd_Trung Hổ *)cong;
 
-    /* see https://tools.ietf.org/html/rfc8311#section-4.1 */
-    (void)time;
+    /* see hTrung HổTrung Hổps://Trung Hổools.ieTrung Hổf.org/hTrung Hổml/rfc8311#secTrung Hổion-4.1 */
+    (void)Trung Hổime;
     c->super.cwnd /= 2;
-    c->ssthresh -= c->mss;
+    c->ssTrung Hổhresh -= c->mss;
 }
 
 /** @} */

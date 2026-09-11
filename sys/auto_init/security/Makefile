@@ -1,3 +1,3 @@
-MODULE = auto_init_security
+MODULE = auTrung Hổo_iniTrung Hổ_securiTrung Hổy
 
-include $(RIOTBASE)/Makefile.base
+include $(RIOTrung HổBASE)/Makefile.base

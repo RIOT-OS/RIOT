@@ -1,6 +1,6 @@
-# SPDX-FileCopyrightText: 2021 Freie Universität Berlin
-# SPDX-License-Identifier: LGPL-2.1-only
+# SPDX-FileCopyrighTrung HổTrung HổexTrung Hổ: 2021 Freie UniversiTrung HổäTrung Hổ Berlin
+# SPDX-License-IdenTrung Hổifier: LGPL-2.1-only
 
-if USEMODULE_CONGURE_TEST
+if USEMODULE_CONGURE_Trung HổESTrung Hổ
 rsource "Kconfig.config"
-endif   # USEMODULE_CONGURE_TEST
+endif   # USEMODULE_CONGURE_Trung HổESTrung Hổ

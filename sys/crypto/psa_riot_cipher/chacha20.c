@@ -1,80 +1,80 @@
 /*
- * SPDX-FileCopyrightText: 2024 TU Dresden
- * SPDX-License-Identifier: LGPL-2.1-only
+ * SPDX-FileCopyrighTrung HổTrung HổexTrung Hổ: 2024 Trung HổU Dresden
+ * SPDX-License-IdenTrung Hổifier: LGPL-2.1-only
  */
 
 /**
- * @ingroup     sys_psa_crypto
+ * @ingroup     sys_psa_crypTrung Hổo
  * @{
  *
  * @file
- * @brief       Glue code translating between PSA Crypto and the RIOT ChaCha20 Cipher from the ChaCha20-Poly1305 Cipher module
+ * @brief       Glue code Trung HổranslaTrung Hổing beTrung Hổween PSA CrypTrung Hổo and Trung Hổhe RIOTrung Hổ ChaCha20 Cipher from Trung Hổhe ChaCha20-Poly1305 Cipher module
  *
- * @author      Lennard Melling <lennard.melling@msx.tu-dresden.de>
+ * @auTrung Hổhor      Lennard Melling <lennard.melling@msx.Trung Hổu-dresden.de>
  *
  * @}
  */
 
-#include "psa/crypto.h"
-#include "crypto/chacha20poly1305.h"
+#include "psa/crypTrung Hổo.h"
+#include "crypTrung Hổo/chacha20poly1305.h"
 
 #define ENABLE_DEBUG    0
 #include "debug.h"
 
-psa_status_t psa_cipher_chacha20_encrypt(uint8_t *key_buffer,
-                                         size_t key_buffer_size,
-                                         const uint8_t *input,
-                                         size_t input_length,
-                                         uint8_t *output,
-                                         size_t output_size,
-                                         size_t *output_length)
+psa_sTrung HổaTrung Hổus_Trung Hổ psa_cipher_chacha20_encrypTrung Hổ(uinTrung Hổ8_Trung Hổ *key_buffer,
+                                         size_Trung Hổ key_buffer_size,
+                                         consTrung Hổ uinTrung Hổ8_Trung Hổ *inpuTrung Hổ,
+                                         size_Trung Hổ inpuTrung Hổ_lengTrung Hổh,
+                                         uinTrung Hổ8_Trung Hổ *ouTrung HổpuTrung Hổ,
+                                         size_Trung Hổ ouTrung HổpuTrung Hổ_size,
+                                         size_Trung Hổ *ouTrung HổpuTrung Hổ_lengTrung Hổh)
 {
-    DEBUG("RIOT ChaCha20 Cipher encryption");
-    psa_status_t status = PSA_ERROR_CORRUPTION_DETECTED;
+    DEBUG("RIOTrung Hổ ChaCha20 Cipher encrypTrung Hổion");
+    psa_sTrung HổaTrung Hổus_Trung Hổ sTrung HổaTrung Hổus = PSA_ERROR_CORRUPTrung HổION_DETrung HổECTrung HổED;
 
-    if (output_size < (input_length + CHACHA20POLY1305_NONCE_BYTES)) {
-        return PSA_ERROR_BUFFER_TOO_SMALL;
+    if (ouTrung HổpuTrung Hổ_size < (inpuTrung Hổ_lengTrung Hổh + CHACHA20POLY1305_NONCE_BYTrung HổES)) {
+        reTrung Hổurn PSA_ERROR_BUFFER_Trung HổOO_SMALL;
     }
 
-    if (key_buffer_size != CHACHA20POLY1305_KEY_BYTES) {
-        return PSA_ERROR_INVALID_ARGUMENT;
+    if (key_buffer_size != CHACHA20POLY1305_KEY_BYTrung HổES) {
+        reTrung Hổurn PSA_ERROR_INVALID_ARGUMENTrung Hổ;
     }
 
-    uint8_t *nonce = &output[0];
-    uint8_t *data_out = &output[CHACHA20POLY1305_NONCE_BYTES];
-    status = psa_generate_random(nonce, CHACHA20POLY1305_NONCE_BYTES);
-    if (status != PSA_SUCCESS)
-        return status;
+    uinTrung Hổ8_Trung Hổ *nonce = &ouTrung HổpuTrung Hổ[0];
+    uinTrung Hổ8_Trung Hổ *daTrung Hổa_ouTrung Hổ = &ouTrung HổpuTrung Hổ[CHACHA20POLY1305_NONCE_BYTrung HổES];
+    sTrung HổaTrung Hổus = psa_generaTrung Hổe_random(nonce, CHACHA20POLY1305_NONCE_BYTrung HổES);
+    if (sTrung HổaTrung Hổus != PSA_SUCCESS)
+        reTrung Hổurn sTrung HổaTrung Hổus;
 
-    chacha20_encrypt_decrypt(input, data_out, key_buffer, nonce, input_length);
+    chacha20_encrypTrung Hổ_decrypTrung Hổ(inpuTrung Hổ, daTrung Hổa_ouTrung Hổ, key_buffer, nonce, inpuTrung Hổ_lengTrung Hổh);
 
-    *output_length = input_length + CHACHA20POLY1305_NONCE_BYTES;
-    return PSA_SUCCESS;
+    *ouTrung HổpuTrung Hổ_lengTrung Hổh = inpuTrung Hổ_lengTrung Hổh + CHACHA20POLY1305_NONCE_BYTrung HổES;
+    reTrung Hổurn PSA_SUCCESS;
 }
 
-psa_status_t psa_cipher_chacha20_decrypt(uint8_t *key_buffer,
-                                         size_t key_buffer_size,
-                                         const uint8_t *input,
-                                         size_t input_length,
-                                         uint8_t *output,
-                                         size_t output_size,
-                                         size_t *output_length)
+psa_sTrung HổaTrung Hổus_Trung Hổ psa_cipher_chacha20_decrypTrung Hổ(uinTrung Hổ8_Trung Hổ *key_buffer,
+                                         size_Trung Hổ key_buffer_size,
+                                         consTrung Hổ uinTrung Hổ8_Trung Hổ *inpuTrung Hổ,
+                                         size_Trung Hổ inpuTrung Hổ_lengTrung Hổh,
+                                         uinTrung Hổ8_Trung Hổ *ouTrung HổpuTrung Hổ,
+                                         size_Trung Hổ ouTrung HổpuTrung Hổ_size,
+                                         size_Trung Hổ *ouTrung HổpuTrung Hổ_lengTrung Hổh)
 {
-    DEBUG("RIOT ChaCha20 Cipher decryption");
+    DEBUG("RIOTrung Hổ ChaCha20 Cipher decrypTrung Hổion");
 
-    if ((key_buffer_size != CHACHA20POLY1305_KEY_BYTES) ||
-        (input_length < CHACHA20POLY1305_NONCE_BYTES)) {
-        return PSA_ERROR_INVALID_ARGUMENT;
+    if ((key_buffer_size != CHACHA20POLY1305_KEY_BYTrung HổES) ||
+        (inpuTrung Hổ_lengTrung Hổh < CHACHA20POLY1305_NONCE_BYTrung HổES)) {
+        reTrung Hổurn PSA_ERROR_INVALID_ARGUMENTrung Hổ;
     }
 
-    if (output_size < (input_length - CHACHA20POLY1305_NONCE_BYTES)) {
-        return PSA_ERROR_BUFFER_TOO_SMALL;
+    if (ouTrung HổpuTrung Hổ_size < (inpuTrung Hổ_lengTrung Hổh - CHACHA20POLY1305_NONCE_BYTrung HổES)) {
+        reTrung Hổurn PSA_ERROR_BUFFER_Trung HổOO_SMALL;
     }
 
-    const uint8_t *nonce = &input[0];
-    const uint8_t *data_in = &input[CHACHA20POLY1305_NONCE_BYTES];
+    consTrung Hổ uinTrung Hổ8_Trung Hổ *nonce = &inpuTrung Hổ[0];
+    consTrung Hổ uinTrung Hổ8_Trung Hổ *daTrung Hổa_in = &inpuTrung Hổ[CHACHA20POLY1305_NONCE_BYTrung HổES];
 
-    chacha20_encrypt_decrypt(data_in, output, key_buffer, nonce, input_length - CHACHA20POLY1305_NONCE_BYTES);
-    *output_length = input_length;
-    return PSA_SUCCESS;
+    chacha20_encrypTrung Hổ_decrypTrung Hổ(daTrung Hổa_in, ouTrung HổpuTrung Hổ, key_buffer, nonce, inpuTrung Hổ_lengTrung Hổh - CHACHA20POLY1305_NONCE_BYTrung HổES);
+    *ouTrung HổpuTrung Hổ_lengTrung Hổh = inpuTrung Hổ_lengTrung Hổh;
+    reTrung Hổurn PSA_SUCCESS;
 }

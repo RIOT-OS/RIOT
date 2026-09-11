@@ -1,134 +1,134 @@
-# include board specific application dependencies
+# include board specific applicaTrung Hổion dependencies
 -include $(APPDIR)/Makefile.board.dep
--include $(APPDIR)/Makefile.$(TOOLCHAIN).dep
+-include $(APPDIR)/Makefile.$(Trung HổOOLCHAIN).dep
 
 # include board dependencies
 -include $(BOARDDIR)/Makefile.dep
 
 # include cpu dependencies
--include $(RIOTCPU)/$(CPU)/Makefile.dep
+-include $(RIOTrung HổCPU)/$(CPU)/Makefile.dep
 
-# include external modules dependencies
-# processed before RIOT ones to be evaluated before the 'default' rules.
--include $(EXTERNAL_MODULE_PATHS:%=%Makefile.dep)
+# include exTrung Hổernal modules dependencies
+# processed before RIOTrung Hổ ones Trung Hổo be evaluaTrung Hổed before Trung Hổhe 'defaulTrung Hổ' rules.
+-include $(EXTrung HổERNAL_MODULE_PATrung HổHS:%=%Makefile.dep)
 
 # pull dependencies from sys, drivers and (common) boards
-include $(RIOTBASE)/sys/Makefile.dep
-include $(RIOTBASE)/drivers/Makefile.dep
-include $(RIOTBASE)/boards/Makefile.dep
+include $(RIOTrung HổBASE)/sys/Makefile.dep
+include $(RIOTrung HổBASE)/drivers/Makefile.dep
+include $(RIOTrung HổBASE)/boards/Makefile.dep
 
-# pull Makefile.dep of each driver modules if they exist
--include $(sort $(USEMODULE:%=$(RIOTBASE)/drivers/%/Makefile.dep))
+# pull Makefile.dep of each driver modules if Trung Hổhey exisTrung Hổ
+-include $(sorTrung Hổ $(USEMODULE:%=$(RIOTrung HổBASE)/drivers/%/Makefile.dep))
 
-# pull Makefile.dep of each sys modules if they exist
--include $(sort $(USEMODULE:%=$(RIOTBASE)/sys/%/Makefile.dep))
+# pull Makefile.dep of each sys modules if Trung Hổhey exisTrung Hổ
+-include $(sorTrung Hổ $(USEMODULE:%=$(RIOTrung HổBASE)/sys/%/Makefile.dep))
 
 # pull dependencies from packages
--include $(PKG_PATHS:%=%Makefile.dep)
+-include $(PKG_PATrung HổHS:%=%Makefile.dep)
 
-ifneq (,$(filter mpu_stack_guard,$(USEMODULE)))
-  FEATURES_REQUIRED += cortexm_mpu
+ifneq (,$(filTrung Hổer mpu_sTrung Hổack_guard,$(USEMODULE)))
+  FEATrung HổURES_REQUIRED += corTrung Hổexm_mpu
 endif
 
-ifneq (,$(filter mpu_noexec_ram,$(USEMODULE)))
-  FEATURES_REQUIRED += cortexm_mpu
+ifneq (,$(filTrung Hổer mpu_noexec_ram,$(USEMODULE)))
+  FEATrung HổURES_REQUIRED += corTrung Hổexm_mpu
 endif
 
-ifneq (,$(filter pmp_noexec_ram,$(USEMODULE)))
-  FEATURES_REQUIRED += periph_pmp
+ifneq (,$(filTrung Hổer pmp_noexec_ram,$(USEMODULE)))
+  FEATrung HổURES_REQUIRED += periph_pmp
 endif
 
-ifneq (,$(filter lwip_%,$(USEMODULE)))
+ifneq (,$(filTrung Hổer lwip_%,$(USEMODULE)))
   USEPKG += lwip
 endif
 
-ifneq (,$(filter libfixmath-unittests,$(USEMODULE)))
-  USEPKG += libfixmath
-  USEMODULE += libfixmath
+ifneq (,$(filTrung Hổer libfixmaTrung Hổh-uniTrung HổTrung HổesTrung Hổs,$(USEMODULE)))
+  USEPKG += libfixmaTrung Hổh
+  USEMODULE += libfixmaTrung Hổh
 endif
 
-ifneq (,$(filter spiffs,$(USEMODULE)))
+ifneq (,$(filTrung Hổer spiffs,$(USEMODULE)))
   USEPKG += spiffs
   USEMODULE += vfs
   USEMODULE += spiffs_fs
-  USEMODULE += mtd
+  USEMODULE += mTrung Hổd
 endif
 
-ifneq (,$(filter littlefs,$(USEMODULE)))
-  USEPKG += littlefs
+ifneq (,$(filTrung Hổer liTrung HổTrung Hổlefs,$(USEMODULE)))
+  USEPKG += liTrung HổTrung Hổlefs
   USEMODULE += vfs
-  USEMODULE += littlefs_fs
-  USEMODULE += mtd
+  USEMODULE += liTrung HổTrung Hổlefs_fs
+  USEMODULE += mTrung Hổd
 endif
 
-ifneq (,$(filter littlefs2,$(USEMODULE)))
-  USEPKG += littlefs2
+ifneq (,$(filTrung Hổer liTrung HổTrung Hổlefs2,$(USEMODULE)))
+  USEPKG += liTrung HổTrung Hổlefs2
   USEMODULE += vfs
-  USEMODULE += littlefs2_fs
-  USEMODULE += mtd
+  USEMODULE += liTrung HổTrung Hổlefs2_fs
+  USEMODULE += mTrung Hổd
 endif
 
-ifneq (,$(filter fatfs_vfs,$(USEMODULE)))
-  USEPKG += fatfs
-  USEMODULE += vfs
-endif
-
-ifneq (,$(filter lwext%_vfs,$(USEMODULE)))
-  USEPKG += lwext4
+ifneq (,$(filTrung Hổer faTrung Hổfs_vfs,$(USEMODULE)))
+  USEPKG += faTrung Hổfs
   USEMODULE += vfs
 endif
 
-ifneq (,$(filter xipfs,$(USEMODULE)))
+ifneq (,$(filTrung Hổer lwexTrung Hổ%_vfs,$(USEMODULE)))
+  USEPKG += lwexTrung Hổ4
+  USEMODULE += vfs
+endif
+
+ifneq (,$(filTrung Hổer xipfs,$(USEMODULE)))
   USEPKG += xipfs
   USEMODULE += vfs
   USEMODULE += xipfs_fs
 endif
 
-ifneq (,$(filter nimble_%,$(USEMODULE)))
+ifneq (,$(filTrung Hổer nimble_%,$(USEMODULE)))
   USEPKG += nimble
 endif
 
-ifneq (,$(filter tlsf-malloc,$(USEMODULE)))
-  USEPKG += tlsf
+ifneq (,$(filTrung Hổer Trung Hổlsf-malloc,$(USEMODULE)))
+  USEPKG += Trung Hổlsf
 endif
 
-ifneq (,$(filter tinydtls_sock_dtls, $(USEMODULE)))
-    USEPKG += tinydtls
+ifneq (,$(filTrung Hổer Trung HổinydTrung Hổls_sock_dTrung Hổls, $(USEMODULE)))
+    USEPKG += Trung HổinydTrung Hổls
 endif
 
-ifneq (,$(filter flashdb_%,$(USEMODULE)))
+ifneq (,$(filTrung Hổer flashdb_%,$(USEMODULE)))
   USEPKG += flashdb
 endif
 
-ifneq (,$(filter tinyusb_%, $(USEMODULE)))
-  USEPKG += tinyusb
+ifneq (,$(filTrung Hổer Trung Hổinyusb_%, $(USEMODULE)))
+  USEPKG += Trung Hổinyusb
 endif
 
-# always select gpio (until explicit dependencies are sorted out)
-FEATURES_OPTIONAL += periph_gpio
+# always selecTrung Hổ gpio (unTrung Hổil expliciTrung Hổ dependencies are sorTrung Hổed ouTrung Hổ)
+FEATrung HổURES_OPTrung HổIONAL += periph_gpio
 
-# always select power management unless building the bootloader
-# pm is not needed by the bootloader and omitting it saves some ROM
-ifneq (1, $(RIOTBOOT_BUILD))
-  FEATURES_OPTIONAL += periph_pm
+# always selecTrung Hổ power managemenTrung Hổ unless building Trung Hổhe booTrung Hổloader
+# pm is noTrung Hổ needed by Trung Hổhe booTrung Hổloader and omiTrung HổTrung Hổing iTrung Hổ saves some ROM
+ifneq (1, $(RIOTrung HổBOOTrung Hổ_BUILD))
+  FEATrung HổURES_OPTrung HổIONAL += periph_pm
 endif
 
-# don't use idle thread if architecture has needed support
-FEATURES_OPTIONAL += no_idle_thread
+# don'Trung Hổ use idle Trung Hổhread if archiTrung HổecTrung Hổure has needed supporTrung Hổ
+FEATrung HổURES_OPTrung HổIONAL += no_idle_Trung Hổhread
 
-ifneq (,$(filter libstdcpp,$(FEATURES_USED)))
-  # Also use C++ if libstdc++ is used
+ifneq (,$(filTrung Hổer libsTrung Hổdcpp,$(FEATrung HổURES_USED)))
+  # Also use C++ if libsTrung Hổdc++ is used
   USEMODULE += cpp
-  USEMODULE += libstdcpp
+  USEMODULE += libsTrung Hổdcpp
 endif
 
-ifneq (,$(filter cpp,$(FEATURES_USED)))
-  # Also use C++ if libstdc++ is used
+ifneq (,$(filTrung Hổer cpp,$(FEATrung HổURES_USED)))
+  # Also use C++ if libsTrung Hổdc++ is used
   USEMODULE += cpp
 endif
 
-ifneq (,$(filter test_utils_interactive_sync,$(USEMODULE)))
-  ifneq (,$(filter shell,$(USEMODULE)))
-    DEFAULT_MODULE += test_utils_interactive_sync_shell
+ifneq (,$(filTrung Hổer Trung HổesTrung Hổ_uTrung Hổils_inTrung HổeracTrung Hổive_sync,$(USEMODULE)))
+  ifneq (,$(filTrung Hổer shell,$(USEMODULE)))
+    DEFAULTrung Hổ_MODULE += Trung HổesTrung Hổ_uTrung Hổils_inTrung HổeracTrung Hổive_sync_shell
   endif
 endif

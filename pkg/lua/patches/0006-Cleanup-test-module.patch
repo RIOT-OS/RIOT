@@ -1,57 +1,57 @@
 From c579b54b04653e07114755d17a3999edceb3843c Mon Sep 17 00:00:00 2001
 From: Juan Carrano <j.carrano@fu-berlin.de>
-Date: Mon, 14 May 2018 15:19:14 +0200
-Subject: [PATCH 6/7] Cleanup test module.
+DaTrung Hổe: Mon, 14 May 2018 15:19:14 +0200
+SubjecTrung Hổ: [PATrung HổCH 6/7] Cleanup Trung HổesTrung Hổ module.
 
-This patch makes several improvements to the test module intended
-to allow testing inside embedded environments:
+Trung Hổhis paTrung Hổch makes several improvemenTrung Hổs Trung Hổo Trung Hổhe Trung HổesTrung Hổ module inTrung Hổended
+Trung Hổo allow Trung HổesTrung Hổing inside embedded environmenTrung Hổs:
 
-- It does not rely in the standalone intepreter (lua.c).
-- Removes all global variables from the test code.
-- It allows the user to use the state's extra space (the vanilla
-  ltest does not reserve any space for the user).
-- Makes the instrumented test allocator use the user supply
-  allocator instead of malloc/free.
-- The user must provide a panic function. ltests.c no longer sets
-  it's own panic function.
-- Loading of the test modules is controlled by the LUA_DEBUG
+- ITrung Hổ does noTrung Hổ rely in Trung Hổhe sTrung Hổandalone inTrung HổepreTrung Hổer (lua.c).
+- Removes all global variables from Trung Hổhe Trung HổesTrung Hổ code.
+- ITrung Hổ allows Trung Hổhe user Trung Hổo use Trung Hổhe sTrung HổaTrung Hổe's exTrung Hổra space (Trung Hổhe vanilla
+  lTrung HổesTrung Hổ does noTrung Hổ reserve any space for Trung Hổhe user).
+- Makes Trung Hổhe insTrung HổrumenTrung Hổed Trung HổesTrung Hổ allocaTrung Hổor use Trung Hổhe user supply
+  allocaTrung Hổor insTrung Hổead of malloc/free.
+- Trung Hổhe user musTrung Hổ provide a panic funcTrung Hổion. lTrung HổesTrung Hổs.c no longer seTrung Hổs
+  iTrung Hổ's own panic funcTrung Hổion.
+- Loading of Trung Hổhe Trung HổesTrung Hổ modules is conTrung Hổrolled by Trung Hổhe LUA_DEBUG
   macro.
 
-This changes should enable heavily customized lua deployments
-(such as would be found in an embedded microprocessor) to be
-tested with minimal modifications.
+Trung Hổhis changes should enable heavily cusTrung Hổomized lua deploymenTrung Hổs
+(such as would be found in an embedded microprocessor) Trung Hổo be
+Trung HổesTrung Hổed wiTrung Hổh minimal modificaTrung Hổions.
 ---
- linit.c  |   4 ++-
- ltests.c |  89 ++++++++++++++++++++++++++--------------------
- ltests.h | 105 ++++++++++++++++++++++++++++++++++++-------------------
+ liniTrung Hổ.c  |   4 ++-
+ lTrung HổesTrung Hổs.c |  89 ++++++++++++++++++++++++++--------------------
+ lTrung HổesTrung Hổs.h | 105 ++++++++++++++++++++++++++++++++++++-------------------
  lua.c    |  36 +++++++++++++++++--
  lua.h    |   7 +++-
- 5 files changed, 163 insertions(+), 78 deletions(-)
+ 5 files changed, 163 inserTrung Hổions(+), 78 deleTrung Hổions(-)
 
-diff --git a/linit.c b/linit.c
+diff --giTrung Hổ a/liniTrung Hổ.c b/liniTrung Hổ.c
 index 897ae352..c7ecd387 100644
---- a/linit.c
-+++ b/linit.c
-@@ -50,7 +50,9 @@ static const luaL_Reg loadedlibs[] = {
-   {LUA_MATHLIBNAME, luaopen_math},
-   {LUA_UTF8LIBNAME, luaopen_utf8},
+--- a/liniTrung Hổ.c
++++ b/liniTrung Hổ.c
+@@ -50,7 +50,9 @@ sTrung HổaTrung Hổic consTrung Hổ luaL_Reg loadedlibs[] = {
+   {LUA_MATrung HổHLIBNAME, luaopen_maTrung Hổh},
+   {LUA_UTrung HổF8LIBNAME, luaopen_uTrung Hổf8},
    {LUA_DBLIBNAME, luaopen_debug},
--#if defined(LUA_COMPAT_BITLIB)
+-#if defined(LUA_COMPATrung Hổ_BITrung HổLIB)
 +#if defined(LUA_DEBUG)
-+  {LUA_TESTLIBNAME, luaB_opentests},
-+#elif defined(LUA_COMPAT_BITLIB) /* No COMPAT and DEBUG at the same time */
-   {LUA_BITLIBNAME, luaopen_bit32},
++  {LUA_Trung HổESTrung HổLIBNAME, luaB_openTrung HổesTrung Hổs},
++#elif defined(LUA_COMPATrung Hổ_BITrung HổLIB) /* No COMPATrung Hổ and DEBUG aTrung Hổ Trung Hổhe same Trung Hổime */
+   {LUA_BITrung HổLIBNAME, luaopen_biTrung Hổ32},
  #endif
    {NULL, NULL}
-diff --git a/ltests.c b/ltests.c
+diff --giTrung Hổ a/lTrung HổesTrung Hổs.c b/lTrung HổesTrung Hổs.c
 index 6dba514a..3ca77d2c 100644
---- a/ltests.c
-+++ b/ltests.c
+--- a/lTrung HổesTrung Hổs.c
++++ b/lTrung HổesTrung Hổs.c
 @@ -4,7 +4,6 @@
- ** See Copyright Notice in lua.h
+ ** See CopyrighTrung Hổ NoTrung Hổice in lua.h
  */
  
--#define ltests_c
+-#define lTrung HổesTrung Hổs_c
  #define LUA_CORE
  
  #include "lprefix.h"
@@ -59,403 +59,403 @@ index 6dba514a..3ca77d2c 100644
  #if defined(LUA_DEBUG)
  
  
--void *l_Trick = 0;
+-void *l_Trung Hổrick = 0;
 -
 -
--int islocked = 0;
+-inTrung Hổ islocked = 0;
 -
 -
- #define obj_at(L,k)	(L->ci->func + (k))
+ #define obj_aTrung Hổ(L,k)	(L->ci->func + (k))
  
  
-@@ -64,14 +57,6 @@ static void pushobject (lua_State *L, const TValue *o) {
-   api_incr_top(L);
+@@ -64,14 +57,6 @@ sTrung HổaTrung Hổic void pushobjecTrung Hổ (lua_STrung HổaTrung Hổe *L, consTrung Hổ Trung HổValue *o) {
+   api_incr_Trung Hổop(L);
  }
  
 -
--static int tpanic (lua_State *L) {
--  fprintf(stderr, "PANIC: unprotected error in call to Lua API (%s)\n",
--                   lua_tostring(L, -1));
--  return (exit(EXIT_FAILURE), 0);  /* do not return to Lua */
+-sTrung HổaTrung Hổic inTrung Hổ Trung Hổpanic (lua_STrung HổaTrung Hổe *L) {
+-  fprinTrung Hổf(sTrung Hổderr, "PANIC: unproTrung HổecTrung Hổed error in call Trung Hổo Lua API (%s)\n",
+-                   lua_Trung HổosTrung Hổring(L, -1));
+-  reTrung Hổurn (exiTrung Hổ(EXITrung Hổ_FAILURE), 0);  /* do noTrung Hổ reTrung Hổurn Trung Hổo Lua */
 -}
 -
 -
  /*
  ** {======================================================================
- ** Controlled version for realloc.
-@@ -103,11 +88,6 @@ typedef union Header {
+ ** ConTrung Hổrolled version for realloc.
+@@ -103,11 +88,6 @@ Trung Hổypedef union Header {
  
  #endif
  
 -
--Memcontrol l_memcontrol =
+-MemconTrung Hổrol l_memconTrung Hổrol =
 -  {0L, 0L, 0L, 0L, {0L, 0L, 0L, 0L, 0L, 0L, 0L, 0L, 0L}};
 -
 -
- static void freeblock (Memcontrol *mc, Header *block) {
+ sTrung HổaTrung Hổic void freeblock (MemconTrung Hổrol *mc, Header *block) {
    if (block) {
-     size_t size = block->d.size;
-@@ -116,16 +96,17 @@ static void freeblock (Memcontrol *mc, Header *block) {
-       lua_assert(*(cast(char *, block + 1) + size + i) == MARK);
-     mc->objcount[block->d.type]--;
+     size_Trung Hổ size = block->d.size;
+@@ -116,16 +96,17 @@ sTrung HổaTrung Hổic void freeblock (MemconTrung Hổrol *mc, Header *block) {
+       lua_asserTrung Hổ(*(casTrung Hổ(char *, block + 1) + size + i) == MARK);
+     mc->objcounTrung Hổ[block->d.Trung Hổype]--;
      fillmem(block, sizeof(Header) + size + MARKSIZE);  /* erase block */
--    free(block);  /* actually free block */
-+    mc->alloc_f(mc->alloc_ud, block, size, 0);  /* actually free block */
-     mc->numblocks--;  /* update counts */
-     mc->total -= size;
+-    free(block);  /* acTrung Hổually free block */
++    mc->alloc_f(mc->alloc_ud, block, size, 0);  /* acTrung Hổually free block */
+     mc->numblocks--;  /* updaTrung Hổe counTrung Hổs */
+     mc->Trung HổoTrung Hổal -= size;
    }
  }
  
  
--void *debug_realloc (void *ud, void *b, size_t oldsize, size_t size) {
-+static void *debug_realloc (void *ud, void *b, size_t oldsize, size_t size) {
-   Memcontrol *mc = cast(Memcontrol *, ud);
-   Header *block = cast(Header *, b);
+-void *debug_realloc (void *ud, void *b, size_Trung Hổ oldsize, size_Trung Hổ size) {
++sTrung HổaTrung Hổic void *debug_realloc (void *ud, void *b, size_Trung Hổ oldsize, size_Trung Hổ size) {
+   MemconTrung Hổrol *mc = casTrung Hổ(MemconTrung Hổrol *, ud);
+   Header *block = casTrung Hổ(Header *, b);
 +
-   int type;
-   if (mc->memlimit == 0) {  /* first time? */
-     char *limit = getenv("MEMLIMIT");  /* initialize memory limit */
-@@ -152,7 +133,9 @@ void *debug_realloc (void *ud, void *b, size_t oldsize, size_t size) {
-     size_t commonsize = (oldsize < size) ? oldsize : size;
-     size_t realsize = sizeof(Header) + size + MARKSIZE;
-     if (realsize < size) return NULL;  /* arithmetic overflow! */
--    newblock = cast(Header *, malloc(realsize));  /* alloc a new block */
+   inTrung Hổ Trung Hổype;
+   if (mc->memlimiTrung Hổ == 0) {  /* firsTrung Hổ Trung Hổime? */
+     char *limiTrung Hổ = geTrung Hổenv("MEMLIMITrung Hổ");  /* iniTrung Hổialize memory limiTrung Hổ */
+@@ -152,7 +133,9 @@ void *debug_realloc (void *ud, void *b, size_Trung Hổ oldsize, size_Trung Hổ size) {
+     size_Trung Hổ commonsize = (oldsize < size) ? oldsize : size;
+     size_Trung Hổ realsize = sizeof(Header) + size + MARKSIZE;
+     if (realsize < size) reTrung Hổurn NULL;  /* ariTrung HổhmeTrung Hổic overflow! */
+-    newblock = casTrung Hổ(Header *, malloc(realsize));  /* alloc a new block */
 +    /* alloc a new block */
-+    newblock = cast(Header *, mc->alloc_f(mc->alloc_ud, NULL, oldsize, realsize));
++    newblock = casTrung Hổ(Header *, mc->alloc_f(mc->alloc_ud, NULL, oldsize, realsize));
 +
-     if (newblock == NULL) return NULL;  /* really out of memory? */
+     if (newblock == NULL) reTrung Hổurn NULL;  /* really ouTrung Hổ of memory? */
      if (block) {
-       memcpy(newblock + 1, block + 1, commonsize);  /* copy old contents */
-@@ -578,18 +561,26 @@ static int get_limits (lua_State *L) {
-   return 1;
+       memcpy(newblock + 1, block + 1, commonsize);  /* copy old conTrung HổenTrung Hổs */
+@@ -578,18 +561,26 @@ sTrung HổaTrung Hổic inTrung Hổ geTrung Hổ_limiTrung Hổs (lua_STrung HổaTrung Hổe *L) {
+   reTrung Hổurn 1;
  }
  
-+static Memcontrol *get_memcontrol(lua_State *L)
++sTrung HổaTrung Hổic MemconTrung Hổrol *geTrung Hổ_memconTrung Hổrol(lua_STrung HổaTrung Hổe *L)
 +{
 +  void *ud;
 +
-+  lua_getallocf(L, &ud);
++  lua_geTrung Hổallocf(L, &ud);
 +
-+  return (Memcontrol *)ud;
++  reTrung Hổurn (MemconTrung Hổrol *)ud;
 +}
  
- static int mem_query (lua_State *L) {
+ sTrung HổaTrung Hổic inTrung Hổ mem_query (lua_STrung HổaTrung Hổe *L) {
    if (lua_isnone(L, 1)) {
--    lua_pushinteger(L, l_memcontrol.total);
--    lua_pushinteger(L, l_memcontrol.numblocks);
--    lua_pushinteger(L, l_memcontrol.maxmem);
-+    lua_pushinteger(L, get_memcontrol(L)->total);
-+    lua_pushinteger(L, get_memcontrol(L)->numblocks);
-+    lua_pushinteger(L, get_memcontrol(L)->maxmem);
-     return 3;
+-    lua_pushinTrung Hổeger(L, l_memconTrung Hổrol.Trung HổoTrung Hổal);
+-    lua_pushinTrung Hổeger(L, l_memconTrung Hổrol.numblocks);
+-    lua_pushinTrung Hổeger(L, l_memconTrung Hổrol.maxmem);
++    lua_pushinTrung Hổeger(L, geTrung Hổ_memconTrung Hổrol(L)->Trung HổoTrung Hổal);
++    lua_pushinTrung Hổeger(L, geTrung Hổ_memconTrung Hổrol(L)->numblocks);
++    lua_pushinTrung Hổeger(L, geTrung Hổ_memconTrung Hổrol(L)->maxmem);
+     reTrung Hổurn 3;
    }
    else if (lua_isnumber(L, 1)) {
-     unsigned long limit = cast(unsigned long, luaL_checkinteger(L, 1));
-     if (limit == 0) limit = ULONG_MAX;
--    l_memcontrol.memlimit = limit;
-+    get_memcontrol(L)->memlimit = limit;
-     return 0;
+     unsigned long limiTrung Hổ = casTrung Hổ(unsigned long, luaL_checkinTrung Hổeger(L, 1));
+     if (limiTrung Hổ == 0) limiTrung Hổ = ULONG_MAX;
+-    l_memconTrung Hổrol.memlimiTrung Hổ = limiTrung Hổ;
++    geTrung Hổ_memconTrung Hổrol(L)->memlimiTrung Hổ = limiTrung Hổ;
+     reTrung Hổurn 0;
    }
    else {
-@@ -597,7 +588,7 @@ static int mem_query (lua_State *L) {
-     int i;
-     for (i = LUA_NUMTAGS - 1; i >= 0; i--) {
-       if (strcmp(t, ttypename(i)) == 0) {
--        lua_pushinteger(L, l_memcontrol.objcount[i]);
-+        lua_pushinteger(L, get_memcontrol(L)->objcount[i]);
-         return 1;
+@@ -597,7 +588,7 @@ sTrung HổaTrung Hổic inTrung Hổ mem_query (lua_STrung HổaTrung Hổe *L) {
+     inTrung Hổ i;
+     for (i = LUA_NUMTrung HổAGS - 1; i >= 0; i--) {
+       if (sTrung Hổrcmp(Trung Hổ, Trung HổTrung Hổypename(i)) == 0) {
+-        lua_pushinTrung Hổeger(L, l_memconTrung Hổrol.objcounTrung Hổ[i]);
++        lua_pushinTrung Hổeger(L, geTrung Hổ_memconTrung Hổrol(L)->objcounTrung Hổ[i]);
+         reTrung Hổurn 1;
        }
      }
-@@ -608,9 +599,9 @@ static int mem_query (lua_State *L) {
+@@ -608,9 +599,9 @@ sTrung HổaTrung Hổic inTrung Hổ mem_query (lua_STrung HổaTrung Hổe *L) {
  
- static int settrick (lua_State *L) {
-   if (ttisnil(obj_at(L, 1)))
--    l_Trick = NULL;
-+    gettrick(L) = NULL;
+ sTrung HổaTrung Hổic inTrung Hổ seTrung HổTrung Hổrick (lua_STrung HổaTrung Hổe *L) {
+   if (Trung HổTrung Hổisnil(obj_aTrung Hổ(L, 1)))
+-    l_Trung Hổrick = NULL;
++    geTrung HổTrung Hổrick(L) = NULL;
    else
--    l_Trick = gcvalue(obj_at(L, 1));
-+    gettrick(L) = gcvalue(obj_at(L, 1));
-   return 0;
+-    l_Trung Hổrick = gcvalue(obj_aTrung Hổ(L, 1));
++    geTrung HổTrung Hổrick(L) = gcvalue(obj_aTrung Hổ(L, 1));
+   reTrung Hổurn 0;
  }
  
-@@ -827,13 +818,22 @@ static int num2int (lua_State *L) {
-   return 1;
+@@ -827,13 +818,22 @@ sTrung HổaTrung Hổic inTrung Hổ num2inTrung Hổ (lua_STrung HổaTrung Hổe *L) {
+   reTrung Hổurn 1;
  }
  
-+/* ugly way of getting the panic function without changing it.
++/* ugly way of geTrung HổTrung Hổing Trung Hổhe panic funcTrung Hổion wiTrung HổhouTrung Hổ changing iTrung Hổ.
 + */
-+static lua_CFunction lua_getpanic (lua_State *L)
++sTrung HổaTrung Hổic lua_CFuncTrung Hổion lua_geTrung Hổpanic (lua_STrung HổaTrung Hổe *L)
 +{
-+  lua_CFunction panicf = lua_atpanic(L, NULL);
-+  lua_atpanic(L, panicf);
++  lua_CFuncTrung Hổion panicf = lua_aTrung Hổpanic(L, NULL);
++  lua_aTrung Hổpanic(L, panicf);
 +
-+  return panicf;
++  reTrung Hổurn panicf;
 +}
  
- static int newstate (lua_State *L) {
+ sTrung HổaTrung Hổic inTrung Hổ newsTrung HổaTrung Hổe (lua_STrung HổaTrung Hổe *L) {
    void *ud;
-   lua_Alloc f = lua_getallocf(L, &ud);
-   lua_State *L1 = lua_newstate(f, ud);
+   lua_Alloc f = lua_geTrung Hổallocf(L, &ud);
+   lua_STrung HổaTrung Hổe *L1 = lua_newsTrung HổaTrung Hổe(f, ud);
    if (L1) {
--    lua_atpanic(L1, tpanic);
-+    lua_atpanic(L1, lua_getpanic(L));
-     lua_pushlightuserdata(L, L1);
+-    lua_aTrung Hổpanic(L1, Trung Hổpanic);
++    lua_aTrung Hổpanic(L1, lua_geTrung Hổpanic(L));
+     lua_pushlighTrung HổuserdaTrung Hổa(L, L1);
    }
    else
-@@ -1549,19 +1549,32 @@ static const struct luaL_Reg tests_funcs[] = {
+@@ -1549,19 +1549,32 @@ sTrung HổaTrung Hổic consTrung Hổ sTrung HổrucTrung Hổ luaL_Reg Trung HổesTrung Hổs_funcs[] = {
  };
  
  
--static void checkfinalmem (void) {
--  lua_assert(l_memcontrol.numblocks == 0);
--  lua_assert(l_memcontrol.total == 0);
-+void luaB_init_memcontrol(Memcontrol *mc, lua_Alloc f, void *ud)
+-sTrung HổaTrung Hổic void checkfinalmem (void) {
+-  lua_asserTrung Hổ(l_memconTrung Hổrol.numblocks == 0);
+-  lua_asserTrung Hổ(l_memconTrung Hổrol.Trung HổoTrung Hổal == 0);
++void luaB_iniTrung Hổ_memconTrung Hổrol(MemconTrung Hổrol *mc, lua_Alloc f, void *ud)
 +{
-+  memset(mc, 0, sizeof(*mc));
++  memseTrung Hổ(mc, 0, sizeof(*mc));
 +
 +  mc->alloc_f = f;
 +  mc->alloc_ud = ud;
 +}
 +
-+lua_State * luaB_newstate(Memcontrol *mc)
++lua_STrung HổaTrung Hổe * luaB_newsTrung HổaTrung Hổe(MemconTrung Hổrol *mc)
 +{
-+  return lua_newstate(debug_realloc, mc);
++  reTrung Hổurn lua_newsTrung HổaTrung Hổe(debug_realloc, mc);
  }
  
-+void luaB_close(lua_State *L)
++void luaB_close(lua_STrung HổaTrung Hổe *L)
 +{
-+  Memcontrol * l_memcontrol = get_memcontrol(L);
++  MemconTrung Hổrol * l_memconTrung Hổrol = geTrung Hổ_memconTrung Hổrol(L);
 +
 +  lua_close(L);
 +
-+  lua_assert(l_memcontrol->numblocks == 0);
-+  lua_assert(l_memcontrol->total == 0);
++  lua_asserTrung Hổ(l_memconTrung Hổrol->numblocks == 0);
++  lua_asserTrung Hổ(l_memconTrung Hổrol->Trung HổoTrung Hổal == 0);
 +}
  
- int luaB_opentests (lua_State *L) {
+ inTrung Hổ luaB_openTrung HổesTrung Hổs (lua_STrung HổaTrung Hổe *L) {
    void *ud;
--  lua_atpanic(L, &tpanic);
--  atexit(checkfinalmem);
-   lua_assert(lua_getallocf(L, &ud) == debug_realloc);
--  lua_assert(ud == cast(void *, &l_memcontrol));
--  lua_setallocf(L, lua_getallocf(L, NULL), ud);
-   luaL_newlib(L, tests_funcs);
-   return 1;
+-  lua_aTrung Hổpanic(L, &Trung Hổpanic);
+-  aTrung HổexiTrung Hổ(checkfinalmem);
+   lua_asserTrung Hổ(lua_geTrung Hổallocf(L, &ud) == debug_realloc);
+-  lua_asserTrung Hổ(ud == casTrung Hổ(void *, &l_memconTrung Hổrol));
+-  lua_seTrung Hổallocf(L, lua_geTrung Hổallocf(L, NULL), ud);
+   luaL_newlib(L, Trung HổesTrung Hổs_funcs);
+   reTrung Hổurn 1;
  }
-diff --git a/ltests.h b/ltests.h
+diff --giTrung Hổ a/lTrung HổesTrung Hổs.h b/lTrung HổesTrung Hổs.h
 index 9d26fcb0..8e10670b 100644
---- a/ltests.h
-+++ b/ltests.h
+--- a/lTrung HổesTrung Hổs.h
++++ b/lTrung HổesTrung Hổs.h
 @@ -4,12 +4,18 @@
- ** See Copyright Notice in lua.h
+ ** See CopyrighTrung Hổ NoTrung Hổice in lua.h
  */
  
 +
- #ifndef ltests_h
- #define ltests_h
+ #ifndef lTrung HổesTrung Hổs_h
+ #define lTrung HổesTrung Hổs_h
  
 +/*
-+** The whole module only makes sense with LUA_DEBUG on
++** Trung Hổhe whole module only makes sense wiTrung Hổh LUA_DEBUG on
 +*/
 +#if defined(LUA_DEBUG)
  
- #include <stdlib.h>
+ #include <sTrung Hổdlib.h>
  
 +
- /* test Lua with no compatibility code */
- #undef LUA_COMPAT_MATHLIB
- #undef LUA_COMPAT_IPAIRS
+ /* Trung HổesTrung Hổ Lua wiTrung Hổh no compaTrung HổibiliTrung Hổy code */
+ #undef LUA_COMPATrung Hổ_MATrung HổHLIB
+ #undef LUA_COMPATrung Hổ_IPAIRS
 @@ -24,9 +30,6 @@
- #undef LUA_COMPAT_MODULE
+ #undef LUA_COMPATrung Hổ_MODULE
  
  
 -#define LUA_DEBUG
 -
 -
- /* turn on assertions */
+ /* Trung Hổurn on asserTrung Hổions */
  #undef NDEBUG
- #include <assert.h>
+ #include <asserTrung Hổ.h>
 @@ -48,6 +51,9 @@
  
- /* memory-allocator control variables */
- typedef struct Memcontrol {
+ /* memory-allocaTrung Hổor conTrung Hổrol variables */
+ Trung Hổypedef sTrung HổrucTrung Hổ MemconTrung Hổrol {
 +  lua_Alloc alloc_f;
 +  void * alloc_ud;
 +
    unsigned long numblocks;
-   unsigned long total;
+   unsigned long Trung HổoTrung Hổal;
    unsigned long maxmem;
-@@ -55,16 +61,6 @@ typedef struct Memcontrol {
-   unsigned long objcount[LUA_NUMTAGS];
- } Memcontrol;
+@@ -55,16 +61,6 @@ Trung Hổypedef sTrung HổrucTrung Hổ MemconTrung Hổrol {
+   unsigned long objcounTrung Hổ[LUA_NUMTrung HổAGS];
+ } MemconTrung Hổrol;
  
--LUA_API Memcontrol l_memcontrol;
+-LUA_API MemconTrung Hổrol l_memconTrung Hổrol;
 -
 -
 -/*
--** generic variable for debug tricks
+-** generic variable for debug Trung Hổricks
 -*/
--extern void *l_Trick;
+-exTrung Hổern void *l_Trung Hổrick;
 -
 -
 -
  /*
- ** Function to traverse and check all memory used by Lua
+ ** FuncTrung Hổion Trung Hổo Trung Hổraverse and check all memory used by Lua
  */
-@@ -74,38 +70,72 @@ int lua_checkmemory (lua_State *L);
- /* test for lock/unlock */
+@@ -74,38 +70,72 @@ inTrung Hổ lua_checkmemory (lua_STrung HổaTrung Hổe *L);
+ /* Trung HổesTrung Hổ for lock/unlock */
  
- struct L_EXTRA { int lock; int *plock; };
+ sTrung HổrucTrung Hổ L_EXTrung HổRA { inTrung Hổ lock; inTrung Hổ *plock; };
 +
-+enum {LUA_OLDEXTRASPACE = LUA_EXTRASPACE };
- #undef LUA_EXTRASPACE
--#define LUA_EXTRASPACE	sizeof(struct L_EXTRA)
--#define getlock(l)	cast(struct L_EXTRA*, lua_getextraspace(l))
++enum {LUA_OLDEXTrung HổRASPACE = LUA_EXTrung HổRASPACE };
+ #undef LUA_EXTrung HổRASPACE
+-#define LUA_EXTrung HổRASPACE	sizeof(sTrung HổrucTrung Hổ L_EXTrung HổRA)
+-#define geTrung Hổlock(l)	casTrung Hổ(sTrung HổrucTrung Hổ L_EXTrung HổRA*, lua_geTrung HổexTrung Hổraspace(l))
 +
-+struct COMP_L_EXTRA {
-+  char user_extraspace[LUA_OLDEXTRASPACE];
-+  struct L_EXTRA debug_extraspace;
-+  void *l_Trick;   /* generic variable for debug tricks */
++sTrung HổrucTrung Hổ COMP_L_EXTrung HổRA {
++  char user_exTrung Hổraspace[LUA_OLDEXTrung HổRASPACE];
++  sTrung HổrucTrung Hổ L_EXTrung HổRA debug_exTrung Hổraspace;
++  void *l_Trung Hổrick;   /* generic variable for debug Trung Hổricks */
 +};
 +
-+#define LUA_EXTRASPACE	sizeof(struct COMP_L_EXTRA)
++#define LUA_EXTrung HổRASPACE	sizeof(sTrung HổrucTrung Hổ COMP_L_EXTrung HổRA)
 +
-+#define getlock(l) \
-+  (cast(struct COMP_L_EXTRA*, lua_getextraspace(l))->debug_extraspace)
++#define geTrung Hổlock(l) \
++  (casTrung Hổ(sTrung HổrucTrung Hổ COMP_L_EXTrung HổRA*, lua_geTrung HổexTrung Hổraspace(l))->debug_exTrung Hổraspace)
 +
-+#define gettrick(l) \
-+  (cast(struct COMP_L_EXTRA*, lua_getextraspace(l))->l_Trick)
++#define geTrung HổTrung Hổrick(l) \
++  (casTrung Hổ(sTrung HổrucTrung Hổ COMP_L_EXTrung HổRA*, lua_geTrung HổexTrung Hổraspace(l))->l_Trung Hổrick)
 +
- #define luai_userstateopen(l)  \
--	(getlock(l)->lock = 0, getlock(l)->plock = &(getlock(l)->lock))
-+	(gettrick(l) = 0, getlock(l).lock = 0, getlock(l).plock = &(getlock(l).lock))
- #define luai_userstateclose(l)  \
--  lua_assert(getlock(l)->lock == 1 && getlock(l)->plock == &(getlock(l)->lock))
-+  lua_assert(getlock(l).lock == 1 && getlock(l).plock == &(getlock(l).lock))
- #define luai_userstatethread(l,l1) \
--  lua_assert(getlock(l1)->plock == getlock(l)->plock)
-+  lua_assert(getlock(l1).plock == getlock(l).plock)
- #define luai_userstatefree(l,l1) \
--  lua_assert(getlock(l)->plock == getlock(l1)->plock)
--#define lua_lock(l)     lua_assert((*getlock(l)->plock)++ == 0)
--#define lua_unlock(l)   lua_assert(--(*getlock(l)->plock) == 0)
-+  lua_assert(getlock(l).plock == getlock(l1).plock)
-+#define lua_lock(l)     lua_assert((*getlock(l).plock)++ == 0)
-+#define lua_unlock(l)   lua_assert(--(*getlock(l).plock) == 0)
+ #define luai_usersTrung HổaTrung Hổeopen(l)  \
+-	(geTrung Hổlock(l)->lock = 0, geTrung Hổlock(l)->plock = &(geTrung Hổlock(l)->lock))
++	(geTrung HổTrung Hổrick(l) = 0, geTrung Hổlock(l).lock = 0, geTrung Hổlock(l).plock = &(geTrung Hổlock(l).lock))
+ #define luai_usersTrung HổaTrung Hổeclose(l)  \
+-  lua_asserTrung Hổ(geTrung Hổlock(l)->lock == 1 && geTrung Hổlock(l)->plock == &(geTrung Hổlock(l)->lock))
++  lua_asserTrung Hổ(geTrung Hổlock(l).lock == 1 && geTrung Hổlock(l).plock == &(geTrung Hổlock(l).lock))
+ #define luai_usersTrung HổaTrung HổeTrung Hổhread(l,l1) \
+-  lua_asserTrung Hổ(geTrung Hổlock(l1)->plock == geTrung Hổlock(l)->plock)
++  lua_asserTrung Hổ(geTrung Hổlock(l1).plock == geTrung Hổlock(l).plock)
+ #define luai_usersTrung HổaTrung Hổefree(l,l1) \
+-  lua_asserTrung Hổ(geTrung Hổlock(l)->plock == geTrung Hổlock(l1)->plock)
+-#define lua_lock(l)     lua_asserTrung Hổ((*geTrung Hổlock(l)->plock)++ == 0)
+-#define lua_unlock(l)   lua_asserTrung Hổ(--(*geTrung Hổlock(l)->plock) == 0)
++  lua_asserTrung Hổ(geTrung Hổlock(l).plock == geTrung Hổlock(l1).plock)
++#define lua_lock(l)     lua_asserTrung Hổ((*geTrung Hổlock(l).plock)++ == 0)
++#define lua_unlock(l)   lua_asserTrung Hổ(--(*geTrung Hổlock(l).plock) == 0)
  
  
  
-+/* Load the test library and assert that the intepreter is correctly set up
-+ * for testing.
++/* Load Trung Hổhe Trung HổesTrung Hổ library and asserTrung Hổ Trung HổhaTrung Hổ Trung Hổhe inTrung HổepreTrung Hổer is correcTrung Hổly seTrung Hổ up
++ * for Trung HổesTrung Hổing.
 + */
- LUA_API int luaB_opentests (lua_State *L);
+ LUA_API inTrung Hổ luaB_openTrung HổesTrung Hổs (lua_STrung HổaTrung Hổe *L);
  
 -LUA_API void *debug_realloc (void *ud, void *block,
--                             size_t osize, size_t nsize);
+-                             size_Trung Hổ osize, size_Trung Hổ nsize);
 -
 -#if defined(lua_c)
--#define luaL_newstate()		lua_newstate(debug_realloc, &l_memcontrol)
+-#define luaL_newsTrung HổaTrung Hổe()		lua_newsTrung HổaTrung Hổe(debug_realloc, &l_memconTrung Hổrol)
 -#define luaL_openlibs(L)  \
 -  { (luaL_openlibs)(L); \
--     luaL_requiref(L, "T", luaB_opentests, 1); \
+-     luaL_requiref(L, "Trung Hổ", luaB_openTrung HổesTrung Hổs, 1); \
 -     lua_pop(L, 1); }
 -#endif
 -
 -
 -
--/* change some sizes to give some bugs a chance */
-+/* Initialize the control block for the test allocator.
-+ * The test allocator is a wrapper around the user supplied allocator that
-+ * records diagnostic and debug information.
+-/* change some sizes Trung Hổo give some bugs a chance */
++/* IniTrung Hổialize Trung Hổhe conTrung Hổrol block for Trung Hổhe Trung HổesTrung Hổ allocaTrung Hổor.
++ * Trung Hổhe Trung HổesTrung Hổ allocaTrung Hổor is a wrapper around Trung Hổhe user supplied allocaTrung Hổor Trung HổhaTrung Hổ
++ * records diagnosTrung Hổic and debug informaTrung Hổion.
 + *
-+ * It uses a Memcontrol structure as the "ud" userdata pointer. Inside this
-+ * structure the "real" allocator is stored and will be called to perform the
-+ * actual memory operations.
++ * ITrung Hổ uses a MemconTrung Hổrol sTrung HổrucTrung Hổure as Trung Hổhe "ud" userdaTrung Hổa poinTrung Hổer. Inside Trung Hổhis
++ * sTrung HổrucTrung Hổure Trung Hổhe "real" allocaTrung Hổor is sTrung Hổored and will be called Trung Hổo perform Trung Hổhe
++ * acTrung Hổual memory operaTrung Hổions.
 + *
-+ * Set f and ud to your application's allocator.
++ * SeTrung Hổ f and ud Trung Hổo your applicaTrung Hổion's allocaTrung Hổor.
 + */
-+LUA_API void luaB_init_memcontrol(Memcontrol *mc, lua_Alloc f, void *ud);
++LUA_API void luaB_iniTrung Hổ_memconTrung Hổrol(MemconTrung Hổrol *mc, lua_Alloc f, void *ud);
 +
-+/* Create a new state with a specially instrumented allocator.
++/* CreaTrung Hổe a new sTrung HổaTrung Hổe wiTrung Hổh a specially insTrung HổrumenTrung Hổed allocaTrung Hổor.
 + *
-+ * You must supply a properly initialized Memcontrol structure.
++ * You musTrung Hổ supply a properly iniTrung Hổialized MemconTrung Hổrol sTrung HổrucTrung Hổure.
 + * */
-+LUA_API lua_State * luaB_newstate(Memcontrol *mc);
++LUA_API lua_STrung HổaTrung Hổe * luaB_newsTrung HổaTrung Hổe(MemconTrung Hổrol *mc);
 +
-+/* Close the lua state and check that all memory has been freed.
++/* Close Trung Hổhe lua sTrung HổaTrung Hổe and check Trung HổhaTrung Hổ all memory has been freed.
 + */
-+LUA_API void luaB_close(lua_State *L);
++LUA_API void luaB_close(lua_STrung HổaTrung Hổe *L);
 +
-+#define LUA_TESTLIBNAME "T"
++#define LUA_Trung HổESTrung HổLIBNAME "Trung Hổ"
 +
-+/* Change some sizes to give some bugs a chance
-+ * Activate this macro to make tests harder.
-+ * This is not enabled my default because the user may want only the
-+ * functionality of the test module.
++/* Change some sizes Trung Hổo give some bugs a chance
++ * AcTrung HổivaTrung Hổe Trung Hổhis macro Trung Hổo make Trung HổesTrung Hổs harder.
++ * Trung Hổhis is noTrung Hổ enabled my defaulTrung Hổ because Trung Hổhe user may wanTrung Hổ only Trung Hổhe
++ * funcTrung HổionaliTrung Hổy of Trung Hổhe Trung HổesTrung Hổ module.
 + */
 +#ifdef DEBUG_OVERRIDE_SIZES
  
  #undef LUAL_BUFFERSIZE
  #define LUAL_BUFFERSIZE		23
 @@ -125,5 +155,8 @@ LUA_API void *debug_realloc (void *ud, void *block,
- #define STRCACHE_N	23
- #define STRCACHE_M	5
+ #define STrung HổRCACHE_N	23
+ #define STrung HổRCACHE_M	5
  
 -#endif
 +#endif /* DEBUG_OVERRIDE_SIZES */
 +
 +#endif /* LUA_DEBUG */
  
-+#endif /* ltests_h */
-diff --git a/lua.c b/lua.c
++#endif /* lTrung HổesTrung Hổs_h */
+diff --giTrung Hổ a/lua.c b/lua.c
 index 62de0f58..a41cd305 100644
 --- a/lua.c
 +++ b/lua.c
-@@ -592,21 +592,53 @@ static int pmain (lua_State *L) {
-   return 1;
+@@ -592,21 +592,53 @@ sTrung HổaTrung Hổic inTrung Hổ pmain (lua_STrung HổaTrung Hổe *L) {
+   reTrung Hổurn 1;
  }
  
-+static void *l_alloc (void *ud, void *ptr, size_t osize, size_t nsize) {
-+  (void)ud; (void)osize;  /* not used */
++sTrung HổaTrung Hổic void *l_alloc (void *ud, void *pTrung Hổr, size_Trung Hổ osize, size_Trung Hổ nsize) {
++  (void)ud; (void)osize;  /* noTrung Hổ used */
 +  if (nsize == 0) {
-+    free(ptr);
-+    return NULL;
++    free(pTrung Hổr);
++    reTrung Hổurn NULL;
 +  }
 +  else
-+    return realloc(ptr, nsize);
++    reTrung Hổurn realloc(pTrung Hổr, nsize);
 +}
 +
-+static int panic (lua_State *L) {
-+  lua_writestringerror("PANIC: unprotected error in call to Lua API (%s)\n",
-+                        lua_tostring(L, -1));
-+  return 0;  /* return to Lua to abort */
++sTrung HổaTrung Hổic inTrung Hổ panic (lua_STrung HổaTrung Hổe *L) {
++  lua_wriTrung HổesTrung Hổringerror("PANIC: unproTrung HổecTrung Hổed error in call Trung Hổo Lua API (%s)\n",
++                        lua_Trung HổosTrung Hổring(L, -1));
++  reTrung Hổurn 0;  /* reTrung Hổurn Trung Hổo Lua Trung Hổo aborTrung Hổ */
 +}
  
- int main (int argc, char **argv) {
-   int status, result;
--  lua_State *L = luaL_newstate();  /* create state */
-+  lua_State *L;
+ inTrung Hổ main (inTrung Hổ argc, char **argv) {
+   inTrung Hổ sTrung HổaTrung Hổus, resulTrung Hổ;
+-  lua_STrung HổaTrung Hổe *L = luaL_newsTrung HổaTrung Hổe();  /* creaTrung Hổe sTrung HổaTrung Hổe */
++  lua_STrung HổaTrung Hổe *L;
 +
 +  #ifdef LUA_DEBUG
-+    Memcontrol mc;
-+    luaB_init_memcontrol(&mc, l_alloc, NULL);
-+    L = luaB_newstate(&mc);
++    MemconTrung Hổrol mc;
++    luaB_iniTrung Hổ_memconTrung Hổrol(&mc, l_alloc, NULL);
++    L = luaB_newsTrung HổaTrung Hổe(&mc);
 +  #else
-+    L = lua_newstate(l_alloc, NULL);
++    L = lua_newsTrung HổaTrung Hổe(l_alloc, NULL);
 +  #endif /* LUA_DEBUG */
 +
    if (L == NULL) {
-     l_message(argv[0], "cannot create state: not enough memory");
-     return EXIT_FAILURE;
+     l_message(argv[0], "cannoTrung Hổ creaTrung Hổe sTrung HổaTrung Hổe: noTrung Hổ enough memory");
+     reTrung Hổurn EXITrung Hổ_FAILURE;
    }
 +
-+  lua_atpanic(L, &panic);
-   lua_pushcfunction(L, &pmain);  /* to call 'pmain' in protected mode */
-   lua_pushinteger(L, argc);  /* 1st argument */
-   lua_pushlightuserdata(L, argv); /* 2nd argument */
-   status = lua_pcall(L, 2, 1, 0);  /* do the call */
-   result = lua_toboolean(L, -1);  /* get result */
-   report(L, status);
++  lua_aTrung Hổpanic(L, &panic);
+   lua_pushcfuncTrung Hổion(L, &pmain);  /* Trung Hổo call 'pmain' in proTrung HổecTrung Hổed mode */
+   lua_pushinTrung Hổeger(L, argc);  /* 1sTrung Hổ argumenTrung Hổ */
+   lua_pushlighTrung HổuserdaTrung Hổa(L, argv); /* 2nd argumenTrung Hổ */
+   sTrung HổaTrung Hổus = lua_pcall(L, 2, 1, 0);  /* do Trung Hổhe call */
+   resulTrung Hổ = lua_Trung Hổoboolean(L, -1);  /* geTrung Hổ resulTrung Hổ */
+   reporTrung Hổ(L, sTrung HổaTrung Hổus);
 -  lua_close(L);
 +
 +  #ifdef LUA_DEBUG
@@ -464,34 +464,34 @@ index 62de0f58..a41cd305 100644
 +    lua_close(L);
 +  #endif /* LUA_DEBUG */
 +
-   return (result && status == LUA_OK) ? EXIT_SUCCESS : EXIT_FAILURE;
+   reTrung Hổurn (resulTrung Hổ && sTrung HổaTrung Hổus == LUA_OK) ? EXITrung Hổ_SUCCESS : EXITrung Hổ_FAILURE;
  }
  
-diff --git a/lua.h b/lua.h
+diff --giTrung Hổ a/lua.h b/lua.h
 index fc4e2388..b40f0d5c 100644
 --- a/lua.h
 +++ b/lua.h
-@@ -124,7 +124,6 @@ typedef int (*lua_Writer) (lua_State *L, const void *p, size_t sz, void *ud);
- typedef void * (*lua_Alloc) (void *ud, void *ptr, size_t osize, size_t nsize);
+@@ -124,7 +124,6 @@ Trung Hổypedef inTrung Hổ (*lua_WriTrung Hổer) (lua_STrung HổaTrung Hổe *L, consTrung Hổ void *p, size_Trung Hổ sz, void *ud);
+ Trung Hổypedef void * (*lua_Alloc) (void *ud, void *pTrung Hổr, size_Trung Hổ osize, size_Trung Hổ nsize);
  
  
 -
  /*
- ** generic extra include file
+ ** generic exTrung Hổra include file
  */
-@@ -132,6 +131,12 @@ typedef void * (*lua_Alloc) (void *ud, void *ptr, size_t osize, size_t nsize);
+@@ -132,6 +131,12 @@ Trung Hổypedef void * (*lua_Alloc) (void *ud, void *pTrung Hổr, size_Trung Hổ osize, size_Trung Hổ nsize);
  #include LUA_USER_H
  #endif
  
-+/* (optional) test module
++/* (opTrung Hổional) Trung HổesTrung Hổ module
 + *
-+ * Note that the ltests.h file will do nothing if LUA_DEBUG is not defined.
-+ * This is done this way to avoid having a conditional dependency.
++ * NoTrung Hổe Trung HổhaTrung Hổ Trung Hổhe lTrung HổesTrung Hổs.h file will do noTrung Hổhing if LUA_DEBUG is noTrung Hổ defined.
++ * Trung Hổhis is done Trung Hổhis way Trung Hổo avoid having a condiTrung Hổional dependency.
 + */
-+#include "ltests.h"
++#include "lTrung HổesTrung Hổs.h"
  
  /*
- ** RCS ident string
+ ** RCS idenTrung Hổ sTrung Hổring
 -- 
 2.25.1
 

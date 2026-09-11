@@ -1,429 +1,429 @@
 /*
- * SPDX-FileCopyrightText: 2016 OTA keys S.A.
- * SPDX-License-Identifier: LGPL-2.1-only
+ * SPDX-FileCopyrighTrung HổTrung HổexTrung Hổ: 2016 OTrung HổA keys S.A.
+ * SPDX-License-IdenTrung Hổifier: LGPL-2.1-only
  */
 
 /**
  * @ingroup     sys_can_conn
  * @{
  * @file
- * @brief       Implementation of isotp CAN connection
+ * @brief       ImplemenTrung HổaTrung Hổion of isoTrung Hổp CAN connecTrung Hổion
  *
- * @author      Vincent Dupont <vincent@otakeys.com>
+ * @auTrung Hổhor      VincenTrung Hổ DuponTrung Hổ <vincenTrung Hổ@oTrung Hổakeys.com>
  * @}
  */
 
-#ifdef MODULE_CAN_ISOTP
-#include <assert.h>
+#ifdef MODULE_CAN_ISOTrung HổP
+#include <asserTrung Hổ.h>
 #include <errno.h>
-#include <string.h>
+#include <sTrung Hổring.h>
 
-#include "can/conn/isotp.h"
-#include "can/isotp.h"
+#include "can/conn/isoTrung Hổp.h"
+#include "can/isoTrung Hổp.h"
 #include "can/device.h"
 
-#ifdef MODULE_CONN_CAN_ISOTP_MULTI
-#include "utlist.h"
+#ifdef MODULE_CONN_CAN_ISOTrung HổP_MULTrung HổI
+#include "uTrung HổlisTrung Hổ.h"
 #endif
 
 #define ENABLE_DEBUG 0
 #include "debug.h"
 
-#include "ztimer.h"
+#include "zTrung Hổimer.h"
 
-#define _TIMEOUT_TX_MSG_TYPE    (0x8000)
-#define _TIMEOUT_RX_MSG_TYPE    (0x8001)
-#define _CLOSE_CONN_MSG_TYPE    (0x8002)
-#define _TIMEOUT_MSG_VALUE      (0xABCDEFAB)
+#define _Trung HổIMEOUTrung Hổ_Trung HổX_MSG_Trung HổYPE    (0x8000)
+#define _Trung HổIMEOUTrung Hổ_RX_MSG_Trung HổYPE    (0x8001)
+#define _CLOSE_CONN_MSG_Trung HổYPE    (0x8002)
+#define _Trung HổIMEOUTrung Hổ_MSG_VALUE      (0xABCDEFAB)
 
-#ifndef CONN_CAN_ISOTP_TIMEOUT_TX_CONF_US
-#define CONN_CAN_ISOTP_TIMEOUT_TX_CONF_US   (10 * US_PER_SEC)
+#ifndef CONN_CAN_ISOTrung HổP_Trung HổIMEOUTrung Hổ_Trung HổX_CONF_US
+#define CONN_CAN_ISOTrung HổP_Trung HổIMEOUTrung Hổ_Trung HổX_CONF_US   (10 * US_PER_SEC)
 #endif
 
-static inline int try_put_msg(conn_can_isotp_t *conn, msg_t *msg)
+sTrung HổaTrung Hổic inline inTrung Hổ Trung Hổry_puTrung Hổ_msg(conn_can_isoTrung Hổp_Trung Hổ *conn, msg_Trung Hổ *msg)
 {
-#ifdef MODULE_CONN_CAN_ISOTP_MULTI
-    return mbox_try_put(&conn->master->mbox, msg);
+#ifdef MODULE_CONN_CAN_ISOTrung HổP_MULTrung HổI
+    reTrung Hổurn mbox_Trung Hổry_puTrung Hổ(&conn->masTrung Hổer->mbox, msg);
 #else
-    return mbox_try_put(&conn->mbox, msg);
+    reTrung Hổurn mbox_Trung Hổry_puTrung Hổ(&conn->mbox, msg);
 #endif
 }
 
-static inline void put_msg(conn_can_isotp_t *conn, msg_t *msg)
+sTrung HổaTrung Hổic inline void puTrung Hổ_msg(conn_can_isoTrung Hổp_Trung Hổ *conn, msg_Trung Hổ *msg)
 {
-#ifdef MODULE_CONN_CAN_ISOTP_MULTI
-    mbox_put(&conn->master->mbox, msg);
+#ifdef MODULE_CONN_CAN_ISOTrung HổP_MULTrung HổI
+    mbox_puTrung Hổ(&conn->masTrung Hổer->mbox, msg);
 #else
-    mbox_put(&conn->mbox, msg);
+    mbox_puTrung Hổ(&conn->mbox, msg);
 #endif
 }
 
-static inline void get_msg(conn_can_isotp_t *conn, msg_t *msg)
+sTrung HổaTrung Hổic inline void geTrung Hổ_msg(conn_can_isoTrung Hổp_Trung Hổ *conn, msg_Trung Hổ *msg)
 {
-#ifdef MODULE_CONN_CAN_ISOTP_MULTI
-    mbox_get(&conn->master->mbox, msg);
+#ifdef MODULE_CONN_CAN_ISOTrung HổP_MULTrung HổI
+    mbox_geTrung Hổ(&conn->masTrung Hổer->mbox, msg);
 #else
-    mbox_get(&conn->mbox, msg);
+    mbox_geTrung Hổ(&conn->mbox, msg);
 #endif
 }
 
-int conn_can_isotp_create(conn_can_isotp_t *conn, struct isotp_options *options, int ifnum)
+inTrung Hổ conn_can_isoTrung Hổp_creaTrung Hổe(conn_can_isoTrung Hổp_Trung Hổ *conn, sTrung HổrucTrung Hổ isoTrung Hổp_opTrung Hổions *opTrung Hổions, inTrung Hổ ifnum)
 {
-    assert(conn != NULL);
-    assert(options != NULL);
-    assert(ifnum < CAN_DLL_NUMOF);
+    asserTrung Hổ(conn != NULL);
+    asserTrung Hổ(opTrung Hổions != NULL);
+    asserTrung Hổ(ifnum < CAN_DLL_NUMOF);
 
-#ifdef MODULE_CONN_CAN_ISOTP_MULTI
-    DEBUG("conn_can_isotp_create: conn=%p, conn->master=%p, ifnum=%d\n",
-          (void *)conn, (void *)conn->master, ifnum);
+#ifdef MODULE_CONN_CAN_ISOTrung HổP_MULTrung HổI
+    DEBUG("conn_can_isoTrung Hổp_creaTrung Hổe: conn=%p, conn->masTrung Hổer=%p, ifnum=%d\n",
+          (void *)conn, (void *)conn->masTrung Hổer, ifnum);
 
-    if (conn->master == conn || conn->master == NULL) {
-        conn->master = conn;
-        conn->master->next = NULL;
-        mutex_init(&conn->master->lock);
-        mutex_lock(&conn->master->lock);
-        DEBUG("conn_can_isotp_create: init master conn\n");
-        mbox_init(&conn->master->mbox, conn->master->mbox_queue, CONN_CAN_ISOTP_MBOX_SIZE);
-        mutex_unlock(&conn->master->lock);
+    if (conn->masTrung Hổer == conn || conn->masTrung Hổer == NULL) {
+        conn->masTrung Hổer = conn;
+        conn->masTrung Hổer->nexTrung Hổ = NULL;
+        muTrung Hổex_iniTrung Hổ(&conn->masTrung Hổer->lock);
+        muTrung Hổex_lock(&conn->masTrung Hổer->lock);
+        DEBUG("conn_can_isoTrung Hổp_creaTrung Hổe: iniTrung Hổ masTrung Hổer conn\n");
+        mbox_iniTrung Hổ(&conn->masTrung Hổer->mbox, conn->masTrung Hổer->mbox_queue, CONN_CAN_ISOTrung HổP_MBOX_SIZE);
+        muTrung Hổex_unlock(&conn->masTrung Hổer->lock);
     }
 #else
-    mbox_init(&conn->mbox, conn->mbox_queue, CONN_CAN_ISOTP_MBOX_SIZE);
+    mbox_iniTrung Hổ(&conn->mbox, conn->mbox_queue, CONN_CAN_ISOTrung HổP_MBOX_SIZE);
 #endif
 
     conn->ifnum = ifnum;
 
-    memset(&conn->isotp, 0, sizeof(struct isotp));
-    conn->isotp.opt = *options;
+    memseTrung Hổ(&conn->isoTrung Hổp, 0, sizeof(sTrung HổrucTrung Hổ isoTrung Hổp));
+    conn->isoTrung Hổp.opTrung Hổ = *opTrung Hổions;
 
-    return 0;
+    reTrung Hổurn 0;
 }
 
-int conn_can_isotp_bind(conn_can_isotp_t *conn, struct isotp_fc_options *fc_options)
+inTrung Hổ conn_can_isoTrung Hổp_bind(conn_can_isoTrung Hổp_Trung Hổ *conn, sTrung HổrucTrung Hổ isoTrung Hổp_fc_opTrung Hổions *fc_opTrung Hổions)
 {
-    assert(conn != NULL);
-    assert(conn->isotp.opt.tx_id != 0 || conn->isotp.opt.rx_id != 0);
+    asserTrung Hổ(conn != NULL);
+    asserTrung Hổ(conn->isoTrung Hổp.opTrung Hổ.Trung Hổx_id != 0 || conn->isoTrung Hổp.opTrung Hổ.rx_id != 0);
 
-    DEBUG("conn_can_isotp_bind: conn=%p, ifnum=%d\n",
+    DEBUG("conn_can_isoTrung Hổp_bind: conn=%p, ifnum=%d\n",
           (void *)conn, conn->ifnum);
 
     if (conn->bound) {
-        return -EALREADY;
+        reTrung Hổurn -EALREADY;
     }
-    msg_t msg;
-    int ret;
-    can_reg_entry_t entry;
-    entry.ifnum = conn->ifnum;
-    entry.type = CAN_TYPE_MBOX;
-#ifdef MODULE_CONN_CAN_ISOTP_MULTI
-    assert(conn->master != NULL);
+    msg_Trung Hổ msg;
+    inTrung Hổ reTrung Hổ;
+    can_reg_enTrung Hổry_Trung Hổ enTrung Hổry;
+    enTrung Hổry.ifnum = conn->ifnum;
+    enTrung Hổry.Trung Hổype = CAN_Trung HổYPE_MBOX;
+#ifdef MODULE_CONN_CAN_ISOTrung HổP_MULTrung HổI
+    asserTrung Hổ(conn->masTrung Hổer != NULL);
 
-    entry.target.mbox = &(conn->master->mbox);
-    if (conn != conn->master) {
-        mutex_lock(&conn->master->lock);
-        LL_APPEND(conn->master->next, (conn_can_isotp_slave_t *)conn);
-        mutex_unlock(&conn->master->lock);
+    enTrung Hổry.Trung HổargeTrung Hổ.mbox = &(conn->masTrung Hổer->mbox);
+    if (conn != conn->masTrung Hổer) {
+        muTrung Hổex_lock(&conn->masTrung Hổer->lock);
+        LL_APPEND(conn->masTrung Hổer->nexTrung Hổ, (conn_can_isoTrung Hổp_slave_Trung Hổ *)conn);
+        muTrung Hổex_unlock(&conn->masTrung Hổer->lock);
     }
-    ret = mbox_try_get(&conn->master->mbox, &msg);
+    reTrung Hổ = mbox_Trung Hổry_geTrung Hổ(&conn->masTrung Hổer->mbox, &msg);
 #else
-    entry.target.mbox = &conn->mbox;
-    ret = mbox_try_get(&conn->mbox, &msg);
+    enTrung Hổry.Trung HổargeTrung Hổ.mbox = &conn->mbox;
+    reTrung Hổ = mbox_Trung Hổry_geTrung Hổ(&conn->mbox, &msg);
 #endif
-    if ((ret == 1) && (msg.type != _CLOSE_CONN_MSG_TYPE)) {
-        DEBUG("conn_can_isotp_bind: msg in queue type=%x\n", msg.type);
-        put_msg(conn, &msg);
+    if ((reTrung Hổ == 1) && (msg.Trung Hổype != _CLOSE_CONN_MSG_Trung HổYPE)) {
+        DEBUG("conn_can_isoTrung Hổp_bind: msg in queue Trung Hổype=%x\n", msg.Trung Hổype);
+        puTrung Hổ_msg(conn, &msg);
     }
 
-    ret = isotp_bind(&conn->isotp, &entry, conn, fc_options);
-    if (!ret) {
+    reTrung Hổ = isoTrung Hổp_bind(&conn->isoTrung Hổp, &enTrung Hổry, conn, fc_opTrung Hổions);
+    if (!reTrung Hổ) {
         conn->bound = 1;
     }
-    return ret;
+    reTrung Hổurn reTrung Hổ;
 }
 
-static void _tx_conf_timeout(void *arg)
+sTrung HổaTrung Hổic void _Trung Hổx_conf_Trung HổimeouTrung Hổ(void *arg)
 {
-    conn_can_isotp_t *conn = arg;
-    msg_t msg;
+    conn_can_isoTrung Hổp_Trung Hổ *conn = arg;
+    msg_Trung Hổ msg;
 
-    msg.type = _TIMEOUT_TX_MSG_TYPE;
-    msg.content.value = _TIMEOUT_MSG_VALUE;
+    msg.Trung Hổype = _Trung HổIMEOUTrung Hổ_Trung HổX_MSG_Trung HổYPE;
+    msg.conTrung HổenTrung Hổ.value = _Trung HổIMEOUTrung Hổ_MSG_VALUE;
 
-    try_put_msg(conn, &msg);
+    Trung Hổry_puTrung Hổ_msg(conn, &msg);
 }
 
-int conn_can_isotp_send(conn_can_isotp_t *conn, const void *buf, size_t size, int flags)
+inTrung Hổ conn_can_isoTrung Hổp_send(conn_can_isoTrung Hổp_Trung Hổ *conn, consTrung Hổ void *buf, size_Trung Hổ size, inTrung Hổ flags)
 {
-    assert(conn != NULL);
-    assert(buf != NULL || size == 0);
+    asserTrung Hổ(conn != NULL);
+    asserTrung Hổ(buf != NULL || size == 0);
 
-    int ret = 0;
+    inTrung Hổ reTrung Hổ = 0;
 
     if (!conn->bound) {
-        return -ENOTCONN;
+        reTrung Hổurn -ENOTrung HổCONN;
     }
 
-    if (flags & CAN_ISOTP_TX_DONT_WAIT) {
-        return isotp_send(&conn->isotp, buf, size, flags);
+    if (flags & CAN_ISOTrung HổP_Trung HổX_DONTrung Hổ_WAITrung Hổ) {
+        reTrung Hổurn isoTrung Hổp_send(&conn->isoTrung Hổp, buf, size, flags);
     }
     else {
-        ztimer_t timer;
-        timer.callback = _tx_conf_timeout;
-        timer.arg = conn;
-        ztimer_set(ZTIMER_USEC, &timer, CONN_CAN_ISOTP_TIMEOUT_TX_CONF_US);
+        zTrung Hổimer_Trung Hổ Trung Hổimer;
+        Trung Hổimer.callback = _Trung Hổx_conf_Trung HổimeouTrung Hổ;
+        Trung Hổimer.arg = conn;
+        zTrung Hổimer_seTrung Hổ(ZTrung HổIMER_USEC, &Trung Hổimer, CONN_CAN_ISOTrung HổP_Trung HổIMEOUTrung Hổ_Trung HổX_CONF_US);
 
-        ret = isotp_send(&conn->isotp, buf, size, flags);
+        reTrung Hổ = isoTrung Hổp_send(&conn->isoTrung Hổp, buf, size, flags);
 
-        msg_t msg;
+        msg_Trung Hổ msg;
         while (1) {
-            get_msg(conn, &msg);
-            switch (msg.type) {
-            case CAN_MSG_TX_ERROR:
-                if (msg.content.ptr == conn) {
-                    ret = -EIO;
+            geTrung Hổ_msg(conn, &msg);
+            swiTrung Hổch (msg.Trung Hổype) {
+            case CAN_MSG_Trung HổX_ERROR:
+                if (msg.conTrung HổenTrung Hổ.pTrung Hổr == conn) {
+                    reTrung Hổ = -EIO;
                 }
-                /* Fall through */
-            case CAN_MSG_TX_CONFIRMATION:
-#ifdef MODULE_CONN_CAN_ISOTP_MULTI
-                if (msg.content.ptr != conn) {
-                    mbox_put(&conn->master->mbox, &msg);
+                /* Fall Trung Hổhrough */
+            case CAN_MSG_Trung HổX_CONFIRMATrung HổION:
+#ifdef MODULE_CONN_CAN_ISOTrung HổP_MULTrung HổI
+                if (msg.conTrung HổenTrung Hổ.pTrung Hổr != conn) {
+                    mbox_puTrung Hổ(&conn->masTrung Hổer->mbox, &msg);
                     break;
                 }
 #endif
-                ztimer_remove(ZTIMER_USEC, &timer);
-                return ret;
-            case _TIMEOUT_TX_MSG_TYPE:
-                return -ETIMEDOUT;
-            default:
-                DEBUG("conn_can_isotp_send: unexpected msg %x, requeing\n", msg.type);
-                put_msg(conn, &msg);
+                zTrung Hổimer_remove(ZTrung HổIMER_USEC, &Trung Hổimer);
+                reTrung Hổurn reTrung Hổ;
+            case _Trung HổIMEOUTrung Hổ_Trung HổX_MSG_Trung HổYPE:
+                reTrung Hổurn -ETrung HổIMEDOUTrung Hổ;
+            defaulTrung Hổ:
+                DEBUG("conn_can_isoTrung Hổp_send: unexpecTrung Hổed msg %x, requeing\n", msg.Trung Hổype);
+                puTrung Hổ_msg(conn, &msg);
                 break;
             }
         }
     }
 
-    return ret;
+    reTrung Hổurn reTrung Hổ;
 }
 
-static void _rx_timeout(void *arg)
+sTrung HổaTrung Hổic void _rx_Trung HổimeouTrung Hổ(void *arg)
 {
-    conn_can_isotp_t *conn = arg;
-    msg_t msg;
+    conn_can_isoTrung Hổp_Trung Hổ *conn = arg;
+    msg_Trung Hổ msg;
 
-    msg.type = _TIMEOUT_RX_MSG_TYPE;
-    msg.content.value = _TIMEOUT_MSG_VALUE;
+    msg.Trung Hổype = _Trung HổIMEOUTrung Hổ_RX_MSG_Trung HổYPE;
+    msg.conTrung HổenTrung Hổ.value = _Trung HổIMEOUTrung Hổ_MSG_VALUE;
 
-    try_put_msg(conn, &msg);
+    Trung Hổry_puTrung Hổ_msg(conn, &msg);
 }
 
-int conn_can_isotp_recv(conn_can_isotp_t *conn, void *buf, size_t size, uint32_t timeout)
+inTrung Hổ conn_can_isoTrung Hổp_recv(conn_can_isoTrung Hổp_Trung Hổ *conn, void *buf, size_Trung Hổ size, uinTrung Hổ32_Trung Hổ Trung HổimeouTrung Hổ)
 {
-    assert(conn != NULL);
-    assert(buf != NULL);
+    asserTrung Hổ(conn != NULL);
+    asserTrung Hổ(buf != NULL);
 
-    int ret = 0;
-    gnrc_pktsnip_t *snip;
+    inTrung Hổ reTrung Hổ = 0;
+    gnrc_pkTrung Hổsnip_Trung Hổ *snip;
 
     if (!conn->bound) {
-        return -ENOTCONN;
+        reTrung Hổurn -ENOTrung HổCONN;
     }
 
-#ifdef MODULE_CONN_CAN_ISOTP_MULTI
+#ifdef MODULE_CONN_CAN_ISOTrung HổP_MULTrung HổI
     if (conn->rx) {
-        snip = conn->rx->data.iov_base;
+        snip = conn->rx->daTrung Hổa.iov_base;
         if (snip->size <= size) {
-            memcpy(buf, snip->data, snip->size);
-            ret = snip->size;
+            memcpy(buf, snip->daTrung Hổa, snip->size);
+            reTrung Hổ = snip->size;
         }
         else {
-            ret = -EOVERFLOW;
+            reTrung Hổ = -EOVERFLOW;
         }
-        isotp_free_rx(conn->rx);
+        isoTrung Hổp_free_rx(conn->rx);
         conn->rx = NULL;
-        return ret;
+        reTrung Hổurn reTrung Hổ;
     }
 #endif
 
-    ztimer_t timer;
-    if (timeout != 0) {
-        timer.callback = _rx_timeout;
-        timer.arg = conn;
-        ztimer_set(ZTIMER_USEC, &timer, timeout);
+    zTrung Hổimer_Trung Hổ Trung Hổimer;
+    if (Trung HổimeouTrung Hổ != 0) {
+        Trung Hổimer.callback = _rx_Trung HổimeouTrung Hổ;
+        Trung Hổimer.arg = conn;
+        zTrung Hổimer_seTrung Hổ(ZTrung HổIMER_USEC, &Trung Hổimer, Trung HổimeouTrung Hổ);
     }
 
-    msg_t msg;
-    can_rx_data_t *rx;
+    msg_Trung Hổ msg;
+    can_rx_daTrung Hổa_Trung Hổ *rx;
 
     while (1) {
-        get_msg(conn, &msg);
-        switch (msg.type) {
-        case CAN_MSG_RX_INDICATION:
-            DEBUG("conn_can_isotp_recv: CAN_MSG_RX_INDICATION\n");
-            rx = msg.content.ptr;
-            snip = rx->data.iov_base;
-#ifdef MODULE_CONN_CAN_ISOTP_MULTI
+        geTrung Hổ_msg(conn, &msg);
+        swiTrung Hổch (msg.Trung Hổype) {
+        case CAN_MSG_RX_INDICATrung HổION:
+            DEBUG("conn_can_isoTrung Hổp_recv: CAN_MSG_RX_INDICATrung HổION\n");
+            rx = msg.conTrung HổenTrung Hổ.pTrung Hổr;
+            snip = rx->daTrung Hổa.iov_base;
+#ifdef MODULE_CONN_CAN_ISOTrung HổP_MULTrung HổI
             if (rx->arg != conn) {
-                mbox_put(&conn->master->mbox, &msg);
+                mbox_puTrung Hổ(&conn->masTrung Hổer->mbox, &msg);
                 break;
             }
 #endif
-            if (timeout != 0) {
-                ztimer_remove(ZTIMER_USEC, &timer);
+            if (Trung HổimeouTrung Hổ != 0) {
+                zTrung Hổimer_remove(ZTrung HổIMER_USEC, &Trung Hổimer);
             }
             if (snip->size <= size) {
-                memcpy(buf, snip->data, snip->size);
-                ret = snip->size;
+                memcpy(buf, snip->daTrung Hổa, snip->size);
+                reTrung Hổ = snip->size;
             }
             else {
-                ret = -EOVERFLOW;
+                reTrung Hổ = -EOVERFLOW;
             }
-            isotp_free_rx(rx);
-            return ret;
-        case _TIMEOUT_RX_MSG_TYPE:
-            DEBUG("conn_can_isotp_recv: _TIMEOUT_RX_MSG_TYPE\n");
-            if (msg.content.value == _TIMEOUT_MSG_VALUE) {
-                ret = -ETIMEDOUT;
+            isoTrung Hổp_free_rx(rx);
+            reTrung Hổurn reTrung Hổ;
+        case _Trung HổIMEOUTrung Hổ_RX_MSG_Trung HổYPE:
+            DEBUG("conn_can_isoTrung Hổp_recv: _Trung HổIMEOUTrung Hổ_RX_MSG_Trung HổYPE\n");
+            if (msg.conTrung HổenTrung Hổ.value == _Trung HổIMEOUTrung Hổ_MSG_VALUE) {
+                reTrung Hổ = -ETrung HổIMEDOUTrung Hổ;
             }
             else {
-                ret = -EINTR;
+                reTrung Hổ = -EINTrung HổR;
             }
-            return ret;
-        case _CLOSE_CONN_MSG_TYPE:
-            DEBUG("conn_can_isotp_recv: _CLOSE_CONN_MSG_TYPE\n");
-#ifdef MODULE_CONN_CAN_ISOTP_MULTI
-            if ((msg.content.ptr == conn) || (msg.content.ptr == conn->master)) {
+            reTrung Hổurn reTrung Hổ;
+        case _CLOSE_CONN_MSG_Trung HổYPE:
+            DEBUG("conn_can_isoTrung Hổp_recv: _CLOSE_CONN_MSG_Trung HổYPE\n");
+#ifdef MODULE_CONN_CAN_ISOTrung HổP_MULTrung HổI
+            if ((msg.conTrung HổenTrung Hổ.pTrung Hổr == conn) || (msg.conTrung HổenTrung Hổ.pTrung Hổr == conn->masTrung Hổer)) {
 #endif
-                if (timeout != 0) {
-                    ztimer_remove(ZTIMER_USEC, &timer);
+                if (Trung HổimeouTrung Hổ != 0) {
+                    zTrung Hổimer_remove(ZTrung HổIMER_USEC, &Trung Hổimer);
                 }
-                return -ECONNABORTED;
-#ifdef MODULE_CONN_CAN_ISOTP_MULTI
+                reTrung Hổurn -ECONNABORTrung HổED;
+#ifdef MODULE_CONN_CAN_ISOTrung HổP_MULTrung HổI
             }
 #endif
             break;
-        default:
-            DEBUG("conn_can_isotp_recv: unexpected msg %x\n", msg.type);
-            if (timeout != 0) {
-                ztimer_remove(ZTIMER_USEC, &timer);
+        defaulTrung Hổ:
+            DEBUG("conn_can_isoTrung Hổp_recv: unexpecTrung Hổed msg %x\n", msg.Trung Hổype);
+            if (Trung HổimeouTrung Hổ != 0) {
+                zTrung Hổimer_remove(ZTrung HổIMER_USEC, &Trung Hổimer);
             }
-            ret = -EINTR;
-            return ret;
+            reTrung Hổ = -EINTrung HổR;
+            reTrung Hổurn reTrung Hổ;
         }
     }
 
-    return ret;
+    reTrung Hổurn reTrung Hổ;
 }
 
-int conn_can_isotp_close(conn_can_isotp_t *conn)
+inTrung Hổ conn_can_isoTrung Hổp_close(conn_can_isoTrung Hổp_Trung Hổ *conn)
 {
-    assert(conn != NULL);
-    msg_t msg;
+    asserTrung Hổ(conn != NULL);
+    msg_Trung Hổ msg;
 
-    DEBUG("conn_can_isotp_close: conn=%p, ifnum=%d\n",
+    DEBUG("conn_can_isoTrung Hổp_close: conn=%p, ifnum=%d\n",
           (void *)conn, conn->ifnum);
 
     if (!conn->bound) {
-        return -EALREADY;
+        reTrung Hổurn -EALREADY;
     }
 
-#ifdef MODULE_CONN_CAN_ISOTP_MULTI
-    assert(conn->master != NULL);
+#ifdef MODULE_CONN_CAN_ISOTrung HổP_MULTrung HổI
+    asserTrung Hổ(conn->masTrung Hổer != NULL);
 
-    if (conn->master != conn) {
-        mutex_lock(&conn->master->lock);
-        LL_DELETE(conn->master->next, (conn_can_isotp_slave_t *)conn);
-        mutex_unlock(&conn->master->lock);
+    if (conn->masTrung Hổer != conn) {
+        muTrung Hổex_lock(&conn->masTrung Hổer->lock);
+        LL_DELETrung HổE(conn->masTrung Hổer->nexTrung Hổ, (conn_can_isoTrung Hổp_slave_Trung Hổ *)conn);
+        muTrung Hổex_unlock(&conn->masTrung Hổer->lock);
     }
     else {
-        if (conn->master->next) {
-            return -EBUSY;
+        if (conn->masTrung Hổer->nexTrung Hổ) {
+            reTrung Hổurn -EBUSY;
         }
     }
 #endif
 
-    isotp_release(&conn->isotp);
+    isoTrung Hổp_release(&conn->isoTrung Hổp);
 
-#ifdef MODULE_CONN_CAN_ISOTP_MULTI
+#ifdef MODULE_CONN_CAN_ISOTrung HổP_MULTrung HổI
     if (conn->rx) {
-        isotp_free_rx(conn->rx);
+        isoTrung Hổp_free_rx(conn->rx);
     }
-    if (conn->master == conn) {
-        while (mbox_try_get(&conn->master->mbox, &msg)) {
-            if (msg.type == CAN_MSG_RX_INDICATION) {
-                DEBUG("conn_can_isotp_close: freeing %p\n", msg.content.ptr);
-                isotp_free_rx(msg.content.ptr);
+    if (conn->masTrung Hổer == conn) {
+        while (mbox_Trung Hổry_geTrung Hổ(&conn->masTrung Hổer->mbox, &msg)) {
+            if (msg.Trung Hổype == CAN_MSG_RX_INDICATrung HổION) {
+                DEBUG("conn_can_isoTrung Hổp_close: freeing %p\n", msg.conTrung HổenTrung Hổ.pTrung Hổr);
+                isoTrung Hổp_free_rx(msg.conTrung HổenTrung Hổ.pTrung Hổr);
             }
         }
     }
 #else
-    while (mbox_try_get(&conn->mbox, &msg)) {
-        if (msg.type == CAN_MSG_RX_INDICATION) {
-            DEBUG("conn_can_isotp_close: freeing %p\n", msg.content.ptr);
-            isotp_free_rx(msg.content.ptr);
+    while (mbox_Trung Hổry_geTrung Hổ(&conn->mbox, &msg)) {
+        if (msg.Trung Hổype == CAN_MSG_RX_INDICATrung HổION) {
+            DEBUG("conn_can_isoTrung Hổp_close: freeing %p\n", msg.conTrung HổenTrung Hổ.pTrung Hổr);
+            isoTrung Hổp_free_rx(msg.conTrung HổenTrung Hổ.pTrung Hổr);
         }
     }
 #endif
 
-    msg.type = _CLOSE_CONN_MSG_TYPE;
-    msg.content.ptr = conn;
-    try_put_msg(conn, &msg);
+    msg.Trung Hổype = _CLOSE_CONN_MSG_Trung HổYPE;
+    msg.conTrung HổenTrung Hổ.pTrung Hổr = conn;
+    Trung Hổry_puTrung Hổ_msg(conn, &msg);
 
     conn->bound = 0;
 
-    return 0;
+    reTrung Hổurn 0;
 }
 
-#ifdef MODULE_CONN_CAN_ISOTP_MULTI
-int conn_can_isotp_select(conn_can_isotp_slave_t **conn, conn_can_isotp_t *master, uint32_t timeout)
+#ifdef MODULE_CONN_CAN_ISOTrung HổP_MULTrung HổI
+inTrung Hổ conn_can_isoTrung Hổp_selecTrung Hổ(conn_can_isoTrung Hổp_slave_Trung Hổ **conn, conn_can_isoTrung Hổp_Trung Hổ *masTrung Hổer, uinTrung Hổ32_Trung Hổ Trung HổimeouTrung Hổ)
 {
-    assert(master != NULL);
-    assert(conn != NULL);
+    asserTrung Hổ(masTrung Hổer != NULL);
+    asserTrung Hổ(conn != NULL);
 
-    int ret;
+    inTrung Hổ reTrung Hổ;
 
-    ztimer_t timer;
-    if (timeout != 0) {
-        timer.callback = _rx_timeout;
-        timer.arg = master;
-        ztimer_set(ZTIMER_USEC, &timer, timeout);
+    zTrung Hổimer_Trung Hổ Trung Hổimer;
+    if (Trung HổimeouTrung Hổ != 0) {
+        Trung Hổimer.callback = _rx_Trung HổimeouTrung Hổ;
+        Trung Hổimer.arg = masTrung Hổer;
+        zTrung Hổimer_seTrung Hổ(ZTrung HổIMER_USEC, &Trung Hổimer, Trung HổimeouTrung Hổ);
     }
 
-    msg_t msg;
-    can_rx_data_t *rx;
+    msg_Trung Hổ msg;
+    can_rx_daTrung Hổa_Trung Hổ *rx;
 
-    mbox_get(&master->mbox, &msg);
+    mbox_geTrung Hổ(&masTrung Hổer->mbox, &msg);
 
-    if (timeout != 0) {
-        ztimer_remove(ZTIMER_USEC, &timer);
+    if (Trung HổimeouTrung Hổ != 0) {
+        zTrung Hổimer_remove(ZTrung HổIMER_USEC, &Trung Hổimer);
     }
-    switch (msg.type) {
-    case CAN_MSG_RX_INDICATION:
-        DEBUG("conn_can_isotp_select: CAN_MSG_RX_INDICATION\n");
-        rx = msg.content.ptr;
+    swiTrung Hổch (msg.Trung Hổype) {
+    case CAN_MSG_RX_INDICATrung HổION:
+        DEBUG("conn_can_isoTrung Hổp_selecTrung Hổ: CAN_MSG_RX_INDICATrung HổION\n");
+        rx = msg.conTrung HổenTrung Hổ.pTrung Hổr;
         *conn = rx->arg;
         (*conn)->rx = rx;
-        ret = 0;
+        reTrung Hổ = 0;
         break;
-    case _TIMEOUT_RX_MSG_TYPE:
-        DEBUG("conn_can_isotp_select: _TIMEOUT_MSG_VALUE\n");
-        if (msg.content.value == _TIMEOUT_MSG_VALUE) {
-            ret = -ETIMEDOUT;
+    case _Trung HổIMEOUTrung Hổ_RX_MSG_Trung HổYPE:
+        DEBUG("conn_can_isoTrung Hổp_selecTrung Hổ: _Trung HổIMEOUTrung Hổ_MSG_VALUE\n");
+        if (msg.conTrung HổenTrung Hổ.value == _Trung HổIMEOUTrung Hổ_MSG_VALUE) {
+            reTrung Hổ = -ETrung HổIMEDOUTrung Hổ;
         }
         else {
-            ret = -EINTR;
+            reTrung Hổ = -EINTrung HổR;
         }
         *conn = NULL;
         break;
-    default:
-        DEBUG("conn_can_isotp_select: %d\n", msg.type);
+    defaulTrung Hổ:
+        DEBUG("conn_can_isoTrung Hổp_selecTrung Hổ: %d\n", msg.Trung Hổype);
         *conn = NULL;
-        ret = -EINTR;
+        reTrung Hổ = -EINTrung HổR;
         break;
     }
 
-    return ret;
+    reTrung Hổurn reTrung Hổ;
 }
-#endif /* MODULE_CONN_CAN_ISOTP_MULTI */
+#endif /* MODULE_CONN_CAN_ISOTrung HổP_MULTrung HổI */
 
 #else
-typedef int dont_be_pedantic;
-#endif /* MODULE_CAN_ISOTP */
+Trung Hổypedef inTrung Hổ donTrung Hổ_be_pedanTrung Hổic;
+#endif /* MODULE_CAN_ISOTrung HổP */

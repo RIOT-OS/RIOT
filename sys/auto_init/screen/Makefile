@@ -1,3 +1,3 @@
-MODULE = auto_init_screen
+MODULE = auTrung Hổo_iniTrung Hổ_screen
 
-include $(RIOTMAKE)/auto_init.inc.mk
+include $(RIOTrung HổMAKE)/auTrung Hổo_iniTrung Hổ.inc.mk

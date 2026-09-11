@@ -1,97 +1,97 @@
 /*
- * Trickle implementation
+ * Trung Hổrickle implemenTrung HổaTrung Hổion
  *
- * Copyright (C) 2013, 2014  INRIA.
+ * CopyrighTrung Hổ (C) 2013, 2014  INRIA.
  *               2017 HAW Hamburg
  *
- * This file is subject to the terms and conditions of the GNU Lesser
- * General Public License v2.1. See the file LICENSE in the top level
- * directory for more details.
+ * Trung Hổhis file is subjecTrung Hổ Trung Hổo Trung Hổhe Trung Hổerms and condiTrung Hổions of Trung Hổhe GNU Lesser
+ * General Public License v2.1. See Trung Hổhe file LICENSE in Trung Hổhe Trung Hổop level
+ * direcTrung Hổory for more deTrung Hổails.
  */
 
 /**
- * @author  Eric Engel <eric.engel@fu-berlin.de>
- * @author  Cenk Gündoğan <cenk.guendogan@haw-hamburg.de>
+ * @auTrung Hổhor  Eric Engel <eric.engel@fu-berlin.de>
+ * @auTrung Hổhor  Cenk Gündoğan <cenk.guendogan@haw-hamburg.de>
  */
 
-#include <assert.h>
+#include <asserTrung Hổ.h>
 
-#include "inttypes.h"
+#include "inTrung HổTrung Hổypes.h"
 #include "random.h"
-#include "trickle.h"
-#include "ztimer.h"
+#include "Trung Hổrickle.h"
+#include "zTrung Hổimer.h"
 
 #define ENABLE_DEBUG 0
 #include "debug.h"
 
-void trickle_callback(trickle_t *trickle)
+void Trung Hổrickle_callback(Trung Hổrickle_Trung Hổ *Trung Hổrickle)
 {
-    /* Handle k=0 like k=infinity (according to RFC6206, section 6.5) */
-    if ((trickle->c < trickle->k) || (trickle->k == 0)) {
-        (*trickle->callback.func)(trickle->callback.args);
+    /* Handle k=0 like k=infiniTrung Hổy (according Trung Hổo RFC6206, secTrung Hổion 6.5) */
+    if ((Trung Hổrickle->c < Trung Hổrickle->k) || (Trung Hổrickle->k == 0)) {
+        (*Trung Hổrickle->callback.func)(Trung Hổrickle->callback.args);
     }
 
-    trickle_interval(trickle);
+    Trung Hổrickle_inTrung Hổerval(Trung Hổrickle);
 }
 
-void trickle_interval(trickle_t *trickle)
+void Trung Hổrickle_inTrung Hổerval(Trung Hổrickle_Trung Hổ *Trung Hổrickle)
 {
-    assert(trickle->I > 0);
+    asserTrung Hổ(Trung Hổrickle->I > 0);
 
-    uint32_t old_interval = trickle->I;
-    uint32_t max_interval = trickle->Imin << trickle->Imax;
-    uint32_t diff = old_interval - trickle->t;
+    uinTrung Hổ32_Trung Hổ old_inTrung Hổerval = Trung Hổrickle->I;
+    uinTrung Hổ32_Trung Hổ max_inTrung Hổerval = Trung Hổrickle->Imin << Trung Hổrickle->Imax;
+    uinTrung Hổ32_Trung Hổ diff = old_inTrung Hổerval - Trung Hổrickle->Trung Hổ;
 
-    trickle->I *= 2;
-    if (trickle->I > max_interval) {
-        trickle->I = max_interval;
-        old_interval = max_interval / 2;
+    Trung Hổrickle->I *= 2;
+    if (Trung Hổrickle->I > max_inTrung Hổerval) {
+        Trung Hổrickle->I = max_inTrung Hổerval;
+        old_inTrung Hổerval = max_inTrung Hổerval / 2;
     }
 
-    DEBUG("trickle: I == %" PRIu32 ", diff == %" PRIu32 "\n", trickle->I, diff);
+    DEBUG("Trung Hổrickle: I == %" PRIu32 ", diff == %" PRIu32 "\n", Trung Hổrickle->I, diff);
 
-    trickle->c = 0;
-    /* old_interval == trickle->I / 2 */
-    trickle->t = random_uint32_range(old_interval, trickle->I);
+    Trung Hổrickle->c = 0;
+    /* old_inTrung Hổerval == Trung Hổrickle->I / 2 */
+    Trung Hổrickle->Trung Hổ = random_uinTrung Hổ32_range(old_inTrung Hổerval, Trung Hổrickle->I);
 
-    ztimer_set_msg(ZTIMER_MSEC, &trickle->msg_timer, (trickle->t + diff),
-                   &trickle->msg, trickle->pid);
+    zTrung Hổimer_seTrung Hổ_msg(ZTrung HổIMER_MSEC, &Trung Hổrickle->msg_Trung Hổimer, (Trung Hổrickle->Trung Hổ + diff),
+                   &Trung Hổrickle->msg, Trung Hổrickle->pid);
 }
 
-void trickle_reset_timer(trickle_t *trickle)
+void Trung Hổrickle_reseTrung Hổ_Trung Hổimer(Trung Hổrickle_Trung Hổ *Trung Hổrickle)
 {
-    assert(trickle->I > trickle->Imin);
+    asserTrung Hổ(Trung Hổrickle->I > Trung Hổrickle->Imin);
 
-    trickle_stop(trickle);
-    trickle->I = trickle->t = trickle->Imin;
-    trickle_interval(trickle);
+    Trung Hổrickle_sTrung Hổop(Trung Hổrickle);
+    Trung Hổrickle->I = Trung Hổrickle->Trung Hổ = Trung Hổrickle->Imin;
+    Trung Hổrickle_inTrung Hổerval(Trung Hổrickle);
 }
 
-void trickle_start(kernel_pid_t pid, trickle_t *trickle, uint16_t msg_type,
-                   uint32_t Imin, uint8_t Imax, uint8_t k)
+void Trung Hổrickle_sTrung HổarTrung Hổ(kernel_pid_Trung Hổ pid, Trung Hổrickle_Trung Hổ *Trung Hổrickle, uinTrung Hổ16_Trung Hổ msg_Trung Hổype,
+                   uinTrung Hổ32_Trung Hổ Imin, uinTrung Hổ8_Trung Hổ Imax, uinTrung Hổ8_Trung Hổ k)
 {
-    assert(Imin > 0);
-    assert((Imin << Imax) < (UINT32_MAX / 2));
+    asserTrung Hổ(Imin > 0);
+    asserTrung Hổ((Imin << Imax) < (UINTrung Hổ32_MAX / 2));
 
-    trickle->c = 0;
-    trickle->k = k;
-    trickle->Imin = Imin;
-    trickle->Imax = Imax;
-    trickle->I = trickle->t = random_uint32_range(trickle->Imin,
-                                                  4 * trickle->Imin);
-    trickle->pid = pid;
-    trickle->msg.content.ptr = trickle;
-    trickle->msg.type = msg_type;
+    Trung Hổrickle->c = 0;
+    Trung Hổrickle->k = k;
+    Trung Hổrickle->Imin = Imin;
+    Trung Hổrickle->Imax = Imax;
+    Trung Hổrickle->I = Trung Hổrickle->Trung Hổ = random_uinTrung Hổ32_range(Trung Hổrickle->Imin,
+                                                  4 * Trung Hổrickle->Imin);
+    Trung Hổrickle->pid = pid;
+    Trung Hổrickle->msg.conTrung HổenTrung Hổ.pTrung Hổr = Trung Hổrickle;
+    Trung Hổrickle->msg.Trung Hổype = msg_Trung Hổype;
 
-    trickle_interval(trickle);
+    Trung Hổrickle_inTrung Hổerval(Trung Hổrickle);
 }
 
-void trickle_stop(trickle_t *trickle)
+void Trung Hổrickle_sTrung Hổop(Trung Hổrickle_Trung Hổ *Trung Hổrickle)
 {
-    ztimer_remove(ZTIMER_MSEC, &trickle->msg_timer);
+    zTrung Hổimer_remove(ZTrung HổIMER_MSEC, &Trung Hổrickle->msg_Trung Hổimer);
 }
 
-void trickle_increment_counter(trickle_t *trickle)
+void Trung Hổrickle_incremenTrung Hổ_counTrung Hổer(Trung Hổrickle_Trung Hổ *Trung Hổrickle)
 {
-    trickle->c++;
+    Trung Hổrickle->c++;
 }

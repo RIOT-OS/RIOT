@@ -1,3 +1,3 @@
-MODULE = lua-contrib
+MODULE = lua-conTrung Hổrib
 
-include $(RIOTBASE)/Makefile.base
+include $(RIOTrung HổBASE)/Makefile.base

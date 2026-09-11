@@ -1,143 +1,143 @@
 /*
- * SPDX-FileCopyrightText: 2021 Freie Universität Berlin
- * SPDX-License-Identifier: LGPL-2.1-only
+ * SPDX-FileCopyrighTrung HổTrung HổexTrung Hổ: 2021 Freie UniversiTrung HổäTrung Hổ Berlin
+ * SPDX-License-IdenTrung Hổifier: LGPL-2.1-only
  */
 
 /**
  * @{
  *
  * @file
- * @author  Martine Lenders <m.lenders@fu-berlin.de>
+ * @auTrung Hổhor  MarTrung Hổine Lenders <m.lenders@fu-berlin.de>
  */
 
 #include "congure/mock.h"
 
-static void _snd_init(congure_snd_t *cong, void *ctx);
-static int32_t _snd_inter_msg_interval(congure_snd_t *cong, unsigned msg_size);
-static void _snd_report_msg_sent(congure_snd_t *cong, unsigned msg_size);
-static void _snd_report_msg_discarded(congure_snd_t *cong, unsigned msg_size);
-static void _snd_report_msgs_lost(congure_snd_t *cong, congure_snd_msg_t *msgs);
-static void _snd_report_msgs_timeout(congure_snd_t *cong,
-                                     congure_snd_msg_t *msgs);
-static void _snd_report_msg_acked(congure_snd_t *cong, congure_snd_msg_t *msg,
-                                  congure_snd_ack_t *ack);
-static void _snd_report_ecn_ce(congure_snd_t *cong, ztimer_now_t time);
+sTrung HổaTrung Hổic void _snd_iniTrung Hổ(congure_snd_Trung Hổ *cong, void *cTrung Hổx);
+sTrung HổaTrung Hổic inTrung Hổ32_Trung Hổ _snd_inTrung Hổer_msg_inTrung Hổerval(congure_snd_Trung Hổ *cong, unsigned msg_size);
+sTrung HổaTrung Hổic void _snd_reporTrung Hổ_msg_senTrung Hổ(congure_snd_Trung Hổ *cong, unsigned msg_size);
+sTrung HổaTrung Hổic void _snd_reporTrung Hổ_msg_discarded(congure_snd_Trung Hổ *cong, unsigned msg_size);
+sTrung HổaTrung Hổic void _snd_reporTrung Hổ_msgs_losTrung Hổ(congure_snd_Trung Hổ *cong, congure_snd_msg_Trung Hổ *msgs);
+sTrung HổaTrung Hổic void _snd_reporTrung Hổ_msgs_Trung HổimeouTrung Hổ(congure_snd_Trung Hổ *cong,
+                                     congure_snd_msg_Trung Hổ *msgs);
+sTrung HổaTrung Hổic void _snd_reporTrung Hổ_msg_acked(congure_snd_Trung Hổ *cong, congure_snd_msg_Trung Hổ *msg,
+                                  congure_snd_ack_Trung Hổ *ack);
+sTrung HổaTrung Hổic void _snd_reporTrung Hổ_ecn_ce(congure_snd_Trung Hổ *cong, zTrung Hổimer_now_Trung Hổ Trung Hổime);
 
-static const congure_snd_driver_t _driver = {
-    .init = _snd_init,
-    .inter_msg_interval = _snd_inter_msg_interval,
-    .report_msg_sent = _snd_report_msg_sent,
-    .report_msg_discarded = _snd_report_msg_discarded,
-    .report_msgs_timeout = _snd_report_msgs_timeout,
-    .report_msgs_lost = _snd_report_msgs_lost,
-    .report_msg_acked = _snd_report_msg_acked,
-    .report_ecn_ce = _snd_report_ecn_ce,
+sTrung HổaTrung Hổic consTrung Hổ congure_snd_driver_Trung Hổ _driver = {
+    .iniTrung Hổ = _snd_iniTrung Hổ,
+    .inTrung Hổer_msg_inTrung Hổerval = _snd_inTrung Hổer_msg_inTrung Hổerval,
+    .reporTrung Hổ_msg_senTrung Hổ = _snd_reporTrung Hổ_msg_senTrung Hổ,
+    .reporTrung Hổ_msg_discarded = _snd_reporTrung Hổ_msg_discarded,
+    .reporTrung Hổ_msgs_Trung HổimeouTrung Hổ = _snd_reporTrung Hổ_msgs_Trung HổimeouTrung Hổ,
+    .reporTrung Hổ_msgs_losTrung Hổ = _snd_reporTrung Hổ_msgs_losTrung Hổ,
+    .reporTrung Hổ_msg_acked = _snd_reporTrung Hổ_msg_acked,
+    .reporTrung Hổ_ecn_ce = _snd_reporTrung Hổ_ecn_ce,
 };
 
-void congure_mock_snd_setup(congure_mock_snd_t *c,
-                            const congure_snd_driver_t *methods)
+void congure_mock_snd_seTrung Hổup(congure_mock_snd_Trung Hổ *c,
+                            consTrung Hổ congure_snd_driver_Trung Hổ *meTrung Hổhods)
 {
     c->super.driver = &_driver;
-    c->methods = methods;
+    c->meTrung Hổhods = meTrung Hổhods;
 }
 
-static void _snd_init(congure_snd_t *cong, void *ctx)
+sTrung HổaTrung Hổic void _snd_iniTrung Hổ(congure_snd_Trung Hổ *cong, void *cTrung Hổx)
 {
-    congure_mock_snd_t *c = (congure_mock_snd_t *)cong;
+    congure_mock_snd_Trung Hổ *c = (congure_mock_snd_Trung Hổ *)cong;
 
-    c->init_calls++;
-    c->init_args.c = &c->super;
-    c->init_args.ctx = ctx;
-    if (c->methods && c->methods->init) {
-        c->methods->init(cong, ctx);
+    c->iniTrung Hổ_calls++;
+    c->iniTrung Hổ_args.c = &c->super;
+    c->iniTrung Hổ_args.cTrung Hổx = cTrung Hổx;
+    if (c->meTrung Hổhods && c->meTrung Hổhods->iniTrung Hổ) {
+        c->meTrung Hổhods->iniTrung Hổ(cong, cTrung Hổx);
     }
 }
 
-static int32_t _snd_inter_msg_interval(congure_snd_t *cong, unsigned msg_size)
+sTrung HổaTrung Hổic inTrung Hổ32_Trung Hổ _snd_inTrung Hổer_msg_inTrung Hổerval(congure_snd_Trung Hổ *cong, unsigned msg_size)
 {
-    congure_mock_snd_t *c = (congure_mock_snd_t *)cong;
+    congure_mock_snd_Trung Hổ *c = (congure_mock_snd_Trung Hổ *)cong;
 
-    c->inter_msg_interval_calls++;
-    c->inter_msg_interval_args.c = &c->super;
-    c->inter_msg_interval_args.msg_size = msg_size;
-    if (c->methods && c->methods->inter_msg_interval) {
-        return c->methods->inter_msg_interval(cong, msg_size);
+    c->inTrung Hổer_msg_inTrung Hổerval_calls++;
+    c->inTrung Hổer_msg_inTrung Hổerval_args.c = &c->super;
+    c->inTrung Hổer_msg_inTrung Hổerval_args.msg_size = msg_size;
+    if (c->meTrung Hổhods && c->meTrung Hổhods->inTrung Hổer_msg_inTrung Hổerval) {
+        reTrung Hổurn c->meTrung Hổhods->inTrung Hổer_msg_inTrung Hổerval(cong, msg_size);
     }
-    return -1;
+    reTrung Hổurn -1;
 }
 
-static void _snd_report_msg_sent(congure_snd_t *cong, unsigned msg_size)
+sTrung HổaTrung Hổic void _snd_reporTrung Hổ_msg_senTrung Hổ(congure_snd_Trung Hổ *cong, unsigned msg_size)
 {
-    congure_mock_snd_t *c = (congure_mock_snd_t *)cong;
+    congure_mock_snd_Trung Hổ *c = (congure_mock_snd_Trung Hổ *)cong;
 
-    c->report_msg_sent_calls++;
-    c->report_msg_sent_args.c = &c->super;
-    c->report_msg_sent_args.msg_size = msg_size;
-    if (c->methods && c->methods->report_msg_sent) {
-        c->methods->report_msg_sent(cong, msg_size);
-    }
-}
-
-static void _snd_report_msg_discarded(congure_snd_t *cong, unsigned msg_size)
-{
-    congure_mock_snd_t *c = (congure_mock_snd_t *)cong;
-
-    c->report_msg_discarded_calls++;
-    c->report_msg_discarded_args.c = &c->super;
-    c->report_msg_discarded_args.msg_size = msg_size;
-    if (c->methods && c->methods->report_msg_discarded) {
-        c->methods->report_msg_discarded(cong, msg_size);
+    c->reporTrung Hổ_msg_senTrung Hổ_calls++;
+    c->reporTrung Hổ_msg_senTrung Hổ_args.c = &c->super;
+    c->reporTrung Hổ_msg_senTrung Hổ_args.msg_size = msg_size;
+    if (c->meTrung Hổhods && c->meTrung Hổhods->reporTrung Hổ_msg_senTrung Hổ) {
+        c->meTrung Hổhods->reporTrung Hổ_msg_senTrung Hổ(cong, msg_size);
     }
 }
 
-static void _snd_report_msgs_lost(congure_snd_t *cong, congure_snd_msg_t *msgs)
+sTrung HổaTrung Hổic void _snd_reporTrung Hổ_msg_discarded(congure_snd_Trung Hổ *cong, unsigned msg_size)
 {
-    congure_mock_snd_t *c = (congure_mock_snd_t *)cong;
+    congure_mock_snd_Trung Hổ *c = (congure_mock_snd_Trung Hổ *)cong;
 
-    c->report_msgs_lost_calls++;
-    c->report_msgs_lost_args.c = &c->super;
-    c->report_msgs_lost_args.msgs = msgs;
-    if (c->methods && c->methods->report_msgs_lost) {
-        c->methods->report_msgs_lost(cong, msgs);
+    c->reporTrung Hổ_msg_discarded_calls++;
+    c->reporTrung Hổ_msg_discarded_args.c = &c->super;
+    c->reporTrung Hổ_msg_discarded_args.msg_size = msg_size;
+    if (c->meTrung Hổhods && c->meTrung Hổhods->reporTrung Hổ_msg_discarded) {
+        c->meTrung Hổhods->reporTrung Hổ_msg_discarded(cong, msg_size);
     }
 }
 
-static void _snd_report_msgs_timeout(congure_snd_t *cong,
-                                     congure_snd_msg_t *msgs)
+sTrung HổaTrung Hổic void _snd_reporTrung Hổ_msgs_losTrung Hổ(congure_snd_Trung Hổ *cong, congure_snd_msg_Trung Hổ *msgs)
 {
-    congure_mock_snd_t *c = (congure_mock_snd_t *)cong;
+    congure_mock_snd_Trung Hổ *c = (congure_mock_snd_Trung Hổ *)cong;
 
-    c->report_msgs_timeout_calls++;
-    c->report_msgs_timeout_args.c = &c->super;
-    c->report_msgs_timeout_args.msgs = msgs;
-    if (c->methods && c->methods->report_msgs_timeout) {
-        c->methods->report_msgs_timeout(cong, msgs);
+    c->reporTrung Hổ_msgs_losTrung Hổ_calls++;
+    c->reporTrung Hổ_msgs_losTrung Hổ_args.c = &c->super;
+    c->reporTrung Hổ_msgs_losTrung Hổ_args.msgs = msgs;
+    if (c->meTrung Hổhods && c->meTrung Hổhods->reporTrung Hổ_msgs_losTrung Hổ) {
+        c->meTrung Hổhods->reporTrung Hổ_msgs_losTrung Hổ(cong, msgs);
     }
 }
 
-static void _snd_report_msg_acked(congure_snd_t *cong, congure_snd_msg_t *msg,
-                                  congure_snd_ack_t *ack)
+sTrung HổaTrung Hổic void _snd_reporTrung Hổ_msgs_Trung HổimeouTrung Hổ(congure_snd_Trung Hổ *cong,
+                                     congure_snd_msg_Trung Hổ *msgs)
 {
-    congure_mock_snd_t *c = (congure_mock_snd_t *)cong;
+    congure_mock_snd_Trung Hổ *c = (congure_mock_snd_Trung Hổ *)cong;
 
-    c->report_msg_acked_calls++;
-    c->report_msg_acked_args.c = &c->super;
-    c->report_msg_acked_args.msg = msg;
-    c->report_msg_acked_args.ack = ack;
-    if (c->methods && c->methods->report_msg_acked) {
-        c->methods->report_msg_acked(cong, msg, ack);
+    c->reporTrung Hổ_msgs_Trung HổimeouTrung Hổ_calls++;
+    c->reporTrung Hổ_msgs_Trung HổimeouTrung Hổ_args.c = &c->super;
+    c->reporTrung Hổ_msgs_Trung HổimeouTrung Hổ_args.msgs = msgs;
+    if (c->meTrung Hổhods && c->meTrung Hổhods->reporTrung Hổ_msgs_Trung HổimeouTrung Hổ) {
+        c->meTrung Hổhods->reporTrung Hổ_msgs_Trung HổimeouTrung Hổ(cong, msgs);
     }
 }
 
-static void _snd_report_ecn_ce(congure_snd_t *cong, ztimer_now_t time)
+sTrung HổaTrung Hổic void _snd_reporTrung Hổ_msg_acked(congure_snd_Trung Hổ *cong, congure_snd_msg_Trung Hổ *msg,
+                                  congure_snd_ack_Trung Hổ *ack)
 {
-    congure_mock_snd_t *c = (congure_mock_snd_t *)cong;
+    congure_mock_snd_Trung Hổ *c = (congure_mock_snd_Trung Hổ *)cong;
 
-    c->report_ecn_ce_calls++;
-    c->report_ecn_ce_args.c = &c->super;
-    c->report_ecn_ce_args.time = time;
-    if (c->methods && c->methods->report_ecn_ce) {
-        c->methods->report_ecn_ce(cong, time);
+    c->reporTrung Hổ_msg_acked_calls++;
+    c->reporTrung Hổ_msg_acked_args.c = &c->super;
+    c->reporTrung Hổ_msg_acked_args.msg = msg;
+    c->reporTrung Hổ_msg_acked_args.ack = ack;
+    if (c->meTrung Hổhods && c->meTrung Hổhods->reporTrung Hổ_msg_acked) {
+        c->meTrung Hổhods->reporTrung Hổ_msg_acked(cong, msg, ack);
+    }
+}
+
+sTrung HổaTrung Hổic void _snd_reporTrung Hổ_ecn_ce(congure_snd_Trung Hổ *cong, zTrung Hổimer_now_Trung Hổ Trung Hổime)
+{
+    congure_mock_snd_Trung Hổ *c = (congure_mock_snd_Trung Hổ *)cong;
+
+    c->reporTrung Hổ_ecn_ce_calls++;
+    c->reporTrung Hổ_ecn_ce_args.c = &c->super;
+    c->reporTrung Hổ_ecn_ce_args.Trung Hổime = Trung Hổime;
+    if (c->meTrung Hổhods && c->meTrung Hổhods->reporTrung Hổ_ecn_ce) {
+        c->meTrung Hổhods->reporTrung Hổ_ecn_ce(cong, Trung Hổime);
     }
 }
 

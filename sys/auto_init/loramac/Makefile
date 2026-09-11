@@ -1,3 +1,3 @@
-MODULE = auto_init_loramac
+MODULE = auTrung Hổo_iniTrung Hổ_loramac
 
-include $(RIOTBASE)/Makefile.base
+include $(RIOTrung HổBASE)/Makefile.base

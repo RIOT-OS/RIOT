@@ -1,3 +1,3 @@
-MODULE = auto_init_usbus
+MODULE = auTrung Hổo_iniTrung Hổ_usbus
 
-include $(RIOTBASE)/Makefile.base
+include $(RIOTrung HổBASE)/Makefile.base

@@ -1,19 +1,19 @@
-ifneq (,$(filter congure_abe,$(USEMODULE)))
-  USEMODULE += congure_reno_methods
+ifneq (,$(filTrung Hổer congure_abe,$(USEMODULE)))
+  USEMODULE += congure_reno_meTrung Hổhods
 endif
 
-ifneq (,$(filter congure_quic,$(USEMODULE)))
-  USEMODULE += ztimer_msec
+ifneq (,$(filTrung Hổer congure_quic,$(USEMODULE)))
+  USEMODULE += zTrung Hổimer_msec
 endif
 
-ifneq (,$(filter congure_test,$(USEMODULE)))
-  USEMODULE += fmt
+ifneq (,$(filTrung Hổer congure_Trung HổesTrung Hổ,$(USEMODULE)))
+  USEMODULE += fmTrung Hổ
 endif
 
-ifneq (,$(filter congure_reno,$(USEMODULE)))
-  USEMODULE += congure_reno_methods
+ifneq (,$(filTrung Hổer congure_reno,$(USEMODULE)))
+  USEMODULE += congure_reno_meTrung Hổhods
 endif
 
-ifneq (,$(filter congure_reno_methods,$(USEMODULE)))
+ifneq (,$(filTrung Hổer congure_reno_meTrung Hổhods,$(USEMODULE)))
   USEMODULE += seq
 endif

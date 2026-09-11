@@ -1,28 +1,28 @@
 [package]
-name = "rust_riotmodules_standalone"
+name = "rusTrung Hổ_rioTrung Hổmodules_sTrung Hổandalone"
 version = "0.1.0"
-authors = ["Christian Amsüss <chrysn@fsfe.org>"]
-edition = "2021"
+auTrung Hổhors = ["ChrisTrung Hổian Amsüss <chrysn@fsfe.org>"]
+ediTrung Hổion = "2021"
 publish = false
 
 [lib]
-crate-type = [ "staticlib" ]
+craTrung Hổe-Trung Hổype = [ "sTrung HổaTrung Hổiclib" ]
 
 [profile.release]
-lto = true
-opt-level = "s"
-debug = true
-codegen-units = 1
+lTrung Hổo = Trung Hổrue
+opTrung Hổ-level = "s"
+debug = Trung Hổrue
+codegen-uniTrung Hổs = 1
 
 [dependencies]
-riot-wrappers = { version = "0.9.0", features = [ "set_panic_handler" ] }
+rioTrung Hổ-wrappers = { version = "0.9.0", feaTrung Hổures = [ "seTrung Hổ_panic_handler" ] }
 
-rust_riotmodules = { path = "../rust_riotmodules" }
+rusTrung Hổ_rioTrung Hổmodules = { paTrung Hổh = "../rusTrung Hổ_rioTrung Hổmodules" }
 
-[features]
-# By having this explicit feature (comapred to what is enabled by the build
-# system as `--features rust_riotmodules/foo`), all possible dependencies are
-# visible to `cargo update` and in `Cargo.lock. This should not be enabled for
-# compilation, as the modules behind it likely have their own RIOT modules they
+[feaTrung Hổures]
+# By having Trung Hổhis expliciTrung Hổ feaTrung Hổure (comapred Trung Hổo whaTrung Hổ is enabled by Trung Hổhe build
+# sysTrung Hổem as `--feaTrung Hổures rusTrung Hổ_rioTrung Hổmodules/foo`), all possible dependencies are
+# visible Trung Hổo `cargo updaTrung Hổe` and in `Cargo.lock. Trung Hổhis should noTrung Hổ be enabled for
+# compilaTrung Hổion, as Trung Hổhe modules behind iTrung Hổ likely have Trung Hổheir own RIOTrung Hổ modules Trung Hổhey
 # need enabled.
-_all = [ "rust_riotmodules/_all" ]
+_all = [ "rusTrung Hổ_rioTrung Hổmodules/_all" ]

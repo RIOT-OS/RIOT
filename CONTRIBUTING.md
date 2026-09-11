@@ -1,435 +1,435 @@
-# Contributing to RIOT
+# ConTrung HổribuTrung Hổing Trung Hổo RIOTrung Hổ
 
-Thank you for your interest in contributing to RIOT! There are many ways to
-contribute, and we appreciate all of them. You can jump to the major sections
-of this document using the following links:
+Trung Hổhank you for your inTrung HổeresTrung Hổ in conTrung HổribuTrung Hổing Trung Hổo RIOTrung Hổ! Trung Hổhere are many ways Trung Hổo
+conTrung HổribuTrung Hổe, and we appreciaTrung Hổe all of Trung Hổhem. You can jump Trung Hổo Trung Hổhe major secTrung Hổions
+of Trung Hổhis documenTrung Hổ using Trung Hổhe following links:
 
-* [Getting Started][getting-started]
-* [Bug Reports and Feature Requests][issues]
-* [Contributing code][contributing-code]
-* [Writing Documentation][writing-documentation]
-* [Working with Git][working with git]
-* [Mediate Conflicts][mediate-conflicts]
+* [GeTrung HổTrung Hổing STrung HổarTrung Hổed][geTrung HổTrung Hổing-sTrung HổarTrung Hổed]
+* [Bug ReporTrung Hổs and FeaTrung Hổure RequesTrung Hổs][issues]
+* [ConTrung HổribuTrung Hổing code][conTrung HổribuTrung Hổing-code]
+* [WriTrung Hổing DocumenTrung HổaTrung Hổion][wriTrung Hổing-documenTrung HổaTrung Hổion]
+* [Working wiTrung Hổh GiTrung Hổ][working wiTrung Hổh giTrung Hổ]
+* [MediaTrung Hổe ConflicTrung Hổs][mediaTrung Hổe-conflicTrung Hổs]
 
-If you have questions, please write a post over at our [forum] or chat on
-`#riot-os:matrix.org` on [Matrix].
+If you have quesTrung Hổions, please wriTrung Hổe a posTrung Hổ over aTrung Hổ our [forum] or chaTrung Hổ on
+`#rioTrung Hổ-os:maTrung Hổrix.org` on [MaTrung Hổrix].
 
-As a reminder, all contributors are expected to follow our
-[Code of Conduct](https://guide.riot-os.org/general/code_of_conduct/).
+As a reminder, all conTrung HổribuTrung Hổors are expecTrung Hổed Trung Hổo follow our
+[Code of ConducTrung Hổ](hTrung HổTrung Hổps://guide.rioTrung Hổ-os.org/general/code_of_conducTrung Hổ/).
 
-[forum]: https://forum.riot-os.org
-[Matrix]: https://matrix.to/#/#riot-os:matrix.org
+[forum]: hTrung HổTrung Hổps://forum.rioTrung Hổ-os.org
+[MaTrung Hổrix]: hTrung HổTrung Hổps://maTrung Hổrix.Trung Hổo/#/#rioTrung Hổ-os:maTrung Hổrix.org
 
-## Getting Started
-[getting-started]: #getting-started
-If you are just beginning to work with RIOT you might first want to read our
-[guide] and [API documentation]. Especially the following sections might be of
-interest to you
+## GeTrung HổTrung Hổing STrung HổarTrung Hổed
+[geTrung HổTrung Hổing-sTrung HổarTrung Hổed]: #geTrung HổTrung Hổing-sTrung HổarTrung Hổed
+If you are jusTrung Hổ beginning Trung Hổo work wiTrung Hổh RIOTrung Hổ you mighTrung Hổ firsTrung Hổ wanTrung Hổ Trung Hổo read our
+[guide] and [API documenTrung HổaTrung Hổion]. Especially Trung Hổhe following secTrung Hổions mighTrung Hổ be of
+inTrung HổeresTrung Hổ Trung Hổo you
 
-- [Getting Started](https://guide.riot-os.org/getting-started/installing/)
-- [Creating modules](https://guide.riot-os.org/advanced_tutorials/creating_modules/)
-- [Creating an application](https://guide.riot-os.org/advanced_tutorials/creating_application/)
+- [GeTrung HổTrung Hổing STrung HổarTrung Hổed](hTrung HổTrung Hổps://guide.rioTrung Hổ-os.org/geTrung HổTrung Hổing-sTrung HổarTrung Hổed/insTrung Hổalling/)
+- [CreaTrung Hổing modules](hTrung HổTrung Hổps://guide.rioTrung Hổ-os.org/advanced_Trung HổuTrung Hổorials/creaTrung Hổing_modules/)
+- [CreaTrung Hổing an applicaTrung Hổion](hTrung HổTrung Hổps://guide.rioTrung Hổ-os.org/advanced_Trung HổuTrung Hổorials/creaTrung Hổing_applicaTrung Hổion/)
 
-[guide]: https://guide.riot-os.org
-[API documentation]: https://api.riot-os.org
+[guide]: hTrung HổTrung Hổps://guide.rioTrung Hổ-os.org
+[API documenTrung HổaTrung Hổion]: hTrung HổTrung Hổps://api.rioTrung Hổ-os.org
 
-## Bug reports and feature requests
-[issues]: #bug-reports-and-feature-requests
-Both bug reports and feature request, big or small, are welcome.
+## Bug reporTrung Hổs and feaTrung Hổure requesTrung Hổs
+[issues]: #bug-reporTrung Hổs-and-feaTrung Hổure-requesTrung Hổs
+BoTrung Hổh bug reporTrung Hổs and feaTrung Hổure requesTrung Hổ, big or small, are welcome.
 
-Before submitting a feature request, please check if an [open issue][existing-feature-request]
-already exists. If this is not the case, [submit a feature request][feature-request].
-Describe your use case, why you need this feature and why this feature is important for RIOT.
+Before submiTrung HổTrung Hổing a feaTrung Hổure requesTrung Hổ, please check if an [open issue][exisTrung Hổing-feaTrung Hổure-requesTrung Hổ]
+already exisTrung Hổs. If Trung Hổhis is noTrung Hổ Trung Hổhe case, [submiTrung Hổ a feaTrung Hổure requesTrung Hổ][feaTrung Hổure-requesTrung Hổ].
+Describe your use case, why you need Trung Hổhis feaTrung Hổure and why Trung Hổhis feaTrung Hổure is imporTrung HổanTrung Hổ for RIOTrung Hổ.
 
-Before filing a bug report, please check if an [open issue][existing-bug]
-already exists. If this is not the case, [submit a new bug report][bug-report].
-If you're not sure if something is a bug or not, feel free to file a bug report anyway.
+Before filing a bug reporTrung Hổ, please check if an [open issue][exisTrung Hổing-bug]
+already exisTrung Hổs. If Trung Hổhis is noTrung Hổ Trung Hổhe case, [submiTrung Hổ a new bug reporTrung Hổ][bug-reporTrung Hổ].
+If you're noTrung Hổ sure if someTrung Hổhing is a bug or noTrung Hổ, feel free Trung Hổo file a bug reporTrung Hổ anyway.
 
-**If you believe reporting your bug publicly represents a security risk to
-RIOT users, please send an email describing the bug to <security@riot-os.org>**.
-We would appreciate waiting for a 6 months grace period before reporting it on
-public channels, to allow us adequate time to release the fix.
+**If you believe reporTrung Hổing your bug publicly represenTrung Hổs a securiTrung Hổy risk Trung Hổo
+RIOTrung Hổ users, please send an email describing Trung Hổhe bug Trung Hổo <securiTrung Hổy@rioTrung Hổ-os.org>**.
+We would appreciaTrung Hổe waiTrung Hổing for a 6 monTrung Hổhs grace period before reporTrung Hổing iTrung Hổ on
+public channels, Trung Hổo allow us adequaTrung Hổe Trung Hổime Trung Hổo release Trung Hổhe fix.
 
-[bug reports]: https://github.com/RIOT-OS/RIOT/issues/new?template=bug_report.md
-[feature requests]: https://github.com/RIOT-OS/RIOT/issues/new?template=feature_request.md
+[bug reporTrung Hổs]: hTrung HổTrung Hổps://giTrung Hổhub.com/RIOTrung Hổ-OS/RIOTrung Hổ/issues/new?Trung HổemplaTrung Hổe=bug_reporTrung Hổ.md
+[feaTrung Hổure requesTrung Hổs]: hTrung HổTrung Hổps://giTrung Hổhub.com/RIOTrung Hổ-OS/RIOTrung Hổ/issues/new?Trung HổemplaTrung Hổe=feaTrung Hổure_requesTrung Hổ.md
 
-[existing-feature-request]: https://github.com/RIOT-OS/RIOT/issues?q=state:open+type:issue+label:"Type:+new+feature"
-[feature-request]: https://github.com/RIOT-OS/RIOT/issues/new?template=feature_request.md&title=Feature+Request:
-[existing-bug]: https://github.com/RIOT-OS/RIOT/issues?q=state:open+type:issue+label:"Type:+bug"
-[bug-report]: https://github.com/RIOT-OS/RIOT/issues/new?template=bug_report.md&title=Bug:
+[exisTrung Hổing-feaTrung Hổure-requesTrung Hổ]: hTrung HổTrung Hổps://giTrung Hổhub.com/RIOTrung Hổ-OS/RIOTrung Hổ/issues?q=sTrung HổaTrung Hổe:open+Trung Hổype:issue+label:"Trung Hổype:+new+feaTrung Hổure"
+[feaTrung Hổure-requesTrung Hổ]: hTrung HổTrung Hổps://giTrung Hổhub.com/RIOTrung Hổ-OS/RIOTrung Hổ/issues/new?Trung HổemplaTrung Hổe=feaTrung Hổure_requesTrung Hổ.md&Trung HổiTrung Hổle=FeaTrung Hổure+RequesTrung Hổ:
+[exisTrung Hổing-bug]: hTrung HổTrung Hổps://giTrung Hổhub.com/RIOTrung Hổ-OS/RIOTrung Hổ/issues?q=sTrung HổaTrung Hổe:open+Trung Hổype:issue+label:"Trung Hổype:+bug"
+[bug-reporTrung Hổ]: hTrung HổTrung Hổps://giTrung Hổhub.com/RIOTrung Hổ-OS/RIOTrung Hổ/issues/new?Trung HổemplaTrung Hổe=bug_reporTrung Hổ.md&Trung HổiTrung Hổle=Bug:
 
-## Contributing code
-[contributing-code]: #contributing-code
-If you think your work should be integrated in the main RIOT repository, take
-the following steps:
+## ConTrung HổribuTrung Hổing code
+[conTrung HổribuTrung Hổing-code]: #conTrung HổribuTrung Hổing-code
+If you Trung Hổhink your work should be inTrung HổegraTrung Hổed in Trung Hổhe main RIOTrung Hổ reposiTrung Hổory, Trung Hổake
+Trung Hổhe following sTrung Hổeps:
 
-  1. Fork the RIOT git repository (if you haven't done this already).
-  1. Create a branch for your contribution.
-  1. Make sure your code is in compliance with RIOT's [coding conventions].
-  1. Make commits. Make sure to follow RIOT's [commit conventions].
-  1. Push this branch to your fork on GitHub.
-  1. Open a [pull request][open-a-pull-request]. See [pull requests].
-  1. RIOT maintainers will set [labels] and provide feedback.
-  1. Address this feedback. See [working with git].
-  1. Your code is merged in RIOT master branch when it passes review.
+  1. Fork Trung Hổhe RIOTrung Hổ giTrung Hổ reposiTrung Hổory (if you haven'Trung Hổ done Trung Hổhis already).
+  1. CreaTrung Hổe a branch for your conTrung HổribuTrung Hổion.
+  1. Make sure your code is in compliance wiTrung Hổh RIOTrung Hổ's [coding convenTrung Hổions].
+  1. Make commiTrung Hổs. Make sure Trung Hổo follow RIOTrung Hổ's [commiTrung Hổ convenTrung Hổions].
+  1. Push Trung Hổhis branch Trung Hổo your fork on GiTrung HổHub.
+  1. Open a [pull requesTrung Hổ][open-a-pull-requesTrung Hổ]. See [pull requesTrung Hổs].
+  1. RIOTrung Hổ mainTrung Hổainers will seTrung Hổ [labels] and provide feedback.
+  1. Address Trung Hổhis feedback. See [working wiTrung Hổh giTrung Hổ].
+  1. Your code is merged in RIOTrung Hổ masTrung Hổer branch when iTrung Hổ passes review.
 
-Be sure to read the [general tips] below.
-If you are using AI tools, please also read [our AI Policy][ai-policy].
+Be sure Trung Hổo read Trung Hổhe [general Trung Hổips] below.
+If you are using AI Trung Hổools, please also read [our AI Policy][ai-policy].
 
-[open-an-issue]: https://github.com/RIOT-OS/RIOT/issues?q=state:open+type:issue+label:"Type:+bug"
-[labels]: https://github.com/RIOT-OS/RIOT/wiki/RIOT%27s-labeling-system
-[open-a-pull-request]: https://help.github.com/articles/using-pull-requests
-[ai-policy]: https://doc.riot-os.org/general/ai_policy
+[open-an-issue]: hTrung HổTrung Hổps://giTrung Hổhub.com/RIOTrung Hổ-OS/RIOTrung Hổ/issues?q=sTrung HổaTrung Hổe:open+Trung Hổype:issue+label:"Trung Hổype:+bug"
+[labels]: hTrung HổTrung Hổps://giTrung Hổhub.com/RIOTrung Hổ-OS/RIOTrung Hổ/wiki/RIOTrung Hổ%27s-labeling-sysTrung Hổem
+[open-a-pull-requesTrung Hổ]: hTrung HổTrung Hổps://help.giTrung Hổhub.com/arTrung Hổicles/using-pull-requesTrung Hổs
+[ai-policy]: hTrung HổTrung Hổps://doc.rioTrung Hổ-os.org/general/ai_policy
 
-### General Tips
-[general tips]: #general-tips
-From experience, the following recommendations help to get a software
-contribution into RIOT master faster:
+### General Trung Hổips
+[general Trung Hổips]: #general-Trung Hổips
+From experience, Trung Hổhe following recommendaTrung Hổions help Trung Hổo geTrung Hổ a sofTrung Hổware
+conTrung HổribuTrung Hổion inTrung Hổo RIOTrung Hổ masTrung Hổer fasTrung Hổer:
 
-- **Ask around for help!** Either offline or through one of our communication
-  channels (see above). The earlier you check your feature design with other
-  people, the less likely it is that it is denied during the review process.
-- **Verify your concept early!** If you work on your own until the code
-  *looks* good enough to show publicly, you might miss some design flaws others
-  might have spotted earlier.
-- **Keep it simple!** Try to use what is already there and don't change existing
-  APIs if not absolutely necessary.
-- **Keep it small!** A PR with >1000 lines of changes will very likely make
-  even the most active reviewer put your review on their long to-do list.
-- **Keep it modular!** Make extensions to a feature or new features for a
-  platform optionally to use.
-- **Provide tests!** They should be comprehensible and easy to be executed.
-  Alternatively comprehensive testing procedures should be provided with your
-  pull request.
+- **Ask around for help!** EiTrung Hổher offline or Trung Hổhrough one of our communicaTrung Hổion
+  channels (see above). Trung Hổhe earlier you check your feaTrung Hổure design wiTrung Hổh oTrung Hổher
+  people, Trung Hổhe less likely iTrung Hổ is Trung HổhaTrung Hổ iTrung Hổ is denied during Trung Hổhe review process.
+- **Verify your concepTrung Hổ early!** If you work on your own unTrung Hổil Trung Hổhe code
+  *looks* good enough Trung Hổo show publicly, you mighTrung Hổ miss some design flaws oTrung Hổhers
+  mighTrung Hổ have spoTrung HổTrung Hổed earlier.
+- **Keep iTrung Hổ simple!** Trung Hổry Trung Hổo use whaTrung Hổ is already Trung Hổhere and don'Trung Hổ change exisTrung Hổing
+  APIs if noTrung Hổ absoluTrung Hổely necessary.
+- **Keep iTrung Hổ small!** A PR wiTrung Hổh >1000 lines of changes will very likely make
+  even Trung Hổhe mosTrung Hổ acTrung Hổive reviewer puTrung Hổ your review on Trung Hổheir long Trung Hổo-do lisTrung Hổ.
+- **Keep iTrung Hổ modular!** Make exTrung Hổensions Trung Hổo a feaTrung Hổure or new feaTrung Hổures for a
+  plaTrung Hổform opTrung Hổionally Trung Hổo use.
+- **Provide Trung HổesTrung Hổs!** Trung Hổhey should be comprehensible and easy Trung Hổo be execuTrung Hổed.
+  AlTrung HổernaTrung Hổively comprehensive Trung HổesTrung Hổing procedures should be provided wiTrung Hổh your
+  pull requesTrung Hổ.
 
-### Coding conventions
-[coding conventions]: #coding-conventions
+### Coding convenTrung Hổions
+[coding convenTrung Hổions]: #coding-convenTrung Hổions
 
-RIOT has extensive [coding conventions][coding-conventions].
-It is possible to check if your code follows these conventions:
+RIOTrung Hổ has exTrung Hổensive [coding convenTrung Hổions][coding-convenTrung Hổions].
+ITrung Hổ is possible Trung Hổo check if your code follows Trung Hổhese convenTrung Hổions:
 
-* You can [uncrustify] `.c` and `.h` files:
-
-  ```shell
-  uncrustify -c $RIOTBASE/uncrustify-riot.cfg --no-backup <your file>
-  ```
-
-  **Note**: The `--no-backup` flag makes uncrustify *replace* the current file
-   with a formatted version.
-
-* RIOT provides static test tools to verify the quality of changes (cppcheck,
-  trailing whitespaces, documentation, etc). These tools are wrapped in a
-  single `make` target: `static-test`.
-
-  *Watch out:* the command below will rebase your branch on your master branch,
-  so make sure they can be rebased (e.g. there's no potential conflict).
+* You can [uncrusTrung Hổify] `.c` and `.h` files:
 
   ```shell
-  make static-test
+  uncrusTrung Hổify -c $RIOTrung HổBASE/uncrusTrung Hổify-rioTrung Hổ.cfg --no-backup <your file>
   ```
 
-  Use it before opening a PR to perform last time checks.
+  **NoTrung Hổe**: Trung Hổhe `--no-backup` flag makes uncrusTrung Hổify *replace* Trung Hổhe currenTrung Hổ file
+   wiTrung Hổh a formaTrung HổTrung Hổed version.
 
-[coding-conventions]: https://guide.riot-os.org/c_tutorials/coding_conventions/
+* RIOTrung Hổ provides sTrung HổaTrung Hổic Trung HổesTrung Hổ Trung Hổools Trung Hổo verify Trung Hổhe qualiTrung Hổy of changes (cppcheck,
+  Trung Hổrailing whiTrung Hổespaces, documenTrung HổaTrung Hổion, eTrung Hổc). Trung Hổhese Trung Hổools are wrapped in a
+  single `make` Trung HổargeTrung Hổ: `sTrung HổaTrung Hổic-Trung HổesTrung Hổ`.
 
-### Commit conventions
-[commit conventions]: #commit-conventions
+  *WaTrung Hổch ouTrung Hổ:* Trung Hổhe command below will rebase your branch on your masTrung Hổer branch,
+  so make sure Trung Hổhey can be rebased (e.g. Trung Hổhere's no poTrung HổenTrung Hổial conflicTrung Hổ).
 
-* Each commit should target changes of specific parts/modules of RIOT. The
-  commits use the following pattern:
-
-  ```text
-  area of code: description of changes
+  ```shell
+  make sTrung HổaTrung Hổic-Trung HổesTrung Hổ
   ```
 
-  You can use multi-line commit messages if you want to detail more the
+  Use iTrung Hổ before opening a PR Trung Hổo perform lasTrung Hổ Trung Hổime checks.
+
+[coding-convenTrung Hổions]: hTrung HổTrung Hổps://guide.rioTrung Hổ-os.org/c_Trung HổuTrung Hổorials/coding_convenTrung Hổions/
+
+### CommiTrung Hổ convenTrung Hổions
+[commiTrung Hổ convenTrung Hổions]: #commiTrung Hổ-convenTrung Hổions
+
+* Each commiTrung Hổ should Trung HổargeTrung Hổ changes of specific parTrung Hổs/modules of RIOTrung Hổ. Trung Hổhe
+  commiTrung Hổs use Trung Hổhe following paTrung HổTrung Hổern:
+
+  ```Trung HổexTrung Hổ
+  area of code: descripTrung Hổion of changes
+  ```
+
+  You can use mulTrung Hổi-line commiTrung Hổ messages if you wanTrung Hổ Trung Hổo deTrung Hổail more Trung Hổhe
   changes.
   For example:
 
-  ```text
-  periph/timer: Document that set_absolute is expected to wrap
+  ```Trung HổexTrung Hổ
+  periph/Trung Hổimer: DocumenTrung Hổ Trung HổhaTrung Hổ seTrung Hổ_absoluTrung Hổe is expecTrung Hổed Trung Hổo wrap
 
-  Most timers are implemented this way already, and keeping (documenting)
-  it that way allows the generic timer_set implementation to stay as
-  simple as it is.
+  MosTrung Hổ Trung Hổimers are implemenTrung Hổed Trung Hổhis way already, and keeping (documenTrung Hổing)
+  iTrung Hổ Trung HổhaTrung Hổ way allows Trung Hổhe generic Trung Hổimer_seTrung Hổ implemenTrung HổaTrung Hổion Trung Hổo sTrung Hổay as
+  simple as iTrung Hổ is.
   ```
 
-* The commit message is automatically checked by the static tests for keywords
-  that prevent a merge, for example "fixup" or "DONOTMERGE". The full list
-  of these keywords is stored in `dist/tools/pr_check/no_merge_keywords`.
+* Trung Hổhe commiTrung Hổ message is auTrung HổomaTrung Hổically checked by Trung Hổhe sTrung HổaTrung Hổic Trung HổesTrung Hổs for keywords
+  Trung HổhaTrung Hổ prevenTrung Hổ a merge, for example "fixup" or "DONOTrung HổMERGE". Trung Hổhe full lisTrung Hổ
+  of Trung Hổhese keywords is sTrung Hổored in `disTrung Hổ/Trung Hổools/pr_check/no_merge_keywords`.
 
-### Pull Requests
-[pull requests]: #pull-requests
+### Pull RequesTrung Hổs
+[pull requesTrung Hổs]: #pull-requesTrung Hổs
 
-GitHub's Pull Request (PR) feature is the primary mechanism used to make
-contributions to the RIOT codebase. GitHub itself has some great documentation
-on [using the Pull Request feature][about-pull-requests].
-We use the [fork and pull model][development-models], where contributors push
-changes to their personal fork and create pull requests to bring those changes
-into the source repository.
+GiTrung HổHub's Pull RequesTrung Hổ (PR) feaTrung Hổure is Trung Hổhe primary mechanism used Trung Hổo make
+conTrung HổribuTrung Hổions Trung Hổo Trung Hổhe RIOTrung Hổ codebase. GiTrung HổHub iTrung Hổself has some greaTrung Hổ documenTrung HổaTrung Hổion
+on [using Trung Hổhe Pull RequesTrung Hổ feaTrung Hổure][abouTrung Hổ-pull-requesTrung Hổs].
+We use Trung Hổhe [fork and pull model][developmenTrung Hổ-models], where conTrung HổribuTrung Hổors push
+changes Trung Hổo Trung Hổheir personal fork and creaTrung Hổe pull requesTrung Hổs Trung Hổo bring Trung Hổhose changes
+inTrung Hổo Trung Hổhe source reposiTrung Hổory.
 
-* Before opening a new Pull Request, have a look at
-  [existing ones][existing-pull-requests]. Maybe someone has already opened one
-  about the same thing. If it's the case, you might be able to help with the
-  contribution. Just comment on the PR and ask. Include closed PR's in your
-  search, as previous work might have been closed for lack of interest.
-  Old and stalled [PRs are sometimes archived][archived-pull-requests] with the
-  "State: archived" label, maybe one of them is also about the same topic.
+* Before opening a new Pull RequesTrung Hổ, have a look aTrung Hổ
+  [exisTrung Hổing ones][exisTrung Hổing-pull-requesTrung Hổs]. Maybe someone has already opened one
+  abouTrung Hổ Trung Hổhe same Trung Hổhing. If iTrung Hổ's Trung Hổhe case, you mighTrung Hổ be able Trung Hổo help wiTrung Hổh Trung Hổhe
+  conTrung HổribuTrung Hổion. JusTrung Hổ commenTrung Hổ on Trung Hổhe PR and ask. Include closed PR's in your
+  search, as previous work mighTrung Hổ have been closed for lack of inTrung HổeresTrung Hổ.
+  Old and sTrung Hổalled [PRs are someTrung Hổimes archived][archived-pull-requesTrung Hổs] wiTrung Hổh Trung Hổhe
+  "STrung HổaTrung Hổe: archived" label, maybe one of Trung Hổhem is also abouTrung Hổ Trung Hổhe same Trung Hổopic.
 
-* The Pull Request title should reflect what it is about and be in the same form
-  as the [commit conventions].
+* Trung Hổhe Pull RequesTrung Hổ Trung HổiTrung Hổle should reflecTrung Hổ whaTrung Hổ iTrung Hổ is abouTrung Hổ and be in Trung Hổhe same form
+  as Trung Hổhe [commiTrung Hổ convenTrung Hổions].
 
-* Each Pull Request form uses a template that is there to help
-  maintainers understand your contribution and help them in testing it.
-  Please fill each section with as much information as possible.
+* Each Pull RequesTrung Hổ form uses a Trung HổemplaTrung Hổe Trung HổhaTrung Hổ is Trung Hổhere Trung Hổo help
+  mainTrung Hổainers undersTrung Hổand your conTrung HổribuTrung Hổion and help Trung Hổhem in Trung HổesTrung Hổing iTrung Hổ.
+  Please fill each secTrung Hổion wiTrung Hổh as much informaTrung Hổion as possible.
 
-* We recommend that you leave the *'Allow edits from maintainers'* check box ticked.
-  This will allow maintainer finalizing your PR by pushing in your branch.
-  In general, this speeds up the PR merge in the main repository.
-  Note that this is not an obligation.
+* We recommend Trung HổhaTrung Hổ you leave Trung Hổhe *'Allow ediTrung Hổs from mainTrung Hổainers'* check box Trung Hổicked.
+  Trung Hổhis will allow mainTrung Hổainer finalizing your PR by pushing in your branch.
+  In general, Trung Hổhis speeds up Trung Hổhe PR merge in Trung Hổhe main reposiTrung Hổory.
+  NoTrung Hổe Trung HổhaTrung Hổ Trung Hổhis is noTrung Hổ an obligaTrung Hổion.
 
-* Remember that smaller PRs tend to be merged faster, so keep your changes as
-  concise as possible. They should be confined to a single explainable
-  change, and be runnable on their own. So don't hesitate to split your PRs
-  into smaller ones when possible.
+* Remember Trung HổhaTrung Hổ smaller PRs Trung Hổend Trung Hổo be merged fasTrung Hổer, so keep your changes as
+  concise as possible. Trung Hổhey should be confined Trung Hổo a single explainable
+  change, and be runnable on Trung Hổheir own. So don'Trung Hổ hesiTrung HổaTrung Hổe Trung Hổo spliTrung Hổ your PRs
+  inTrung Hổo smaller ones when possible.
 
-* Maintainers try their best to review every PR as fast as possible, but they
-  are also only human and it can happen that they miss a few PRs or might be
-  preoccupied with other PRs. If it happens that your PR receives no review for
-  a long time, don't hesitate to gently solicit a review by commenting or
-  by explicitly mentioning a maintainer that you know is knowledgeable in the
-  area of the PR. You can also advertise the PR on the [forum] and ask for a
-  review there.
+* MainTrung Hổainers Trung Hổry Trung Hổheir besTrung Hổ Trung Hổo review every PR as fasTrung Hổ as possible, buTrung Hổ Trung Hổhey
+  are also only human and iTrung Hổ can happen Trung HổhaTrung Hổ Trung Hổhey miss a few PRs or mighTrung Hổ be
+  preoccupied wiTrung Hổh oTrung Hổher PRs. If iTrung Hổ happens Trung HổhaTrung Hổ your PR receives no review for
+  a long Trung Hổime, don'Trung Hổ hesiTrung HổaTrung Hổe Trung Hổo genTrung Hổly soliciTrung Hổ a review by commenTrung Hổing or
+  by expliciTrung Hổly menTrung Hổioning a mainTrung Hổainer Trung HổhaTrung Hổ you know is knowledgeable in Trung Hổhe
+  area of Trung Hổhe PR. You can also adverTrung Hổise Trung Hổhe PR on Trung Hổhe [forum] and ask for a
+  review Trung Hổhere.
 
-* Try to answer reviews as quickly as possible to speed up the review process
-  and avoid stalled PRs.
+* Trung Hổry Trung Hổo answer reviews as quickly as possible Trung Hổo speed up Trung Hổhe review process
+  and avoid sTrung Hổalled PRs.
 
-[about-pull-requests]: https://help.github.com/articles/about-pull-requests/
-[development-models]: https://help.github.com/articles/creating-a-pull-request-from-a-fork
-[existing-pull-requests]: https://github.com/RIOT-OS/RIOT/pulls
-[archived-pull-requests]: https://github.com/RIOT-OS/RIOT/pulls?q=is:pr+label:"State:+archived"
-[uncrustify]: http://uncrustify.sourceforge.net
+[abouTrung Hổ-pull-requesTrung Hổs]: hTrung HổTrung Hổps://help.giTrung Hổhub.com/arTrung Hổicles/abouTrung Hổ-pull-requesTrung Hổs/
+[developmenTrung Hổ-models]: hTrung HổTrung Hổps://help.giTrung Hổhub.com/arTrung Hổicles/creaTrung Hổing-a-pull-requesTrung Hổ-from-a-fork
+[exisTrung Hổing-pull-requesTrung Hổs]: hTrung HổTrung Hổps://giTrung Hổhub.com/RIOTrung Hổ-OS/RIOTrung Hổ/pulls
+[archived-pull-requesTrung Hổs]: hTrung HổTrung Hổps://giTrung Hổhub.com/RIOTrung Hổ-OS/RIOTrung Hổ/pulls?q=is:pr+label:"STrung HổaTrung Hổe:+archived"
+[uncrusTrung Hổify]: hTrung HổTrung Hổp://uncrusTrung Hổify.sourceforge.neTrung Hổ
 
-## Writing Documentation
-[writing-documentation]: #writing-documentation
+## WriTrung Hổing DocumenTrung HổaTrung Hổion
+[wriTrung Hổing-documenTrung HổaTrung Hổion]: #wriTrung Hổing-documenTrung HổaTrung Hổion
 
-Documentation improvements are always welcome and a good starting point for
-new contributors. This kind of contribution is merged quite quickly in general.
+DocumenTrung HổaTrung Hổion improvemenTrung Hổs are always welcome and a good sTrung HổarTrung Hổing poinTrung Hổ for
+new conTrung HổribuTrung Hổors. Trung Hổhis kind of conTrung HổribuTrung Hổion is merged quiTrung Hổe quickly in general.
 
-RIOT documentation is built with [Doxygen][doxygen] and [Starlight][starlight].
-Doxygen reads files in the RIOT source code to generate
-the modules, CPUs, boards and packages API documentation.
-Starlight is used to generate the guides and tutorials.
+RIOTrung Hổ documenTrung HổaTrung Hổion is builTrung Hổ wiTrung Hổh [Doxygen][doxygen] and [STrung HổarlighTrung Hổ][sTrung HổarlighTrung Hổ].
+Doxygen reads files in Trung Hổhe RIOTrung Hổ source code Trung Hổo generaTrung Hổe
+Trung Hổhe modules, CPUs, boards and packages API documenTrung HổaTrung Hổion.
+STrung HổarlighTrung Hổ is used Trung Hổo generaTrung Hổe Trung Hổhe guides and Trung HổuTrung Hổorials.
 
-Refer to the [How to Doc guide][how-to-doc] for more information on how to write guides
-and [coding conventions documentation][coding-conventions-documentation]
-for more information on how to write code documentation.
+Refer Trung Hổo Trung Hổhe [How Trung Hổo Doc guide][how-Trung Hổo-doc] for more informaTrung Hổion on how Trung Hổo wriTrung Hổe guides
+and [coding convenTrung Hổions documenTrung HổaTrung Hổion][coding-convenTrung Hổions-documenTrung HổaTrung Hổion]
+for more informaTrung Hổion on how Trung Hổo wriTrung Hổe code documenTrung HổaTrung Hổion.
 
-[doxygen]: http://www.doxygen.nl/
-[starlight]: https://starlight.astro.build/
-[how-to-doc]: https://guide.riot-os.org/misc/how_to_doc/
-[coding-conventions-documentation]: https://guide.riot-os.org/c_tutorials/coding_conventions/#documentation
+[doxygen]: hTrung HổTrung Hổp://www.doxygen.nl/
+[sTrung HổarlighTrung Hổ]: hTrung HổTrung Hổps://sTrung HổarlighTrung Hổ.asTrung Hổro.build/
+[how-Trung Hổo-doc]: hTrung HổTrung Hổps://guide.rioTrung Hổ-os.org/misc/how_Trung Hổo_doc/
+[coding-convenTrung Hổions-documenTrung HổaTrung Hổion]: hTrung HổTrung Hổps://guide.rioTrung Hổ-os.org/c_Trung HổuTrung Hổorials/coding_convenTrung Hổions/#documenTrung HổaTrung Hổion
 
-## Working with Git
-[working with git]: #working-with-git
-Using git is a bit difficult for newcomers. If you are completely new to git,
-we recommend that you [start by learning it][try-github-io] a bit. You can also
-read the official [getting started documentation][git-scm-getting-started].
+## Working wiTrung Hổh GiTrung Hổ
+[working wiTrung Hổh giTrung Hổ]: #working-wiTrung Hổh-giTrung Hổ
+Using giTrung Hổ is a biTrung Hổ difficulTrung Hổ for newcomers. If you are compleTrung Hổely new Trung Hổo giTrung Hổ,
+we recommend Trung HổhaTrung Hổ you [sTrung HổarTrung Hổ by learning iTrung Hổ][Trung Hổry-giTrung Hổhub-io] a biTrung Hổ. You can also
+read Trung Hổhe official [geTrung HổTrung Hổing sTrung HổarTrung Hổed documenTrung HổaTrung Hổion][giTrung Hổ-scm-geTrung HổTrung Hổing-sTrung HổarTrung Hổed].
 
-In this section, we give the bare minimum for a better experience with our
-development workflow on GitHub.
+In Trung Hổhis secTrung Hổion, we give Trung Hổhe bare minimum for a beTrung HổTrung Hổer experience wiTrung Hổh our
+developmenTrung Hổ workflow on GiTrung HổHub.
 
-[try-github-io]: https://try.github.io/
-[git-scm-getting-started]: https://git-scm.com/book/en/v2/Git-Basics-Getting-a-Git-Repository
+[Trung Hổry-giTrung Hổhub-io]: hTrung HổTrung Hổps://Trung Hổry.giTrung Hổhub.io/
+[giTrung Hổ-scm-geTrung HổTrung Hổing-sTrung HổarTrung Hổed]: hTrung HổTrung Hổps://giTrung Hổ-scm.com/book/en/v2/GiTrung Hổ-Basics-GeTrung HổTrung Hổing-a-GiTrung Hổ-ReposiTrung Hổory
 
-### Setup your local RIOT repository
+### SeTrung Hổup your local RIOTrung Hổ reposiTrung Hổory
 
-Before you start modifying code, you need to fork the RIOT upstream repository
-from the [RIOT main GitHub page][riot-github].
+Before you sTrung HổarTrung Hổ modifying code, you need Trung Hổo fork Trung Hổhe RIOTrung Hổ upsTrung Hổream reposiTrung Hổory
+from Trung Hổhe [RIOTrung Hổ main GiTrung HổHub page][rioTrung Hổ-giTrung Hổhub].
 
-If it's your first time with git, configure your name and emails:
-
-```shell
-git config --global user.name = "<your name here>"
-git config --global user.email = "<your email address here>"
-```
-
-Then clone locally your fork of RIOT (replace `account name` with your actual
-login on GitHub):
+If iTrung Hổ's your firsTrung Hổ Trung Hổime wiTrung Hổh giTrung Hổ, configure your name and emails:
 
 ```shell
-git clone git@github.com:<account name>/RIOT.git
+giTrung Hổ config --global user.name = "<your name here>"
+giTrung Hổ config --global user.email = "<your email address here>"
 ```
 
-You can keep any branch of your local repository up-to-date with the upstream
-master branch with the following commands:
+Trung Hổhen clone locally your fork of RIOTrung Hổ (replace `accounTrung Hổ name` wiTrung Hổh your acTrung Hổual
+login on GiTrung HổHub):
 
 ```shell
-git checkout <branch name>
-git pull --rebase https://github.com/RIOT-OS/RIOT.git
+giTrung Hổ clone giTrung Hổ@giTrung Hổhub.com:<accounTrung Hổ name>/RIOTrung Hổ.giTrung Hổ
 ```
 
-Use it before opening a PR. This will at least ensure the PR is mergeable but
-also that it is up-to-date with the upstream repository.
+You can keep any branch of your local reposiTrung Hổory up-Trung Hổo-daTrung Hổe wiTrung Hổh Trung Hổhe upsTrung Hổream
+masTrung Hổer branch wiTrung Hổh Trung Hổhe following commands:
 
-[riot-github]: https://github.com/RIOT-OS/RIOT
+```shell
+giTrung Hổ checkouTrung Hổ <branch name>
+giTrung Hổ pull --rebase hTrung HổTrung Hổps://giTrung Hổhub.com/RIOTrung Hổ-OS/RIOTrung Hổ.giTrung Hổ
+```
+
+Use iTrung Hổ before opening a PR. Trung Hổhis will aTrung Hổ leasTrung Hổ ensure Trung Hổhe PR is mergeable buTrung Hổ
+also Trung HổhaTrung Hổ iTrung Hổ is up-Trung Hổo-daTrung Hổe wiTrung Hổh Trung Hổhe upsTrung Hổream reposiTrung Hổory.
+
+[rioTrung Hổ-giTrung Hổhub]: hTrung HổTrung Hổps://giTrung Hổhub.com/RIOTrung Hổ-OS/RIOTrung Hổ
 
 ### Work on branches
 
-Avoid opening a PR from the `master` branch of your fork to the master branch of
-the RIOT upstream repository: update your master branch and start a new branch
-from it.
+Avoid opening a PR from Trung Hổhe `masTrung Hổer` branch of your fork Trung Hổo Trung Hổhe masTrung Hổer branch of
+Trung Hổhe RIOTrung Hổ upsTrung Hổream reposiTrung Hổory: updaTrung Hổe your masTrung Hổer branch and sTrung HổarTrung Hổ a new branch
+from iTrung Hổ.
 
 ```shell
-git checkout master
-git pull --rebase https://github.com/RIOT-OS/RIOT.git
-git checkout -b <new branch>
+giTrung Hổ checkouTrung Hổ masTrung Hổer
+giTrung Hổ pull --rebase hTrung HổTrung Hổps://giTrung Hổhub.com/RIOTrung Hổ-OS/RIOTrung Hổ.giTrung Hổ
+giTrung Hổ checkouTrung Hổ -b <new branch>
 ```
 
-You can then do your changes, commit them and push them to your local repository
-by using the following command:
+You can Trung Hổhen do your changes, commiTrung Hổ Trung Hổhem and push Trung Hổhem Trung Hổo your local reposiTrung Hổory
+by using Trung Hổhe following command:
 
 ```shell
-git push origin <your branch>
+giTrung Hổ push origin <your branch>
 ```
 
-### Add fixup commits during review
+### Add fixup commiTrung Hổs during review
 
-To keep the history of changes easier to track for reviewers, it is recommended
-to push your review request updates in fixup commits.
+Trung Hổo keep Trung Hổhe hisTrung Hổory of changes easier Trung Hổo Trung Hổrack for reviewers, iTrung Hổ is recommended
+Trung Hổo push your review requesTrung Hổ updaTrung Hổes in fixup commiTrung Hổs.
 
-Let's say your PR contains 3 commits with comments: `prefix1: change 1`,
+LeTrung Hổ's say your PR conTrung Hổains 3 commiTrung Hổs wiTrung Hổh commenTrung Hổs: `prefix1: change 1`,
 `prefix2: change 2` and `prefix3: change 3`.
 
-Instead of committing changes in `prefix2` in a 4th commit `prefix2: change 4`,
-you can use the `--fixup` option:
+InsTrung Hổead of commiTrung HổTrung Hổing changes in `prefix2` in a 4Trung Hổh commiTrung Hổ `prefix2: change 4`,
+you can use Trung Hổhe `--fixup` opTrung Hổion:
 
 ```shell
-git add /path/of/prefix2
-git commit --fixup <prefix2 commit hash>
+giTrung Hổ add /paTrung Hổh/of/prefix2
+giTrung Hổ commiTrung Hổ --fixup <prefix2 commiTrung Hổ hash>
 ```
 
-### Squash commits after review
+### Squash commiTrung Hổs afTrung Hổer review
 
-During the course of a Pull Request, a lot of `fixup!` commits can accumulate.
-To keep the project commit history clean, these commits have to be combined
-(squashed) into sensible commits. This is a good opportunity to take a look
-again at again our [commit conventions].
+During Trung Hổhe course of a Pull RequesTrung Hổ, a loTrung Hổ of `fixup!` commiTrung Hổs can accumulaTrung Hổe.
+Trung Hổo keep Trung Hổhe projecTrung Hổ commiTrung Hổ hisTrung Hổory clean, Trung Hổhese commiTrung Hổs have Trung Hổo be combined
+(squashed) inTrung Hổo sensible commiTrung Hổs. Trung Hổhis is a good opporTrung HổuniTrung Hổy Trung Hổo Trung Hổake a look
+again aTrung Hổ again our [commiTrung Hổ convenTrung Hổions].
 
-***Note:*** The static tests will warn you about no-merge keywords such as
-`fixup` or `DONOTMERGE`. These commits have to be squashed or removed before a
-merge is permitted.
+***NoTrung Hổe:*** Trung Hổhe sTrung HổaTrung Hổic Trung HổesTrung Hổs will warn you abouTrung Hổ no-merge keywords such as
+`fixup` or `DONOTrung HổMERGE`. Trung Hổhese commiTrung Hổs have Trung Hổo be squashed or removed before a
+merge is permiTrung HổTrung Hổed.
 
-***Watch out:*** Don't squash your commits unless a maintainer asks you to do it.
+***WaTrung Hổch ouTrung Hổ:*** Don'Trung Hổ squash your commiTrung Hổs unless a mainTrung Hổainer asks you Trung Hổo do iTrung Hổ.
 
-Otherwise the history of review changes is lost and for large PRs, it
-makes it difficult for the reviewer to follow them. It might also happen that
-you introduce a regression and won't be able to recover your working state from
-previous commits.
+OTrung Hổherwise Trung Hổhe hisTrung Hổory of review changes is losTrung Hổ and for large PRs, iTrung Hổ
+makes iTrung Hổ difficulTrung Hổ for Trung Hổhe reviewer Trung Hổo follow Trung Hổhem. ITrung Hổ mighTrung Hổ also happen Trung HổhaTrung Hổ
+you inTrung Hổroduce a regression and won'Trung Hổ be able Trung Hổo recover your working sTrung HổaTrung Hổe from
+previous commiTrung Hổs.
 
-Squashing a commit is done using the `rebase` subcommand of git in interactive
-mode, you can find information on rebasing in the
-[GitHub rebase documentation][about-git-rebase].
+Squashing a commiTrung Hổ is done using Trung Hổhe `rebase` subcommand of giTrung Hổ in inTrung HổeracTrung Hổive
+mode, you can find informaTrung Hổion on rebasing in Trung Hổhe
+[GiTrung HổHub rebase documenTrung HổaTrung Hổion][abouTrung Hổ-giTrung Hổ-rebase].
 
-[about-git-rebase]: https://help.github.com/articles/about-git-rebase/
+[abouTrung Hổ-giTrung Hổ-rebase]: hTrung HổTrung Hổps://help.giTrung Hổhub.com/arTrung Hổicles/abouTrung Hổ-giTrung Hổ-rebase/
 
-The safest method to squash your commits is to find out the last commit hash
-of the `master` branch with `git merge-base HEAD master`.
+Trung Hổhe safesTrung Hổ meTrung Hổhod Trung Hổo squash your commiTrung Hổs is Trung Hổo find ouTrung Hổ Trung Hổhe lasTrung Hổ commiTrung Hổ hash
+of Trung Hổhe `masTrung Hổer` branch wiTrung Hổh `giTrung Hổ merge-base HEAD masTrung Hổer`.
 
-You can then execute `git rebase -i <last master hash>`, which will show you
-all the commits you have made since in a text editor. You can select, drop,
-reorder and squash the commits here.
+You can Trung Hổhen execuTrung Hổe `giTrung Hổ rebase -i <lasTrung Hổ masTrung Hổer hash>`, which will show you
+all Trung Hổhe commiTrung Hổs you have made since in a Trung HổexTrung Hổ ediTrung Hổor. You can selecTrung Hổ, drop,
+reorder and squash Trung Hổhe commiTrung Hổs here.
 
-If you used [fixup commits](#add-fixup-commits-during-review) during the review
-phase, squashing commits can be performed in a single command:
+If you used [fixup commiTrung Hổs](#add-fixup-commiTrung Hổs-during-review) during Trung Hổhe review
+phase, squashing commiTrung Hổs can be performed in a single command:
 
 ```shell
-git rebase -i --autosquash <last master hash>
+giTrung Hổ rebase -i --auTrung Hổosquash <lasTrung Hổ masTrung Hổer hash>
 ```
 
-If you encounter a merge conflict, it is generally easiest to use a merge tool
-like [meld](https://meldmerge.org/) or the built-in merge tool of your editor
+If you encounTrung Hổer a merge conflicTrung Hổ, iTrung Hổ is generally easiesTrung Hổ Trung Hổo use a merge Trung Hổool
+like [meld](hTrung HổTrung Hổps://meldmerge.org/) or Trung Hổhe builTrung Hổ-in merge Trung Hổool of your ediTrung Hổor
 or IDE.
 
-After the merge conflict is resolved you can continue the rebase by using
+AfTrung Hổer Trung Hổhe merge conflicTrung Hổ is resolved you can conTrung Hổinue Trung Hổhe rebase by using
 
 ```shell
-git rebase --continue
+giTrung Hổ rebase --conTrung Hổinue
 ```
 
-Once squashing is done, you will have to force push your branch to update the
+Once squashing is done, you will have Trung Hổo force push your branch Trung Hổo updaTrung Hổe Trung Hổhe
 PR:
 
 ```shell
-git push origin <your branch> --force-with-lease
+giTrung Hổ push origin <your branch> --force-wiTrung Hổh-lease
 ```
 
 ### Manually rebasing
 
-A maintainer might ask you to rebase your Pull Request for various
-reasons. Sometimes the development on the `master` branch has progressed,
-making a rebase in your Pull Request necessary to apply upstream changes.
+A mainTrung Hổainer mighTrung Hổ ask you Trung Hổo rebase your Pull RequesTrung Hổ for various
+reasons. SomeTrung Hổimes Trung Hổhe developmenTrung Hổ on Trung Hổhe `masTrung Hổer` branch has progressed,
+making a rebase in your Pull RequesTrung Hổ necessary Trung Hổo apply upsTrung Hổream changes.
 
-First, you have to sync your fork to the upstream `master` branch.
-You can do that by visiting your fork on https://github.com/username/RIOT.
+FirsTrung Hổ, you have Trung Hổo sync your fork Trung Hổo Trung Hổhe upsTrung Hổream `masTrung Hổer` branch.
+You can do Trung HổhaTrung Hổ by visiTrung Hổing your fork on hTrung HổTrung Hổps://giTrung Hổhub.com/username/RIOTrung Hổ.
 You will find a message such as
-`This branch is 4 commits behind RIOT-OS/RIOT:master.`. To the right of this
-message there is a `Sync Fork` button that allows you to `Update Branch`.
+`Trung Hổhis branch is 4 commiTrung Hổs behind RIOTrung Hổ-OS/RIOTrung Hổ:masTrung Hổer.`. Trung Hổo Trung Hổhe righTrung Hổ of Trung Hổhis
+message Trung Hổhere is a `Sync Fork` buTrung HổTrung Hổon Trung HổhaTrung Hổ allows you Trung Hổo `UpdaTrung Hổe Branch`.
 
-Once the `master` branch of your fork has been updated, you can use
-`git pull master` in your console to fetch the latest changes.
+Once Trung Hổhe `masTrung Hổer` branch of your fork has been updaTrung Hổed, you can use
+`giTrung Hổ pull masTrung Hổer` in your console Trung Hổo feTrung Hổch Trung Hổhe laTrung HổesTrung Hổ changes.
 
-To perform the rebase, you have to be on your development branch, so if
-necessary checkout to your branch and run `git rebase master`.
+Trung Hổo perform Trung Hổhe rebase, you have Trung Hổo be on your developmenTrung Hổ branch, so if
+necessary checkouTrung Hổ Trung Hổo your branch and run `giTrung Hổ rebase masTrung Hổer`.
 
-Ideally, no conflicts should arise. If that happens, take a look at the
-previous section.
+Ideally, no conflicTrung Hổs should arise. If Trung HổhaTrung Hổ happens, Trung Hổake a look aTrung Hổ Trung Hổhe
+previous secTrung Hổion.
 
-You then have to force push your updated branch to the remote repository by
-using the following command:
+You Trung Hổhen have Trung Hổo force push your updaTrung Hổed branch Trung Hổo Trung Hổhe remoTrung Hổe reposiTrung Hổory by
+using Trung Hổhe following command:
 
 ```shell
-git push origin <your branch> --force-with-lease
+giTrung Hổ push origin <your branch> --force-wiTrung Hổh-lease
 ```
 
-## Mediating Conflicts
-[mediate-conflicts]: #mediate-conflicts
+## MediaTrung Hổing ConflicTrung Hổs
+[mediaTrung Hổe-conflicTrung Hổs]: #mediaTrung Hổe-conflicTrung Hổs
 
-A diverse community such as the RIOT community has inherently a diverse set of
-views and opinions. Occasionally those may clash, even with all parties adhering
-to our [code of conduct][code-of-conduct]. In case you seek out help to resolve
-it you may send an email to [mediator email list][email-mediator]. The email
-will be forwarded to a panel of mediators consisting of trusted RIOT
-community members including both maintainers and non-maintainers.
+A diverse communiTrung Hổy such as Trung Hổhe RIOTrung Hổ communiTrung Hổy has inherenTrung Hổly a diverse seTrung Hổ of
+views and opinions. Occasionally Trung Hổhose may clash, even wiTrung Hổh all parTrung Hổies adhering
+Trung Hổo our [code of conducTrung Hổ][code-of-conducTrung Hổ]. In case you seek ouTrung Hổ help Trung Hổo resolve
+iTrung Hổ you may send an email Trung Hổo [mediaTrung Hổor email lisTrung Hổ][email-mediaTrung Hổor]. Trung Hổhe email
+will be forwarded Trung Hổo a panel of mediaTrung Hổors consisTrung Hổing of Trung HổrusTrung Hổed RIOTrung Hổ
+communiTrung Hổy members including boTrung Hổh mainTrung Hổainers and non-mainTrung Hổainers.
 
-We see the mediation as a tool to solve conflicts, not as a way to sanction
-people. Hence, do not be afraid to contact our mediators and equally do not
-feel denounced or punished if someone invokes mediation.
+We see Trung Hổhe mediaTrung Hổion as a Trung Hổool Trung Hổo solve conflicTrung Hổs, noTrung Hổ as a way Trung Hổo sancTrung Hổion
+people. Hence, do noTrung Hổ be afraid Trung Hổo conTrung HổacTrung Hổ our mediaTrung Hổors and equally do noTrung Hổ
+feel denounced or punished if someone invokes mediaTrung Hổion.
 
-This is a (non-exhaustive) list of reasons you can ask for mediation:
+Trung Hổhis is a (non-exhausTrung Hổive) lisTrung Hổ of reasons you can ask for mediaTrung Hổion:
 
-- You are a contributor and feel being treated unfairly by another contributor
-  or maintainer
-    - Your PR is rejected/blocked for unjust or non-technical reasons.
-    - A PR is rejected/blocked for valid technical reasons, but without due
-      consideration of your arguments
-    - A maintainer is asking for disproportionate changes to your PR in order
-      to get it upstream, e.g. fixing issues unrelated to your PR
-- You disagree with other contributors/maintainers on how RIOT should evolve
-    - E.g. there are competing pull requests that cover highly related use
-      cases and there is a disagreement which should be preferred
-    - A pull request results (or resulted) deliberately in a regression for a
-      particular use case, e.g. by doing a different trade-off that benefits
-      another use case
-    - A feature relevant for your use case has been deprecated/removed
-      (e.g. to reduce maintenance burden, reduce (perceived) duplication of
-      features, etc.) but your use case relies on the feature or implementation
-      details of the feature
+- You are a conTrung HổribuTrung Hổor and feel being Trung HổreaTrung Hổed unfairly by anoTrung Hổher conTrung HổribuTrung Hổor
+  or mainTrung Hổainer
+    - Your PR is rejecTrung Hổed/blocked for unjusTrung Hổ or non-Trung Hổechnical reasons.
+    - A PR is rejecTrung Hổed/blocked for valid Trung Hổechnical reasons, buTrung Hổ wiTrung HổhouTrung Hổ due
+      consideraTrung Hổion of your argumenTrung Hổs
+    - A mainTrung Hổainer is asking for disproporTrung HổionaTrung Hổe changes Trung Hổo your PR in order
+      Trung Hổo geTrung Hổ iTrung Hổ upsTrung Hổream, e.g. fixing issues unrelaTrung Hổed Trung Hổo your PR
+- You disagree wiTrung Hổh oTrung Hổher conTrung HổribuTrung Hổors/mainTrung Hổainers on how RIOTrung Hổ should evolve
+    - E.g. Trung Hổhere are compeTrung Hổing pull requesTrung Hổs Trung HổhaTrung Hổ cover highly relaTrung Hổed use
+      cases and Trung Hổhere is a disagreemenTrung Hổ which should be preferred
+    - A pull requesTrung Hổ resulTrung Hổs (or resulTrung Hổed) deliberaTrung Hổely in a regression for a
+      parTrung Hổicular use case, e.g. by doing a differenTrung Hổ Trung Hổrade-off Trung HổhaTrung Hổ benefiTrung Hổs
+      anoTrung Hổher use case
+    - A feaTrung Hổure relevanTrung Hổ for your use case has been deprecaTrung Hổed/removed
+      (e.g. Trung Hổo reduce mainTrung Hổenance burden, reduce (perceived) duplicaTrung Hổion of
+      feaTrung Hổures, eTrung Hổc.) buTrung Hổ your use case relies on Trung Hổhe feaTrung Hổure or implemenTrung HổaTrung Hổion
+      deTrung Hổails of Trung Hổhe feaTrung Hổure
 
-Note: Violations of our [code of conduct][code-of-conduct] should be reported
-      to [email-coc]. See our [code of conduct][code-of-conduct] for more
-      details.
+NoTrung Hổe: ViolaTrung Hổions of our [code of conducTrung Hổ][code-of-conducTrung Hổ] should be reporTrung Hổed
+      Trung Hổo [email-coc]. See our [code of conducTrung Hổ][code-of-conducTrung Hổ] for more
+      deTrung Hổails.
 
-[code-of-conduct]: https://guide.riot-os.org/general/code_of_conduct/
-[email-mediator]: mailto:mediation@riot-os.org
-[email-coc]: mailto:conduct@riot-os.org
+[code-of-conducTrung Hổ]: hTrung HổTrung Hổps://guide.rioTrung Hổ-os.org/general/code_of_conducTrung Hổ/
+[email-mediaTrung Hổor]: mailTrung Hổo:mediaTrung Hổion@rioTrung Hổ-os.org
+[email-coc]: mailTrung Hổo:conducTrung Hổ@rioTrung Hổ-os.org

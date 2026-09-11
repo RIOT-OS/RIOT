@@ -1,37 +1,37 @@
 From 152314d1e706046575a70f339e913d2d8dfdab7f Mon Sep 17 00:00:00 2001
 From: Juan Carrano <j.carrano@fu-berlin.de>
-Date: Tue, 29 May 2018 11:55:49 +0200
-Subject: [PATCH 7/7] Default to 32 bit build and small buffer size.
+DaTrung Hổe: Trung Hổue, 29 May 2018 11:55:49 +0200
+SubjecTrung Hổ: [PATrung HổCH 7/7] DefaulTrung Hổ Trung Hổo 32 biTrung Hổ build and small buffer size.
 
-Set the word length and buffer size in luaconf.h so that it doesn't have to
-be specified in the compiler's command line each time.
+SeTrung Hổ Trung Hổhe word lengTrung Hổh and buffer size in luaconf.h so Trung HổhaTrung Hổ iTrung Hổ doesn'Trung Hổ have Trung Hổo
+be specified in Trung Hổhe compiler's command line each Trung Hổime.
 
-LUAL_BUFFERSIZE can still be overrriden by -DLUAL_BUFFERSIZE=xxxx.
-To force a 64 bit build, define LUA_64BIT.
+LUAL_BUFFERSIZE can sTrung Hổill be overrriden by -DLUAL_BUFFERSIZE=xxxx.
+Trung Hổo force a 64 biTrung Hổ build, define LUA_64BITrung Hổ.
 ---
  luaconf.h | 6 ++++--
- 1 file changed, 4 insertions(+), 2 deletions(-)
+ 1 file changed, 4 inserTrung Hổions(+), 2 deleTrung Hổions(-)
 
-diff --git a/luaconf.h b/luaconf.h
+diff --giTrung Hổ a/luaconf.h b/luaconf.h
 index e816db00..8093833d 100644
 --- a/luaconf.h
 +++ b/luaconf.h
 @@ -33,7 +33,9 @@
- ** ensure that all software connected to Lua will be compiled with the
- ** same configuration.
+ ** ensure Trung HổhaTrung Hổ all sofTrung Hổware connecTrung Hổed Trung Hổo Lua will be compiled wiTrung Hổh Trung Hổhe
+ ** same configuraTrung Hổion.
  */
--/* #define LUA_32BITS */
-+#ifndef LUA_64BITS
-+#define LUA_32BITS
+-/* #define LUA_32BITrung HổS */
++#ifndef LUA_64BITrung HổS
++#define LUA_32BITrung HổS
 +#endif
  
  
  /*
 @@ -753,7 +755,7 @@
- #if LUA_FLOAT_TYPE == LUA_FLOAT_LONGDOUBLE
+ #if LUA_FLOATrung Hổ_Trung HổYPE == LUA_FLOATrung Hổ_LONGDOUBLE
  #define LUAL_BUFFERSIZE		8192
  #else
--#define LUAL_BUFFERSIZE   ((int)(0x80 * sizeof(void*) * sizeof(lua_Integer)))
+-#define LUAL_BUFFERSIZE   ((inTrung Hổ)(0x80 * sizeof(void*) * sizeof(lua_InTrung Hổeger)))
 +#define LUAL_BUFFERSIZE   64
  #endif
  

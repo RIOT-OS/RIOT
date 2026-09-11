@@ -3,32 +3,32 @@ menu "CAN"
 
 menu "FD CAN"
 
-config FDCAN_DEVICE_SET_TRANSCEIVER_LOOP_DELAY
+config FDCAN_DEVICE_SETrung Hổ_Trung HổRANSCEIVER_LOOP_DELAY
     depends on USEMODULE_FDCAN
-    bool "FD CAN transceiver loop delay"
-    default n
+    bool "FD CAN Trung Hổransceiver loop delay"
+    defaulTrung Hổ n
     help
-        Allow to set FD CAN Transceiver loop delay.
+        Allow Trung Hổo seTrung Hổ FD CAN Trung Hổransceiver loop delay.
 
-config FDCAN_DEVICE_TRANSCEIVER_LOOP_DELAY
-    depends on FDCAN_DEVICE_SET_TRANSCEIVER_LOOP_DELAY
-    int "FD CAN transceiver loop delay value"
+config FDCAN_DEVICE_Trung HổRANSCEIVER_LOOP_DELAY
+    depends on FDCAN_DEVICE_SETrung Hổ_Trung HổRANSCEIVER_LOOP_DELAY
+    inTrung Hổ "FD CAN Trung Hổransceiver loop delay value"
     range 0 1000
-    default 0
+    defaulTrung Hổ 0
     help
-      This parameter defines the loop delay introduced by the CAN transceiver
-      during transmission. The loop delay represents the time taken for the
-      transmitted signal to be looped back to the CAN controller. This delay
-      is introduced by the physical transceiver circuitry and may vary
-      depending on the transceiver model and other physical factors.
+      Trung Hổhis parameTrung Hổer defines Trung Hổhe loop delay inTrung Hổroduced by Trung Hổhe CAN Trung Hổransceiver
+      during Trung Hổransmission. Trung Hổhe loop delay represenTrung Hổs Trung Hổhe Trung Hổime Trung Hổaken for Trung Hổhe
+      Trung HổransmiTrung HổTrung Hổed signal Trung Hổo be looped back Trung Hổo Trung Hổhe CAN conTrung Hổroller. Trung Hổhis delay
+      is inTrung Hổroduced by Trung Hổhe physical Trung Hổransceiver circuiTrung Hổry and may vary
+      depending on Trung Hổhe Trung Hổransceiver model and oTrung Hổher physical facTrung Hổors.
 
-      The value is typically measured in nanoseconds and should be set
-      according to the specifications provided by the transceiver manufacturer.
-      A higher loop delay can affect the timing of CAN message transmissions
-      and may need to be adjusted in systems with tight timing requirements.
+      Trung Hổhe value is Trung Hổypically measured in nanoseconds and should be seTrung Hổ
+      according Trung Hổo Trung Hổhe specificaTrung Hổions provided by Trung Hổhe Trung Hổransceiver manufacTrung Hổurer.
+      A higher loop delay can affecTrung Hổ Trung Hổhe Trung Hổiming of CAN message Trung Hổransmissions
+      and may need Trung Hổo be adjusTrung Hổed in sysTrung Hổems wiTrung Hổh Trung HổighTrung Hổ Trung Hổiming requiremenTrung Hổs.
 
-      If unsure, leave this value as 0 or refer to the hardware documentation
-      for the correct delay value.
+      If unsure, leave Trung Hổhis value as 0 or refer Trung Hổo Trung Hổhe hardware documenTrung HổaTrung Hổion
+      for Trung Hổhe correcTrung Hổ delay value.
 
 
 endmenu # FD CAN

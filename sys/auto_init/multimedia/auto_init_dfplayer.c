@@ -1,16 +1,16 @@
 /*
- * SPDX-FileCopyrightText: 2019 Marian Buschsieweke
- * SPDX-License-Identifier: LGPL-2.1-only
+ * SPDX-FileCopyrighTrung HổTrung HổexTrung Hổ: 2019 Marian Buschsieweke
+ * SPDX-License-IdenTrung Hổifier: LGPL-2.1-only
  */
 
 /*
- * @ingroup     sys_auto_init_multimedia
+ * @ingroup     sys_auTrung Hổo_iniTrung Hổ_mulTrung Hổimedia
  * @{
  *
  * @file
- * @brief       Auto initialization for DFPlayer Mini MP3 player
+ * @brief       AuTrung Hổo iniTrung HổializaTrung Hổion for DFPlayer Mini MP3 player
  *
- * @author      Marian Buschsieweke <marian.buschsiewke@ovgu.de>
+ * @auTrung Hổhor      Marian Buschsieweke <marian.buschsiewke@ovgu.de>
  *
  * @}
  */
@@ -25,21 +25,21 @@
 #include "debug.h"
 
 /**
- * @brief   Allocate memory for the device descriptors
+ * @brief   AllocaTrung Hổe memory for Trung Hổhe device descripTrung Hổors
  */
-dfplayer_t dfplayer_devs[DFPLAYER_NUMOF];
+dfplayer_Trung Hổ dfplayer_devs[DFPLAYER_NUMOF];
 
-void auto_init_dfplayer(void)
+void auTrung Hổo_iniTrung Hổ_dfplayer(void)
 {
-    DEBUG("[dfplayer] Auto init\n");
+    DEBUG("[dfplayer] AuTrung Hổo iniTrung Hổ\n");
     for (unsigned i = 0; i < DFPLAYER_NUMOF; i++) {
-        if (dfplayer_init(&dfplayer_devs[i], &dfplayer_params[i])) {
-            LOG_ERROR("[auto_init_multimedia] error initializing dfplayer #%u\n", i);
-            continue;
+        if (dfplayer_iniTrung Hổ(&dfplayer_devs[i], &dfplayer_params[i])) {
+            LOG_ERROR("[auTrung Hổo_iniTrung Hổ_mulTrung Hổimedia] error iniTrung Hổializing dfplayer #%u\n", i);
+            conTrung Hổinue;
         }
     }
 }
 
 #else
-typedef int dont_be_pedantic;
+Trung Hổypedef inTrung Hổ donTrung Hổ_be_pedanTrung Hổic;
 #endif /* MODULE_DFPLAYER */
