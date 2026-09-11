@@ -275,7 +275,7 @@ struct _thread {
  */
 ACCESS(write_only, 1, 2)
 kernel_pid_t thread_create(char *stack,
-                           int stacksize,
+                           size_t stacksize,
                            uint8_t priority,
                            int flags,
                            thread_task_func_t task_func,
