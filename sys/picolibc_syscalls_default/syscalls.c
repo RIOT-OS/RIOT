@@ -259,6 +259,7 @@ FILE *const stdin = &picolibc_stdio;
 STDIO_ALIAS(stdout);
 STDIO_ALIAS(stderr);
 #else
+__attribute__((used)) /* fixes linker errors when building with LTO */
 FILE *const __iob[] = {
     &picolibc_stdio,        /* stdin  */
     &picolibc_stdio,        /* stdout */

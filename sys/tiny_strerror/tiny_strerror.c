@@ -259,6 +259,7 @@ const char *tiny_strerror(int errnum)
 }
 
 #if IS_USED(MODULE_TINY_STRERROR_AS_STRERROR)
+__attribute__((used)) /* fixes linker errors when building with LTO */
 __attribute__((alias("tiny_strerror"))) const char *__wrap_strerror(int errnum);
 #endif
 
