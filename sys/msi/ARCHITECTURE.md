@@ -165,7 +165,7 @@ _handlers[MSI_VEC_NUMOF]
 +--------+--------+
 ```
 
-Slots are the **protocol state**.  
+Slots are the **protocol state**.
 Handlers are **local dispatch**, not part of the on-wire / in-memory
 message.
 

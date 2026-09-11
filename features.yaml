@@ -905,6 +905,8 @@ groups:
   - name: dbgpin
     help: The platform provides the necessary initialization hooks
           for the `dbgpin` module.
+  - name: msi_arch
+    help: The CPU provides an architecture-specific MSI-like doorbell backend.
   - name: no_idle_thread
     help: The MCU can idle without an idle thread
   - name: riotboot
