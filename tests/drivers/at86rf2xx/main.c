@@ -100,11 +100,9 @@ int main(void)
     /* start the shell */
     puts("Initialization successful - starting the shell now");
 
-    char line_buf[SHELL_DEFAULT_BUFSIZE];
 #if AT86RF2XX_RANDOM_NUMBER_GENERATOR
+    char line_buf[SHELL_DEFAULT_BUFSIZE];
     shell_run(shell_commands, line_buf, SHELL_DEFAULT_BUFSIZE);
-#else
-    shell_run(NULL, line_buf, SHELL_DEFAULT_BUFSIZE);
 #endif
 
     return 0;

@@ -163,8 +163,6 @@ int main(void)
     }
 
     puts("Dropping to shell for manual testing");
-    char line_buf[SHELL_DEFAULT_BUFSIZE];
-    shell_run(NULL, line_buf, SHELL_DEFAULT_BUFSIZE);
-
+    /* shell starts implicitly after returning */
     return 0;
 }

@@ -11,11 +11,13 @@
  *
  */
 
+#include <stdio.h>
 #include <errno.h>
 #include "shell.h"
 #include "time_units.h"
 #include "fmt.h"
 #include "rtc_utils.h"
+
 #include "walltime.h"
 #include "ztimer.h"
 
@@ -132,9 +134,6 @@ int main(void)
         .cb = _time_change_cb,
     };
     walltime_change_subscribe(&sub);
-
-    char line_buf[SHELL_DEFAULT_BUFSIZE];
-    shell_run(NULL, line_buf, SHELL_DEFAULT_BUFSIZE);
 
     return 0;
 }

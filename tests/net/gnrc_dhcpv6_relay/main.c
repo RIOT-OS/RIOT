@@ -11,14 +11,9 @@
  */
 
 #include <stddef.h>
-#include "shell.h"
 
 int main(void)
 {
-    char shell_buffer[SHELL_DEFAULT_BUFSIZE];
-
-    /* start shell */
-    shell_run(NULL, shell_buffer, sizeof(shell_buffer));
     return 0;
 }
 

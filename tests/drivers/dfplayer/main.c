@@ -21,7 +21,6 @@
 #include "event.h"
 #include "event/thread.h"
 #include "fmt.h"
-#include "shell.h"
 #include "xtimer.h"
 
 static const char *_sources[] = {
@@ -156,9 +155,6 @@ int main(void)
     if (dfplayer_set_callbacks(dfplayer_get(0), _cb_done, _cb_src)) {
         print_str("Error: Failed to register callbacks\n");
     }
-
-    char line_buf[SHELL_DEFAULT_BUFSIZE];
-    shell_run(NULL, line_buf, SHELL_DEFAULT_BUFSIZE);
 
     return 0;
 }

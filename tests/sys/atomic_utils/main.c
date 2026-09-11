@@ -1350,8 +1350,6 @@ int main(void)
         "failure here is not an indication of an issue, but indicates the.\n"
         "test is working as expected.\n"
     );
-    char line_buf[SHELL_DEFAULT_BUFSIZE];
-    shell_run(NULL, line_buf, SHELL_DEFAULT_BUFSIZE);
 
     return 0;
 }

@@ -17,7 +17,6 @@
 
 #include <stdio.h>
 
-#include "shell.h"
 #include "msg.h"
 #include "nimble_statconn.h"
 #include "net/bluetil/addr.h"
@@ -73,11 +72,7 @@ int main(void)
     /* register for BLE events */
     nimble_statconn_eventcb(_on_ble_evt);
 
-    /* start shell */
     puts("All up, running the shell now");
-    char line_buf[SHELL_DEFAULT_BUFSIZE];
-    shell_run(NULL, line_buf, SHELL_DEFAULT_BUFSIZE);
-
-    /* should never be reached */
+    /* shell starts implicitly after returning */
     return 0;
 }

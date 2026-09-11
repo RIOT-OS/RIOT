@@ -18,7 +18,6 @@
 #include <stdio.h>
 
 #include "msg.h"
-#include "shell.h"
 
 #define MAIN_MSG_QUEUE_SIZE (4)
 static msg_t main_msg_queue[MAIN_MSG_QUEUE_SIZE];
@@ -29,11 +28,7 @@ int main(void)
      * required for the thread executing the shell */
     msg_init_queue(main_msg_queue, MAIN_MSG_QUEUE_SIZE);
     puts("RIOT socket example application");
-    /* start shell */
     puts("All up, running the shell now");
-    char line_buf[SHELL_DEFAULT_BUFSIZE];
-    shell_run(NULL, line_buf, SHELL_DEFAULT_BUFSIZE);
-
-    /* should be never reached */
+    /* shell starts implicitly after returning */
     return 0;
 }
