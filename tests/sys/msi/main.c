@@ -11,7 +11,7 @@
  * @brief       MSI-like mailbox: a thread posts, the ISR prints
  *
  * This is not PCI Express MSI. A thread writes a generic mailbox slot. The
- * Cortex-M backend pends HASH_RNG_IRQn, and `isr_hash_rng()` drains the
+ * Cortex-M backend pends RNG_IRQn, and `isr_rng()` drains the
  * mailbox and prints there.
  *
  * @author      Ajit Upadhyay <u.ajiit@gmail.com>
@@ -28,7 +28,7 @@
 #include "ztimer.h"
 
 #ifndef MSI_TEST_IRQN
-#  define MSI_TEST_IRQN     HASH_RNG_IRQn
+#  define MSI_TEST_IRQN     RNG_IRQn
 #endif
 
 #define POST_COUNT          (4U)
@@ -46,7 +46,7 @@ static void _on_msi(unsigned vec, uint32_t event, uint32_t data, void *arg)
     _isr_hits++;
 }
 
-void isr_hash_rng(void)
+void isr_rng(void)
 {
     msi_isr();
 }

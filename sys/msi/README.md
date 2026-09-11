@@ -72,20 +72,20 @@ static void on_msi(unsigned vec, uint32_t event, uint32_t data, void *arg)
 }
 
 /* Must match the IRQ passed to msi_init() */
-void isr_hash_rng(void)
+void isr_rng(void)
 {
     msi_isr();
 }
 
 int main(void)
 {
-    msi_init(HASH_RNG_IRQn);
+    msi_init(RNG_IRQn);
     msi_register(0, on_msi, NULL);
     msi_post(0, 1, 0xA001);   /* write mailbox + ring doorbell */
 }
 ```
 
-On STM32F746 the Cortex-M backend interprets `HASH_RNG_IRQn` as the doorbell
+On STM32F746 the Cortex-M backend interprets `RNG_IRQn` as the doorbell
 identifier. Any unused NVIC line can be used if the application also
 implements the matching `isr_*` function.
 

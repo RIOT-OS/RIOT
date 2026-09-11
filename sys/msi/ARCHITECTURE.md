@@ -14,7 +14,7 @@ Cortex-M NVIC backend, and the nucleo-f746zg demo fit together.
 +---------------------------+
 | Application / test        |  tests/sys/msi
 |  thread posts             |
-|  isr_hash_rng()           |
+|  isr_rng()                |
 +-------------+-------------+
               |
               v
@@ -82,7 +82,7 @@ the same feature after implementing the backend interface.
                     CPU exception
                           |
                           v
-                   isr_hash_rng()     (application)
+                   isr_rng()          (application)
                           |
                           v
                      msi_isr()        (module)
@@ -116,16 +116,16 @@ slot[vec].valid = 1
     v
 Cortex-M backend
     |
-    | NVIC_SetPendingIRQ(HASH_RNG_IRQn)
+    | NVIC_SetPendingIRQ(RNG_IRQn)
     v
 +------------------+
 |      NVIC        |
-|  HASH_RNG_IRQn   |   unused peripheral line, used as software IRQ
+|  RNG_IRQn        |   unused peripheral line, used as software IRQ
 +--------+---------+
          |
          | exception entry (handler mode)
          v
-  isr_hash_rng()
+  isr_rng()
          |
          v
      msi_isr()
@@ -139,9 +139,9 @@ Cortex-M backend
 msi_poster continues
 ```
 
-`HASH_RNG_IRQn` is interpreted only by the Cortex-M backend. It is not
-special; it is an unused vector selected so the demo does not steal USART,
-EXTI, or TIM IRQs that RIOT already uses.
+`RNG_IRQn` is interpreted only by the Cortex-M backend. It is not special; it
+is an unused vector selected so the demo does not steal USART, EXTI, or TIM
+IRQs that RIOT already uses.
 
 `cortexm_init()` already programs every NVIC line to
 `CPU_DEFAULT_IRQ_PRIO`. The module only enables the line.
@@ -269,8 +269,8 @@ The application must:
 For Cortex-M with a static RIOT vector table, this means choosing an unused
 `IRQn` and defining the matching `void isr_<name>(void)`.
 
-If the application enables the real HASH/RNG peripheral IRQ while the demo
-owns `HASH_RNG_IRQn`, the two uses conflict. Pick another unused line.
+If the application enables the real RNG peripheral IRQ while the demo owns
+`RNG_IRQn`, the two uses conflict. Pick another unused line.
 
 ## 9. Limits that follow from the architecture
 

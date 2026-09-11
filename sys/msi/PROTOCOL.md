@@ -115,15 +115,15 @@ makes the CPU take an interrupt.
 The application must implement the matching RIOT ISR and call `msi_isr()`:
 
 ```c
-void isr_hash_rng(void)
+void isr_rng(void)
 {
     msi_isr();
 }
 ```
 
-On STM32F746 the demo uses `HASH_RNG_IRQn` because the HASH/RNG hardware IRQ
-is unused. Any unused `IRQn` is valid if the `isr_*` name matches the
-generated vector table.
+On STM32F746 the demo uses `RNG_IRQn` because the RNG hardware IRQ is unused.
+Any unused `IRQn` is valid if the `isr_*` name matches the generated vector
+table.
 
 ## 6. State machine (one vector)
 
@@ -284,9 +284,9 @@ Each post:
 
 ```text
 [thread]  write slot + msi_arch_trigger()
-[backend] NVIC_SetPendingIRQ(HASH_RNG)
-[NVIC]    take HASH_RNG
-[isr]     isr_hash_rng() -> msi_isr()
+[backend] NVIC_SetPendingIRQ(RNG_IRQn)
+[NVIC]    take RNG_IRQn
+[isr]     isr_rng() -> msi_isr()
 [ISR]     print doorbell-N, vec, event, data
 [ISR]     valid = 0
 [thread]  msi_post() returns 0

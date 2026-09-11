@@ -8,7 +8,7 @@ SPDX-License-Identifier: LGPL-2.1-only
 Demo for the `msi` module on **nucleo-f746zg**.
 
 A thread writes a generic mailbox slot. The Cortex-M backend then pends
-`HASH_RNG_IRQn`, and the ISR prints the payload. This is a software MSI-like
+`RNG_IRQn`, and the ISR prints the payload. This is a software MSI-like
 doorbell, not PCI Express MSI.
 
 Protocol and architecture:
@@ -45,5 +45,4 @@ TEST PASSED
 
 `[thread]` lines run in thread mode. `msi_post()` calls the generic
 `msi_arch_trigger()` hook, whose Cortex-M implementation calls
-`NVIC_SetPendingIRQ(HASH_RNG_IRQn)`. `[ISR]` lines run in
-`isr_hash_rng()`.
+`NVIC_SetPendingIRQ(RNG_IRQn)`. `[ISR]` lines run in `isr_rng()`.
