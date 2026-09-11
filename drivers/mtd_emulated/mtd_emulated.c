@@ -126,7 +126,19 @@ int _write_page(mtd_dev_t *dev, const void *src,
         /* page addr + offset + size must not exceed the size of memory */
         return -EOVERFLOW;
     }
-    memcpy(mtd->memory + page_addr + offset, src, size);
+
+    /* a page program never wraps into the next page, so write at most up to
+     * the end of the page and leave the remainder to the caller */
+    size = MIN(size, mtd->base.page_size - offset);
+
+    /* emulate the programming behavior of a flash memory: bits can only be
+     * changed from 1 to 0 when writing */
+    uint8_t *dst = mtd->memory + page_addr + offset;
+    const uint8_t *bytes = src;
+
+    for (uint32_t i = 0; i < size; i++) {
+        dst[i] &= bytes[i];
+    }
 
     return size;
 }
