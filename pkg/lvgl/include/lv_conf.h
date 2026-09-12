@@ -102,8 +102,6 @@ extern "C" {
 #      endif
 #    endif
 #  endif
-#endif
-
 /* Set an address for the memory pool instead of allocating it as a normal array.
  * Can be in external SRAM too. */
 #  define LV_MEM_ADR          0     /* 0: unused */
