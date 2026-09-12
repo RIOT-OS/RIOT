@@ -45,7 +45,8 @@ extern "C" {
 
 /** Swap the 2 bytes of RGB565 color.
  *
- * Useful if the display has an 8 bit interface (e.g. SPI). */
+ * Useful if the display has an 8 bit interface (e.g. SPI).
+ */
 #ifndef LV_COLOR_16_SWAP
 #  if IS_USED(MODULE_LCD)
 #    define LV_COLOR_16_SWAP   1
@@ -114,12 +115,13 @@ extern "C" {
 /** Number of the intermediate memory buffers.
  *
  * These are used during rendering and other internal processing
- *  mechanisms. You will see an error log message if there weren't enough buffers.
+ * mechanisms. You will see an error log message if there weren't enough buffers.
  */
 #define LV_MEM_BUF_MAX_NUM      16
 
 /** Use the standard `memcpy` and `memset` instead of LVGL's own functions.
- *  (Might or might not be faster). */
+ *  (Might or might not be faster).
+ */
 #define LV_MEMCPY_MEMSET_STD    1
 
 /*====================
@@ -133,7 +135,7 @@ extern "C" {
 #define LV_INDEV_DEF_READ_PERIOD    30      /* [ms] */
 
 /** Default Dot Per Inch. Used to initialize default sizes such as widget size,
- * style paddings. (Not very important, you can adjust it to modify default sizes and spaces.)
+ *  style paddings. (Not very important, you can adjust it to modify default sizes and spaces.)
  */
 #define LV_DPI_DEF                  130     /* [px/inch] */
 
@@ -147,18 +149,18 @@ extern "C" {
 
 /** Enable complex draw engine.
  *
- *  Required to draw shadow, gradient, rounded corners, circles, arc, skew lines, image
- *  transformations or any masks.
+ * Required to draw shadow, gradient, rounded corners, circles, arc, skew lines, image
+ * transformations or any masks.
  */
 #define LV_DRAW_COMPLEX 1
 #if LV_DRAW_COMPLEX != 0
 
 /** Allow buffering some of the shadow calculation.
  *
- *  `LV_SHADOW_CACHE_SIZE` is the max. shadow size to buffer, where shadow size
- *  is `shadow_width + radius`. Caching has `LV_SHADOW_CACHE_SIZE^2` RAM cost.
+ * `LV_SHADOW_CACHE_SIZE` is the max. shadow size to buffer, where shadow size
+ * is `shadow_width + radius`. Caching has `LV_SHADOW_CACHE_SIZE^2` RAM cost.
  */
-#define LV_SHADOW_CACHE_SIZE    0
+#  define LV_SHADOW_CACHE_SIZE  0
 #endif /* LV_DRAW_COMPLEX */
 
 /** Default image cache size.
@@ -176,7 +178,7 @@ extern "C" {
 /** Number of stops allowed per gradient.
  *
  * Increase this to allow more stops.
- *  This adds `sizeof(lv_color_t) + 1` bytes per additional stop.
+ * This adds `sizeof(lv_color_t) + 1` bytes per additional stop.
  */
 #define LV_GRADIENT_MAX_STOPS       2
 
@@ -184,8 +186,8 @@ extern "C" {
  *
  * When LVGL calculates the gradient "maps" it can save them into a cache to avoid calculating
  * them again. `LV_GRAD_CACHE_DEF_SIZE` sets the size of this cache in bytes. If the cache is
- * too small the map will be allocated only while it's required for the drawing 0 mean no caching.
- */
+ * too small the map will be allocated only while it's required for the drawing.
+ * Set to 0 to disable caching. */
 #define LV_GRAD_CACHE_DEF_SIZE      0
 
 /** Maximum buffer size to allocate for rotation.
@@ -202,7 +204,7 @@ extern "C" {
 #if LV_USE_GPU_STM32_DMA2D
 /** Must be defined to include path of CMSIS header of target processor
  * e.g. "stm32f769xx.h" or "stm32f429xx.h". */
-#define LV_GPU_DMA2D_CMSIS_INCLUDE
+#  define LV_GPU_DMA2D_CMSIS_INCLUDE
 #endif
 
 /** Use NXP's PXP GPU iMX RTxxx platforms */
@@ -216,7 +218,7 @@ extern "C" {
  *    has to be defined in order to use FreeRTOS OSA, otherwise bare-metal implementation is selected.
  * - 0: `lv_gpu_nxp_pxp_init()` has to be called manually before `lv_init()`.
  */
-#define LV_USE_GPU_NXP_PXP_AUTO_INIT 0
+#  define LV_USE_GPU_NXP_PXP_AUTO_INIT 0
 #endif
 
 /** Use NXP's VG-Lite GPU iMX RTxxx platforms */
@@ -295,7 +297,8 @@ extern "C" {
 #define LV_USE_PERF_MONITOR     0
 
 /** 1: Show the used memory and the memory fragmentation  in the left bottom corner
- *  Requires LV_MEM_CUSTOM = 0 */
+ *  Requires `LV_MEM_CUSTOM = 0`
+ */
 #define LV_USE_MEM_MONITOR      0
 
 /** 1: Draw random colored rectangles over the redrawn areas */
@@ -365,7 +368,8 @@ extern "C" {
 #define LV_EXPORT_CONST_INT(int_value) struct _silence_gcc_warning
 
 /** Extend the default -32k..32k coordinate range to -4M..4M by using int32_t for coordinates
- *  instead of int16_t */
+ *  instead of int16_t.
+ */
 #define LV_USE_LARGE_COORD  0
 
 /*==================
@@ -406,7 +410,8 @@ extern "C" {
 #define LV_FONT_SIMSUN_16_CJK            0  /* 1000 most common CJK radicals */
 
 /** @name Pixel perfect monospace fonts
- * @{ */
+ * @{
+ */
 #define LV_FONT_UNSCII_8        0
 #define LV_FONT_UNSCII_16       0
 /** @} */
@@ -442,7 +447,7 @@ extern "C" {
  *
  * Doesn't matter with "normal" fonts.
  */
-#define LV_FONT_SUBPX_BGR       0
+#  define LV_FONT_SUBPX_BGR     0
 #endif
 
 /*=================
@@ -495,7 +500,7 @@ extern "C" {
  * - `LV_BASE_DIR_RTL` Right-to-Left
  * - `LV_BASE_DIR_AUTO` detect texts base direction
  */
-#define LV_BIDI_BASE_DIR_DEF  LV_BASE_DIR_AUTO
+#  define LV_BIDI_BASE_DIR_DEF    LV_BASE_DIR_AUTO
 #endif
 
 /** Enable Arabic/Persian processing
