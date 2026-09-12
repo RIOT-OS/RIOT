@@ -459,7 +459,8 @@ extern "C" {
  * Select a character encoding for strings.
  * Your IDE or editor should have the same character encoding
  * - LV_TXT_ENC_UTF8
- * - LV_TXT_ENC_ASCII */
+ * - LV_TXT_ENC_ASCII
+ */
 #define LV_TXT_ENC LV_TXT_ENC_ASCII
 
 /** Can break (wrap) texts on these chars */
