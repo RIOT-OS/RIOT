@@ -64,9 +64,9 @@ static inline void _set_version(unicoap_header_rfc7252_t* header)
  * @brief       Gets the message type of an RFC 7252 PDU
  * @param[in]   header   CoAP PDU header
  * @returns     @ref COAP_TYPE_CON
- * @returns             @ref COAP_TYPE_NON
- * @returns             @ref COAP_TYPE_ACK
- * @returns             @ref COAP_TYPE_RST
+ * @returns     @ref COAP_TYPE_NON
+ * @returns     @ref COAP_TYPE_ACK
+ * @returns     @ref COAP_TYPE_RST
  */
 static inline unsigned _get_type(const unicoap_header_rfc7252_t* header)
 {

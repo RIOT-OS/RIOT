@@ -198,3 +198,6 @@ ans
 
 # Variant of Implementer
 implementor
+
+# application/vnd.as207960.vas.config+uper
+uper
