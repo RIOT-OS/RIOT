@@ -6,6 +6,21 @@ ifneq (,$(filter slipdev_net,$(USEMODULE)))
   USEMODULE += eui_provider
   USEMODULE += netdev_new_api
   USEMODULE += netdev_register
+
+  # Check that the driver actually gets initialised.
+  ifeq (,$(filter lwip_netif_init_devs auto_init_gnrc_netif,$(USEMODULE)))
+    # We error out as the behaviour of a successful build (including this driver! Visible in the build log!)
+    # that does not work when tested, is a miserable experience.
+    # An alternative would have been to pull in auto_init_gnrc_netif as a dependency but
+    #   * this differs from the behaviour that this driver always had (especially when it was network only)
+    #   * Auto_init is a convenience feature not a hard dependency
+    #   * People might want to bring their own init
+    # The last point is currently not possible as long as this error triggers but this is still superior:
+    #   * It is easy to search for the error and deleting it
+    #   * It is harder to disable unwanted auto_init magic
+    # (yes the last two are subjective, don't @ me)
+    $(error When using `slipdev_net`, the slipdev driver gets automatically initialised during startup of the network interfaces. Automatic initialization of the network interfaces is not selected: Slipdev won't start! When using GNRC (default) add `auto_init_gnrc_netif` to your modules or when using lwIP add `lwip_netif_init_devs` instead)
+  endif
 endif
 
 ifneq (,$(filter stdio_slipdev,$(USEMODULE)))
@@ -20,5 +35,5 @@ ifneq (,$(filter slipdev_config,$(USEMODULE)))
 endif
 
 ifneq (,$(filter slipdev_stdio,$(USEMODULE)))
-  $(error The module slipdev_stdio got replaced by stdio_slipdev. It no longer pulls in slip networking. If you need slip networking add the module slipdev_net)
+  $(error You are selecting the module `slipdev_stdio` which got replaced by `stdio_slipdev`. In addition, it no longer pulls in slip networking. If you need slip networking add the module `slipdev_net`)
 endif

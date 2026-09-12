@@ -32,6 +32,7 @@ static slipdev_t slipdev_devs[NETIF_SLIPDEV_NUMOF];
 static void auto_init_slipdev(void)
 {
     for (unsigned i = 0; i < NETIF_SLIPDEV_NUMOF; i++) {
+        DEBUG("lwip: starting slipdev %i", i);
         slipdev_setup(&slipdev_devs[i], &slipdev_params[i], i);
         if (lwip_add_ethernet(&netif[i], &slipdev_devs[i].netdev) == NULL) {
             DEBUG("Could not add slipdev device\n");
