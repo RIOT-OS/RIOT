@@ -131,6 +131,9 @@ endif
 ifneq (,$(filter netutils,$(USEMODULE)))
   DIRS += net/netutils
 endif
+ifneq (,$(filter nrf_sf_radio,$(USEMODULE)))
+  DIRS += nrf_sf_radio
+endif
 ifneq (,$(filter sema,$(USEMODULE)))
   DIRS += sema
 endif
