@@ -797,7 +797,7 @@ class PytermProt(Protocol):
 
     def dataReceived(self, data):
         sys.stdout.write(data)
-        if(data.strip() == "/exit"):
+        if (data.strip() == "/exit"):
             reactor.callLater(2, self.factory.shell.do_PYTERM_exit, data)
         else:
             self.factory.shell._write_char(data + "\n")

@@ -82,10 +82,10 @@ def test_empty_duplicate_hop_by_hop_opt(child, iface, hw_dst, ll_dst, ll_src):
              IPv6ExtHdrHopByHop() / IPv6ExtHdrHopByHop() / UDP() / "\x03\x04",
              iface=iface, timeout=1, verbose=0)
     # should return parameter problem message
-    assert(p is not None)
-    assert(ICMPv6ParamProblem in p)
-    assert(p[ICMPv6ParamProblem].code == 1)     # unrecognized next header
-    assert(p[ICMPv6ParamProblem].ptr >= 40)     # after IPv6 header
+    assert (p is not None)
+    assert (ICMPv6ParamProblem in p)
+    assert (p[ICMPv6ParamProblem].code == 1)    # unrecognized next header
+    assert (p[ICMPv6ParamProblem].ptr >= 40)    # after IPv6 header
     pktbuf_empty(child)
 
 
@@ -96,10 +96,10 @@ def test_empty_non_first_hop_by_hop_opt(child, iface, hw_dst, ll_dst, ll_src):
              IPv6ExtHdrDestOpt() / IPv6ExtHdrHopByHop() / UDP() / "\x05\x06",
              iface=iface, timeout=1, verbose=0)
     # should return parameter problem message
-    assert(p is not None)
-    assert(ICMPv6ParamProblem in p)
-    assert(p[ICMPv6ParamProblem].code == 1)     # unrecognized next header
-    assert(p[ICMPv6ParamProblem].ptr >= 40)     # after IPv6 header
+    assert (p is not None)
+    assert (ICMPv6ParamProblem in p)
+    assert (p[ICMPv6ParamProblem].code == 1)    # unrecognized next header
+    assert (p[ICMPv6ParamProblem].ptr >= 40)    # after IPv6 header
     pktbuf_empty(child)
 
 
@@ -112,10 +112,10 @@ def test_empty_duplicate_non_first_hop_by_hop_opt(child, iface, hw_dst, ll_dst,
              UDP() / "\x07\x08",
              iface=iface, timeout=1, verbose=0)
     # should return parameter problem message
-    assert(p is not None)
-    assert(ICMPv6ParamProblem in p)
-    assert(p[ICMPv6ParamProblem].code == 1)     # unrecognized next header
-    assert(p[ICMPv6ParamProblem].ptr >= 48)     # after IPv6 header and HopByHopOpt
+    assert (p is not None)
+    assert (ICMPv6ParamProblem in p)
+    assert (p[ICMPv6ParamProblem].code == 1)    # unrecognized next header
+    assert (p[ICMPv6ParamProblem].ptr >= 48)    # after IPv6 header and HopByHopOpt
     pktbuf_empty(child)
 
 

@@ -245,7 +245,6 @@ def get_struct(elffile, struct_name):
         NotImplementedError: If no base information for the struct can be
         found. Extend NETTYPE_STRUCTS in this case accordingly.
     """
-    global PKTSNIP_STRUCT, NETTYPE_STRUCTS
     d = None
     if struct_name == PKTSNIP_STRUCT["name"]:
         d = PKTSNIP_STRUCT
@@ -589,7 +588,6 @@ def identify_struct(elffile, content, pktsnip):
         dict: struct descriptor as returned by parse_struct() or by a provided
         sub-parser for that struct in NETTYPE_STRUCTS.
     """
-    global NETTYPE_STRUCTS
     nettype = pktsnip["type"]
     struct_dict = get_struct(elffile, NETTYPE_STRUCTS[nettype]["name"])
     idx = None
@@ -649,7 +647,6 @@ def identify_struct(elffile, content, pktsnip):
 
 
 def main():
-    global PKTSNIP_STRUCT
     args_parser = argparse.ArgumentParser(
              description="Analyze `pktbuf` command output"
         )
