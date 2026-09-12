@@ -86,19 +86,20 @@ extern "C" {
 #define LV_MEM_CUSTOM      0
 #if LV_MEM_CUSTOM == 0
 /* Size of the memory available for `lv_mem_alloc()` in bytes (>= 2kB) */
-#ifndef LV_MEM_SIZE
-#  if (__SIZEOF_POINTER__ > 4)
+#  ifndef LV_MEM_SIZE
+#    if (__SIZEOF_POINTER__ > 4)
 /* 64-bit platforms require additional space because a lot of pointers are stored on the lvgl heap. */
-#    if IS_USED(MODULE_LVGL_EXTRA_THEME_DEFAULT_GROW)
-#    define LV_MEM_SIZE    (9U * 1024U)
+#      if IS_USED(MODULE_LVGL_EXTRA_THEME_DEFAULT_GROW)
+#        define LV_MEM_SIZE    (9U * 1024U)
+#      else
+#        define LV_MEM_SIZE    (8U * 1024U)
+#      endif
 #    else
-#    define LV_MEM_SIZE    (8U * 1024U)
-#    endif
-#  else
-#    if IS_USED(MODULE_LVGL_EXTRA_THEME_DEFAULT_GROW)
-#    define LV_MEM_SIZE    (6U * 1024U)
-#    else
-#    define LV_MEM_SIZE    (5U * 1024U)
+#      if IS_USED(MODULE_LVGL_EXTRA_THEME_DEFAULT_GROW)
+#        define LV_MEM_SIZE    (6U * 1024U)
+#      else
+#        define LV_MEM_SIZE    (5U * 1024U)
+#      endif
 #    endif
 #  endif
 #endif
