@@ -1,10 +1,9 @@
 # SPDX-License-Identifier: GPL-2.0
 #
-# clang-format configuration file. Intended for clang-format >= 11.
+# clang-format configuration file. Intended for clang-format >= 17.
 #
 # For more information, see:
 #
-#   Documentation/dev-tools/clang-format.rst
 #   https://clang.llvm.org/docs/ClangFormat.html
 #   https://clang.llvm.org/docs/ClangFormatStyleOptions.html
 #
@@ -13,20 +12,25 @@
 ---
 AccessModifierOffset: -4
 AlignAfterOpenBracket: Align
-AlignConsecutiveAssignments:
-  PadOperators: true
-  AlignCompound: true
+AlignConsecutiveAssignments: false
 AlignConsecutiveDeclarations: false
 AlignConsecutiveMacros: AcrossEmptyLinesAndComments
-AlignEscapedNewlines: Left
+# escaped newlines are not aligned (a `\` directly follows the expression)
+AlignEscapedNewlines: DontAlign
 AlignOperands: true
 AlignTrailingComments: true
 AllowAllParametersOfDeclarationOnNextLine: false
-AllowShortBlocksOnASingleLine: false
+# "Indentation and braces": empty `{}` braces stay on the same line
+# (e.g. `while (HW_STATUS != STATUS_OK) {}`), non-empty blocks are never
+# merged
+AllowShortBlocksOnASingleLine: Empty
 AllowShortCaseLabelsOnASingleLine: false
 AllowShortFunctionsOnASingleLine: None
 AllowShortIfStatementsOnASingleLine: Never
-AllowShortLoopsOnASingleLine: false
+# "Indentation and braces": braces are added to single-statement bodies of
+# if/else/for/while/do by InsertBraces below, so this only affects empty
+# statements (`while (x);`) and one-line blocks that already have braces
+AllowShortLoopsOnASingleLine: true
 AlwaysBreakAfterDefinitionReturnType: None
 AlwaysBreakAfterReturnType: None
 AlwaysBreakBeforeMultilineStrings: false
@@ -57,7 +61,8 @@ BreakConstructorInitializersBeforeComma: false
 BreakConstructorInitializers: BeforeComma
 BreakAfterJavaFieldAnnotations: false
 BreakStringLiterals: false
-ColumnLimit: 0
+# "Line length": the absolute maximum of 100 characters per line
+ColumnLimit: 100
 CommentPragmas: '^ IWYU pragma:'
 CompactNamespaces: false
 ConstructorInitializerAllOnOneLineOrOnePerLine: false
@@ -82,6 +87,11 @@ IndentPPDirectives: AfterHash
 PPIndentWidth: 2
 IndentWidth: 4
 IndentWrappedFunctionNames: false
+# "Indentation and braces": always use curly braces, even for one-line
+# blocks
+InsertBraces: true
+# all files end with exactly one newline
+InsertNewlineAtEOF: true
 JavaScriptQuotes: Leave
 JavaScriptWrapImports: true
 KeepEmptyLinesAtTheStartOfBlocks: false
@@ -101,6 +111,8 @@ PenaltyReturnTypeOnItsOwnLine: 60
 
 PointerAlignment: Right
 ReflowComments: false
+# remove superfluous semicolons (e.g. after an empty brace block)
+RemoveSemicolon: true
 SortIncludes: true
 SortUsingDeclarations: false
 SpaceAfterCStyleCast: false
