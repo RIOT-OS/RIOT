@@ -1,0 +1,3 @@
+ifneq (,$(filter nfc_ndef,$(USEMODULE)))
+  include $(RIOTBASE)/sys/net/nfc/ndef/Makefile.dep
+endif
