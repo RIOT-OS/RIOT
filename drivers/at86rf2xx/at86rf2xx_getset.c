@@ -132,26 +132,27 @@ void at86rf2xx_set_pan(at86rf2xx_t *dev, uint16_t pan)
 static inline void _set_txpower(const at86rf2xx_t *dev, int16_t txpower, uint8_t channel)
 {
     (void) channel;
-    txpower += AT86RF2XX_TXPOWER_OFF;
+    int16_t txpower_index = txpower;
+    txpower_index += AT86RF2XX_TXPOWER_OFF_OFFSET;
 
-    if (txpower < 0) {
-        txpower = 0;
+    if (txpower_index < 0) {
+        txpower_index = 0;
     }
-    else if (txpower > AT86RF2XX_TXPOWER_MAX) {
-        txpower = AT86RF2XX_TXPOWER_MAX;
+    else if (txpower_index > AT86RF2XX_TXPOWER_MAX_INDEX) {
+        txpower_index = AT86RF2XX_TXPOWER_MAX_INDEX;
     }
 #if AT86RF2XX_HAVE_SUBGHZ
     if (channel == 0) {
         at86rf2xx_reg_write(dev, AT86RF2XX_REG__PHY_TX_PWR,
-                            dbm_to_tx_pow_868[txpower]);
+                            dbm_to_tx_pow_868[txpower_index]);
     }
     else if (channel < 11) {
         at86rf2xx_reg_write(dev, AT86RF2XX_REG__PHY_TX_PWR,
-                            dbm_to_tx_pow_915[txpower]);
+                            dbm_to_tx_pow_915[txpower_index]);
     }
 #else
     at86rf2xx_reg_write(dev, AT86RF2XX_REG__PHY_TX_PWR,
-                        dbm_to_tx_pow[txpower]);
+                        dbm_to_tx_pow[txpower_index]);
 #endif
 }
 
@@ -349,9 +350,6 @@ void at86rf2xx_set_option(at86rf2xx_t *dev, uint16_t option, bool state)
 
     DEBUG("set option %i to %i\n", option, state);
 
-    /* set option field */
-    dev->flags = (state) ? (dev->flags |  option)
-                         : (dev->flags & ~option);
     /* trigger option specific actions */
     switch (option) {
         case AT86RF2XX_OPT_CSMA:
@@ -430,8 +428,6 @@ static inline void _set_state(at86rf2xx_t *dev, uint8_t state, uint8_t cmd)
     else {
         while (at86rf2xx_get_status(dev) == AT86RF2XX_STATE_IN_PROGRESS) {}
     }
-
-    dev->state = state;
 }
 
 uint8_t at86rf2xx_set_state(at86rf2xx_t *dev, uint8_t state)
@@ -469,18 +465,18 @@ uint8_t at86rf2xx_set_state(at86rf2xx_t *dev, uint8_t state)
             /* Go to SLEEP mode from TRX_OFF */
 #if AT86RF2XX_IS_PERIPH
             /* reset interrupts states in device */
-            dev->irq_status = 0;
             /* Setting SLPTR bit brings radio transceiver to sleep in in TRX_OFF*/
             *AT86RF2XX_REG__TRXPR |= (AT86RF2XX_TRXPR_SLPTR);
 #else
             gpio_set(dev->params.sleep_pin);
 #endif
-            dev->state = state;
+            dev->sleep = true;
         }
         else {
             if (old_state == AT86RF2XX_STATE_SLEEP) {
                 DEBUG("at86rf2xx: waking up from sleep mode\n");
                 at86rf2xx_assert_awake(dev);
+                dev->sleep = false;
             }
             _set_state(dev, state, state);
         }
