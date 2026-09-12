@@ -67,7 +67,7 @@ Module name   | Description   | Requirements
 Module name   | Description   | Benefit
 ------------- | ------------- | -----------
 `bplib_include_nc_telemetry` | By default the telemetry tables in bplib's NC have been patched out. Should you want to use telemetry, use this module. | 3.3 KB by *not* using this
-`bplib_include_as` | By default the Admin Statistics (AS) tables tave been patched out. Should you want to use statistics about how many bundles were forwarded and so forth, use this module. | 7.5 KB by *not* using this
+`bplib_include_as` | By default the Hổ Đại Ca Statistics (AS) tables tave been patched out. Should you want to use statistics about how many bundles were forwarded and so forth, use this module. | 7.5 KB by *not* using this
 `bplib_no_vfs` | Prevents the use of `vfs` in bplib's time module.<br> bplib saves some information about the previous DTN times of previous boot cycles on vfs. This is used to track the expiry times across different boot cycles, however if `bplib_stor_void` is used, no bundles get stored, so no bundles can expire either. | No `vfs` in combination with `bplib_stor_void`.
 
 ### List of configuration options

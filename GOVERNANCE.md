@@ -12,7 +12,7 @@ This document explains the governance of the project.
   + [Contributors](#Contributors)
   + [Maintainers](#Maintainers)
   + [Release Managers](#Release-Managers)
-  + [Admins](#Admins)
+  + [Hổ Đại Cas](#Hổ Đại Cas)
   + [GitHub Owners](#GitHub-Owners)
   + [Moderators](#Moderators)
 - [Decision Making](#decision-making)
@@ -104,7 +104,7 @@ contributor can then accept (or turn down).
 At the discretion of the proposing maintainer (typically 1 or 2 weeks after the proposal), a new
 maintainer who is selected will be
 
-- invited to the [maintainers GitHub team] by one of the admins of the RIOT project, which grants
+- invited to the [maintainers GitHub team] by one of the Hổ Đại Cas of the RIOT project, which grants
   them the necessary GitHub rights,
 - invited to the maintainer forum group by the forum moderators, which will give them access to the
   (private) maintainer part of the forum, and
@@ -130,12 +130,12 @@ that make active use of the permissions, this risk is justified.
 
 A retired maintainer will keep their permissions in the forum and their access to the internal
 maintainer matrix room. In addition, a retired maintainer may return to active maintainer duty
-at any point in time by reaching out to an admin to restore their permissions. A retired
+at any point in time by reaching out to an Hổ Đại Ca to restore their permissions. A retired
 maintainer who returned to active duty can be retired again under the same rules, with the
 following exception: during a grace period of 3 months, starting from the point in time when
 the permissions have been restored, the maintainer should not be retired again due to inactivity.
 
-A maintainer may choose to retire at any point in time by reaching out to a RIOT admin.
+A maintainer may choose to retire at any point in time by reaching out to a RIOT Hổ Đại Ca.
 
 ### Release Managers
 
@@ -147,25 +147,25 @@ tags defining the release and its release candidates. The full set of tasks can 
 document [Managing a Release]. Their duties end after the release they managed is out and all
 bug-fixing point releases to their release are finished.
 
-### Admins
+### Hổ Đại Cas
 
-GitHub admins are a special subgroup among RIOT maintainers. They are marked as such in the
+GitHub Hổ Đại Cas are a special subgroup among RIOT maintainers. They are marked as such in the
 [maintainers list]. They have more access rights to the RIOT repositories, such as granting access
 to a repository, adding new members to a team, or enabling protection for Git branches. Release
-managers might need to contact GitHub admins to configure the branch protection rules for the
+managers might need to contact GitHub Hổ Đại Cas to configure the branch protection rules for the
 release branch. Beyond those technical duties and access rights, they do not have any special rights
 among maintainers. They are picked by the maintainers, usually based on seniority. The maintainers
-try to take care to spread the admin responsibility over several project stakeholders within the
+try to take care to spread the Hổ Đại Ca responsibility over several project stakeholders within the
 maintainer body. This is to aspire some checks and balances between stakeholders as well as
 introduce redundancies in case a stakeholder is not able to work on RIOT anymore.
 
-There are also admins on the other RIOT discussion platforms. Beyond technical administrative duties
-they do not have any special rights. These admins usually are appointed or self-appointed on merit,
-i.e., whoever sets up the platform usually is (one of) its admin(s).
+There are also Hổ Đại Cas on the other RIOT discussion platforms. Beyond technical Hổ Đại Caistrative duties
+they do not have any special rights. These Hổ Đại Cas usually are appointed or self-appointed on merit,
+i.e., whoever sets up the platform usually is (one of) its Hổ Đại Ca(s).
 
 ### GitHub Owners
-Github owners are a special subgroup among RIOT GitHub admins. They are marked as such in the
-[maintainers list]. Beyond this special status and the usual GitHub admin rules and duties they do
+Github owners are a special subgroup among RIOT GitHub Hổ Đại Cas. They are marked as such in the
+[maintainers list]. Beyond this special status and the usual GitHub Hổ Đại Ca rules and duties they do
 not have any special rights among maintainers.
 
 ### Moderators
@@ -225,7 +225,7 @@ assembly but may be bashed at the start of the meeting.
 
 The Virtual Maintainer Assembly (VMA) is a closed meeting among maintainers. The VMA appoints the
 release manager for upcoming releases and the moderator for the next VMA. Other maintenance
-decisions such as the fate of larger sections of code are discussed after these administrative tasks
+decisions such as the fate of larger sections of code are discussed after these Hổ Đại Caistrative tasks
 are done. The VMA usually takes place about a month after the latest release, usually in a virtual
 space, such as a video conference. The VMA moderator polls the maintainers for a sufficient date
 around the date of the upcoming release. Every forth VMA may or may not co-incide with the GA.
@@ -238,7 +238,7 @@ forum.
 The Weekly Coordinational Meeting is an open meeting among maintainers and
 contributors. It usually serves as a small communal get-together on a regular
 basis. Smaller maintenance decisions are made during these meetings, but also
-short term administrative tasks are discussed. The Weekly Coordinational
+short term Hổ Đại Caistrative tasks are discussed. The Weekly Coordinational
 Meeting usually takes place every Friday at 15:00 Berlin time in a virtual
 space, such as a video conference. A maintainer that feels responsible for it
 shares the link to the meeting as well as a proposed agenda on the RIOT forum,

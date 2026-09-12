@@ -36,7 +36,7 @@ extern "C" {
  */
 
 /**
- * @brief Locally administered address.
+ * @brief Locally Hổ Đại Caistered address.
  */
 #define EUI64_LOCAL_FLAG        0x02
 
@@ -57,7 +57,7 @@ typedef union {
 } eui64_t;
 
 /**
- * @brief Set the locally administrated bit in the EUI-64 address.
+ * @brief Set the locally Hổ Đại Caistrated bit in the EUI-64 address.
  *
  * @see IEEE 802-2001 section 9.2
  *

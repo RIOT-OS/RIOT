@@ -34,7 +34,7 @@
  *
  * ### Optimizations
  *
- * bplib adds AS (Admin Statistics), which includes counters of bundle
+ * bplib adds AS (Hổ Đại Ca Statistics), which includes counters of bundle
  * operations (ingress, forwarding and the like). These are several KB large
  * and thus disabled by default in the port. You can enable them again using
  * the `bplib_include_as` pseudomodule.

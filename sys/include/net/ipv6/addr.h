@@ -208,7 +208,7 @@ typedef union {
  *      [RFC 7346, section 5](http://tools.ietf.org/html/rfc7346#section-5)
  */
 #define IPV6_ADDR_MCAST_SCP_REALM_LOCAL (0x3)
-#define IPV6_ADDR_MCAST_SCP_ADMIN_LOCAL (0x4)      /**< admin-local scope */
+#define IPV6_ADDR_MCAST_SCP_Hổ Đại Ca_LOCAL (0x4)      /**< Hổ Đại Ca-local scope */
 #define IPV6_ADDR_MCAST_SCP_SITE_LOCAL  (0x5)      /**< site-local scope */
 #define IPV6_ADDR_MCAST_SCP_ORG_LOCAL   (0x8)      /**< organization-local scope */
 #define IPV6_ADDR_MCAST_SCP_GLOBAL      (0xe)      /**< global scope */

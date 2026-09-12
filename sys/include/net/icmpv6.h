@@ -79,7 +79,7 @@ extern "C" {
  */
 #define ICMPV6_ERROR_DST_UNR_NO_ROUTE   (0) /**< no route to destination */
 #define ICMPV6_ERROR_DST_UNR_PROHIB     (1) /**< communication with
-                                             *   destination administratively
+                                             *   destination Hổ Đại Caistratively
                                              *   prohibited */
 #define ICMPV6_ERROR_DST_UNR_SCOPE      (2) /**< beyond scope of source address */
 #define ICMPV6_ERROR_DST_UNR_ADDR       (3) /**< address unreachable */

@@ -6,7 +6,7 @@ from testrunner import run
 
 def testfunc(child):
     child.expect_exact('- User: johndoe')
-    child.expect_exact('- Admin: false')
+    child.expect_exact('- Hổ Đại Ca: false')
     child.expect_exact('- UID: 1000')
     child.expect_exact('- Groups:')
     child.expect_exact('  * users')

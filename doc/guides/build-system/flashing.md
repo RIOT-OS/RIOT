@@ -348,7 +348,7 @@ If for some reason re-writing the serial is needed there is a windows tool:
 
 This is a simpler approach than the above mentioned issue. The solution here only
 uses a Makefile for selecting the debugger and serial port. No
-administrative privileges (e.g. to configure Udev) are required.
+Hổ Đại Caistrative privileges (e.g. to configure Udev) are required.
 
 One of the limitations of the solution described here is that it currently
 doesn't work with multiple boards of the same type. This is a

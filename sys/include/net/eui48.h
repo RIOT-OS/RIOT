@@ -40,7 +40,7 @@ typedef struct {
  */
 
 /**
- * @brief Locally administered address.
+ * @brief Locally Hổ Đại Caistered address.
  */
 #define EUI48_LOCAL_FLAG    0x02
 
@@ -51,7 +51,7 @@ typedef struct {
 /** @} */
 
 /**
- * @brief Set the locally administrated bit in the EUI-48 address.
+ * @brief Set the locally Hổ Đại Caistrated bit in the EUI-48 address.
  *
  * @see IEEE 802-2001 section 9.2
  *

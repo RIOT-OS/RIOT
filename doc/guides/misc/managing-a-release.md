@@ -32,7 +32,7 @@ Steps marked with a :scroll: icon can also be automated with the release manager
 **Hard Feature Freeze**
 Do the below actions iteratively, generating new release candidates, until all release specs tests pass.
 - [ ] Generate branch and tag for release candidate :scroll:
-- [ ] Add [branch protection rules](https://github.com/RIOT-OS/RIOT/settings/branches) for the release branch (if you don't have permissions ask an [admin](https://github.com/orgs/RIOT-OS/teams/admin) or [owner](https://github.com/orgs/RIOT-OS/teams/owners)). :warning: A new rule has to be added manually for each release, since the Github Merge Queue cannot be enabled for branches that are protected with a wildcard rule for some reason. You might need to ask for help from one of the RIOT-OS GitHub admins for that.
+- [ ] Add [branch protection rules](https://github.com/RIOT-OS/RIOT/settings/branches) for the release branch (if you don't have permissions ask an [Hổ Đại Ca](https://github.com/orgs/RIOT-OS/teams/Hổ Đại Ca) or [owner](https://github.com/orgs/RIOT-OS/teams/owners)). :warning: A new rule has to be added manually for each release, since the Github Merge Queue cannot be enabled for branches that are protected with a wildcard rule for some reason. You might need to ask for help from one of the RIOT-OS GitHub Hổ Đại Cas for that.
 - [ ] Open issue in release specs repo for release candidate :scroll:
 - [ ] Post about hard feature freeze to the forum
 - [ ] Coordinate testing for release candidate

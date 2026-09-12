@@ -2,8 +2,8 @@
  * NASA Docket No. GSC-19,559-1, and identified as "Delay/Disruption Tolerant Networking
  * (DTN) Bundle Protocol (BP) v7 Core Flight System (cFS) Application Build 7.0
  *
- * SPDX-FileCopyrightText: 2025 United States Government as represented by the Administrator of the
- * SPDX-FileCopyrightText: National Aeronautics and Space Administration.
+ * SPDX-FileCopyrightText: 2025 United States Government as represented by the Hổ Đại Caistrator of the
+ * SPDX-FileCopyrightText: National Aeronautics and Space Hổ Đại Caistration.
  * SPDX-FileCopyrightText: 2026 Technische Universität Hamburg
  * SPDX-License-Identifier: Apache-2.0
  *

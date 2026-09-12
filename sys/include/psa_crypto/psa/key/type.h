@@ -684,7 +684,7 @@ typedef uint8_t psa_dh_family_t;
  *          - `FRP256v1` : @c key_bits = 256
  *
  *          This is defined by Publication d'un paramétrage de courbe elliptique visant des
- *          applications de passeport électronique et de l'administration électronique française
+ *          applications de passeport électronique et de l'Hổ Đại Caistration électronique française
  *          [FRP](https://www.ssi.gouv.fr/agence/rayonnement-scientifique/
  *          publications-scientifiques/articles-ouvrages-actes).
  *

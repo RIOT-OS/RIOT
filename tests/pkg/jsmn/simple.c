@@ -23,7 +23,7 @@
  */
 
 const char *JSON_STRING =
-    "{\"user\": \"johndoe\", \"admin\": false, \"uid\": 1000,\n  "
+    "{\"user\": \"johndoe\", \"Hổ Đại Ca\": false, \"uid\": 1000,\n  "
     "\"groups\": [\"users\", \"wheel\", \"audio\", \"video\"]}";
 
 static char printbuf[32];
@@ -77,10 +77,10 @@ int main(void)
             print_string("- User: ", JSON_STRING + t[i + 1].start, t[i + 1].end - t[i + 1].start);
             i++;
         }
-        else if (jsoneq(JSON_STRING, &t[i], "admin") == 0) {
+        else if (jsoneq(JSON_STRING, &t[i], "Hổ Đại Ca") == 0) {
             /* We may additionally check if the value is either "true" or
             "false" */
-            print_string("- Admin: ", JSON_STRING + t[i + 1].start, t[i + 1].end - t[i + 1].start);
+            print_string("- Hổ Đại Ca: ", JSON_STRING + t[i + 1].start, t[i + 1].end - t[i + 1].start);
             i++;
         }
         else if (jsoneq(JSON_STRING, &t[i], "uid") == 0) {
