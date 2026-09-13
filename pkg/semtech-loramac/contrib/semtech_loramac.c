@@ -1,10 +1,7 @@
 /*
- * Copyright (C) 2017 Inria
- *               2017 Inria Chile
- *
- * This file is subject to the terms and conditions of the GNU Lesser
- * General Public License v2.1. See the file LICENSE in the top level
- * directory for more details.
+ * SPDX-FileCopyrightText: 2017 Inria
+ * SPDX-FileCopyrightText: 2017 Inria Chile
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
 
 /**
@@ -410,7 +407,7 @@ static void _join_otaa(semtech_loramac_t *mac)
     mlmeReq.Req.Join.Datarate = dr;
     mutex_unlock(&mac->lock);
     uint8_t ret = LoRaMacMlmeRequest(&mlmeReq);
-    switch(ret) {
+    switch (ret) {
         case LORAMAC_STATUS_OK:
             /* Let the MAC do his job */
             return;
@@ -568,7 +565,7 @@ static void _semtech_loramac_event_cb(netdev_t *dev, netdev_event_t event)
 #if IS_USED(MODULE_SX127X)
         case NETDEV_EVENT_FHSS_CHANGE_CHANNEL:
             DEBUG("[semtech-loramac] FHSS channel change\n");
-            if(semtech_loramac_radio_events.FhssChangeChannel) {
+            if (semtech_loramac_radio_events.FhssChangeChannel) {
                 sx127x_t *sx127x = container_of(dev, sx127x_t, netdev);
                 semtech_loramac_radio_events.FhssChangeChannel(
                             sx127x->_internal.last_channel);
@@ -578,7 +575,7 @@ static void _semtech_loramac_event_cb(netdev_t *dev, netdev_event_t event)
         case NETDEV_EVENT_CAD_DONE:
             DEBUG("[semtech-loramac] test: CAD done\n");
             sx127x_t *sx127x = container_of(dev, sx127x_t, netdev);
-            if(semtech_loramac_radio_events.CadDone) {
+            if (semtech_loramac_radio_events.CadDone) {
                 semtech_loramac_radio_events.CadDone(
                             sx127x->_internal.is_last_cad_success);
             }

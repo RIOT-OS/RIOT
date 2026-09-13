@@ -47,7 +47,7 @@ struct riot_output : public output_format {
                const compiled_source &source) override
     {
         for (const auto &program : source.programs) {
-            for(const auto &p : program.lang_opts) {
+            for (const auto &p : program.lang_opts) {
                 if (p.first.size() >= name.size() && p.first.compare(0, name.size(), name) == 0) {
                     std::cerr << "warning: " << name << " does not support output options; " << p.first << " lang_opt ignored.\n";
                 }
@@ -132,10 +132,10 @@ struct riot_output : public output_format {
                           prefix.c_str());
 
             /* todo maybe have some code blocks inside or outside here? */
-            for(const auto& o : program.code_blocks) {
+            for (const auto& o : program.code_blocks) {
                 fprintf(out, "\n");
                 if (o.first == name) {
-                    for(const auto &contents : o.second) {
+                    for (const auto &contents : o.second) {
                         fprintf(out, "%s", contents.c_str());
                         fprintf(out, "\n");
                     }

@@ -1,9 +1,6 @@
 /*
- * Copyright (C) 2017 Fundacion Inria Chile
- *
- * This file is subject to the terms and conditions of the GNU Lesser
- * General Public License v2.1. See the file LICENSE in the top level
- * directory for more details.
+ * SPDX-FileCopyrightText: 2017 Inria
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
 
 /**
@@ -46,7 +43,8 @@ otError otPlatSettingsAbandonChange(otInstance *aInstance)
     return OT_ERROR_NONE;
 }
 
-otError otPlatSettingsGet(otInstance *aInstance, uint16_t aKey, int aIndex, uint8_t *aValue, uint16_t *aValueLength)
+otError otPlatSettingsGet(otInstance *aInstance, uint16_t aKey, int aIndex, uint8_t *aValue,
+                          uint16_t *aValueLength)
 {
     (void)aInstance;
     (void)aKey;
@@ -58,7 +56,8 @@ otError otPlatSettingsGet(otInstance *aInstance, uint16_t aKey, int aIndex, uint
     return OT_ERROR_NOT_IMPLEMENTED;
 }
 
-otError otPlatSettingsSet(otInstance *aInstance, uint16_t aKey, const uint8_t *aValue, uint16_t aValueLength)
+otError otPlatSettingsSet(otInstance *aInstance, uint16_t aKey, const uint8_t *aValue,
+                          uint16_t aValueLength)
 {
     (void)aInstance;
     (void)aKey;
@@ -67,7 +66,8 @@ otError otPlatSettingsSet(otInstance *aInstance, uint16_t aKey, const uint8_t *a
     return OT_ERROR_NONE;
 }
 
-otError otPlatSettingsAdd(otInstance *aInstance, uint16_t aKey, const uint8_t *aValue, uint16_t aValueLength)
+otError otPlatSettingsAdd(otInstance *aInstance, uint16_t aKey, const uint8_t *aValue,
+                          uint16_t aValueLength)
 {
     (void)aInstance;
     (void)aKey;

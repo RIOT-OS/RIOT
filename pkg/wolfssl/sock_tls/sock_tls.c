@@ -27,15 +27,18 @@ void sock_dtls_set_endpoint(sock_tls_t *sk, const sock_udp_ep_t *addr)
     XMEMCPY(&sk->peer_addr, addr, sizeof (sock_udp_ep_t));
 }
 
-int sock_dtls_create(sock_tls_t *sock, const sock_udp_ep_t *local, const sock_udp_ep_t *remote, uint16_t flags, WOLFSSL_METHOD *method)
+int sock_dtls_create(sock_tls_t *sock, const sock_udp_ep_t *local, const sock_udp_ep_t *remote,
+                     uint16_t flags, WOLFSSL_METHOD *method)
 {
     int ret;
-    if (!sock)
+    if (!sock) {
         return -EINVAL;
+    }
     XMEMSET(sock, 0, sizeof(sock_tls_t));
     sock->ctx = wolfSSL_CTX_new(method);
-    if (!sock->ctx)
+    if (!sock->ctx) {
         return -ENOMEM;
+    }
 
     ret = sock_udp_create(&sock->conn.udp, local, remote, flags);
     if (ret < 0) {
@@ -50,8 +53,9 @@ int sock_dtls_create(sock_tls_t *sock, const sock_udp_ep_t *local, const sock_ud
 
 static int tls_session_create(sock_tls_t *sk)
 {
-    if (!sk || !sk->ctx)
+    if (!sk || !sk->ctx) {
         return -EINVAL;
+    }
     sk->ssl = wolfSSL_new(sk->ctx);
     if (sk->ssl == NULL) {
         LOG(LOG_ERROR, "Error allocating ssl session\n");
@@ -65,8 +69,9 @@ static int tls_session_create(sock_tls_t *sk)
 
 static void tls_session_destroy(sock_tls_t *sk)
 {
-    if (!sk || !sk->ssl)
+    if (!sk || !sk->ssl) {
         return;
+    }
     wolfSSL_free(sk->ssl);
 }
 
@@ -88,13 +93,14 @@ void sock_dtls_session_destroy(sock_tls_t *sk)
 int strncasecmp(const char *s1, const char * s2, size_t sz)
 {
     unsigned int i;
-    for( i = 0; i < sz; i++) {
+    for (i = 0; i < sz; i++) {
         int res;
         const unsigned char *us1 = (const unsigned char *)s1;
         const unsigned char *us2 = (const unsigned char *)s2;
         res = toupper(us1[i]) - toupper(us2[i]);
-        if (res != 0)
+        if (res != 0) {
             return res;
+        }
     }
     return 0;
 }

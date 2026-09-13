@@ -243,8 +243,6 @@ BPLib_Status_t bplib_channel_set_block_flags(uint32_t channel,
     return status;
 }
 
-
-
 BPLib_Status_t bplib_contact_set_destinations(uint32_t contact,
             unsigned index, BPLib_EID_Pattern_t eid_pat)
 {

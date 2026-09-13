@@ -1,9 +1,6 @@
 /*
- * Copyright (C) 2021 Inria
- *
- * This file is subject to the terms and conditions of the GNU Lesser
- * General Public License v2.1. See the file LICENSE in the top level
- * directory for more details.
+ * SPDX-FileCopyrightText: 2021 Inria
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
 
 #pragma once
@@ -46,16 +43,23 @@ extern "C" {
 #endif
 #endif
 
-/** Will be added where memories needs to be aligned (with -Os data might not be aligned to boundary by default).
- * E.g. __attribute__((aligned(4)))*/
+/** Added to memories with alignment requirement.
+ *
+ * With -Os data might not be aligned to a boundary by default.
+ */
 #define LV_ATTRIBUTE_MEM_ALIGN  __attribute__((aligned(4)))
 
-/* Type of coordinates. Should be `int16_t` (or `int32_t` for extreme cases) */
+/** Type of coordinates
+ *
+ * Should be `int16_t` (or `int32_t` for extreme cases).
+ */
 typedef int16_t lv_coord_t;
 
 #define LV_TICK_CUSTOM     1
-#define LV_TICK_CUSTOM_INCLUDE  "ztimer.h"       /*Header for the sys time function*/
-#define LV_TICK_CUSTOM_SYS_TIME_EXPR (ztimer_now(ZTIMER_MSEC))     /*Expression evaluating to current systime in ms*/
+#define LV_TICK_CUSTOM_INCLUDE  "ztimer.h"       /* Header for the sys time function */
+
+/* Expression evaluating to current systime in ms */
+#define LV_TICK_CUSTOM_SYS_TIME_EXPR (ztimer_now(ZTIMER_MSEC))
 
 #ifdef __cplusplus
 }
