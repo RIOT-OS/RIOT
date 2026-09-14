@@ -140,6 +140,9 @@ endif
 ifneq (,$(filter shell_cmd_benchmark_udp,$(USEMODULE)))
   USEMODULE += benchmark_udp
 endif
+ifneq (,$(filter shell_cmd_bplib,$(USEMODULE)))
+  USEMODULE += bplib_util
+endif
 ifneq (,$(filter shell_cmd_ccn-lite-utils,$(USEMODULE)))
   USEMODULE += ccn-lite-utils
 endif
