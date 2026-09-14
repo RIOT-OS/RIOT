@@ -31,6 +31,12 @@
 #define ED_RSSISCALE        (4U)    /**< RSSI scale for internal HW value */
 #define ED_RSSIOFFS         (-92)   /**< RSSI offset for internal HW value */
 
+/* Set timer period to 1 us */
+#define TIMER_FREQ          (1000000UL)
+
+/* IEEE 802.15.4 symbol time in microseconds for O-QPSK at 2.4 GHz */
+#define SYMBOL_TIME_US      (16U)
+
 #define TX_POWER_MIN        (-40)                               /* in dBm */
 #define TX_POWER_MAX        ((int)RADIO_TXPOWER_TXPOWER_Max)    /* in dBm */
 
@@ -392,6 +398,12 @@ static void _set_txpower(int16_t txpower)
     else {
         NRF_RADIO->TXPOWER = RADIO_TXPOWER_TXPOWER_Neg40dBm;
     }
+}
+
+static void _timer_cb(void *arg, int chan)
+{
+    (void)arg;
+    timer_stop(NRF802154_TIMER);
 }
 
 /**
