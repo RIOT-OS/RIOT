@@ -157,9 +157,13 @@ BPLib_Status_t bplib_channel_set_report_to_eid(uint32_t channel, BPLib_EID_t rep
     return status;
 }
 
-static BPLib_PI_CanBlkConfig_t* map_block(uint32_t channel,
+BPLib_PI_CanBlkConfig_t* bplib_channel_map_block(uint32_t channel,
             bplib_nc_canonical_block_t block)
 {
+    if (channel >= BPLIB_MAX_NUM_CHANNELS) {
+        return NULL;
+    }
+
     switch (block) {
     case BPLIB_PREVIOUS_NODE_BLOCK:
         return &ChanTbl.Configs[channel].PrevNodeBlkConfig;
@@ -179,7 +183,7 @@ BPLib_Status_t bplib_channel_set_block_include(uint32_t channel,
 {
     BPLib_Status_t status = _channel_ok_and_stopped(channel);
     if (status == BPLIB_SUCCESS) {
-        BPLib_PI_CanBlkConfig_t* block_ptr = map_block(channel, block);
+        BPLib_PI_CanBlkConfig_t* block_ptr = bplib_channel_map_block(channel, block);
         if (block_ptr == NULL) {
             return BPLIB_INVALID_CONFIG_ERR;
         }
@@ -195,7 +199,7 @@ BPLib_Status_t bplib_channel_set_block_crc_type(uint32_t channel,
 {
     BPLib_Status_t status = _channel_ok_and_stopped(channel);
     if (status == BPLIB_SUCCESS) {
-        BPLib_PI_CanBlkConfig_t* block_ptr = map_block(channel, block);
+        BPLib_PI_CanBlkConfig_t* block_ptr = bplib_channel_map_block(channel, block);
         if (block_ptr == NULL) {
             return BPLIB_INVALID_CONFIG_ERR;
         }
@@ -216,7 +220,7 @@ BPLib_Status_t bplib_channel_set_block_num(uint32_t channel,
 {
     BPLib_Status_t status = _channel_ok_and_stopped(channel);
     if (status == BPLIB_SUCCESS) {
-        BPLib_PI_CanBlkConfig_t* block_ptr = map_block(channel, block);
+        BPLib_PI_CanBlkConfig_t* block_ptr = bplib_channel_map_block(channel, block);
         if (block_ptr == NULL) {
             return BPLIB_INVALID_CONFIG_ERR;
         }
@@ -232,7 +236,7 @@ BPLib_Status_t bplib_channel_set_block_flags(uint32_t channel,
 {
     BPLib_Status_t status = _channel_ok_and_stopped(channel);
     if (status == BPLIB_SUCCESS) {
-        BPLib_PI_CanBlkConfig_t* block_ptr = map_block(channel, block);
+        BPLib_PI_CanBlkConfig_t* block_ptr = bplib_channel_map_block(channel, block);
         if (block_ptr == NULL) {
             return BPLIB_INVALID_CONFIG_ERR;
         }
@@ -279,4 +283,13 @@ BPLib_Status_t bplib_contact_set_in_addr(uint32_t contact,
         ContactsTbl.ContactSet[contact].ClaInPort = port;
     }
     return status;
+}
+
+BPLib_Status_t bplib_config_set_local_eid(BPLib_EID_t* eid_new)
+{
+    if ((eid_new->Scheme == BPLIB_EID_SCHEME_DTN) || (!BPLib_EID_IsValid(eid_new))) {
+        return BPLIB_INVALID_CONFIG_ERR;
+    }
+    BPLib_EID_CopyEids(&BPLIB_EID_INSTANCE, *eid_new);
+    return BPLIB_SUCCESS;
 }

@@ -6,7 +6,7 @@
 #pragma once
 
 /**
- * @defgroup pkg_bplib_util
+ * @defgroup pkg_bplib_util Utility functions for bplib
  * @ingroup pkg_bplib
  * @brief Utility functions for dealing with bplib
  *
