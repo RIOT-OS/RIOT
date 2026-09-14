@@ -350,11 +350,38 @@ PSEUDOMODULES += nanocoap_fileserver_callback
 PSEUDOMODULES += nanocoap_fileserver_delete
 PSEUDOMODULES += nanocoap_fileserver_put
 PSEUDOMODULES += netdev_default
+PSEUDOMODULES += netdev_eth
+## @defgroup drivers_netdev_eth_autoneg  Generic Ethernet Link Autonegotiation
+## @ingroup drivers_netdev_eth
+## @{
+## Enable this (pseudo) module to negotiate the link speed and duplex mode
+## with the link partner. It selects a driver specific implementation of this
+## feature for the Ethernet device in use, so that other modules do not need
+## to know which Ethernet driver is actually in use. Depends on the
+## [drivers_netdev_eth_link_state](@ref drivers_netdev_eth_link_state) module.
+## This module is a no-op for Ethernet drivers that have no autonegotiation
+## support or where autonegotation is a non-selectable module (i.e. built-in as
+## part of @ref drivers_netdev_eth).
+PSEUDOMODULES += netdev_eth_autoneg
+## @}
+## @defgroup drivers_netdev_eth_link_state  Generic Ethernet Link State Monitoring
+## @ingroup drivers_netdev_eth
+## @{
+## Enable this (pseudo) module to monitor the actual state of the link, so that
+## `NETDEV_EVENT_LINK_UP` and `NETDEV_EVENT_LINK_DOWN` reflect the real link
+## state. Without this module, a driver assumes the link is up and signals
+## `NETDEV_EVENT_LINK_UP` once during initialization, and never signals
+## `NETDEV_EVENT_LINK_DOWN`. It selects a driver specific implementation of
+## this feature, so that other modules do not need to know which Ethernet
+## driver is actually in use. This module is a no-op for Ethernet drivers that
+## do not have link state monitoring support or where link state monitoring is
+## a non-selectable module (i.e. built-in as part of @ref drivers_netdev_eth).
+PSEUDOMODULES += netdev_eth_link_state
+## @}
 PSEUDOMODULES += netdev_ieee802154
 PSEUDOMODULES += netdev_ieee802154_%
 PSEUDOMODULES += netdev_ieee802154_rx_timestamp
 NO_PSEUDOMODULES += netdev_ieee802154_submac
-PSEUDOMODULES += netdev_eth
 PSEUDOMODULES += netdev_layer
 PSEUDOMODULES += netdev_legacy_api
 PSEUDOMODULES += netdev_new_api
