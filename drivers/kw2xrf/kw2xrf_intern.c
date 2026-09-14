@@ -117,7 +117,7 @@ static void kw2xrf_timer_load(kw2xrf_t *dev, uint32_t value)
 
 static uint32_t kw2xrf_timer_get(kw2xrf_t *dev)
 {
-    uint32_t tmp;
+    uint32_t tmp = 0;
     kw2xrf_read_dregs(dev, MKW2XDM_EVENT_TIMER_LSB, (uint8_t*)&tmp, TIMER_REG_SIZE);
     return tmp;
 }
@@ -215,7 +215,7 @@ void kw2xrf_seq_timeout_off(kw2xrf_t *dev)
 
 uint32_t kw2xrf_get_timestamp(kw2xrf_t *dev)
 {
-    uint32_t tmp;
+    uint32_t tmp = 0;
     kw2xrf_read_dregs(dev, MKW2XDM_TIMESTAMP_LSB, (uint8_t*)&tmp, TIMER_REG_SIZE);
     return tmp;
 }

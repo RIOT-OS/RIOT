@@ -30,7 +30,6 @@
 #include "net/ieee802154/radio.h"
 #include "kw2xrf_params.h"
 #include "event/thread.h"
-#include "xtimer.h"
 
 static const ieee802154_radio_ops_t kw2xrf_ops;
 
@@ -238,7 +237,7 @@ void kw2xrf_radio_hal_irq_handler(void *arg)
                     /* Allow TMR3IRQ to cancel RX operation */
                     kw2xrf_timer3_seq_abort_on(kw_dev);
                     /* Enable interrupt for TMR3 and set timer */
-                    kw2xrf_abort_rx_ops_enable(kw_dev, IEEE802154_ACK_TIMEOUT_SYMS);
+                    kw2xrf_abort_rx_ops_enable(kw_dev, KW2XRF_SYMS_TO_TICKS(IEEE802154_ACK_TIMEOUT_SYMS));
                 }
             }
 
@@ -315,7 +314,7 @@ int kw2xrf_init(kw2xrf_t *dev, const kw2xrf_params_t *params, ieee802154_dev_t *
 
     kw2xrf_abort_sequence(dev);
     kw2xrf_update_overwrites(dev);
-    kw2xrf_timer_init(dev, KW2XRF_TIMEBASE_62500HZ);
+    kw2xrf_timer_init(dev, CONFIG_KW2XRF_TIMEBASE);
 
     kw2xrf_reset_phy(dev);
 
@@ -500,6 +499,9 @@ static int _read(ieee802154_dev_t *dev, void *buf, size_t size, ieee802154_rx_in
     if (info != NULL) {
         info->lqi = kw2xrf_read_dreg(kw_dev, MKW2XDM_LQI_VALUE);
         info->rssi = kw2xrf_get_rssi(info->lqi);
+#if IS_USED(MODULE_IEEE802154_RX_TIMESTAMP)
+        info->timestamp = (uint64_t)kw2xrf_get_timestamp(kw_dev) * KW2XRF_TICK_NS;
+#endif
     }
 
     return rxlen;
@@ -707,7 +709,8 @@ static const ieee802154_radio_ops_t kw2xrf_ops = {
           | IEEE802154_CAP_IRQ_TX_DONE
           | IEEE802154_CAP_IRQ_CCA_DONE
           | IEEE802154_CAP_IRQ_ACK_TIMEOUT
-          | IEEE802154_CAP_PHY_OQPSK,
+          | IEEE802154_CAP_PHY_OQPSK
+          | IEEE802154_CAP_RX_TIMESTAMP,
     .write = _write,
     .read = _read,
     .request_on = _request_on,
