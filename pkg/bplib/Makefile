@@ -25,6 +25,9 @@ bplib_nc:
 bplib_init:
 	+"$(MAKE)" -C $(RIOTPKG)/bplib/init
 
+bplib_util:
+	+"$(MAKE)" -C $(RIOTPKG)/bplib/util
+
 # ----------------------------- Storage modules --------------------------------
 bplib_stor_vfs_ordered:
 	+"$(MAKE)" -C $(RIOTPKG)/bplib/storage/vfs/ordered
