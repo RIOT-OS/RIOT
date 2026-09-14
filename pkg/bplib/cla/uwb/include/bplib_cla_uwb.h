@@ -16,7 +16,7 @@
  * already be in a started state and decive configuration should already have
  * happened (with dwt_configure()). The other settings, like auto ACKs will be
  * enabled during the initialization of the CLA.
- * 
+ *
  * The remote short address will be taken from the @ref pkg_bplib_nc tables, so
  * bplib_contact_set_out_addr() needs to be configured before. The remote PAN is
  * set as the port. The local address and PAN is set with the corresponding
