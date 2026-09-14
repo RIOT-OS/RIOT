@@ -1,9 +1,6 @@
 /*
- * Copyright (C) 2015 Kaspar Schleiser <kaspar@schleiser.de>
- *
- * This file is subject to the terms and conditions of the GNU Lesser
- * General Public License v2.1. See the file LICENSE in the top level
- * directory for more details.
+ * SPDX-FileCopyrightText: 2015 Kaspar Schleiser <kaspar@schleiser.de>
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
 
 #pragma once
@@ -40,8 +37,10 @@
  * @author      Kaspar Schleiser <kaspar@schleiser.de>
  */
 
+#include <errno.h>
 #include <stddef.h>
 #include <stdint.h>
+#include <string.h>
 #include <time.h>
 #include <unistd.h>
 
@@ -422,6 +421,41 @@ size_t fmt_to_lower(char *out, const char *str);
  *                          to an invalid date/time format
  */
 int fmt_time_tm_iso8601(char out[20], const struct tm *tm, char separator);
+
+/**
+ * @brief Convert a string to a boolean value
+ *
+ * Recognizes "1", "true", "yes" and "on" as true, and "0", "false", "no" and "off"
+ * as false (case-sensitive).
+ *
+ * @param[in]   str  Pointer to string to read from
+ * @param[in]   n    Maximum nr of characters to consider
+ *
+ * @retval      1        if @p str is a truthy value
+ * @retval      0        if @p str is a falsy value
+ * @retval      -EINVAL  if @p str is neither a truthy nor a falsy value
+ */
+int scn_bool(const char *str, size_t n);
+
+/**
+ * @brief Convert a NUL-terminated string to a boolean value
+ *
+ * Convenience wrapper around scn_bool() that uses strlen(@p str) as
+ * length, so the whole string is considered.
+ *
+ * @param[in]   str  Pointer to NUL-terminated string to read from
+ *
+ * @retval      1        if @p str is a truthy value
+ * @retval      0        if @p str is a falsy value
+ * @retval      -EINVAL  if @p str is neither a truthy nor a falsy value
+ */
+static inline int scn_bool_str(const char *str)
+{
+    if (!str) {
+        return -EINVAL;
+    }
+    return scn_bool(str, strlen(str));
+}
 
 /**
  * @brief Convert string of decimal digits to uint32

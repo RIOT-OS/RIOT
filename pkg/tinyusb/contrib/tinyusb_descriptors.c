@@ -168,7 +168,7 @@ uint8_t const *tud_hid_descriptor_report_cb(uint8_t itf)
  * It fills the report buffer content and returns its length. Returning
  * zero will causes the stack to send a STALL request.
  *
- * @note: The function is only a dummy function and therefore defined as a weak
+ * @note  The function is only a dummy function and therefore defined as a weak
  *        symbol that can be overwritten by real functions if needed by the
  *        application. */
 __attribute__((weak))
@@ -188,7 +188,7 @@ uint16_t tud_hid_get_report_cb(uint8_t itf, uint8_t report_id,
 /* The function is invoked when SET_REPORT control request is received or
  * data are received on OUT endpoint (Report ID = 0, Type = 0).
  *
- * @note: The function is only a dummy function and therefore defined as a weak
+ * @note  The function is only a dummy function and therefore defined as a weak
  *        symbol that can be overwritten by real functions if needed by the
  *        application. */
 __attribute__((weak))

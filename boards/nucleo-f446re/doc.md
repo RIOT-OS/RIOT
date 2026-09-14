@@ -16,7 +16,7 @@ You can find general information about the Nucleo64 boards on the
 
 ## Pinout
 
-<img src="pinouts/nucleo-f446re.svg" alt="Pinout for the Nucleo-F446RE (from STM user manual UM1724, <http://www.st.com/resource/en/user_manual/dm00105823.pdf>, page 35)" width=50% />
+<img src="nucleo-f446re.svg" alt="Pinout for the Nucleo-F446RE (from STM user manual UM1724, <http://www.st.com/resource/en/user_manual/dm00105823.pdf>, page 35)" width=50% />
 
 ### MCU
 

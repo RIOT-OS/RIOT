@@ -40,7 +40,7 @@ include $(RIOTMAKE)/tools/gdb.inc.mk
 CFLAGS_STATIC_ANALYSIS := -fanalyzer
 
 # this needs to be recursively evaluated
-RCFLAGS_WRITE_SARIF = -fdiagnostics-set-output=sarif:file='$$@.sarif'
+RCFLAGS_WRITE_SARIF = -fdiagnostics-add-output=sarif:file='$$@.sarif'
 
 # Data address spaces starts at zero for all supported architectures. This fixes
 # compilation at least on MSP430 and AVR.

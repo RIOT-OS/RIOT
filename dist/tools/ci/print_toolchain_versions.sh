@@ -7,7 +7,7 @@ get_cmd_version() {
         return
     fi
 
-    VERSION_RAW=$( ($@ --version) 2>&1)
+    VERSION_RAW=$( ("$@" --version) 2>&1)
     ERR=$?
     VERSION=$(echo "$VERSION_RAW" | head -n 1)
 
@@ -23,7 +23,7 @@ get_cmd_version() {
 get_define() {
     local cc="$1"
     local line=
-    if command -v "$cc" 2>&1 >/dev/null; then
+    if command -v "$cc" > /dev/null 2>&1; then
         line=$(echo "$3" | "$cc" -x c -include "$2" -E -o - - 2>/dev/null | sed -e '/^[   ]*#/d' -e '/^[  ]*$/d')
     fi
     if [ -z "$line" ]; then
@@ -37,12 +37,13 @@ get_kernel_info() {
 }
 
 get_os_info() {
-    local os="$(uname -s)"
+    local os
+    os=$(uname -s)
     local osname="unknown"
     local osvers="unknown"
     if [ "$os" = "Linux" ]; then
-        osname="$(cat /etc/os-release | grep ^NAME= | awk -F'=' '{print $2}')"
-        osvers="$(cat /etc/os-release | grep ^VERSION= | awk -F'=' '{print $2}')"
+        osname="$(grep ^NAME= /etc/os-release | awk -F'=' '{print $2}')"
+        osvers="$(grep ^VERSION= /etc/os-release | awk -F'=' '{print $2}')"
     elif [ "$os" = "Darwin" ]; then
         osname="$(sw_vers -productName)"
         osvers="$(sw_vers -productVersion)"
@@ -54,7 +55,7 @@ get_os_info() {
 }
 
 extract_shell_version() {
-    SHELL_NAME=$"(basename $1)"
+    SHELL_NAME="$(basename "$1")"
     SHELL_VERSION="$($1 --version 2>/dev/null)"
     ERR=$?
     if [ $ERR -ne 0 ] ; then # if it does not like the --version switch, it is probably dash
@@ -112,7 +113,7 @@ avr_libc_version() {
 printf "\n"
 printf "%s\n" "RIOT version information"
 printf "%s\n" "----------------------------"
-if [ -d .git ]; then
+if git rev-parse --is-inside-work-tree >/dev/null 2>&1; then
     RIOT_BRANCH=$(git rev-parse --abbrev-ref HEAD)
     RIOT_COMMIT_HASH=$(git rev-parse HEAD)
     RIOT_COMMIT_DATE=$(git log -1 --format=%cd --date=short)
@@ -153,6 +154,11 @@ for p in \
     printf "%25s: %s\n" "$p-gcc" "$(get_cmd_version ${p}-gcc)"
 done
 printf "%25s: %s\n" "clang" "$(get_cmd_version clang)"
+printf "\n"
+printf "%s\n" "Installed container tools"
+printf "%s\n" "-------------------------"
+printf "%25s: %s\n" "docker" "$(get_cmd_version docker)"
+printf "%25s: %s\n" "podman" "$(get_cmd_version podman)"
 printf "\n"
 printf "%s\n" "Installed compiler libs"
 printf "%s\n" "-----------------------"

@@ -29,8 +29,6 @@ extern "C" {
 
 /**
  * @brief obtain IOCFG-register for a DIO
- *
- * @param[in] dio_num DIO number (0-31)
  */
 typedef struct {
     reg32_t CFG[32]; /**< Config */

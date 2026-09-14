@@ -6,10 +6,7 @@
 #pragma once
 
 /**
- * @defgroup    cpu_cortexm_common ARM Cortex-M common
- * @ingroup     cpu
- * @brief       Common implementations and headers for Cortex-M family based
- *              micro-controllers
+ * @ingroup     cpu_cortexm_common
  * @{
  *
  * @file

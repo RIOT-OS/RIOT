@@ -2,7 +2,7 @@
  * Copyright (c) 2015, Freescale Semiconductor, Inc.
  * Copyright 2016-2017 NXP
  * All rights reserved.
- * 
+ *
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
@@ -91,7 +91,6 @@ extern "C" {
  * @param   port            GPIO port to mux (value from 0 ~ 1)
  * @param   pin             GPIO pin to mux (value from 0 ~ 31)
  * @param   modeFunc        OR'ed values of type IOCON_*
- * @return  Nothing
  */
 __STATIC_INLINE void IOCON_PinMuxSet(SYSCON_Type *base, uint8_t port, uint8_t pin, uint32_t modeFunc)
 {
@@ -151,7 +150,6 @@ __STATIC_INLINE void IOCON_PinMuxSet(SYSCON_Type *base, uint8_t port, uint8_t pi
  * @param   base            The base of SYSCON peripheral on the chip
  * @param   pinArray        Pointer to array of pin mux selections
  * @param   arrayLength     Number of entries in pinArray
- * @return  Nothing
  */
 __STATIC_INLINE void IOCON_SetPinMuxing(SYSCON_Type *base, const iocon_group_t *pinArray, uint32_t arrayLength)
 {
@@ -169,7 +167,6 @@ __STATIC_INLINE void IOCON_SetPinMuxing(SYSCON_Type *base, const iocon_group_t *
  * @param   port            GPIO port (value from 0 ~ 1)
  * @param   pin             GPIO pin (value from 0 ~ 31)
  * @param   func            Pin fucntion (value from 0 ~ 7)
- * @return  Nothing
  */
 __STATIC_INLINE void IOCON_FuncSet(SYSCON_Type *base, uint8_t port, uint8_t pin, uint8_t func)
 {
@@ -215,7 +212,6 @@ __STATIC_INLINE void IOCON_FuncSet(SYSCON_Type *base, uint8_t port, uint8_t pin,
  *        - kIOCON_HighDriveStrength = 1U - High-drive strength is configured
  *        - kIOCON_LowDriveWithExtraStrength = 2U - Low-drive with extra strength is configured
  *        - kIOCON_HighDriveWithExtraStrength = 3U - High-drive with extra strength is configured
- * @return  Nothing
  */
 __STATIC_INLINE void IOCON_DriveSet(SYSCON_Type *base, uint8_t port, uint8_t pin, uint8_t strength)
 {
@@ -238,7 +234,6 @@ __STATIC_INLINE void IOCON_DriveSet(SYSCON_Type *base, uint8_t port, uint8_t pin
  *        - kIOCON_HighZ = 0U - High Z is configured.
  *        - kIOCON_PullDown = 1U - Pull-down is configured
  *        - kIOCON_PullUp = 2U - Pull-up is configured
- * @return  Nothing
  */
 __STATIC_INLINE void IOCON_PullSet(SYSCON_Type *base, uint8_t port, uint8_t pin, uint8_t pullMode)
 {

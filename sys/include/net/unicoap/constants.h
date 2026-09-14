@@ -1,11 +1,8 @@
 /*
- * Copyright (C) 2024-2025 Carl Seifert
- * Copyright (C) 2024-2025 TU Dresden
- * Copyright (C) 2018 Freie Universität Berlin
- *
- * This file is subject to the terms and conditions of the GNU Lesser General
- * Public License v2.1. See the file LICENSE in the top level directory for
- * more details.
+ * SPDX-FileCopyrightText: 2024-2025 Carl Seifert
+ * SPDX-FileCopyrightText: 2024-2025 TU Dresden
+ * SPDX-FileCopyrightText: 2018 Freie Universität Berlin
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
 
 #pragma once
@@ -20,7 +17,7 @@
  * @file
  * @brief   Constants used in CoAP such as option numbers and message codes
  * @ingroup net_unicoap_message
- * @author  Carl Seifert <carl.seifert1@mailbox.tu-dresden.de>
+ * @author  Carl Seifert <carl.seifert@tu-dresden.de>
  * @author  Hauke Petersen <hauke.petersen@fu-berlin.de>
  */
 
@@ -413,8 +410,6 @@ static_assert(sizeof(unicoap_status_t) == sizeof(uint8_t),
  */
 /**
  * @brief CoAP option number
- *
- * These option numbers are not valid in signaling messages.
  */
 typedef enum {
     /**

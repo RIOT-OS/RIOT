@@ -31,15 +31,6 @@ including Bluetooth Low Energy, Thread and Zigbee.
 | MCU Manual            | [Manual](https://docs-be.nordicsemi.com/bundle/ps_nrf52840/attach/nRF52840_PS_v1.11.pdf)                          |
 | Board Documentation   | [Documentation](https://docs.nordicsemi.com/bundle/ug_nrf52840_dk/page/UG/dk/intro.html)                          |
 
-### RESET pin configuration
-
-On many (all?) nrf52840dk boards, the reset pin is not configured out-of-the box.
-This means, that simply nothing happens if the RESET pin is pressed. To change
-this, RIOT provides a little tool in `dist/tools/nrf52_resetpin_cfg`.
-
-Simply compile, flash, and run that tool on your board, and the reset pin should
-work for the time being.
-
 ## Flash the board
 
 See the `Flashing` section in @ref boards_common_nrf52.

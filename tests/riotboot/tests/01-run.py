@@ -25,9 +25,9 @@ class RiotbootDevice:
             "riotboot/flash-slot{}".format(self.slot_num),
             "APP_VER={}".format(self.app_ver),
         ]
-        assert(self.slot_num is not None)
-        assert(self.app_ver is not None)
-        assert subprocess.call(cmd) == 0
+        assert (self.slot_num is not None)
+        assert (self.app_ver is not None)
+        assert (subprocess.call(cmd) == 0)
 
     def get_current_slot_and_app_ver(self, child):
         # Ask for current slot, should be 0 or 1

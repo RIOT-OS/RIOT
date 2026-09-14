@@ -42,12 +42,22 @@ typedef void (*u8g2_init_function_t)(u8g2_t *u8g2, const u8g2_cb_t *rotation, u8
  * @brief   U8G2 display initialization parameters
  */
 typedef struct {
-    u8g2_init_function_t init_function;         /**< Initialization function for u8g2 */
-    u8x8_riotos_t peripheral_configuration;     /**< Peripheral configuration for RIOT-OS */
+    u8g2_init_function_t init_function;     /**< Initialization function for u8g2 */
+    u8x8_riotos_t peripheral_configuration; /**< Peripheral configuration for RIOT-OS */
+    uint8_t i2c_address;                    /**< I2C address of the display. Set to 0 when using SPI. */
     /**
-     * I2C address of the display. Set to 0 when using SPI.
+     * @brief Rotation function for u8g2, to control the display orientation.
+     *
+     * Valid values, defined in u8g2.h, are:
+     * - `U8G2_R0`: No rotation, landscape
+     * - `U8G2_R1`: 90 degree clockwise rotation
+     * - `U8G2_R2`: 180 degree clockwise rotation
+     * - `U8G2_R3`: 270 degree clockwise rotation
+     * - `U8G2_MIRROR`: No rotation, landscape, display content is mirrored
+     *
+     * @see For more details, check: https://github.com/olikraus/u8g2/wiki/u8g2setupc#setup-arguments
      */
-    uint8_t i2c_address;
+    const u8g2_cb_t *rotation_function;
 } u8g2_display_params_t;
 
 /**

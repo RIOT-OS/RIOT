@@ -1,0 +1,14 @@
+# the board uses an ESP32-S3R2 with 2 MB embedded SPI RAM.
+CPU_MODEL = esp32s3_r2
+
+# common board and CPU features
+include $(RIOTBOARD)/common/esp32s3/Makefile.features
+
+# peripherals provided by the board
+FEATURES_PROVIDED += periph_adc
+FEATURES_PROVIDED += periph_i2c
+FEATURES_PROVIDED += periph_spi
+FEATURES_PROVIDED += periph_usbdev
+
+# other features provided by the board
+FEATURES_PROVIDED += esp_spi_ram

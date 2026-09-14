@@ -1,3 +1,6 @@
+// SPDX-FileCopyrightText: 2019-2021 Raspberry Pi (Trading) Ltd.
+// SPDX-License-Identifier: BSD-3-Clause
+// origin: https://github.com/raspberrypi/pico-sdk/tree/master/src/rp2040/boot_stage2
 // Padded and checksummed version of: boot2_w25q080.bin
 
 .cpu cortex-m0plus

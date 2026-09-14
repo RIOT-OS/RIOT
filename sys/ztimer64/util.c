@@ -103,7 +103,7 @@ int ztimer64_msg_receive_until(ztimer64_clock_t *clock, msg_t *msg,
     }
 
     ztimer64_t t;
-    msg_t m = { .type = MSG_ZTIMER, .content.ptr = &m };
+    msg_t m = { .type = MSG_ZTIMER64, .content.ptr = &m };
 
     ztimer64_set_msg_at(clock, &t, target, &m, thread_getpid());
 

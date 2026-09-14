@@ -187,6 +187,7 @@ static void IRAM _sys_isr(void *arg)
         return;
     }
 
+    irq_isr_enter();
     /* disable alarms first */
     timer_ll_enable_intr(sys_timer.dev, TIMER_LL_EVENT_ALARM(sys_timer.timer_id), false);
     timer_ll_enable_alarm(sys_timer.dev, sys_timer.timer_id, false);
@@ -214,6 +215,7 @@ static void IRAM _sys_isr(void *arg)
         /* call the alarm handler afterwards if callback was defined */
         alarm_cb(alarm_arg);
     }
+    irq_isr_exit();
 }
 
 const rtt_hw_driver_t _rtt_hw_sys_driver = {

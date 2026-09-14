@@ -177,6 +177,34 @@ extern "C" {
 #endif
 
 /**
+ * @brief   Emit an attribute (if supported by the compiler) that declares how
+ *          a function will access its parameters
+ *
+ * @note    The annotation can be repeated for every applicable pair of pointer
+ *          and size.
+ * @param   mode        Any of: `read_only`, `read_write`, `write_only`, or
+ *                      `none`
+ * @param   ptr_idx     **Position** of the argument that points to the data
+ *                      to access (e.g. 1 = first argument)
+ * @param   size_idx    **Position** of the argument that gives the size in
+ *                      terms of array elements (or bytes in case of `void *`)
+ *
+ * @note    This is supported in [GCC since 10.1.0](https://gcc.gnu.org/onlinedocs/gcc-10.1.0/gcc/Common-Function-Attributes.html).
+ *          If the compiler does not support this attribute, it will be a no-op.
+ */
+#if DOXYGEN
+#  define ACCESS(mode, ptr_idx, size_idx) implementation_defined
+#elif defined(__has_attribute)
+#  if __has_attribute(access)
+#    define ACCESS(mode, ptr_idx, size_idx) __attribute__((access(mode, ptr_idx, size_idx)))
+#  else
+#    define ACCESS(mode, ptr_idx, size_idx)
+#  endif
+#else
+#  define ACCESS(mode, ptr_idx, size_idx)
+#endif
+
+/**
  * @brief   Hint to the compiler that the condition @p x is likely taken
  *
  * @param[in] x     Condition that is likely taken

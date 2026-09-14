@@ -1,0 +1,37 @@
+MODULE=decadriver
+
+ifneq (,$(filter decadriver_dw3000,$(USEMODULE)))
+  SRC += dwt_uwb_driver/dw3000/dw3000_device.c
+  CFLAGS += -DCONFIG_DW3000_CHIP_DW3000=1
+endif
+
+ifneq (,$(filter decadriver_dw3720,$(USEMODULE)))
+  SRC += dwt_uwb_driver/dw3720/dw3720_device.c
+  CFLAGS += -DCONFIG_DW3000_CHIP_DW3720=1
+endif
+
+SRC += dwt_uwb_driver/deca_interface.c
+SRC += dwt_uwb_driver/deca_rsl.c
+SRC += dwt_uwb_driver/lib/qmath/src/qmath.c
+
+SRC += platform/deca_compat.c
+SRC += platform/dw3000_spi_trace.c
+
+INCLUDES += -I$(PKGDIRBASE)/decadriver/dwt_uwb_driver/lib/qmath/include
+
+CFLAGS += -Wno-overflow
+CFLAGS += -Wno-unused-parameter
+CFLAGS += -Wno-pointer-to-int-cast
+CFLAGS += -Wno-unused-but-set-variable
+CFLAGS += -Wno-unused-function
+CFLAGS += -Wno-return-type
+CFLAGS += -Wno-constant-conversion
+CFLAGS += -Wno-unknown-attributes
+
+# The ESP8266 compiler errorneously creates signed outputs from unsigned inputs
+# on shift operations.
+ifeq (esp8266,$(CPU))
+  CFLAGS += -Wno-sign-compare
+endif
+
+include $(RIOTBASE)/Makefile.base

@@ -1,9 +1,6 @@
 /*
- * Copyright (C) 2021 Freie Universität Berlin
- *
- * This file is subject to the terms and conditions of the GNU Lesser
- * General Public License v2.1. See the file LICENSE in the top level
- * directory for more details.
+ * SPDX-FileCopyrightText: 2021 Freie Universität Berlin
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
 
 /**
@@ -516,8 +513,11 @@ static int _do_block(coap_pkt_t *pdu, const sock_udp_ep_t *remote,
     bool more;
     coap_block_slicer_t slicer;
 
-    coap_block_slicer_init(&slicer, context->cur_blk_num++,
-                           CONFIG_GCOAP_DNS_BLOCK_SIZE);
+    int res = coap_block_slicer_init(&slicer, context->cur_blk_num++,
+                                     CONFIG_GCOAP_DNS_BLOCK_SIZE);
+    if (res) {
+        return res;
+    }
     tl_type = _req_init(pdu, &_uri_comp, true);
     if (tl_type == GCOAP_SOCKET_TYPE_UNDEF) {
         return -EINVAL;
@@ -537,9 +537,8 @@ static int _do_block(coap_pkt_t *pdu, const sock_udp_ep_t *remote,
     }
     len = coap_opt_finish(pdu, COAP_OPT_FINISH_PAYLOAD);
 
-    int res = coap_blockwise_put_bytes_pkt(pdu, &slicer,
-                                           context->dns_buf,
-                                           context->dns_buf_len);
+    res = coap_blockwise_put_bytes_pkt(pdu, &slicer, context->dns_buf,
+                                       context->dns_buf_len);
 
     if (res) {
         return res;

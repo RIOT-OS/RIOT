@@ -132,7 +132,8 @@ static const unsigned char hpangramm_no_more[] =
                                     0x10, 0x91, 0xc4, 0x94, 0x89, 0x26, 0xae, 0x1c,
                                     0x94, 0x88, 0xdd, 0xda, 0xe1, 0x80, 0xbb, 0x80};
 /* exchanged `z` with `k` of the first word `Fran[z|k]` */
-static const char *spangramm_no_more = "Frank jagt im komplett verwahrlosten Taxi quer durch Bayern";
+static const char *spangramm_no_more = "Frank jagt im komplett verwahrlosten "
+                                       "Taxi quer durch Bayern";
 
 /**
  * @brief expected hash for test empty
@@ -366,8 +367,9 @@ static void test_hashes_sha512_hash_clear_ctx(void)
 
     TEST_ASSERT(memcmp(hempty, hash, SHA512_DIGEST_LENGTH) == 0);
     for (size_t i=0; i<sizeof(sha512_context_t); i++) {
-        if (((uint8_t*)&sha512)[i] != 0)
+        if (((uint8_t*)&sha512)[i] != 0) {
             TEST_FAIL("sha512_context_t not completely cleared.");
+        }
     }
 }
 

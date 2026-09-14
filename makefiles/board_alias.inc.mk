@@ -27,9 +27,9 @@ ifneq (, $(_BOARD_ALIAS_USED))
   TEST_ON_CI_BLACKLIST += $(if $(filter $(_alias),$(_test_blacklist)), $(_board))
   # inform the user about the alias
   ifeq (native,$(_alias))
-    $(shell echo 'using BOARD="$(_board)" as "$(_alias)" on a $(_platform_bits)-bit system' 1>&2)
+    $(call echoinfo,("using BOARD=\"$(_board)\" as \"$(_alias)\" on a $(_platform_bits)-bit system"))
   else
-    MSG="Warning: BOARD=\"$(_alias)\" is a deprecated alias. Consider using BOARD=\"$(_board)\" instead."
-    $(shell $(COLOR_ECHO) "$(COLOR_RED)$(MSG)$(COLOR_RESET)" 1>&2)
+    $(call echoerr,("Warning: BOARD=\"$(_alias)\" is a deprecated alias."\
+                    "Consider using BOARD=\"$(_board)\" instead."))
   endif
 endif

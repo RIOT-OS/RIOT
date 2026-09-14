@@ -1,0 +1,63 @@
+From 5cbdcf0a951b79fa87a4473c47faed051580e3e3 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Mikolai=20G=C3=BCtschow?= <mikolai.guetschow@tu-dresden.de>
+Date: Tue, 12 May 2026 15:01:14 +0200
+Subject: [PATCH 7/7] Wrapper targets: also print when stderr is used
+
+Matching the behavior of the newlib and picolibc RIOT integration
+---
+ printf.c | 18 ++++++++++++------
+ 1 file changed, 12 insertions(+), 6 deletions(-)
+
+diff --git a/printf.c b/printf.c
+index 6604ee0..53a25db 100644
+--- a/printf.c
++++ b/printf.c
+@@ -997,7 +997,10 @@ int __wrap_putchar(int c)
+ __attribute__((used))
+ int __wrap_putc(int c, FILE *stream)
+ {
+-  (void)stream;
++  if (stream != stdout && stream != stderr) {
++    return EOF;
++  }
++
+   _putchar((char)c);
+   return 1;
+ }
+@@ -1021,7 +1024,10 @@ int __wrap_puts(const char *s)
+ __attribute__((used))
+ int __wrap_fputs(const char *s, FILE *stream)
+ {
+-  (void)stream;
++  if (stream != stdout && stream != stderr) {
++    return EOF;
++  }
++
+   size_t len = strlen(s);
+   write_all(s, len);
+   return len;
+@@ -1031,8 +1037,8 @@ int __wrap_fputs(const char *s, FILE *stream)
+ __attribute__((used))
+ int __wrap_vfprintf(FILE *stream, const char *format, va_list va)
+ {
+-  if (stream != stdout) {
+-    return 0;
++  if (stream != stdout && stream != stderr) {
++    return EOF;
+   }
+ 
+   return vprintf_(format, va);
+@@ -1053,8 +1059,8 @@ int __wrap_fprintf(FILE *stream, const char *format, ...)
+ __attribute__((used))
+ int __wrap_vdprintf(int fd, const char *format, va_list va)
+ {
+-  if (fd != STDOUT_FILENO) {
+-    return 0;
++  if (fd != STDOUT_FILENO && fd != STDERR_FILENO) {
++    return EOF;
+   }
+ 
+   return vprintf_(format, va);
+-- 
+2.39.5
+

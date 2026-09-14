@@ -1,0 +1,28 @@
+# SPDX-FileCopyrightText: 2026 Technische Universität Hamburg
+# SPDX-License-Identifier: LGPL-2.1-only
+
+# CPU models
+
+config CPU_MODEL_STM32U385CG
+    bool
+    select CPU_LINE_STM32U385XX
+
+config CPU_MODEL_STM32U385KG
+    bool
+    select CPU_LINE_STM32U385XX
+
+config CPU_MODEL_STM32U385RG
+    bool
+    select CPU_LINE_STM32U385XX
+
+config CPU_MODEL_STM32U385VG
+    bool
+    select CPU_LINE_STM32U385XX
+
+# Configure CPU model
+
+config CPU_MODEL
+    default "stm32u385cg" if CPU_MODEL_STM32U385CG
+    default "stm32u385kg" if CPU_MODEL_STM32U385KG
+    default "stm32u385rg" if CPU_MODEL_STM32U385RG
+    default "stm32u385vg" if CPU_MODEL_STM32U385VG

@@ -273,6 +273,7 @@ struct _thread {
  *                      @ref SCHED_PRIO_LEVELS or @p stacksize is too small
  * @retval  -EOVERFLOW  there are too many threads running already
  */
+ACCESS(write_only, 1, 2)
 kernel_pid_t thread_create(char *stack,
                            int stacksize,
                            uint8_t priority,
@@ -463,6 +464,7 @@ static inline thread_t *thread_get_active(void)
  *
  * @return stack pointer
  */
+ACCESS(write_only, 3, 4)
 char *thread_stack_init(thread_task_func_t task_func, void *arg,
                         void *stack_start, int stack_size);
 
@@ -516,6 +518,7 @@ static inline const char *thread_getname(kernel_pid_t pid)
  *
  * @return              the amount of unused space of the thread's stack
  */
+ACCESS(read_only, 1, 2)
 uintptr_t measure_stack_free_internal(const char *stack, size_t size);
 
 /**

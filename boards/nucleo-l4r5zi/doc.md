@@ -16,7 +16,7 @@ You can find general information about the Nucleo144 boards on the
 
 ## Pinout
 
-<img src="pinouts/nucleo-l4r5zi.svg"  alt="Pinout for the Nucleo-L4R5ZI (from STM user manual, UM2179, http://www.st.com/st-web-ui/static/active/en/resource/technical/document/user_manual/um2179-stm32-nucleo144-boards-mb1312-stmicroelectronics.pdf, page 35)" width=55% />
+<img src="nucleo-l4r5zi.svg"  alt="Pinout for the Nucleo-L4R5ZI (from STM user manual, UM2179, http://www.st.com/st-web-ui/static/active/en/resource/technical/document/user_manual/um2179-stm32-nucleo144-boards-mb1312-stmicroelectronics.pdf, page 35)" width=55% />
 
 ### MCU
 

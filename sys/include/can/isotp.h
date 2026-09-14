@@ -1,9 +1,6 @@
 /*
- * Copyright (C) 2016 OTA keys S.A.
- *
- * This file is subject to the terms and conditions of the GNU Lesser General
- * Public License v2.1. See the file LICENSE in the top level directory for more
- * details.
+ * SPDX-FileCopyrightText: 2016 OTA keys S.A.
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
 
 #pragma once
@@ -26,29 +23,30 @@ extern "C" {
 
 #include "can/can.h"
 #include "can/common.h"
+#include "compiler_hints.h"
+#include "net/gnrc/pktbuf.h"
 #include "thread.h"
 #include "ztimer.h"
-#include "net/gnrc/pktbuf.h"
 
 #ifndef CAN_ISOTP_BS
 /**
  * @brief   Default Block Size for RX Flow Control frames
  */
-#define CAN_ISOTP_BS        (10)
+#  define CAN_ISOTP_BS (10)
 #endif
 
 #ifndef CAN_ISOTP_STMIN
 /**
  * @brief   Default STmin for RX Flow Control frames
  */
-#define CAN_ISOTP_STMIN     (5)
+#  define CAN_ISOTP_STMIN (5)
 #endif
 
 #ifndef CAN_ISOTP_WFTMAX
 /**
  * @brief   Default maximum WFT for TX Flow Control
  */
-#define CAN_ISOTP_WFTMAX    (1)
+#  define CAN_ISOTP_WFTMAX (1)
 #endif
 
 /**
@@ -168,6 +166,7 @@ kernel_pid_t isotp_init(char *stack, int stacksize, char priority, const char *n
  * @return the number of bytes sent
  * @return < 0 if an error occurred  (-EBUSY, -ENOMEM)
  */
+ACCESS(read_only, 2, 3)
 int isotp_send(struct isotp *isotp, const void *buf, int len, int flags);
 
 /**

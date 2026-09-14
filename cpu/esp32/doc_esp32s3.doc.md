@@ -222,7 +222,8 @@ of the `periph_sdmmc_8bit` module.
 
 The following example shows a configuration with 4-bit or 8-bit data
 bus width dependent on whether the `periph_sdmmc_8bit` module is enabled.
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~{.c}
+
+```c
 static const sdmmc_conf_t sdmmc_config[] = {
     {
         .slot = SDMMC_SLOT_0,
@@ -244,7 +245,7 @@ static const sdmmc_conf_t sdmmc_config[] = {
 };
 
 #define SDMMC_NUMOF 1
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+```
 
 If the board supports a Card Detect pin or a Write Protect pin, the
 corresponding GPIOs have to be defined in @ref sdmmc_conf_t::cd and

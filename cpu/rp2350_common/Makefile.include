@@ -8,9 +8,9 @@ RAM_START_ADDR  := 0x20000000 # Non-Secure RAM address for rp2350
 CFLAGS += -DCPU_FAM_$(call uppercase_and_underscore,$(CPU_FAM))
 
 INCLUDES += -I$(RIOTCPU)/rp2350_common/include
-INCLUDES += -isystem$(RIOTBASE)/build/pkg/picosdk/src/rp2_common/cmsis/stub/CMSIS/Core/Include
-INCLUDES += -isystem$(RIOTBASE)/build/pkg/picosdk/src/rp2_common/cmsis/stub/CMSIS/Device/RP2350/Include
-INCLUDES += -isystem$(RIOTBASE)/build/pkg/picosdk/src/rp2350/hardware_regs/include/hardware
+INCLUDES += -isystem$(PKGDIRBASE)/picosdk/src/rp2_common/cmsis/stub/CMSIS/Core/Include
+INCLUDES += -isystem$(PKGDIRBASE)/picosdk/src/rp2_common/cmsis/stub/CMSIS/Device/RP2350/Include
+INCLUDES += -isystem$(PKGDIRBASE)/picosdk/src/rp2350/hardware_regs/include/hardware
 
 # Supported programmers and debuggers
 PROGRAMMERS_SUPPORTED := picotool openocd jlink

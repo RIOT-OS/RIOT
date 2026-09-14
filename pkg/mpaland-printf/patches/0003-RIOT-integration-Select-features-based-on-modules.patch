@@ -1,7 +1,7 @@
-From 4d6939143a251b93022980a472f2bcd9c42b8573 Mon Sep 17 00:00:00 2001
+From 811f4148888fdd11209c485a78212916eec96822 Mon Sep 17 00:00:00 2001
 From: Marian Buschsieweke <marian.buschsieweke@posteo.net>
 Date: Sat, 11 May 2024 18:38:51 +0200
-Subject: [PATCH 3/4] RIOT integration: Select features based on modules
+Subject: [PATCH 3/7] RIOT integration: Select features based on modules
 
 Using module `printf_float` adds support for printing floats, using
 module `printf_long_long` adds support for printing `long long` or
@@ -11,7 +11,7 @@ module `printf_long_long` adds support for printing `long long` or
  1 file changed, 4 insertions(+), 4 deletions(-)
 
 diff --git a/printf.c b/printf.c
-index d560d2b..6923fee 100644
+index 2133eb2..f43a500 100644
 --- a/printf.c
 +++ b/printf.c
 @@ -60,8 +60,8 @@
@@ -37,5 +37,5 @@ index d560d2b..6923fee 100644
  #endif
  
 -- 
-2.49.0
+2.39.5
 

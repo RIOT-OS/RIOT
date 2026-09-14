@@ -1,0 +1,1 @@
+TweetNaCl is a self-contained public-domain C library, so it can easily be integrated into applications.

@@ -28,10 +28,10 @@
  *
  * **To have a viable executable file within XiPFS**, please follow these steps :
  * - create a file with executable flag.
- * - Fill it with actual compiled code in an appropriate file format, here XiPFS-Format.
+ * - Fill it with actual compiled code in an appropriate file format, here FAE format.
  * *This is where the actual startup sequence and relocation happen*.
  * - Call execute on it with appropriate args *at least the executable filename should be passed along*.
  *
- * @see      https://github.com/2xs/xipfs
- * @see      https://github.com/2xs/XiPFS_Format
+ * @see      https://github.com/2xs/xipfs/tree/main
+ * @see      https://github.com/2xs/fae_format/tree/master
  */

@@ -10,15 +10,15 @@
  * @author  Bennet Hattesen <bennet.hattesen@haw-hamburg.de>
  */
 #include "checksum/crc16_ccitt.h"
-#include "net/nanocoap.h"
+#include "event.h"
+#include "net/unicoap/transport.h"
 #include "slipdev.h"
 #include "slipdev_internal.h"
 
 /* The special init is the result of normal fcs init combined with slipmux config start (0xa9) */
 #define SPECIAL_INIT_FCS (0x374cU)
-#define COAP_STACKSIZE (1024)
 
-static char coap_stack[COAP_STACKSIZE];
+static event_queue_t *queue = NULL;
 
 static inline void _slipdev_lock(void)
 {
@@ -34,62 +34,70 @@ static inline void _slipdev_unlock(void)
     }
 }
 
-void *_coap_server_thread(void *arg)
+/* called in ISR context */
+void slipdev_coap_dispatch_recv(event_t *event)
 {
-    static uint8_t buf[512];
-    slipdev_t *dev = arg;
+    if (queue) {
+        event_post(queue, event);
+    }
+}
 
-    while (1) {
-        thread_flags_wait_any(1);
-        size_t len;
-        while (crb_get_chunk_size(&dev->rb_config, &len)) {
-            if (len > sizeof(buf)) {
-                crb_consume_chunk(&dev->rb_config, NULL, len);
-                continue;
-            }
-            crb_consume_chunk(&dev->rb_config, buf, len);
+void slipdev_coap_set_event_queue(event_queue_t *q)
+{
+    queue = q;
+}
 
-            /* Is the crc correct via residue(=0xF0B8) test */
-            if (crc16_ccitt_fcs_update(SPECIAL_INIT_FCS, buf, len) != 0xF0B8) {
-                break;
-            }
+void slipdev_coap_unset_event_queue(void)
+{
+    queue = NULL;
+}
 
-            /* cut off the FCS checksum at the end */
-            size_t pktlen = len - 2;
+int slipdev_coap_recv(uint8_t *buf, size_t buf_size, slipdev_t *dev)
+{
+    size_t len;
 
-            coap_pkt_t pkt;
-            sock_udp_ep_t remote;
-            coap_request_ctx_t ctx = {
-                .remote = &remote,
-            };
-            if (coap_parse(&pkt, buf, pktlen) < 0) {
-                break;
-            }
-            unsigned int res = 0;
-            if ((res = coap_handle_req(&pkt, buf, sizeof(buf), &ctx)) <= 0) {
-                break;
-            }
+    if (crb_get_chunk_size(&dev->rb_config, &len)) {
+        if ((len > buf_size) || (len <= 2)) {
+            crb_consume_chunk(&dev->rb_config, NULL, len);
+            return -1;
+        }
+        crb_consume_chunk(&dev->rb_config, buf, len);
 
-            uint16_t fcs_sum = crc16_ccitt_fcs_finish(SPECIAL_INIT_FCS, buf, res);
+        /* Is the crc correct via residue(=0xF0B8) test */
+        if (crc16_ccitt_fcs_update(SPECIAL_INIT_FCS, buf, len) != 0xF0B8) {
+            return -2;
+        }
+        /* cut off the FCS checksum at the end */
+        size_t pktlen = len - 2;
 
-            _slipdev_lock();
-            slipdev_write_byte(dev->config.uart, SLIPDEV_START_COAP);
-            slipdev_write_bytes(dev->config.uart, buf, res);
-            slipdev_write_bytes(dev->config.uart, (uint8_t *)&fcs_sum, 2);
-            slipdev_write_byte(dev->config.uart, SLIPDEV_END);
-            _slipdev_unlock();
+        return pktlen;
+    }
+    return 0;
+}
+
+void slipdev_coap_send(const iolist_t *iolist, const slipdev_t *dev)
+{
+    uint16_t fcs_sum = SPECIAL_INIT_FCS;
+    _slipdev_lock();
+    slipdev_write_byte(dev->config.uart, SLIPDEV_START_COAP);
+
+    for (const iolist_t *iol = iolist; iol; iol = iol->iol_next) {
+        if (iol->iol_len) {
+            fcs_sum = crc16_ccitt_fcs_update(fcs_sum, iol->iol_base, iol->iol_len);
+            slipdev_write_bytes(dev->config.uart, iol->iol_base, iol->iol_len);
         }
     }
 
-    return NULL;
+    fcs_sum = crc16_ccitt_fcs_finish(fcs_sum, NULL, 0);
+    slipdev_write_bytes(dev->config.uart, (uint8_t *)&fcs_sum, 2);
+    slipdev_write_byte(dev->config.uart, SLIPDEV_END);
+    _slipdev_unlock();
 }
 
-void slipdev_setup_coap(slipdev_t *dev) {
+void slipdev_setup_coap(slipdev_t *dev)
+{
     crb_init(&dev->rb_config, dev->rxmem_config, sizeof(dev->rxmem_config));
-
-    dev->coap_server_pid = thread_create(coap_stack, sizeof(coap_stack), THREAD_PRIORITY_MAIN - 1,
-                                         THREAD_CREATE_STACKTEST, _coap_server_thread,
-                                         (void *)dev, "Slipmux CoAP server");
+    dev->rxevent.handler = unicoap_slipdev_recv_handler;
 }
 
 /** @} */

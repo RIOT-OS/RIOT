@@ -846,8 +846,11 @@ int
 devopen(const char *dev, int flags)
 {
     char t[1024];
-    strcpy(t, "/dev/");
-    strcat(t, dev);
+    int written_len = snprintf(t, sizeof(t), "/dev/%s", dev);
+    if (written_len >= sizeof(t)) {
+        /* we got truncated */
+        return -1;
+    }
     return open(t, flags);
 }
 

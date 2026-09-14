@@ -1,3 +1,8 @@
+/*
+ * SPDX-FileCopyrightText: 2024 Marian Buschsieweke
+ * SPDX-License-Identifier: LGPL-2.1-only
+ */
+
 #include "irq.h"
 #include "macros/math.h"
 #include "mutex.h"

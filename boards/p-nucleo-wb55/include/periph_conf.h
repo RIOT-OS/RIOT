@@ -189,12 +189,12 @@ static const stm32_usbdev_fs_config_t stm32_usbdev_fs_config[] = {
  * @{
  */
 static const adc_conf_t adc_config[] = {
-    {GPIO_PIN(PORT_C, 0), 0, 1},  /*< ADC1_IN1 */
-    {GPIO_PIN(PORT_C, 1), 0, 2},  /*< ADC1_IN2 */
-    {GPIO_PIN(PORT_A, 1), 0, 6},  /*< ADC1_IN6 */
-    {GPIO_PIN(PORT_A, 0), 0, 5},  /*< ADC1_IN5 */
-    {GPIO_PIN(PORT_C, 3), 0, 4},  /*< ADC1_IN4 */
-    {GPIO_PIN(PORT_C, 2), 0, 3},  /*< ADC1_IN3 */
+    {GPIO_PIN(PORT_C, 0), 0, 1},  /* ADC1_IN1 */
+    {GPIO_PIN(PORT_C, 1), 0, 2},  /* ADC1_IN2 */
+    {GPIO_PIN(PORT_A, 1), 0, 6},  /* ADC1_IN6 */
+    {GPIO_PIN(PORT_A, 0), 0, 5},  /* ADC1_IN5 */
+    {GPIO_PIN(PORT_C, 3), 0, 4},  /* ADC1_IN4 */
+    {GPIO_PIN(PORT_C, 2), 0, 3},  /* ADC1_IN3 */
     {GPIO_UNDEF, 0, 18}, /* VBAT */
 };
 

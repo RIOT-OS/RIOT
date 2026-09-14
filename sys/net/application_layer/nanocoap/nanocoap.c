@@ -1,11 +1,8 @@
 /*
- * Copyright (C) 2016-18 Kaspar Schleiser <kaspar@schleiser.de>
- *               2018 Inria
- *               2018 Freie Universität Berlin
- *
- * This file is subject to the terms and conditions of the GNU Lesser
- * General Public License v2.1. See the file LICENSE in the top level
- * directory for more details.
+ * SPDX-FileCopyrightText: 2016-2018 Kaspar Schleiser <kaspar@schleiser.de>
+ * SPDX-FileCopyrightText: 2018 Inria
+ * SPDX-FileCopyrightText: 2018 Freie Universität Berlin
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
 
 /**
@@ -74,38 +71,14 @@ bool coap_is_hdr_in_bounds(const coap_pkt_t *pkt, size_t len)
         return false;
     }
 
-    if (IS_USED(MODULE_NANOCOAP_TOKEN_EXT)) {
-        /* coap_pkt_tkl_ext_len() blows an assertion on invalid TKL value, so
-         * we have to rule that out here already. The magic number 15 is the
-         * only invalid value here, as per
-         * https://datatracker.ietf.org/doc/html/rfc8974#section-2.1.
-         * The magic number has no name in the RFC, so adding a named constant
-         * here would rather obfuscate then help when checking the code against
-         * the spec. */
-        if ((coap_get_udp_hdr_const(pkt)->ver_t_tkl & 0x0f) == 15) {
-            return false;
-        }
+    uint8_t tkl = coap_get_token_len(pkt);
 
-        min_len += coap_pkt_tkl_ext_len(pkt);
-
-        if (len < min_len) {
-            return false;
-        }
-
-        min_len += coap_get_token_len(pkt);
+    if (tkl > COAP_TOKEN_LENGTH_MAX) {
+        DEBUG("nanocoap: token length invalid\n");
+        return false;
     }
-    else {
-        uint8_t tkl = coap_get_token_len(pkt);
 
-        /* we have to either allow extendend token lengths fully
-         * (MODULE_NANOCOAP_TOKEN_EXT is used), or not at all */
-        if (tkl > COAP_TOKEN_LENGTH_MAX) {
-            DEBUG("nanocoap: token length invalid\n");
-            return false;
-        }
-
-        min_len += tkl;
-    }
+    min_len += tkl;
 
     return (len >= min_len);
 }
@@ -510,7 +483,9 @@ int coap_get_blockopt(coap_pkt_t *pkt, uint16_t option, uint32_t *blknum, uint8_
         return -1;
     }
 
-    if (option_len > 4) {
+    /* option is 0 to 3 bytes in length, see
+     * https://www.rfc-editor.org/info/rfc7959/#section-2.1 */
+    if (option_len > 3) {
         DEBUG("nanocoap: invalid option length\n");
         return -1;
     }
@@ -528,6 +503,7 @@ int coap_get_blockopt(coap_pkt_t *pkt, uint16_t option, uint32_t *blknum, uint8_
 bool coap_find_uri_query(coap_pkt_t *pkt, const char *key, const char **value, size_t *len)
 {
     uint8_t *opt_pos = NULL;
+    size_t len_key = strlen(key);
 
     while (1) {
         int len_query;
@@ -538,11 +514,11 @@ bool coap_find_uri_query(coap_pkt_t *pkt, const char *key, const char **value, s
         }
 
         const char *separator = memchr(key_data, '=', len_query);
-        size_t len_key = separator
-                       ? (separator - (char *)key_data)
-                       : len_query;
+        size_t len_query_key = separator
+                             ? (separator - (char *)key_data)
+                             : len_query;
 
-        if (memcmp(key, key_data, len_key)) {
+        if (len_key != len_query_key || memcmp(key, key_data, len_query_key)) {
             continue;
         }
 
@@ -553,7 +529,7 @@ bool coap_find_uri_query(coap_pkt_t *pkt, const char *key, const char **value, s
         assert(len);
         if (separator) {
             *value = separator + 1;
-            *len = len_query - len_key - 1;
+            *len = len_query - len_query_key - 1;
         } else {
             *value = NULL;
             *len   = 0;
@@ -789,40 +765,21 @@ ssize_t coap_build_udp_hdr(void *buf, size_t buf_len, uint8_t type,
 {
     assert(!(type & ~0x3));
 
-    uint16_t tkl_ext;
-    uint8_t tkl_ext_len, tkl;
-
-    if (token_len > 268 && IS_USED(MODULE_NANOCOAP_TOKEN_EXT)) {
-        tkl_ext_len = 2;
-        tkl_ext = htons(token_len - 269); /* 269 = 255 + 14 */
-        tkl = 14;
-    }
-    else if (token_len > 12 && IS_USED(MODULE_NANOCOAP_TOKEN_EXT)) {
-        tkl_ext_len = 1;
-        tkl_ext = token_len - 13;
-        tkl = 13;
-    }
-    else {
-        tkl = token_len;
-        tkl_ext_len = 0;
+    if (token_len > COAP_TOKEN_LENGTH_MAX) {
+        return -EINVAL;
     }
 
-    size_t hdr_len = sizeof(coap_udp_hdr_t) + token_len + tkl_ext_len;
-    if (buf_len < hdr_len) {
+    size_t hdr_len = sizeof(coap_udp_hdr_t) + token_len;
+    if (hdr_len > buf_len) {
         return -EOVERFLOW;
     }
 
     memset(buf, 0, sizeof(coap_udp_hdr_t));
     coap_udp_hdr_t *hdr = buf;
-    hdr->ver_t_tkl = (COAP_V1 << 6) | (type << 4) | tkl;
+    hdr->ver_t_tkl = (COAP_V1 << 6) | (type << 4) | (uint8_t)token_len;
     hdr->code = code;
     hdr->id = htons(id);
     buf += sizeof(coap_udp_hdr_t);
-
-    if (tkl_ext_len) {
-        memcpy(buf, &tkl_ext, tkl_ext_len);
-        buf += tkl_ext_len;
-    }
 
     /* Some users build a response packet in the same buffer that contained
      * the request. In this case, the argument token already points inside
@@ -1579,29 +1536,46 @@ void coap_block_object_init(coap_block1_t *block, size_t blknum, size_t blksize,
     block->offset = block->blknum << (block->szx + 4);
 }
 
-void coap_block_slicer_init(coap_block_slicer_t *slicer, size_t blknum,
+int coap_block_slicer_init(coap_block_slicer_t *slicer, size_t blknum,
                             size_t blksize)
 {
-    slicer->start = blknum * blksize;
-    slicer->end = slicer->start + blksize;
+    if (__builtin_mul_overflow(blknum, blksize, &slicer->start) ||
+        __builtin_add_overflow(slicer->start, blksize, &slicer->end)) {
+        *slicer = (coap_block_slicer_t){0};
+        return -EINVAL;
+    }
     slicer->cur = 0;
+
+    return 0;
 }
 
-void coap_block2_init(coap_pkt_t *pkt, coap_block_slicer_t *slicer)
+int coap_block2_init(coap_pkt_t *pkt, coap_block_slicer_t *slicer)
 {
     uint32_t blknum = 0;
-    uint8_t szx = CONFIG_NANOCOAP_BLOCK_SIZE_EXP_MAX - 4;
+    uint8_t szx = CONFIG_NANOCOAP_BLOCK_SIZE_MAX;
 
     /* Retrieve the block2 option from the client request */
     if (coap_get_blockopt(pkt, COAP_OPT_BLOCK2, &blknum, &szx) >= 0) {
-        /* Use the client requested block size if it is smaller than our own
-         * maximum block size */
-        if (CONFIG_NANOCOAP_BLOCK_SIZE_EXP_MAX - 4 < szx) {
-            szx = CONFIG_NANOCOAP_BLOCK_SIZE_EXP_MAX - 4;
+        /* If the client's requested block size is not acceptable (too large),
+         * we go with the maximum we are willing to do and recompute the
+         * block number to stay at the same offset. */
+        if (szx > CONFIG_NANOCOAP_BLOCK_SIZE_MAX) {
+            unsigned shift = szx - CONFIG_NANOCOAP_BLOCK_SIZE_MAX;
+            szx = CONFIG_NANOCOAP_BLOCK_SIZE_MAX;
+            uint64_t tmp = blknum;
+            tmp <<= shift;
+            if (tmp > COAP_BLOCKWISE_NUM_MAX) {
+                return -EBADMSG;
+            }
+            blknum = tmp;
         }
     }
 
-    coap_block_slicer_init(slicer, blknum, coap_szx2size(szx));
+    if (coap_block_slicer_init(slicer, blknum, coap_szx2size(szx))) {
+        return -EBADMSG;
+    }
+
+    return 0;
 }
 
 bool coap_block_finish(coap_block_slicer_t *slicer)
@@ -1725,8 +1699,10 @@ ssize_t coap_well_known_core_default_handler(coap_pkt_t *pkt, uint8_t *buf, \
     (void)context;
     coap_block_slicer_t slicer;
     coap_builder_t state;
-    coap_block2_init(pkt, &slicer);
-    int err;
+    int err = coap_block2_init(pkt, &slicer);
+    if (err) {
+        return err;
+    }
     err = coap_builder_init_reply(&state, buf, len, pkt, COAP_CODE_CONTENT);
     if (err) {
         return err;

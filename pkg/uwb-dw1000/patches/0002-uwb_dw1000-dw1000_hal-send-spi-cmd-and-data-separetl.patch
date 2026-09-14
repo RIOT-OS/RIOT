@@ -17,7 +17,7 @@ index 2390635..a5e24af 100644
      hal_gpio_write(inst->ss_pin, 0);
 
 -#if !defined(MYNEWT)
-+#if !defined(MYNEWT) && !defined(RIOT_VERSION)
++#if !defined(MYNEWT) && !defined(RIOT_OS)
      /* Linux mode really, for when we can't split the command and data */
      assert(cmd_size + length < inst->uwb_dev.txbuf_size);
      assert(cmd_size + length < MYNEWT_VAL(DW1000_HAL_SPI_MAX_CNT));
@@ -35,7 +35,7 @@ index 2390635..a5e24af 100644
      hal_gpio_write(inst->ss_pin, 0);
 
 -#if !defined(MYNEWT)
-+#if !defined(MYNEWT) && !defined(RIOT_VERSION)
++#if !defined(MYNEWT) && !defined(RIOT_OS)
      /* Linux mode really, for when we can't split the command and data */
      assert(cmd_size + length < inst->uwb_dev.txbuf_size);
      assert(cmd_size + length < MYNEWT_VAL(DW1000_HAL_SPI_MAX_CNT));

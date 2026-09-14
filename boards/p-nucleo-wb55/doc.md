@@ -19,7 +19,7 @@ You can find general information about the Nucleo64 boards on the
 
 ## Pinout
 
-<img src="pinouts/p-nucleo-wb55.svg" alt="Pinout for the p-nucleo-wb55" width=50% />
+<img src="p-nucleo-wb55.svg" alt="Pinout for the p-nucleo-wb55" width=50% />
 
 ### MCU
 

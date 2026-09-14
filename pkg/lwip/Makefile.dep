@@ -18,9 +18,25 @@ ifneq (,$(filter sock_udp,$(USEMODULE)))
   USEMODULE += lwip_sock_udp
 endif
 
-ifneq (,$(filter stm32_eth,$(USEMODULE)))
-  ifneq (,$(filter lwip_dhcp_auto,$(USEMODULE)))
+# if lwip_dhcp_auto or lwip_ipv6 is used, enable link up detection:
+# - lwip_dhcp_auto needs link up events to trigger the DHCP process
+# - lwip_ipv6 needs link up events to perform duplicate address detection
+ifneq (,$(filter lwip_dhcp_auto lwip_ipv6,$(USEMODULE)))
+  ifneq (,$(filter efm32_eth,$(USEMODULE)))
+    USEMODULE += efm32_eth_link_up
+  endif
+  ifneq (,$(filter lpc1768_eth,$(USEMODULE)))
+    USEMODULE += lpc1768_eth_link_up
+  endif
+  ifneq (,$(filter stm32_eth,$(USEMODULE)))
     USEMODULE += stm32_eth_link_up
+  endif
+endif
+
+ifneq (,$(filter lwip_app_lwiperf,$(USEMODULE)))
+  USEMODULE += lwip_tcp
+  ifneq (,$(filter lwip_ipv4,$(USEMODULE)))
+    USEMODULE += lwip_arp
   endif
 endif
 
@@ -101,6 +117,10 @@ endif
 
 ifneq (,$(filter lwip_dhcp_auto,$(USEMODULE)))
   USEMODULE += lwip_dhcp
+endif
+
+ifneq (,$(filter lwip_dhcp,$(USEMODULE)))
+  USEMODULE += lwip_udp
 endif
 
 # if an actual netdev is used, we need lwip_netdev to integrate it

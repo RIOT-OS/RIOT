@@ -15,7 +15,7 @@ index 70cdf76d12..41fac5d339 100644
  extern "C" {
  #endif
  
-+#if !defined(RIOT_VERSION)
++#if !defined(RIOT_OS)
  /**
   * Decoded values from SD card Card Specific Data register
   */
@@ -23,7 +23,7 @@ index 70cdf76d12..41fac5d339 100644
      uint8_t sec_feature;        /*!< secure data management features supported by the card */
  } sdmmc_ext_csd_t;
  
-+#endif /* !defined(RIOT_VERSION) */
++#endif /* !defined(RIOT_OS) */
 +
  /**
   * SD/MMC command response buffer
@@ -32,7 +32,7 @@ index 70cdf76d12..41fac5d339 100644
      esp_err_t (*is_slot_set_to_uhs1)(int slot, bool *is_uhs1); /*!< host slot is set to uhs1 or not*/
  } sdmmc_host_t;
  
-+#if !defined(RIOT_VERSION)
++#if !defined(RIOT_OS)
  /**
   * SD/MMC card information structure
   */
@@ -40,7 +40,7 @@ index 70cdf76d12..41fac5d339 100644
      uint32_t reserved : 22;     /*!< Reserved for future expansion */
  } sdmmc_card_t;
  
-+#endif /* !defined(RIOT_VERSION) */
++#endif /* !defined(RIOT_OS) */
 +
  /**
   * SD/MMC erase command(38) arguments

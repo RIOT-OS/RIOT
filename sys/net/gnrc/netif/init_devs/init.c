@@ -1,18 +1,18 @@
+/*
+ * SPDX-FileCopyrightText: 2020 Freie Universität Berlin
+ * SPDX-FileCopyrightText: 2020 Kaspar Schleiser <kaspar@schleiser.de>
+ * SPDX-FileCopyrightText: 2013 INRIA
+ * SPDX-License-Identifier: LGPL-2.1-only
+ */
+
 /**
- * Auto initialization for network devices
- *
- * Copyright (C) 2020 Freie Universität Berlin
- *               2020 Kaspar Schleiser <kaspar@schleiser.de>
- *               2013  INRIA.
- *
- * This file is subject to the terms and conditions of the GNU Lesser
- * General Public License v2.1. See the file LICENSE in the top level
- * directory for more details.
- *
  * @ingroup sys_auto_init
  * @{
  * @file
- * @brief   initializes any used network interface that has a trivial init function
+ * @brief   Network devices auto initialization
+ *
+ * initializes any used network interface that has a trivial init function
+ *
  * @author  Oliver Hahm <oliver.hahm@inria.fr>
  * @author  Hauke Petersen <hauke.petersen@fu-berlin.de>
  * @author  Kaspar Schleiser <kaspar@schleiser.de>
@@ -62,6 +62,11 @@ void gnrc_netif_init_devs(void)
         auto_init_cc2420();
     }
 
+    if (IS_USED(MODULE_EFM32_ETH)) {
+        extern void auto_init_efm32_eth(void);
+        auto_init_efm32_eth();
+    }
+
     if (IS_USED(MODULE_ENCX24J600)) {
         extern void auto_init_encx24j600(void);
         auto_init_encx24j600();
@@ -80,6 +85,11 @@ void gnrc_netif_init_devs(void)
     if (IS_USED(MODULE_ESP_IEEE802154)) {
         extern void auto_init_esp_ieee802154(void);
         auto_init_esp_ieee802154();
+    }
+
+    if (IS_USED(MODULE_GRETH)) {
+        extern void auto_init_greth(void);
+        auto_init_greth();
     }
 
     /* don't change the order of auto_init_esp_now and auto_init_esp_wifi */
@@ -102,6 +112,11 @@ void gnrc_netif_init_devs(void)
     if (IS_USED(MODULE_DOSE)) {
         extern void auto_init_dose(void);
         auto_init_dose();
+    }
+
+    if (IS_USED(MODULE_LPC1768_ETH)) {
+        extern void auto_init_lpc1768_eth(void);
+        auto_init_lpc1768_eth();
     }
 
     if (IS_USED(MODULE_SAM0_ETH)) {

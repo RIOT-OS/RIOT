@@ -1,12 +1,9 @@
 /*
- * Copyright (C) 2016-18 Kaspar Schleiser <kaspar@schleiser.de>
- *               2018 Freie Universität Berlin
- *               2018 Inria
- *               2018 Ken Bannister <kb2ma@runbox.com>
- *
- * This file is subject to the terms and conditions of the GNU Lesser
- * General Public License v2.1. See the file LICENSE in the top level
- * directory for more details.
+ * SPDX-FileCopyrightText: 2016-2018 Kaspar Schleiser <kaspar@schleiser.de>
+ * SPDX-FileCopyrightText: 2018 Freie Universität Berlin
+ * SPDX-FileCopyrightText: 2018 Inria
+ * SPDX-FileCopyrightText: 2018 Ken Bannister <kb2ma@runbox.com>
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
 
 #pragma once
@@ -131,7 +128,7 @@ extern "C" {
  */
 /** @brief   Maximum number of Options in a message */
 #ifndef CONFIG_NANOCOAP_NOPTS_MAX
-#define CONFIG_NANOCOAP_NOPTS_MAX          (16)
+#  define CONFIG_NANOCOAP_NOPTS_MAX             (16)
 #endif
 
 /**
@@ -139,26 +136,26 @@ extern "C" {
  *           a message
  */
 #ifndef CONFIG_NANOCOAP_URI_MAX
-#define CONFIG_NANOCOAP_URI_MAX            (64)
+#  define CONFIG_NANOCOAP_URI_MAX               (64)
 #endif
 
 /**
  * @brief    Maximum size for a blockwise transfer as a power of 2
  */
-#ifndef CONFIG_NANOCOAP_BLOCK_SIZE_EXP_MAX
-#define CONFIG_NANOCOAP_BLOCK_SIZE_EXP_MAX  (6)
+#ifndef CONFIG_NANOCOAP_BLOCK_SIZE_MAX
+#  define CONFIG_NANOCOAP_BLOCK_SIZE_MAX        COAP_BLOCKSIZE_64
 #endif
 
 /**
  * @brief CoAP block-wise-transfer size that should be used by default
  */
 #ifndef CONFIG_NANOCOAP_BLOCKSIZE_DEFAULT
-#define CONFIG_NANOCOAP_BLOCKSIZE_DEFAULT  COAP_BLOCKSIZE_64
+#  define CONFIG_NANOCOAP_BLOCKSIZE_DEFAULT     COAP_BLOCKSIZE_64
 #endif
 
 /** @brief   Maximum length of a query string written to a message */
 #ifndef CONFIG_NANOCOAP_QS_MAX
-#define CONFIG_NANOCOAP_QS_MAX             (64)
+#  define CONFIG_NANOCOAP_QS_MAX                (64)
 #endif
 /** @} */
 
@@ -168,7 +165,7 @@ extern "C" {
  *           Value obtained experimentally when using SUIT
  */
 #ifndef CONFIG_NANOCOAP_BLOCK_HEADER_MAX
-#define CONFIG_NANOCOAP_BLOCK_HEADER_MAX   (80)
+#  define CONFIG_NANOCOAP_BLOCK_HEADER_MAX      (80)
 #endif
 
 /**
@@ -629,12 +626,9 @@ static inline void coap_set_id(coap_pkt_t *pkt, uint16_t id)
 /**
  * @brief   Get a message's token length [in byte]
  *
- * If the `nanocoap_token_ext` module is enabled, this will include
- * the extended token length.
- *
  * @param[in]   pkt   CoAP packet
  *
- * @returns     length of token in the given message (0-8 byte)
+ * @returns     token length in bytes (0-COAP_TOKEN_LENGTH_MAX for valid packets)
  */
 static inline unsigned coap_get_token_len(const coap_pkt_t *pkt)
 {
@@ -695,52 +689,6 @@ static inline unsigned coap_get_ver(const coap_pkt_t *pkt)
 }
 
 /**
- * @brief   Get the size of the extended Token length field
- *          (RFC 8974)
- *
- * @deprecated  Use @ref coap_pkt_tkl_ext_len instead.
- *
- * @note    This requires the `nanocoap_token_ext` module to be enabled
- *
- * @param[in]   hdr   CoAP header
- *
- * @returns     number of bytes used for extended token length
- */
-static inline uint8_t coap_hdr_tkl_ext_len(const coap_udp_hdr_t *hdr)
-{
-    if (!IS_USED(MODULE_NANOCOAP_TOKEN_EXT)) {
-        return 0;
-    }
-
-    switch (hdr->ver_t_tkl & 0x0f) {
-    case 13:
-        return 1;
-    case 14:
-        return 2;
-    case 15:
-        assert(0);
-        /* fall-through */
-    default:
-        return 0;
-    }
-}
-
-/**
- * @brief   Get the size of the extended Token length field
- *          (RFC 8974)
- *
- * @note    This requires the `nanocoap_token_ext` module to be enabled
- *
-     * @param[in]   pkt     CoAP packet
- *
- * @returns     number of bytes used for extended token length
- */
-static inline uint8_t coap_pkt_tkl_ext_len(const coap_pkt_t *pkt)
-{
-    return coap_hdr_tkl_ext_len(coap_get_udp_hdr_const(pkt));
-}
-
-/**
  * @brief   Validate that the header of @p pkt is no longer than
  *          @p len bytes.
  *
@@ -773,7 +721,7 @@ bool coap_is_hdr_in_bounds(const coap_pkt_t *pkt, size_t len);
  */
 static inline uint8_t *coap_hdr_data_ptr(const coap_udp_hdr_t *hdr)
 {
-    return ((uint8_t *)hdr) + sizeof(coap_udp_hdr_t) + coap_hdr_tkl_ext_len(hdr);
+    return ((uint8_t *)hdr) + sizeof(coap_udp_hdr_t);
 }
 
 /**
@@ -785,8 +733,7 @@ static inline uint8_t *coap_hdr_data_ptr(const coap_udp_hdr_t *hdr)
  */
 static inline unsigned coap_get_total_hdr_len(const coap_pkt_t *pkt)
 {
-    return sizeof(coap_udp_hdr_t) + coap_hdr_tkl_ext_len(pkt->hdr) +
-           coap_get_token_len(pkt);
+    return sizeof(coap_udp_hdr_t) + coap_get_token_len(pkt);
 }
 
 /**
@@ -861,27 +808,7 @@ static inline void coap_hdr_set_type(coap_udp_hdr_t *hdr, unsigned type)
  */
 static inline size_t coap_hdr_get_token_len(const coap_udp_hdr_t *hdr)
 {
-    const uint8_t *buf = (const void *)hdr;
-    /* Regarding use unnamed magic numbers 13 and 269:
-     * - If token length is < 13 it fits into TKL field (4 bit)
-     * - If token length is < 269 it fits into 8-bit extended TKL field
-     * - Otherwise token length goes into 16-bit extended TKL field.
-     *
-     * (Not using named constants here, as RFC 8974 also has no names for those
-     * magic numbers.)
-     *
-     * See: https://www.rfc-editor.org/rfc/rfc8974#name-extended-token-length-tkl-f
-     */
-    switch (coap_hdr_tkl_ext_len(hdr)) {
-    case 0:
-        return hdr->ver_t_tkl & 0x0f;
-    case 1:
-        return buf[sizeof(coap_udp_hdr_t)] + 13;
-    case 2:
-        return byteorder_bebuftohs(buf + sizeof(coap_udp_hdr_t)) + 269;
-    }
-
-    return 0;
+    return hdr->ver_t_tkl & 0x0f;
 }
 
 /**
@@ -902,7 +829,8 @@ static inline size_t coap_hdr_get_token_len(const coap_udp_hdr_t *hdr)
 static inline const void * coap_hdr_get_token(const coap_udp_hdr_t *hdr)
 {
     uint8_t *token = (void *)hdr;
-    token += sizeof(*hdr) + coap_hdr_tkl_ext_len(hdr);
+    /* token comes directly after the fixed size header for UDP */
+    token += sizeof(*hdr);
     return token;
 }
 
@@ -922,7 +850,7 @@ static inline const void * coap_hdr_get_token(const coap_udp_hdr_t *hdr)
  */
 static inline size_t coap_hdr_len(const coap_udp_hdr_t *hdr)
 {
-    return sizeof(*hdr) + coap_hdr_tkl_ext_len(hdr) + coap_hdr_get_token_len(hdr);
+    return sizeof(*hdr) + coap_hdr_get_token_len(hdr);
 }
 
 /**
@@ -1265,7 +1193,7 @@ static inline ssize_t coap_get_proxy_uri(coap_pkt_t *pkt, char **target)
  * @param[in]    blknum     offset from the beginning of content, in terms of
                             @p blksize byte blocks
  * @param[in]    blksize    size of each block; must be a power of 2 between 16
- *                          and 2 raised to #CONFIG_NANOCOAP_BLOCK_SIZE_EXP_MAX
+ *                          and `coap_szx2size(CONFIG_NANOCOAP_BLOCK_SIZE_MAX)`
  * @param[in]    more       more blocks? use 1 if yes; 0 if no or unknown
  */
 void coap_block_object_init(coap_block1_t *block, size_t blknum, size_t blksize,
@@ -1333,8 +1261,12 @@ static inline bool coap_block2_finish(coap_block_slicer_t *slicer)
  *
  * @param[in]   pkt         packet to work on
  * @param[out]  slicer      Preallocated slicer struct to fill
+ *
+ * @retval       0          Success
+ * @retval       -EBADMSG   @p pkt contains an invalid block options
  */
-void coap_block2_init(coap_pkt_t *pkt, coap_block_slicer_t *slicer);
+WARN_UNUSED_RESULT
+int coap_block2_init(coap_pkt_t *pkt, coap_block_slicer_t *slicer);
 
 /**
  * @brief Initialize a block slicer struct from content information
@@ -1343,10 +1275,14 @@ void coap_block2_init(coap_pkt_t *pkt, coap_block_slicer_t *slicer);
  * @param[in]    blknum     offset from the beginning of content, in terms of
                             @p blksize byte blocks
  * @param[in]    blksize    size of each block; must be a power of 2 between 16
- *                          and 2 raised to #CONFIG_NANOCOAP_BLOCK_SIZE_EXP_MAX
+ *                          `coap_szx2size(CONFIG_NANOCOAP_BLOCK_SIZE_MAX)`
+ * @retval       0          Success
+ * @retval       -EINVAL    @p blknum and/or @p blksize are invalid, e.g.
+ *                          because they point outside the addressable RAM
  */
-void coap_block_slicer_init(coap_block_slicer_t *slicer, size_t blknum,
-                            size_t blksize);
+WARN_UNUSED_RESULT
+int coap_block_slicer_init(coap_block_slicer_t *slicer, size_t blknum,
+                           size_t blksize);
 
 /**
  * @brief Add a byte array to a block2 reply when building the response using
@@ -1512,28 +1448,6 @@ int coap_get_blockopt(coap_pkt_t *pkt, uint16_t option, uint32_t *blknum, uint8_
  * @returns false if there are no critical options, or all have been accessed.
  */
 bool coap_has_unprocessed_critical_options(const coap_pkt_t *pkt);
-
-/**
- * @brief   Helper to decode SZX value to size in bytes
- *
- * @param[in]   szx     SZX value to decode
- *
- * @returns     SZX value decoded to bytes
- */
-#define coap_szx2size(szx) (1U << ((szx) + 4))
-
-/**
- * @brief   Helper to encode byte size into next equal or smaller SZX value
- *
- * @param[in]   len     Size in bytes
- *
- * @returns     closest SZX value that fits into a buffer of @p len
- */
-static inline unsigned coap_size2szx(unsigned len)
-{
-    assert(len >= 16);
-    return bitarithm_msb(len >> 4);
-}
 /**@}*/
 
 /**
@@ -2577,12 +2491,6 @@ static inline ssize_t coap_build_hdr(coap_udp_hdr_t *hdr, unsigned type, const v
                                      size_t token_len, unsigned code, uint16_t id)
 {
     size_t fingers_crossed_size = sizeof(*hdr) + token_len;
-
-    if (IS_USED(MODULE_NANOCOAP_TOKEN_EXT)) {
-        /* With RFC 8974, we have an additional extended TKL
-         * field of 0-4 bytes in length */
-        fingers_crossed_size += 4;
-    }
 
     return coap_build_udp_hdr(hdr, fingers_crossed_size, type, token, token_len, code, id);
 }

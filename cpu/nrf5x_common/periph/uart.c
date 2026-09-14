@@ -112,6 +112,7 @@ static inline void set_power(uart_t uart, bool value)
 #endif
 }
 
+MAYBE_UNUSED
 static inline bool get_power(uart_t uart)
 {
     UART_TYPE *dev = uart_config[uart].dev;

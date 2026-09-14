@@ -52,5 +52,3 @@ PSEUDOMODULES += bplib_walltime_available
 PSEUDOMODULES += bplib_include_nc_telemetry
 PSEUDOMODULES += bplib_include_as
 PSEUDOMODULES += bplib_no_vfs
-
-ARCHIVES += $(BINDIR)/libbplib.a

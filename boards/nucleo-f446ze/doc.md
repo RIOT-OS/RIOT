@@ -16,7 +16,7 @@ You can find general information about the Nucleo144 boards on the
 
 ## Pinout
 
-<img src="pinouts/nucleo-f446ze-and-f722ze.svg" alt="Pinout for the Nucleo-F446ZE (from STM user manual, UM1974, http://www.st.com/resource/en/user_manual/dm00244518.pdf, page 35)" width=50% />
+<img src="nucleo-f446ze-and-f722ze.svg" alt="Pinout for the Nucleo-F446ZE (from STM user manual, UM1974, http://www.st.com/resource/en/user_manual/dm00244518.pdf, page 35)" width=50% />
 
 ### MCU
 

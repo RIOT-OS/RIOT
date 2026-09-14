@@ -385,8 +385,6 @@ osaStatus_t OSA_SemaphorePost(osaSemaphoreId_t semId);
  *
  * This function creates a non-recursive mutex and sets it to unlocked status.
  *
- * @param none.
- *
  * @retval handler to the new mutex if the mutex is created successfully.
  * @retval NULL   if the mutex can not be created.
  */
@@ -488,7 +486,7 @@ osaStatus_t OSA_EventClear(osaEventId_t eventId, osaEventFlags_t flagsToClear);
  *                    If the wait condition is not met, pass osaWaitForever_c will
  *                    wait indefinitely, pass 0 will return osaStatus_Timeout
  *                    immediately.
- * @param setFlags    Flags that wakeup the waiting task are obtained by this parameter.
+ * @param pSetFlags   Flags that wakeup the waiting task are obtained by this parameter.
  *
  * @retval osaStatus_Success The wait condition met and function returns successfully.
  * @retval osaStatus_Timeout Has not met wait condition within timeout.
@@ -517,10 +515,10 @@ osaStatus_t OSA_EventDestroy(osaEventId_t eventId);
  *
  * This function  allocates memory for and initializes a message queue. Message queue elements are hardcoded as void*.
  *
- * @param msgNo :number of messages the message queue should accommodate.
+ * @param msgNo  number of messages the message queue should accommodate.
  *               This parameter should not exceed osNumberOfMessages defined in OSAbstractionConfig.h.
  *
-* @return:  Handler to access the queue for put and get operations. If message queue
+* @return  Handler to access the queue for put and get operations. If message queue
  *         creation failed, return NULL.
  */
 osaMsgQId_t OSA_MsgQCreate(uint32_t  msgNo);

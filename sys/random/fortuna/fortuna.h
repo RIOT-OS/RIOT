@@ -1,17 +1,28 @@
-/**
- * @brief Fortuna PRNG implementation.
- *
- * The MIT License applies to this software. See the included LICENSE.txt file
- * for more information.
+/*
+ * SPDX-FileCopyrightText: 2016 Brandon Lin
+ * SPDX-FileCopyrightText: 2016-2018 Bas Stottelaar
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
 
-/*
+#pragma once
+
+/**
+ * @{
+ * @file
+ *
+ * @brief   Fortuna CSPRNG interface.
+ *
+ * @author  Bas Stottelaar <basstottelaar@gmail.com>
+ *
  * This is not your general purpose PRNG: it is hungry for memory.
  *
- * See https://www.schneier.com/cryptography/paperfiles/fortuna.pdf for the
- * implementation details. Code insipred by https://github.com/blin00/os (MIT
- * licensed), but heavily modified, stripped and improved for RIOT-OS.
+ * Code inspired by https://github.com/blin00/os and originally licensed under
+ * the MIT license. Since then it was heavily modified, stripped and improved
+ * for RIOT-OS. Permission granted by the original author to relicense under
+ * the LGPL-2.1-only license.
  *
+ * Fortuna is based on a paper by Bruce Schneier and Niels Ferguson, which can
+ * be found at https://www.schneier.com/cryptography/paperfiles/fortuna.pdf.
  * The implementation follows the paper, with a few exceptions:
  *
  * - Initialization of the generator and PRNG is combined in fortuna_init.
@@ -23,9 +34,6 @@
  *   whenever fortuna_pseudo_random_data checks if the generator is seeded! See
  *   https://crypto.stackexchange.com/q/56390 for more information.
  */
-
-#ifndef FORTUNA_H
-#define FORTUNA_H
 
 #include "mutex.h"
 #if FORTUNA_RESEED_INTERVAL_MS > 0 && IS_USED(MODULE_FORTUNA_RESEED)
@@ -242,5 +250,4 @@ int fortuna_update_seed(fortuna_state_t *state, fortuna_seed_t *inout);
 }
 #endif
 
-#endif /* FORTUNA_H */
 /** @} */

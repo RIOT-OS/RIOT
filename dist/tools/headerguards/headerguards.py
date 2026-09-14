@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 import os
+import re
 import sys
 import difflib
 from io import BytesIO, TextIOWrapper
@@ -58,7 +59,7 @@ def fix_headerguard(filename):
                 guard_found += 1
                 guard_name = line[8:].rstrip()
                 line = "#ifndef %s\n" % (supposed)
-            elif pragma_once_found != 0 and line.startswith("#ifndef %s" % supposed):
+            elif pragma_once_found != 0 and re.match("#ifndef %s_?$" % supposed, line):
                 # check if there is pragma once *and* headerguards, but avoid false
                 # positives by narrowing in on the to-be-expected guard
                 guard_found += 1

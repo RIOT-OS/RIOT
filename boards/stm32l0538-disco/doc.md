@@ -14,7 +14,7 @@ The board also provides an on-board 2.04\" E-paper display (not supported yet).
 
 ## Pinout
 
-<img src="pinouts/stm32l0538-disco.svg" alt="Pinout for the stm32l0538-disco (from STM board manual)" width=50% />
+<img src="stm32l0538-disco.svg" alt="Pinout for the stm32l0538-disco (from STM board manual)" width=50% />
 
 ### MCU
 

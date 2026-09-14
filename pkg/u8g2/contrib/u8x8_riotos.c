@@ -186,9 +186,9 @@ uint8_t u8x8_byte_hw_i2c_riotos(u8x8_t *u8g2, uint8_t msg, uint8_t arg_int, void
 
     switch (msg) {
         case U8X8_MSG_BYTE_SEND:
+            assert((index + arg_int) <= sizeof(buffer));
             memcpy(&buffer[index], arg_ptr, arg_int);
             index += arg_int;
-            assert(index <= sizeof(buffer));
             break;
         case U8X8_MSG_BYTE_INIT:
             break;

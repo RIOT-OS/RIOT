@@ -18,6 +18,7 @@ actively measure the power consumption of your hardware and code, in real-time.
 | MCU             | EFM32GG12B810F1024GM64                               |
 |-----------------|------------------------------------------------------|
 | Family          | ARM Cortex-M4F                                       |
+| Series          | Series 1                                             |
 | Vendor          | Silicon Labs                                         |
 | Vendor Family   | EFM32 Giant Gecko 12B                                |
 | RAM             | 192.0 KiB                                            |
@@ -72,8 +73,7 @@ PIN 1 is the top-left contact.
 | ADC         | 0       | ADC0:CH0   |                  | Internal temperature                |
 | ADC         | 1       | ADC0:CH1   |                  | AVDD                                |
 | I2C         | 0       | I2C0       | SDA:PE4, SCL:PE5 | Normal speed                        |
-| HWCRYPTO    | -       | -          |                  | AES128/AES256, SHA1, SHA224/SHA256  |
-| HWRNG       | -       | TNRG0      |                  | True Random Number Generator (TRNG) |
+| HWRNG       | -       | TRNG0      |                  | True Random Number Generator (TRNG) |
 | RTT         | -       | RTCC       |                  | 1 Hz interval, either RTT or RTC    |
 | RTC         | -       | RTCC       |                  | 1 Hz interval, either RTT or RTC    |
 | SPI         | 0       | USART3     | MOSI:PA0, MISO:PA1, CLK:PA2 |                          |
@@ -85,18 +85,18 @@ PIN 1 is the top-left contact.
 
 ### User interface
 
-| Peripheral | Mapped to | Pin       | Comments   |
-|------------|-----------|-----------|------------|
-| Button     | PB0_PIN   | PD5       |            |
-|            | PB1_PIN   | PD8       |            |
-| LED        | LED0R_PIN | PA12      |            |
-|            | LED0G_PIN | PA13      |            |
-|            | LED0B_PIN | PA14      |            |
-|            | LED1R_PIN | PD6       |            |
-|            | LED1G_PIN | PF12      |            |
-|            | LED1B_PIN | PE12      |            |
-|            | LED0_PIN  | LED0R_PIN |            |
-|            | LED1_PIN  | LED1R_PIN |            |
+| Peripheral | Number | Mapped to | Pin       | Comments |
+|------------|--------|-----------|-----------|----------|
+| Button     | 0      | PB0_PIN   | PD5       |          |
+|            | 1      | PB1_PIN   | PD8       |          |
+| LED        | 0      | LED0R_PIN | PA12      |          |
+|            |        | LED0G_PIN | PA13      |          |
+|            |        | LED0B_PIN | PA14      |          |
+|            |        | LED0_PIN  | LED0R_PIN |          |
+|            | 1      | LED1R_PIN | PD6       |          |
+|            |        | LED1G_PIN | PF12      |          |
+|            |        | LED1B_PIN | PE12      |          |
+|            |        | LED1_PIN  | LED1R_PIN |          |
 
 ## Implementation Status
 
@@ -107,7 +107,7 @@ PIN 1 is the top-left contact.
 |                  | DAC        | yes       | VDAC, IDAC is not supported                        |
 |                  | Flash      | yes       |                                                    |
 |                  | GPIO       | yes       | Interrupts are shared across pins (see ref manual) |
-|                  | HW Crypto  | yes       |                                                    |
+|                  | HWRNG      | yes       |                                                    |
 |                  | I2C        | yes       |                                                    |
 |                  | PWM        | yes       |                                                    |
 |                  | RTCC       | yes       | As RTT or RTC                                      |
@@ -131,7 +131,7 @@ expects data from the MCU with the same settings.
 
 There are several clock sources that are available for the different
 peripherals. You are advised to read
-[AN0004.0](https://www.silabs.com/documents/public/application-notes/an0004.0-efm32-cmu.pdf)
+[AN0004.1](https://www.silabs.com/documents/public/application-notes/an0004.1-efm32-cmu.pdf)
 to get familiar with the different clocks.
 
 | Source | Internal | Speed      | Comments                           |
@@ -186,17 +186,9 @@ Therefore, only one of both peripherals can be enabled at the same time.
 
 Configured at 1 Hz interval, the RTCC will overflow each 136 years.
 
-### Hardware crypto
-
-This MCU is equipped with a hardware-accelerated crypto peripheral that can
-speed up AES128, AES256, SHA1, SHA256 and several other cryptographic
-computations.
-
-A peripheral driver interface is proposed, but not yet implemented.
-
 ### Usage of EMLIB
 
-This port makes uses of EMLIB by Silicon Labs to abstract peripheral registers.
+This port makes use of EMLIB by Silicon Labs to abstract peripheral registers.
 While some overhead is to be expected, it ensures proper setup of devices,
 provides chip errata and simplifies development. The exact overhead depends on
 the application and peripheral usage, but the largest overhead is expected
@@ -205,7 +197,10 @@ inline methods or macros (which have no overhead).
 
 Another advantage of EMLIB are the included assertions. These assertions ensure
 that peripherals are used properly. To enable this, pass `DEBUG_EFM` to your
-compiler.
+compiler defines.
+
+EMLIB is licensed by Silicon Labs under the zlib-style license, which permits
+distribution of source.
 
 ### Pin locations
 
@@ -249,7 +244,3 @@ Some boards have (limited) support for emulation, which can be started with:
 ```shell
 BOARD=sltb009a make emulate
 ```
-
-## License information
-
-Silicon Labs' EMLIB: zlib-style license (permits distribution of source).

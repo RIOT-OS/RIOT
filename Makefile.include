@@ -207,9 +207,8 @@ include $(RIOTMAKE)/dependencies_debug.inc.mk
 # Use TOOLCHAIN environment variable to select the toolchain to use.
 ifneq (,$(filter native native32 native64,$(BOARD)))
   ifeq ($(OS),Darwin)
-    $(shell $(COLOR_ECHO) "$(COLOR_RED)"Buildin on macOS is not supported."\
-                          "We recommend vagrant for building:$(COLOR_RESET)"\
-                          "https://github.com/RIOT-OS/RIOT/blob/master/dist/tools/vagrant/README.md 1>&2)
+    $(call echoerr,("Building on macOS is not supported. We recommend vagrant for building:"))
+    $(call echoinfo,("https://github.com/RIOT-OS/RIOT/blob/master/dist/tools/vagrant/README.md"))
   endif
 endif
 # Use override so that we can redefine a variable set on the command line (as
@@ -236,7 +235,10 @@ GLOBAL_GOALS += info-boards-features-blacklisted \
                 generate-Makefile.ci \
                 #
 
-ifneq (, $(filter $(GLOBAL_GOALS), $(MAKECMDGOALS)))
+PRIVATE_GLOBAL_GOALS := info-boards-collect \
+                        #
+
+ifneq (,$(filter $(GLOBAL_GOALS) $(PRIVATE_GLOBAL_GOALS),$(MAKECMDGOALS)))
   include $(RIOTMAKE)/info-global.inc.mk
 else
 
@@ -335,6 +337,12 @@ APPLICATION := $(strip $(APPLICATION))
 
 DOWNLOAD_TO_FILE ?= $(DLCACHE)
 
+# Check whether `which` is installed
+ifeq ($(shell command -v which 2>/dev/null),)
+  $(error 'which' is required but not found in PATH.)
+endif
+
+# Check whether unzip or 7z is installed, and set UNZIP_HERE to the command to use
 ifeq (,$(UNZIP_HERE))
   ifeq (0,$(shell which unzip > /dev/null 2>&1 ; echo $$?))
     UNZIP_HERE = $(call memoized,UNZIP_HERE,$(shell which unzip) -q)
@@ -397,13 +405,6 @@ include $(RIOTMAKE)/defaultmodules_regular.inc.mk
 
 # Include Kconfig functionalities
 include $(RIOTMAKE)/kconfig.mk
-
-# always select provided architecture features
-FEATURES_REQUIRED += $(filter arch_%,$(FEATURES_PROVIDED))
-# always select CPU core features
-FEATURES_REQUIRED += $(filter cpu_core_%,$(FEATURES_PROVIDED))
-# always "select" bug affecting the current build
-FEATURES_REQUIRED += $(filter bug_%,$(FEATURES_PROVIDED))
 
 # check if required features are provided and update $(FEATURES_USED)
 include $(RIOTMAKE)/features_check.inc.mk
@@ -550,7 +551,7 @@ ifneq (,$(RIOT_VERSION_OVERRIDE))
 endif
 
 # Generate machine readable RIOT VERSION macro
-RIOT_VERSION_CODE ?= $(shell echo $(RIOT_VERSION_GIT) | \
+RIOT_VERSION_CODE ?= $(shell echo $(RIOT_VERSION) | \
                       sed -E 's/([0-9]+)\.([0-9]+)\.?([0-9]+)?.*/RIOT_VERSION_NUM\\\(\1,\2,0\3,$(RIOT_EXTRAVERSION)\\\)/' | \
                       grep RIOT_VERSION_NUM || echo "$(RIOT_VERSION_DUMMY_CODE)")
 
@@ -791,8 +792,8 @@ endif
 	$(call check_cmd,$(CC),Compiler)
 
 ..build-message: $(if $(SHOULD_RUN_KCONFIG), check-kconfig-errors)
-	@$(COLOR_ECHO) '$(COLOR_GREEN)Building application "$(APPLICATION)" for "$(BOARD)" with CPU "$(CPU)".$(COLOR_RESET)'
-	@$(COLOR_ECHO)
+	@$(call sh_echogreen,("Building application \"$(APPLICATION)\" for \"$(BOARD)\" with CPU \"$(CPU)\"."))
+	@$(call sh_echoinfo)
 
 # The `clean` needs to be serialized before everything else.
 all $(BASELIBS) $(ARCHIVES) $(BUILDDEPS) $(GENSRC) ..in-docker-container: | $(CLEAN)
@@ -814,9 +815,13 @@ ifndef MAKE_RESTARTS
 endif
 
 # Remove intermediates, but keep the .elf, .hex and .map etc.
+# Special care has to be taken for ESP32 targets, the bootloader directory has
+# to be kept!
 clean-intermediates:
 	-@$(foreach dir,$(PKG_PATHS),"$(MAKE)" -C $(dir) distclean $(NEWLINE))
-	-@rm -rf $(BINDIR)/*.a $(BINDIR)/*/
+	-@rm -rf $(BINDIR)/*.a
+	-@find $(BINDIR)/ -mindepth 1 \
+	    -not -path "*/esp\_bootloader" -type d -exec rm -rf {} +;
 
 clean-pkg:
 	-@$(foreach dir,$(PKG_PATHS),"$(MAKE)" -C $(dir) distclean $(NEWLINE))
@@ -961,75 +966,80 @@ include $(RIOTMAKE)/tools/targets.inc.mk
 include $(RIOTMAKE)/usb-codes.inc.mk
 
 # Warn if the selected board and drivers don't provide all needed features:
-ifeq (, $(filter help generate-Makefile.ci, $(MAKECMDGOALS)))
+ifeq (, $(filter clean distclean generate-Makefile.ci help, $(MAKECMDGOALS)))
   EXPECT_ERRORS :=
 
   # Test if there where dependencies against a module in DISABLE_MODULE.
   ifneq (, $(filter $(DISABLE_MODULE), $(USEMODULE)))
-    $(shell $(COLOR_ECHO) "$(COLOR_RED)Required modules were disabled using DISABLE_MODULE:$(COLOR_RESET)"\
-                          "$(sort $(filter $(DISABLE_MODULE), $(USEMODULE)))" 1>&2)
+    $(call echoinfo,($(call c_red,"Required modules were disabled using DISABLE_MODULE:")\
+                     "$(sort $(filter $(DISABLE_MODULE), $(USEMODULE)))"))
     USEMODULE := $(filter-out $(DISABLE_MODULE), $(USEMODULE))
     EXPECT_ERRORS := 1
   endif
 
   # Test if all feature requirements were met by the selected board.
   ifneq (,$(FEATURES_MISSING))
-    $(shell $(COLOR_ECHO) "$(COLOR_RED)There are unsatisfied feature requirements:$(COLOR_RESET)"\
-                          "$(FEATURES_MISSING)" 1>&2)
+    $(call echoinfo,($(call c_red,"There are unsatisfied feature requirements:")\
+                     "$(FEATURES_MISSING)"))
     EXPECT_ERRORS := 1
   endif
 
   # Test if no feature in the requirements used is blacklisted for the selected board.
   ifneq (,$(FEATURES_USED_BLACKLISTED))
-    $(shell $(COLOR_ECHO) "$(COLOR_RED)Some feature requirements are blacklisted:$(COLOR_RESET)"\
-                          "$(FEATURES_USED_BLACKLISTED)" 1>&2)
+    $(call echoinfo,($(call c_red,"Some feature requirements are blacklisted:")\
+                     "$(FEATURES_USED_BLACKLISTED)"))
     EXPECT_ERRORS := 1
   endif
 
-BOARDS_SUPPORTED += $(BOARD_WHITELIST)
-BOARDS_UNSUPPORTED += $(BOARD_BLACKLIST)
+  BOARDS_SUPPORTED += $(BOARD_WHITELIST)
+  BOARDS_UNSUPPORTED += $(BOARD_BLACKLIST)
 
-ifneq (, $(BOARD_WHITELIST)$(BOARD_BLACKLIST))
-  $(shell $(COLOR_ECHO) "$(COLOR_YELLOW)BOARD_WHITELIST has been renamed to BOARDS_SUPPORTED and BOARD_BLACKLIST to BOARDS_UNSUPPORTED.$(COLOR_RESET)" 1>&2)
-  $(shell $(COLOR_ECHO) "The contents of BOARD_WHITELIST have been appended to BOARDS_SUPPORTED and the contents of BOARD_BLACKLIST to BOARDS_UNSUPPORTED for compatibility." 1>&2)
-endif
+  ifneq (, $(BOARD_WHITELIST)$(BOARD_BLACKLIST))
+    $(call echowarn,("BOARD_WHITELIST has been renamed to BOARDS_SUPPORTED and"\
+                     "BOARD_BLACKLIST to BOARDS_UNSUPPORTED."))
+    $(call echoinfo,("The contents of BOARD_WHITELIST have been appended to BOARDS_SUPPORTED"\
+                     "and the contents of BOARD_BLACKLIST to BOARDS_UNSUPPORTED for compatibility."))
+  endif
 
   # Test if any used feature conflict with another one.
   ifneq (,$(FEATURES_CONFLICTING))
-    $(shell $(COLOR_ECHO) "$(COLOR_RED)The following features conflict:$(COLOR_RESET)"\
-                          "$(FEATURES_CONFLICTING)" 1>&2)
+    $(call echoinfo,($(call c_red,"The following features conflict:")\
+                     "$(FEATURES_CONFLICTING)"))
     ifneq (, $(FEATURES_CONFLICT_MSG))
-        $(shell $(COLOR_ECHO) "$(COLOR_YELLOW)Rationale: $(COLOR_RESET)$(FEATURES_CONFLICT_MSG)" 1>&2)
+        $(call echoinfo,($(call c_yellow,"Rationale: ")"$(FEATURES_CONFLICT_MSG)"))
     endif
     EXPECT_ERRORS := 1
   endif
   # If there is a list of supported boards, then test if the board is supported.
   ifneq (,$(strip $(BOARDS_SUPPORTED)))
     ifeq (, $(filter $(BOARDS_SUPPORTED), $(BOARD)))
-      $(shell $(COLOR_ECHO) "$(COLOR_RED)The selected BOARD=$(BOARD) is not listed in BOARDS_SUPPORTED$(COLOR_RESET)." 1>&2)
-      $(shell $(COLOR_ECHO) "$(COLOR_YELLOW)When the list BOARDS_SUPPORTED is not empty, only boards explicitly listed there are supported.$(COLOR_RESET)" 1>&2)
-      $(shell $(COLOR_ECHO) "BOARDS_SUPPORTED = \"$(BOARDS_SUPPORTED)\"" 1>&2)
+      $(call echoerr,("The selected BOARD=$(BOARD) is not listed in BOARDS_SUPPORTED."))
+      $(call echowarn,("When the list BOARDS_SUPPORTED is not empty, only"\
+                       "boards explicitly listed there are supported."))
+      $(call echoinfo,("BOARDS_SUPPORTED = \"$(strip $(BOARDS_SUPPORTED))\""))
       EXPECT_ERRORS := 1
     endif
   endif
 
   # If there is a list of unsupported boards, then test if the board is unsupported.
   ifneq (,$(filter $(BOARDS_UNSUPPORTED),$(BOARD)))
-    $(shell $(COLOR_ECHO) "$(COLOR_RED)The selected BOARD=$(BOARD) is listed in BOARDS_UNSUPPORTED.$(COLOR_RESET)" 1>&2)
-    $(shell $(COLOR_ECHO) "BOARDS_UNSUPPORTED = $(BOARDS_UNSUPPORTED)" 1>&2)
+    $(call echoerr,("The selected BOARD=$(BOARD) is listed in BOARDS_UNSUPPORTED."))
+    $(call echoinfo,("BOARDS_UNSUPPORTED = \"$(strip $(BOARDS_UNSUPPORTED))\""))
     EXPECT_ERRORS := 1
   endif
 
   #  test if toolchain is supported.
   ifeq (,$(filter $(TOOLCHAIN),$(TOOLCHAINS_SUPPORTED)))
-    $(shell $(COLOR_ECHO) "$(COLOR_RED)The selected TOOLCHAIN=$(TOOLCHAIN) is not supported.$(COLOR_RESET)\nSupported toolchains: $(TOOLCHAINS_SUPPORTED)" 1>&2)
+    $(call echoerr,("The selected TOOLCHAIN=$(TOOLCHAIN) is not supported."))
+    $(call echoinfo,("Supported toolchains: $(TOOLCHAINS_SUPPORTED)"))
     EXPECT_ERRORS := 1
   endif
 
   # If there is a blacklist, then test if the board is blacklisted.
   ifneq (,$(TOOLCHAINS_BLACKLIST))
     ifneq (,$(filter $(TOOLCHAIN),$(TOOLCHAINS_BLACKLIST)))
-      $(shell $(COLOR_ECHO) "$(COLOR_RED)The selected TOOLCHAIN=$(TOOLCHAIN) is blacklisted:$(COLOR_RESET) $(TOOLCHAINS_BLACKLIST)" 1>&2)
+      $(call echoinfo,($(call c_red,"The selected TOOLCHAIN=$(TOOLCHAIN) is blacklisted:")\
+                       "$(TOOLCHAINS_BLACKLIST)"))
       EXPECT_ERRORS := 1
     endif
   endif
@@ -1038,16 +1048,17 @@ endif
   CONTINUE_ON_EXPECTED_ERRORS ?= 0
   ifneq (, $(EXPECT_ERRORS))
     ifneq (1,$(CONTINUE_ON_EXPECTED_ERRORS))
-      $(error You can let the build continue on expected errors by setting CONTINUE_ON_EXPECTED_ERRORS=1 to the command line)
+      $(error You can let the build continue on expected errors by setting CONTINUE_ON_EXPECTED_ERRORS=1 to the command line.)
     endif
-    $(shell $(COLOR_ECHO) "\n\n$(COLOR_RED)EXPECT ERRORS!$(COLOR_RESET)\n\n" 1>&2)
+    $(call echoerr,(\n\nEXPECT ERRORS!\n\n))
   endif
 
 endif
 
+# filter all targets starting with lowercase and containing lowercase letters,
+# hyphens, or underscores; explicitly include generate-Makefile.ci
+# inspired by: https://stackoverflow.com/a/26339924
 help:
-  # filter all targets starting with lowercase and containing lowercase letters, hyphens, or underscores; explicitly include generate-Makefile.ci
-  # inspired by: https://stackoverflow.com/a/26339924
 	@LC_ALL=C $(MAKE) -pRrq -f $(firstword $(MAKEFILE_LIST)) : 2>/dev/null | sed -ne 's/\(^[a-z][a-z_-]*\|generate-Makefile.ci\):.*/\1/p' | sort -u
 
 ifeq (iotlab-m3,$(BOARD))
@@ -1088,6 +1099,8 @@ $(RIOTBUILD_CONFIG_HEADER_C).in: FORCE | $(CLEAN)
 CFLAGS_WITH_MACROS += $(CFLAGS)
 CFLAGS_WITH_MACROS += -DRIOT_VERSION=\"$(RIOT_VERSION)\"
 CFLAGS_WITH_MACROS += -DRIOT_VERSION_CODE=$(RIOT_VERSION_CODE)
+# To allow package code easily check if compiled against RIOT or not:
+CFLAGS_WITH_MACROS += -DRIOT_OS=1
 ifneq (,$(RIOT_VERSION_EXTRA))
   CFLAGS_WITH_MACROS += -DCONFIG_RIOT_VERSION_EXTRA=\""$(RIOT_VERSION_EXTRA)"\"
 endif

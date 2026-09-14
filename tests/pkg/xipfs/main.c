@@ -1,6 +1,6 @@
 /*
- * SPDX-FileCopyrightText: 2024 Université de Lille
- * SPDX-License-Identifier: LGPL-2.1-only
+ * SPDX-FileCopyrightText: 2024-2026 Université de Lille
+ * SPDX-License-Identifier: LGPL-2.1-or-later
  */
 
 /**
@@ -28,19 +28,7 @@
 
 #include "blob/minimal.fae.h"
 
-/**
- * @def PANIC
- *
- * @brief This macro handles fatal errors
- */
-#define PANIC() for (;;) {}
-
-/**
- * @def NVME0P0_PAGE_NUM
- *
- * @brief The number of flash page for the nvme0p0 file system
- */
-#define NVME0P0_PAGE_NUM 20
+#define NVME0P0_PAGE_NUM 20 /**< The number of flash page for the nvme0p0 file system */
 
 #define XIPFS_ASSERT(condition)       \
 do {                                  \
@@ -50,19 +38,13 @@ do {                                  \
     assert((condition));              \
 } while (0)
 
-/*
- * Allocate a new contiguous space for the nvme0p0 file system
- */
+/* Allocate a new contiguous space for the nvme0p0 file system */
 XIPFS_NEW_PARTITION(nvme0p0, "/dev/nvme0p0", NVME0P0_PAGE_NUM);
 
-/*
- * Get a pointer to an xipfs_mount_t from a vfs_xipfs_mount_t
- */
+/* Get a pointer to an xipfs_mount_t from a vfs_xipfs_mount_t */
 xipfs_mount_t *xipfs_nvme0p0 = NULL;
 
-/*
- * Test function prototypes
- */
+/* Test function prototypes */
 static void test_xipfs_flash_memory(void);
 
 static void test_xipfs_format_invalid_cases(void);
@@ -108,7 +90,7 @@ static void test_xipfs_open_ok(void);
 static void test_xipfs_read_ebadf_descp(void);
 static void test_xipfs_read_efault_dest(void);
 static void test_xipfs_read_eacces_flags(void);
-static void test_xipfs_read_eio_empty_file(void);
+static void test_xipfs_read_ok_empty_file(void);
 static void test_xipfs_write_ebadf_descp(void);
 static void test_xipfs_write_efault_src(void);
 static void test_xipfs_write_eacces_flags(void);
@@ -189,7 +171,12 @@ static void test_xipfs_stat_enametoolong_path(void);
 static void test_xipfs_stat_enotdir_path(void);
 static void test_xipfs_stat_enoent_path(void);
 static void test_xipfs_stat_ok(void);
+static void test_xipfs_statvfs_efault_path(void);
 static void test_xipfs_statvfs_efault_buf(void);
+static void test_xipfs_statvfs_enoent_path_null_char(void);
+static void test_xipfs_statvfs_enametoolong_path(void);
+static void test_xipfs_statvfs_enotdir_path(void);
+static void test_xipfs_statvfs_enoent_path(void);
 static void test_xipfs_statvfs_ok(void);
 static void test_xipfs_new_file_efault_path(void);
 static void test_xipfs_new_file_enoent_path_null_char(void);
@@ -305,7 +292,7 @@ void test_xipfs_suite(vfs_xipfs_mount_t *vfs_xipfs_mount) {
     test_xipfs_read_ebadf_descp();
     test_xipfs_read_efault_dest();
     test_xipfs_read_eacces_flags();
-    test_xipfs_read_eio_empty_file();
+    test_xipfs_read_ok_empty_file();
 
     /* xipfs_write */
     test_xipfs_write_ebadf_descp();
@@ -408,7 +395,12 @@ void test_xipfs_suite(vfs_xipfs_mount_t *vfs_xipfs_mount) {
     test_xipfs_stat_ok();
 
     /* xipfs_statvfs */
+    test_xipfs_statvfs_efault_path();
     test_xipfs_statvfs_efault_buf();
+    test_xipfs_statvfs_enoent_path_null_char();
+    test_xipfs_statvfs_enametoolong_path();
+    test_xipfs_statvfs_enotdir_path();
+    test_xipfs_statvfs_enoent_path();
     test_xipfs_statvfs_ok();
 
     /* xipfs_new_file */
@@ -479,10 +471,7 @@ void test_xipfs_suite(vfs_xipfs_mount_t *vfs_xipfs_mount) {
     printf("Tests finished.\n");
 }
 
-/*
- * Entry point
- */
-
+/* Entry point */
 int main(void)
 {
     test_xipfs_flash_memory();
@@ -518,9 +507,7 @@ int main(void)
     for (;;) {}
 }
 
-/*
- * Test function implementations
- */
+/* Test function implementations */
 static void test_xipfs_flash_memory(void)
 {
     printf("Flash memory tests started...\n");
@@ -584,12 +571,6 @@ static void test_xipfs_mountpoint_invalid_cases(test_xipfs_mountpoint_callback_t
         }
         /* Empty string */
         mp.mount_path = "";
-        {
-            int ret = callback(&mp);
-            XIPFS_ASSERT(ret == -EINVAL);
-        }
-        /* Root */
-        mp.mount_path = "/";
         {
             int ret = callback(&mp);
             XIPFS_ASSERT(ret == -EINVAL);
@@ -1603,7 +1584,7 @@ static void test_xipfs_read_eacces_flags(void)
     XIPFS_ASSERT(ret == 0);
 }
 
-static void test_xipfs_read_eio_empty_file(void)
+static void test_xipfs_read_ok_empty_file(void)
 {
     xipfs_file_desc_t desc;
     char buf;
@@ -1616,7 +1597,7 @@ static void test_xipfs_read_eio_empty_file(void)
 
     /* test */
     ret = xipfs_read(xipfs_nvme0p0, &desc, &buf, sizeof(buf));
-    XIPFS_ASSERT(ret == -EIO);
+    XIPFS_ASSERT(ret == 0);
 
     /* clean up */
     ret = xipfs_close(xipfs_nvme0p0, &desc);
@@ -1983,7 +1964,7 @@ static void test_xipfs_write_last_page_of_filesystem(void)
      * Try to write one more byte into the file.
      */
     bytes_count = xipfs_write(xipfs_nvme0p0, &desc, write_pattern, 1);
-    XIPFS_ASSERT(bytes_count == -EDQUOT);
+    XIPFS_ASSERT(bytes_count == 0);
 
     ret = xipfs_close(xipfs_nvme0p0, &desc);
     XIPFS_ASSERT(ret == 0);
@@ -3207,22 +3188,109 @@ static void test_xipfs_stat_ok(void)
     XIPFS_ASSERT(ret == 0);
 }
 
-static void test_xipfs_statvfs_efault_buf(void)
-{
-    int ret;
-
-    /* test */
-    ret = xipfs_statvfs(xipfs_nvme0p0, NULL, NULL);
-    XIPFS_ASSERT(ret == -EFAULT);
-}
-
-static void test_xipfs_statvfs_ok(void)
+static void test_xipfs_statvfs_efault_path(void)
 {
     struct xipfs_statvfs buf;
     int ret;
 
     /* test */
     ret = xipfs_statvfs(xipfs_nvme0p0, NULL, &buf);
+    XIPFS_ASSERT(ret == -EFAULT);
+}
+
+static void test_xipfs_statvfs_efault_buf(void)
+{
+    xipfs_file_desc_t desc;
+    int ret;
+
+    /* initialization */
+    ret = xipfs_open(xipfs_nvme0p0, &desc, "/toto", O_CREAT, 0);
+    XIPFS_ASSERT(ret == 0);
+
+    ret = xipfs_close(xipfs_nvme0p0, &desc);
+    XIPFS_ASSERT(ret == 0);
+
+    /* test */
+    ret = xipfs_statvfs(xipfs_nvme0p0, "/toto", NULL);
+    XIPFS_ASSERT(ret == -EFAULT);
+
+    /* clean up */
+    ret = xipfs_format(xipfs_nvme0p0);
+    XIPFS_ASSERT(ret == 0);
+}
+
+static void test_xipfs_statvfs_enoent_path_null_char(void)
+{
+    struct xipfs_statvfs buf;
+    int ret;
+
+    /* test */
+    ret = xipfs_statvfs(xipfs_nvme0p0, "", &buf);
+    XIPFS_ASSERT(ret == -ENOENT);
+}
+
+static void test_xipfs_statvfs_enametoolong_path(void)
+{
+    struct xipfs_statvfs buf;
+    int ret;
+
+    /* test */
+    ret = xipfs_statvfs(xipfs_nvme0p0, "/totooooooooooooooooooooooo"
+            "ooooooooooooooooooooooooooooooooooooo", &buf);
+    XIPFS_ASSERT(ret == -ENAMETOOLONG);
+}
+
+static void test_xipfs_statvfs_enotdir_path(void)
+{
+    xipfs_file_desc_t desc;
+    struct xipfs_statvfs buf;
+    int ret;
+
+    /* initialization */
+    ret = xipfs_open(xipfs_nvme0p0, &desc, "/toto", O_CREAT, 0);
+    XIPFS_ASSERT(ret == 0);
+
+    ret = xipfs_close(xipfs_nvme0p0, &desc);
+    XIPFS_ASSERT(ret == 0);
+
+    /* test */
+    ret = xipfs_statvfs(xipfs_nvme0p0, "/toto/toto", &buf);
+    XIPFS_ASSERT(ret == -ENOTDIR);
+
+    /* clean up */
+    ret = xipfs_format(xipfs_nvme0p0);
+    XIPFS_ASSERT(ret == 0);
+}
+
+static void test_xipfs_statvfs_enoent_path(void)
+{
+    struct xipfs_statvfs buf;
+    int ret;
+
+    /* test */
+    ret = xipfs_statvfs(xipfs_nvme0p0, "/toto", &buf);
+    XIPFS_ASSERT(ret == -ENOENT);
+}
+
+static void test_xipfs_statvfs_ok(void)
+{
+    xipfs_file_desc_t desc;
+    struct xipfs_statvfs buf;
+    int ret;
+
+    /* initialization */
+    ret = xipfs_open(xipfs_nvme0p0, &desc, "/toto", O_CREAT, 0);
+    XIPFS_ASSERT(ret == 0);
+
+    ret = xipfs_close(xipfs_nvme0p0, &desc);
+    XIPFS_ASSERT(ret == 0);
+
+    /* test */
+    ret = xipfs_statvfs(xipfs_nvme0p0, "/toto", &buf);
+    XIPFS_ASSERT(ret == 0);
+
+    /* clean up */
+    ret = xipfs_format(xipfs_nvme0p0);
     XIPFS_ASSERT(ret == 0);
 }
 

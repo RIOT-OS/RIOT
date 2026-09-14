@@ -15,7 +15,7 @@ def testfunc(child):
     res = child.expect([TIMEOUT, "Message was not written"])
     # we actually want the timeout here. The application runs into an assertion
     # pretty quickly when failing and runs forever on success
-    assert(res == 0)
+    assert (res == 0)
 
 
 if __name__ == "__main__":

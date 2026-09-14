@@ -519,7 +519,7 @@ static int test_timer(void)
         //~ print_str("e: ");
         //~ print_u32_dec(time_elapsed);
         //~ print_str("\n");
-    } while(time_elapsed < TEST_PRINT_INTERVAL_TICKS);
+    } while (time_elapsed < TEST_PRINT_INTERVAL_TICKS);
 
     uint32_t ref_now = timer_read(TIM_REF_DEV);
     uint32_t tut_now = READ_TUT();
@@ -723,7 +723,7 @@ int main(void)
 #endif
     ref_begin = timer_read(TIM_REF_DEV);
     tut_begin = READ_TUT();
-    while(1) {
+    while (1) {
         test_timer();
     }
 

@@ -15,6 +15,9 @@ ifneq (,$(filter shell_cmds_default,$(USEMODULE)))
   ifneq (,$(filter benchmark_udp,$(USEMODULE)))
     USEMODULE += shell_cmd_benchmark_udp
   endif
+  ifneq (,$(filter bplib,$(USEPKG)))
+    USEMODULE += shell_cmd_bplib
+  endif
   ifneq (,$(filter ccn-lite-utils,$(USEMODULE)))
     USEMODULE += shell_cmd_ccn-lite-utils
   endif

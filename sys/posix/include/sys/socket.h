@@ -466,10 +466,10 @@ static inline ssize_t send(int socket, const void *buffer, size_t length,
  *          that operate on sockets.
  *
  * @param[in] domain    Specifies the communications domain in which a socket
- *                      is to be created. Valid values are prefixed with ``AF_`
+ *                      is to be created. Valid values are prefixed with `AF_`
  *                      and defined in @ref socket.h.
  * @param[in] type      Specifies the type of socket to be created. Valued
- *                      values are prefixed with ``SOCK_`` and defined in
+ *                      values are prefixed with `SOCK_` and defined in
  *                      @ref socket.h.
  * @param[in] protocol  Specifies a particular protocol to be used with the
  *                      socket. Specifying a protocol of 0 causes socket() to

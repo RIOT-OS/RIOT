@@ -4,23 +4,59 @@
 ## These are implemented in other modules or core components,
 ## and serve to enable certain functionality.
 ##
-## Here, pseudomodules are used instead of plain defines (that would be set using `CFLAGS += -DMODULE_NAME`)
-## because they can participate in dependency resolution:
-## they can pull in other modules.
+## Pseudomodules can be used as a replacement for plain defines such as
+## `CFLAGS += -DMODULE_NAME` which often lack standardization in naming and
+## behavior. Furthermore, pseudomodules can participate in dependency
+## resolution and pull in other modules.
 ##
 ## Pseudomodules are often enabled automatically through module dependencies,
-## but can also be enabled manually by stating `USEMODULE += module_name` in the Makefile.
+## but can also be enabled manually by adding `USEMODULE += module_name` to
+## an application or module Makefile.
 ##
 ## The list of documented pseudomodules is not comprehensive by far;
-## @ref makefiles/pseudomodules.inc.mk lists all that are not defined inside their main modules.
+## @ref makefiles/pseudomodules.inc.mk lists all that are not defined inside
+## their main modules.
+## Packages and drivers may also add modules to PSEUDOMODULES in their
+## respective `Makefile.include`.
 ## Not all modules listed there are "generic" pseudomodules;
-## some are merely optional components of a particular subsystem and should be documented there.
+## some are merely optional components of a particular subsystem and should be
+## documented there.
 ##
-## See also <a href="creating-modules.html#pseudomodules">the documentation on pseudomodules in general</a>.
+## For further information, please refer to the "Pseudomodules" section in the
+## [Creating Modules Guide](https://doc.riot-os.org/advanced_tutorials/creating_modules/#pseudomodules)
 ##
 ## @{
 
+################################################################################
+# PLEASE KEEP THIS LIST ALPHABETICALLY SORTED!!11!!
+#
+# The entries should be sorted by the module name, so `PSEUDOMODULES` and
+# `NO_PSEUDOMODULES` entries can be mixed.
+#
+# One blank line should remain between modules of different first letter and
+# one blank line should be kept between a documented module and the following
+# unrelated modules to allow for visual distinction between them.
+#
+# Please add a Doxygen documentation block to your pseudomodule instead of
+# just a comment.
+################################################################################
+
+PSEUDOMODULES += arduino_pwm
+PSEUDOMODULES += arduino_serial_stdio
+
+# Most auto_init modules are pseudomodules
+PSEUDOMODULES += auto_init_%
+NO_PSEUDOMODULES += auto_init_can
+NO_PSEUDOMODULES += auto_init_loramac
+NO_PSEUDOMODULES += auto_init_multimedia
+NO_PSEUDOMODULES += auto_init_screen
+NO_PSEUDOMODULES += auto_init_security
+NO_PSEUDOMODULES += auto_init_usbus
+NO_PSEUDOMODULES += auto_init_wdt_event
+NO_PSEUDOMODULES += auto_init_wdt_thread
+
 PSEUDOMODULES += atomic_utils
+
 PSEUDOMODULES += base64url
 
 ## @defgroup pseudomodule_board_software_reset board_software_reset
@@ -33,8 +69,6 @@ PSEUDOMODULES += base64url
 ## be advertised in any other capacity, e.g. through @ref sys_auto_init_saul).
 PSEUDOMODULES += board_software_reset
 
-PSEUDOMODULES += arduino_pwm
-PSEUDOMODULES += arduino_serial_stdio
 ## @defgroup pseudomodule_arm_stack_limit arm_stack_limit
 ## @{
 ## @brief Set MSP/PSP stack lower limit
@@ -49,11 +83,14 @@ PSEUDOMODULES += can_mbox
 PSEUDOMODULES += can_pm
 PSEUDOMODULES += can_raw
 PSEUDOMODULES += can_rx_mailbox
-PSEUDOMODULES += ccn-lite-utils
 PSEUDOMODULES += cc2538_rf_obs_sig
+PSEUDOMODULES += ccn-lite-utils
 PSEUDOMODULES += conn_can_isotp_multi
 PSEUDOMODULES += cord_ep_standalone
 PSEUDOMODULES += core_%
+# core_lib is not a submodule
+NO_PSEUDOMODULES += core_lib
+
 PSEUDOMODULES += cortexm_fpu
 PSEUDOMODULES += cortexm_svc
 PSEUDOMODULES += cpp
@@ -61,29 +98,44 @@ PSEUDOMODULES += cpu_check_address
 PSEUDOMODULES += crc16_fast
 PSEUDOMODULES += crc32_fast
 PSEUDOMODULES += credman_load
+PSEUDOMODULES += crypto_aes_128
+PSEUDOMODULES += crypto_aes_192
+PSEUDOMODULES += crypto_aes_256
+# By using this pseudomodule, T tables will be precalculated.
+PSEUDOMODULES += crypto_aes_precalculated
+# This pseudomodule causes a loop in AES to be unrolled (more flash, less CPU)
+PSEUDOMODULES += crypto_aes_unroll
+
 PSEUDOMODULES += dbgpin
 PSEUDOMODULES += devfs_%
 PSEUDOMODULES += dhcpv6_%
 PSEUDOMODULES += dhcpv6_client_dns
-PSEUDOMODULES += dhcpv6_client_ia_pd
 PSEUDOMODULES += dhcpv6_client_ia_na
+PSEUDOMODULES += dhcpv6_client_ia_pd
 PSEUDOMODULES += dhcpv6_client_mud_url
 PSEUDOMODULES += dhcpv6_relay
 PSEUDOMODULES += dns_cache
 PSEUDOMODULES += dns_msg
+
 PSEUDOMODULES += ecc_%
+PSEUDOMODULES += efm32_eth_auto
+PSEUDOMODULES += efm32_eth_link_up
 PSEUDOMODULES += ethos_stdio
 PSEUDOMODULES += event_%
 PSEUDOMODULES += event_timeout
 PSEUDOMODULES += event_timeout_ztimer
 PSEUDOMODULES += evtimer_mbox
+
 PSEUDOMODULES += fatfs_vfs_format
 PSEUDOMODULES += fdcan
+PSEUDOMODULES += fido2_tests
 PSEUDOMODULES += fmt_%
+PSEUDOMODULES += fortuna_reseed
+
+PSEUDOMODULES += gcoap_dtls
+PSEUDOMODULES += gcoap_fileserver
 PSEUDOMODULES += gcoap_forward_proxy
 PSEUDOMODULES += gcoap_forward_proxy_thread
-PSEUDOMODULES += gcoap_fileserver
-PSEUDOMODULES += gcoap_dtls
 ## @addtogroup net_gcoap_dns
 ## @{
 ## Enable @ref net_gcoap_dns
@@ -92,14 +144,13 @@ PSEUDOMODULES += gcoap_dns
 PSEUDOMODULES += gcoap_dns_proxied
 ## @}
 
-PSEUDOMODULES += fido2_tests
 ## @addtogroup net_dhcpv6_client
 ## @{
-
-## @defgroup net_gnrc_dhcpv6_client	gnrc_dhcpv6_client: Basic DHCPv6 client implementation in GNRC
+## @defgroup net_gnrc_dhcpv6_client	gnrc_dhcpv6_client
+## @brief Basic DHCPv6 client implementation in GNRC
 PSEUDOMODULES += gnrc_dhcpv6_client
-
-## @defgroup net_gnrc_dhcpv6_client_6lbr gnrc_dhcpv6_client_6lbr: Basic client for GNRC 6LoWPAN BRs
+## @defgroup net_gnrc_dhcpv6_client_6lbr gnrc_dhcpv6_client_6lbr
+## @brief Basic client for GNRC 6LoWPAN BRs
 PSEUDOMODULES += gnrc_dhcpv6_client_6lbr
 ## @}
 
@@ -114,8 +165,6 @@ PSEUDOMODULES += gnrc_ipv6_auto_subnets_simple
 PSEUDOMODULES += gnrc_ipv6_classic
 PSEUDOMODULES += gnrc_ipv6_default
 PSEUDOMODULES += gnrc_ipv6_ext_frag_stats
-PSEUDOMODULES += gnrc_ipv6_router
-PSEUDOMODULES += gnrc_ipv6_router_default
 PSEUDOMODULES += gnrc_ipv6_nib_6lbr
 PSEUDOMODULES += gnrc_ipv6_nib_6ln
 PSEUDOMODULES += gnrc_ipv6_nib_6lr
@@ -124,16 +173,18 @@ PSEUDOMODULES += gnrc_ipv6_nib_dyn_lladdr
 PSEUDOMODULES += gnrc_ipv6_nib_rio
 PSEUDOMODULES += gnrc_ipv6_nib_router
 PSEUDOMODULES += gnrc_ipv6_nib_rtr_adv_pio_cb
+PSEUDOMODULES += gnrc_ipv6_router
+PSEUDOMODULES += gnrc_ipv6_router_default
 PSEUDOMODULES += gnrc_lorawan_1_1
-PSEUDOMODULES += gnrc_neterr
 PSEUDOMODULES += gnrc_netapi_callbacks
 PSEUDOMODULES += gnrc_netapi_mbox
-PSEUDOMODULES += gnrc_netif_bus
-PSEUDOMODULES += gnrc_netif_timestamp
+PSEUDOMODULES += gnrc_neterr
 PSEUDOMODULES += gnrc_netif_6lo
+PSEUDOMODULES += gnrc_netif_bus
+PSEUDOMODULES += gnrc_netif_dedup
 PSEUDOMODULES += gnrc_netif_ipv6
 PSEUDOMODULES += gnrc_netif_single
-PSEUDOMODULES += gnrc_netif_dedup
+PSEUDOMODULES += gnrc_netif_timestamp
 
 
 ## @addtogroup 	net_gnrc_nettype
@@ -205,9 +256,9 @@ PSEUDOMODULES += gnrc_sixlowpan_border_router_default
 PSEUDOMODULES += gnrc_sixlowpan_default
 PSEUDOMODULES += gnrc_sixlowpan_frag_hint
 PSEUDOMODULES += gnrc_sixlowpan_frag_sfr_ecn
+PSEUDOMODULES += gnrc_sixlowpan_frag_sfr_ecn_fqueue
 PSEUDOMODULES += gnrc_sixlowpan_frag_sfr_ecn_if_in
 PSEUDOMODULES += gnrc_sixlowpan_frag_sfr_ecn_if_out
-PSEUDOMODULES += gnrc_sixlowpan_frag_sfr_ecn_fqueue
 PSEUDOMODULES += gnrc_sixlowpan_frag_sfr_stats
 ##
 ## @addtogroup net_gnrc_sixlowpan_frag_sfr_congure
@@ -215,25 +266,29 @@ PSEUDOMODULES += gnrc_sixlowpan_frag_sfr_stats
 ##
 PSEUDOMODULES += gnrc_sixlowpan_frag_sfr_congure
 ## @defgroup net_gnrc_sixlowpan_frag_sfr_congure_abe gnrc_sixlowpan_frag_sfr_congure_abe: TCP Reno with ABE
-## @brief  Congestion control for SFR using the [TCP Reno congestion control algorithm with ABE](@ref sys_congure_abe)
+## @brief  Congestion control for SFR using the
+##         [TCP Reno congestion control algorithm with ABE](@ref sys_congure_abe)
 ##
-## Provides an Alternative Backoff with Explicit Content Notification (ABE) to TCP-Reno-based congestion
-## control
+## Provides an Alternative Backoff with Explicit Content Notification (ABE)
+## to TCP-Reno-based congestion control
 ## @{
 PSEUDOMODULES += gnrc_sixlowpan_frag_sfr_congure_abe
 ## @}
 ## @defgroup net_gnrc_sixlowpan_frag_sfr_congure_reno gnrc_sixlowpan_frag_sfr_congure_reno: TCP Reno
-## @brief  Congestion control for SFR using the [TCP Reno congestion control algorithm](@ref sys_congure_reno)
+## @brief  Congestion control for SFR using the
+##         [TCP Reno congestion control algorithm](@ref sys_congure_reno)
 ## @{
 PSEUDOMODULES += gnrc_sixlowpan_frag_sfr_congure_reno
 ## @}
 ## @defgroup net_gnrc_sixlowpan_frag_sfr_congure_quic gnrc_sixlowpan_frag_sfr_congure_quic: QUIC CC
-## @brief  Congestion control for SFR using the [congestion control algorithm of QUIC](@ref sys_congure_quic)
+## @brief  Congestion control for SFR using the
+##         [congestion control algorithm of QUIC](@ref sys_congure_quic)
 ## @{
 PSEUDOMODULES += gnrc_sixlowpan_frag_sfr_congure_quic
 ## @}
 ## @defgroup net_gnrc_sixlowpan_frag_sfr_congure_sfr gnrc_sixlowpan_frag_sfr_congure_sfr: Appendix C
-## @brief  Basic congestion control for 6LoWPAN SFR as proposed in Appendix C of RFC 8931
+## @brief  Basic congestion control for 6LoWPAN SFR as proposed in
+##         Appendix C of RFC 8931
 ## @see    [RFC 8931, Appendix C](https://tools.ietf.org/html/rfc8931#section-appendix.c)
 ## @{
 PSEUDOMODULES += gnrc_sixlowpan_frag_sfr_congure_sfr
@@ -245,25 +300,32 @@ PSEUDOMODULES += gnrc_sixlowpan_router_default
 PSEUDOMODULES += gnrc_sock_async
 PSEUDOMODULES += gnrc_sock_check_reuse
 PSEUDOMODULES += gnrc_txtsnd
+
+PSEUDOMODULES += ieee802154_rx_timestamp
 PSEUDOMODULES += ieee802154_security
 PSEUDOMODULES += ieee802154_submac
 PSEUDOMODULES += ieee802154_submac_soft_ack
 PSEUDOMODULES += ipv4
 PSEUDOMODULES += ipv6
+
 PSEUDOMODULES += l2filter_blacklist
 PSEUDOMODULES += l2filter_whitelist
-PSEUDOMODULES += libstdcpp
-PSEUDOMODULES += log
-PSEUDOMODULES += lora
-PSEUDOMODULES += lwext4_no_gpl
-PSEUDOMODULES += lwext2_vfs
-PSEUDOMODULES += lwext3_vfs
-PSEUDOMODULES += lwext4_vfs
-PSEUDOMODULES += lwext4_vfs_format
+
 ## @defgroup pseudomodule_libc_gettimeofday libc_gettimeofday
 ## @brief Includes implementation of gettimeofday()
 ##
 PSEUDOMODULES += libc_gettimeofday
+
+PSEUDOMODULES += libstdcpp
+PSEUDOMODULES += log
+PSEUDOMODULES += lora
+PSEUDOMODULES += lpc1768_eth_auto
+PSEUDOMODULES += lpc1768_eth_link_up
+PSEUDOMODULES += lwext2_vfs
+PSEUDOMODULES += lwext3_vfs
+PSEUDOMODULES += lwext4_no_gpl
+PSEUDOMODULES += lwext4_vfs
+PSEUDOMODULES += lwext4_vfs_format
 
 ## @defgroup pseudomodule_mpu_stack_guard mpu_stack_guard
 ## @brief MPU based stack guard
@@ -277,87 +339,107 @@ PSEUDOMODULES += mpu_stack_guard
 ## @brief Mark RAM as non-executable using the MPU
 ##
 ## Mark the RAM non executable.
-## This is a protection mechanism which makes exploitation of buffer overflows significantly harder.
+## This is a protection mechanism which makes exploitation of buffer overflows
+## significantly harder.
 PSEUDOMODULES += mpu_noexec_ram
 ## @}
 
-## @defgroup pseudomodule_pmp_noexec_ram pmp_noexec_ram
-## @{
-## @brief Mark RAM as non-executable using the PMP
-##
-## Mark the RAM non executable.
-## This is a protection mechanism which makes exploitation of buffer overflows significantly harder.
-PSEUDOMODULES += pmp_noexec_ram
-## @}
-
 PSEUDOMODULES += mtd_write_page
+
 PSEUDOMODULES += nanocoap_%
 PSEUDOMODULES += nanocoap_fileserver_callback
 PSEUDOMODULES += nanocoap_fileserver_delete
 PSEUDOMODULES += nanocoap_fileserver_put
 PSEUDOMODULES += netdev_default
+PSEUDOMODULES += netdev_ieee802154
 PSEUDOMODULES += netdev_ieee802154_%
 PSEUDOMODULES += netdev_ieee802154_rx_timestamp
-PSEUDOMODULES += netdev_ieee802154
+NO_PSEUDOMODULES += netdev_ieee802154_submac
 PSEUDOMODULES += netdev_eth
 PSEUDOMODULES += netdev_layer
 PSEUDOMODULES += netdev_legacy_api
 PSEUDOMODULES += netdev_new_api
 PSEUDOMODULES += netdev_register
 PSEUDOMODULES += netstats
-PSEUDOMODULES += netstats_l2
-PSEUDOMODULES += netstats_neighbor_etx
-PSEUDOMODULES += netstats_neighbor_count
-PSEUDOMODULES += netstats_neighbor_rssi
-PSEUDOMODULES += netstats_neighbor_lqi
-PSEUDOMODULES += netstats_neighbor_tx_time
 PSEUDOMODULES += netstats_ipv6
+PSEUDOMODULES += netstats_l2
+PSEUDOMODULES += netstats_neighbor_count
+PSEUDOMODULES += netstats_neighbor_etx
+PSEUDOMODULES += netstats_neighbor_lqi
+PSEUDOMODULES += netstats_neighbor_rssi
+PSEUDOMODULES += netstats_neighbor_tx_time
 PSEUDOMODULES += netstats_rpl
-PSEUDOMODULES += nimble
-PSEUDOMODULES += nimble_adv_ext
-PSEUDOMODULES += nimble_autoconn_%
-PSEUDOMODULES += nimble_netif_ext
-PSEUDOMODULES += nimble_phy_coded
-PSEUDOMODULES += nimble_phy_2mbit
-PSEUDOMODULES += nimble_rpble_ext
-PSEUDOMODULES += nimble_statconn_ext
-PSEUDOMODULES += nimble_autoadv_shell
-PSEUDOMODULES += nrfx
 PSEUDOMODULES += newlib
 PSEUDOMODULES += newlib_gnu_source
 PSEUDOMODULES += newlib_nano
+PSEUDOMODULES += nimble
+PSEUDOMODULES += nimble_adv_ext
+PSEUDOMODULES += nimble_autoadv_shell
+PSEUDOMODULES += nimble_autoconn_%
+PSEUDOMODULES += nimble_netif_ext
+PSEUDOMODULES += nimble_phy_2mbit
+PSEUDOMODULES += nimble_phy_coded
+PSEUDOMODULES += nimble_rpble_ext
+PSEUDOMODULES += nimble_statconn_ext
 PSEUDOMODULES += nrf24l01p_ng_diagnostics
+PSEUDOMODULES += nrfx
+
+# print ascii representation in function od_hex_dump()
+PSEUDOMODULES += od_string
+
 PSEUDOMODULES += opendsme
 PSEUDOMODULES += openthread
+
+# declare periph submodules as pseudomodules, but exclude periph_common
+PSEUDOMODULES += periph_%
+NO_PSEUDOMODULES += periph_common
+
 PSEUDOMODULES += picolibc
 PSEUDOMODULES += picolibc_stdout_buffered
+# Modules to automatically start PIO programs
+PSEUDOMODULES += pio_autostart_%
+
 PSEUDOMODULES += pktqueue
+
+## @defgroup pseudomodule_pmp_noexec_ram pmp_noexec_ram
+## @{
+## @brief Mark RAM as non-executable using the PMP
+##
+## Mark the RAM non executable.
+## This is a protection mechanism which makes exploitation of buffer overflows
+## significantly harder.
+PSEUDOMODULES += pmp_noexec_ram
+## @}
+
 PSEUDOMODULES += posix_headers
 PSEUDOMODULES += printf_float
 PSEUDOMODULES += printf_long_long
 PSEUDOMODULES += prng
+# add all pseudo random number generator variants as pseudomodules
 PSEUDOMODULES += prng_%
-PSEUDOMODULES += psa_riot_cipher_aes_common
-PSEUDOMODULES += psa_riot_cipher_aes_128_ecb
+
 PSEUDOMODULES += psa_riot_cipher_aes_128_cbc
+PSEUDOMODULES += psa_riot_cipher_aes_128_ecb
 PSEUDOMODULES += psa_riot_cipher_aes_192_cbc
 PSEUDOMODULES += psa_riot_cipher_aes_256_cbc
+PSEUDOMODULES += psa_riot_cipher_aes_common
 PSEUDOMODULES += psa_riot_cipher_chacha20
+PSEUDOMODULES += psa_riot_hashes_hmac_sha256
 PSEUDOMODULES += psa_riot_hashes_md5
+PSEUDOMODULES += psa_riot_hashes_sha3_256
+PSEUDOMODULES += psa_riot_hashes_sha3_384
+PSEUDOMODULES += psa_riot_hashes_sha3_512
 PSEUDOMODULES += psa_riot_hashes_sha_1
 PSEUDOMODULES += psa_riot_hashes_sha_224
 PSEUDOMODULES += psa_riot_hashes_sha_256
 PSEUDOMODULES += psa_riot_hashes_sha_384
 PSEUDOMODULES += psa_riot_hashes_sha_512
-PSEUDOMODULES += psa_riot_hashes_sha3_256
-PSEUDOMODULES += psa_riot_hashes_sha3_384
-PSEUDOMODULES += psa_riot_hashes_sha3_512
 PSEUDOMODULES += psa_riot_hashes_sha_512_224
 PSEUDOMODULES += psa_riot_hashes_sha_512_256
-PSEUDOMODULES += psa_riot_hashes_hmac_sha256
-PSEUDOMODULES += fortuna_reseed
+
 PSEUDOMODULES += riotboot_%
 PSEUDOMODULES += rtt_cmd
+
 PSEUDOMODULES += saul_adc
 PSEUDOMODULES += saul_bat_voltage
 PSEUDOMODULES += saul_default
@@ -371,7 +453,7 @@ PSEUDOMODULES += sched_runq_callback
 ## @defgroup pseudomodule_sema_deprecated sema_deprecated
 ## @ingroup sys_sema
 ## @{
-## @deprecated  Will be removed after 2021.07 release.
+## @deprecated  Will be removed after the 2021.07 release.
 PSEUDOMODULES += sema_deprecated
 ## @}
 PSEUDOMODULES += semtech_loramac_rx
@@ -398,6 +480,7 @@ PSEUDOMODULES += shell_builtin_cmd_help_json
 PSEUDOMODULES += shell_cmd_app_metadata
 PSEUDOMODULES += shell_cmd_at30tse75x
 PSEUDOMODULES += shell_cmd_benchmark_udp
+PSEUDOMODULES += shell_cmd_bplib
 PSEUDOMODULES += shell_cmd_ccn-lite-utils
 PSEUDOMODULES += shell_cmd_conn_can
 PSEUDOMODULES += shell_cmd_cord_ep
@@ -423,7 +506,8 @@ PSEUDOMODULES += shell_cmd_gnrc_txtsnd
 ## @defgroup sys_shell_commands_gnrc_udp GNRC UDP shell command
 ## @ingroup sys_shell_commands
 ## @{
-## @deprecated use @ref sys_shell_commands_udp instead. will be removed after release 2026.10
+## @deprecated Use @ref sys_shell_commands_udp instead. will be removed after
+##             the 2026.10 release.
 PSEUDOMODULES += shell_cmd_gnrc_udp
 ## @}
 PSEUDOMODULES += shell_cmd_heap
@@ -457,19 +541,23 @@ PSEUDOMODULES += shell_cmd_sys
 PSEUDOMODULES += shell_cmd_udp
 PSEUDOMODULES += shell_cmd_udp_server
 PSEUDOMODULES += shell_cmd_udptty
-PSEUDOMODULES += shell_cmd_xipfs
 PSEUDOMODULES += shell_cmd_vfs
+PSEUDOMODULES += shell_cmd_xipfs
 PSEUDOMODULES += shell_cmds_default
 PSEUDOMODULES += shell_hooks
 PSEUDOMODULES += shell_lock_auto_locking
 PSEUDOMODULES += shield_llcc68
 PSEUDOMODULES += shield_sx1262
 PSEUDOMODULES += shield_w5100
-PSEUDOMODULES += stdio_slipdev
+
+# Submodules provided by Skald
+PSEUDOMODULES += skald_ibeacon
+PSEUDOMODULES += skald_eddystone
+
+PSEUDOMODULES += slipdev
 PSEUDOMODULES += slipdev_config
 PSEUDOMODULES += slipdev_l2addr
 PSEUDOMODULES += slipdev_net
-PSEUDOMODULES += slipdev
 PSEUDOMODULES += sock
 PSEUDOMODULES += sock_async
 PSEUDOMODULES += sock_aux_local
@@ -496,6 +584,8 @@ PSEUDOMODULES += stdio_default
 PSEUDOMODULES += stdio_dispatch
 PSEUDOMODULES += stdio_ethos
 PSEUDOMODULES += stdio_nimble_debug
+PSEUDOMODULES += stdio_notify
+PSEUDOMODULES += stdio_slipdev
 PSEUDOMODULES += stdio_telnet
 ## @defgroup sys_stdio_uart_onlcr   Support for DOS line endings in STDIO-UART
 ## @ingroup sys_stdio_uart
@@ -509,10 +599,17 @@ PSEUDOMODULES += stm32_eth
 PSEUDOMODULES += stm32_eth_auto
 PSEUDOMODULES += stm32_eth_link_up
 PSEUDOMODULES += stm32_eth_tracing
+# STM32 periph pseudomodules
+PSEUDOMODULES += stm32_periph_%
 PSEUDOMODULES += stm32mp1_eng_mode
-PSEUDOMODULES += suit_transport_%
 PSEUDOMODULES += suit_storage_%
+PSEUDOMODULES += suit_transport_%
 PSEUDOMODULES += sys_bus_%
+
+# declare shell version of test_utils_interactive_sync
+PSEUDOMODULES += test_utils_interactive_sync_shell
+PSEUDOMODULES += test_utils_main_exit_cb
+
 PSEUDOMODULES += tiny_strerror_as_strerror
 PSEUDOMODULES += tiny_strerror_minimal
 
@@ -522,7 +619,14 @@ PSEUDOMODULES += unicoap_driver_rfc7252_common
 # Alias for unicoap_driver_rfc7252_common_pdu, and is hence a pseudomodule
 PSEUDOMODULES += unicoap_driver_rfc7252_pdu
 
+# Common sock dependencies of sock-based CoAP drivers in unicoap
+PSEUDOMODULES += unicoap_sock_support
+
+# XFA support for CoAP resource definitions in unicoap server
+PSEUDOMODULES += unicoap_server_resource_declarations
+
 PSEUDOMODULES += usbus_urb
+
 PSEUDOMODULES += vdd_lc_filter_%
 ## @defgroup pseudomodule_vfs_auto_format vfs_auto_format
 ## @brief Format mount points at startup unless they can be mounted
@@ -557,19 +661,23 @@ PSEUDOMODULES += vfs_auto_mount
 ## backends.
 PSEUDOMODULES += vfs_default
 
+PSEUDOMODULES += wakaama_objects_%
 PSEUDOMODULES += walltime_default
 PSEUDOMODULES += walltime_impl_ds1307
 PSEUDOMODULES += walltime_impl_ds3231
+PSEUDOMODULES += walltime_impl_max31331
+PSEUDOMODULES += walltime_impl_max31343
 PSEUDOMODULES += walltime_impl_rtc
-PSEUDOMODULES += wakaama_objects_%
-PSEUDOMODULES += wifi_scan_list
 PSEUDOMODULES += wifi_enterprise
+PSEUDOMODULES += wifi_scan_list
+
 PSEUDOMODULES += xtimer_on_ztimer
 PSEUDOMODULES += xtimer_no_ztimer_default
+
 PSEUDOMODULES += zptr
 PSEUDOMODULES += ztimer
-PSEUDOMODULES += ztimer_%
 PSEUDOMODULES += ztimer64_%
+PSEUDOMODULES += ztimer_%
 
 ## @defgroup pseudomodule_ztimer_auto_adjust ztimer_auto_adjust
 ## @brief A module to set on init ztimer->adjust_sleep/adjust_set values
@@ -582,59 +690,16 @@ PSEUDOMODULES += ztimer64_%
 ## a configurable @ref CONFIG_ZTIMER_AUTO_ADJUST_SETTLE value can be set for this.
 ##
 ## Alternatively CONFIG_ZTIMER_USEC_ADJUST_% values can be set in the BOARDs
-## configuration header board.h. These can be found out by running tests/sys/ztimer_overhead
+## configuration header board.h. These can be found out by running
+## `tests/sys/ztimer_overhead`.
 PSEUDOMODULES += ztimer_auto_adjust
-
-# core_lib is not a submodule
-NO_PSEUDOMODULES += core_lib
 
 # ztimer's main module is called "ztimer_core"
 NO_PSEUDOMODULES += ztimer_core
-NO_PSEUDOMODULES += netdev_ieee802154_submac
 
-# print ascii representation in function od_hex_dump()
-PSEUDOMODULES += od_string
-
-# add all pseudo random number generator variants as pseudomodules
-PSEUDOMODULES += prng_%
-
-# STM32 periph pseudomodules
-PSEUDOMODULES += stm32_periph_%
-
-# declare periph submodules as pseudomodules, but exclude periph_common
-PSEUDOMODULES += periph_%
-NO_PSEUDOMODULES += periph_common
-
-# Modules to automatically start PIO programs
-PSEUDOMODULES += pio_autostart_%
-
-# Submodules provided by Skald
-PSEUDOMODULES += skald_ibeacon
-PSEUDOMODULES += skald_eddystone
-
-PSEUDOMODULES += crypto_aes_128
-PSEUDOMODULES += crypto_aes_192
-PSEUDOMODULES += crypto_aes_256
-# By using this pseudomodule, T tables will be precalculated.
-PSEUDOMODULES += crypto_aes_precalculated
-# This pseudomodule causes a loop in AES to be unrolled (more flash, less CPU)
-PSEUDOMODULES += crypto_aes_unroll
-
-# declare shell version of test_utils_interactive_sync
-PSEUDOMODULES += test_utils_interactive_sync_shell
-PSEUDOMODULES += test_utils_main_exit_cb
-
-# All auto_init modules are pseudomodules
-PSEUDOMODULES += auto_init_%
-NO_PSEUDOMODULES += auto_init_can
-NO_PSEUDOMODULES += auto_init_loramac
-NO_PSEUDOMODULES += auto_init_multimedia
-NO_PSEUDOMODULES += auto_init_security
-NO_PSEUDOMODULES += auto_init_usbus
-NO_PSEUDOMODULES += auto_init_screen
-NO_PSEUDOMODULES += auto_init_wdt_event
-NO_PSEUDOMODULES += auto_init_wdt_thread
-
-# Packages and drivers may also add modules to PSEUDOMODULES in their `Makefile.include`.
+################################################################################
+# Don't you dare to add your pseudomodule to the bottom of the list
+# instead of putting it in alphabetical order! :<
+################################################################################
 
 ## @}

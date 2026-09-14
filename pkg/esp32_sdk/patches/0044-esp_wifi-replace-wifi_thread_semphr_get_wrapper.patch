@@ -28,7 +28,7 @@ index 92795986d89..fa1113590f2 100644
  
  static void * wifi_thread_semphr_get_wrapper(void)
  {
-+#if defined(RIOT_VERSION)
++#if defined(RIOT_OS)
 +    extern void *riot_wifi_thread_semphr_get(void);
 +    return riot_wifi_thread_semphr_get();
 +#else
@@ -51,7 +51,7 @@ index 59e69b3d785..3e3b616c407 100644
  
  static void * wifi_thread_semphr_get_wrapper(void)
  {
-+#if defined(RIOT_VERSION)
++#if defined(RIOT_OS)
 +    extern void *riot_wifi_thread_semphr_get(void);
 +    return riot_wifi_thread_semphr_get();
 +#else
@@ -74,7 +74,7 @@ index c4b37a1802e..017e35e9858 100644
  
  static void *wifi_thread_semphr_get_wrapper(void)
  {
-+#if defined(RIOT_VERSION)
++#if defined(RIOT_OS)
 +    extern void *riot_wifi_thread_semphr_get(void);
 +    return riot_wifi_thread_semphr_get();
 +#else
@@ -97,7 +97,7 @@ index 7358e324d6e..5e88bb2f5b8 100644
  
  static void * wifi_thread_semphr_get_wrapper(void)
  {
-+#if defined(RIOT_VERSION)
++#if defined(RIOT_OS)
 +    extern void *riot_wifi_thread_semphr_get(void);
 +    return riot_wifi_thread_semphr_get();
 +#else
@@ -120,7 +120,7 @@ index faa5da10182..b082375f6b0 100644
  
  static void * wifi_thread_semphr_get_wrapper(void)
  {
-+#if defined(RIOT_VERSION)
++#if defined(RIOT_OS)
 +    extern void *riot_wifi_thread_semphr_get(void);
 +    return riot_wifi_thread_semphr_get();
 +#else

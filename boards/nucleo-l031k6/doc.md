@@ -12,7 +12,7 @@ You can find general information about the Nucleo32 boards on the
 
 ## Pinout
 
-<img src="pinouts/nucleo-l432kc-and-more.svg" alt="Pinout for the Nucleo-L031K6 (from STM user manual, UM1956, https://www.st.com/resource/en/user_manual/um1956-stm32-nucleo32-boards-mb1180-stmicroelectronics.pdf, page 32)" width=25% />
+<img src="nucleo-l432kc-and-more.svg" alt="Pinout for the Nucleo-L031K6 (from STM user manual, UM1956, https://www.st.com/resource/en/user_manual/um1956-stm32-nucleo32-boards-mb1180-stmicroelectronics.pdf, page 32)" width=25% />
 
 ### MCU
 

@@ -15,12 +15,15 @@
 
 #include "stdio_base.h"
 
-static void _async_read_wrapper(int fd, void *arg) {
+static void _async_read_wrapper(int fd, void *arg)
+{
+    (void)arg;
+
     uint8_t buf[STDIO_RX_BUFSIZE];
 
     int res = real_read(fd, &buf, sizeof(buf));
     if (res > 0) {
-        isrpipe_write(arg, buf, res);
+        stdio_rx_write(buf, res);
     }
 
     native_async_read_continue(fd);
@@ -30,7 +33,7 @@ static void _init(void)
 {
     native_async_read_setup();
     if (IS_USED(MODULE_STDIN)) {
-        native_async_read_add_int_handler(STDIN_FILENO, &stdin_isrpipe,
+        native_async_read_add_int_handler(STDIN_FILENO, NULL,
                                           _async_read_wrapper);
     }
 }

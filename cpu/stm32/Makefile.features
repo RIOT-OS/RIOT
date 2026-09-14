@@ -29,9 +29,13 @@ ifneq (f1,$(CPU_FAM))
 endif
 
 ifneq (,$(filter $(CPU_FAM),c0 f0 f1 f3 g0 g4 l0 l1 l4 l5 u5 wb wl))
-  FEATURES_PROVIDED += periph_flashpage
-  FEATURES_PROVIDED += periph_flashpage_in_address_space
-  FEATURES_PROVIDED += periph_flashpage_pagewise
+  # The STM32G491 has "Category 4" flash which is currently not supported by
+  # the flashpage peripheral driver.
+  ifeq (,$(filter stm32g491%,$(CPU_MODEL)))
+    FEATURES_PROVIDED += periph_flashpage
+    FEATURES_PROVIDED += periph_flashpage_in_address_space
+    FEATURES_PROVIDED += periph_flashpage_pagewise
+  endif
 endif
 
 ifneq (,$(filter $(CPU_FAM),f0 f2 f3 f4 f7 l0 l1 l4 l5 u5 wb wl))

@@ -152,7 +152,7 @@ static inline bool _dst_not_me(socket_zep_t *dev, const void *buf)
 
     dst_len = ieee802154_get_dst(buf, dst_addr, &dst_pan);
 
-    if (dst_pan.u16 != dev->pan_id) {
+    if (dst_pan.u16 != dev->pan_id && dst_pan.u16 != 0xffff) {
         DEBUG("socket_zep::dst_not_me: PAN ID %x != %x\n", dst_pan.u16, dev->pan_id);
         return true;
     }
@@ -491,7 +491,7 @@ static int _write(ieee802154_dev_t *dev, const iolist_t *iolist)
 
     for (unsigned i = 0; i < n; i++) {
         memcpy(out, iolist->iol_base, iolist->iol_len);
-        chksum = crc16_ccitt_false_update(chksum, iolist->iol_base, iolist->iol_len);
+        chksum = crc16_ccitt_kermit_update(chksum, iolist->iol_base, iolist->iol_len);
         out += iolist->iol_len;
         iolist = iolist->iol_next;
     }
@@ -597,7 +597,15 @@ static int _read(ieee802154_dev_t *dev, void *buf, size_t max_size,
     }
 
     /* skip the ZEP header, just copy payload without FCS */
-    memcpy(buf, zep + 1, res);
+    const void *payload = zep + 1;
+    memcpy(buf, payload, res);
+
+    uint16_t crc = unaligned_get_u16((uint8_t *)payload + res);
+    if (crc16_ccitt_kermit_calc(payload, res) != crc) {
+        DEBUG("socket_zep::read: crc mismatch!\n");
+        return -EINVAL;
+    }
+
     return res;
 }
 

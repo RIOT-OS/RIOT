@@ -45,23 +45,24 @@ function stripDoxygenAnchors(line: string): string {
   return line.replace(/\s*\{#[^}]+\}\s*/g, "").trimEnd();
 }
 
+/** Human-friendly labels for the Doxygen callout/aside commands we render. */
+const CALLOUT_LABELS: Record<string, string> = {
+  warning: "Warning",
+  attention: "Warning",
+  important: "Warning",
+  note: "Note",
+  remark: "Note",
+  tip: "Tip",
+  hint: "Tip",
+};
+
 /**
  * Map Doxygen callout/aside commands to human-friendly labels.
  * @param command The Doxygen callout command (e.g. "warning", "note", "tip", etc.).
  * @returns A human-friendly label for the callout (e.g. "Warning", "Note", "Tip"), or null if the command is not recognized as a callout.
  */
 function getCalloutLabel(command: string): string | null {
-  const key = command.toLowerCase();
-  if (key === "warning" || key === "attention" || key === "important") {
-    return "Warning";
-  }
-  if (key === "note" || key === "remark") {
-    return "Note";
-  }
-  if (key === "tip" || key === "hint") {
-    return "Tip";
-  }
-  return null;
+  return CALLOUT_LABELS[command.toLowerCase()] ?? null;
 }
 
 /**
@@ -100,20 +101,11 @@ export function extractDoxygenGroupTitleFromDoxygen(
   groupPrefix: string,
   fallback: string,
 ): string {
-  const lines = content.split("\n");
-  const defgroupPattern = new RegExp(
-    `@defgroup\\s+${groupPrefix}_[A-Za-z0-9._-]+\\s+(.+)$`
+  const match = content.match(
+    new RegExp(`@defgroup\\s+${groupPrefix}_[A-Za-z0-9._-]+\\s+(.+)$`, "m"),
   );
 
-  for (let i = 0; i < lines.length; i++) {
-    const match = lines[i].match(defgroupPattern);
-    if (!match) {
-      continue;
-    }
-    return stripAsterisksAndQuotes(match[1]);
-  }
-
-  return fallback;
+  return match ? stripAsterisksAndQuotes(match[1]) : fallback;
 }
 
 /**
@@ -184,40 +176,110 @@ function transformImageLine(line: string): string | null {
 }
 
 /**
- * Transform Doxygen markdown content to remove unsupported directives and convert some to standard markdown.
- * @param content The raw Doxygen markdown content to transform.
- * @returns The transformed markdown content with unsupported directives removed and some converted to standard markdown.
- * @warn This function does not support all Doxygen directives and may not cover all edge cases.
- *          It is intended to handle the most common directives found in RIOT board documentation,
- *          but may need to be extended in the future to support additional directives or edge cases.
+ * Astro site-relative path under which the images of the Doxygen source tree are
+ * served.
  */
-export function transformDoxygenMarkdown(content: string): string {
-  // Split the content into lines and process each line to handle Doxygen directives.
-  const sourceLines = content.split(/\r?\n/);
-  const out: string[] = [];
+const IMAGE_BASE_PATH = "/img";
 
-  for (let i = 0; i < sourceLines.length; i++) {
-    const rawLine = sourceLines[i];
-    const line = rawLine.trim();
-    const brief = transformBriefLine(line);
-    const callout = transformCalloutLine(line);
-    const image = transformImageLine(line);
+/** File extensions that are treated as images when rewriting relative paths. */
+const IMAGE_EXTENSION_PATTERN = /\.(?:svg|png|jpe?g|gif|webp|avif)$/i;
 
-    if (isGroupMetadata(line)) {
-      // If desired, we could potentially use these to structure the content in the future,
-      // but for now we just ignore them.
-    } else if (brief !== null) {
-      out.push(brief);
-    } else if (callout !== null) {
-      if (callout) {
-        out.push(callout);
-      }
-    } else if (image !== null) {
-      out.push(image);
-    } else {
-      out.push(stripDoxygenAnchors(replaceInlineDoxygenCommands(rawLine)));
-    }
+/** URLs that must be kept as they are (absolute, protocol relative, data, anchors). */
+const ABSOLUTE_URL_PATTERN = /^(?:[A-Za-z][A-Za-z0-9+.-]*:|\/\/|\/|#)/;
+
+/**
+ * Rewrite a single image reference to a path that the site can serve.
+ *
+ * Doxygen resolves image references through its IMAGE_PATH, because the docs sadly
+ * only spell out the file name (e.g. `nucleo-f031k6-and-more.svg`) even though the
+ * file lives in `doc/doxygen/src/pinouts/`.
+ * The image will be hosted by starlight inside the `IMAGE_BASE_PATH`.
+ *
+ * @param target The image reference as written in the Doxygen documentation.
+ * @returns The rewritten reference, or the unchanged target if it is not a relative image.
+ */
+function rewriteImageReference(target: string): string {
+  if (
+    ABSOLUTE_URL_PATTERN.test(target) ||
+    !IMAGE_EXTENSION_PATTERN.test(target)
+  ) {
+    return target;
   }
 
-  return out.join("\n");
+  // Only the file name is relevant
+  const fileName = target.split("/").pop();
+  return `${IMAGE_BASE_PATH}/${fileName}`;
+}
+
+/**
+ * Rewrite the relative image references of a line of text, both in markdown
+ * image syntax (`![alt](file.svg)`) and in raw `<img>` tags, which the board
+ * and CPU docs use to be able to set an image width.
+ *
+ * @param line The line of text to rewrite the image references in.
+ * @returns The line of text with all relative image references rewritten.
+ */
+function rewriteImageReferences(line: string): string {
+  return line
+    .replace(
+      /(<img\b[^>]*?\ssrc\s*=\s*(["']))(.*?)\2/gi,
+      (_match, prefix: string, quote: string, target: string) =>
+        `${prefix}${rewriteImageReference(target)}${quote}`,
+    )
+    .replace(
+      /(!\[[^\]]*\]\(\s*)([^)\s]+)/g,
+      (_match, prefix: string, target: string) =>
+        `${prefix}${rewriteImageReference(target)}`,
+    );
+}
+
+/**
+ * Transform a single line of Doxygen markdown.
+ * @param rawLine The untrimmed input line.
+ * @returns The transformed line, or null if the line should be dropped.
+ */
+function transformDoxygenLine(rawLine: string): string | null {
+  const line = rawLine.trim();
+
+  // Group metadata could be used to structure the content in the future,
+  // but for now we just drop it.
+  if (isGroupMetadata(line)) {
+    return null;
+  }
+
+  const brief = transformBriefLine(line);
+  if (brief !== null) {
+    return brief;
+  }
+
+  // Callout commands without a human-friendly label (e.g. @experimental)
+  // yield an empty string and are dropped.
+  const callout = transformCalloutLine(line);
+  if (callout !== null) {
+    return callout || null;
+  }
+
+  const image = transformImageLine(line);
+  if (image !== null) {
+    return rewriteImageReferences(image);
+  }
+
+  return rewriteImageReferences(
+    stripDoxygenAnchors(replaceInlineDoxygenCommands(rawLine)),
+  );
+}
+
+/**
+ * Transform Doxygen markdown content to remove unsupported directives and
+ * convert some to standard markdown.
+ *
+ * @param content The raw Doxygen markdown content to transform.
+ * @returns The transformed markdown content.
+ */
+export function transformDoxygenMarkdown(content: string): string {
+  return content
+    .split(/\r?\n/)
+    .map(transformDoxygenLine)
+    .filter((line): line is string => line !== null)
+    .join("\n");
 }

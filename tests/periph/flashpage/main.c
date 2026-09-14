@@ -91,7 +91,7 @@ static int getpage(const char *str)
 #ifdef MODULE_PERIPH_FLASHPAGE_PAGEWISE
 static void memdump(void *addr, size_t len)
 {
-    od_hex_dump	(addr, len, LINE_LEN);
+    od_hex_dump(addr, len, LINE_LEN);
 }
 
 static void dump_local(void)

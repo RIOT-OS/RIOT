@@ -1,0 +1,3 @@
+# UART_DEV(0) is reserved for the GNSS module
+STDIO_UART_DEV ?= 1
+UF2_SOFTDEV ?= SD730

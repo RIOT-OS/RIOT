@@ -19,10 +19,11 @@
 #define ENABLE_DEBUG 0
 #include "debug.h"
 
-#include "net/gnrc.h"
-#include "luid.h"
 #include "gnrc_netif_nrf24l01p_ng.h"
+#include "luid.h"
+#include "net/gnrc.h"
 #include "nrf24l01p_ng.h"
+#include "utlist.h"
 
 /**
  * @brief   Broadcast/Multicast flag

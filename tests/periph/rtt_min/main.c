@@ -73,5 +73,14 @@ int main(void)
     printf("RTT_MIN_OFFSET for %s over %" PRIu32 " samples: %" PRIu32 "\n",
            RIOT_BOARD, samples, value);
 
+    if (value <= RTT_MIN_OFFSET) {
+        printf("OK %" PRIu32 " <= %u\n", value, RTT_MIN_OFFSET);
+    }
+    else {
+        printf("BAD %" PRIu32 " > %u\n", value, RTT_MIN_OFFSET);
+        printf("Please define RTT_MIN_OFFSET as (%" PRIu32"U) in your CPU's " \
+               "periph_cpu.h file!\n", value);
+    }
+
     return 0;
 }

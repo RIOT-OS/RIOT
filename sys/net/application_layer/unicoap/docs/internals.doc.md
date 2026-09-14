@@ -3,11 +3,12 @@
 @{
 
 ## CoAP 101
-CoAP was originally specified in [RFC 7252](https://datatracker.ietf.org/doc/html/rfc7252)
-and could only be used in combination with UDP and DTLS as transport protocols.
-[RFC 8223](https://datatracker.ietf.org/doc/html/rfc8323) modified the CoAP format
-for sending CoAP messages over TCP, TLS, and WebSockets (including WebSockets over TLS).
-There is also an Internet Draft for [CoAP over GATT (BLE)](https://datatracker.ietf.org/doc/draft-amsuess-core-coap-over-gatt).
+CoAP was originally specified in [RFC 7252](https://datatracker.ietf.org/doc/html/rfc7252) and could
+only be used in combination with UDP and DTLS as transport protocols.
+[RFC 8223](https://datatracker.ietf.org/doc/html/rfc8323) modified the CoAP format for sending CoAP
+messages over TCP, TLS, and WebSockets (including WebSockets over TLS). There is also an Internet
+Draft for
+[CoAP over GATT (BLE)](https://datatracker.ietf.org/doc/draft-amsuess-core-coap-over-gatt).
 
 Each of these standards leverage different messaging models, i.e., what timeouts to apply, how
 reliable transmission is implemented, and what messages are allowed to be sent
@@ -40,9 +41,9 @@ Here, `unicoap` coordinates with the operating system networking interface.
 <img src="unicoap-layers.svg" alt="Figure 1: Layered Design of unicoap" width="500em"/>
 
 ### Overview of CoAP Combinations
-To better illustrate what parts of the CoAP stack differ, have a look
-at the following graph, where each node represents a version of a certain layer. Each leaf node stands for
-a different CoAP combination ("CoAP over ...") specification.
+To better illustrate what parts of the CoAP stack differ, have a look at the following graph, where
+each node represents a version of a certain layer. Each leaf node stands for a different CoAP
+combination ("CoAP over ...") specification.
 ```
                                   Requests/Responses
                              RFC 7252, RFC 7641, RFC 7959, ...
@@ -75,7 +76,7 @@ using confirmable and acknowledgement messages.
 
 @see [RFC 7252](https://datatracker.ietf.org/doc/html/rfc7252)
 
-#### CoAP over TCP, CoAP over TLS, and CoAP over WebScokets (RFC 8323)
+#### CoAP over TCP, CoAP over TLS, and CoAP over WebSockets (RFC 8323)
 RFC 8323 eliminates the need for reliability to be implemented on the application layer, as the underlying
 transport protocol already provides reliability. While message processing looks the same for both
 CoAP over TCP/TLS ([RFC 8323, Section 3](https://datatracker.ietf.org/doc/html/rfc8323#section-3)) and
@@ -100,41 +101,45 @@ to use the CoAP over UDP driver, you import the `unicoap_driver_udp` by adding i
 Makefile variable: `USEMODULE += unicoap_driver_udp`.
 
 Drivers themselves can in turn consist of a shared module for messaging and a specific transport
-support module. For example, the CoAP over DTLS driver encompasses a transport module for DTLS networking;
-and depends on the common RFC 7252 messaging module also employed by the CoAP over UDP driver.
-You can see this relationship in `Makefile.dep` in the `unicoap` source directory: The common
-messaging module is a shared dependency of both the @ref net_unicoap_drivers_udp and @ref net_unicoap_drivers_dtls.
-driver module. We encourage you to follow the same approach for CoAP combinations that share a common
-messaging model, such as CoAP over TCP, TLS, and WebSockets when implementing these.
+support module. For example, the CoAP over DTLS driver encompasses a transport module for DTLS
+networking; and depends on the common RFC 7252 messaging module also employed by the CoAP over UDP
+driver. You can see this relationship in `Makefile.dep` in the `unicoap` source directory: The
+common messaging module is a shared dependency of both the @ref net_unicoap_drivers_udp and
+@ref net_unicoap_drivers_dtls driver module. We encourage you to follow the same approach for CoAP
+combinations that share a common messaging model, such as CoAP over TCP, TLS, and WebSockets when
+implementing these.
 
 On a high level, each driver interacts with the upper layers on these three occasions:
 
 - **Initialization and deinitialization**:
-  Drivers must provide an [initialization](/FIXME-upcoming-pr-unicoap_init) and [teardown](/FIXME-upcoming-pr-unicoap_deinit)
+  Drivers must provide an [initialization](@ref unicoap_init) and [teardown](@ref unicoap_deinit).
   These may be used for setup work in the transport and messaging layer such as for creating
   sockets or establishing connections to peripherals, alongside allocating objects required for messaging.
 
-- **Sending side / Outbound**:
-  A driver must expose a standardized API for [sending from the messaging layer](/FIXME-upcoming-pr-unicoap_messaging_send).
-  The exchange layer will call into this functionality, prompting the driver to perform any due
-  work in the messaging layer like attempting to retransmit the message. Apart from the message,
-  as well as the remote and local endpoint, this function accepts flags that customize transmission
-  behavior. The RFC 7252 message type is abstracted into a _reliability_ flag the messaging layer in
-  the CoAP over UDP and DTLS drivers interpret as an instruction to send a confirmable message. When
-  finished, the messaging layer serializes the message and forwards it to the transport
-  implementation.
+- **Sending side / Outbound**: A driver must expose a standardized API for
+  [sending from the messaging layer](@ref unicoap_messaging_send). The exchange layer will call into
+  this functionality, prompting the driver to perform any due work in the messaging layer like
+  attempting to retransmit the message. Apart from the message, as well as the remote and local
+  endpoint, this function accepts flags that customize transmission behavior. The RFC 7252 message
+  type is abstracted into a _reliability_ flag the messaging layer in the CoAP over UDP and DTLS
+  drivers interpret as an instruction to send a confirmable message. When finished, the messaging
+  layer serializes the message and forwards it to the transport implementation.
 
-- **Receiving side / Inbound**:
-  Upon receipt of a new message, each driver will need to invoke an [exchange-layer processing function](/FIXME-upcoming-pr-unicoap_exchange_process).
+- **Receiving side / Inbound**: Upon receipt of a new message, each driver will need to invoke an
+  [exchange-layer processing function](@ref unicoap_exchange_process).
 
-- **Ping**: Due to the variability in ping mechanisms (empty `CON` in CoAP over UDP and `7.03` message in CoAP over reliable transports), each driver can implement a ping function. unicoap bundles these APIs and provides a [single, generic ping function that multiplexes](/FIXME-upcoming-pr-unicoap_ping) between the driver implementations.
+- **Ping**: Due to the variability in ping mechanisms (empty `CON` in CoAP over UDP and `7.03`
+  message in CoAP over reliable transports), each driver can implement a ping function. unicoap
+  bundles these APIs and provides a
+  [single, generic ping function that multiplexes](/FIXME-upcoming-pr-unicoap_ping) between the
+  driver implementations.
 
 ### Communication Between Layers
 
 The following figure illustrates communication between layers in a block-wise transfer,
 where a client request from the application may result in multiple
-[`unicoap_messaging_send`](/FIXME-upcoming-pr-unicoap_messaging_send) and
-[`unicoap_exchange_process`](/FIXME-upcoming-pr-unicoap_exchange_process) calls between the
+[`unicoap_messaging_send`](@ref unicoap_messaging_send) and
+[`unicoap_exchange_process`](@ref unicoap_exchange_process) calls between the
 exchange and messaging layer:
 
 <img src="unicoap-layers-comms.svg" alt="Figure 3: Communication between layers" width="600em"/>
@@ -152,7 +157,7 @@ suffixes in the function names depicted in the figure above.
 In the `unicoap` codebase you will encounter several marks (`MARK: ...`)
 that help with extending the suite.
 
-- **MARK: unicoap_driver_extension_point**: Every region of code that would need to be extended to support a new transport protocol or driver is
-  annotated with this mark.
+- **MARK: unicoap_driver_extension_point**: Every region of code that would need to be extended to
+  support a new transport protocol or driver is annotated with this mark.
 
 @}

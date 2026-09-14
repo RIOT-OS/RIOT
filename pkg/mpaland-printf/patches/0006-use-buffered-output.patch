@@ -1,14 +1,14 @@
-From 1070ce82390a7ca9bdaef52f106488ac7ef99645 Mon Sep 17 00:00:00 2001
+From 123962fa0ad5825ee483059ecb3eb537574db611 Mon Sep 17 00:00:00 2001
 From: Marian Buschsieweke <marian.buschsieweke@posteo.net>
 Date: Sun, 19 Oct 2025 16:58:11 +0200
-Subject: [PATCH] use buffered output
+Subject: [PATCH 6/7] use buffered output
 
 ---
- printf.c | 63 +++++++++++++++++++++++++++++++++++++++++---------------
- 1 file changed, 46 insertions(+), 17 deletions(-)
+ printf.c | 55 ++++++++++++++++++++++++++++++++++++++++++-------------
+ 1 file changed, 42 insertions(+), 13 deletions(-)
 
 diff --git a/printf.c b/printf.c
-index 33fd8a6..756fd12 100644
+index be372d8..6604ee0 100644
 --- a/printf.c
 +++ b/printf.c
 @@ -133,6 +133,27 @@ typedef struct {
@@ -47,23 +47,19 @@ index 33fd8a6..756fd12 100644
 +static inline void _out_char(char character, void* _buffer, size_t idx, size_t maxlen)
  {
 -  (void)buffer; (void)idx; (void)maxlen;
--  if (character) {
--    _putchar(character);
--  }
--}
--
--
 +  (void)idx; (void)maxlen;
 +  output_buffer_type *buffer = _buffer;
 +  if (buffer->fill == sizeof(buffer->buf)) {
 +    write_all(buffer->buf, sizeof(buffer->buf));
 +    buffer->fill = 0;
 +  }
-+  if (character) {
+   if (character) {
+-    _putchar(character);
 +    buffer->buf[buffer->fill++] = character;
-+  }
-+}
-+
+   }
+ }
+ 
+-
  // internal output function wrapper
  static inline void _out_fct(char character, void* buffer, size_t idx, size_t maxlen)
  {
@@ -115,7 +111,7 @@ index 33fd8a6..756fd12 100644
  }
  
  
-@@ -962,8 +991,8 @@ int __wrap_putchar(int c)
+@@ -983,8 +1012,8 @@ __attribute__((used))
  int __wrap_puts(const char *s)
  {
    size_t len = strlen(s);
@@ -127,5 +123,5 @@ index 33fd8a6..756fd12 100644
  }
  
 -- 
-2.43.0
+2.39.5
 

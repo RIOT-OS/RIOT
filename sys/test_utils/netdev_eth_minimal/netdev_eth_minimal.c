@@ -44,11 +44,17 @@ void _recv(netdev_t *dev)
     ethernet_hdr_t *header = (ethernet_hdr_t *)_buffer;
     uint8_t *payload = _buffer + sizeof(ethernet_hdr_t);
 
-    putchar('\n');
     data_len = dev->driver->recv(dev, _buffer, sizeof(_buffer), &rx_info);
     if (data_len < 0) {
+        printf("Receive error: %" PRIdSIZE "\n", data_len);
         return;
     }
+    if ((size_t)data_len < sizeof(ethernet_hdr_t)) {
+        printf("Frame too small: %" PRIdSIZE "bytes\n", data_len);
+        return;
+    }
+
+    putchar('\n');
 
     l2util_addr_to_str(header->dst, ETHERNET_ADDR_LEN, _addr_str);
     printf("Dest. addr.: %s\n", _addr_str);
@@ -94,7 +100,7 @@ void netdev_register_signal(struct netdev *dev, netdev_type_t type, uint8_t inde
 {
     (void) type;
 
-    if (index > NETDEV_ETH_MINIMAL_NUMOF) {
+    if (index >= NETDEV_ETH_MINIMAL_NUMOF) {
         return;
     }
     printf("Device %d registered (type: %d)\n", index, type);

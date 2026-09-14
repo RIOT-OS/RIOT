@@ -20,6 +20,8 @@ def testfunc(child):
     test_ongoing = r'Sample \d+'
     while child.expect([test_end, test_ongoing]):
         pass
+    test_result_ok = r'OK \d+ <= \d+'
+    child.expect(test_result_ok)
 
 
 if __name__ == "__main__":

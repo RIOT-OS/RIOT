@@ -1,0 +1,13 @@
+USEMODULE += core_thread_flags
+USEMODULE += periph_gpio
+USEMODULE += periph_gpio_irq
+USEMODULE += periph_spi
+USEMODULE += ztimer
+USEMODULE += ztimer_msec
+
+USEMODULE += decadriver_riot
+
+# if no chip variant has been selected, use DW3000 as default
+ifeq (,$(filter decadriver_dw%,$(USEMODULE)))
+  USEMODULE += decadriver_dw3000
+endif

@@ -41,7 +41,7 @@ static void *_second_thread(void *arg)
 {
     (void)arg;
 
-    while(1) {
+    while (1) {
         thread_flags_wait_any(0x0 - 1);
     }
 
@@ -68,7 +68,7 @@ int main(void)
     uint32_t n = 0;
 
     xtimer_set(&timer, TEST_DURATION);
-    while(!_flag) {
+    while (!_flag) {
         thread_flags_set(tcb, 0x1);
         n++;
     }

@@ -1,0 +1,45 @@
+From: RIOT buildsystem <buildsystem@riot>
+Date: Wed, 20 May 2026 00:00:00 +0100
+Subject: [PATCH] model: work around __unused redefinition with glibc
+
+ Based on https://github.com/raspberrypi/picotool/issues/300#issuecomment-4495672748
+ Affected version (at least):
+    - gcc 16.1.1 20260430 (2.43)
+    - gcc 16.1.1 20260515 (2.43-5)
+---
+ model/model.h | 12 +++++++++++-
+ 1 file changed, 11 insertions(+), 1 deletion(-)
+
+diff --git a/model/model.h b/model/model.h
+index 17bf824..318b0d2 100644
+--- a/model/model.h
++++ b/model/model.h
+@@ -4,9 +4,16 @@
+  * SPDX-License-Identifier: BSD-3-Clause
+  */
+ #pragma once
++
++/* 2026-05-20 Temporary fix for https://github.com/raspberrypi/picotool/issues/300 */
++#undef __unused
++#define __unused __glibc_unused
++
+ #include "boot/uf2.h"
+ #include "boot/picoboot.h"
+ 
++#undef __unused
++
+ // Unreadable ROM data
+ #include "rp2350_a2_rom_end.h"
+ #include "rp2350_a3_rom_end.h"
+@@ -418,4 +425,7 @@ static bool contains_unreadable_rom(uint32_t addr, uint32_t size, const model_t&
+             (addr < model->unreadable_rom_start() && addr + size > model->unreadable_rom_end());
+ }
+ 
+-#endif
+\ No newline at end of file
++#endif
++
++/* 2026-05-20 Temporary fix for https://github.com/raspberrypi/picotool/issues/300 */
++#define __unused __attribute__((__unused__))
+--
+2.49.0

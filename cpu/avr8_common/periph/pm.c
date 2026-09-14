@@ -25,10 +25,10 @@
 #include "debug.h"
 
 /**
- * @note: The pm_set assumes that interrupts are disable and there is no reason
+ * @note  The pm_set assumes that interrupts are disable and there is no reason
  *        to save SREG here.
  *
- * @note: DEBUG affects this routine.
+ * @note  DEBUG affects this routine.
  */
 void pm_set(unsigned mode)
 {

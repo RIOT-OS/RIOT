@@ -1,9 +1,6 @@
 /*
- * Copyright (C) 2017 Freie Universität Berlin
- *
- * This file is subject to the terms and conditions of the GNU Lesser
- * General Public License v2.1. See the file LICENSE in the top level
- * directory for more details.
+ * SPDX-FileCopyrightText: 2017 Freie Universität Berlin
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
 
 /**
@@ -201,7 +198,7 @@ static void on_pingreq(sock_udp_ep_t *remote)
 
 static void on_pingresp(void)
 {
-    /** @todo: trigger update something like a 'last seen' value */
+    /** @todo trigger update something like a 'last seen' value */
 }
 
 static void send_ping(void)

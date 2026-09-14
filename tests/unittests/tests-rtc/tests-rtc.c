@@ -14,6 +14,8 @@
 #include "embUnit.h"
 
 #include "periph/rtc.h"
+#include "time_units.h"
+#include "tm.h"
 
 static void _test_equal_tm(const struct tm *a, const struct tm *b)
 {
@@ -306,6 +308,95 @@ static void test_rtc_localtime(void)
     _test_equal_tm(&t3, &t);
 }
 
+static void test_rtc_rollunder_mday_zero(void)
+{
+    /* The range of mday is given as [1 to 31], so it should roll under
+     * to the previous month on 0. */
+    struct tm tm_source = {
+        .tm_sec  = 0,
+        .tm_min  = 0,
+        .tm_hour = 12,
+        .tm_mday = 0,
+        .tm_mon  = 0,
+        .tm_year = 120
+    };
+    rtc_tm_normalize(&tm_source);
+
+    /* 31st December 2019 */
+    struct tm tm_target = {
+        .tm_sec  = 0,
+        .tm_min  = 0,
+        .tm_hour = 12,
+        .tm_mday = 31,
+        .tm_mon  = TM_MON_DEC,
+        .tm_year = 120 - 1,
+        .tm_wday = TM_WDAY_TUE,
+        .tm_yday = 364,
+        .tm_isdst= 0
+    };
+
+    _test_equal_tm(&tm_target, &tm_source);
+}
+
+static void test_rtc_rollunder_mday_neg(void)
+{
+    /* A negative mday should roll under to the previous month. */
+    struct tm tm_source = {
+        .tm_sec  = 0,
+        .tm_min  = 0,
+        .tm_hour = 12,
+        .tm_mday = -11,
+        .tm_mon  = 0,
+        .tm_year = 120
+    };
+    rtc_tm_normalize(&tm_source);
+
+    /* 20th December 2019 */
+    struct tm tm_target = {
+        .tm_sec  = 0,
+        .tm_min  = 0,
+        .tm_hour = 12,
+        .tm_mday = 20,
+        .tm_mon  = TM_MON_DEC,
+        .tm_year = 120 - 1,
+        .tm_wday = TM_WDAY_FRI,
+        .tm_yday = 353,
+        .tm_isdst= 0
+    };
+
+    _test_equal_tm(&tm_target, &tm_source);
+}
+
+static void test_rtc_rollunder_chained(void)
+{
+    /* Negative values for the basic tm fields (sec, min, hour, mday, mon)
+     * should lead to a chain of roll under events. */
+    struct tm tm_source = {
+        .tm_sec  = -15, /* roll under -1 minute */
+        .tm_min  = -15, /* roll under -1 hour */
+        .tm_hour = -6,  /* roll under -1 day */
+        .tm_mday = -15, /* roll under -1 month */
+        .tm_mon  = -6,  /* roll under -1 year */
+        .tm_year = 120
+    };
+    rtc_tm_normalize(&tm_source);
+
+    /* 14th June 2019 */
+    struct tm tm_target = {
+        .tm_sec  = SEC_PER_MIN - 15,
+        .tm_min  = (MIN_PER_HOUR - 15) - 1,
+        .tm_hour = (HOURS_PER_DAY - 6) - 1,
+        .tm_mday = 14,
+        .tm_mon  = TM_MON_JUN,
+        .tm_year = 120 - 1,
+        .tm_wday = TM_WDAY_FRI,
+        .tm_yday = 164,
+        .tm_isdst= 0
+    };
+
+    _test_equal_tm(&tm_target, &tm_source);
+}
+
 Test *tests_rtc_tests(void)
 {
     EMB_UNIT_TESTFIXTURES(fixtures) {
@@ -319,6 +410,9 @@ Test *tests_rtc_tests(void)
         new_TestFixture(test_rtc_mktime),
         new_TestFixture(test_mktime),
         new_TestFixture(test_rtc_localtime),
+        new_TestFixture(test_rtc_rollunder_mday_zero),
+        new_TestFixture(test_rtc_rollunder_mday_neg),
+        new_TestFixture(test_rtc_rollunder_chained),
     };
 
     EMB_UNIT_TESTCALLER(rtc_tests, NULL, NULL, fixtures);

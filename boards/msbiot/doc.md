@@ -164,13 +164,16 @@ found [here](https://github.com/RIOT-OS/RIOT/tree/master/tests/drivers/mpu9x50).
 |:--------------------- |:------------------------------------------------------------------------------------------------- |
 | Type                  | Nine-Axis MotionTracking Device (Gyro, Accel and Compass)                                         |
 | Vendor                | Invensense                                                                                        |
-| Product Specification | [Product Specification](https://invensense.tdk.com/wp-content/uploads/2015/02/MPU-9150-Datasheet.pdf)    |
-| Register Map          | [Register Map](https://invensense.tdk.com/wp-content/uploads/2015/02/MPU-9150-Register-Map.pdf)             |
+| Product Specification | [Product Specification]                                                                           |
+| Register Map          | [Register Map]                                                                                    |
 | Driver                | @ref drivers_mpu9x50                                                                              |
 | I²C Device            | I2C1 (Mapped to I2C_0 in RIOT)                                                                    |
 | SCL                   | PB6                                                                                               |
 | SDA                   | PB7                                                                                               |
 | IRQ Line              | PB11                                                                                              |
+
+[Product Specification]: https://invensense.tdk.com/wp-content/uploads/2015/02/MPU-9150-Datasheet.pdf
+[Register Map]: https://invensense.tdk.com/wp-content/uploads/2015/02/MPU-9150-Register-Map.pdf
 
 ### Other components
 
@@ -200,14 +203,23 @@ You can flash the board by calling the following command:
 BOARD=msbiot make flash
 ```
 
+### Using RTT as STDIO
+
+By default `stdio_rtt` is used. So just connect the ST-Link and type
+`BOARD=msbiot make term` and you'll get the serial console.
+
 ### Using the UART for STDIO
 
-The MCU's USART2 is set as the default input/output for the MSB-IoT inside
-RIOT (mapped to UART_0). It is initialized and configured automatically for
-every RIOT application and can be used for communication with your computer. The
-easiest way is to use an USB to TTL adapter:
+The MCU's USART2 that is routed to the pin headers is mapped as `UART_0` and
+the default UART for when `stdio_uart` is used. Since `stdio_rtt` is the default
+you need to use
 
-Step 1: Connect your adapter and the boards pin strip with RX<=>PA02,
-TX<=>PA03 and GND<=>GND
+```
+USEMODULE=stdio_uart BOARD=msbio make flash term
+```
 
-Step 2: Done. The MCUs USART2 is used as STDIO.
+Note that you need to rebuild and flash the app when switching the stdio
+backend.
+
+Connect your adapter and the boards pin strip with RX<=>PA02, TX<=>PA03 and
+GND<=>GND

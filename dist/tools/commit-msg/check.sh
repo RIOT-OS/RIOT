@@ -57,7 +57,7 @@ fi
 
 ERROR="$(git log \
     --no-merges --pretty=format:'%s' "$(git merge-base "${BRANCH}" HEAD)"..HEAD | \
-    while read -r msg; do
+    while read -r msg || [ -n "$msg" ]; do
         ERROR=0
         MSG=""
 

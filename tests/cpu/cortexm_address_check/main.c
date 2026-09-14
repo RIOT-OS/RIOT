@@ -36,10 +36,13 @@ static int cmd_check(int argc, char **argv)
 
     address = (char *)address_value;
 
-    if (cpu_check_address(address))
+    if (cpu_check_address(address)) {
         printf("Address 0x%08" PRIx32 " is valid. Feel free to access it\n", address_value);
-    else
-        printf("Address 0x%08" PRIx32 " is NOT valid. Accessing it will result in BusFault\n", address_value);
+    }
+    else {
+        printf("Address 0x%08" PRIx32 " is NOT valid. Accessing it will result in BusFault\n",
+               address_value);
+    }
 
     return 0;
 }

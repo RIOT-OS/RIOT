@@ -29,7 +29,8 @@ void addFailurePSA(const char *func, psa_status_t errcode, long line, const char
     addFailure(msg, line, file);
 }
 
-#define TEST_ASSERT_PSA(func_, do_) { psa_status_t ret = func_; if (ret != PSA_SUCCESS) { addFailurePSA(#func_, ret, __LINE__, __FILE__); do_; } }
+#define TEST_ASSERT_PSA(func_, do_) { psa_status_t ret = func_; if (ret != PSA_SUCCESS) \
+                                    { addFailurePSA(#func_, ret, __LINE__, __FILE__); do_; } }
 #define TEST_ASSERT_PSA_CLEANUP(func_) TEST_ASSERT_PSA(func_, goto cleanup)
 #define TEST_ASSERT_PSA_RETURN(func_) TEST_ASSERT_PSA(func_, return)
 #define TEST_ASSERT_PSA_CONTINUE(func_) TEST_ASSERT_PSA(func_, )

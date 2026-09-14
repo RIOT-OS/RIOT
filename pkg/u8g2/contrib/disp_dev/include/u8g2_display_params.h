@@ -86,6 +86,24 @@ extern "C" {
 #endif
 
 /**
+ * @brief   Default U8G2 rotation function to control the display orientation
+ *
+ * Valid values, defined in u8g2.h, are:
+ * - `U8G2_R0`: No rotation, landscape
+ * - `U8G2_R1`: 90 degree clockwise rotation
+ * - `U8G2_R2`: 180 degree clockwise rotation
+ * - `U8G2_R3`: 270 degree clockwise rotation
+ * - `U8G2_MIRROR`: No rotation, landscape, display content is mirrored
+ *
+ * @see     Check the u8g2 reference for possible rotation functions:
+ *          https://github.com/olikraus/u8g2/wiki/u8g2setupc#setup-arguments
+ */
+#ifndef U8G2_DISPLAY_PARAM_ROTATION_FUNCTION
+#  define U8G2_DISPLAY_PARAM_ROTATION_FUNCTION U8G2_R0
+#endif
+
+
+/**
  * @brief   Default configuration struct
  */
 #ifndef U8G2_DISPLAY_PARAMS
@@ -99,6 +117,7 @@ extern "C" {
                 .pin_reset = U8G2_DISPLAY_PARAM_PIN_RESET, \
             }, \
             .i2c_address = U8G2_DISPLAY_PARAM_I2C_ADDR, \
+            .rotation_function = U8G2_DISPLAY_PARAM_ROTATION_FUNCTION, \
         }
 #endif
 /**@}*/

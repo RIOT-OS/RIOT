@@ -1,9 +1,6 @@
 /*
- * Copyright (C) 2016 Eistec AB
- *
- * This file is subject to the terms and conditions of the GNU Lesser
- * General Public License v2.1. See the file LICENSE in the top level
- * directory for more details.
+ * SPDX-FileCopyrightText: 2016 Eistec AB
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
 
 #pragma once
@@ -21,9 +18,12 @@
  * The overall design goals are:
  * - Provide implementations for all newlib "file" syscalls
  * - Keep it simple, do not add every possible file operation from Linux VFS.
- * - Easy to map existing file system implementations for resource constrained systems onto the VFS layer API
- * - Avoid keeping a central `enum` of all file system drivers that has to be kept up to date with external packages etc.
- * - Use POSIX `<errno.h>` numbers as negative return codes for errors, avoid the global `errno` variable.
+ * - Easy to map existing file system implementations for resource constrained
+ *   systems onto the VFS layer API
+ * - Avoid keeping a central `enum` of all file system drivers that has to be
+ *   kept up to date with external packages etc.
+ * - Use POSIX `<errno.h>` numbers as negative return codes for errors, avoid
+ *   the global `errno` variable.
  * - Only absolute paths to files (no per-process working directory)
  * - No dynamic memory allocation
  *
@@ -63,7 +63,7 @@
 #include "macros/utils.h"
 #include "mtd.h"
 #ifdef MODULE_NANOCOAP_FS
-#include "net/sock/config.h"
+#  include "net/sock/config.h"
 #endif
 #include "xfa.h"
 
@@ -81,7 +81,7 @@ extern "C" {
  * @brief   MAX7 Function to get the largest of 7 values
  */
 #ifndef MAX7
-#define MAX7(a, b, c, d, e, f, g) MAX(MAX(MAX(MAX(MAX((a), (b)), MAX((c), (d))), (e)), (f)), (g))
+#  define MAX7(a, b, c, d, e, f, g) MAX(MAX(MAX(MAX(MAX((a), (b)), MAX((c), (d))), (e)), (f)), (g))
 #endif
 
 /**
@@ -89,7 +89,7 @@ extern "C" {
  * @{
  */
 #ifdef MODULE_FATFS_VFS
-#include "ffconf.h"
+#  include "ffconf.h"
 
 #  if FF_FS_TINY
 #    define _FATFS_FILE_CACHE              (0)
@@ -222,22 +222,21 @@ extern "C" {
  * @{
  */
 #if defined(MODULE_XIPFS) || DOXYGEN
-#  define XIPFS_VFS_DIR_BUFFER_SIZE        (68) /**< sizeof(xipfs_dir_desc_t) */
-#  define XIPFS_VFS_FILE_BUFFER_SIZE       (12) /**< sizeof(xipfs_file_desc_t) */
+#  define XIPFS_VFS_DIR_BUFFER_SIZE     (68) /**< sizeof(xipfs_dir_desc_t) */
+#  define XIPFS_VFS_FILE_BUFFER_SIZE    (12) /**< sizeof(xipfs_file_desc_t) */
 #else
-#  define XIPFS_VFS_DIR_BUFFER_SIZE        (1)
-#  define XIPFS_VFS_FILE_BUFFER_SIZE       (1)
+#  define XIPFS_VFS_DIR_BUFFER_SIZE     (1)
+#  define XIPFS_VFS_FILE_BUFFER_SIZE    (1)
 #endif
 /** @} */
 
-#ifndef VFS_MAX_OPEN_FILES
 /**
  * @brief Maximum number of simultaneous open files
  */
-#define VFS_MAX_OPEN_FILES (16)
+#ifndef VFS_MAX_OPEN_FILES
+#  define VFS_MAX_OPEN_FILES            (16)
 #endif
 
-#ifndef VFS_DIR_BUFFER_SIZE
 /**
  * @brief Size of buffer space in vfs_DIR
  *
@@ -258,24 +257,24 @@ extern "C" {
  *
  * @attention @code
  * #if VFS_DIR_BUFFER_SIZE < 123
- * #error VFS_DIR_BUFFER_SIZE is too small, at least 123 bytes is required
+ * #  error VFS_DIR_BUFFER_SIZE is too small, at least 123 bytes is required
  * #endif
  * @endcode
  *
  * @attention Put the check in the public header file (.h), do not put the check in the
  * implementation (.c) file.
  */
-#define VFS_DIR_BUFFER_SIZE MAX7(FATFS_VFS_DIR_BUFFER_SIZE,       \
-                                 LITTLEFS_VFS_DIR_BUFFER_SIZE,    \
-                                 LITTLEFS2_VFS_DIR_BUFFER_SIZE,   \
-                                 SPIFFS_VFS_DIR_BUFFER_SIZE,      \
-                                 LWEXT4_VFS_DIR_BUFFER_SIZE,      \
-                                 NANOCOAP_FS_VFS_DIR_BUFFER_SIZE, \
-                                 XIPFS_VFS_DIR_BUFFER_SIZE        \
-                                )
+#ifndef VFS_DIR_BUFFER_SIZE
+#  define VFS_DIR_BUFFER_SIZE MAX7(FATFS_VFS_DIR_BUFFER_SIZE,       \
+                                   LITTLEFS_VFS_DIR_BUFFER_SIZE,    \
+                                   LITTLEFS2_VFS_DIR_BUFFER_SIZE,   \
+                                   SPIFFS_VFS_DIR_BUFFER_SIZE,      \
+                                   LWEXT4_VFS_DIR_BUFFER_SIZE,      \
+                                   NANOCOAP_FS_VFS_DIR_BUFFER_SIZE, \
+                                   XIPFS_VFS_DIR_BUFFER_SIZE        \
+                                  )
 #endif
 
-#ifndef VFS_FILE_BUFFER_SIZE
 /**
  * @brief Size of buffer space in vfs_file_t
  *
@@ -288,24 +287,24 @@ extern "C" {
  *
  * @attention @code
  * #if VFS_FILE_BUFFER_SIZE < 123
- * #error VFS_FILE_BUFFER_SIZE is too small, at least 123 bytes is required
+ * #  error VFS_FILE_BUFFER_SIZE is too small, at least 123 bytes is required
  * #endif
  * @endcode
  *
  * @attention Put the check in the public header file (.h), do not put the check in the
  * implementation (.c) file.
  */
-#define VFS_FILE_BUFFER_SIZE MAX7(FATFS_VFS_FILE_BUFFER_SIZE,       \
-                                  LITTLEFS_VFS_FILE_BUFFER_SIZE,    \
-                                  LITTLEFS2_VFS_FILE_BUFFER_SIZE,   \
-                                  SPIFFS_VFS_FILE_BUFFER_SIZE,      \
-                                  LWEXT4_VFS_FILE_BUFFER_SIZE,      \
-                                  NANOCOAP_FS_VFS_FILE_BUFFER_SIZE, \
-                                  XIPFS_VFS_FILE_BUFFER_SIZE        \
-                                 )
+#ifndef VFS_FILE_BUFFER_SIZE
+#  define VFS_FILE_BUFFER_SIZE MAX7(FATFS_VFS_FILE_BUFFER_SIZE,       \
+                                    LITTLEFS_VFS_FILE_BUFFER_SIZE,    \
+                                    LITTLEFS2_VFS_FILE_BUFFER_SIZE,   \
+                                    SPIFFS_VFS_FILE_BUFFER_SIZE,      \
+                                    LWEXT4_VFS_FILE_BUFFER_SIZE,      \
+                                    NANOCOAP_FS_VFS_FILE_BUFFER_SIZE, \
+                                    XIPFS_VFS_FILE_BUFFER_SIZE        \
+                                   )
 #endif
 
-#ifndef VFS_NAME_MAX
 /**
  * @brief Maximum length of the name in a @c vfs_dirent_t (not including terminating null)
  *
@@ -313,7 +312,8 @@ extern "C" {
  *
  * Similar to the POSIX macro NAME_MAX
  */
-#define VFS_NAME_MAX (31)
+#ifndef VFS_NAME_MAX
+#  define VFS_NAME_MAX (31)
 #endif
 
 /**
@@ -419,7 +419,8 @@ typedef struct {
     union {
         void *ptr;              /**< pointer to private data */
         int value;              /**< alternatively, you can use private_data as an int */
-        uint8_t buffer[VFS_FILE_BUFFER_SIZE]; /**< Buffer space, in case a single pointer is not enough */
+        /** Buffer space, in case a single pointer is not enough */
+        uint8_t buffer[VFS_FILE_BUFFER_SIZE];
     } private_data;             /**< File system driver private data, implementation defined */
 } vfs_file_t;
 
@@ -437,7 +438,8 @@ typedef struct {
     union {
         void *ptr;             /**< pointer to private data */
         int value;             /**< alternatively, you can use private_data as an int */
-        uint8_t buffer[VFS_DIR_BUFFER_SIZE]; /**< Buffer space, in case a single pointer is not enough */
+        /** Buffer space, in case a single pointer is not enough */
+        uint8_t buffer[VFS_DIR_BUFFER_SIZE];
     } private_data;            /**< File system driver private data, implementation defined */
 } vfs_DIR;
 
@@ -475,8 +477,8 @@ struct vfs_file_ops {
      *
      * @param[in]  filp     pointer to open file
      *
-     * @return 0 on success
-     * @return <0 on error, the file is considered closed anyway
+     * @retval 0 on success
+     * @retval <0 on error, the file is considered closed anyway
      */
     int (*close) (vfs_file_t *filp);
 
@@ -487,8 +489,8 @@ struct vfs_file_ops {
      * @param[in]  cmd      fcntl command, see man 3p fcntl
      * @param[in]  arg      argument to fcntl command, see man 3p fcntl
      *
-     * @return 0 on success
-     * @return <0 on error
+     * @retval 0 on success
+     * @retval <0 on error
      */
     int (*fcntl) (vfs_file_t *filp, int cmd, int arg);
 
@@ -498,8 +500,8 @@ struct vfs_file_ops {
      * @param[in]  filp     pointer to open file
      * @param[out] buf      pointer to stat struct to fill
      *
-     * @return 0 on success
-     * @return <0 on error
+     * @retval 0 on success
+     * @retval <0 on error
      */
     int (*fstat) (vfs_file_t *filp, struct stat *buf);
 
@@ -518,7 +520,7 @@ struct vfs_file_ops {
      * @param[in]  whence   determines the seek method, see detailed description
      *
      * @return the new seek location in the file on success
-     * @return <0 on error
+     * @retval <0 on error
      */
     off_t (*lseek) (vfs_file_t *filp, off_t off, int whence);
 
@@ -541,12 +543,13 @@ struct vfs_file_ops {
      * same const char array and the strings may overlap
      *
      * @param[in]  filp     pointer to open file
-     * @param[in]  name     null-terminated name of the file to open, relative to the file system root, including a leading slash
+     * @param[in]  name     null-terminated name of the file to open, relative
+     *                      to the file system root, including a leading slash
      * @param[in]  flags    flags for opening, see man 2 open, man 3p open
      * @param[in]  mode     mode for creating a new file, see man 2 open, man 3p open
      *
-     * @return 0 on success
-     * @return <0 on error
+     * @retval 0 on success
+     * @retval <0 on error
      */
     int (*open) (vfs_file_t *filp, const char *name, int flags, mode_t mode);
 
@@ -558,7 +561,7 @@ struct vfs_file_ops {
      * @param[in]  nbytes   maximum number of bytes to read
      *
      * @return number of bytes read on success
-     * @return <0 on error
+     * @retval <0 on error
      */
     ssize_t (*read) (vfs_file_t *filp, void *dest, size_t nbytes);
 
@@ -570,7 +573,7 @@ struct vfs_file_ops {
      * @param[in]  nbytes   maximum number of bytes to write
      *
      * @return number of bytes written on success
-     * @return <0 on error
+     * @retval <0 on error
      */
     ssize_t (*write) (vfs_file_t *filp, const void *src, size_t nbytes);
 
@@ -580,8 +583,8 @@ struct vfs_file_ops {
      *
      * @param[in]  filp     pointer to open file
      *
-     * @return 0 on success
-     * @return <0 on error
+     * @retval 0 on success
+     * @retval <0 on error
      */
     int (*fsync) (vfs_file_t *filp);
 };
@@ -594,10 +597,10 @@ struct vfs_dir_ops {
      * @brief Open a directory for reading with readdir
      *
      * @param[in]  dirp     pointer to open directory
-     * @param[in]  name     null-terminated name of the dir to open, relative to the file system root, including a leading slash
+     * @param[in]  dirname  null-terminated name of the dir to open, relative to the file system root, including a leading slash
      *
-     * @return 0 on success
-     * @return <0 on error
+     * @retval 0 on success
+     * @retval <0 on error
      */
     int (*opendir) (vfs_DIR *dirp, const char *dirname);
 
@@ -616,9 +619,9 @@ struct vfs_dir_ops {
      * @param[in]  dirp     pointer to open directory
      * @param[out] entry    directory entry information
      *
-     * @return 1 if @p entry was updated
-     * @return 0 if @p dirp has reached the end of the directory index
-     * @return <0 on error
+     * @retval 1 if @p entry was updated
+     * @retval 0 if @p dirp has reached the end of the directory index
+     * @retval <0 on error
      */
     int (*readdir) (vfs_DIR *dirp, vfs_dirent_t *entry);
 
@@ -627,8 +630,8 @@ struct vfs_dir_ops {
      *
      * @param[in]  dirp     pointer to open directory
      *
-     * @return 0 on success
-     * @return <0 on error, the directory stream dirp should be considered invalid
+     * @retval 0 on success
+     * @retval <0 on error, the directory stream dirp should be considered invalid
      */
     int (*closedir) (vfs_DIR *dirp);
 };
@@ -644,8 +647,8 @@ struct vfs_file_system_ops {
      *
      * @param[in]   mountp  file system to format
      *
-     * @return 0 on success
-     * @return <0 on error
+     * @retval 0 on success
+     * @retval <0 on error
      */
     int (*format) (vfs_mount_t *mountp);
 
@@ -660,8 +663,8 @@ struct vfs_file_system_ops {
      *
      * @param[in]  mountp  file system mount being mounted
      *
-     * @return 0 on success
-     * @return <0 on error
+     * @retval 0 on success
+     * @retval <0 on error
      */
     int (*mount) (vfs_mount_t *mountp);
 
@@ -670,8 +673,8 @@ struct vfs_file_system_ops {
      *
      * @param[in]  mountp  file system mount being unmounted
      *
-     * @return 0 on success
-     * @return <0 on error
+     * @retval 0 on success
+     * @retval <0 on error
      */
     int (*umount) (vfs_mount_t *mountp);
 
@@ -686,8 +689,8 @@ struct vfs_file_system_ops {
      * @param[in]  from_path  absolute path to existing file
      * @param[in]  to_path    absolute path to destination
      *
-     * @return 0 on success
-     * @return <0 on error
+     * @retval 0 on success
+     * @retval <0 on error
      */
     int (*rename) (vfs_mount_t *mountp, const char *from_path, const char *to_path);
 
@@ -697,8 +700,8 @@ struct vfs_file_system_ops {
      * @param[in]  mountp  file system mount to operate on
      * @param[in]  name    name of the file to delete
      *
-     * @return 0 on success
-     * @return <0 on error
+     * @retval 0 on success
+     * @retval <0 on error
      */
     int (*unlink) (vfs_mount_t *mountp, const char *name);
 
@@ -709,8 +712,8 @@ struct vfs_file_system_ops {
      * @param[in]  name    name of the directory to create
      * @param[in]  mode    file creation mode bits
      *
-     * @return 0 on success
-     * @return <0 on error
+     * @retval 0 on success
+     * @retval <0 on error
      */
     int (*mkdir) (vfs_mount_t *mountp, const char *name, mode_t mode);
 
@@ -722,8 +725,8 @@ struct vfs_file_system_ops {
      * @param[in]  mountp  file system mount to operate on
      * @param[in]  name    name of the directory to remove
      *
-     * @return 0 on success
-     * @return <0 on error
+     * @retval 0 on success
+     * @retval <0 on error
      */
     int (*rmdir) (vfs_mount_t *mountp, const char *name);
 
@@ -734,8 +737,8 @@ struct vfs_file_system_ops {
      * @param[in]  path    path to file being queried
      * @param[out] buf     pointer to stat struct to fill
      *
-     * @return 0 on success
-     * @return <0 on error
+     * @retval 0 on success
+     * @retval <0 on error
      */
     int (*stat) (vfs_mount_t *mountp, const char *restrict path, struct stat *restrict buf);
 
@@ -751,8 +754,8 @@ struct vfs_file_system_ops {
      * @param[in]  path    path to a file on the file system being queried
      * @param[out] buf     pointer to statvfs struct to fill
      *
-     * @return 0 on success
-     * @return <0 on error
+     * @retval 0 on success
+     * @retval <0 on error
      */
     int (*statvfs) (vfs_mount_t *mountp, const char *restrict path, struct statvfs *restrict buf);
 };
@@ -771,8 +774,8 @@ void vfs_bind_stdio(void);
  *
  * @param[in]  fd    fd number to close
  *
- * @return 0 on success
- * @return <0 on error
+ * @retval 0 on success
+ * @retval <0 on error
  */
 int vfs_close(int fd);
 
@@ -783,8 +786,8 @@ int vfs_close(int fd);
  * @param[in]  cmd   fcntl command, see man 3p fcntl
  * @param[in]  arg   argument to fcntl command, see man 3p fcntl
  *
- * @return 0 on success
- * @return <0 on error
+ * @retval 0 on success
+ * @retval <0 on error
  */
 int vfs_fcntl(int fd, int cmd, int arg);
 
@@ -794,8 +797,8 @@ int vfs_fcntl(int fd, int cmd, int arg);
  * @param[in]  fd       fd number obtained from vfs_open
  * @param[out] buf      pointer to stat struct to fill
  *
- * @return 0 on success
- * @return <0 on error
+ * @retval 0 on success
+ * @retval <0 on error
  */
 int vfs_fstat(int fd, struct stat *buf);
 
@@ -805,8 +808,8 @@ int vfs_fstat(int fd, struct stat *buf);
  * @param[in]  fd       fd number obtained from vfs_open
  * @param[out] buf      pointer to statvfs struct to fill
  *
- * @return 0 on success
- * @return <0 on error
+ * @retval 0 on success
+ * @retval <0 on error
  */
 int vfs_fstatvfs(int fd, struct statvfs *buf);
 
@@ -816,8 +819,8 @@ int vfs_fstatvfs(int fd, struct statvfs *buf);
  * @param[in]  dirp     pointer to open directory
  * @param[out] buf      pointer to statvfs struct to fill
  *
- * @return 0 on success
- * @return <0 on error
+ * @retval 0 on success
+ * @retval <0 on error
  */
 int vfs_dstatvfs(vfs_DIR *dirp, struct statvfs *buf);
 
@@ -836,7 +839,7 @@ int vfs_dstatvfs(vfs_DIR *dirp, struct statvfs *buf);
  * @param[in]  whence   determines the seek method, see detailed description
  *
  * @return the new seek location in the file on success
- * @return <0 on error
+ * @retval <0 on error
  */
 off_t vfs_lseek(int fd, off_t off, int whence);
 
@@ -848,7 +851,7 @@ off_t vfs_lseek(int fd, off_t off, int whence);
  * @param[in]  mode    file mode
  *
  * @return fd number on success (>= 0)
- * @return <0 on error
+ * @retval <0 on error
  */
 int vfs_open(const char *name, int flags, mode_t mode);
 
@@ -859,11 +862,11 @@ int vfs_open(const char *name, int flags, mode_t mode);
  * @param[out] dest     destination buffer to hold the file contents
  * @param[in]  count    maximum number of bytes to read
  *
- * @return number of bytes read on success
- * @return <0 on error
- *
  * For simple cases of only a single read from a file, the @ref
  * vfs_file_to_buffer function can be used.
+ *
+ * @return number of bytes read on success
+ * @retval <0 on error
  */
 ssize_t vfs_read(int fd, void *dest, size_t count);
 
@@ -877,7 +880,7 @@ ssize_t vfs_read(int fd, void *dest, size_t count);
  * @param[in]  count    maximum number of characters to read
  *
  * @return number of bytes read on success
- * @return <0 on error
+ * @retval <0 on error
  */
 ssize_t vfs_readline(int fd, char *dest, size_t count);
 
@@ -888,11 +891,11 @@ ssize_t vfs_readline(int fd, char *dest, size_t count);
  * @param[in]  src      pointer to source buffer
  * @param[in]  count    maximum number of bytes to write
  *
- * @return number of bytes written on success
- * @return <0 on error
- *
  * For simple cases of only a single write to a file, the @ref
  * vfs_file_from_buffer function can be used.
+ *
+ * @return number of bytes written on success
+ * @retval <0 on error
  */
 ssize_t vfs_write(int fd, const void *src, size_t count);
 
@@ -903,7 +906,7 @@ ssize_t vfs_write(int fd, const void *src, size_t count);
  * @param[in]  iolist   iolist to read from
  *
  * @return number of bytes written on success
- * @return <0 on error
+ * @retval <0 on error
  */
 ssize_t vfs_write_iol(int fd, const iolist_t *iolist);
 
@@ -913,8 +916,8 @@ ssize_t vfs_write_iol(int fd, const iolist_t *iolist);
  *
  * @param[in]  fd       fd number obtained from vfs_open
  *
- * @return 0 on success
- * @return <0 on error
+ * @retval 0 on success
+ * @retval <0 on error
  */
 int vfs_fsync(int fd);
 
@@ -926,8 +929,8 @@ int vfs_fsync(int fd);
  * @param[out] dirp     pointer to directory stream struct for storing the state
  * @param[in]  dirname  null-terminated name of the dir to open, absolute file system path
  *
- * @return 0 on success
- * @return <0 on error
+ * @retval 0 on success
+ * @retval <0 on error
  */
 int vfs_opendir(vfs_DIR *dirp, const char *dirname);
 
@@ -944,9 +947,9 @@ int vfs_opendir(vfs_DIR *dirp, const char *dirname);
  * @param[in]  dirp     pointer to open directory
  * @param[out] entry    directory entry information
  *
- * @return 1 if @p entry was updated
- * @return 0 if @p dirp has reached the end of the directory index
- * @return <0 on error
+ * @retval 1 if @p entry was updated
+ * @retval 0 if @p dirp has reached the end of the directory index
+ * @retval <0 on error
  */
 int vfs_readdir(vfs_DIR *dirp, vfs_dirent_t *entry);
 
@@ -958,8 +961,8 @@ int vfs_readdir(vfs_DIR *dirp, vfs_dirent_t *entry);
  *
  * @param[in]  dirp     pointer to open directory
  *
- * @return 0 on success
- * @return <0 on error, the directory stream dirp should be considered invalid
+ * @retval 0 on success
+ * @retval <0 on error, the directory stream dirp should be considered invalid
  */
 int vfs_closedir(vfs_DIR *dirp);
 
@@ -973,8 +976,8 @@ int vfs_closedir(vfs_DIR *dirp);
  *
  * @param[in]  mountp   pointer to the mount structure of the filesystem to format
  *
- * @return 0 on success
- * @return <0 on error
+ * @retval 0 on success
+ * @retval <0 on error
  */
 int vfs_format(vfs_mount_t *mountp);
 
@@ -988,8 +991,8 @@ int vfs_format(vfs_mount_t *mountp);
  *
  * @param[in]  path     Path of the pre-configured mount point
  *
- * @return 0 on success
- * @return <0 on error
+ * @retval 0 on success
+ * @retval <0 on error
  */
 int vfs_format_by_path(const char *path);
 
@@ -1001,8 +1004,8 @@ int vfs_format_by_path(const char *path);
  *
  * @param[in]  mountp    pointer to the mount structure of the file system to mount
  *
- * @return 0 on success
- * @return <0 on error
+ * @retval 0 on success
+ * @retval <0 on error
  */
 int vfs_mount(vfs_mount_t *mountp);
 
@@ -1016,8 +1019,8 @@ int vfs_mount(vfs_mount_t *mountp);
  *
  * @param[in]  path     Path of the pre-configured mount point
  *
- * @return 0 on success
- * @return <0 on error
+ * @retval 0 on success
+ * @retval <0 on error
  */
 int vfs_mount_by_path(const char *path);
 
@@ -1029,8 +1032,8 @@ int vfs_mount_by_path(const char *path);
  * @param[in]  path     Path of the pre-configured mount point
  * @param[in]  force    Unmount the filesystem even if there are still open files
  *
- * @return 0 on success
- * @return <0 on error
+ * @retval 0 on success
+ * @retval <0 on error
  */
 int vfs_unmount_by_path(const char *path, bool force);
 
@@ -1044,8 +1047,8 @@ int vfs_unmount_by_path(const char *path, bool force);
  * @param[in]  from_path  absolute path to existing file
  * @param[in]  to_path    absolute path to destination
  *
- * @return 0 on success
- * @return <0 on error
+ * @retval 0 on success
+ * @retval <0 on error
  */
 int vfs_rename(const char *from_path, const char *to_path);
 
@@ -1054,11 +1057,11 @@ int vfs_rename(const char *from_path, const char *to_path);
  *
  * This will fail if there are any open files or directories on the mounted file system
  *
- * @param[in]  mountp    pointer to the mount structure of the file system to unmount
+ * @param[in]  mountp   pointer to the mount structure of the file system to unmount
  * @param[in]  force    Unmount the filesystem even if there are still open files
  *
- * @return 0 on success
- * @return <0 on error
+ * @retval 0 on success
+ * @retval <0 on error
  */
 int vfs_umount(vfs_mount_t *mountp, bool force);
 
@@ -1067,8 +1070,8 @@ int vfs_umount(vfs_mount_t *mountp, bool force);
  *
  * @param[in]  name   name of file to delete
  *
- * @return 0 on success
- * @return <0 on error
+ * @retval 0 on success
+ * @retval <0 on error
  */
 int vfs_unlink(const char *name);
 
@@ -1078,8 +1081,8 @@ int vfs_unlink(const char *name);
  * @param[in]  name    name of the directory to create
  * @param[in]  mode    file creation mode bits
  *
- * @return 0 on success
- * @return <0 on error
+ * @retval 0 on success
+ * @retval <0 on error
  */
 int vfs_mkdir(const char *name, mode_t mode);
 
@@ -1090,8 +1093,8 @@ int vfs_mkdir(const char *name, mode_t mode);
  *
  * @param[in]  name    name of the directory to remove
  *
- * @return 0 on success
- * @return <0 on error
+ * @retval 0 on success
+ * @retval <0 on error
  */
 int vfs_rmdir(const char *name);
 
@@ -1101,8 +1104,8 @@ int vfs_rmdir(const char *name);
  * @param[in]  path    path to file being queried
  * @param[out] buf     pointer to stat struct to fill
  *
- * @return 0 on success
- * @return <0 on error
+ * @retval 0 on success
+ * @retval <0 on error
  */
 int vfs_stat(const char *restrict path, struct stat *restrict buf);
 
@@ -1115,8 +1118,8 @@ int vfs_stat(const char *restrict path, struct stat *restrict buf);
  * @param[in]  path    path to a file on the file system being queried
  * @param[out] buf     pointer to statvfs struct to fill
  *
- * @return 0 on success
- * @return <0 on error
+ * @retval 0 on success
+ * @retval <0 on error
  */
 int vfs_statvfs(const char *restrict path, struct statvfs *restrict buf);
 
@@ -1137,7 +1140,7 @@ int vfs_statvfs(const char *restrict path, struct statvfs *restrict buf);
  * @param[in]  private_data  opaque pointer to private data
  *
  * @return fd number on success (>= 0)
- * @return <0 on error
+ * @retval <0 on error
  */
 int vfs_bind(int fd, int flags, const vfs_file_ops_t *f_op, void *private_data);
 
@@ -1156,7 +1159,7 @@ int vfs_bind(int fd, int flags, const vfs_file_ops_t *f_op, void *private_data);
  * @param[in]  buflen     available space in @p buf
  *
  * @return number of path components in the normalized path on success
- * @return <0 on error
+ * @retval <0 on error
  */
 int vfs_normalize_path(char *buf, const char *path, size_t buflen);
 
@@ -1186,8 +1189,8 @@ int vfs_normalize_path(char *buf, const char *path, size_t buflen);
  *
  * @param[in,out] dir     The root directory of the discovered mount point
  *
- * @return     @c true if another file system is mounted; @p dir then contains an open directory.
- * @return     @c false if the file system list is exhausted; @p dir is uninitialized then.
+ * @retval     true if another file system is mounted; @p dir then contains an open directory.
+ * @retval     false if the file system list is exhausted; @p dir is uninitialized then.
  */
 bool vfs_iterate_mount_dirs(vfs_DIR *dir);
 
@@ -1202,11 +1205,12 @@ bool vfs_iterate_mount_dirs(vfs_DIR *dir);
  * @param[in] fd    A file descriptor
  *
  * @return  Pointer to the file information struct if a file with @p fd exists.
- * @return  NULL, when no file with file descriptor @p fd exists.
+ * @retval  NULL, when no file with file descriptor @p fd exists.
  */
 const vfs_file_t *vfs_file_get(int fd);
 
-/** @brief  Implementation of `stat` using `fstat`
+/**
+ * @brief  Implementation of `stat` using `fstat`
  *
  * This helper can be used by file system drivers that do not have any more
  * efficient implementation of `fs_op::stat` than opening the file and running

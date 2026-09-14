@@ -42,6 +42,7 @@ static int cmd_uptime(int argc, char **argv)
 static int _cmd_set_time(char **argv)
 {
     struct tm now;
+    memset(&now, 0, sizeof(now));
 
     if (scn_time_tm_iso8601_date(&now, argv[0]) < 0) {
         return -1;

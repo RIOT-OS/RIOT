@@ -44,7 +44,7 @@ int main(void)
     for (i = 0; i < QDEC_NUMOF; i++) {
         int32_t error = qdec_init(QDEC_DEV(i), QDEC_X4, handler, (void *)(uintptr_t)i);
         if (error) {
-            fprintf(stderr,"Not supported mode !\n");
+            fprintf(stderr, "Mode not supported!\n");
             return error;
         }
     }

@@ -27,7 +27,7 @@
 #include <stddef.h>
 
 #if MODULE_VFS
-#include "vfs.h"
+#  include "vfs.h"
 #endif
 
 #ifdef __cplusplus
@@ -50,10 +50,10 @@ typedef struct nvram {
      * @param[in]  dev   Pointer to NVRAM device descriptor
      * @param[out] dst   Pointer to the first byte in the system memory address space
      * @param[in]  src   Starting address in the NVRAM device address space
-     * @param[in]  len   Number of bytes to copy
+     * @param[in]  size  Number of bytes to copy
      *
      * @return           Number of bytes read on success
-     * @return           <0 on errors
+     * @retval           <0 on errors
      */
     int (*read)(struct nvram *dev, uint8_t *dst, uint32_t src, size_t size);
 
@@ -65,10 +65,10 @@ typedef struct nvram {
      * @param[in]  dev   Pointer to NVRAM device descriptor
      * @param[in]  src   Pointer to the first byte in the system memory address space
      * @param[in]  dst   Starting address in the NVRAM device address space
-     * @param[in]  len   Number of bytes to copy
+     * @param[in]  size  Number of bytes to copy
      *
      * @return           Number of bytes written on success
-     * @return           <0 on errors
+     * @retval           <0 on errors
      */
     int (*write)(struct nvram *dev, const uint8_t *src, uint32_t dst, size_t size);
 

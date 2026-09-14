@@ -1,4 +1,3 @@
-CPU = efm32
 CPU_FAM = efm32hg
 CPU_MODEL = efm32hg322f64
 

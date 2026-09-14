@@ -1,9 +1,6 @@
 /*
- * Copyright (C) 2013 Freie Universität Berlin, Computer Systems & Telematics
- *
- * This file is subject to the terms and conditions of the GNU Lesser
- * General Public License v2.1. See the file LICENSE in the top level
- * directory for more details.
+ * SPDX-FileCopyrightText: 2013 Freie Universität Berlin, Computer Systems & Telematics
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
 
 #pragma once
@@ -20,16 +17,21 @@
  * your Makefile.
  *
  * If only one key size is needed and that key size is not 128 bits, the 128 bit
- * key size can be disabled with DISABLE_MODULE += crypto_aes_128 as an
+ * `USEMODULE += crypto_aes_192` and/or `USEMODULE += crypto_aes_256` to
+ * your Makefile.
+ *
+ * If only one key size is needed and that key size is not 128 bits, the 128 bit
+ * key size can be disabled with `DISABLE_MODULE += crypto_aes_128` as an
  * optimization.
  *
- * @author      Freie Universitaet Berlin, Computer Systems & Telematics
  * @author      Nicolai Schmittberger <nicolai.schmittberger@fu-berlin.de>
  * @author      Fabrice Bellard
  * @author      Zakaria Kasmi <zkasmi@inf.fu-berlin.de>
  */
 
 #include <stdint.h>
+
+#include "compiler_hints.h"
 #include "crypto/ciphers.h"
 
 #ifdef __cplusplus
@@ -40,9 +42,9 @@ typedef uint32_t u32;
 typedef uint16_t u16;
 typedef uint8_t u8;
 
-# define GETU32(pt) (((u32)(pt)[0] << 24) ^ ((u32)(pt)[1] << 16) ^ \
+#define GETU32(pt)  (((u32)(pt)[0] << 24) ^ ((u32)(pt)[1] << 16) ^ \
                      ((u32)(pt)[2] <<  8) ^ ((u32)(pt)[3]))
-# define PUTU32(ct, st) { (ct)[0] = (u8)((st) >> 24); \
+#define PUTU32(ct, st)  { (ct)[0] = (u8)((st) >> 24); \
                           (ct)[1] = (u8)((st) >> 16); \
                           (ct)[2] = (u8)((st) >>  8); \
                           (ct)[3] = (u8)(st); }
@@ -77,11 +79,13 @@ typedef struct {
  *                        support key lengths of 24 or 32 bytes
  * @param       key       a pointer to the key
  *
- * @return  CIPHER_INIT_SUCCESS if the initialization was successful.
- * @return  CIPHER_ERR_BAD_CONTEXT_SIZE if CIPHER_MAX_CONTEXT_SIZE has not
- *          been defined (which means that the cipher has not been included
- *          in the build)
+ * @retval  CIPHER_INIT_SUCCESS            the initialization was successful
+ * @retval  CIPHER_ERR_BAD_CONTEXT_SIZE    `CIPHER_MAX_CONTEXT_SIZE` undefined
+ *
+ * @note    `CIPHER_ERR_BAD_CONTEXT_SIZE` error is typically when the
+ *          cipher has not been included in the build
  */
+ACCESS(read_only, 2, 3)
 int aes_init(cipher_context_t *context, const uint8_t *key, uint8_t keySize);
 
 /**
@@ -97,18 +101,19 @@ int aes_init(cipher_context_t *context, const uint8_t *key, uint8_t keySize);
  * @param       cipher_block  a pointer to the place where the ciphertext will
  *                            be stored
  *
- * @return  1 on success
- * @return  A negative value if the cipher key cannot be expanded with the
- *          AES key schedule
+ * @retval      1             success
+ * @retval      -1            @p context has not been initialized, see @p aes_init
+ * @retval      -2            key size in @p context invalid (memory safety bug?)
+ * @retval      <0            other error
  */
 int aes_encrypt(const cipher_context_t *context, const uint8_t *plain_block,
                 uint8_t *cipher_block);
 
 /**
- * @brief   decrypts one cipher-block and saves the plain-block in plainBlock.
- *          decrypts one blocksize long block of ciphertext pointed to by
- *          cipherBlock to one blocksize long block of plaintext and stores
- *          the plaintext in the memory-area pointed to by plainBlock
+ * @brief   Decrypts one cipher-block and saves the plain-block in @p plain_block.
+ *          Decrypts one blocksize long block of ciphertext pointed to by
+ *          @p cipher_block to one blocksize long block of plaintext and stores
+ *          the plaintext in the memory-area pointed to by @p plain_block.
  *
  * @param       context       the cipher_context_t-struct to use for this
  *                            decryption
@@ -117,9 +122,10 @@ int aes_encrypt(const cipher_context_t *context, const uint8_t *plain_block,
  * @param       plain_block   a pointer to the place where the decrypted
  *                            plaintext will be stored
  *
- * @return  1 on success
- * @return  A negative value if the cipher key cannot be expanded with the
- *          AES key schedule
+ * @retval      1             success
+ * @retval      -1            @p context has not been initialized, see @p aes_init
+ * @retval      -2            key size in @p context invalid (memory safety bug?)
+ * @retval      <0            other error
  */
 int aes_decrypt(const cipher_context_t *context, const uint8_t *cipher_block,
                 uint8_t *plain_block);

@@ -11,7 +11,7 @@ This board is a replacement for the older @ref boards_stm32f429i-disco board.
 
 ## Pinout
 
-<img src="pinouts/stm32f429i-disc1.svg" alt="Pinout for the STM32F429I-DISC1, bottom layout (from STM user manual UM1607, https://www.st.com/resource/en/user_manual/um1670-discovery-kit-with-stm32f429zi-mcu-stmicroelectronics.pdf, page 12)" width=50% />
+<img src="stm32f429i-disc1.svg" alt="Pinout for the STM32F429I-DISC1, bottom layout (from STM user manual UM1607, https://www.st.com/resource/en/user_manual/um1670-discovery-kit-with-stm32f429zi-mcu-stmicroelectronics.pdf, page 12)" width=50% />
 
 ### MCU
 

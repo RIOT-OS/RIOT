@@ -1,9 +1,6 @@
 /*
- * Copyright (C) 2016 Oliver Hahm <oliver.hahm@inria.fr>
- *
- * This file is subject to the terms and conditions of the GNU Lesser
- * General Public License v2.1. See the file LICENSE in the top level
- * directory for more details.
+ * SPDX-FileCopyrightText: 2016 Oliver Hahm <oliver.hahm@inria.fr>
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
 
 #pragma once
@@ -106,6 +103,8 @@ void sha1_init_hmac(sha1_context *ctx, const void *key, size_t key_length);
 
 /**
  * @brief Finalizes the SHA-1 message digest with MAC
+ *
+ * Internal key material will be wiped after this function is called.
  *
  * @param[in] ctx     Pointer to the SHA-1 context
  * @param[out] digest Result location, must be 20 byte

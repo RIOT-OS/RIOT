@@ -147,16 +147,3 @@ the following command to connect to the board serial port:
 ```shell
 make BOARD=waveshare-nrf52840-eval-kit -C examples/basic/hello-world PORT=/dev/ttyUSB<n> term
 ```
-
-## RESET Pin Configuration
-
-On nRF52840 boards, the RESET pin is not configured out-of-the box.
-This means, that simply nothing happens if the RESET button is pressed. To
-change this, RIOT provides a little tool in `dist/tools/nrf52_resetpin_cfg`:
-
-```shell
-RESET_PIN='GPIO_PIN\(0,18\)' make BOARD=waveshare-nrf52840-eval-kit -C dist/tools/nrf52_resetpin_cfg/ flash
-```
-
-Simply compile, flash, and run that tool on your board, and the reset pin should
-work for the time being.

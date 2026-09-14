@@ -12,7 +12,7 @@ You can find general information about the Nucleo32 boards on the
 
 ## Pinout
 
-<img src="pinouts/nucleo-f031k6-and-more.svg" alt="Pinout for the Nucleo-F303K8 (from ST User Manual, UM1956, https://www.st.com/resource/en/user_manual/um1956-stm32-nucleo32-boards-mb1180-stmicroelectronics.pdf, page 31)" width=25% />
+<img src="nucleo-f031k6-and-more.svg" alt="Pinout for the Nucleo-F303K8 (from ST User Manual, UM1956, https://www.st.com/resource/en/user_manual/um1956-stm32-nucleo32-boards-mb1180-stmicroelectronics.pdf, page 31)" width=25% />
 
 ## Hardware
 

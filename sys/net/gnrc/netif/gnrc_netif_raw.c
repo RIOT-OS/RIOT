@@ -1,9 +1,6 @@
 /*
- * Copyright (C) 2017 Freie Universität Berlin
- *
- * This file is subject to the terms and conditions of the GNU Lesser
- * General Public License v2.1. See the file LICENSE in the top level
- * directory for more details.
+ * SPDX-FileCopyrightText: 2017 Freie Universität Berlin
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
 
 /**
@@ -16,6 +13,7 @@
 #include "net/gnrc/pktbuf.h"
 #include "net/gnrc/netif/hdr.h"
 #include "net/gnrc/netif/raw.h"
+#include "utlist.h"
 
 #define ENABLE_DEBUG    0
 #include "debug.h"

@@ -17,6 +17,7 @@
  */
 
 #include "cpu.h"
+#include "mii.h"
 #include "periph_cpu.h"
 #include "em_cmu.h"
 #include "usbdev_cfg_otg_fs.h"
@@ -265,6 +266,22 @@ static const uart_conf_t uart_config[] = {
 #define UART_NUMOF          ARRAY_SIZE(uart_config)
 #define UART_0_ISR_RX       isr_usart4_rx
 #define UART_1_ISR_RX       isr_usart5_rx
+/** @} */
+
+/**
+ * @name    Ethernet (RMII) configuration
+ *
+ * The SLSTK3701A wires the EFM32GG11 ETH peripheral to a Microchip
+ * KSZ8091-RNDCA PHY at MIIM address 0.
+ * @{
+ */
+static const eth_conf_t eth_config = {
+    .phy_en_pin = GPIO_PIN(PI, 10),
+    .phy_rst_pin = GPIO_UNDEF,
+    .routeloc1 = ETH_ROUTELOC1_RMIILOC_LOC1 | ETH_ROUTELOC1_MDIOLOC_LOC1,
+    .speed = MII_BMCR_SPEED_100 | MII_BMCR_FULL_DPLX,
+    .phy_addr = 0, /* Microchip KSZ8091-RNDCA */
+};
 /** @} */
 
 #ifdef __cplusplus

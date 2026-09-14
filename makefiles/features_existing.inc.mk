@@ -9,7 +9,6 @@ FEATURES_EXISTING := \
     arch_arm \
     arch_arm7 \
     arch_avr8 \
-    arch_efm32 \
     arch_esp \
     arch_esp32 \
     arch_esp32_xtensa \
@@ -81,6 +80,7 @@ FEATURES_EXISTING := \
     cpu_msp430_f2xx_g2xx \
     cpu_msp430_x1xx \
     cpu_native \
+    cpu_noelv \
     cpu_nrf51 \
     cpu_nrf52 \
     cpu_nrf53 \
@@ -111,11 +111,13 @@ FEATURES_EXISTING := \
     cpu_stm32l4 \
     cpu_stm32l5 \
     cpu_stm32mp1 \
+    cpu_stm32u3 \
     cpu_stm32u5 \
     cpu_stm32wb \
     cpu_stm32wl \
     dbgpin \
     efm32_coretemp \
+    efm32_eth \
     emulator_renode \
     esp_ble \
     esp_hw_counter \
@@ -135,6 +137,7 @@ FEATURES_EXISTING := \
     gecko_sdk_librail_nonfpu \
     highlevel_stdio \
     libstdcpp \
+    lpc1768_eth \
     motor_driver \
     netif \
     netif_ethernet \

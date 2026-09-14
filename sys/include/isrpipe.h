@@ -1,9 +1,6 @@
 /*
- * Copyright (C) 2016 Kaspar Schleiser <kaspar@schleiser.de>
- *
- * This file is subject to the terms and conditions of the GNU Lesser
- * General Public License v2.1. See the file LICENSE in the top level
- * directory for more details.
+ * SPDX-FileCopyrightText: 2016 Kaspar Schleiser <kaspar@schleiser.de>
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
 
 #pragma once
@@ -77,8 +74,8 @@ int isrpipe_write_one(isrpipe_t *isrpipe, uint8_t c);
  * @param[in]   buf         bytes to add to isrpipe buffer
  * @param[in]   n           number of bytes to add from buf to isrpipe's buffer
  *
- * @returns     number of bytes that could be added
- * @returns     -1 if buffer was full
+ * @returns     Number of bytes that have been added. Can be less than @p n
+ *              if the buffer had insufficient space.
  */
 int isrpipe_write(isrpipe_t *isrpipe, const uint8_t *buf, size_t n);
 
@@ -86,12 +83,41 @@ int isrpipe_write(isrpipe_t *isrpipe, const uint8_t *buf, size_t n);
  * @brief   Read data from isrpipe (blocking)
  *
  * @param[in]   isrpipe    isrpipe object to operate on
- * @param[in]   buf        buffer to write to
+ * @param[out]  buf        buffer to write to
  * @param[in]   count      number of bytes to read
  *
  * @returns     number of bytes read
  */
 int isrpipe_read(isrpipe_t *isrpipe, uint8_t *buf, size_t count);
+
+/**
+ * @brief   Read a single byte from isrpipe (blocking)
+ *
+ * @param[in]   isrpipe    isrpipe object to operate on
+ *
+ * @returns     the byte read
+ */
+uint8_t isrpipe_read_one(isrpipe_t *isrpipe);
+
+/**
+ * @brief   Clear the isrpipe's buffer
+ *
+ * @param[in]   isrpipe    isrpipe object to operate on
+ *
+ * @note    If a write has already unlocked the internal mutex, the first
+ *          blocking read after this call will consume that pending wakeup
+ *          before blocking normally.
+ */
+void isrpipe_clear(isrpipe_t *isrpipe);
+
+/**
+ * @brief   Get the number of bytes available for reading from the isrpipe
+ *
+ * @param[in]   isrpipe    isrpipe object to operate on
+ *
+ * @returns     number of bytes available in the isrpipe's buffer
+ */
+unsigned int isrpipe_available(isrpipe_t *isrpipe);
 
 #ifdef __cplusplus
 }

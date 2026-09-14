@@ -152,9 +152,9 @@ typedef struct candev_stm32_rx_fifo {
 
 /** Internal interrupt flags */
 typedef struct candev_stm32_isr {
-    int isr_tx : 3;     /**< Tx mailboxes interrupt */
-    int isr_rx : 2;     /**< Rx FIFO interrupt */
-    int isr_wkup : 1;   /**< Wake up interrupt */
+    uint8_t isr_tx : 3;     /**< Tx mailboxes interrupt */
+    uint8_t isr_rx : 2;     /**< Rx FIFO interrupt */
+    uint8_t isr_wkup : 1;   /**< Wake up interrupt */
 } candev_stm32_isr_t;
 
 /** STM32 CAN device descriptor */

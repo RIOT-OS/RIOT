@@ -283,12 +283,14 @@ int rtt_write(const char* buf_ptr, unsigned num_bytes) {
 
 static bool _rtt_read_cb(void *arg)
 {
+    (void)arg;
+
     int bytes = rtt_read_bytes_avail();
     uint8_t buffer[STDIO_RX_BUFSIZE];
 
     if (bytes) {
         bytes = rtt_read(buffer, sizeof(buffer));
-        isrpipe_write(arg, buffer, bytes);
+        stdio_rx_write(buffer, bytes);
     }
 
     return true;
@@ -304,7 +306,7 @@ static void _init(void) {
         return;
     }
 
-    ztimer_periodic_init(ZTIMER_MSEC, &stdin_timer, _rtt_read_cb, &stdin_isrpipe,
+    ztimer_periodic_init(ZTIMER_MSEC, &stdin_timer, _rtt_read_cb, NULL,
                          STDIO_POLL_INTERVAL_MS);
     ztimer_periodic_start(&stdin_timer);
     _init_done = true;

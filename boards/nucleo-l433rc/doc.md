@@ -16,7 +16,7 @@ You can find general information about the Nucleo64 boards on the
 
 ### Pinout
 
-<img src="pinouts/nucleo-l433rc.svg" alt="Pinout for the Nucleo-L433RC (from STM user manual, UM2206, http://www.st.com/resource/en/user_manual/um2206-stm32-nucleo64p-boards-mb1319-stmicroelectronics.pdf, page 37)" width=50% />
+<img src="nucleo-l433rc.svg" alt="Pinout for the Nucleo-L433RC (from STM user manual, UM2206, http://www.st.com/resource/en/user_manual/um2206-stm32-nucleo64p-boards-mb1319-stmicroelectronics.pdf, page 37)" width=50% />
 
 ### MCU
 

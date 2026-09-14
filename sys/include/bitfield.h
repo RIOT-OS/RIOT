@@ -1,9 +1,6 @@
 /*
- * Copyright (C) 2015 INRIA
- *
- * This file is subject to the terms and conditions of the GNU Lesser
- * General Public License v2.1. See the file LICENSE in the top level
- * directory for more details.
+ * SPDX-FileCopyrightText: 2015 INRIA
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
 
 #pragma once
@@ -12,14 +9,13 @@
  * @defgroup    sys_bitfield Bitfields
  * @ingroup     sys
  * @brief       Bitfields of arbitrary length
+ * @{
  *
  * The bitfields in this module have their most significant bytes first and
  * their most significant bits within each byte of the bitfield also first.
  *
  * @file
- * @{
- *
- * @brief       bitfields operations on bitfields of arbitrary length
+ * @brief       Bitfield operations on bitfields of arbitrary length
  *
  * @note        Code taken mostly from
  *              <a href="http://stackoverflow.com/questions/1590893/error-trying-to-define-a-1-024-bit-128-byte-bit-field">

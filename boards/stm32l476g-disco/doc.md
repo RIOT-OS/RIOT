@@ -14,7 +14,7 @@ ROM Flash.
 
 ## Pinout
 
-<img src="pinouts/stm32l476g-disco.svg" alt="Pinout for the stm32l476g-disco (from STM board manual)" width=50% />
+<img src="stm32l476g-disco.svg" alt="Pinout for the stm32l476g-disco (from STM board manual)" width=50% />
 
 ### MCU
 

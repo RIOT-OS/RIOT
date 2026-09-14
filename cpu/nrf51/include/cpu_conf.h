@@ -6,9 +6,7 @@
 #pragma once
 
 /**
- * @defgroup        cpu_nrf51 Nordic nRF51 MCU
- * @ingroup         cpu
- * @brief           Nordic nRF51 family of CPUs
+ * @ingroup         cpu_nrf51
  * @{
  *
  * @file

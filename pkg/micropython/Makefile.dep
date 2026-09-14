@@ -1,8 +1,9 @@
-USEMODULE += xtimer
+USEMODULE += core_thread_flags
+USEMODULE += libc_gettimeofday
 USEMODULE += stdin
+USEMODULE += stdio_available
+USEMODULE += stdio_notify
+USEMODULE += xtimer
 
-# MicroPython doesn't compile for <32bit platforms
+# MicroPython does not compile for 8 and 16 bit architectures
 FEATURES_BLACKLIST += arch_8bit arch_16bit
-
-# This port currently requires ISR_STACKSIZE and thread_isr_stack_start
-FEATURES_BLACKLIST += arch_esp32 arch_esp8266 arch_riscv

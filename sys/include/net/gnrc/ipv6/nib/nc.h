@@ -1,9 +1,6 @@
 /*
- * Copyright (C) 2017 Freie Universität Berlin
- *
- * This file is subject to the terms and conditions of the GNU Lesser
- * General Public License v2.1. See the file LICENSE in the top level
- * directory for more details.
+ * SPDX-FileCopyrightText: 2017 Freie Universität Berlin
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
 
 #pragma once
@@ -23,6 +20,7 @@
 #include <stdbool.h>
 #include <stdint.h>
 
+#include "compiler_hints.h"
 #include "net/eui64.h"
 #include "net/gnrc/netif/hdr.h"
 #include "net/gnrc/ipv6/nib/conf.h"
@@ -230,6 +228,7 @@ static inline unsigned gnrc_ipv6_nib_nc_get_ar_state(const gnrc_ipv6_nib_nc_t *e
  * @return  -EINVAL, if @p ipv6 is invalid (i.e.
  *          @ref CONFIG_GNRC_IPV6_NIB_ARSM == 0 and @p ipv6 is not link-local).
  */
+ACCESS(read_only, 3, 4)
 int gnrc_ipv6_nib_nc_set(const ipv6_addr_t *ipv6, unsigned iface,
                          const uint8_t *l2addr, size_t l2addr_len);
 
@@ -249,6 +248,7 @@ int gnrc_ipv6_nib_nc_set(const ipv6_addr_t *ipv6, unsigned iface,
  *          gnrc_netif_t::device_type of @p netif.
  * @retval  -ENOMEM if no space is left in neighbor cache.
  */
+ACCESS(read_only, 2, 3)
 int gnrc_ipv6_nib_nc_set_6ln(unsigned iface, const uint8_t *l2addr,
                              size_t l2addr_len);
 #else /* CONFIG_GNRC_IPV6_NIB_6LN */
@@ -289,6 +289,7 @@ void gnrc_ipv6_nib_nc_del(const ipv6_addr_t *ipv6, unsigned iface);
  * @retval  True if a neighbor with @p l2addr existed.
  * @retval  False otherwise.
  */
+ACCESS(read_only, 2, 3)
 bool gnrc_ipv6_nib_nc_del_l2(unsigned iface, const uint8_t *l2addr, size_t l2addr_len);
 #endif /* CONFIG_GNRC_IPV6_NIB_ARSM */
 

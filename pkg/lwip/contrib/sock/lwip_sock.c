@@ -569,7 +569,7 @@ int lwip_sock_recv(struct netconn *conn, uint32_t timeout, struct netbuf **buf)
 
 #if LWIP_SO_RCVTIMEO
     if ((timeout != 0) && (timeout != SOCK_NO_TIMEOUT)) {
-        netconn_set_recvtimeout(conn, timeout / US_PER_MS);
+        netconn_set_recvtimeout(conn, lwip_sock_timeout_ms(timeout));
     }
     else
 #endif
@@ -681,6 +681,7 @@ ssize_t lwip_sock_sendv(struct netconn *conn, const iolist_t *snips,
                 DEBUG("[lwip_sock_sendv] lwip_sock_bind_addr_to_netif() "
                       "returned %u, but expected %u\n",
                       (unsigned)netif, (unsigned)remote->netif);
+                netbuf_delete(buf);
                 return -EINVAL;
             }
         }

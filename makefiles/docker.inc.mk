@@ -5,7 +5,8 @@
 # When the docker image is updated, checks at
 # dist/tools/buildsystem_sanity_check/check.sh start complaining in CI, and
 # provide the latest values to verify and fill in.
-DOCKER_TESTED_IMAGE_REPO_DIGEST := b932e0079de853104bdb579a35d5a02d8613c87dc30130c67b03aa3b2027fd26
+
+DOCKER_TESTED_IMAGE_REPO_DIGEST := 5db178a4ad8d2755a94c0e521b9e544995d10eeb5bf801f8d4fb3e3e19e5f84d
 
 DOCKER_PULL_IDENTIFIER := docker.io/riot/riotbuild@sha256:$(DOCKER_TESTED_IMAGE_REPO_DIGEST)
 export DOCKER_IMAGE ?= $(DOCKER_PULL_IDENTIFIER)
@@ -36,7 +37,8 @@ export DOCKER_MAKECMDGOALS := $(filter $(DOCKER_MAKECMDGOALS_POSSIBLE),$(MAKECMD
 
 # Docker creates the files .dockerinit and .dockerenv in the root directory of
 # the container, we check for the files to determine if we are inside a container.
-ifneq (,$(wildcard /.dockerinit /.dockerenv))
+# Podman uses /run/.containerenv instead.
+ifneq (,$(wildcard /.dockerinit /.dockerenv /run/.containerenv))
   export INSIDE_DOCKER := 1
 else
   export INSIDE_DOCKER := 0
@@ -53,7 +55,6 @@ export DOCKER_ENV_VARS += \
   AR \
   AS \
   ASFLAGS \
-  BINDIR \
   BINDIRBASE \
   BOARD \
   BOARDS \
@@ -145,7 +146,7 @@ _docker_is_podman = $(shell $(DOCKER) --version | grep podman 2>/dev/null)
 # - allocate a pseudo-tty
 # - remove container on exit
 # - set username/UID to executor
-DOCKER_USER ?= $$(id -u)
+DOCKER_USER ?= $$(id -u):$$(id -g)
 DOCKER_USER_OPT = $(if $(_docker_is_podman),--userns keep-id,--user $(DOCKER_USER))
 DOCKER_RUN_FLAGS ?= --rm --tty $(DOCKER_USER_OPT)
 
@@ -299,6 +300,13 @@ DOCKER_VOLUMES_AND_ENV += $(call docker_volume,$(HOME)/.cargo/git,$(DOCKER_BUILD
 DOCKER_VOLUMES_AND_ENV += -e 'TZ=$(HOST_TIMEZONE)'
 DOCKER_VOLUMES_AND_ENV += -e 'RIOTBASE=$(DOCKER_RIOTBASE)'
 DOCKER_VOLUMES_AND_ENV += -e 'CCACHE_BASEDIR=$(DOCKER_RIOTBASE)'
+
+# Only export the BINDIR path if it is not the standard path.
+# We have to check it this way since BINDIR is often overridden and we can not
+# reliably check it's origin.
+ifneq ($(BINDIR),$(BINDIRBASE)/$(BOARD))
+  DOCKER_VOLUMES_AND_ENV += $(call docker_volume_and_env,BINDIR,,bindir)
+endif
 
 DOCKER_VOLUMES_AND_ENV += $(call docker_volume_and_env,BUILD_DIR,,build)
 

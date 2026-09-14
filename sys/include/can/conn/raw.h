@@ -1,9 +1,6 @@
 /*
- * Copyright (C) 2016 OTA keys S.A.
- *
- * This file is subject to the terms and conditions of the GNU Lesser
- * General Public License v2.1. See the file LICENSE in the top level
- * directory for more details.
+ * SPDX-FileCopyrightText: 2016 OTA keys S.A.
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
 
 #pragma once
@@ -28,6 +25,7 @@
 extern "C" {
 #endif
 
+#include "compiler_hints.h"
 #include "can/can.h"
 #include "can/raw.h"
 #include "mbox.h"
@@ -51,11 +49,11 @@ extern "C" {
  * @brief   RAW CAN connection
  */
 typedef struct conn_can_raw {
-    int ifnum;                 /**< Interface number of the can device */
-    int flags;                 /**< Config flags for that conn object */
-    size_t count;              /**< number of filters set */
-    struct can_filter *filter; /**< list of filter */
-    mbox_t mbox;               /**< mbox */
+    int ifnum;                          /**< Interface number of the can device */
+    int flags;                          /**< Config flags for that conn object */
+    size_t count;                       /**< number of filters set */
+    const struct can_filter *filter;    /**< list of filter */
+    mbox_t mbox;                        /**< mbox */
     /**
      * message queue
      */
@@ -76,7 +74,8 @@ typedef struct conn_can_raw {
  * @return 0 if socket was successfully connected
  * @return any other negative number in case of an error
  */
-int conn_can_raw_create(conn_can_raw_t *conn, struct can_filter *filter, size_t count,
+ACCESS(read_only, 2, 3)
+int conn_can_raw_create(conn_can_raw_t *conn, const struct can_filter *filter, size_t count,
                         int ifnum, int flags);
 
 /**
@@ -131,7 +130,8 @@ int conn_can_raw_send(conn_can_raw_t *conn, const can_frame_t *frame, int flags)
  * @return 0 if can filters were successfully set
  * @return any other negative number in case of an error
  */
-int conn_can_raw_set_filter(conn_can_raw_t *conn, struct can_filter *filter, size_t count);
+ACCESS(read_only, 2, 3)
+int conn_can_raw_set_filter(conn_can_raw_t *conn, const struct can_filter *filter, size_t count);
 
 #ifdef __cplusplus
 }

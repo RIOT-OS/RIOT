@@ -52,8 +52,10 @@ static ssize_t _riot_block2_handler(coap_pkt_t *pkt, uint8_t *buf, size_t len,
     (void)context;
     coap_block_slicer_t slicer;
     coap_builder_t state;
-    coap_block2_init(pkt, &slicer);
-    int err;
+    int err = coap_block2_init(pkt, &slicer);
+    if (err) {
+        return err;
+    }
     err = coap_builder_init_reply(&state, buf, len, pkt, COAP_CODE_CONTENT);
     if (err) {
         return err;
@@ -199,7 +201,7 @@ NANOCOAP_RESOURCE(sha256) {
 };
 
 /* separate response requires an event thread to execute it */
-#ifdef MODULE_EVENT_THREAD
+#ifdef MODULE_NANOCOAP_SERVER_EVENT_THREAD
 static nanocoap_server_response_ctx_t _separate_ctx;
 
 static void _send_response(void *ctx)
@@ -245,7 +247,7 @@ static ssize_t _separate_handler(coap_pkt_t *pkt, uint8_t *buf, size_t len,
 NANOCOAP_RESOURCE(separate) {
     .path = "/separate", .methods = COAP_GET, .handler = _separate_handler,
 };
-#endif /* MODULE_EVENT_THREAD */
+#endif /* MODULE_NANOCOAP_SERVER_EVENT_THREAD */
 
 #ifdef MODULE_NANOCOAP_SERVER_OBSERVE
 static ssize_t _time_handler(coap_pkt_t *pkt, uint8_t *buf, size_t len, coap_request_ctx_t *context)

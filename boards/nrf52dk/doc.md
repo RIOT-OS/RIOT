@@ -35,15 +35,6 @@ pin headers and an integrated J-Link programmer, debugger and UART adapter.
 | MCU Reference Manual  | [Reference Manual](https://infocenter.nordicsemi.com/pdf/nRF52832_PS_v1.4.pdf)        |
 | Board Datasheet       | [User Guide](https://infocenter.nordicsemi.com/pdf/nRF52_DK_User_Guide_v1.3.1.pdf)    |
 
-### RESET pin configuration
-
-On many (all?) nrf52dk boards, the reset pin is not configured out-of-the box.
-This means, that simply nothing happens if the RESET pin is pressed. To change
-this, RIOT provides a little tool in `dist/tools/nrf52_resetpin_cfg`.
-
-Simply compile, flash, and run that tool on your board, and the reset pin should
-work for the time being.
-
 ## Current measurement
 
 There are two pins for current measurement on board. Don't connect these pins

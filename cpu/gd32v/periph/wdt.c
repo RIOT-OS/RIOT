@@ -129,7 +129,7 @@ void wdt_setup_reboot(uint32_t min_time, uint32_t max_time)
     _set_prescaler(pre);
     _set_reload(rel);
 
-    DEBUG("[wdt]: reset time %lu [us]\n", _wdt_time(pre, rel));
+    DEBUG("[wdt]: reset time %" PRIu32 " [us]\n", _wdt_time(pre, rel));
 
     /* Refresh wdt counter */
     wdt_kick();

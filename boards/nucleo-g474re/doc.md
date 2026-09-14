@@ -12,7 +12,7 @@ You can find general information about the Nucleo64 boards on the
 
 ## Pinout
 
-<img src="pinouts/nucleo-g431rb-and-more.svg" alt="Pinout for the Nucleo-G4741RE (from STM user manual UM2505, https://www.st.com/resource/en/user_manual/um2505-stm32g4-nucleo64-boards-mb1367-stmicroelectronics.pdf, page 29)" width=50% />
+<img src="nucleo-g431rb-and-more.svg" alt="Pinout for the Nucleo-G4741RE (from STM user manual UM2505, https://www.st.com/resource/en/user_manual/um2505-stm32g4-nucleo64-boards-mb1367-stmicroelectronics.pdf, page 29)" width=50% />
 
 ### MCU
 

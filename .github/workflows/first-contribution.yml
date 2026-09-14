@@ -1,14 +1,31 @@
 name: First-time contributor greeting
 
 on:
-  pull_request:
+  # It's safe to use pull_request_target here, because we aren't checking out
+  # code from the pull request branch.
+  # See https://securitylab.github.com/research/github-actions-preventing-pwn-requests/
+  pull_request_target:
+    types:
+      - opened
+      - reopened
+      - ready_for_review
+      - synchronize
 
 permissions:
   pull-requests: write
 
 jobs:
   greet:
-    if: ${{ github.event.pull_request.author_association == 'FIRST_TIME_CONTRIBUTOR' }}
+    # Copied from https://github.com/llvm/llvm-project/blob/main/.github/workflows/new-prs.yml
+    # FIRST_TIME_CONTRIBUTOR appears to be buggy and can not be directly
+    # checked for some unknown reason.
+    if: >-
+      (github.event.action == 'opened') &&
+      (github.event.pull_request.author_association != 'COLLABORATOR') &&
+      (github.event.pull_request.author_association != 'CONTRIBUTOR') &&
+      (github.event.pull_request.author_association != 'MANNEQUIN') &&
+      (github.event.pull_request.author_association != 'MEMBER') &&
+      (github.event.pull_request.author_association != 'OWNER')
     runs-on: ubuntu-latest
     steps:
       - name: Comment on PR
@@ -21,5 +38,5 @@ jobs:
               owner: context.repo.owner,
               repo: context.repo.repo,
               issue_number: prNumber,
-              body: `Hey @${user}, thank you for your first contribution! We really appreciate it! If you haven't already, please take a look at [our contributing guidelines](https://github.com/RIOT-OS/RIOT/blob/master/CONTRIBUTING.md) before the review process starts. Also, due to how the GitHub review system works, please avoid force-pushing or squashing your commits unless asked to by a maintainer (or unless your commit is still in "draft commit" stage). Your pull request will be reviewed as soon as possible.`
+              body: `Hey @${user}, thank you for your first contribution! We really appreciate it! If you haven't already, please take a look at [our contributing guidelines](https://github.com/RIOT-OS/RIOT/blob/master/CONTRIBUTING.md) before the review process starts. Also, due to how the GitHub review system works, please avoid force-pushing or squashing your commits unless asked to by a maintainer (or unless your commit is still in "draft commit" stage). Lastly, make sure to comply with [our AI Policy](https://doc.riot-os.org/general/ai_policy/) when using AI. Your pull request will be reviewed as soon as possible.`
             });

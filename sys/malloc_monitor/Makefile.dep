@@ -1,1 +1,5 @@
-USEMODULE += malloc_thread_safe
+# malloc_monitor hooks into malloc_thread_safe to leverage existing malloc wrappers
+# except for native, which provides its own malloc wrappers
+ifeq (, $(filter native%, $(BOARD)))
+  USEMODULE += malloc_thread_safe
+endif

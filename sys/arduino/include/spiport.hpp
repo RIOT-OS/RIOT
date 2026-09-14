@@ -228,7 +228,7 @@ public:
 };
 
 /**
- * @brief: Instance of the SPI interface as required by the Arduino API
+ * @brief   Instance of the SPI interface as required by the Arduino API
  */
 extern SPIClass SPI;
 

@@ -1,0 +1,54 @@
+From c95eadc77b493c37d7e564f59df2dc21e00cec86 Mon Sep 17 00:00:00 2001
+From: Marian Buschsieweke <marian.buschsieweke@ml-pa.com>
+Date: Wed, 10 Jun 2026 19:43:12 +0200
+Subject: [PATCH] src/ccnl-riot: sort and fix includes
+
+- add missing include for `utlist.h` (this previously was included
+  indirectly)
+- use `time_units.h` as provider of time units, not `timex.h`
+- sort headers alphabetically
+---
+ src/ccnl-riot/src/ccn-lite-riot.c | 24 ++++++++++++------------
+ 1 file changed, 12 insertions(+), 12 deletions(-)
+
+diff --git a/src/ccnl-riot/src/ccn-lite-riot.c b/src/ccnl-riot/src/ccn-lite-riot.c
+index 0ddb488a..921521c8 100644
+--- a/src/ccnl-riot/src/ccn-lite-riot.c
++++ b/src/ccnl-riot/src/ccn-lite-riot.c
+@@ -29,21 +29,21 @@
+ #include <time.h>
+ 
+ /* RIOT specific includes */
+-#include "sched.h"
+-#include "random.h"
+-#include "timex.h"
+-#include "ztimer64.h"
+-#include "net/gnrc/netreg.h"
+-#include "net/gnrc/netif.h"
+-#include "net/gnrc/netif/hdr.h"
+-#include "net/gnrc/netapi.h"
+-#include "net/packet.h"
+ #include "ccn-lite-riot.h"
+-
+-#include "ccnl-os-time.h"
+ #include "ccnl-fwd.h"
+-#include "ccnl-producer.h"
++#include "ccnl-os-time.h"
+ #include "ccnl-pkt-builder.h"
++#include "ccnl-producer.h"
++#include "net/gnrc/netapi.h"
++#include "net/gnrc/netif.h"
++#include "net/gnrc/netif/hdr.h"
++#include "net/gnrc/netreg.h"
++#include "net/packet.h"
++#include "random.h"
++#include "sched.h"
++#include "time_units.h"
++#include "utlist.h"
++#include "ztimer64.h"
+ 
+ /**
+  * @brief RIOT specific local variables
+-- 
+2.53.0
+

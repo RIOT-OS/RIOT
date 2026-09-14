@@ -46,7 +46,7 @@ int main(void){
 
     printf("\n+--------Starting Measurements--------+\n");
 
-    while(1){
+    while (1) {
         opt3001_read_lux(&dev, &convlux);
 
         printf("MilliLux: %" PRIu32 "\n", convlux);

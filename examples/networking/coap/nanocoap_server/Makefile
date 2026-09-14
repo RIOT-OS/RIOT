@@ -61,12 +61,14 @@ USEMODULE += hashes
 # development process:
 #DEVELHELP = 1
 
+include $(RIOTBASE)/makefiles/color.inc.mk
+
 # Use different settings when compiling for one of the following (low-memory)
 # boards
 LOW_MEMORY_BOARDS := nucleo-f334r8
 
 ifneq (,$(filter $(BOARD),$(LOW_MEMORY_BOARDS)))
-  $(info Using low-memory configuration for microcoap_server.)
+  $(call echoinfo,("Using low-memory configuration for nanocoap_server."))
   ## low-memory tuning values
   USEMODULE += prng_minstd
 endif
@@ -82,7 +84,7 @@ ifneq (,$(filter $(BOARD),$(HIGH_MEMORY_BOARDS)))
   USEMODULE += event_timeout_ztimer
   USEMODULE += nanocoap_server_observe
   USEMODULE += nanocoap_server_separate
-
+  USEMODULE += nanocoap_server_event_thread
   # enable fileserver
   USEMODULE += nanocoap_fileserver
   USEMODULE += vfs_default

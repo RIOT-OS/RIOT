@@ -16,7 +16,7 @@ boards_common_nucleo64 page.
 
 ## Pinout
 
-<img src="pinouts/nucleo-f072rb.svg" alt="Pinout for the Nucleo-F072RB (from user manual UM1724, http://www.st.com/resource/en/user_manual/dm00105823.pdf, page 29)" width=50% />
+<img src="nucleo-f072rb.svg" alt="Pinout for the Nucleo-F072RB (from user manual UM1724, http://www.st.com/resource/en/user_manual/dm00105823.pdf, page 29)" width=50% />
 
 ### MCU
 

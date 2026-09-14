@@ -78,7 +78,7 @@
  * during build time:
  *
  * 1. `USEMDOULE += nimble_autoconn_ipsp`
- * 2. `USEMODULE += nibmle_autoconn_ndnsp'
+ * 2. `USEMODULE += nibmle_autoconn_ndnsp`
  *
  * @note    The NDN support service (NDNSP) is defined by us and it is not at
  *          all standardized nor sanctioned by the BT SIG. For experimental use

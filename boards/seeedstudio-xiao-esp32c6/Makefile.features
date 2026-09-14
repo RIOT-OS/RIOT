@@ -1,0 +1,21 @@
+CPU = esp32
+CPU_MODEL = esp32c6_fh4
+
+# common board and CPU features
+include $(RIOTBOARD)/common/esp32c6/Makefile.features
+
+FEATURES_PROVIDED += periph_adc
+FEATURES_PROVIDED += periph_i2c
+FEATURES_PROVIDED += periph_pwm
+FEATURES_PROVIDED += periph_spi
+FEATURES_PROVIDED += periph_uart
+
+# Various other features (if any)
+FEATURES_PROVIDED += arduino_analog
+FEATURES_PROVIDED += arduino_i2c
+FEATURES_PROVIDED += arduino_pins
+FEATURES_PROVIDED += arduino_spi
+FEATURES_PROVIDED += arduino_uart
+
+FEATURES_PROVIDED += highlevel_stdio
+FEATURES_PROVIDED += xiao_shield

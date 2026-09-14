@@ -1,9 +1,6 @@
 /*
- * Copyright (C) 2018 Freie Universität Berlin
- *
- * This file is subject to the terms and conditions of the GNU Lesser
- * General Public License v2.1. See the file LICENSE in the top level
- * directory for more details.
+ * SPDX-FileCopyrightText: 2018 Freie Universität Berlin
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
 
 #pragma once
@@ -107,6 +104,16 @@ typedef struct __attribute__((packed)) {
 } dhcpv6_duid_l2_t;
 
 #if defined(MODULE_AUTO_INIT_DHCPV6_CLIENT) || defined(DOXYGEN)
+/**
+ * @brief   Configure a hook function to be executed during dhcpv6 client's
+ *          auto init.
+ *
+ * @param[in] _hook     The hook function to be called during auto init.
+ * @param[in] netif         The network interface the client should listen on.
+ *                          SOCK_ADDR_ANY_NETIF for any interface
+ */
+void dhcpv6_client_set_init_hook(void (*_hook)(void), uint16_t netif);
+
 /**
  * @brief   Auto-initializes the client in its own thread
  *

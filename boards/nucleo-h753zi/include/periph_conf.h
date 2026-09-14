@@ -38,9 +38,9 @@ extern "C" {
  * @{
  */
 static const dma_conf_t dma_config[] = {
-    { .stream = 4 },   /* DMA1 Stream 4 - USART3_TX */
-    { .stream = 14 },  /* DMA2 Stream 6 - USART6_TX */
-    { .stream = 6 },   /* DMA1 Stream 6 - USART2_TX */
+    { .stream = 4 },   /* DMA1 Stream 4  - USART3_TX */
+    { .stream = 14 },  /* DMA2 Stream 14 - USART6_TX */
+    { .stream = 6 },   /* DMA1 Stream 6  - USART2_TX */
 };
 
 #define DMA_0_ISR  isr_dma1_stream4
@@ -65,6 +65,8 @@ static const uart_conf_t uart_config[] = {
         .tx_af      = GPIO_AF7,
         .bus        = APB1,
         .irqn       = USART3_IRQn,
+        .type       = STM32_USART,
+        .clk_src    = 0, /* Use APB clock */
 #ifdef MODULE_PERIPH_DMA
         .dma        = 0,
         .dma_chan   = 46 /* DMAMUX_REQ_USART3_TX */
@@ -79,6 +81,8 @@ static const uart_conf_t uart_config[] = {
         .tx_af      = GPIO_AF7,
         .bus        = APB2,
         .irqn       = USART6_IRQn,
+        .type       = STM32_USART,
+        .clk_src    = 0, /* Use APB clock */
 #ifdef MODULE_PERIPH_DMA
         .dma        = 1,
         .dma_chan   = 72 /* DMAMUX_REQ_USART6_TX */
@@ -93,16 +97,32 @@ static const uart_conf_t uart_config[] = {
         .tx_af      = GPIO_AF7,
         .bus        = APB1,
         .irqn       = USART2_IRQn,
+        .type       = STM32_USART,
+        .clk_src    = 0, /* Use APB clock */
 #ifdef MODULE_PERIPH_DMA
         .dma        = 2,
         .dma_chan   = 44 /* DMAMUX_REQ_USART2_TX */
 #endif
-    }
+    },
+    {
+        .dev        = LPUART1,
+        .rcc_mask   = RCC_APB4ENR_LPUART1EN,
+        .rx_pin     = GPIO_PIN(PORT_B, 7), /* connected to D0 */
+        .tx_pin     = GPIO_PIN(PORT_B, 6), /* connected to D1 */
+        .rx_af      = GPIO_AF8,
+        .tx_af      = GPIO_AF8,
+        .bus        = APB4,
+        .irqn       = LPUART1_IRQn,
+        .type       = STM32_LPUART,
+        .clk_src    = 0, /* Use APB clock */
+        /* the LPUART uses the BDMA controller rather than the normal DMA controller */
+    },
 };
 
 #define UART_0_ISR          (isr_usart3)
 #define UART_1_ISR          (isr_usart6)
 #define UART_2_ISR          (isr_usart2)
+#define UART_3_ISR          (isr_lpuart1)
 #define UART_NUMOF          ARRAY_SIZE(uart_config)
 /** @} */
 

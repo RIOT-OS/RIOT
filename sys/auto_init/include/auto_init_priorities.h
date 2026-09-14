@@ -1,9 +1,6 @@
 /*
- * Copyright (C) 2022 Otto-von-Guericke-Universität Magdebug
- *
- * This file is subject to the terms and conditions of the GNU Lesser
- * General Public License v2.1. See the file LICENSE in the top level
- * directory for more details.
+ * SPDX-FileCopyrightText: 2022 Otto-von-Guericke-Universität Magdebug
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
 
 #pragma once
@@ -190,6 +187,12 @@ extern "C" {
  */
 #define AUTO_INIT_PRIO_MOD_GCOAP                        1240
 #endif
+#ifndef AUTO_INIT_PRIO_MOD_UNICOAP
+/**
+ * @brief   `unicoap` priority
+ */
+#define AUTO_INIT_PRIO_MOD_UNICOAP                      1245
+#endif
 #ifndef AUTO_INIT_PRIO_MOD_DEVFS
 /**
  * @brief   DEVFS priority
@@ -338,19 +341,19 @@ extern "C" {
 /**
  * @brief   DHCPv6 client priority
  */
-#define AUTO_INIT_PRIO_MOD_DHCPV6_CLIENT                1470
+#define AUTO_INIT_PRIO_MOD_DHCPV6_CLIENT                1480
 #endif
 #ifndef AUTO_INIT_PRIO_MOD_DHCPV6_RELAY
 /**
  * @brief   DHCPv6 relay priority
  */
-#define AUTO_INIT_PRIO_MOD_DHCPV6_RELAY                 1480
+#define AUTO_INIT_PRIO_MOD_DHCPV6_RELAY                 1490
 #endif
 #ifndef AUTO_INIT_PRIO_MOD_DHCPV6_CLIENT_SIMPLE_PD
 /**
  * @brief   DHCPv6 client simple PD priority
  */
-#define AUTO_INIT_PRIO_MOD_DHCPV6_CLIENT_SIMPLE_PD      1490
+#define AUTO_INIT_PRIO_MOD_DHCPV6_CLIENT_SIMPLE_PD      1470
 #endif
 #ifndef AUTO_INIT_PRIO_MOD_GNRC_IPV6_AUTO_SUBNETS
 /**

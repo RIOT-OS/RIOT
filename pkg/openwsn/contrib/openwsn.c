@@ -27,6 +27,7 @@
 #ifdef MODULE_AT86RF2XX
 #include "at86rf2xx.h"
 #include "at86rf2xx_params.h"
+#include "event/thread.h"
 #endif
 
 #ifdef MODULE_CC2538_RF
@@ -37,6 +38,10 @@
 #include "nrf802154.h"
 #endif
 
+#ifdef MODULE_KW41ZRF
+#include "kw41zrf.h"
+#endif
+
 #define LOG_LEVEL LOG_NONE
 #include "log.h"
 
@@ -44,17 +49,19 @@
 #define OPENWSN_SCHED_PRIO            (THREAD_PRIORITY_MAIN - 4)
 #define OPENWSN_SCHED_STACKSIZE       (2048)
 
-#ifdef MODULE_OPENWSN_RADIO_NETDEV
 #ifdef MODULE_AT86RF2XX
-static at86rf2xx_t at86rf2xx_dev;
+static at86rf2xx_bhp_ev_t at86rf2xx_bhp;
+static ieee802154_dev_t at86rf2xx_dev;
 #endif
-#else
+
 #ifdef MODULE_CC2538_RF
 static ieee802154_dev_t cc2538_rf_dev;
 #endif
 #ifdef MODULE_NRF802154
 static ieee802154_dev_t nrf802154_hal_dev;
 #endif
+#ifdef MODULE_KW41ZRF
+static ieee802154_dev_t kw41zrf_hal_dev;
 #endif
 
 static char _stack[OPENWSN_SCHED_STACKSIZE];
@@ -73,12 +80,10 @@ void* _radio_init_dev(void)
     void* dev = NULL;
     /* avoid cppcheck style (redundantAssignment)*/
     (void) dev;
-#ifdef MODULE_OPENWSN_RADIO_NETDEV
     #ifdef MODULE_AT86RF2XX
-        dev = &at86rf2xx_dev.netdev.netdev;
-        at86rf2xx_setup(&at86rf2xx_dev, &at86rf2xx_params[0], 0);
+        dev = &at86rf2xx_dev;
+        at86rf2xx_init_event(&at86rf2xx_bhp, &at86rf2xx_params[0], &at86rf2xx_dev, EVENT_PRIO_HIGHEST);
     #endif
-#else
     #ifdef MODULE_CC2538_RF
         dev = &cc2538_rf_dev;
         cc2538_rf_hal_setup(dev);
@@ -89,7 +94,12 @@ void* _radio_init_dev(void)
         nrf802154_hal_setup(dev);
         nrf802154_init();
     #endif
-#endif
+    #ifdef MODULE_KW41ZRF
+        dev = &kw41zrf_hal_dev;
+        kw41zrf_hal_setup(&kw41zrf_hal_dev);
+        kw41zrf_init();
+    #endif
+
     return dev;
 }
 

@@ -177,7 +177,7 @@ def testfunc(child):
 
     run(test_task02)
     run(test_task03)
-    if(_check_eeprom(child)):
+    if _check_eeprom(child):
         run(test_task04)
 
     print("TEST PASSED")

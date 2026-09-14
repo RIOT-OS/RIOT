@@ -62,24 +62,33 @@ static const uint8_t apbmul[] = {
     [APB1] = 2,
 #if defined(CPU_FAM_STM32L4) || defined(CPU_FAM_STM32WB) || \
     defined(CPU_FAM_STM32G0) || defined(CPU_FAM_STM32G4) || \
-    defined(CPU_FAM_STM32L5) || defined(CPU_FAM_STM32U5) || \
-    defined(CPU_FAM_STM32WL) || defined(CPU_FAM_STM32C0)
+    defined(CPU_FAM_STM32L5) || defined(CPU_FAM_STM32U3) || \
+    defined(CPU_FAM_STM32U5) || defined(CPU_FAM_STM32C0) || \
+    defined(CPU_FAM_STM32WL)
     [APB12] = 2,
 #endif
 #else
     [APB1] = 1,
 #if defined(CPU_FAM_STM32L4) || defined(CPU_FAM_STM32WB) || \
     defined(CPU_FAM_STM32G0) || defined(CPU_FAM_STM32G4) || \
-    defined(CPU_FAM_STM32L5) || defined(CPU_FAM_STM32U5) || \
-    defined(CPU_FAM_STM32WL) || defined(CPU_FAM_STM32C0)
+    defined(CPU_FAM_STM32L5) || defined(CPU_FAM_STM32U3) || \
+    defined(CPU_FAM_STM32U5) || defined(CPU_FAM_STM32C0) || \
+    defined(CPU_FAM_STM32WL)
     [APB12] = 1,
 #endif
 #endif
 #if defined(APB2_PERIPH_EN)
 #if (CLOCK_APB2 < CLOCK_CORECLOCK)
-    [APB2] = 2
+    [APB2] = 2,
 #else
-    [APB2] = 1
+    [APB2] = 1,
+#endif
+#endif
+#if defined(APB3_PERIPH_EN) && defined(CLOCK_APB3)
+#if (CLOCK_APB3 < CLOCK_CORECLOCK)
+    [APB3] = 2,
+#else
+    [APB3] = 1,
 #endif
 #endif
 };
@@ -118,6 +127,10 @@ static volatile uint32_t* _rcc_en_reg(bus_t bus)
 #ifdef AHB1_PERIPH_EN
     case AHB1:
         return &AHB1_PERIPH_EN;
+#endif
+#ifdef AHB12_PERIPH_EN
+    case AHB12:
+        return &AHB12_PERIPH_EN;
 #endif
 #ifdef AHB2_PERIPH_EN
     case AHB2:
@@ -366,9 +379,14 @@ uint32_t periph_apb_clk(bus_t bus)
     if (bus == APB2) {
         return CLOCK_APB2;
     }
+#ifdef CLOCK_APB3
+    if (bus == APB3) {
+        return CLOCK_APB3;
+    }
+#endif /* CLOCK_APB3 */
 #else
     (void)bus;
-#endif
+#endif /* CLOCK_APB2 */
     return CLOCK_APB1;
 }
 

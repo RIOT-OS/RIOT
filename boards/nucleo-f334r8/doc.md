@@ -17,7 +17,7 @@ You can find general information about the Nucleo64 boards on the
 
 ## Pinout
 
-<img src="pinouts/nucleo-f334r8.svg" alt="Pinout for the nucleo-F334R8 (from user manual UM1724, <http://www.st.com/resource/en/user_manual/dm00105823.pdf>, page 31)" width=50% />
+<img src="nucleo-f334r8.svg" alt="Pinout for the nucleo-F334R8 (from user manual UM1724, <http://www.st.com/resource/en/user_manual/dm00105823.pdf>, page 31)" width=50% />
 
 ### MCU
 

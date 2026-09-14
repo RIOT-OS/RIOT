@@ -1,5 +1,5 @@
 /*
- * SPDX-FileCopyrightText: 2026 Hamburg University of Technology (TUHH)
+ * SPDX-FileCopyrightText: 2026 Technische Universität Hamburg
  * SPDX-License-Identifier: LGPL-2.1-only
  */
 #include "bplib_init.h"
@@ -104,19 +104,6 @@ static void _config_nc(void)
     bplib_contact_set_destinations(0, 0, reachable_eids);
     bplib_contact_set_out_addr(0, BPLIB_EXAMPLE_REMOTE, 0);
 }
-
-static int _bp(int argc, char **argv)
-{
-    if (argc != 3) {
-        printf("Usage: bp <channel> <message>\n");
-        return 1;
-    }
-
-    BPLib_PI_Ingress(&bplib_instance_data.BPLibInst, atoi(argv[1]), argv[2], strlen(argv[2]));
-
-    return 0;
-}
-SHELL_COMMAND(bp, "Send BP Test Bundles", _bp);
 
 int main(void)
 {

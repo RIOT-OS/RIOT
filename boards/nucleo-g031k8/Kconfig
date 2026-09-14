@@ -1,0 +1,13 @@
+# SPDX-FileCopyrightText: 2026 Hudson C. Dalpra
+# SPDX-License-Identifier: LGPL-2.1-only
+
+config BOARD
+    default "nucleo-g031k8" if BOARD_NUCLEO_G031K8
+
+config BOARD_NUCLEO_G031K8
+    bool
+    default y
+    select BOARD_COMMON_NUCLEO32
+    select CPU_MODEL_STM32G031K8
+
+source "$(RIOTBOARD)/common/nucleo32/Kconfig"

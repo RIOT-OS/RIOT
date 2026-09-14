@@ -10,7 +10,14 @@ endif
 ifneq (,$(filter unicoap_driver_dtls,$(USEMODULE)))
   DIRS += drivers/rfc7252/dtls
 endif
+ifneq (,$(filter unicoap_driver_slipmux,$(USEMODULE)))
+  DIRS += drivers/rfc7252/slipmux
+endif
 
 # MARK: unicoap_driver_extension_point
+
+ifneq (,$(filter unicoap_server,$(USEMODULE)))
+  DIRS += server
+endif
 
 include $(RIOTBASE)/Makefile.base

@@ -1,9 +1,6 @@
 /*
- * Copyright (C) 2018 Freie Universität Berlin
- *
- * This file is subject to the terms and conditions of the GNU Lesser
- * General Public License v2.1. See the file LICENSE in the top level
- * directory for more details.
+ * SPDX-FileCopyrightText: 2018 Freie Universität Berlin
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
 
 #pragma once
@@ -20,6 +17,10 @@
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  *
  */
+
+#include <stdbool.h>
+
+#include "bitarithm.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -618,14 +619,15 @@ typedef enum {
  * @name Blockwise transfer (RFC7959)
  * @{
  */
-#define COAP_BLOCKWISE_NUM_OFF  (4)
-#define COAP_BLOCKWISE_MORE_OFF (3)
-#define COAP_BLOCKWISE_SZX_MASK (0x07)
-#define COAP_BLOCKWISE_SZX_MAX  (7)
+#define COAP_BLOCKWISE_NUM_OFF  (4)         /**< offset of the NUM field in bits */
+#define COAP_BLOCKWISE_NUM_MAX  (0xfffffU)  /**< highest possible block number (20 bits) */
+#define COAP_BLOCKWISE_MORE_OFF (3)         /**< offset of the more field in bits */
+#define COAP_BLOCKWISE_SZX_MASK (0x07)      /**< bitmask to get the SZX field */
+#define COAP_BLOCKWISE_SZX_MAX  (7)         /**< largest valid SZX value */
 /** @} */
 
 /**
- * @brief Coap block-wise-transfer size SZX
+ * @brief CoAP block-wise-transfer size SZX
  */
 typedef enum {
     COAP_BLOCKSIZE_16 = 0,
@@ -636,6 +638,70 @@ typedef enum {
     COAP_BLOCKSIZE_512,
     COAP_BLOCKSIZE_1024,
 } coap_blksize_t;
+
+/**
+ * @brief   Convert a @ref coap_blksize_t constant to a size in bytes without
+ *          error checking
+ *
+ * @param[in]   szx     Constant to convert
+ *
+ * @return      The number of bytes that constant encodes.
+ *
+ * From [RFC7959](https://www.rfc-editor.org/info/rfc7959/#section-2.2):
+ *
+ * > The block size is represented as a three-bit
+ * > unsigned integer indicating the size of a block to the power of
+ * > two.  Thus, block size = 2**(SZX + 4).
+ */
+#define COAP_SZX2SIZE(szx) \
+    (1U << (4U + (szx)))
+
+/**
+ * @brief   Convert a @ref coap_blksize_t constant to a size in bytes
+ *
+ * @param[in]   szx     Constant to convert
+ *
+ * @return      The number of bytes that constant encodes.
+ * @retval      0       @p szx was invalid
+ *
+ * Example usage:
+ * ```c
+ * assert(coap_blksize_to_bytes(COAP_BLOCKSIZE_128) == 128);
+ * ```
+ */
+static inline unsigned coap_szx2size(coap_blksize_t szx)
+{
+    if ((unsigned)szx > (unsigned)COAP_BLOCKSIZE_1024) {
+        return 0;
+    }
+
+    return COAP_SZX2SIZE(szx);
+}
+
+/**
+ * @brief   Get the closest blocksize enum for given size
+ *
+ * @param[in]   size    Target size in bytes
+ *
+ * @warning If @p size is smaller than 16, `COAP_BLOCKSIZE_16` is returned
+ *          as there is no smaller blocksize than that.
+ *
+ * @return  The largest blocksize fitting into @p size bytes
+ * @retval  COAP_BLOCKSIZE_16       @p size was smaller than 32
+ * @retval  COAP_BLOCKSIZE_1024     @p size was at least 1024
+ */
+static inline coap_blksize_t coap_size2szx(unsigned size)
+{
+    if (size < 32) {
+        return COAP_BLOCKSIZE_16;
+    }
+
+    if (size >= 1024) {
+        return COAP_BLOCKSIZE_1024;
+    }
+
+    return bitarithm_msb(size >> 4);
+}
 
 #ifdef __cplusplus
 }

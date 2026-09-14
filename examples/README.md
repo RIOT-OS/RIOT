@@ -60,6 +60,8 @@ Here is a quick overview of the examples available in the RIOT:
 | [gcoap_fileserver](./networking/coap/gcoap_fileserver/README.md) | This example demonstrates the usage of the `gcoap` module to serve files over CoAP. |
 | [gcoap_dtls](./networking/coap/gcoap_dtls/README.md) | This example demonstrates the usage of the `gcoap` module with DTLS. |
 | [nanocoap_server](./networking/coap/nanocoap_server/README.md) | This example demonstrates the usage of the `nanocoap` module, a high-level API for CoAP (Constrained Application Protocol) messaging. |
+| [libcoap_client](./networking/coap/libcoap_client/README.md) | This example demonstrates the usage of the `libcoap` module for providing a CoAP client. |
+| [libcoap_server](./networking/coap/libcoap_server/README.md) | This example demonstrates the usage of the `libcoap` module for providing a CoAP server. |
 
 ### Bluetooth Low Energy (BLE)
 
@@ -135,7 +137,8 @@ Here is a quick overview of the examples available in the RIOT:
 | [sniffer](./networking/misc/sniffer/README.md) | This application is built to run together with the script `./tools/sniffer.py` as a sniffer for (wireless) data traffic. |
 | [benckmark_udp](./networking/misc/benchmark_udp/README.md) | This example uses the `benchmark_udp` module to create a stress-test for the RIOT network stack. |
 | [sock_tcp_echo](./networking/misc/sock_tcp_echo/README.md) | This is a simple TCP echo server / client that uses the SOCK API. |
-| [lwip_ipv4](./networking/misc/lwip_ipv4/README.md) | This is a simple UDP client / server using LWIP for IPv4. |
+| [lwip_ipv4](./networking/misc/lwip_ipv4/README.md) | This is a simple UDP client / server using lwIP for IPv4. |
+| [lwiperf](./networking/misc/lwiperf/README.md) | This is a lwIP benchmark application, providing an iPerf client and server. |
 
 
 ## Advanced Examples
@@ -152,7 +155,9 @@ Here is a quick overview of the examples available in the RIOT:
 | [twr_aloha](./advanced/twr_aloha/README.md) | This example allows testing different two-way ranging algorithms between two boards supporting a dw1000 device. This makes use of the uwb-core pkg. |
 | [senml_saul](./advanced/senml_saul/README.md) | This example demonstrates the usage of the SAUL (Sensor Actuator Uber Layer) module with the SenML (Sensor Measurement Lists) format. |
 | [opendsme](./advanced/opendsme/README.md) | This example demonstrates the usage of the OpenDSME module in RIOT. |
-| [xipfs](./advanced/xipfs/README.md) | This example demonstrates the usage of XIPFS for creating and executing an executable file. |
+| [xipfs_minimal_example](./advanced/xipfs/xipfs_minimal_example/README.md) | This example demonstrates a simple usage of XiPFS for creating and executing an executable file. |
+| [xipfs_memory_image_example](./advanced/xipfs/xipfs_memory_image_example/README.md) | This example demonstrates how to embed a pre-made off-board XiPFS mount point memory image. |
+| [xipfs_complete_example](./advanced/xipfs/xipfs_complete_example/README.md) | This example demonstrates how to use various XiPFS mount points from code. |
 
 ## Examples from Guides
 

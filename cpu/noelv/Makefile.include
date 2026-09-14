@@ -1,0 +1,6 @@
+# The riscv-none-elf newlib limits.h does not define SSIZE_MAX. Without it,
+# lwIP falls back to redefining ssize_t as int, which conflicts with the
+# 64-bit `long int` ssize_t of the rv64 toolchain.
+CFLAGS += -DSSIZE_MAX=__LONG_MAX__
+
+include $(RIOTCPU)/riscv_common/Makefile.include

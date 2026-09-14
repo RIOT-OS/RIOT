@@ -1,9 +1,6 @@
 /*
- * Copyright (C) 2015-2017 Simon Brummer
- *
- * This file is subject to the terms and conditions of the GNU Lesser
- * General Public License v2.1. See the file LICENSE in the top level
- * directory for more details.
+ * SPDX-FileCopyrightText: 2015-2017 Simon Brummer
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
 
 #pragma once
@@ -22,15 +19,17 @@
  */
 
 #include <stdint.h>
+
+#include "compiler_hints.h"
 #include "net/gnrc/pkt.h"
 #include "net/gnrc/tcp/tcb.h"
 
 #ifdef SOCK_HAS_IPV6
-#include "net/sock.h"
+#  include "net/sock.h"
 #else
-#ifdef MODULE_GNRC_IPV6
-#include "net/gnrc/ipv6.h"
-#endif
+#  ifdef MODULE_GNRC_IPV6
+#    include "net/gnrc/ipv6.h"
+#  endif
 #endif
 
 #ifdef __cplusplus
@@ -83,6 +82,7 @@ typedef struct {
  * @return   -EAFNOSUPPORT if @p address_family is not supported.
  * @return   -EINVAL if @p addr_size does not match @p family.
  */
+ACCESS(read_only, 3, 4)
 int gnrc_tcp_ep_init(gnrc_tcp_ep_t *ep, int family, const uint8_t *addr, size_t addr_size,
                      uint16_t port, uint16_t netif);
 
@@ -230,6 +230,7 @@ int gnrc_tcp_accept(gnrc_tcp_tcb_queue_t *queue, gnrc_tcp_tcb_t **tcb,
  * @return   -ECONNABORTED if the connection was aborted.
  * @return   -ETIMEDOUT if @p user_timeout_duration_ms expired.
  */
+ACCESS(read_only, 2, 3)
 ssize_t gnrc_tcp_send(gnrc_tcp_tcb_t *tcb, const void *data, const size_t len,
                       const uint32_t user_timeout_duration_ms);
 
@@ -264,8 +265,9 @@ ssize_t gnrc_tcp_send(gnrc_tcp_tcb_t *tcb, const void *data, const size_t len,
  * @return   -ECONNABORTED if the connection was aborted.
  * @return   -ETIMEDOUT if @p user_timeout_duration_ms expired.
  */
-ssize_t gnrc_tcp_recv(gnrc_tcp_tcb_t *tcb, void *data, const size_t max_len,
-                      const uint32_t user_timeout_duration_ms);
+ACCESS(write_only, 2, 3)
+ssize_t gnrc_tcp_recv(gnrc_tcp_tcb_t *tcb, void *data, size_t max_len,
+                      uint32_t user_timeout_duration_ms);
 
 /**
  * @brief Close a TCP connection.
@@ -292,7 +294,7 @@ void gnrc_tcp_abort(gnrc_tcp_tcb_t *tcb);
  *
  * @pre @p queue must not be NULL
  *
- * @note: Blocks until all currently opened connections maintained
+ * @note  Blocks until all currently opened connections maintained
  *        by @p queue were closed.
  *
  * @param[in,out] queue   TCB queue to stop listening

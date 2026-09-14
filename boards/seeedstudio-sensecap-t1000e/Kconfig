@@ -1,0 +1,35 @@
+# SPDX-FileCopyrightText: 2026 Baptiste Le Duc <baptiste.leduc@etik.com>
+# SPDX-License-Identifier: LGPL-2.1-only
+
+config BOARD
+    default "seeedstudio-sensecap-t1000e" if BOARD_SEEEDSTUDIO_T1000E
+
+config BOARD_SEEEDSTUDIO_T1000E
+    bool
+    default y
+    select BOARD_COMMON_NRF52
+    select CPU_MODEL_NRF52840XXAA
+
+config T1000E_ENABLE_3V3
+    bool "Enable 3.3V rail"
+    default y
+    help
+        Drive the main 3.3V load switch at boot. Required by most
+        on-board peripherals. Disable to save power if all peripherals
+        are managed at runtime.
+
+config T1000E_ENABLE_SENSOR
+    bool "Enable sensor power rail"
+    default y
+    help
+        Drive the sensor load switch at boot, powering the light sensor
+        and NTC thermistor. Disable if neither sensor is used.
+
+config T1000E_ENABLE_ACC
+    bool "Enable accelerometer power rail"
+    default y
+    help
+        Drive the accelerometer load switch at boot, powering the
+        QMA6100P. Disable if the accelerometer is not used.
+
+source "$(RIOTBOARD)/common/nrf52/Kconfig"

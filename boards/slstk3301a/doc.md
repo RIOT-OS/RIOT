@@ -1,6 +1,6 @@
-@defgroup    boards_slstk3301a Silicon Labs SLSTK3301A starter kit
-@ingroup     boards
-@brief       Support for Silicon Labs SLSTK3301A starter kit
+@defgroup   boards_slstk3301a Silicon Labs SLSTK3301A starter kit
+@ingroup    boards
+@brief      Support for Silicon Labs SLSTK3301A starter kit
 
 ## Overview
 
@@ -18,6 +18,7 @@ actively measure the power consumption of your hardware and code, in real-time.
 | MCU             | EFM32TG11B520F128GM80                                                                              |
 |-----------------|----------------------------------------------------------------------------------------------------|
 | Family          | ARM Cortex-M0PLUS                                                                                  |
+| Series          | Series 1                                                                                           |
 | Vendor          | Silicon Labs                                                                                       |
 | Vendor Family   | EFM32 Tiny Gecko 11B                                                                               |
 | RAM             | 32.0 KiB                                                                                           |
@@ -62,27 +63,27 @@ PIN 1 is the bottom-left contact when the header faces you horizontally.
 
 ### Peripheral mapping
 
-| Peripheral | Number  | Hardware        | Pins                              | Comments                                                 |
-|------------|---------|-----------------|-----------------------------------|----------------------------------------------------------|
-| ADC        | 0       | ADC0            | CHAN0: internal temperature       | Ports are fixed, 14/16-bit resolution not supported      |
-| I2C        | 0       | I2C0            | SDA: PD6, CLK: PD7                | `I2C_SPEED_LOW` and `I2C_SPEED_HIGH` clock speed deviate |
-| HWCRYPTO   | &mdash; | &mdash;         |                                   | AES128/AES256, SHA1, SHA256                              |
-| RTT        | &mdash; | RTCC            |                                   | 1 Hz interval. Either RTT or RTC (see below)             |
-| RTC        | &mdash; | RTCC            |                                   | 1 Hz interval. Either RTC or RTT (see below)             |
-| SPI        | 0       | USART1          | MOSI: PC11, MISO: PC10, CLK: PA12 |                                                          |
-| Timer      | 0       | TIMER0 + TIMER1 |                                   | TIMER0 is used as prescaler (must be adjacent)           |
-|            | 1       | LETIMER0        |                                   |                                                          |
-| UART       | 0       | USART1          | RX: PD1, TX: PD0                  | Default STDIO output                                     |
-|            | 1       | LEUART0         | RX: PC15, TX: PC14                | Baud rate limited (see below)                            |
+| Peripheral | Number | Hardware        | Pins                              | Comments                                                 |
+|------------|--------|-----------------|-----------------------------------|----------------------------------------------------------|
+| ADC        | 0      | ADC0            | CHAN0: internal temperature       | Ports are fixed, 14/16-bit resolution not supported      |
+| I2C        | 0      | I2C0            | SDA: PD6, CLK: PD7                | `I2C_SPEED_LOW` and `I2C_SPEED_HIGH` clock speed deviate |
+| HWRNG      | -      | TRNG0           |                                   | Hardware-based true random number generator              |
+| RTT        | -      | RTCC            |                                   | 1 Hz interval. Either RTT or RTC (see below)             |
+| RTC        | -      | RTCC            |                                   | 1 Hz interval. Either RTC or RTT (see below)             |
+| SPI        | 0      | USART1          | MOSI: PC11, MISO: PC10, CLK: PA12 |                                                          |
+| Timer      | 0      | TIMER0 + TIMER1 |                                   | TIMER0 is used as prescaler (must be adjacent)           |
+|            | 1      | LETIMER0        |                                   |                                                          |
+| UART       | 0      | USART1          | RX: PD1, TX: PD0                  | Default STDIO output                                     |
+|            | 1      | LEUART0         | RX: PC15, TX: PC14                | Baud rate limited (see below)                            |
 
 ### User interface
 
-| Peripheral | Mapped to | Pin  | Comments   |
-|------------|-----------|------|------------|
-| Button     | PB0_PIN   | PD5  |            |
-|            | PB1_PIN   | PC9  |            |
-| LED        | LED0_PIN  | PD2  |            |
-|            | LED1_PIN  | PC2  |            |
+| Peripheral | Number | Mapped to | Pin | Comments |
+|------------|--------|-----------|-----|----------|
+| Button     | 0      | PB0_PIN   | PD5 |          |
+|            | 1      | PB1_PIN   | PC9 |          |
+| LED        | 0      | LED0_PIN  | PD2 |          |
+|            | 1      | LED1_PIN  | PC2 |          |
 
 ## Implementation Status
 
@@ -92,11 +93,11 @@ PIN 1 is the bottom-left contact when the header faces you horizontally.
 | Low-level driver              | ADC        | yes       |                                                                |
 |                               | Flash      | yes       |                                                                |
 |                               | GPIO       | yes       | Interrupts are shared across pins (see reference manual)       |
-|                               | HW Crypto  | yes       |                                                                |
+|                               | HWRNG      | yes       |                                                                |
 |                               | I2C        | yes       |                                                                |
 |                               | PWM        | yes       |                                                                |
 |                               | RTCC       | yes       | As RTT or RTC                                                  |
-|                               | SPI        | partially | Only master mode                                               |
+|                               | SPI        | yes       | Only master mode                                               |
 |                               | Timer      | yes       |                                                                |
 |                               | UART       | yes       | USART is shared with SPI. LEUART baud rate limited (see below) |
 | Temperature + humidity sensor | Si7021     | yes       | Silicon Labs Temperature + Humidity sensor                     |
@@ -125,7 +126,7 @@ expects data from the MCU with the same settings.
 ### Clock selection
 
 There are several clock sources that are available for the different
-peripherals. You are advised to read [AN0004.0](https://www.silabs.com/documents/public/application-notes/an0004.0-efm32-cmu.pdf)
+peripherals. You are advised to read [AN0004.1](https://www.silabs.com/documents/public/application-notes/an0004.1-efm32-cmu.pdf)
 to get familiar with the different clocks.
 
 | Source | Internal | Speed      | Comments                           |
@@ -181,14 +182,6 @@ Therefore, only one of both peripherals can be enabled at the same time.
 
 Configured at 1 Hz interval, the RTCC will overflow each 136 years.
 
-### Hardware crypto
-
-This MCU is equipped with a hardware-accelerated crypto peripheral that can
-speed up AES128, AES256, SHA1, SHA256 and several other cryptographic
-computations.
-
-A peripheral driver interface is proposed, but not yet implemented.
-
 ### Usage of EMLIB
 
 This port makes use of EMLIB by Silicon Labs to abstract peripheral registers.
@@ -200,7 +193,7 @@ inline methods or macros (which have no overhead).
 
 Another advantage of EMLIB are the included assertions. These assertions ensure
 that peripherals are used properly. To enable this, pass `DEBUG_EFM` to your
-compiler.
+compiler defines.
 
 EMLIB is licensed by Silicon Labs under the zlib-style license, which permits
 distribution of source.

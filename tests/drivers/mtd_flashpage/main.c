@@ -18,7 +18,7 @@
 #include "mtd_flashpage.h"
 
 /* For MSP430 cpu's the last page holds the interrupt vector, although the api
-   should not limit erasing that page, we don't want to break when testing */
+ * should not limit erasing that page, we don't want to break when testing */
 #ifdef __MSP430__
 #define LAST_AVAILABLE_PAGE    (FLASHPAGE_NUMOF - 2)
 #else
@@ -26,14 +26,19 @@
 #endif
 
 #if (__SIZEOF_POINTER__ == 2)
-#define TEST_ADDRESS1       (uint16_t)((uintptr_t)flashpage_addr(LAST_AVAILABLE_PAGE) - (uintptr_t)CPU_FLASH_BASE)
-#define TEST_ADDRESS2       (uint16_t)((uintptr_t)flashpage_addr(LAST_AVAILABLE_PAGE - 1) - (uintptr_t)CPU_FLASH_BASE)
+#define TEST_ADDRESS1       (uint16_t)((uintptr_t)flashpage_addr(LAST_AVAILABLE_PAGE) \
+                            - (uintptr_t)CPU_FLASH_BASE)
+#define TEST_ADDRESS2       (uint16_t)((uintptr_t)flashpage_addr(LAST_AVAILABLE_PAGE - 1) \
+                            - (uintptr_t)CPU_FLASH_BASE)
 #else
-#define TEST_ADDRESS1       (uint32_t)((uintptr_t)flashpage_addr(LAST_AVAILABLE_PAGE) - (uintptr_t)CPU_FLASH_BASE)
-#define TEST_ADDRESS2       (uint32_t)((uintptr_t)flashpage_addr(LAST_AVAILABLE_PAGE - 1) - (uintptr_t)CPU_FLASH_BASE)
+#define TEST_ADDRESS1       (uint32_t)((uintptr_t)flashpage_addr(LAST_AVAILABLE_PAGE) \
+                            - (uintptr_t)CPU_FLASH_BASE)
+#define TEST_ADDRESS2       (uint32_t)((uintptr_t)flashpage_addr(LAST_AVAILABLE_PAGE - 1) \
+                            - (uintptr_t)CPU_FLASH_BASE)
 #endif
 /* Address of last flash page and not last available flashpage */
-#define TEST_ADDRESS0       (uint32_t)((uintptr_t)flashpage_addr((FLASHPAGE_NUMOF - 1)) - (uintptr_t)CPU_FLASH_BASE)
+#define TEST_ADDRESS0       (uint32_t)((uintptr_t)flashpage_addr((FLASHPAGE_NUMOF - 1)) \
+                            - (uintptr_t)CPU_FLASH_BASE)
 
 #define PAGES_PER_SECTOR    8
 

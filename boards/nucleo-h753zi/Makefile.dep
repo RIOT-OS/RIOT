@@ -1,1 +1,7 @@
+# The H7 has an LPUART present and it is configured, so we have to add the
+# `periph_lpuart` to the required features.
+ifneq (,$(filter periph_uart,$(USEMODULE)))
+  FEATURES_REQUIRED += periph_lpuart
+endif
+
 include $(RIOTBOARD)/common/nucleo/Makefile.dep

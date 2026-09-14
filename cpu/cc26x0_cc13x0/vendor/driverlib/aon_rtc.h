@@ -166,8 +166,6 @@ extern "C"
 //! \note Event generation for each of the three channels must also be enabled
 //!  using the function AONRTCChannelEnable().
 //!
-//! \return None
-//!
 //! \sa AONRTCChannelEnable()
 //
 //*****************************************************************************
@@ -187,8 +185,6 @@ AONRTCEnable(void)
 //! \note Event generation for each of the three channels can also be disabled
 //! using the function AONRTCChannelDisable().
 //!
-//! \return None
-//!
 //! \sa AONRTCChannelDisable()
 //
 //*****************************************************************************
@@ -204,8 +200,6 @@ AONRTCDisable(void)
 //! \brief Reset the RTC.
 //!
 //! Reset the AON Real Time Clock.
-//!
-//! \return None
 //
 //*****************************************************************************
 __STATIC_INLINE void
@@ -295,8 +289,6 @@ AONRTCChannelActive(uint32_t ui32Channel)
 //! - \ref AON_RTC_CONFIG_DELAY_112
 //! - \ref AON_RTC_CONFIG_DELAY_128
 //! - \ref AON_RTC_CONFIG_DELAY_144
-//!
-//! \return None.
 //
 //*****************************************************************************
 __STATIC_INLINE void
@@ -330,8 +322,6 @@ AONRTCDelayConfig(uint32_t ui32Delay)
 //! - \ref AON_RTC_CH1
 //! - \ref AON_RTC_CH2
 //! - \ref AON_RTC_CH_NONE
-//!
-//! \return None
 //
 //*****************************************************************************
 __STATIC_INLINE void
@@ -361,8 +351,6 @@ AONRTCCombinedEventConfig(uint32_t ui32Channels)
 //! - \ref AON_RTC_CH0
 //! - \ref AON_RTC_CH1
 //! - \ref AON_RTC_CH2
-//!
-//! \return None
 //
 //*****************************************************************************
 __STATIC_INLINE void
@@ -533,8 +521,6 @@ AONRTCSubSecIncrGet(void)
 //! - \ref AON_RTC_MODE_CH1_CAPTURE
 //! - \ref AON_RTC_MODE_CH1_COMPARE
 //!
-//! \return None
-//!
 //!  \sa AONRTCModeCh1Get()
 //
 //*****************************************************************************
@@ -587,8 +573,6 @@ AONRTCModeCh1Get(void)
 //! - \ref AON_RTC_MODE_CH2_CONTINUOUS
 //! - \ref AON_RTC_MODE_CH2_NORMALCOMPARE
 //!
-//! \return None
-//!
 //! \sa AONRTCIncValueCh2Set(), AONRTCIncValueCh2Get()
 //
 //*****************************************************************************
@@ -640,8 +624,6 @@ AONRTCModeCh2Get(void)
 //! - \ref AON_RTC_CH1
 //! - \ref AON_RTC_CH2
 //!
-//! \return None
-//!
 //! \sa AONRTCEnable()
 //
 //*****************************************************************************
@@ -682,8 +664,6 @@ AONRTCChannelEnable(uint32_t ui32Channel)
 //! - \ref AON_RTC_CH0
 //! - \ref AON_RTC_CH1
 //! - \ref AON_RTC_CH2
-//!
-//! \return None
 //!
 //! \sa AONRTCDisable()
 //
@@ -729,8 +709,6 @@ AONRTCChannelDisable(uint32_t ui32Channel)
 //! - \ref AON_RTC_CH2
 //! \param ui32CompValue is the compare value to set for the specified channel.
 //! - Format: <16 sec.16 subsec>
-//!
-//! \return None
 //!
 //! \sa AONRTCCurrentCompareValueGet()
 //
@@ -847,8 +825,6 @@ extern uint64_t AONRTCCurrent64BitValueGet(void);
 //! a series of completely equidistant events.
 //!
 //! \param ui32IncValue is the increment value when operating in continuous mode.
-//!
-//! \return None
 //!
 //! \sa AONRTCIncValueCh2Get()
 //

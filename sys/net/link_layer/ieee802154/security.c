@@ -1,9 +1,6 @@
 /*
- * Copyright (C) 2020 Otto-von-Guericke-Universität Magdeburg
- *
- * This file is subject to the terms and conditions of the GNU Lesser
- * General Public License v2.1. See the file LICENSE in the top level
- * directory for more details.
+ * SPDX-FileCopyrightText: 2020 Otto-von-Guericke-Universität Magdeburg
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
 
 /**
@@ -491,6 +488,11 @@ int ieee802154_sec_decrypt_frame(ieee802154_sec_context_t *ctx,
         *mic = NULL;
         *mic_size = 0;
         return IEEE802154_SEC_OK;
+    }
+
+    if ((uint32_t)frame_size < ((uint32_t)(*header_size) + (uint32_t)aux_size +
+                                (uint32_t)mac_size)) {
+        return -IEEE802154_SEC_UNSUPORTED;
     }
 
     *payload_size = frame_size - *header_size - aux_size - mac_size;

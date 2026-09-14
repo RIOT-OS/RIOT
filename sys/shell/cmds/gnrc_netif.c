@@ -1312,7 +1312,7 @@ static int _netif_set_lw_key(netif_t *iface, netopt_t opt, char *key_str)
 static int _netif_set_addr(netif_t *iface, netopt_t opt, char *addr_str)
 {
     uint8_t addr[GNRC_NETIF_L2ADDR_MAXLEN];
-    size_t addr_len = l2util_addr_from_str(addr_str, addr);
+    size_t addr_len = l2util_addr_from_str_sized(addr_str, addr, sizeof(addr));
 
     if (addr_len == 0) {
         printf("error: unable to parse address.\n"
@@ -1461,7 +1461,7 @@ static int _netif_set_encrypt_key(netif_t *iface, netopt_t opt, char *key_str)
 static int _netif_addrm_l2filter(netif_t *iface, char *val, bool add)
 {
     uint8_t addr[GNRC_NETIF_L2ADDR_MAXLEN];
-    size_t addr_len = l2util_addr_from_str(val, addr);
+    size_t addr_len = l2util_addr_from_str_sized(val, addr, sizeof(addr));
 
     if ((addr_len == 0) || (addr_len > CONFIG_L2FILTER_ADDR_MAXLEN)) {
         printf("error: given address is invalid\n");
@@ -1769,7 +1769,7 @@ static int _netif_add(char *cmd_name, netif_t *iface, int argc, char **argv)
     (void)iface;
     (void)argc;
     (void)argv;
-    printf("error: GNRC_IPV6 module not enabled.\n");
+    puts("error: no ipv6 support\nUse 'USEMODULE += gnrc_ipv6' to enable it");
 
     return 1;
 #endif

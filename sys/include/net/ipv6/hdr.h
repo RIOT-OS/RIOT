@@ -1,9 +1,6 @@
 /*
- * Copyright (C) 2015 Martine Lenders <mlenders@inf.fu-berlin.de>
- *
- * This file is subject to the terms and conditions of the GNU Lesser
- * General Public License v2.1. See the file LICENSE in the top level
- * directory for more details.
+ * SPDX-FileCopyrightText: 2015 Martine Lenders <mlenders@inf.fu-berlin.de>
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
 
 #pragma once
@@ -247,7 +244,8 @@ static inline void ipv6_hdr_set_fl(ipv6_hdr_t *hdr, uint32_t fl)
 {
     hdr->v_tc_fl.u8[1] &= 0xf0;
     hdr->v_tc_fl.u8[1] |= (0x0f & (byteorder_htonl(fl).u8[1]));
-    hdr->v_tc_fl.u16[1] = byteorder_htonl(fl).u16[1];
+    hdr->v_tc_fl.u8[2] = byteorder_htonl(fl).u8[2];
+    hdr->v_tc_fl.u8[3] = byteorder_htonl(fl).u8[3];
 }
 
 /**

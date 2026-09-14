@@ -309,7 +309,7 @@ def test_ipv6_ext_frag_send_full_pktbuf(child, s, iface, ll_dst):
             break
         finally:
             pktbuf_empty(child)
-    assert(count > 1)
+    assert (count > 1)
 
 
 def _fwd_setup(child, ll_dst, g_src, g_dst):
@@ -362,7 +362,7 @@ def test_ipv6_ext_frag_fwd_success(child, s, iface, ll_dst):
 
 def test_ipv6_ext_frag_fwd_too_big(child, s, iface, ll_dst):
     mock_id, mtu, dst_mac = _fwd_setup(child, ll_dst, "beef::1", "affe::1")
-    assert(get_host_mtu(iface) > mtu)
+    assert (get_host_mtu(iface) > mtu)
     payload_fit = get_host_mtu(iface) - len(IPv6() / IPv6ExtHdrFragment() /
                                             UDP())
     pkt = srp1(Ether(dst=dst_mac) / IPv6(src="beef::1", dst="affe::1") /
@@ -371,10 +371,10 @@ def test_ipv6_ext_frag_fwd_too_big(child, s, iface, ll_dst):
                timeout=2, verbose=0, iface=iface)
     # packet should not be fragmented further but an ICMPv6 error should be
     # returned instead
-    assert(pkt is not None)
-    assert(ICMPv6PacketTooBig in pkt)
-    assert(IPv6ExtHdrFragment in pkt)
-    assert(pkt[IPv6ExtHdrFragment].id == 0x477384a9)
+    assert (pkt is not None)
+    assert (ICMPv6PacketTooBig in pkt)
+    assert (IPv6ExtHdrFragment in pkt)
+    assert (pkt[IPv6ExtHdrFragment].id == 0x477384a9)
     _fwd_teardown(child, mock_id)
 
 

@@ -9,6 +9,9 @@
 #include "bit.h"
 #include "xh3irq.h"
 
+#define ENABLE_DEBUG 0
+#include "debug.h"
+
 uint32_t xh3irq_has_pending(void)
 {
     /*
@@ -35,9 +38,7 @@ void xh3irq_handler(void)
     uint32_t meinext = (read_csr(0xBE4) >> MEINEXT_IRQ_OFFSET) & MEINEXT_MASK;
 
     void (*isr)(void) = (void (*)(void)) vector_cpu[meinext];
-#ifdef DEVELHELP
-    printf("Calling isr %p for irq %ld\n", isr, meinext);
-#endif
+    DEBUG("Calling isr %p for irq %ld\n", isr, meinext);
     isr();
 }
 

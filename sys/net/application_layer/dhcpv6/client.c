@@ -1,9 +1,6 @@
 /*
- * Copyright (C) 2018 Freie Universität Berlin
- *
- * This file is subject to the terms and conditions of the GNU Lesser
- * General Public License v2.1. See the file LICENSE in the top level
- * directory for more details.
+ * SPDX-FileCopyrightText: 2018 Freie Universität Berlin
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
 
 /**
@@ -131,6 +128,17 @@ static char _thread_stack[DHCPV6_CLIENT_STACK_SIZE];
 static void *_thread(void *args);
 static kernel_pid_t _thread_pid;
 
+static void (*_init_hook)(void) = NULL;
+static uint16_t _dhcpv6_netif = SOCK_ADDR_ANY_NETIF;
+
+void dhcpv6_client_set_init_hook(void (*_hook)(void), uint16_t netif)
+{
+    /* set hook function to call during auto init */
+    _init_hook = _hook;
+    /* specify interface to use for DHCPv6 */
+    _dhcpv6_netif = netif;
+}
+
 void dhcpv6_client_auto_init(void)
 {
     if (_thread_pid <= 0) {
@@ -145,9 +153,21 @@ static void *_thread(void *args)
 {
     (void)args;
     event_queue_t auto_init_event_queue;
+    /* initialize client event queue */
     event_queue_init(&auto_init_event_queue);
-    dhcpv6_client_init(&auto_init_event_queue, SOCK_ADDR_ANY_NETIF);
+    /* initialize DHCPv6 client either on any interface or
+     * (if configured via the init hook) a specific one */
+    dhcpv6_client_init(&auto_init_event_queue, _dhcpv6_netif);
+
+    /* execute init hook if set */
+    if (_init_hook != NULL)
+    {
+        _init_hook();
+    }
+
+    /* start DHCPv6 client */
     dhcpv6_client_start();
+    /* start event loop of DHCPv6 client */
     event_loop(&auto_init_event_queue); /* never returns */
     return NULL;
 }
@@ -1110,7 +1130,10 @@ static bool _parse_reply(uint8_t *rep, size_t len, uint8_t request_type)
                 break;
 #endif  /* IS_USED(MODULE_DHCPV6_CLIENT_DNS) */
             case DHCPV6_OPT_IA_PD:
-                if (_parse_ia_pd_option((dhcpv6_opt_ia_pd_t *)opt)) {
+                if (_opt_len(opt) < sizeof(dhcpv6_opt_ia_pd_t)) {
+                    DEBUG("DHCPv6 client: IA_PD option underflow minimum size\n");
+                    return false;
+                } else if (_parse_ia_pd_option((dhcpv6_opt_ia_pd_t *)opt)) {
                      /* No error occurred */
                      break;
                  } else {
@@ -1118,7 +1141,10 @@ static bool _parse_reply(uint8_t *rep, size_t len, uint8_t request_type)
                      return false;
                  }
             case DHCPV6_OPT_IA_NA:
-                 if (_parse_ia_na_option((dhcpv6_opt_ia_na_t *)opt)) {
+                 if (_opt_len(opt) < sizeof(dhcpv6_opt_ia_na_t)) {
+                    DEBUG("DHCPv6 client: IA_NA option underflow minimum size\n");
+                    return false;
+                 } else if (_parse_ia_na_option((dhcpv6_opt_ia_na_t *)opt)) {
                      /* No error occurred */
                      break;
                  } else {

@@ -16,7 +16,7 @@ which may or may not work with RIOT.
 
 ## Pinout
 
-![pinout](pinouts/pinout-bluepill.svg)
+![pinout](pinout-bluepill.svg)
 
 ## MCU
 

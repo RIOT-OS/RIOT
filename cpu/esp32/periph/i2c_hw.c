@@ -393,7 +393,7 @@ int i2c_write_bytes(i2c_t dev, uint16_t addr, const void *data, size_t len, uint
 #endif
 
 /*
- * @note:
+ * @note
  * It is a known problem that the ESP32x I2C hardware implementation checks
  * the ACK when the next command in the pipeline is executed. That is,
  * for a segmented write operation of type `START ADDR DATA0 STOP` the
@@ -416,7 +416,7 @@ static int _i2c_status_to_errno(i2c_t dev)
         LOG_TAG_DEBUG("i2c", "ack error dev=%u\n", dev);
         if (_i2c_bus[dev].cmd_op == I2C_LL_CMD_WRITE) {
             /*
-             * @note: In a write transfer, an ACK error can happen for the
+             * @note  In a write transfer, an ACK error can happen for the
              * address field as well as for data. If the FIFO still contains
              * all data bytes, the ACK error happened in address field and we
              * have to return -ENXIO. Otherwise, the ACK error happened in data
@@ -429,7 +429,7 @@ static int _i2c_status_to_errno(i2c_t dev)
         }
         else {
             /*
-             * @note: In a read transfer, an ACK is only expected for the
+             * @note  In a read transfer, an ACK is only expected for the
              * address field. Thus, an ACK error can only happen for the address
              * field. Therefore, we always return -ENXIO in case of an ACK
              * error.

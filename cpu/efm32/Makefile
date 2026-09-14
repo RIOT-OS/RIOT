@@ -51,5 +51,8 @@ endif
 ifneq (,$(filter efm32_coretemp,$(USEMODULE)))
   DIRS += drivers/coretemp
 endif
+ifneq (,$(filter efm32_eth,$(USEMODULE)))
+  DIRS += drivers/eth
+endif
 
 include $(RIOTBASE)/Makefile.base

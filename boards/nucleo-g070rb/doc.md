@@ -12,7 +12,7 @@ You can find general information about the Nucleo64 boards on the
 
 ## Pinout
 
-<img src="pinouts/nucleo-g070rb-and-g071rb.svg" alt="Pinout for the Nucleo-G070RG (from STM user manual UM2324, https://www.st.com/resource/en/user_manual/um2324-stm32-nucleo64-boards-mb1360-stmicroelectronics.pdf, page 34)" width=50% />
+<img src="nucleo-g070rb-and-g071rb.svg" alt="Pinout for the Nucleo-G070RG (from STM user manual UM2324, https://www.st.com/resource/en/user_manual/um2324-stm32-nucleo64-boards-mb1360-stmicroelectronics.pdf, page 34)" width=50% />
 
 ### MCU
 

@@ -39,7 +39,7 @@ extern "C" {
 typedef sema_t sem_t;
 
 /**
- * @brief Value returned if `sem_open' failed.
+ * @brief Value returned if `sem_open` failed.
  */
 #define SEM_FAILED      ((sem_t *) 0)
 
@@ -222,7 +222,7 @@ static inline int sem_unlink(const char *name)
 }
 
 /**
- * @brief Similar to `sem_wait' but wait only until @p abstime.
+ * @brief Similar to `sem_wait` but wait only until @p abstime.
  *
  * @see <a href="http://pubs.opengroup.org/onlinepubs/9699919799/functions/sem_timedwait.html">
  *          The Open Group Base Specifications Issue 7, sem_timedwait()

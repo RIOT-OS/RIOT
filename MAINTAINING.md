@@ -1,7 +1,7 @@
 # RIOT Maintainer Guidelines
 
-This list presents a series of technical and non-technical guidelines for maintainers.
-The list is not exhaustive, it represents a baseline on
+This list presents a series of technical and non-technical guidelines for
+maintainers. The list is not exhaustive, it represents a baseline on
 things that should be ensured for contributions.
 
 Notes:
@@ -30,9 +30,9 @@ areas of RIOT they each maintain.
 Before spending the time on an in-depth code review, it's important to assess
 the overall validity of the PR.
 
-1.  Does the reasoning for this PR make sense? \
+1.  Does the reasoning for this PR make sense?<br/>
     Are the requirements and design goals clearly thought out and clearly
-    expressed? \
+    expressed?<br/>
     Is the problem that the PR intends to solve clearly stated?
 2.  Is the solution presented in the PR as simple as possible to satisfy the
     requirements, but no simpler?
@@ -43,7 +43,7 @@ the overall validity of the PR.
 6.  Does the PR break with existing concepts?
 7.  Is there a clean commit history in the pulled branch? The commit history
     should group the code differences cleanly.
-8.  Are there clear and adequate instructions on how to test the PR? \
+8.  Are there clear and adequate instructions on how to test the PR?<br/>
     This may or may not include implemented tests as part of the PR.
 9.  Does the code compile and run?
 10. Does this PR respect the rights of previous authors, either through
@@ -57,7 +57,7 @@ the overall validity of the PR.
 The following list is not exhaustive, it addresses the coding issues we have
 regularly seen in the past. In particular, check that the [Best Practices]
 are followed. These checks can be aided (but not replaced) by a tool such as
-Coccinelle, using the script found in dist/tools/coccinelle.
+Coccinelle, using the script found in `dist/tools/coccinelle`.
 
 1.  Check for code duplication
 2.  [Check memory usage][Comparing build sizes]
@@ -74,15 +74,15 @@ Coccinelle, using the script found in dist/tools/coccinelle.
 
 ### 3. - Test the PR
 
-Run tests to verify the correct behavior (see 1.6), both on `native` and on a
+Run tests to verify the correct behavior (see 1.9), both on `native` and on a
 few selected boards, or present clearly and logically articulated reasons for
 skipping some/all tests.
 
 
-### 4. - Review the code against the coding conventions
+### 4. - Review the code against the Coding Conventions
 
 Check that the code follows the [Coding Conventions]. This can be aided (but not
-replaced) by Uncrustify, using the uncrustify-riot.cfg file found in the base
+replaced) by Uncrustify, using the `uncrustify-riot.cfg` file found in the base
 directory. Note the difference between personal coding style, which is allowed
 subject to the other guidelines, and the coding conventions, which are absolute
 and must always be followed.
@@ -173,9 +173,8 @@ Once the release branch is created, no backports of new features will be
 accepted. Instead, backports should consist only of bug fixes or of reverting
 features that were added during the last development period (and not part of any
 release), but didn't reach the required maturity or API stability yet. For
-bigger changes (which explicitly includes any revert), the PR has to be
-announced to the maintainer mailing list and should be merged no sooner than
-48h after the announcement and needs at least two ACKs.
+bigger changes (which explicitly includes any revert), the PR should be merged
+no sooner than 48h after opening and needs at least two ACKs.
 
 In case of security relevant backports (both bug fixes and reverts), the
 announcement can be skipped and the fix merged once at least two ACKs are

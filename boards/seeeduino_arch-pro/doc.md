@@ -29,6 +29,7 @@ interface.
 | UARTs           | 3x USART                                 |
 | SPIs            | 2x USART                                 |
 | I2Cs            | 2x                                       |
+| Ethernet        | 1                                        |
 | Vcc             | 2.4V - 3.6V                              |
 | Datasheet       | [Datasheet](https://www.nxp.com/docs/en/data-sheet/LPC1769_68_67_66_65_64_63.pdf)|
 | Manual          | [Manual](http://www.nxp.com/documents/user_manual/UM10360.pdf)|

@@ -387,8 +387,6 @@ CPUbasepriSet(uint32_t ui32NewBasepri)
 //! performance of the processor because the stores to memory have to complete
 //! before the next instruction can be executed.
 //!
-//! \return None
-//!
 //! \sa \ref CPU_WriteBufferEnable()
 //
 //*****************************************************************************
@@ -404,8 +402,6 @@ CPU_WriteBufferDisable( void )
 //!
 //! Re-enables write buffer during default memory map accesses if
 //! \ref CPU_WriteBufferDisable() has been used for bus fault debugging.
-//!
-//! \return None
 //!
 //! \sa \ref CPU_WriteBufferDisable()
 //

@@ -15,7 +15,7 @@ If you have questions, please write a post over at our [forum] or chat on
 `#riot-os:matrix.org` on [Matrix].
 
 As a reminder, all contributors are expected to follow our
-[Code of Conduct](CODE_OF_CONDUCT.md).
+[Code of Conduct](https://guide.riot-os.org/general/code_of_conduct/).
 
 [forum]: https://forum.riot-os.org
 [Matrix]: https://matrix.to/#/#riot-os:matrix.org
@@ -74,10 +74,12 @@ the following steps:
   1. Your code is merged in RIOT master branch when it passes review.
 
 Be sure to read the [general tips] below.
+If you are using AI tools, please also read [our AI Policy][ai-policy].
 
 [open-an-issue]: https://github.com/RIOT-OS/RIOT/issues?q=state:open+type:issue+label:"Type:+bug"
 [labels]: https://github.com/RIOT-OS/RIOT/wiki/RIOT%27s-labeling-system
 [open-a-pull-request]: https://help.github.com/articles/using-pull-requests
+[ai-policy]: https://doc.riot-os.org/general/ai_policy
 
 ### General Tips
 [general tips]: #general-tips
@@ -128,7 +130,7 @@ It is possible to check if your code follows these conventions:
 
   Use it before opening a PR to perform last time checks.
 
-[coding-conventions]: CODING_CONVENTIONS.md
+[coding-conventions]: https://guide.riot-os.org/c_tutorials/coding_conventions/
 
 ### Commit conventions
 [commit conventions]: #commit-conventions
@@ -214,22 +216,19 @@ into the source repository.
 Documentation improvements are always welcome and a good starting point for
 new contributors. This kind of contribution is merged quite quickly in general.
 
-RIOT documentation is built with [doxygen][doxygen]. Doxygen is configured to
-parse header (.h) and `doc.txt` files in the RIOT source code to generate
-the modules, cpus, boards and packages documentation.
-General documentation pages are written in Markdown and located in
-`doc/doxygen/src`.
+RIOT documentation is built with [Doxygen][doxygen] and [Starlight][starlight].
+Doxygen reads files in the RIOT source code to generate
+the modules, CPUs, boards and packages API documentation.
+Starlight is used to generate the guides and tutorials.
 
-To generate the documentation, simply run the following
-from the base directory of the RIOT source code.
-
-```shell
-make doc
-```
-
-The generated documentation is located in `doc/doxygen/html`
+Refer to the [How to Doc guide][how-to-doc] for more information on how to write guides
+and [coding conventions documentation][coding-conventions-documentation]
+for more information on how to write code documentation.
 
 [doxygen]: http://www.doxygen.nl/
+[starlight]: https://starlight.astro.build/
+[how-to-doc]: https://guide.riot-os.org/misc/how_to_doc/
+[coding-conventions-documentation]: https://guide.riot-os.org/c_tutorials/coding_conventions/#documentation
 
 ## Working with Git
 [working with git]: #working-with-git
@@ -431,6 +430,6 @@ Note: Violations of our [code of conduct][code-of-conduct] should be reported
       to [email-coc]. See our [code of conduct][code-of-conduct] for more
       details.
 
-[code-of-conduct]: CODE_OF_CONDUCT.md
+[code-of-conduct]: https://guide.riot-os.org/general/code_of_conduct/
 [email-mediator]: mailto:mediation@riot-os.org
 [email-coc]: mailto:conduct@riot-os.org

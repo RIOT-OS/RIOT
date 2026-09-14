@@ -1,0 +1,8 @@
+# load the common Makefile.include for Nucleo-32 boards
+include $(RIOTBOARD)/common/nucleo32/Makefile.include
+
+# When the NRST_MODE option byte is 2, the NRST pin is a GPIO and no longer
+# resets the MCU, so the ST-Link's SRST reset fails. Reset over SWD instead.
+# See doc.md.
+OPENOCD_RESET_USE_CONNECT_ASSERT_SRST = 0
+OPENOCD_EXTRA_INIT += -c 'reset_config none'

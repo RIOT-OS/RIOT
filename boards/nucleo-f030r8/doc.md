@@ -16,7 +16,7 @@ boards_common_nucleo64 page.
 
 ## Pinout
 
-<img src="pinouts/nucleo-f030r8.svg" alt="Pinout for the Nucleo-F030R8 from STM user manual UM1724, http://www.st.com/resource/en/user_manual/dm00105823.pdf, page 28)" width=50% />
+<img src="nucleo-f030r8.svg" alt="Pinout for the Nucleo-F030R8 from STM user manual UM1724, http://www.st.com/resource/en/user_manual/dm00105823.pdf, page 28)" width=50% />
 
 ### MCU
 

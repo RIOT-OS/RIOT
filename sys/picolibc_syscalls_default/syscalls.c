@@ -116,7 +116,12 @@ static const struct heap heaps[NUM_HEAPS] = {
 void __attribute__((__noreturn__))
 _exit(int n)
 {
-    LOG_INFO("#! exit %i: powering off\n", n);
+    if (n > 0) {
+        LOG_ERROR("ERR: program failed with exit code %i\n", n);
+    }
+    else {
+        LOG_WARNING("WARN: program exited\n");
+    }
 #ifdef MODULE_PERIPH_PM
     pm_off();
 #endif /* MODULE_PERIPH_PM */

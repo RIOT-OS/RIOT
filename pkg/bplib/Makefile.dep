@@ -1,6 +1,8 @@
 USEPKG += qcbor
 # We need a newer version of QCBOR, >= 1.5.1 (as specified by NASA)
 
+USEMODULE += bplib
+
 USEMODULE += core_mutex
 USEMODULE += core_thread
 USEMODULE += ztimer

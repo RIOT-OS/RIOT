@@ -1,0 +1,33 @@
+MODULE=bplib
+
+BPLIB_FOLDERS := aa/arp aa/as aa/fwp aa/nc \
+    bpa/bi bpa/ct bpa/ebp bpa/pdb bpa/pi bpa/stor \
+    ci/cbor ci/crc ci/eid ci/em ci/mem ci/pl ci/qm ci/rbt ci/time \
+    cla version
+
+BPLIB_PRIVATE_INCLUDE_DIRS := $(foreach dir,$(BPLIB_FOLDERS),$(dir)/inc) inc
+
+# Note 1: We don't compile bpa/stor
+# Note 2: We use the ben_allocator and exlude the std_allocator (which would use
+#  malloc instead of a static allocation pool for the blocks). This could be
+#  swapped or a custom allocator could even be used here.
+BPLIB_SOURCES_INIT := $(foreach dir,$(BPLIB_FOLDERS),$(wildcard $(dir)/src/*.c))
+BPLIB_IGNORED_SOURCES := bpa/stor/src/% ci/mem/src/bplib_std_allocator.c
+
+INCLUDES += $(foreach dir,$(BPLIB_PRIVATE_INCLUDE_DIRS),-I$(dir))
+SRC += $(filter-out $(BPLIB_IGNORED_SOURCES),$(BPLIB_SOURCES_INIT))
+
+CFLAGS += -Wno-format
+CFLAGS += -Wno-int-to-pointer-cast
+CFLAGS += -Wno-old-style-definition
+CFLAGS += -Wno-unused-parameter
+CFLAGS += -Wno-cast-function-type
+CFLAGS += -Wno-sign-compare
+# LLVM specifics that GCC does not complain about
+ifeq (llvm,$(TOOLCHAIN))
+  CFLAGS += -Wno-strict-prototypes
+  CFLAGS += -Wno-format-nonliteral
+  CFLAGS += -Wno-unused-but-set-variable
+endif
+
+include $(RIOTBASE)/Makefile.base

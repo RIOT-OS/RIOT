@@ -58,7 +58,7 @@ static int _read(mtd_dev_t *dev, void *buff, uint32_t addr, uint32_t size)
 
     DEBUG("mtd_native: read from page %" PRIu32 " count %" PRIu32 "\n", addr, size);
 
-    if (addr + size > mtd_size) {
+    if ((addr > mtd_size) || (size > (mtd_size - addr))) {
         return -EOVERFLOW;
     }
 
@@ -82,11 +82,11 @@ static int _write_page(mtd_dev_t *dev, const void *buff, uint32_t page, uint32_t
     DEBUG("mtd_native: write from page %" PRIx32 ", offset 0x%" PRIx32 " count %" PRIu32 "\n",
           page, offset, size);
 
-    if (page > dev->sector_count * dev->pages_per_sector) {
+    if (page >= (dev->sector_count * dev->pages_per_sector)) {
         return -EOVERFLOW;
     }
 
-    if (offset > dev->page_size) {
+    if (offset >= dev->page_size) {
         return -EOVERFLOW;
     }
 
@@ -116,7 +116,7 @@ static int _erase(mtd_dev_t *dev, uint32_t addr, uint32_t size)
 
     DEBUG("mtd_native: erase from sector %" PRIu32 " count %" PRIu32 "\n", addr, size);
 
-    if (addr + size > mtd_size) {
+    if ((addr > mtd_size) || (size > (mtd_size - addr))) {
         return -EOVERFLOW;
     }
     if (((addr % sector_size) != 0) || ((size % sector_size) != 0)) {

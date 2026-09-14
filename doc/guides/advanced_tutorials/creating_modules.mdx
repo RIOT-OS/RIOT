@@ -163,11 +163,14 @@ SRC := spam.c
 SUBMODULES = 1
 ```
 
-When using `SUBMODULES` in a `MODULE` all `SRC` file excluded from `foo/Makefile`
+When using `SUBMODULES` in a `MODULE` all `SRC` not referenced by `foo/Makefile`
 will be considered `SUBMODULES`. In the example above `ham.c` and `eggs.c`.
 These source files will be conditionally included depending if the modules have
 been added, i.e. `USEMODULE += foo_ham foo_eggs` (it's the same as case 1 but
-handled automatically in `Makefile.base`).
+handled automatically in `Makefile.base`). Please note however that you also
+need to add the parent module `foo_bar`, otherwise the linker might not find
+your submodules. This should usually happen inside the `Makefile.dep` of the
+parent module.
 
 The `SUBMODULES` mechanism is more flexible since `BASE_MODULE` allows matching
 the only parts of compounded module names and only match against part of that name.

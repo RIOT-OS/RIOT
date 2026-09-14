@@ -101,11 +101,31 @@ static void test_hashes_cmac_keysize(void)
                           CIPHER_INIT_SUCCESS);
 }
 
+static void test_hashes_cmac_wipe(void)
+{
+    aes128_cmac_context_t ctx;
+    uint8_t digest[AES128_CMAC_BLOCK_SIZE];
+    uint8_t zeros_block[AES128_CMAC_BLOCK_SIZE];
+    uint8_t zeros_cipher[sizeof(ctx.aes128_ctx)];
+
+    memset(zeros_block, 0, sizeof(zeros_block));
+    memset(zeros_cipher, 0, sizeof(zeros_cipher));
+
+    aes128_cmac_init(&ctx, AES128_CMAC_KEY, 16);
+    aes128_cmac_update(&ctx, TEST_1_INP, sizeof(TEST_1_INP));
+    aes128_cmac_final(&ctx, digest);
+
+    TEST_ASSERT(memcmp(ctx.X, zeros_block, sizeof(ctx.X)) == 0);
+    TEST_ASSERT(memcmp(ctx.M_last, zeros_block, sizeof(ctx.M_last)) == 0);
+    TEST_ASSERT(memcmp(&ctx.aes128_ctx, zeros_cipher, sizeof(ctx.aes128_ctx)) == 0);
+}
+
 Test *tests_hashes_cmac_tests(void)
 {
     EMB_UNIT_TESTFIXTURES(fixtures) {
         new_TestFixture(test_hashes_cmac),
         new_TestFixture(test_hashes_cmac_keysize),
+        new_TestFixture(test_hashes_cmac_wipe),
     };
 
     EMB_UNIT_TESTCALLER(test_hashes_cmac, NULL, NULL, fixtures);

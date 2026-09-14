@@ -24,4 +24,17 @@ MEMORY
     eth_ram         : ORIGIN = 0x20080000, LENGTH = 16K
 }
 
+SECTIONS
+{
+    .usb_ram (NOLOAD) :
+    {
+        *(.usb_ram .usb_ram.*)
+    } > usb_ram
+
+    .eth_ram (NOLOAD) :
+    {
+        *(.eth_ram .eth_ram.*)
+    } > eth_ram
+}
+
 INCLUDE cortexm.ld

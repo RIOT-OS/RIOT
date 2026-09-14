@@ -213,7 +213,7 @@ void spi_release(spi_t bus)
 }
 
 /**
- * @brief: Wait for the FIFO to be empty.
+ * @brief Wait for the FIFO to be empty.
  */
 static void _spi_wait_txempty(SPI_Type *spi_bus)
 {

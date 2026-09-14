@@ -1,0 +1,13 @@
+# SPDX-FileCopyrightText: 2026 Technische Universität Hamburg
+# SPDX-License-Identifier: LGPL-2.1-only
+
+config BOARD
+    default "boards_elecrow-crowpanel-esp32s3-rotary-128" if BOARD_ELECROW_CROWPANEL_ESP32S3_ROTARY_128
+
+config BOARD_ELECROW_CROWPANEL_ESP32S3_ROTARY_128
+    bool
+    default y
+    select BOARD_COMMON_ESP32S3
+    select CPU_MODEL_ESP32S3R8
+
+source "$(RIOTBOARD)/common/esp32s3/Kconfig"

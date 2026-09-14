@@ -845,7 +845,7 @@ config CPU_FAM_MYCPU
     select HAS_PERIPH_ECC_P256R1
     select HAS_PERIPH_SPEEDYCRYPT
 ```
-The `HAS_PERIPH_*` symbols are defined in ``. If your device
+The `HAS_PERIPH_*` symbols are defined in. If your device
 provides capabilities that are not yet defined, you can add them to that file.
 
 Next we need to define selectable modules for this in the `cpu/myCPU/periph` folder, which

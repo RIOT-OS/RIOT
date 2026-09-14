@@ -56,7 +56,28 @@
 #       still self-explanatory. Adding `#define BITS_PER_BYTE 8` and
 #       `#define BIT_POS_IN_BYTE_MASK 7` to silence the warning would not
 #       improve the readability here, but instead reduce it.
-#
+# - readability-implicit-bool-conversion:
+#       Conversion to bool is well defined and happens in a lot of places. With
+#       this enabled, the source code in the editor lights up like a christmas
+#       tree due to the amount of warnings.
+# - bugprone-narrowing-conversions:
+#       This warning is too aggressive: Even when returning e.g. a compile time
+#       constant that is known to fit the return type of a function, a simple
+#       `return FOO;` will get a warning. But using `return (some_type)FOO;` is
+#       not more readable and explicit casts actively harm, as they mute
+#       a lot of compiler diagnostics.
+# - bugprone-assignment-in-if-condition:
+#       This is idomatic C and not disallowed or discouraged by the coding
+#       convention:
+#       ```c
+#       if ((err = something()) < 0) {
+#            return err;
+#       }
+#       ```
+#       So let's not warn about it, while it still is considered acceptable.
+# - readability-isolate-declaration:
+#       Multiple declaration in a single line is not disallowed by the coding
+#       convention used a lot in the code base. So let's allow it.
 # Warning
 # -------
 #
@@ -65,16 +86,20 @@
 # helpful. If you modify this file to improve your experience, please consider
 # upstreaming the changes.
 ---
-Checks: "clang-analyzer-*,
-         bugprone-*,
+Checks: "bugprone-*,
+         clang-analyzer-*,
+         linuxkernel-*,
+         misc-*,
          portability-*,
          readability-*,
-         misc-*,
-         linuxkernel-*,
-         -bugprone-reserved-identifier,
+         -bugprone-assignment-in-if-condition,
          -bugprone-easily-swappable-parameters,
+         -bugprone-narrowing-conversions,
+         -bugprone-reserved-identifier,
          -readability-identifier-length,
-         -readability-magic-numbers
+         -readability-implicit-bool-conversion,
+         -readability-isolate-declaration,
+         -readability-magic-numbers,
         "
 WarningsAsErrors: "bugprone-*,
                    portability-*,
