@@ -103,9 +103,7 @@
 
  ### radio
 
- The radio adaptation maps to RIOT's @ref netdev API or on
- @ref drivers_ieee802154_hal API. The later is preferred but not yet
- supported by all boards.
+ The radio adaptation maps to RIOT's on @ref drivers_ieee802154_hal API.
 
  Hardware MAC layer features such as CSMA/CA, ACK handling and retransmissions
  are handled by OpenWSN, so the radio driver must support disabling AUTOACK
@@ -130,18 +128,6 @@
  For CRC error handling:
 
      - `IEEE802154_CAP_IRQ_CRC_ERROR`
-
- #### netdev
-
- The radio adaptation preloads the buffer so `NETOPT_PRELOADING` must be
- supported.
-
- The radio drivers should support the following netdev events:
-
-     - `NETDEV_EVENT_RX_STARTED`
-     - `NETDEV_EVENT_TX_STARTED`
-     - `NETDEV_EVENT_RX_COMPLETE`
-     - `NETDEV_EVENT_TX_COMPLETE`
 
  ### uart
 
