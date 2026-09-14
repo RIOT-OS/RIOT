@@ -12,21 +12,30 @@
  *
  * @brief       Driver for the EFM32 Ethernet peripheral
  *
- * ## Link State Events
+ * ## Link State Monitoring
  *
- * To enable Link Events, use the (pseudo) module `efm32_eth_link_up`. This
- * module will monitor the link state, and will emit events when the link goes
- * up or down.
+ * To monitor the actual state of the link, use the generic (pseudo) module
+ * `netdev_eth_link_state`, which selects the `efm32_eth_link_up` implementation
+ * of this driver automatically, and emits events when the link goes up or
+ * down. Without this module, the driver assumes the link is up and signals
+ * `NETDEV_EVENT_LINK_UP` once during initialization, and never signals
+ * `NETDEV_EVENT_LINK_DOWN`. To force the `efm32_eth` specific implementation
+ * instead of the generic one, use the (pseudo) module `efm32_eth_link_up`
+ * directly.
  *
- * ## Link Auto Negotiation
+ * ## Link Autonegotiation
  *
- * To enable Link Auto Negotiation, use the (pseudo) module `efm32_eth_auto`.
+ * To enable Link Autonegotiation, use the generic (pseudo) module
+ * `netdev_eth_autoneg`, which selects the `efm32_eth_auto` implementation of
+ * this driver automatically.
  *
  * In general, it is highly recommended to use auto-negotiation, as this can
  * avoid various communication issues on the PHY layer due to configuration
  * mismatch of the link partners.
  *
- * This feature depends on the link state events feature.
+ * This feature depends on the link state events feature. To force the
+ * `efm32_eth` specific implementation instead of the generic one, use the
+ * (pseudo) module `efm32_eth_auto` directly.
  *
  * @{
  *
