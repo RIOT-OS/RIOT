@@ -24,6 +24,8 @@
 #define ENABLE_DEBUG 0
 #include "debug.h"
 
+#define TIMER_REG_SIZE 3
+
 void kw2xrf_disable_interrupts(kw2xrf_t *dev)
 {
     DEBUG("[kw2xrf] disable interrupts\n");
@@ -109,14 +111,14 @@ int kw2xrf_can_switch_to_idle(kw2xrf_t *dev)
 /** Load the timer value (Setting Current Time) */
 static void kw2xrf_timer_load(kw2xrf_t *dev, uint32_t value)
 {
-    kw2xrf_write_dregs(dev, MKW2XDM_T1CMP_LSB, (uint8_t *)&value, sizeof(value));
+    kw2xrf_write_dregs(dev, MKW2XDM_T1CMP_LSB, (uint8_t *)&value, TIMER_REG_SIZE);
     kw2xrf_set_dreg_bit(dev, MKW2XDM_PHY_CTRL4, MKW2XDM_PHY_CTRL4_TMRLOAD);
 }
 
 static uint32_t kw2xrf_timer_get(kw2xrf_t *dev)
 {
     uint32_t tmp;
-    kw2xrf_read_dregs(dev, MKW2XDM_EVENT_TIMER_LSB, (uint8_t*)&tmp, sizeof(tmp));
+    kw2xrf_read_dregs(dev, MKW2XDM_EVENT_TIMER_LSB, (uint8_t*)&tmp, TIMER_REG_SIZE);
     return tmp;
 }
 
@@ -214,6 +216,6 @@ void kw2xrf_seq_timeout_off(kw2xrf_t *dev)
 uint32_t kw2xrf_get_timestamp(kw2xrf_t *dev)
 {
     uint32_t tmp;
-    kw2xrf_read_dregs(dev, MKW2XDM_TIMESTAMP_LSB, (uint8_t*)&tmp, sizeof(tmp));
+    kw2xrf_read_dregs(dev, MKW2XDM_TIMESTAMP_LSB, (uint8_t*)&tmp, TIMER_REG_SIZE);
     return tmp;
 }
