@@ -24,18 +24,14 @@
 #include "net/ieee802154.h"
 #include "nrf802154.h"
 #include "net/ieee802154/radio.h"
+#include "periph/timer.h"
+#include "time_units.h"
 
 #define ENABLE_DEBUG        0
 #include "debug.h"
 
 #define ED_RSSISCALE        (4U)    /**< RSSI scale for internal HW value */
 #define ED_RSSIOFFS         (-92)   /**< RSSI offset for internal HW value */
-
-/* Set timer period to 1 us */
-#define TIMER_FREQ          (1000000UL)
-
-/* IEEE 802.15.4 symbol time in microseconds for O-QPSK at 2.4 GHz */
-#define SYMBOL_TIME_US      (16U)
 
 #define TX_POWER_MIN        (-40)                               /* in dBm */
 #define TX_POWER_MAX        ((int)RADIO_TXPOWER_TXPOWER_Max)    /* in dBm */
@@ -61,6 +57,32 @@
                              RADIO_SHORTS_CCAIDLE_TXEN_Msk | \
                              RADIO_SHORTS_CCABUSY_DISABLE_Msk | \
                              RADIO_SHORTS_TXREADY_START_Msk)
+
+/**
+ * @brief   PPI channel connecting RADIO->EVENTS_ADDRESS to the MAC timer
+ *
+ */
+#ifndef CONFIG_NRF802154_TIMESTAMP_PPI_CH
+#  define CONFIG_NRF802154_TIMESTAMP_PPI_CH   18U
+#endif
+
+#define MAC_TIMER_DEV       (timer_config[NRF802154_TIMER].dev) /**< Hardware Timer */
+#define MAC_TIMER_CHAN_TS   1U /**< timer channel for capturing RX timestamp */
+
+/* Frequency of the MAC timer in Hz */
+#ifndef CONFIG_NRF802154_TIMER_FREQ
+#  define CONFIG_NRF802154_TIMER_FREQ   IEEE802154_SYMBOL_RATE_HZ
+#endif
+
+#define TIMER_FREQ  CONFIG_NRF802154_TIMER_FREQ
+
+#define NRF802154_TICKS_TO_NS(ticks) \
+    (((uint64_t)(ticks) * NS_PER_SEC) / TIMER_FREQ)
+
+/**
+ * @brief   Timestamp of the last received frame in timer ticks
+ */
+static uint32_t _rx_timestamp_ticks;
 
 static uint8_t rxbuf[IEEE802154_FRAME_LEN_MAX + 3]; /* len PHR + PSDU + LQI */
 static uint8_t txbuf[IEEE802154_FRAME_LEN_MAX + 3]; /* len PHR + PSDU + LQI */
@@ -97,6 +119,9 @@ static void _power_on(void)
     if (NRF_RADIO->POWER == 0) {
         clock_hfxo_request();
         NRF_RADIO->POWER = 1;
+        if (IS_USED(MODULE_IEEE802154_RX_TIMESTAMP)) {
+            timer_start(NRF802154_TIMER);
+        }
     }
 }
 
@@ -105,6 +130,9 @@ static void _power_off(void)
     if (NRF_RADIO->POWER == 1) {
         NRF_RADIO->POWER = 0;
         clock_hfxo_release();
+        if (IS_USED(MODULE_IEEE802154_RX_TIMESTAMP)) {
+            timer_stop(NRF802154_TIMER);
+        }
     }
 }
 
@@ -338,6 +366,9 @@ static int _read(ieee802154_dev_t *dev, void *buf, size_t max_size,
            after enabling the ADDRESS_RSSISTART short. */
         int16_t rssi_dbm = hwlqi + ED_RSSIOFFS - 1;
         radio_info->rssi = ieee802154_dbm_to_rssi(rssi_dbm);
+#if IS_USED(MODULE_IEEE802154_RX_TIMESTAMP)
+        radio_info->timestamp = NRF802154_TICKS_TO_NS(_rx_timestamp_ticks);
+#endif
     }
     memcpy(buf, &rxbuf[1], pktlen);
 
@@ -400,12 +431,6 @@ static void _set_txpower(int16_t txpower)
     }
 }
 
-static void _timer_cb(void *arg, int chan)
-{
-    (void)arg;
-    timer_stop(NRF802154_TIMER);
-}
-
 /**
  * @brief   Set radio into DISABLED state
  */
@@ -416,6 +441,12 @@ int nrf802154_init(void)
     rxbuf[0] = 0;
     txbuf[0] = 0;
 
+    if(IS_USED(MODULE_IEEE802154_RX_TIMESTAMP)) {
+        int res = timer_init(NRF802154_TIMER, TIMER_FREQ, NULL, NULL);
+        assert(res >= 0);
+        (void)res;
+        timer_stop(NRF802154_TIMER);
+    }
     /* power off peripheral (but do not release the HFXO as we never requested
      * it so far) */
     NRF_RADIO->POWER = 0;
@@ -433,6 +464,9 @@ void isr_radio(void)
             dev->cb(dev, IEEE802154_RADIO_INDICATION_TX_START);
         }
         else if (_state == STATE_RX) {
+            if(IS_USED(MODULE_IEEE802154_RX_TIMESTAMP)) {
+                _rx_timestamp_ticks = MAC_TIMER_DEV->CC[MAC_TIMER_CHAN_TS];
+            }
             dev->cb(dev, IEEE802154_RADIO_INDICATION_RX_START);
         }
     }
@@ -547,6 +581,16 @@ static int _request_on(ieee802154_dev_t *dev)
     NRF_RADIO->MODECNF0 |= RADIO_MODECNF0_RU_Msk;
 
     NRF_RADIO->SHORTS = DEFAULT_SHORTS;
+
+    if(IS_USED(MODULE_IEEE802154_RX_TIMESTAMP)) {
+        /* EVENTS_ADDRESS marks the end of the SFD.
+         * EVENTS_FRAMESTART was measured to fire consistently 32 us later.
+         * This is expected by the manual */
+        NRF_PPI->CH[CONFIG_NRF802154_TIMESTAMP_PPI_CH].EEP = (uint32_t)&NRF_RADIO->EVENTS_ADDRESS;
+        NRF_PPI->CH[CONFIG_NRF802154_TIMESTAMP_PPI_CH].TEP =
+            (uint32_t)&MAC_TIMER_DEV->TASKS_CAPTURE[MAC_TIMER_CHAN_TS];
+        NRF_PPI->CHENSET = (1UL << CONFIG_NRF802154_TIMESTAMP_PPI_CH);
+    }
 
     /* enable interrupts */
     NVIC_EnableIRQ(RADIO_IRQn);
@@ -758,7 +802,8 @@ static const ieee802154_radio_ops_t nrf802154_ops = {
           | IEEE802154_CAP_IRQ_TX_DONE
           | IEEE802154_CAP_IRQ_CCA_DONE
           | IEEE802154_CAP_PHY_OQPSK
-          | IEEE802154_CAP_FRAME_RETENTION,
+          | IEEE802154_CAP_FRAME_RETENTION
+          | IEEE802154_CAP_RX_TIMESTAMP,
 
     .write = _write,
     .read = _read,
