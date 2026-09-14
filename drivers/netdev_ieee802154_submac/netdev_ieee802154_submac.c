@@ -283,8 +283,7 @@ static int _recv(netdev_t *netdev, void *buf, size_t len, void *info)
 
 #if IS_USED(MODULE_NETDEV_IEEE802154_RX_TIMESTAMP)
         if (ieee802154_radio_has_capability(&submac->dev, IEEE802154_CAP_RX_TIMESTAMP)) {
-            netdev_rx_info->timestamp = rx_info.timestamp;
-            netdev_rx_info->flags |= NETDEV_RX_IEEE802154_INFO_FLAG_TIMESTAMP;
+            netdev_ieee802154_rx_info_set_timestamp(netdev_rx_info, rx_info.timestamp);
         }
 #endif
 

@@ -167,7 +167,10 @@ typedef enum {
      */
     IEEE802154_CAP_SRC_ADDR_MATCH       = BIT19,
     /**
-     * @brief the devices records timestamps on received frames
+     * @brief the device supports hardware timestamping of received frames
+     *
+     * If present @ref ieee802154_rx_info_t::timestamp is valid for every frame
+     * successfully read with @ref ieee802154_radio_ops::read.
      */
     IEEE802154_CAP_RX_TIMESTAMP         = BIT20,
     /**
@@ -398,7 +401,22 @@ typedef struct {
      */
     uint8_t rssi;
     uint8_t lqi;            /**< LQI of the received frame */
-    uint64_t timestamp;     /**< Timestamp value of a received frame in ns */
+#if IS_USED(MODULE_IEEE802154_RX_TIMESTAMP)
+    /**
+     * @brief Timestamp of the received frame in nanoseconds
+     *
+     * Time at which the radio detected the end of the SFD (start of the PHR),
+     * in the radio's timebase.
+     *
+     * Only valid if the device reports @ref IEEE802154_CAP_RX_TIMESTAMP.
+     *
+     * @note Timestamps of different radios are not comparable
+     *       as they differ in resolution, accuracy and capture delay.
+     *       The underlying counter wraps around after a radio specific period
+     *       and may be paused while the radio is off.
+     */
+    uint64_t timestamp;
+#endif
 } ieee802154_rx_info_t;
 
 /**
