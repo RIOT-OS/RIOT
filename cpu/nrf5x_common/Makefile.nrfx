@@ -35,7 +35,7 @@ else ifeq (nrf52, $(CPU_FAM))
   PKG_SPARSE_PATHS += mdk/nrf52840_name_change.h
   PKG_SPARSE_PATHS += mdk/nrf52840_peripherals.h
 
-else ifneq (nrf53%, $(CPU_FAM))
+else ifneq (,$(filter nrf53 nrf9160, $(CPU_FAM)))
   PKG_SPARSE_PATHS += mdk/nrf5340_application.h
   PKG_SPARSE_PATHS += mdk/nrf5340_application_bitfields.h
   PKG_SPARSE_PATHS += mdk/nrf5340_application_name_change.h
@@ -44,6 +44,17 @@ else ifneq (nrf53%, $(CPU_FAM))
   PKG_SPARSE_PATHS += mdk/nrf5340_network_bitfields.h
   PKG_SPARSE_PATHS += mdk/nrf5340_network_name_change.h
   PKG_SPARSE_PATHS += mdk/nrf5340_network_peripherals.h
+
+else ifeq (nrf54l, $(CPU_FAM))
+  PKG_SPARSE_PATHS  = mdk/nrf54l15_types.h
+  PKG_SPARSE_PATHS += mdk/nrf54l15_global.h
+  PKG_SPARSE_PATHS += mdk/nrf54l15_application.h
+  PKG_SPARSE_PATHS += mdk/nrf54l15_application_peripherals.h
+
+  # support headers without any further includes, fetching them avoids
+  # having to patch the headers above
+  PKG_SPARSE_PATHS += mdk/compiler_abstraction.h
+  PKG_SPARSE_PATHS += mdk/system_nrf.h
 
 endif
 
