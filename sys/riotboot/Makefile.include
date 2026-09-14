@@ -25,3 +25,12 @@ CFLAGS += -DSLOT0_OFFSET=$(SLOT0_OFFSET)
 CFLAGS += -DSLOT1_LEN=$(SLOT1_LEN)
 CFLAGS += -DSLOT1_OFFSET=$(SLOT1_OFFSET)
 CFLAGS += -DNUM_SLOTS=$(NUM_SLOTS)
+
+# riotboot header version 1
+PSEUDOMODULES += riotboot_hdr_v1
+# riotboot header version 2
+PSEUDOMODULES += riotboot_hdr_v2
+# User has to mark image as active manually
+PSEUDOMODULES += riotboot_hdr_auto_activate
+# Confirm image on first boot once main is reached
+PSEUDOMODULES += riotboot_hdr_auto_confirm
