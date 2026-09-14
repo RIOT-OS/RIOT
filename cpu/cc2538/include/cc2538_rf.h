@@ -83,6 +83,9 @@ extern "C" {
 
 #define CC2538_SFR_MTMSEL_MASK      (0x7)           /**< MAC Timer selection mask */
 #define CC2538_SFR_MTMSEL_TIMER_P   (0x2)           /**< Selects Timer period */
+#define CC2538_SFR_MTMSEL_TIMER_CAP (0x1)           /**< Selects Timer capture */
+#define CC2538_SFR_MTMOVFSEL_MASK   (0x70)          /**< MAC Timer overflow selection mask */
+#define CC2538_SFR_MTMOVFSEL_CAP    (0x1 << 4)      /**< Selects Timer overflow capture */
 #define CC2538_MCTRL_SYNC_MASK      (0x2)           /**< Sync MAC Timer to external clock */
 #define CC2538_MCTRL_RUN_MASK       (0x1)           /**< Run MAC Timer */
 
