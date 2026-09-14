@@ -8,9 +8,6 @@ on:
       - trying
     tags:
       - '*'
-  pull_request:
-    branches:
-      - '*'
   merge_group:
 
 jobs:
