@@ -280,3 +280,12 @@ BPLib_Status_t bplib_contact_set_in_addr(uint32_t contact,
     }
     return status;
 }
+
+BPLib_Status_t bplib_config_set_local_eid(BPLib_EID_t* eid_new)
+{
+    if ((eid_new->Scheme == BPLIB_EID_SCHEME_DTN) || (!BPLib_EID_IsValid(eid_new))) {
+        return BPLIB_INVALID_CONFIG_ERR;
+    }
+    BPLib_EID_CopyEids(&BPLIB_EID_INSTANCE, *eid_new);
+    return BPLIB_SUCCESS;
+}

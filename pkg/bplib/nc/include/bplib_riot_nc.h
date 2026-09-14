@@ -314,6 +314,17 @@ BPLib_Status_t bplib_contact_set_out_addr(uint32_t contact,
 BPLib_Status_t bplib_contact_set_in_addr(uint32_t contact,
             const char* addr, uint16_t port);
 
+/**
+ * @brief Updates the local EID 
+ *
+ * Note that DTN format EIDs are NOT supported, only IPN.
+ *
+ * @param eid_new The new local EID of the executing node
+ * @retval BPLIB_SUCCESS on success
+ * @retval BPLIB_INVALID_CONFIG_ERR if the EID is invalid. This includes DTN format EIDs.
+ */
+BPLib_Status_t bplib_config_set_local_eid(BPLib_EID_t* eid_new);
+
 #ifdef __cplusplus
 }
 #endif
