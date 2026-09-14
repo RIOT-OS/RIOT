@@ -367,6 +367,7 @@ typedef struct {
     gpio_t led_pin;        /**< LED GPIO, GPIO_UNDEF to disable */
     uint8_t sample_period; /**< Sample period used, e.g. QDEC_SAMPLEPER_SAMPLEPER_128us */
     bool debounce_filter;  /**< Enable/disable debounce filter */
+    bool led_active_state; /**< Active state of the LED. True is active high, false is active low */
 } qdec_conf_t;
 
 /**

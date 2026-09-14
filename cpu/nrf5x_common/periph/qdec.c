@@ -72,6 +72,7 @@ int32_t qdec_init(qdec_t qdec, qdec_mode_t mode, qdec_cb_t cb, void *arg)
     /* Optionally set or disable the LED */
     if (gpio_is_valid(conf(qdec)->led_pin)) {
         dev(qdec)->PSEL.LED = conf(qdec)->led_pin;
+        dev(qdec)->LEDPOL = conf(qdec)->led_active_state ? 1 : 0;
     }
     else {
         dev(qdec)->PSEL.LED = QDEC_PSEL_LED_CONNECT_Msk;
