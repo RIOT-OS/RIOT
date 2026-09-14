@@ -50,12 +50,15 @@ ifneq (,$(filter native native32 native64,$(BOARD)))
 else
   # on non-native boards, we need to bump the event thread's stack
   CFLAGS += -DEVENT_THREAD_MEDIUM_STACKSIZE=1024
+# Uncomment if you need more ISR Stacksize for debugging purposes
+  # CFLAGS += -DISR_STACKSIZE=2048
 endif
 
 USEMODULE += od
 USEMODULE += luid
 USEMODULE += l2util
 USEMODULE += ieee802154
+USEMODULE += ieee802154_rx_timestamp
 USEMODULE += shell
 USEMODULE += shell_cmds_default
 USEMODULE += ps
