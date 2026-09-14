@@ -222,9 +222,11 @@ struct ieee802154_submac {
     ieee802154_fsm_state_t fsm_state;    /**< State of the SubMAC */
     ieee802154_phy_mode_t phy_mode;     /**< IEEE 802.15.4 PHY mode */
     const iolist_t *psdu;               /**< stores the current PSDU */
+#if IS_USED(MODULE_IEEE802154_SUBMAC_SOFT_ACK)
     uint8_t rx_buf[IEEE802154_FRAME_LEN_MAX]; /**< stores received frame */
     size_t rx_len;                      /**< stores length of received frame */
     ieee802154_rx_info_t rx_info;       /**< stores lqi and rssi of received frame */
+#endif /* MODULE_IEEE802154_SUBMAC_SOFT_ACK */
 };
 
 /**
@@ -435,7 +437,11 @@ static inline int ieee802154_set_tx_power(ieee802154_submac_t *submac,
  */
 static inline int ieee802154_get_frame_length(ieee802154_submac_t *submac)
 {
+#if IS_USED(MODULE_IEEE802154_SUBMAC_SOFT_ACK)
     return submac->rx_len;
+#else
+    return ieee802154_radio_len(&submac->dev);
+#endif
 }
 
 /**
@@ -457,6 +463,7 @@ static inline int ieee802154_get_frame_length(ieee802154_submac_t *submac)
 static inline int ieee802154_read_frame(ieee802154_submac_t *submac, void *buf,
                                         size_t len, ieee802154_rx_info_t *info)
 {
+#if IS_USED(MODULE_IEEE802154_SUBMAC_SOFT_ACK)
     if (submac->rx_len > len) {
         return -ENOBUFS;
     }
@@ -468,6 +475,9 @@ static inline int ieee802154_read_frame(ieee802154_submac_t *submac, void *buf,
         memcpy(buf, submac->rx_buf, submac->rx_len);
     }
     return submac->rx_len;
+#else
+    return ieee802154_radio_read(&submac->dev, buf, len, info);
+#endif
 }
 
 /**

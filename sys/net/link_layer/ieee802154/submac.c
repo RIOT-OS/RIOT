@@ -186,6 +186,7 @@ static ieee802154_fsm_state_t _fsm_state_prepare(ieee802154_submac_t *submac,
 static ieee802154_fsm_state_t _fsm_state_tx(ieee802154_submac_t *submac,
                                             ieee802154_fsm_ev_t ev);
 
+#if IS_USED(MODULE_IEEE802154_SUBMAC_SOFT_ACK)
 static int _handle_fsm_ev_tx_ack(ieee802154_submac_t *submac, uint8_t seq_num)
 {
     ieee802154_dev_t *dev = &submac->dev;
@@ -222,6 +223,7 @@ static int _handle_fsm_ev_tx_ack(ieee802154_submac_t *submac, uint8_t seq_num)
         return 0;
     }
 }
+#endif
 
 static ieee802154_fsm_state_t _fsm_state_rx(ieee802154_submac_t *submac, ieee802154_fsm_ev_t ev)
 {
@@ -239,6 +241,7 @@ static ieee802154_fsm_state_t _fsm_state_rx(ieee802154_submac_t *submac, ieee802
         return IEEE802154_FSM_STATE_PREPARE;
     case IEEE802154_FSM_EV_RX_DONE:
         while (ieee802154_radio_set_idle(dev, false) < 0) {}
+#if IS_USED(MODULE_IEEE802154_SUBMAC_SOFT_ACK)
         submac->rx_len = ieee802154_radio_len(dev);
         assert(submac->rx_len <= IEEE802154_FRAME_LEN_MAX);
         res = ieee802154_radio_read(dev, submac->rx_buf, submac->rx_len, &submac->rx_info);
@@ -261,6 +264,9 @@ static ieee802154_fsm_state_t _fsm_state_rx(ieee802154_submac_t *submac, ieee802
                     }
                 }
             }
+#else
+        if (ieee802154_radio_len(&submac->dev) > (int)IEEE802154_MIN_FRAME_LEN) {
+#endif
             submac->cb->rx_done(submac);
             return IEEE802154_FSM_STATE_IDLE;
         }
@@ -798,10 +804,12 @@ int ieee802154_submac_init(ieee802154_submac_t *submac, const network_uint16_t *
 
     submac->fsm_state = IEEE802154_FSM_STATE_RX;
 
+#if IS_USED(MODULE_IEEE802154_SUBMAC_SOFT_ACK)
     submac->rx_len = 0;
     submac->rx_info.rssi = 0;
     submac->rx_info.lqi = 0;
     memset(submac->rx_buf, 0, sizeof(submac->rx_buf));
+#endif
 
     int res;
 
