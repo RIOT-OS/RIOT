@@ -1,18 +1,9 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-# Copyright (C) 2022  HAW Hamburg
-#
-# This library is free software; you can redistribute it and/or
-# modify it under the terms of the GNU Lesser General Public
-# License as published by the Free Software Foundation; either
-# version 2.1 of the License, or (at your option) any later version.
-#
-# This library is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-# Lesser General Public License for more details.
-#
+# SPDX-FileCopyrightText: 2022 HAW Hamburg
+# SPDX-License-Identifier: LGPL-2.1-only
+
 """Helper script to pre-test murdock build conditions.
 
 This is intended to compile like murdock giving control for only a subset of
@@ -27,12 +18,13 @@ The following use cases are:
     I made a change to something in the stm32 clocks...
     `./compile_like_murdock.py -c stm32`
 
-    I changed a driver the DHT driver
+    I changed some drivers...
     `./compile_like_murdock.py -a tests/drivers/dht tests/drivers/saul`
 
     I changed a nucleo-f103rb board...
     `./compile_like_murdock.py -a all -b nucleo-f103rb`
 """
+
 import argparse
 import os
 import subprocess
@@ -153,12 +145,27 @@ def _all_apps(cwd):
     return __exec_cmd(cmd, cwd=cwd).split()
 
 
+def _supported_by_toolchain(app, toolchain, env, cwd):
+    cmd = ('make', 'info-toolchains-supported', '--no-print-directory')
+    toolchains = __exec_cmd(cmd, env=env, cwd=cwd).split()
+
+    return toolchain in toolchains
+
+
 def _supported_boards(boards, env, cwd, all_boards=False):
     cmd = ('make', 'info-boards-supported', '--no-print-directory', '-j')
     supported_boards = __exec_cmd(cmd, env=env, cwd=cwd).split()
     if all_boards:
         return supported_boards
     return [brd for brd in supported_boards if brd in boards]
+
+
+def _sufficient_memory(board, env, cwd):
+    cmd = ('make', 'info-debug-variable-BOARD_INSUFFICIENT_MEMORY', '--no-print-directory')
+    insufficient_memory = __exec_cmd(cmd, env=env, cwd=cwd).split()
+
+    # Has the board sufficient memory (not listed in BOARD_INSUFFICIENT_MEMORY)?
+    return board not in insufficient_memory
 
 
 def _supported_boards_from_cpu(cpu, env, cwd):
@@ -227,6 +234,10 @@ def main():
                               "filter.  If empty, a subset of boards will be "
                               "selected for you. If 'all' then it will test "
                               "all supported boards."))
+    parser.add_argument("--no-memory-check", action="store_true",
+                        help=("Override the BOARDS_INSUFFICIENT_MEMORY "
+                              "variable stored in Makefile.ci and build "
+                              "regardless."))
     parser.add_argument("-c", "--cpu", type=str,
                         help=("Optional filter for all supported boards "
                               "belonging to the cpu family, for example, "
@@ -239,6 +250,10 @@ def main():
                               " If empty we will choose what is tested."))
     parser.add_argument("-t", "--toolchain", choices=["gnu", "llvm"], default="gnu",
                         help=("Toolchain to use"))
+    parser.add_argument("--no-toolchain-check", action="store_true",
+                        help=("Override the TOOLCHAINS_BLACKLIST variable "
+                              "for the given board/application and build "
+                              "regardless."))
     parser.add_argument("-d", "--dry-run", action="store_true",
                         help=("Show each of the boards and apps to be compiled"
                               " without spending super long to compile them"))
@@ -269,26 +284,36 @@ def main():
     for app in apps:
         test_dir = str(pathlib.PurePath(riot_dir, app))
         if not pathlib.Path(test_dir).exists():
-            print(f"{test_dir: <60}SKIP: Does not exists (typo?)")
+            print(f"{test_dir: <60} SKIP: Does not exists (typo?)")
             continue
+
+        if not args.no_toolchain_check and \
+                not _supported_by_toolchain(app, args.toolchain, full_env, test_dir):
+            print(f"{app: <60} SKIP: Toolchain '{args.toolchain}' not supported")
+            continue
+
         if args.cpu:
-            target_boards = _supported_boards_from_cpu(args.cpu, full_env,
-                                                       test_dir)
+            target_boards = _supported_boards_from_cpu(args.cpu, full_env, test_dir)
         elif args.boards and args.boards[0] == "all":
             target_boards = _supported_boards(boards, full_env, test_dir, True)
         else:
-            target_boards = _supported_boards(boards, full_env, test_dir,
-                                              False)
+            target_boards = _supported_boards(boards, full_env, test_dir, False)
+
         for board in target_boards:
             if args.dry_run:
                 print(f"{app: <30} {board: <30}")
             elif args.modules_packages:
-                _modules_packages(app, board, args.jobs, full_env, riot_dir,
-                                  args)
+                _modules_packages(app, board, args.jobs, full_env, riot_dir, args)
             else:
+                if not args.no_memory_check and \
+                        not _sufficient_memory(board, full_env, test_dir):
+                    print(f"{app: <60} SKIP: Insufficient memory stored")
+                    continue
+
                 if not _build(app, board, args.toolchain, args.jobs, full_env,
                               riot_dir, args):
                     ret = -1
+
     elapse_time = datetime.datetime.now() - start_time
     _end(elapse_time.total_seconds(), args.jobs)
     exit(ret)
