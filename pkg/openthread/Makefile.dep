@@ -1,10 +1,9 @@
 USEMODULE += event
+USEMODULE += ieee802154
 USEMODULE += l2util
-USEMODULE += netdev
 USEMODULE += openthread_contrib
-USEMODULE += openthread_contrib_netdev
 
-ifneq (,$(filter openthread-cli-%,$(USEMODULE)))
+ifneq (,$(filter openthread_cli_%,$(USEMODULE)))
   USEMODULE += shell_cmds_default
 endif
 

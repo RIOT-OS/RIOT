@@ -1,11 +1,11 @@
 OPENTHREAD_DIR = $(RIOTBASE)/pkg/openthread
 
+INCLUDES += -I$(PKGDIRBASE)/openthread/examples/platforms/utils
 INCLUDES += -I$(PKGDIRBASE)/openthread/include
 INCLUDES += -I$(OPENTHREAD_DIR)/include
 
 ifneq (,$(filter openthread_contrib,$(USEMODULE)))
   DIRS += $(OPENTHREAD_DIR)/contrib
-  DIRS += $(OPENTHREAD_DIR)/contrib/netdev
 endif
 
 ifneq (,$(filter cortex-m0% cortex-m3%,$(CPU_CORE)))
@@ -14,6 +14,6 @@ ifneq (,$(filter cortex-m0% cortex-m3%,$(CPU_CORE)))
   TOOLCHAINS_BLACKLIST += llvm
 endif
 
-ARCHIVES += $(addprefix $(BINDIR)/,$(addsuffix .a,$(filter openthread-%,$(USEMODULE))))
+ARCHIVES += $(addprefix $(BINDIR)/,$(addsuffix .a,$(subst _,-,$(filter-out openthread_contrib,$(filter openthread_%,$(USEMODULE))))))
 ARCHIVES += $(BINDIR)/mbedcrypto.a
 ARCHIVES += $(BINDIR)/mbedtls.a
