@@ -45,6 +45,7 @@ int32_t qdec_init(qdec_t qdec, qdec_mode_t mode, qdec_cb_t cb, void *arg)
     (void)mode;
     /* Verify parameters */
     assert((qdec < QDEC_NUMOF));
+    assert(conf(qdec)->sample_period <= QDEC_SAMPLEPER_SAMPLEPER_131ms);
 
     /* The nrf5x peripheral counts all edges */
     if (mode != QDEC_X4) {
@@ -79,6 +80,7 @@ int32_t qdec_init(qdec_t qdec, qdec_mode_t mode, qdec_cb_t cb, void *arg)
     }
 
     dev(qdec)->DBFEN = conf(qdec)->debounce_filter ? 1 : 0;
+    dev(qdec)->SAMPLEPER = conf(qdec)->sample_period;
 
     /* Enable the peripheral */
     dev(qdec)->ENABLE = 1;
