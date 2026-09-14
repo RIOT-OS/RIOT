@@ -12,8 +12,10 @@
  */
 
 #include <err.h>
+#include <signal.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <unistd.h>
 
 #include "periph/pm.h"
 #include "native_internal.h"
@@ -31,6 +33,17 @@
 #include "debug.h"
 
 unsigned _native_retval = EXIT_SUCCESS;
+
+#ifdef __GCOV__
+void native_gcov_exit(void)
+{
+    extern void __gcov_dump(void);
+    _native_in_isr = 1;
+    _native_interrupts_enabled = false;
+    __gcov_dump();
+    _exit(_native_retval);
+}
+#endif
 
 static void _native_sleep(void)
 {
@@ -71,7 +84,12 @@ void pm_off(void)
     extern void auto_unmount_vfs(void);
     auto_unmount_vfs();
 #endif
+#ifdef __GCOV__
+    native_gcov_exit();
+    /* unreachable - native_gcov_exit() does not return */
+#else
     real_exit(_native_retval);
+#endif
 }
 
 void pm_reboot(void)

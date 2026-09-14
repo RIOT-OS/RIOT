@@ -330,6 +330,23 @@ ssize_t _native_write(int fd, const void *buf, size_t count);
 ssize_t _native_writev(int fildes, const struct iovec *iov, int iovcnt);
 /** @} */
 
+/* MARK: - Coverage */
+/**
+ * @name Coverage support
+ * @{
+ */
+#ifdef __GCOV__
+/**
+ * @brief Flush gcov coverage data and terminate the process
+ *
+ * Disables native's interrupt machinery, dumps gcov instrumentation data to
+ * the .gcda files, then exits. Safe to call from both ISR and non-ISR
+ * contexts.
+ */
+void native_gcov_exit(void);
+#endif
+/** @} */
+
 #ifdef __cplusplus
 }
 #endif

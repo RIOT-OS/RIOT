@@ -124,7 +124,12 @@ void cpu_switch_context_exit(void)
     if (sched_num_threads <= 1) {
         extern unsigned _native_retval;
         DEBUG_CPU("cpu_switch_context_exit: last task has ended. exiting.\n");
+#    ifdef __GCOV__
+        native_gcov_exit();
+        /* unreachable - native_gcov_exit() does not return */
+#    else
         real_exit(_native_retval);
+#    endif
     }
 # endif
 
