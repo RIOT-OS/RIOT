@@ -538,7 +538,11 @@ include $(RIOTMAKE)/cflags.inc.mk
 -include $(RIOTBASE)/EXTRAVERSION
 
 include $(RIOTMAKE)/git_version.inc.mk
-RIOT_VERSION_GIT := $(or $(GIT_VERSION),'UNKNOWN (builddir: $(RIOTBASE))')
+# This variable is recursively expanded on purpose, because it is only expanded
+# when $(RIOT_VERSION) has not been set already. This is the case for CI
+# builds. Outside of CI, $(GIT_VERSION) is memoized and will not be
+# re-evaluated on every expansion of $(RIOT_VERSION_GIT).
+RIOT_VERSION_GIT = $(or $(GIT_VERSION),'UNKNOWN (builddir: $(RIOTBASE))')
 RIOT_VERSION ?= $(RIOT_VERSION_GIT)
 RIOT_EXTRAVERSION ?= 0
 
