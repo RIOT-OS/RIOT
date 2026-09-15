@@ -284,13 +284,17 @@ tree can be used:
 
 - apps
     - my_app
+        - include
+            - my_subdir_header.h
+        - my_header.h
         - Makefile
+        - main.c
 - boards
   - my_board/
 - modules
     - my_module
         - include
-            -my_module.h
+            - my_module.h
         - Makefile
         - Makefile.include
         - my_module.c
@@ -299,8 +303,10 @@ tree can be used:
 </FileTree>
 
 In this example tree, the `apps` directory contains a collection of applications
-for the project. The modules directory could contain extra modules for the
-applications.
+for the project. You can add application headers at the same level as your
+`main.c` file or in an `include/` subdirectory to keep the application's root
+folder cleaner, if many source files and/or headers are present.
+The modules directory could contain extra modules for the applications.
 
 The Makefile inside the application needs at least the following as bare minimum:
 
