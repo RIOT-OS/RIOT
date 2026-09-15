@@ -38,7 +38,7 @@ Please paste or specifically describe the actual output.
 
 #### Versions
 <!--
-Operating system: macOS, Linux, Vagrant VM
+Operating system: macOS, Linux, Windows/WSL, Docker/Podman
 Build environment: GCC, CLang versions (you can run the following command from
 the RIOT base directory: make print-versions).
 -->

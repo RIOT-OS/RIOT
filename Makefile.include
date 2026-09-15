@@ -207,8 +207,8 @@ include $(RIOTMAKE)/dependencies_debug.inc.mk
 # Use TOOLCHAIN environment variable to select the toolchain to use.
 ifneq (,$(filter native native32 native64,$(BOARD)))
   ifeq ($(OS),Darwin)
-    $(call echoerr,("Building on macOS is not supported. We recommend vagrant for building:"))
-    $(call echoinfo,("https://github.com/RIOT-OS/RIOT/blob/master/dist/tools/vagrant/README.md"))
+    $(call echoerr,("Building on macOS is not supported. We recommend Docker for building:"))
+    $(call echoinfo,("https://doc.riot-os.org/build-system/build-in-docker/"))
   endif
 endif
 # Use override so that we can redefine a variable set on the command line (as
