@@ -125,7 +125,7 @@ typedef void (*qdec_cb_t)(void *arg);
 /**
  * @brief   Default interrupt context entry holding callback and argument
  */
-#ifndef HAVE_TIMER_ISR_CTX_T
+#ifndef HAVE_QDEC_ISR_CTX_T
 typedef struct {
     qdec_cb_t cb;           /**< callback executed from qdec interrupt */
     void *arg;              /**< optional argument given to that callback */
