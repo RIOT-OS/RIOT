@@ -45,6 +45,7 @@ int32_t qdec_init(qdec_t qdec, qdec_mode_t mode, qdec_cb_t cb, void *arg)
     (void)mode;
     /* Verify parameters */
     assert((qdec < QDEC_NUMOF));
+    assert(conf(qdec)->sample_period <= QDEC_SAMPLEPER_SAMPLEPER_131ms);
 
     /* The nrf5x peripheral counts all edges */
     if (mode != QDEC_X4) {
@@ -69,12 +70,17 @@ int32_t qdec_init(qdec_t qdec, qdec_mode_t mode, qdec_cb_t cb, void *arg)
     dev(qdec)->PSEL.A = conf(qdec)->a_pin;
     dev(qdec)->PSEL.B = conf(qdec)->b_pin;
 
-    /** Optionally set or disable the LED */
-    dev(qdec)->PSEL.LED = gpio_is_valid(conf(qdec)->led_pin)
-        ? QDEC_PSEL_LED_CONNECT_Msk
-        : conf(qdec)->led_pin;
+    /* Optionally set or disable the LED */
+    if (gpio_is_valid(conf(qdec)->led_pin)) {
+        dev(qdec)->PSEL.LED = conf(qdec)->led_pin;
+        dev(qdec)->LEDPOL = conf(qdec)->led_active_state ? 1 : 0;
+    }
+    else {
+        dev(qdec)->PSEL.LED = QDEC_PSEL_LED_CONNECT_Msk;
+    }
 
     dev(qdec)->DBFEN = conf(qdec)->debounce_filter ? 1 : 0;
+    dev(qdec)->SAMPLEPER = conf(qdec)->sample_period;
 
     /* Enable the peripheral */
     dev(qdec)->ENABLE = 1;
