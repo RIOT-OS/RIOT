@@ -519,7 +519,6 @@ include $(RIOTMAKE)/cflags.inc.mk
 -include $(RIOTBASE)/EXTRAVERSION
 
 include $(RIOTMAKE)/git_version.inc.mk
-RIOT_VERSION_GIT := $(or $(GIT_VERSION),'UNKNOWN (builddir: $(RIOTBASE))')
 RIOT_VERSION ?= $(RIOT_VERSION_GIT)
 RIOT_EXTRAVERSION ?= 0
 
