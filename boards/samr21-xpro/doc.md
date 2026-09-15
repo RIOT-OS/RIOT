@@ -202,11 +202,3 @@ Tracked in <https://github.com/RIOT-OS/RIOT/issues/2228>
 
 When using the SW0 user button as interrupt source it appears that this is
 triggered when just tipping on the button and not really pressing it.
-
-### Flashing might not work in Virtual Box with macOS as host
-
-It might happen that flashing through OpenOCD works once inside Virtual Box.
-But when you try to flash again, you could get a CMSIS-DAP related error. It
-seems to only happen with USB 3.0 ports. You can take a look at
-[Vagrant](http://en.wikipedia.org/wiki/Vagrant_%28software%29) and use a virtual
-Linux to run the virtual RIOT, and flash from macOS.

@@ -96,7 +96,8 @@ The below methodology is recommended, using well-known de facto standard tools f
 compatible with RIOT. Using the below workflow improves time-to-running-code compared to typical IoT software
 workflows (which can be as retro as "LED-driven" debugging).
 
-0. For newbies, preliminaries are typically faster with the provisioned virtual environment setup, e.g. with **Vagrant**.
+0. For first-timers, setting up a build system is typically faster with the provided
+   [Docker container](https://doc.riot-os.org/build-system/build-in-docker/).
 1. To check your code, first use available **static analysis** as much as possible initially, which means
    (i) enable all compiler warnings and fix all problems found, then (ii) use a supported linter such as **cppcheck**
    to find bad coding patterns (i.e. code smells) and identify misuse of standard APIs.
