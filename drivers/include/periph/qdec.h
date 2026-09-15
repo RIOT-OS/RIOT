@@ -143,7 +143,8 @@ typedef struct {
  * See description above for more details about modes.
  *
  * On QDEC counter overflow, an interrupt is triggered.
- * The interruption calls the callback defined.
+ * The interruption calls the callback defined. Some platforms allow configuring
+ * the maximum counter value in the board's `qdec_conf_t`.
  *
  * @pre     The QDEC device must not be active when calling `qdec_init()`. It
  *          must either not have been initialized before or it must be stopped
