@@ -11,17 +11,8 @@
  *
  */
 
-#include <stdio.h>
-
-#include "shell.h"
 
 int main(void)
 {
-    /* define buffer to be used by the shell */
-    char line_buf[SHELL_DEFAULT_BUFSIZE];
-
-    /* start shell */
-    shell_run(NULL, line_buf, SHELL_DEFAULT_BUFSIZE);
-
     return 0;
 }

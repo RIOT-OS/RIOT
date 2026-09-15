@@ -16,7 +16,6 @@
 
 #include <stdio.h>
 
-#include "shell.h"
 #include "vfs_default.h"
 
 int main(void)
@@ -29,10 +28,6 @@ int main(void)
         printf("\t%s\n", mount.mp->mount_point);
     }
     printf("\ndata dir: %s\n", VFS_DEFAULT_DATA);
-
-    /* start the shell */
-    char line_buf[SHELL_DEFAULT_BUFSIZE];
-    shell_run(NULL, line_buf, SHELL_DEFAULT_BUFSIZE);
 
     return 0;
 }
