@@ -1,7 +1,8 @@
 # Test if the input language was specified externally.
 # Otherwise test if the compiler unterstands the "-std=c11" flag, and use it if so.
 ifeq ($(filter -std=%,$(CFLAGS)),)
-  ifeq ($(shell $(CC) -std=c11 -E - 2>/dev/null >/dev/null </dev/null ; echo $$?),0)
+  CC_SUPPORTS_STD_C11 ?= $(shell $(CC) -std=c11 -E - 2>/dev/null >/dev/null </dev/null && echo 1 || echo 0)
+  ifeq (1,$(CC_SUPPORTS_STD_C11))
     CFLAGS += -std=c11
   endif
 endif
@@ -47,7 +48,8 @@ CXXUWFLAGS += -std=%
 CXXUWFLAGS += -Wstrict-prototypes -Wold-style-definition
 
 ifeq ($(filter -std=%,$(CXXEXFLAGS)),)
-  ifeq ($(shell $(CC) -std=c++14 -E - 2>/dev/null >/dev/null </dev/null ; echo $$?),0)
+  CC_SUPPORTS_STD_CXX14 ?= $(shell $(CC) -std=c++14 -E - 2>/dev/null >/dev/null </dev/null && echo 1 || echo 0)
+  ifeq (1,$(CC_SUPPORTS_STD_CXX14))
     CXXEXFLAGS += -std=c++14
   endif
 endif
