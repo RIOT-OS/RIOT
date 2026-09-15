@@ -28,6 +28,7 @@
 #include <assert.h>
 
 #include "byteorder.h"
+#include "net/inet_csum.h"
 #include "net/ipv4/addr.h"
 
 #ifdef __cplusplus
@@ -212,6 +213,56 @@ static inline uint16_t ipv4_hdr_get_fo(ipv4_hdr_t *hdr)
 {
     return (((hdr->fl_fo.u8[0] & 0x1f) << 8) + hdr->fl_fo.u8[1]);
 }
+
+/**
+ * @brief   Calculates the header checksum of @p hdr.
+ *
+ * @see     [RFC 791, section 3.1](https://tools.ietf.org/html/rfc791#section-3.1)
+ *
+ * @pre     ipv4_hdr_t::csum of @p hdr is set to 0.
+ *
+ * @param[in] hdr   An IPv4 header, with ipv4_hdr_t::csum set to 0.
+ *
+ * @return  The IPv4 header checksum of @p hdr, in network byte order.
+ */
+static inline network_uint16_t ipv4_hdr_csum(ipv4_hdr_t *hdr)
+{
+    uint16_t csum = inet_csum(0, (uint8_t *)hdr, ipv4_hdr_get_ihl(hdr));
+
+    return byteorder_htons(~csum);
+}
+
+/**
+ * @brief   Calculates the Internet Checksum for the IPv4 Pseudo Header.
+ *
+ * @see     [RFC 793, section 3.1](https://tools.ietf.org/html/rfc793#section-3.1)
+ *
+ * @param[in] sum       Preinitialized value of the sum.
+ * @param[in] prot_num  The @ref net_protnum you want to calculate the
+ *                      checksum for.
+ * @param[in] hdr       An IPv4 header to derive the Pseudo Header from.
+ * @param[in] len       The upper-layer packet length for the pseudo header.
+ *
+ * @return  The non-normalized Internet Checksum of the given IPv4 pseudo header.
+ */
+static inline uint16_t ipv4_hdr_inet_csum(uint16_t sum, ipv4_hdr_t *hdr,
+                                          uint8_t prot_num, uint16_t len)
+{
+    if (((uint32_t)sum + len + prot_num) > 0xffff) {
+        /* increment by one for overflow to keep it as 1's complement sum */
+        sum++;
+    }
+
+    return inet_csum(sum + len + prot_num, hdr->src.u8,
+                     (2 * sizeof(ipv4_addr_t)));
+}
+
+/**
+ * @brief   Outputs an IPv4 header to stdout.
+ *
+ * @param[in] hdr   An IPv4 header.
+ */
+void ipv4_hdr_print(ipv4_hdr_t *hdr);
 
 #ifdef __cplusplus
 }

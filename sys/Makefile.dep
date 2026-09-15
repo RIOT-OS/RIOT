@@ -177,6 +177,11 @@ ifneq (,$(filter sixlowpan,$(USEMODULE)))
   USEMODULE += ipv6_hdr
 endif
 
+ifneq (,$(filter ipv4_hdr,$(USEMODULE)))
+  USEMODULE += inet_csum
+  USEMODULE += ipv4_addr
+endif
+
 ifneq (,$(filter ipv6_hdr,$(USEMODULE)))
   USEMODULE += inet_csum
   USEMODULE += ipv6_addr
