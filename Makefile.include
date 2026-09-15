@@ -385,6 +385,7 @@ endif
 
 # Add standard include directories
 INCLUDES += -I$(APPDIR)
+INCLUDES += $(addprefix -I,$(wildcard $(APPDIR)/include))
 INCLUDES += -I$(RIOTBASE)/core/lib/include
 INCLUDES += -I$(RIOTBASE)/core/include
 INCLUDES += -I$(RIOTBASE)/drivers/include
