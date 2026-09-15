@@ -48,7 +48,7 @@ extern "C" {
  * @brief   The desired frequency for the RTT
  */
 #ifdef DOXYGEN
-#define RTT_FREQUENCY
+#  define RTT_FREQUENCY
 #endif
 
 /**
@@ -58,7 +58,7 @@ extern "C" {
  *
  */
 #ifdef DOXYGEN
-#define RTT_MAX_VALUE
+#  define RTT_MAX_VALUE
 #endif
 
 /**
@@ -76,32 +76,32 @@ extern "C" {
  *
  */
 #ifndef RTT_MIN_OFFSET
-#pragma message "RTT_MIN_OFFSET is undefined. Using default value of 2. " \
-                "Please test your CPU using RIOT/tests/periph/rtt_min and " \
-                "define RTT_MIN_OFFSET in periph_cpu.h accordingly."
-#define RTT_MIN_OFFSET (2U)
+#  pragma message "RTT_MIN_OFFSET is undefined. Using default value of 2. "   \
+                  "Please test your CPU using RIOT/tests/periph/rtt_min and " \
+                  "define RTT_MIN_OFFSET in periph_cpu.h accordingly."
+#  define RTT_MIN_OFFSET (2U)
 #endif
 
 /* Allow mock-RTT for unit tests */
 #ifdef MOCK_RTT_FREQUENCY
-#undef RTT_FREQUENCY
-#define RTT_FREQUENCY MOCK_RTT_FREQUENCY
+#  undef RTT_FREQUENCY
+#  define RTT_FREQUENCY MOCK_RTT_FREQUENCY
 #else
-#ifndef RTT_FREQUENCY
-#warning "RTT_FREQUENCY undefined. Set RTT_FREQUENCY to the number of ticks " \
-         "per second for the current architecture."
-#endif
+#  ifndef RTT_FREQUENCY
+#    warning "RTT_FREQUENCY undefined. Set RTT_FREQUENCY to the number of ticks " \
+             "per second for the current architecture."
+#  endif
 #endif
 
 /* Allow mock-RTT for unit tests */
 #ifdef MOCK_RTT_MAX_VALUE
-#undef RTT_MAX_VALUE
-#define RTT_MAX_VALUE MOCK_RTT_MAX_VALUE
+#  undef RTT_MAX_VALUE
+#  define RTT_MAX_VALUE MOCK_RTT_MAX_VALUE
 #else
-#ifndef RTT_MAX_VALUE
-#warning "RTT_MAX_VALUE is undefined. Set RTT_MAX_VALUE to the maximum value " \
-         "for the RTT counter, ensure it is (2^n - 1)."
-#endif
+#  ifndef RTT_MAX_VALUE
+#    warning "RTT_MAX_VALUE is undefined. Set RTT_MAX_VALUE to the maximum value " \
+             "for the RTT counter, ensure it is (2^n - 1)."
+#  endif
 #endif
 
 /**
@@ -151,14 +151,14 @@ extern "C" {
  * @param[in]   ticks   rtt ticks
  * @return              number of seconds
  */
-#define RTT_TICKS_TO_SEC(ticks)  (RTT_TICKS_TO_MS(ticks) / 1000)
+#define RTT_TICKS_TO_SEC(ticks) (RTT_TICKS_TO_MS(ticks) / 1000)
 
 /**
  * @brief       Convert rtt ticks to minutes
  * @param[in]   ticks   rtt ticks
  * @return              number of minutes
  */
-#define RTT_TICKS_TO_MIN(ticks)  (RTT_TICKS_TO_SEC(ticks) / 60)
+#define RTT_TICKS_TO_MIN(ticks) (RTT_TICKS_TO_SEC(ticks) / 60)
 
 /**
  * @brief Signature for the alarm callback
@@ -166,7 +166,7 @@ extern "C" {
  * @param[in] arg           Optional argument which is passed to the
  *                          callback
  */
-typedef void(*rtt_cb_t)(void *arg);
+typedef void (*rtt_cb_t)(void *arg);
 
 /**
  * @brief Initialize RTT module
