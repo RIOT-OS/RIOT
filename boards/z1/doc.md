@@ -2,6 +2,12 @@
 @ingroup    boards
 @brief      Support for the Zolertia Z1 board.
 
+@warning The z1 board is deprecated and currently remains as a test platform
+         for 16-bit microcontrollers. The functionality is not actively
+         maintained anymore and it does not necessarily work to the same standards
+         as other boards in RIOT.
+         It might be removed on short notice in the future.
+
 ## Components
 
 | MCU | [MSP430F2617](http://zolertia.sourceforge.net/wiki/index.php/Mainpage:z1#MSP430F2617_MCU_from_Texas_Instruments) |
