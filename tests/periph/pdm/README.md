@@ -31,8 +31,9 @@ make flash test > /tmp/pdm && \
 --output-file /tmp/output
 ```
 
-then open the `/tmp/output.wav` to verify, if `matplotlib` is installed you
-can also check `/tmp/output.png`
+After that you can open the `/tmp/output.wav` file to verify the recording and
+if `matplotlib` is installed you can also check `/tmp/output.png` to see a
+visual plot of the data.
 
 ## Configuration
 
