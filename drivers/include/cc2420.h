@@ -13,6 +13,10 @@
  * @file
  * @brief       Interface definition for the CC2420 driver
  *
+ * @warning The CC2420 driver is deprecated and will be removed after the
+ *          2027.04 Release! If you are still using it actively, please
+ *          notify the maintainers.
+ *
  * @author      Thomas Eichinger <thomas.eichinger@fu-berlin.de>
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  */
