@@ -105,7 +105,7 @@ workflows (which can be as retro as "LED-driven" debugging).
    as well as the **GCC stack smashing detection**, to detect and avoid undefined behavior due to invalid memory access.
 3. In case of networked applications or protocols, test **several instances of native** communicating via a virtual
    network mimicking the targeted scenario, which means (i) either using the default virtual full-mesh or other
-   topologies configured via DESvirt, and (ii) using **Wireshark** to capture and analyze virtual network traffic,
+   topologies, and (ii) using **Wireshark** to capture and analyze virtual network traffic,
    e.g. to ensure protocol packets are syntactically correct, and to observe network communication patterns.
 4. In case of incorrect behavior at this stage, analyze the system state for semantic errors on native using the
    standard debugger **gdb**, which allows virtually unlimited conditional breakpoints, record and replay,
