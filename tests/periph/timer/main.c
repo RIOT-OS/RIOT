@@ -182,12 +182,12 @@ static int test_timer(unsigned num, uint32_t timer_freq)
          * it was cleared */
     }
     if (atomic_load_u8(&fired)) {
-        printf("    ERROR: Spurious timer fired (1/2)\n");
+        printf("    ERROR: Spurious timer fired (1/3)\n");
         return 0;
     }
 
-    /* checking again to make sure that any IRQ pending bit that may just was
-     * mask doesn't trigger a timer IRQ on the next set */
+    /* check again to make sure that an IRQ pending bit that may have just
+     * been masked does not trigger a timer IRQ one period later */
     target = timer_read(TIMER_DEV(num)) + duration;
 
     while ((target - timer_read(TIMER_DEV(num))) <= duration) {
@@ -195,7 +195,29 @@ static int test_timer(unsigned num, uint32_t timer_freq)
          * it was cleared */
     }
     if (atomic_load_u8(&fired)) {
-        printf("    ERROR: Spurious timer fired (2/2)\n");
+        printf("    ERROR: Spurious timer fired (2/3)\n");
+        return 0;
+    }
+
+    /* some timers can cause a spurious IRQ when the timer is re-armed after it
+     * was just cleared (switched on), which results in an already pending IRQ
+     * right after timer_set_absolute returns */
+    atomic_store_u8(&fired, 0);
+    target = timer_read(TIMER_DEV(num)) + duration;
+    expect(0 == timer_set_absolute(TIMER_DEV(num), 0, target));
+
+    /* the distance to the target is read first, so that a real IRQ is not
+     * mistaken for an early one in the check below. */
+    unsigned remaining = target - timer_read(TIMER_DEV(num));
+    uint8_t fired_early = atomic_load_u8(&fired);
+
+    expect(0 == timer_clear(TIMER_DEV(num), 0));
+
+    /* to avoid false positives, we only report an error if the timer fired
+     * early and there are still more than MINIMUM_TICKS ticks left */
+    if (fired_early && (remaining > MINIMUM_TICKS) && (remaining <= duration)) {
+        printf("    ERROR: Spurious timer fired on re-arm (3/3), %u of %u "
+               "ticks left\n", remaining, duration);
         return 0;
     }
 
