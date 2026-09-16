@@ -347,7 +347,7 @@ static ieee802154_submac_fsm_return_t _fsm_state_rx(ieee802154_submac_t *submac,
                     if (_handle_fsm_ev_tx_ack(submac, ieee802154_get_seq(submac->rx_buf)) !=
                             IEEE802154_SUBMAC_FSM_RETURN_TRANSITION) {
 
-                        DEBUG("IEEE802154 submac: Sending ACK failed with status: %d\n",
+                        DEBUG("IEEE802154 submac: Sending ACK failed with status: %ld\n",
                                 submac->fsm_context_res);
                     }
                     else {
