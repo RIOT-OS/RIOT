@@ -288,7 +288,7 @@ check_files_in_boards_not_reference_board_var() {
     pathspec+=(':!boards/common/nrf52/Makefile.include')
 
     git -C "${RIOTBASE}" grep -n "${patterns[@]}" -- "${pathspec[@]}" \
-        | error_with_message "Code in boards/ should not use \$(BOARDS) to reference files since this breaks external BOARDS changing BOARDSDIR"
+        | error_with_message "Code in boards/ should not use \$(BOARDS) to reference files since this breaks external BOARDS changing EXTERNAL_BOARD_DIRS"
 }
 
 check_no_pseudomodules_in_makefile_dep() {

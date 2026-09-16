@@ -115,21 +115,6 @@ ifneq ($(abspath $(RIOTBASE)/boards),$(abspath $(RIOTBOARD)))
   __DIRECTORY_VARIABLES += RIOTBOARD
 endif
 
-# Only warn users, not the CI.
-ifneq ($(RIOT_CI_BUILD),1)
-  # Do not warn when set from sub-make
-  ifeq ($(MAKELEVEL),0)
-    ifneq (,$(BOARDSDIR))
-      $(warning Using BOARDSDIR is deprecated use EXTERNAL_BOARD_DIRS instead)
-    endif
-  endif
-endif
-
-# Needed for backward compatibility:
-ifneq (,$(BOARDSDIR))
-  EXTERNAL_BOARD_DIRS += $(BOARDSDIR)
-endif
-
 # Make all paths absolute.
 override RIOTBASE               := $(abspath $(RIOTBASE))
 override RIOTCPU                := $(abspath $(RIOTCPU))
@@ -251,10 +236,6 @@ BOARDSDIRS := $(EXTERNAL_BOARD_DIRS) $(RIOTBOARD)
 BOARDDIR := $(word 1,$(foreach dir,$(BOARDSDIRS),$(wildcard $(dir)/$(BOARD)/.)))
 # Sanitize folder
 BOARDDIR := $(abspath $(BOARDDIR))
-
-# Also provide BOARDSDIR for compatibility and for accessing common folders
-# (e.g. include $(BOARDSDIR)/common/external_common/Makefile.dep)
-BOARDSDIR := $(dir $(BOARDDIR))
 
 ifeq (,$(BOARDDIR))
   $(info Folders searched for the board: $(BOARDSDIRS))
