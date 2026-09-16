@@ -17,3 +17,8 @@ PYTERMFLAGS +=  --set-rts 0
 
 # stm32loader programmer is supported
 PROGRAMMERS_SUPPORTED += stm32loader
+
+include $(RIOTBASE)/makefiles/color.inc.mk
+$(call echowarn,("The lobaro-lorabox board is deprecated and will be removed"\
+                 "after the 2027.04 Release! If you are still using it"\
+                 "actively, please notify the maintainers."))

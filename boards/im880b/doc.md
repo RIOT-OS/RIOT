@@ -2,6 +2,10 @@
 @ingroup     boards
 @brief       Support for the im880b with stm32l151cb-a
 
+@warning The im880b board is deprecated and will be removed after the
+         2027.04 Release! If you are still using it actively, please
+         notify the maintainers.
+
 ## Hardware
 
 ![LoraBox](https://www.wireless-solutions.de/images/stories/products/im880a.png)
