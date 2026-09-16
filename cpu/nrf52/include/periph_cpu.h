@@ -85,6 +85,14 @@ typedef enum {
 #endif
 
 /**
+ * @brief   Structure for PDM configuration data
+ */
+typedef struct {
+    uint8_t din_pin;            /**< DIN pin */
+    uint8_t clk_pin;            /**< CLK pin */
+} pdm_conf_t;
+
+/**
  * @brief Common SPI/I2C interrupt callback
  *
  * @param   arg     Opaque context pointer
@@ -142,14 +150,6 @@ void nrf5x_spi_acquire(NRF_SPIM_Type *bus, spi_twi_irq_cb_t cb, void *arg);
  * @param   bus bus to release exclusive access on
  */
 void nrf5x_spi_release(NRF_SPIM_Type *bus);
-
-/**
- * @brief   Structure for PDM configuration data
- */
-typedef struct {
-    uint8_t din_pin;            /**< DIN pin */
-    uint8_t clk_pin;            /**< CLK pin */
-} pdm_conf_t;
 
 #ifdef __cplusplus
 }
