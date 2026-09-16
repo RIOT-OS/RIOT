@@ -209,4 +209,4 @@ All code files contain licensing information.
 For more information, see the [RIOT website][riot-website].
 
 [riot-website]: https://www.riot-os.org
-[board-selection]: boards/doc.md
+[board-selection]: https://api.riot-os.org/group__boards.html
