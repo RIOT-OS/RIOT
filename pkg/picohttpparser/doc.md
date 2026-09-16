@@ -2,17 +2,15 @@
 @ingroup  pkg
 @brief    Provides a minimal, dependency-free HTTP/1.x request parser
 
-# PicoHTTPParser
-
 [PicoHTTPParser](https://github.com/h2o/picohttpparser) is a tiny, primitive,
 fast HTTP request/response parser.
 
-It only parses HTTP/1.x requests and responses. It is not a webserver and not a
-HTTP client, nor does it open sockets, allocate buffer bodies or generate
+It only parses HTTP/1.x requests and responses. It is neither a webserver, nor
+an HTTP client. It does not open sockets, allocate buffer bodies or build
 responses. Unlike most parsers, it is stateless and does not allocate memory by
 itself. All it does is accept a pointer to the buffer and the output structure,
 and sets up the pointers in the latter to point at the necessary portions of
-the buffer
+the buffer.
 
 ## Usage
 The parser must be added to the `Makefile` with
@@ -23,7 +21,7 @@ USEPKG += picohttpparser
 
 Then, include the header file `picohttpparser.h` and start using the
 `phr_parse_request` or `phr_parse_response` functions. Both implementations do
-not copy the data, it only sets pointers to the data in the buffer, so the
+not copy the data, they only set pointers to the data in the buffer, so the
 buffer must remain valid during processing.
 
 ## As a request parser
@@ -32,7 +30,6 @@ Below is a minimal example of how to use the parser to parse an HTTP request
 that is stored in a buffer `request`.
 
 ```c
-
 #define MAX_HEADERS 8
 
 const char *method;
@@ -64,7 +61,6 @@ Below is a minimal example of how to use the parser to parse an HTTP response
 that is stored in a buffer `response`.
 
 ```c
-
 #define MAX_HEADERS 8
 
 int minor_version;

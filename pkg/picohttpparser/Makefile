@@ -1,6 +1,7 @@
 PKG_NAME = picohttpparser
 PKG_URL = https://github.com/h2o/picohttpparser
-PKG_VERSION = f4d94b48b31e0abae029ebeafcfd9ca0680ede58
+# v1.2
+PKG_VERSION = 539bb9f510f5aefc8efda53aaf822a21ecae2832
 PKG_LICENSE = MIT
 
 include $(RIOTBASE)/pkg/pkg.mk
