@@ -12,7 +12,10 @@ BOARDS_SUPPORTED += adafruit-clue \
                    cc2538dk \
                    derfmega128 \
                    derfmega256 \
+                   esp32c6-devkit \
+                   esp32h2-devkit \
                    feather-nrf52840 \
+                   frdm-kw41z \
                    microduino-corerf \
                    native \
                    nrf52840dk \
@@ -22,13 +25,17 @@ BOARDS_SUPPORTED += adafruit-clue \
                    nucleo-f303re \
                    nucleo-wl55jc \
                    omote \
+                   openlabs-kw41z-mini \
                    openmote-cc2538 \
+                   pba-d-01-kw2x \
+                   phynode-kw41z \
                    reel \
                    remote-pa \
                    remote-reva \
                    remote-revb \
                    samr21-xpro \
-                   pba-d-01-kw2x \
+                   seeedstudio-xiao-esp32c6 \
+                   usb-kw41z \
                    zigduino \
                    #
 
