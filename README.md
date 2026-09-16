@@ -52,6 +52,8 @@ LGPL code.
   - Take the [RIOT online course][riot-course] at your own pace
 - **Explore the API:** Check out the [API documentation][api-docs]
   for detailed information on RIOT's features and functions.
+- **Find your board:** Check the [Board Selection Guide][board-selection]
+  to find the best hardware for your project.
 
 [getting-started]: https://guide.riot-os.org/getting-started/installing/
 [tutorials]: https://github.com/RIOT-OS/Tutorials
@@ -207,3 +209,4 @@ All code files contain licensing information.
 For more information, see the [RIOT website][riot-website].
 
 [riot-website]: https://www.riot-os.org
+[board-selection]: boards/doc.md
