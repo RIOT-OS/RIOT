@@ -25,10 +25,8 @@ Maybe one really wants to check the signals are correct, there is a
 
 One can run the following
 ```shell
-make flash test > /tmp/pdm && \
-../../../dist/tools/pdm_to_wav/pdm_to_wav.py \
-/tmp/pdm \
---output-file /tmp/output
+make flash test > /tmp/pdm
+../../../dist/tools/pdm_to_wav/pdm_to_wav.py /tmp/pdm --output-file /tmp/output
 ```
 
 After that you can open the `/tmp/output.wav` file to verify the recording and
