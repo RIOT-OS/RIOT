@@ -88,8 +88,8 @@ typedef enum {
  * @brief   Structure for PDM configuration data
  */
 typedef struct {
-    uint8_t din_pin;            /**< DIN pin */
-    uint8_t clk_pin;            /**< CLK pin */
+    gpio_t din_pin;            /**< DIN pin */
+    gpio_t clk_pin;            /**< CLK pin */
 } pdm_conf_t;
 
 /**
