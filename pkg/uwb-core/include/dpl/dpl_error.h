@@ -41,7 +41,7 @@ enum dpl_error {
     DPL_OS_NOT_STARTED = OS_NOT_STARTED,
     DPL_ENOENT = OS_ENOENT,
     DPL_EBUSY = OS_EBUSY,
-    DPL_ERROR = OS_ERROR ,
+    DPL_ERROR = OS_ERROR,
 };
 
 /**
