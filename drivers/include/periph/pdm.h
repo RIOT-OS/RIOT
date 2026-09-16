@@ -104,8 +104,8 @@ typedef struct {
  * @param[in] cb        data received callback function
  * @param[in] arg       context passed to the callback function
  *
- * @retval  >0   actual configured PDM sample rate in Hz on success
- * @retval  <0   on error
+ * @retval  >0          actual configured PDM sample rate in Hz on success
+ * @retval  -ENOTSUP    @p mode is not supported
  */
 int32_t pdm_init(pdm_mode_t mode, uint32_t rate, int8_t gain,
                  pdm_data_cb_t cb, void *arg);
