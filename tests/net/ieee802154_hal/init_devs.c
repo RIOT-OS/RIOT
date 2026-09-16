@@ -121,6 +121,7 @@ void ieee802154_hal_test_init_devs(ieee802154_dev_cb_t cb, void *opaque)
             break;
         }
     }
+    return;
 #endif
 
 #ifdef MODULE_KW2XRF
