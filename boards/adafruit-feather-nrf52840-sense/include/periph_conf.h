@@ -19,6 +19,7 @@
  *
  */
 
+#include "board.h"
 #include "periph_cpu.h"
 #include "cfg_clock_32_0.h"
 #include "cfg_rtt_default.h"
@@ -88,23 +89,9 @@ static const i2c_conf_t i2c_config[] = {
 /** @} */
 
 /**
- * @name    PDM configuration
+ * @name    PDM pin configuration
  * @{
  */
-#ifndef PDM_DIN_PIN
-/**
- * @brief   GPIO pin for the data line
- */
-#  define PDM_DIN_PIN GPIO_PIN(0, 0)
-#endif
-
-#ifndef PDM_CLK_PIN
-/**
- * @brief   GPIO pin for the clock
- */
-#  define PDM_CLK_PIN GPIO_PIN(0, 1)
-#endif
-
 /**
  * @brief   PDM pin configuration
  */
