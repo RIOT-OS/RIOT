@@ -161,18 +161,6 @@ extern "C" {
 #endif
 
 /**
- * @brief   Minimum wait time in microseconds after a send operation
- *
- * @experimental
- *
- * This is purely meant as a debugging feature to slow down a radios sending.
- */
-#ifndef CONFIG_GNRC_NETIF_MIN_WAIT_AFTER_SEND_US
-#define CONFIG_GNRC_NETIF_MIN_WAIT_AFTER_SEND_US   (0U)
-#endif
-/** @} */
-
-/**
  * @brief   Message queue size for network interface threads
  */
 #ifndef GNRC_NETIF_MSG_QUEUE_SIZE
@@ -206,3 +194,4 @@ extern "C" {
 #ifdef __cplusplus
 }
 #endif
+/** @} */
