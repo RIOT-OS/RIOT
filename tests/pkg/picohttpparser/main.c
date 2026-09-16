@@ -19,24 +19,12 @@
  * @}
  */
 
-#include <stdbool.h>
 #include <string.h>
 
 #include "embUnit.h"
 #include "picohttpparser.h"
 
 #define MAX_HEADERS (8)
-
-/**
- * @brief   Compares a buffer with an expected string
- *
- * The use of `strncmp` is avoided, because `strncmp` with a length taken from
- * the buffer provides prefix matching, not equality.
- */
-static bool _str_is(const char *buf, size_t len, const char *expected)
-{
-    return strlen(expected) == len && memcmp(buf, expected, len) == 0;
-}
 
 static void test_picohttpparser_request_simple(void)
 {
@@ -55,8 +43,10 @@ static void test_picohttpparser_request_simple(void)
                                 &num_headers, 0);
 
     TEST_ASSERT_EQUAL_INT((int)(sizeof(request) - 1), res);
-    TEST_ASSERT(_str_is(method, method_len, "GET"));
-    TEST_ASSERT(_str_is(path, path_len, "/"));
+    TEST_ASSERT(strncmp(method, "GET", method_len) == 0);
+    TEST_ASSERT_EQUAL_INT((int)strlen("GET"), (int)method_len);
+    TEST_ASSERT(strncmp(path, "/", path_len) == 0);
+    TEST_ASSERT_EQUAL_INT((int)strlen("/"), (int)path_len);
     TEST_ASSERT_EQUAL_INT(1, minor_version);
     TEST_ASSERT_EQUAL_INT(0, (int)num_headers);
 }
@@ -84,18 +74,31 @@ static void test_picohttpparser_request_headers(void)
                                 &num_headers, 0);
 
     TEST_ASSERT_EQUAL_INT((int)(sizeof(request) - 1), res);
-    TEST_ASSERT(_str_is(method, method_len, "POST"));
-    TEST_ASSERT(_str_is(path, path_len, "/api/data"));
+    TEST_ASSERT(strncmp(method, "POST", method_len) == 0);
+    TEST_ASSERT_EQUAL_INT((int)strlen("POST"), (int)method_len);
+    TEST_ASSERT(strncmp(path, "/api/data", path_len) == 0);
+    TEST_ASSERT_EQUAL_INT((int)strlen("/api/data"), (int)path_len);
     TEST_ASSERT_EQUAL_INT(4, (int)num_headers);
 
-    TEST_ASSERT(_str_is(headers[0].name, headers[0].name_len, "Host"));
-    TEST_ASSERT(_str_is(headers[0].value, headers[0].value_len, "example.com"));
-    TEST_ASSERT(_str_is(headers[1].name, headers[1].name_len, "Content-Type"));
-    TEST_ASSERT(_str_is(headers[1].value, headers[1].value_len, "application/json"));
-    TEST_ASSERT(_str_is(headers[2].name, headers[2].name_len, "Content-Length"));
-    TEST_ASSERT(_str_is(headers[2].value, headers[2].value_len, "13"));
-    TEST_ASSERT(_str_is(headers[3].name, headers[3].name_len, "X-Custom-Header"));
-    TEST_ASSERT(_str_is(headers[3].value, headers[3].value_len, "CustomValue"));
+    TEST_ASSERT(strncmp(headers[0].name, "Host", headers[0].name_len) == 0);
+    TEST_ASSERT_EQUAL_INT((int)strlen("Host"), (int)headers[0].name_len);
+    TEST_ASSERT(strncmp(headers[0].value, "example.com", headers[0].value_len) == 0);
+    TEST_ASSERT_EQUAL_INT((int)strlen("example.com"), (int)headers[0].value_len);
+
+    TEST_ASSERT(strncmp(headers[1].name, "Content-Type", headers[1].name_len) == 0);
+    TEST_ASSERT_EQUAL_INT((int)strlen("Content-Type"), (int)headers[1].name_len);
+    TEST_ASSERT(strncmp(headers[1].value, "application/json", headers[1].value_len) == 0);
+    TEST_ASSERT_EQUAL_INT((int)strlen("application/json"), (int)headers[1].value_len);
+
+    TEST_ASSERT(strncmp(headers[2].name, "Content-Length", headers[2].name_len) == 0);
+    TEST_ASSERT_EQUAL_INT((int)strlen("Content-Length"), (int)headers[2].name_len);
+    TEST_ASSERT(strncmp(headers[2].value, "13", headers[2].value_len) == 0);
+    TEST_ASSERT_EQUAL_INT((int)strlen("13"), (int)headers[2].value_len);
+
+    TEST_ASSERT(strncmp(headers[3].name, "X-Custom-Header", headers[3].name_len) == 0);
+    TEST_ASSERT_EQUAL_INT((int)strlen("X-Custom-Header"), (int)headers[3].name_len);
+    TEST_ASSERT(strncmp(headers[3].value, "CustomValue", headers[3].value_len) == 0);
+    TEST_ASSERT_EQUAL_INT((int)strlen("CustomValue"), (int)headers[3].value_len);
 }
 
 static void test_picohttpparser_request_partial(void)
@@ -139,13 +142,17 @@ static void test_picohttpparser_request_body(void)
 
     TEST_ASSERT(res > 0);
     TEST_ASSERT_EQUAL_INT(1, (int)num_headers);
-    TEST_ASSERT(_str_is(headers[0].name, headers[0].name_len, "Content-Length"));
-    TEST_ASSERT(_str_is(headers[0].value, headers[0].value_len, "13"));
+
+    TEST_ASSERT(strncmp(headers[0].name, "Content-Length", headers[0].name_len) == 0);
+    TEST_ASSERT_EQUAL_INT((int)strlen("Content-Length"), (int)headers[0].name_len);
+    TEST_ASSERT(strncmp(headers[0].value, "13", headers[0].value_len) == 0);
+    TEST_ASSERT_EQUAL_INT((int)strlen("13"), (int)headers[0].value_len);
 
     const char *body = request + res;
     size_t body_len = (sizeof(request) - 1) - (size_t)res;
 
-    TEST_ASSERT(_str_is(body, body_len, "Hello, World!"));
+    TEST_ASSERT(strncmp(body, "Hello, World!", body_len) == 0);
+    TEST_ASSERT_EQUAL_INT((int)strlen("Hello, World!"), (int)body_len);
 }
 
 static void test_picohttpparser_response_simple(void)
@@ -165,7 +172,8 @@ static void test_picohttpparser_response_simple(void)
     TEST_ASSERT_EQUAL_INT((int)(sizeof(response) - 1), res);
     TEST_ASSERT_EQUAL_INT(1, minor_version);
     TEST_ASSERT_EQUAL_INT(200, status);
-    TEST_ASSERT(_str_is(msg, msg_len, "OK"));
+    TEST_ASSERT(strncmp(msg, "OK", msg_len) == 0);
+    TEST_ASSERT_EQUAL_INT((int)strlen("OK"), (int)msg_len);
     TEST_ASSERT_EQUAL_INT(0, (int)num_headers);
 }
 
@@ -191,15 +199,24 @@ static void test_picohttpparser_response_headers(void)
     TEST_ASSERT_EQUAL_INT((int)(sizeof(response) - 1), res);
     TEST_ASSERT_EQUAL_INT(1, minor_version);
     TEST_ASSERT_EQUAL_INT(404, status);
-    TEST_ASSERT(_str_is(msg, msg_len, "Not Found"));
+    TEST_ASSERT(strncmp(msg, "Not Found", msg_len) == 0);
+    TEST_ASSERT_EQUAL_INT((int)strlen("Not Found"), (int)msg_len);
     TEST_ASSERT_EQUAL_INT(3, (int)num_headers);
 
-    TEST_ASSERT(_str_is(headers[0].name, headers[0].name_len, "Content-Type"));
-    TEST_ASSERT(_str_is(headers[0].value, headers[0].value_len, "text/plain"));
-    TEST_ASSERT(_str_is(headers[1].name, headers[1].name_len, "Content-Length"));
-    TEST_ASSERT(_str_is(headers[1].value, headers[1].value_len, "9"));
-    TEST_ASSERT(_str_is(headers[2].name, headers[2].name_len, "X-Custom-Header"));
-    TEST_ASSERT(_str_is(headers[2].value, headers[2].value_len, "CustomValue"));
+    TEST_ASSERT(strncmp(headers[0].name, "Content-Type", headers[0].name_len) == 0);
+    TEST_ASSERT_EQUAL_INT((int)strlen("Content-Type"), (int)headers[0].name_len);
+    TEST_ASSERT(strncmp(headers[0].value, "text/plain", headers[0].value_len) == 0);
+    TEST_ASSERT_EQUAL_INT((int)strlen("text/plain"), (int)headers[0].value_len);
+
+    TEST_ASSERT(strncmp(headers[1].name, "Content-Length", headers[1].name_len) == 0);
+    TEST_ASSERT_EQUAL_INT((int)strlen("Content-Length"), (int)headers[1].name_len);
+    TEST_ASSERT(strncmp(headers[1].value, "9", headers[1].value_len) == 0);
+    TEST_ASSERT_EQUAL_INT((int)strlen("9"), (int)headers[1].value_len);
+
+    TEST_ASSERT(strncmp(headers[2].name, "X-Custom-Header", headers[2].name_len) == 0);
+    TEST_ASSERT_EQUAL_INT((int)strlen("X-Custom-Header"), (int)headers[2].name_len);
+    TEST_ASSERT(strncmp(headers[2].value, "CustomValue", headers[2].value_len) == 0);
+    TEST_ASSERT_EQUAL_INT((int)strlen("CustomValue"), (int)headers[2].value_len);
 }
 
 static void test_picohttpparser_response_partial(void)
@@ -239,13 +256,17 @@ static void test_picohttpparser_response_body(void)
 
     TEST_ASSERT(res > 0);
     TEST_ASSERT_EQUAL_INT(1, (int)num_headers);
-    TEST_ASSERT(_str_is(headers[0].name, headers[0].name_len, "Content-Length"));
-    TEST_ASSERT(_str_is(headers[0].value, headers[0].value_len, "13"));
+
+    TEST_ASSERT(strncmp(headers[0].name, "Content-Length", headers[0].name_len) == 0);
+    TEST_ASSERT_EQUAL_INT((int)strlen("Content-Length"), (int)headers[0].name_len);
+    TEST_ASSERT(strncmp(headers[0].value, "13", headers[0].value_len) == 0);
+    TEST_ASSERT_EQUAL_INT((int)strlen("13"), (int)headers[0].value_len);
 
     const char *body = response + res;
     size_t body_len = (sizeof(response) - 1) - (size_t)res;
 
-    TEST_ASSERT(_str_is(body, body_len, "Hello, World!"));
+    TEST_ASSERT(strncmp(body, "Hello, World!", body_len) == 0);
+    TEST_ASSERT_EQUAL_INT((int)strlen("Hello, World!"), (int)body_len);
 }
 
 static void test_picohttpparser_headers_simple(void)
@@ -265,12 +286,20 @@ static void test_picohttpparser_headers_simple(void)
     TEST_ASSERT_EQUAL_INT((int)(sizeof(raw_headers) - 1), res);
     TEST_ASSERT_EQUAL_INT(3, (int)num_headers);
 
-    TEST_ASSERT(_str_is(headers[0].name, headers[0].name_len, "Host"));
-    TEST_ASSERT(_str_is(headers[0].value, headers[0].value_len, "example.com"));
-    TEST_ASSERT(_str_is(headers[1].name, headers[1].name_len, "Connection"));
-    TEST_ASSERT(_str_is(headers[1].value, headers[1].value_len, "close"));
-    TEST_ASSERT(_str_is(headers[2].name, headers[2].name_len, "X-Custom-Header"));
-    TEST_ASSERT(_str_is(headers[2].value, headers[2].value_len, "CustomValue"));
+    TEST_ASSERT(strncmp(headers[0].name, "Host", headers[0].name_len) == 0);
+    TEST_ASSERT_EQUAL_INT((int)strlen("Host"), (int)headers[0].name_len);
+    TEST_ASSERT(strncmp(headers[0].value, "example.com", headers[0].value_len) == 0);
+    TEST_ASSERT_EQUAL_INT((int)strlen("example.com"), (int)headers[0].value_len);
+
+    TEST_ASSERT(strncmp(headers[1].name, "Connection", headers[1].name_len) == 0);
+    TEST_ASSERT_EQUAL_INT((int)strlen("Connection"), (int)headers[1].name_len);
+    TEST_ASSERT(strncmp(headers[1].value, "close", headers[1].value_len) == 0);
+    TEST_ASSERT_EQUAL_INT((int)strlen("close"), (int)headers[1].value_len);
+
+    TEST_ASSERT(strncmp(headers[2].name, "X-Custom-Header", headers[2].name_len) == 0);
+    TEST_ASSERT_EQUAL_INT((int)strlen("X-Custom-Header"), (int)headers[2].name_len);
+    TEST_ASSERT(strncmp(headers[2].value, "CustomValue", headers[2].value_len) == 0);
+    TEST_ASSERT_EQUAL_INT((int)strlen("CustomValue"), (int)headers[2].value_len);
 }
 
 Test *tests_picohttpparser(void)
