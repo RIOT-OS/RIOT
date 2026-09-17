@@ -215,12 +215,13 @@ static ieee802154_submac_fsm_return_t _tx_end(ieee802154_submac_t *submac, int s
     /* notify upper layer after ACK transmission about reception */
     if (!_does_send_ack(dev) && submac->fsm.fsm_state_cb == _fsm_state_tx_ack) {
         DEBUG("IEEE802154 submac: ACK transmission done\n");
-        submac->cb->rx_done(submac);
+        submac->dispatch = IEEE802154_FSM_DISPATCH_RX_DONE;
     }
     else
 #endif
     {
-        submac->cb->tx_done(submac, status, &submac->tx_info);
+        submac->dispatch = IEEE802154_FSM_DISPATCH_TX_DONE;
+        submac->tx_info.status = status;
     }
     return _state_transition(&submac->fsm, _fsm_state_idle);
 }
@@ -357,7 +358,7 @@ static ieee802154_submac_fsm_return_t _fsm_state_rx(ieee802154_submac_t *submac,
 #else
         if (ieee802154_radio_len(&submac->dev) > (int)IEEE802154_MIN_FRAME_LEN) {
 #endif
-            submac->cb->rx_done(submac);
+            submac->dispatch = IEEE802154_FSM_DISPATCH_RX_DONE;
             return _state_transition(&submac->fsm, _fsm_state_idle);
         }
         else {
@@ -673,7 +674,21 @@ int ieee802154_submac_process_ev(ieee802154_submac_t *submac,
         last_event = IEEE802154_FSM_EV_ENTRY;
     }
     atomic_store_u8(&submac->fsm.busy_status, false);
-    return res;
+    ieee802154_fsm_dispatch_t dispatch = submac->dispatch;
+    submac->dispatch = IEEE802154_FSM_DISPATCH_NONE;
+
+    switch (dispatch) {
+        case IEEE802154_FSM_DISPATCH_TX_DONE:
+            submac->cb->tx_done(submac, submac->tx_info.status, &submac->tx_info);
+            break;
+        case IEEE802154_FSM_DISPATCH_RX_DONE:
+            submac->cb->rx_done(submac);
+            break;
+        default:
+            break;
+    }
+
+    return submac->fsm_context_res;
 }
 
 int ieee802154_send(ieee802154_submac_t *submac, const iolist_t *iolist)
@@ -915,6 +930,7 @@ int ieee802154_submac_init(ieee802154_submac_t *submac, const network_uint16_t *
     ieee802154_dev_t *dev = &submac->dev;
 
     submac->fsm.fsm_state_cb = _fsm_state_rx;
+    submac->dispatch = IEEE802154_FSM_DISPATCH_NONE;
 
 #if IS_USED(MODULE_IEEE802154_SUBMAC_SOFT_ACK)
     submac->rx_len = 0;

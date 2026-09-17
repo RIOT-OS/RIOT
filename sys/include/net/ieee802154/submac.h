@@ -205,6 +205,15 @@ typedef struct {
 } ieee802154_fsm_t;
 
 /**
+ * @brief Dispatch status of the FSM
+ */
+typedef enum {
+    IEEE802154_FSM_DISPATCH_NONE,               /**< no event to dispatch */
+    IEEE802154_FSM_DISPATCH_TX_DONE,            /**< dispatch TX Done event */
+    IEEE802154_FSM_DISPATCH_RX_DONE,            /**< dispatch RX Done event */
+} ieee802154_fsm_dispatch_t;
+
+/**
  * @brief IEEE 802.15.4 SubMAC descriptor
  */
 struct ieee802154_submac {
@@ -229,6 +238,7 @@ struct ieee802154_submac {
     const iolist_t *psdu;               /**< stores the current PSDU */
     uint8_t tx_ftype;                   /**< ftype of the lastest transmitted frame */
     ieee802154_tx_info_t tx_info;       /**< stores the transmission info */
+    ieee802154_fsm_dispatch_t dispatch; /**< store the dispatch status */
 #if IS_USED(MODULE_IEEE802154_SUBMAC_SOFT_ACK)
     uint8_t rx_buf[IEEE802154_FRAME_LEN_MAX]; /**< stores received frame */
     size_t rx_len;                      /**< stores length of received frame */
