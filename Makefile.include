@@ -1072,9 +1072,6 @@ ifneq (,$(filter openv-%,$(MAKECMDGOALS)))
   include $(RIOTBASE)/dist/tools/openvisualizer/makefile.openvisualizer.inc.mk
 endif
 
-# Include desvirt Makefile
-include $(RIOTTOOLS)/desvirt/Makefile.desvirt
-
 # Build a header file with all common macro definitions and undefinitions
 # Everytime the header is updated, it will trigger a new compilation.
 #
