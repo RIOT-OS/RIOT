@@ -659,7 +659,6 @@ static size_t _iphc_nhc_ipv6_ext_decode(gnrc_pktsnip_t *sixlo, size_t offset,
 }
 
 static size_t _iphc_nhc_ipv6_decode(gnrc_pktsnip_t *sixlo, size_t offset,
-                                    const gnrc_sixlowpan_frag_rb_t *rbuf,
                                     size_t *prev_nh_offset,
                                     gnrc_pktsnip_t *ipv6,
                                     size_t *uncomp_hdr_len)
@@ -687,7 +686,6 @@ static size_t _iphc_nhc_ipv6_decode(gnrc_pktsnip_t *sixlo, size_t offset,
             gnrc_pktsnip_t *netif = gnrc_pktsnip_search_type(sixlo,
                                                              GNRC_NETTYPE_NETIF);
             ipv6_hdr_t *ipv6_hdr;
-            uint16_t payload_len;
             size_t tmp;
 
             if (ipv6_nhc & NHC_IPV6_EXT_NH) {
@@ -731,23 +729,6 @@ static size_t _iphc_nhc_ipv6_decode(gnrc_pktsnip_t *sixlo, size_t offset,
                 *prev_nh_offset = 0;
             }
             offset += tmp;
-            /* might be needed to be overwritten by IPv6 reassembly after the IPv6
-             * packet was reassembled to get complete length */
-            if (rbuf != NULL) {
-                if (_is_rfrag(sixlo)) {
-                    payload_len = (rbuf->super.datagram_size + *uncomp_hdr_len) -
-                                  (sizeof(ipv6_hdr_t) - offset);
-                }
-                else {
-                    payload_len = rbuf->super.datagram_size - *uncomp_hdr_len -
-                                  sizeof(ipv6_hdr_t);
-                }
-            }
-            else {
-                payload_len = (sixlo->size + *uncomp_hdr_len) -
-                              sizeof(ipv6_hdr_t) - offset;
-            }
-            ipv6_hdr->len = byteorder_htons(payload_len);
             *uncomp_hdr_len += sizeof(ipv6_hdr_t);
             break;
         }
@@ -980,7 +961,6 @@ void gnrc_sixlowpan_iphc_recv(gnrc_pktsnip_t *sixlo, void *rbuf_ptr,
                 case NHC_IPV6_EXT_ID_ALT:
                     payload_offset = _iphc_nhc_ipv6_decode(sixlo,
                                                            payload_offset,
-                                                           rbuf,
                                                            &prev_nh_offset,
                                                            ipv6,
                                                            &uncomp_hdr_len);
