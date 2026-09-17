@@ -6,8 +6,9 @@ ifneq (,$(filter prng_fortuna,$(USEMODULE)))
   USEMODULE += hashes
   USEMODULE += crypto
   ifneq (,$(filter fortuna_reseed,$(USEMODULE)))
-      USEMODULE += atomic_utils
-      USEMODULE += xtimer
+    USEMODULE += atomic_utils
+    USEMODULE += ztimer
+    USEMODULE += ztimer_msec
   endif
 endif
 
