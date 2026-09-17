@@ -2039,9 +2039,6 @@ static void *_gnrc_netif_thread(void *args)
 #endif
     /* now let rest of GNRC use the interface */
     gnrc_netif_release(netif);
-#if (CONFIG_GNRC_NETIF_MIN_WAIT_AFTER_SEND_US > 0U)
-    uint32_t last_wakeup = ztimer_now(ZTIMER_USEC);
-#endif
 
     while (1) {
         msg_t msg;
@@ -2061,16 +2058,6 @@ static void *_gnrc_netif_thread(void *args)
             case GNRC_NETAPI_MSG_TYPE_SND:
                 DEBUG("gnrc_netif: GNRC_NETDEV_MSG_TYPE_SND received\n");
                 _send(netif, msg.content.ptr, false);
-#if (CONFIG_GNRC_NETIF_MIN_WAIT_AFTER_SEND_US > 0U)
-                ztimer_periodic_wakeup(
-                        ZTIMER_USEC,
-                        &last_wakeup,
-                        CONFIG_GNRC_NETIF_MIN_WAIT_AFTER_SEND_US
-                    );
-                /* override last_wakeup in case last_wakeup +
-                 * CONFIG_GNRC_NETIF_MIN_WAIT_AFTER_SEND_US was in the past */
-                last_wakeup = ztimer_now(ZTIMER_USEC);
-#endif
                 break;
             case GNRC_NETAPI_MSG_TYPE_SET:
                 opt = msg.content.ptr;
