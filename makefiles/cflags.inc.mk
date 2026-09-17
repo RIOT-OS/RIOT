@@ -72,7 +72,7 @@ endif
 # Check if linker supports `-z noexecstack`. Handle BUILD_IN_DOCKER separately,
 # as this is run in the host environment rather than inside the container. We
 # just hardcode this in the BUILD_IN_DOCKER case for now.
-LINKER_SUPPORTS_NOEXECSTACK ?= $(shell LC_ALL=C $(LINK) $(RIOTTOOLS)/testprogs/minimal_linkable.c -o /dev/null -lc -Wall -Wextra -pedantic -z noexecstack 2> /dev/null && echo 1 || echo 0)
+LINKER_SUPPORTS_NOEXECSTACK ?= $(shell LC_ALL=C $(LINK) $(RIOTTOOLS)/testprogs/minimal_linkable.c -o /dev/null -lc -Wall -Wextra -pedantic -z noexecstack > /dev/null 2>&1 && echo 1 || echo 0)
 TOOLCHAIN_CAPABILITY_VARS += LINKER_SUPPORTS_NOEXECSTACK
 
 # As we do not use nested functions or other stuff requiring trampoline code,
