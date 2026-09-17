@@ -364,7 +364,11 @@ toolchain_capabilities_available() {
         echo "$capabilities" | toolchain_capabilities_put "$board" "$toolchain"
     fi
 
-    eval "export $(echo "$capabilities" | tr '\n' ' ')"
+    while IFS= read -r line; do
+        [ -n "$line" ] && export "$line"
+    done <<EOF
+$(echo "$capabilities" | grep -E '^[A-Za-z_][A-Za-z0-9_]*=')
+EOF
 }
 
 # compile one app for one board with one toolchain. delete intermediates.
