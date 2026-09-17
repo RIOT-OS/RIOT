@@ -219,7 +219,6 @@ struct ieee802154_submac {
     uint16_t panid;                     /**< IEEE 802.15.4 PAN ID */
     uint16_t channel_num;               /**< IEEE 802.15.4 channel number */
     uint8_t channel_page;               /**< IEEE 802.15.4 channel page */
-    uint8_t retrans;                    /**< current number of retransmissions */
     uint8_t csma_retries_nb;            /**< current number of CSMA-CA retries */
     uint8_t backoff_mask;               /**< internal value used for random backoff calculation */
     uint8_t csma_retries;               /**< maximum number of CSMA-CA retries */
@@ -229,6 +228,7 @@ struct ieee802154_submac {
     ieee802154_phy_mode_t phy_mode;     /**< IEEE 802.15.4 PHY mode */
     const iolist_t *psdu;               /**< stores the current PSDU */
     uint8_t tx_ftype;                   /**< ftype of the lastest transmitted frame */
+    ieee802154_tx_info_t tx_info;       /**< stores the transmission info */
 #if IS_USED(MODULE_IEEE802154_SUBMAC_SOFT_ACK)
     uint8_t rx_buf[IEEE802154_FRAME_LEN_MAX]; /**< stores received frame */
     size_t rx_len;                      /**< stores length of received frame */
