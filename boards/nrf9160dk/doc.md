@@ -35,6 +35,18 @@ A secure image has to be present in flash; the non-secure application does not
 boot on its own. The secure image configures which flash, RAM and
 peripherals are handed over to the non-secure world.
 
+With the `riot-tee` package selected, the application is in addition linked
+behind the flash and RAM region that the secure image reserves for itself.
+
+Both images are built, merged and flashed together with the `tee-flash` target:
+
+```shell
+make BOARD=nrf9160dk -C tests/sys/psa_riot_tee tee-flash
+```
+
+This requires `mergehex` (shipped with the Nordic command line tools) to be
+installed and available in `PATH`.
+
 ### Accessing STDIO via UART
 
 The STDIO is directly accessible via the USB port. On a Linux host, it's
