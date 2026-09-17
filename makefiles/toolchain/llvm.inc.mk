@@ -98,4 +98,5 @@ OPTIONAL_CFLAGS_BLACKLIST += -fno-delete-null-pointer-checks
 OPTIONAL_CFLAGS_BLACKLIST += -Wformat-overflow
 OPTIONAL_CFLAGS_BLACKLIST += -Wformat-truncation
 
-LLVM_VERSION := $(shell command -v $(CC) > /dev/null && $(CC) -dumpversion | cut -d . -f 1)
+# Parse only the major version of LLVM
+LLVM_VERSION := $(firstword $(subst ., ,$(shell command -v $(CC) > /dev/null && $(CC) -dumpversion)))

@@ -5,8 +5,10 @@ JLINK_PRE_FLASH += r
 # setup OpenOCD for flashing
 OPENOCD_DEBUG_ADAPTER ?= stlink
 
-# default to JLink as programmer, but only if JLinkExe is in $PATH
-ifneq (,$(shell which JLinkExe))
+# default to JLink as programmer if available
+JLINK ?= JLinkExe
+
+ifneq (,$(shell command -v $(JLINK) 2>/dev/null))
   PROGRAMMER ?= jlink
 else
   PROGRAMMER ?= openocd

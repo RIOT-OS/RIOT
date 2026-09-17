@@ -1,4 +1,4 @@
-VARIANT = $(shell echo $(CPU_VARIANT) | tr 'a-z-' 'A-Z_')
+VARIANT = $(call uppercase_and_underscore,$(CPU_VARIANT))
 CFLAGS += -DCPU_VARIANT_$(VARIANT)
 
 LINKER_SCRIPT ?= $(RIOTCPU)/cc26xx_cc13xx/ldscripts/cc26xx_cc13xx.ld

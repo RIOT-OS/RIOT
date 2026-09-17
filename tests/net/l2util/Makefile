@@ -2,6 +2,9 @@ DEVELHELP = 0
 
 include ../Makefile.net_common
 
+# needed for 'uppercase' below, as 'Makefile.include' is only included at the end
+include $(RIOTBASE)/makefiles/utils/strings.mk
+
 USEMODULE += embunit
 USEMODULE += l2util
 
@@ -16,6 +19,6 @@ CHECKED_IFDEF_PATHS = cc110x \
                       nimble_netif
 
 CFLAGS += $(foreach path,$(CHECKED_IFDEF_PATHS),\
-            -DMODULE_$(shell echo $(path) | tr a-z A-Z))
+            -DMODULE_$(call uppercase,$(path)))
 
 include $(RIOTBASE)/Makefile.include
