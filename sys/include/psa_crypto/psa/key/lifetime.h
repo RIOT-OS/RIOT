@@ -226,6 +226,11 @@ typedef uint32_t psa_key_location_t;
 #define PSA_KEY_LOCATION_SE_MAX ((psa_key_location_t)0x8000ff)
 
 /**
+ * @brief   Key is stored in PSA key storage, but was encrypted by RIOT-TEE
+ */
+#define PSA_KEY_LOCATION_LOCAL_SEALED     (PSA_KEY_LOCATION_VENDOR_FLAG | 0x100)
+
+/**
  * @brief   Extract the persistence level from a key lifetime.
  *
  * @param   lifetime The lifetime value to query: a value of type @ref psa_key_lifetime_t.
