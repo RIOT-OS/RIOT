@@ -1,0 +1,13 @@
+# SPDX-FileCopyrightText: 2024 HAW Hamburg
+# SPDX-License-Identifier: LGPL-2.1-only
+
+USEMODULE += cryptoservice_contrib
+USEMODULE += auto_init
+
+# Use the secure world implementation where the platform has one. On platforms
+# without TrustZone-M the feature is simply not used and no secure image is built.
+FEATURES_OPTIONAL += trustzone_m
+
+ifneq (,$(filter trustzone_m,$(FEATURES_USED)))
+  USEPKG += riot-tee
+endif
