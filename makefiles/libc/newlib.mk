@@ -1,6 +1,7 @@
 ifneq (,$(filter newlib_nano,$(USEMODULE)))
   # Test if nano.specs is available
   LINKER_SUPPORTS_NANO_SPECS ?= $(shell $(LINK) -specs=nano.specs -E - 2>/dev/null >/dev/null </dev/null && echo 1 || echo 0)
+  TOOLCHAIN_CAPABILITY_VARS += LINKER_SUPPORTS_NANO_SPECS
   ifeq (1,$(LINKER_SUPPORTS_NANO_SPECS))
     USE_NEWLIB_NANO = 1
     NEWLIB_NANO_NEEDS_SHORT_WCHAR ?= $(shell LC_ALL=C $(LINK) \
@@ -8,6 +9,7 @@ ifneq (,$(filter newlib_nano,$(USEMODULE)))
                                        -lc -specs=nano.specs -Wall -Wextra -pedantic 2>&1 | \
                                        grep -q "use of wchar_t values across objects may fail" \
                                        && echo 1 || echo 0)
+    TOOLCHAIN_CAPABILITY_VARS += NEWLIB_NANO_NEEDS_SHORT_WCHAR
     ifeq (1,$(NEWLIB_NANO_NEEDS_SHORT_WCHAR))
         CFLAGS += -fshort-wchar
         LINKFLAGS += -Wl,--no-wchar-size-warning

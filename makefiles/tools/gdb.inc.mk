@@ -4,6 +4,7 @@ export GDBPREFIX ?= $(PREFIX)
 # gdb-multiarch, there typically is a reason for it - e.g. missing support for
 # that particular target in gdb-multiarch.
 PREFIXED_GDB_AVAILABLE ?= $(shell $(GDBPREFIX)gdb -v > /dev/null 2>&1 && echo 1 || echo 0)
+TOOLCHAIN_CAPABILITY_VARS += PREFIXED_GDB_AVAILABLE
 ifeq (1,$(PREFIXED_GDB_AVAILABLE))
   export GDB ?= $(GDBPREFIX)gdb
 else

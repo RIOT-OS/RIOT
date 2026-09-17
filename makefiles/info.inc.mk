@@ -6,6 +6,7 @@
         check-toolchain-supported \
         info-programmers-supported \
         info-rust \
+        info-toolchain-capabilities \
         generate-Makefile.ci \
         #
 
@@ -265,6 +266,13 @@ check-toolchain-supported:
 
 info-programmers-supported:
 	@echo $(sort $(PROGRAMMERS_SUPPORTED))
+
+# Prints the values discovered by the CC_SUPPORTS_*/LINKER_SUPPORTS_*/etc.
+# `?=` checks, one KEY=VALUE pair per line. This lets the discovery be forced
+# once (e.g. per BOARD/TOOLCHAIN) and the result be fed back into subsequent
+# builds via the environment, instead of every build re-running the checks.
+info-toolchain-capabilities:
+	@$(foreach v,$(TOOLCHAIN_CAPABILITY_VARS),echo $(v)=$($(v));)
 
 info-rust:
 	cargo version

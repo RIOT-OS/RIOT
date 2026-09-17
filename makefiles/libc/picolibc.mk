@@ -1,6 +1,7 @@
 ifneq (,$(filter picolibc,$(USEMODULE)))
   # Test if picolibc.specs is available
   LINKER_SUPPORTS_PICOLIBC_SPECS ?= $(shell $(LINK) -specs=picolibc.specs -E - 2>/dev/null >/dev/null </dev/null && echo 1 || echo 0)
+  TOOLCHAIN_CAPABILITY_VARS += LINKER_SUPPORTS_PICOLIBC_SPECS
   ifeq (1,$(LINKER_SUPPORTS_PICOLIBC_SPECS))
     USE_PICOLIBC = 1
     ifeq (LC_ALL=C $(LINK) $(RIOTTOOLS)/testprogs/minimal_linkable.c -o /dev/null -lc -specs=picolibc.specs -Wall -Wextra -pedantic 2>&1 | grep -q "use of wchar_t values across objects may fail" ; echo $$?),0)
