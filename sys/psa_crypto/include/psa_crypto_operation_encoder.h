@@ -45,6 +45,7 @@ typedef enum {
     PSA_CBC_NO_PAD_AES_192,
     PSA_CBC_NO_PAD_AES_256,
     PSA_CBC_PKCS7_AES_256,
+    PSA_ECB_NO_PAD_AES_128,
     PSA_STREAM_CIPHER_CHACHA20
 } psa_cipher_op_t;
 
@@ -200,7 +201,10 @@ typedef enum {
  * @return  @ref PSA_INVALID_OPERATION  @c alg, @c bits and @c type are not compatible
  */
 #define GET_ECB_NO_PADDING_OPERATION(type, bits) \
-    (PSA_INVALID_OPERATION)
+    ((type == PSA_KEY_TYPE_AES) ? \
+     ((bits == 128) ? PSA_ECB_NO_PAD_AES_128 : \
+      PSA_INVALID_OPERATION) : \
+     PSA_INVALID_OPERATION)
 
 /**
  * @brief Combine key type and size with a PSA_ALG_OFB algorithm
