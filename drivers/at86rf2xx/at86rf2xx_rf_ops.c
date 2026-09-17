@@ -34,6 +34,9 @@
 #define ENABLE_DEBUG (0)
 #include "debug.h"
 
+#define IEEE802154_PAGE_24GHZ_OQPSK 2           /**< page value for 2.4 GHz O-QPSK PHY */
+#define IEEE802154_PAGE_SUB_GHZ_OQPSK_BPSK 0    /**< page value for Sub GHz O-QPSK or BPSK PHY */
+
 static const ieee802154_radio_ops_t at86rf2xx_ops;
 static ieee802154_dev_t *at86rf2xx_periph;
 
@@ -501,7 +504,8 @@ static int _config_phy(ieee802154_dev_t *hal, const ieee802154_phy_conf_t *conf)
 {
     at86rf2xx_t *dev = hal->priv;
     uint16_t channel = conf->channel;
-    uint8_t page = conf->page;
+    uint8_t page = (AT86RF2XX_HAVE_SUBGHZ && conf->phy_mode == IEEE802154_PHY_OQPSK) ?
+                    IEEE802154_PAGE_24GHZ_OQPSK : IEEE802154_PAGE_SUB_GHZ_OQPSK_BPSK;
     int8_t txpower = conf->pow;
 
     if (txpower < (-AT86RF2XX_TXPOWER_OFF_OFFSET)
@@ -819,7 +823,13 @@ int at86rf2xx_init_event(at86rf2xx_bhp_ev_t *bhp, const at86rf2xx_params_t *para
 }
 
 static const ieee802154_radio_ops_t at86rf2xx_ops = {
-    .caps =  IEEE802154_CAP_24_GHZ
+    .caps =
+#if AT86RF2XX_HAVE_SUBGHZ
+            IEEE802154_CAP_SUB_GHZ
+            | IEEE802154_CAP_PHY_BPSK
+#else
+            IEEE802154_CAP_24_GHZ
+#endif
             | IEEE802154_CAP_IRQ_CRC_ERROR
             | IEEE802154_CAP_IRQ_RX_START
             | IEEE802154_CAP_IRQ_TX_DONE
