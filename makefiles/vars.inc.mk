@@ -36,7 +36,6 @@ export DISABLE_MODULE        # Used in the application's Makefile to suppress DE
 export RIOTBASE              # The root folder of RIOT. The folder where this very file lives in.
 export RIOTCPU               # For third party CPUs this folder is the base of the CPUs.
 export RIOTBOARD             # This folder is the base of the riot boards.
-export BOARDSDIR             # This is the folder containing the board dir
 export EXTERNAL_BOARD_DIRS   # List of folders containing external board dirs
 export BOARDDIR              # This folder contains the board
 export RIOTPKG               # For overriding RIOT's pkg directory
