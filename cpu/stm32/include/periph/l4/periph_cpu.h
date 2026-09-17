@@ -24,13 +24,13 @@ extern "C" {
  * @brief   Available number of ADC devices
  */
 #if defined(ADC3)
-#define ADC_DEVS            (3U)
+#  define ADC_DEVS          (3U)
 #elif defined(ADC2)
-#define ADC_DEVS            (2U)
+#  define ADC_DEVS          (2U)
 #elif defined(ADC1)
-#define ADC_DEVS            (1U)
+#  define ADC_DEVS          (1U)
 #else
-#error "Can't determine the number of ADC devices"
+#  error "Can't determine the number of ADC devices"
 #endif
 
 #if defined(CPU_MODEL_STM32L412KB) || defined(CPU_MODEL_STM32L476RG) || \
@@ -41,8 +41,11 @@ extern "C" {
 /**
  * @brief   ADC voltage regulator start-up time [us]
  */
-#define ADC_T_ADCVREG_STUP_US (20)
+#  define ADC_T_ADCVREG_STUP_US (20)
 #endif
+
+/* determined with tests/periph/rtt_min */
+#define RTT_MIN_OFFSET (4U)
 
 #ifndef DOXYGEN
 
@@ -50,13 +53,13 @@ extern "C" {
  * @brief   Starting address of the ROM bootloader
  *          see application note AN2606
  */
-#define STM32_BOOTLOADER_ADDR   (0x1FFF0000)
+#  define STM32_BOOTLOADER_ADDR (0x1FFF0000)
 
 /**
  * @brief   Override ADC resolution values
  * @{
  */
-#define HAVE_ADC_RES_T
+#  define HAVE_ADC_RES_T
 typedef enum {
     ADC_RES_6BIT  = (ADC_CFGR_RES),     /**< ADC resolution: 6 bit */
     ADC_RES_8BIT  = (ADC_CFGR_RES_1),   /**< ADC resolution: 8 bit */
@@ -71,8 +74,8 @@ typedef enum {
  * @name   Constants for internal VBAT ADC line
  * @{
  */
-#define VBAT_ADC_RES        ADC_RES_12BIT
-#define VBAT_ADC_MAX        4095
+#  define VBAT_ADC_RES      ADC_RES_12BIT
+#  define VBAT_ADC_MAX      4095
 /** @} */
 
 #endif /* ndef DOXYGEN */
