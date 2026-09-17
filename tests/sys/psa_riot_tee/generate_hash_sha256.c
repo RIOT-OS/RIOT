@@ -1,0 +1,50 @@
+/*
+ * SPDX-FileCopyrightText: 2024 HAW Hamburg
+ * SPDX-License-Identifier: LGPL-2.1-only
+ */
+
+#include <stdio.h>
+#include <stdint.h>
+
+#include "test_utils.h"
+#include "psa/crypto.h"
+
+static const uint8_t msg[] = {
+    0x09, 0xfc, 0x1a, 0xcc,
+    0xc2, 0x30, 0xa2, 0x05,
+    0xe4, 0xa2, 0x08, 0xe6,
+    0x4a, 0x8f, 0x20, 0x42,
+    0x91, 0xf5, 0x81, 0xa1,
+    0x27, 0x56, 0x39, 0x2d,
+    0xa4, 0xb8, 0xc0, 0xcf,
+    0x5e, 0xf0, 0x2b, 0x95
+};
+static const size_t msg_len = sizeof(msg); // exclude NULL-byte
+
+static const uint8_t hash_sha256[] = {
+    0x4f, 0x44, 0xc1, 0xc7,
+    0xfb, 0xeb, 0xb6, 0xf9,
+    0x60, 0x18, 0x29, 0xf3,
+    0x89, 0x7b, 0xfd, 0x65,
+    0x0c, 0x56, 0xfa, 0x07,
+    0x84, 0x4b, 0xe7, 0x64,
+    0x89, 0x07, 0x63, 0x56,
+    0xac, 0x18, 0x86, 0xa4
+};
+
+static void test_psa_hash_sha256_gen(void)
+{
+    TEST_ASSERT_PSA_SUCCESS(psa_hash_compare(PSA_ALG_SHA_256, msg, msg_len,
+                                             hash_sha256, sizeof(hash_sha256)));
+}
+
+Test* tests_psa_hash_sha256_gen(void)
+{
+    EMB_UNIT_TESTFIXTURES(fixtures) {
+        new_TestFixture(test_psa_hash_sha256_gen),
+    };
+
+    EMB_UNIT_TESTCALLER(tests_psa_hash_sha256_gen, NULL, NULL, fixtures);
+
+    return (Test *)&tests_psa_hash_sha256_gen;
+}
