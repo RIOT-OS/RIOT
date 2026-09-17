@@ -20,8 +20,12 @@
 
 #include "cpu.h"
 
-#ifdef NRF_POWER_S
-#define NRF_POWER NRF_POWER_S
+#if defined(CPU_FAM_NRF53) || defined(CPU_FAM_NRF9160)
+#  ifdef NRF_TRUSTZONE_NONSECURE
+#    define NRF_POWER NRF_POWER_NS
+#  else
+#    define NRF_POWER NRF_POWER_S
+#  endif
 #endif
 
 /* Workaround inconsistency between nRF9160 / nRF53 headers */

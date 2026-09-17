@@ -22,10 +22,11 @@ extern "C" {
 #endif
 
 /**
- * @brief   Compatibility wrapper for nRF9160
+ * @brief   Compatibility wrapper for nRF53 and nRF9160
  */
-#ifdef NRF_FICR_S
-#define NRF_FICR NRF_FICR_S
+#if (defined(CPU_FAM_NRF53) || defined(CPU_FAM_NRF9160)) && \
+    !defined(NRF_TRUSTZONE_NONSECURE)
+#  define NRF_FICR NRF_FICR_S
 #endif
 
 /**

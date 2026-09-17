@@ -35,17 +35,26 @@
 #define PORT_BIT            (1 << 5)
 #define PIN_MASK            (0x1f)
 
-/* Compatibility wrapper defines for nRF9160 */
-#ifdef NRF_P0_S
-#define NRF_P0 NRF_P0_S
+/* Compatibility wrapper defines for nRF53 and nRF9160 */
+#if defined(CPU_FAM_NRF53) || defined(CPU_FAM_NRF9160)
+#  ifdef NRF_TRUSTZONE_NONSECURE
+#    define NRF_P0 NRF_P0_NS
+#  else
+#    define NRF_P0 NRF_P0_S
+#  endif
 #endif
 
-#ifdef NRF_P1_S
-#define NRF_P1 NRF_P1_S
+/* Only the nRF53 has a second GPIO port */
+#ifdef CPU_FAM_NRF53
+#  define NRF_P1 NRF_P1_S
 #endif
 
-#ifdef NRF_GPIOTE0_S
-#define NRF_GPIOTE NRF_GPIOTE0_S
+#if defined(CPU_FAM_NRF53) || defined(CPU_FAM_NRF9160)
+#  ifdef NRF_TRUSTZONE_NONSECURE
+#    define NRF_GPIOTE NRF_GPIOTE1_NS
+#  else
+#    define NRF_GPIOTE NRF_GPIOTE0_S
+#  endif
 #define GPIOTE_IRQn GPIOTE0_IRQn
 #endif
 
@@ -84,6 +93,9 @@ static inline NRF_GPIO_Type *port(gpio_t pin)
 #if (CPU_FAM_NRF51)
     (void) pin;
     return NRF_GPIO;
+#elif defined(CPU_FAM_NRF9160) && defined(NRF_TRUSTZONE_NONSECURE)
+    (void) pin;
+    return NRF_P0_NS;
 #elif defined(NRF_P1)
     return (pin & PORT_BIT) ? NRF_P1 : NRF_P0;
 #else
