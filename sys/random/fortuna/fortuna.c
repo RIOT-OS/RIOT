@@ -171,7 +171,7 @@ static int fortuna_pseudo_random_data(fortuna_state_t *state, uint8_t *out,
 #if IS_USED(MODULE_FORTUNA_RESEED) && FORTUNA_RESEED_INTERVAL_MS > 0
 static void _reseed_callback(void *arg)
 {
-    fortuna_state_t *state = (fortuna_state_t *) arg;
+    fortuna_state_t *state = (fortuna_state_t *)arg;
     atomic_store_u8(&state->needs_reseed, 1);
 }
 
@@ -181,7 +181,8 @@ static void _reseed_timer_set(fortuna_state_t *state)
     ztimer_set(ZTIMER_MSEC, &state->reseed_timer, FORTUNA_RESEED_INTERVAL_MS);
 }
 
-static void _reseed_timer_init(fortuna_state_t *state) {
+static void _reseed_timer_init(fortuna_state_t *state)
+{
     /* initialize reseed timer */
     state->reseed_timer.callback = _reseed_callback;
     state->reseed_timer.arg = state;
@@ -197,7 +198,7 @@ int fortuna_init(fortuna_state_t *state)
     /* set everything to zero, then initialize the pools */
     memset(state, 0, sizeof(fortuna_state_t));
 
-    for (int i = 0; i < (int) FORTUNA_POOLS; i++) {
+    for (unsigned i = 0; i < FORTUNA_POOLS; i++) {
         sha256_init(&state->pools[i].ctx);
     }
 
@@ -236,7 +237,7 @@ int fortuna_random_data(fortuna_state_t *state, uint8_t *out, size_t bytes)
 
         fortuna_reseed_init(state);
 
-        for (int i = 0; i < (int) FORTUNA_POOLS; i++) {
+        for (unsigned i = 0; i < FORTUNA_POOLS; i++) {
             /* pool i is included if 2^i divides the reseed counter */
             if ((state->reseeds & (((uint32_t)1 << i) - 1)) == 0) {
                 /* pools are written to via fortuna_add_random_event */

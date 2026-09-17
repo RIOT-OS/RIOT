@@ -16,9 +16,9 @@
 
 #include <string.h>
 
+#include "fortuna/fortuna.h"
 #include "log.h"
 #include "mutex.h"
-#include "fortuna/fortuna.h"
 
 /**
  * @brief This holds the PRNG state.
@@ -28,7 +28,7 @@ static fortuna_state_t fortuna_state;
 /**
  * @brief Initialize the PRNG with a given number of bytes.
  */
-static void _init(uint8_t *in, size_t bytes)
+static void _init(const uint8_t *in, size_t bytes)
 {
     fortuna_seed_t seed;
 
@@ -36,7 +36,7 @@ static void _init(uint8_t *in, size_t bytes)
        with a small input */
     memset(seed, 0, sizeof(seed));
 
-    for (int i = 0; i < (int) bytes; i++) {
+    for (unsigned i = 0; i < bytes; i++) {
         seed[i % sizeof(seed)] ^= in[i];
     }
 
@@ -78,19 +78,19 @@ static void _read(uint8_t *out, size_t bytes)
 
 void random_init_by_array(uint32_t init_key[], int key_length)
 {
-    _init((uint8_t *) init_key, sizeof(uint32_t) * key_length);
+    _init((uint8_t *)init_key, sizeof(uint32_t) * key_length);
 }
 
 void random_init(uint32_t s)
 {
-    _init((uint8_t *) &s, sizeof(s));
+    _init((uint8_t *)&s, sizeof(s));
 }
 
 uint32_t random_uint32(void)
 {
     uint32_t data;
 
-    _read((uint8_t *) &data, sizeof(data));
+    _read((uint8_t *)&data, sizeof(data));
 
     return data;
 }
