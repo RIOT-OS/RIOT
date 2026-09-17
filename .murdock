@@ -321,6 +321,52 @@ test_cache_put() {
     redis-cli -h ${MURDOCK_REDIS_HOST} set "$1" ok
 }
 
+# cache key for the toolchain capability discovery below, keyed on board,
+# toolchain and job ID
+toolchain_capabilities_cache_key() {
+    echo "toolchain_capabilities-${DWQ_JOBID}-${1}-${2}"
+}
+
+# print the cached 'key=value' toolchain capability lines for $board:$toolchain,
+# if any. Empty output means a cache miss (or the cache being disabled).
+toolchain_capabilities_get() {
+    test "${ENABLE_TEST_CACHE}" = "1" || return 0
+    redis-cli -h ${MURDOCK_REDIS_HOST} get "$(toolchain_capabilities_cache_key "$1" "$2")"
+}
+
+# store 'key=value' toolchain capability lines, read from stdin, for
+# $board:$toolchain. Entries expire after 12 hours, which should be more
+# than enough
+toolchain_capabilities_put() {
+    local ttl=43200
+
+    redis-cli -h ${MURDOCK_REDIS_HOST} set "$(toolchain_capabilities_cache_key "$1" "$2")" "$(cat)" EX ${ttl} > /dev/null
+}
+
+# run the "info-toolchain-capabilities" target to retrieve 'key=value' pairs of
+# all the toolchain capabilities for $board:$toolchain
+toolchain_capabilities_discover() {
+    local appdir=$1 board=$2 toolchain=$3
+
+    BOARD=$board TOOLCHAIN=$toolchain \
+        make -s --no-print-directory -C${appdir} info-toolchain-capabilities 2>/dev/null
+}
+
+# ensure that the toolchain capability variables for $board:$toolchain are
+# exported into the current shell, so a subsequent 'make' for the same
+# board/toolchain reuses them via `?=` instead of re-discovering them.
+toolchain_capabilities_available() {
+    local appdir=$1 board=$2 toolchain=$3
+    local capabilities="$(toolchain_capabilities_get "$board" "$toolchain")"
+
+    if [ -z "$capabilities" ]; then
+        capabilities="$(toolchain_capabilities_discover "$appdir" "$board" "$toolchain")"
+        echo "$capabilities" | toolchain_capabilities_put "$board" "$toolchain"
+    fi
+
+    eval "export $(echo "$capabilities" | tr '\n' ' ')"
+}
+
 # compile one app for one board with one toolchain. delete intermediates.
 compile() {
     local appdir=$1
@@ -352,6 +398,8 @@ compile() {
     # On CI, this is a tmpfs, so using that instead of the `/cache/.ccache` volume
     # reduces disk IO.
     export CCACHE_TEMPDIR="$(pwd)/.ccache/tmp"
+
+    toolchain_capabilities_available "$appdir" "$board" "$toolchain"
 
     CCACHE_BASEDIR="$(pwd)" BOARD=$board TOOLCHAIN=$toolchain RIOT_CI_BUILD=1 \
         make -C${appdir} all test-input-hash -j${JOBS:-4}
