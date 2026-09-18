@@ -156,11 +156,11 @@ static inline void _set_txpower(const at86rf2xx_t *dev, int16_t txpower, uint8_t
 #endif
 }
 
-void at86rf2xx_configure_phy(at86rf2xx_t *dev, uint8_t chan, uint8_t page, int16_t txpower)
+void at86rf2xx_configure_phy(at86rf2xx_t *dev, uint8_t chan, ieee802154_phy_mode_t mode, int16_t txpower)
 {
     /* we must be in TRX_OFF before changing the PHY configuration */
     uint8_t prev_state = at86rf2xx_set_state(dev, AT86RF2XX_STATE_TRX_OFF);
-    (void) page;
+    (void) mode;
     (void) chan;
     (void) txpower;
 
@@ -181,13 +181,11 @@ void at86rf2xx_configure_phy(at86rf2xx_t *dev, uint8_t chan, uint8_t page, int16
         trx_ctrl2 |= AT86RF2XX_TRX_CTRL_2_MASK__SUB_MODE;
     }
 
-    if (page == 0) {
-        /* BPSK coding */
+    if (mode == IEEE802154_PHY_BPSK) {
         /* Data sheet recommends using a +2 dB setting for BPSK */
         rf_ctrl0 |= AT86RF2XX_RF_CTRL_0_GC_TX_OFFS__2DB;
     }
-    else if (page == 2) {
-        /* O-QPSK coding */
+    else if (mode == IEEE802154_PHY_OQPSK) {
         trx_ctrl2 |= AT86RF2XX_TRX_CTRL_2_MASK__BPSK_OQPSK;
         /* Data sheet recommends using a +1 dB setting for O-QPSK */
         rf_ctrl0 |= AT86RF2XX_RF_CTRL_0_GC_TX_OFFS__1DB;
