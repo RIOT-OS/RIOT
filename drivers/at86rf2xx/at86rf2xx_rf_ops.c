@@ -23,6 +23,7 @@
 #include "at86rf2xx_internal.h"
 #include "at86rf2xx_registers.h"
 #include "macros/utils.h"
+#include "net/ieee802154.h"
 #include "net/ieee802154/radio.h"
 #include "sched.h"
 #include "thread.h"
@@ -501,7 +502,6 @@ static int _config_phy(ieee802154_dev_t *hal, const ieee802154_phy_conf_t *conf)
 {
     at86rf2xx_t *dev = hal->priv;
     uint16_t channel = conf->channel;
-    uint8_t page = conf->page;
     int8_t txpower = conf->pow;
 
     if (txpower < (-AT86RF2XX_TXPOWER_OFF_OFFSET)
@@ -510,7 +510,9 @@ static int _config_phy(ieee802154_dev_t *hal, const ieee802154_phy_conf_t *conf)
     }
 
     mutex_lock(&dev->lock);
-    at86rf2xx_configure_phy(dev, channel, page, txpower);
+    ieee802154_phy_mode_t mode = conf->phy_mode == IEEE802154_PHY_NO_OP
+                               ? at86rf2xx_get_phy_mode(dev) : conf->phy_mode;
+    at86rf2xx_configure_phy(dev, channel, mode, txpower);
     mutex_unlock(&dev->lock);
     return 0;
 }

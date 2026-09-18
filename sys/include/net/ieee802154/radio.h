@@ -468,7 +468,6 @@ typedef enum {
 typedef struct {
     ieee802154_phy_mode_t phy_mode; /**< IEEE802.15.4 PHY mode */
     uint16_t channel;               /**< IEEE802.15.4 channel number */
-    uint8_t page;                   /**< IEEE802.15.4 channel page */
     int8_t pow;                     /**< TX power in dBm */
 } ieee802154_phy_conf_t;
 
