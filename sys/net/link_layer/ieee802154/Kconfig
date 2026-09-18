@@ -46,10 +46,6 @@ config IEEE802154_DEFAULT_SUBGHZ_CHANNEL
     int "IEEE802.15.4 default sub-GHZ channel"
     default 5
 
-config IEEE802154_DEFAULT_SUBGHZ_PAGE
-    int "IEEE802.15.4 default sub-GHZ page"
-    default 2
-
 config IEEE802154_DEFAULT_CHANNEL
     int "IEEE802.15.4 default channel"
     default 26
