@@ -127,6 +127,22 @@ typedef enum {
 } gnrc_ipv6_event_t;
 
 /**
+ * @brief   GNRC Netif components
+ */
+typedef enum {
+#if IS_USED(MODULE_GNRC_NETIF_IPV6) || defined(DOXYGEN)
+    GNRC_NETIF_COMP_IPV6,                   /**< IPv6 component */
+#endif
+#if IS_USED(MODULE_GNRC_NETIF_6LO) || defined(DOXYGEN)
+    GNRC_NETIF_COMP_6LO,                    /**< 6Lo component */
+#endif
+#if IS_USED(MODULE_GNRC_NETIF_LORAWAN) || defined(DOXYGEN)
+    GNRC_NETIF_COMP_LORAWAN,                /**< LoRaWAN component */
+#endif
+    GNRC_NETIF_COMP_NUMOF,                  /**< Number of netif components */
+} gnrc_netif_comp_t;
+
+/**
  * @brief   Operations to an interface
  */
 typedef struct gnrc_netif_ops gnrc_netif_ops_t;
@@ -742,6 +758,64 @@ static inline int gnrc_netif_send(gnrc_netif_t *netif, gnrc_pktsnip_t *pkt)
 {
     return gnrc_netapi_send(netif->pid, pkt);
 }
+
+/**
+ * @brief   Get the IPv6 component of a network interface
+ *
+ * @param[in] netif  The network interface
+ *
+ * @return  Pointer to the IPv6 component of @p netif
+ * @return  NULL if @ref MODULE_GNRC_NETIF_IPV6 is not used
+ */
+static inline void *gnrc_netif_comp_get_ipv6(const gnrc_netif_t *netif)
+{
+#if IS_USED(MODULE_GNRC_NETIF_IPV6) || defined(DOXYGEN)
+        return (void*) &netif->ipv6;
+#else
+        (void) netif;
+        return NULL;
+#endif
+
+}
+
+/**
+ * @brief   Get the 6Lo component of a network interface
+ *
+ * @param[in] netif  The network interface
+ *
+ * @return  Pointer to the 6Lo component of @p netif
+ * @return  NULL if @ref MODULE_GNRC_NETIF_6LO is not used
+ */
+static inline void *gnrc_netif_comp_get_6lo(const gnrc_netif_t *netif)
+{
+#if IS_USED(MODULE_GNRC_NETIF_6LO) || defined(DOXYGEN)
+        return (void*) &netif->sixlo;
+#else
+        (void) netif;
+        return NULL;
+#endif
+
+}
+
+/**
+ * @brief   Get the LoRaWAN component of a network interface
+ *
+ * @param[in] netif  The network interface
+ *
+ * @return  Pointer to the LoRaWAN component of @p netif
+ * @return  NULL if @ref MODULE_GNRC_NETIF_LORAWAN is not used
+ */
+static inline void *gnrc_netif_comp_get_lorawan(const gnrc_netif_t *netif)
+{
+#if IS_USED(MODULE_GNRC_NETIF_LORAWAN) || defined(DOXYGEN)
+        return (void*) &netif->lorawan;
+#else
+        (void) netif;
+        return NULL;
+#endif
+
+}
+
 
 #if defined(MODULE_GNRC_NETIF_BUS) || DOXYGEN
 /**
