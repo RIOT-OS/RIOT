@@ -7,6 +7,9 @@ INCLUDES += -I$(RIOTBASE)/sys/include/psa_crypto
 
 backends = $(words $(filter $1_backend_%,$(USEMODULE)))
 
+# Random
+PSEUDOMODULES += psa_custom_random
+
 # Pseudomodules
 ## Asymmetric
 PSEUDOMODULES += psa_asymmetric
@@ -23,6 +26,7 @@ ifneq (,$(filter psa_asymmetric_ecc_p192r1,$(USEMODULE)))
 endif
 
 PSEUDOMODULES += psa_asymmetric_ecc_p256r1
+PSEUDOMODULES += psa_asymmetric_ecc_p256r1_backend_cryptoservice
 PSEUDOMODULES += psa_asymmetric_ecc_p256r1_backend_microecc
 PSEUDOMODULES += psa_asymmetric_ecc_p256r1_backend_periph
 PSEUDOMODULES += psa_asymmetric_ecc_p256r1_custom_backend
@@ -51,8 +55,11 @@ endif
 PSEUDOMODULES += psa_cipher
 PSEUDOMODULES += psa_cipher_aes_128_ecb
 PSEUDOMODULES += psa_cipher_aes_128_ecb_backend_riot
+PSEUDOMODULES += psa_cipher_aes_128_ecb_backend_cryptoservice
+PSEUDOMODULES += psa_cipher_aes_128_ecb_custom_backend
 
 PSEUDOMODULES += psa_cipher_aes_128_cbc
+PSEUDOMODULES += psa_cipher_aes_128_cbc_backend_cryptoservice
 PSEUDOMODULES += psa_cipher_aes_128_cbc_backend_periph
 PSEUDOMODULES += psa_cipher_aes_128_cbc_backend_riot
 PSEUDOMODULES += psa_cipher_aes_128_cbc_custom_backend
@@ -173,6 +180,7 @@ ifneq (,$(filter psa_hash_sha_224,$(USEMODULE)))
 endif
 
 PSEUDOMODULES += psa_hash_sha_256
+PSEUDOMODULES += psa_hash_sha_256_backend_cryptoservice
 PSEUDOMODULES += psa_hash_sha_256_backend_periph
 PSEUDOMODULES += psa_hash_sha_256_backend_riot
 PSEUDOMODULES += psa_hash_sha_256_custom_backend

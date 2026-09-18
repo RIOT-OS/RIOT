@@ -1,0 +1,20 @@
+# SPDX-FileCopyrightText: 2024 HAW Hamburg
+# SPDX-License-Identifier: LGPL-2.1-only
+
+PKG_SOURCE_DIR ?= $(PKGDIRBASE)/cryptoservice
+
+INCLUDES += -I$(PKG_SOURCE_DIR)/api
+INCLUDES += -I$(RIOTPKG)/cryptoservice/include
+
+DIRS += $(RIOTPKG)/cryptoservice/contrib
+
+ifneq (,$(filter psa_cryptoservice, $(USEMODULE)))
+  DIRS += $(RIOTPKG)/cryptoservice/psa_cryptoservice
+  INCLUDES += -I$(RIOTBASE)/sys/psa_crypto/include
+endif
+
+PSEUDOMODULES += psa_cryptoservice_ecc_p256
+PSEUDOMODULES += psa_cryptoservice_hashes_sha256
+PSEUDOMODULES += psa_cryptoservice_aes_128_cbc
+PSEUDOMODULES += psa_cryptoservice_aes_128_ecb
+PSEUDOMODULES += psa_cryptoservice_random

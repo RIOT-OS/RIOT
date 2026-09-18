@@ -25,6 +25,10 @@
 #include "psa_crypto_se_management.h"
 #include "psa_crypto_se_driver.h"
 
+#if IS_USED(MODULE_PSA_CUSTOM_RANDOM)
+#  include "psa_crypto_custom_random.h"
+#endif
+
 #if IS_USED(MODULE_PSA_KEY_MANAGEMENT)
 #include "psa_crypto_slot_management.h"
 
@@ -101,6 +105,8 @@ psa_status_t psa_location_dispatch_import_key( const psa_key_attributes_t *attri
 
     switch (location) {
     case PSA_KEY_LOCATION_LOCAL_STORAGE:
+        return psa_algorithm_dispatch_import_key(attributes, data, data_length, slot, bits);
+    case PSA_KEY_LOCATION_LOCAL_SEALED:
         return psa_algorithm_dispatch_import_key(attributes, data, data_length, slot, bits);
     default:
         return PSA_ERROR_NOT_SUPPORTED;
@@ -585,5 +591,9 @@ psa_status_t psa_location_dispatch_mac_abort(psa_mac_operation_t *operation)
 psa_status_t psa_location_dispatch_generate_random(uint8_t *output,
                                                    size_t output_size)
 {
+#if IS_USED(MODULE_PSA_CUSTOM_RANDOM)
+    return psa_custom_generate_random(output, output_size);
+#else
     return psa_builtin_generate_random(output, output_size);
+#endif
 }

@@ -1,6 +1,11 @@
 ifneq (,$(filter psa_crypto,$(USEMODULE)))
+ifneq (,$(filter psa_cryptoservice,$(USEMODULE)))
+  USEMODULE += psa_cryptoservice_random
+  USEMODULE += psa_custom_random
+else
   USEMODULE += random
   USEMODULE += prng_sha256prng
+endif
 endif
 
 ifneq (,$(filter psa_persistent_storage, $(USEMODULE)))
@@ -55,6 +60,11 @@ ifneq (,$(filter psa_asymmetric_ecc_p256r1,$(USEMODULE)))
   endif
 endif
 
+ifneq (,$(filter psa_asymmetric_ecc_p256r1_backend_cryptoservice,$(USEMODULE)))
+  USEPKG += cryptoservice
+  USEMODULE += psa_cryptoservice_ecc_p256
+endif
+
 ifneq (,$(filter psa_asymmetric_ecc_p256r1_backend_microecc,$(USEMODULE)))
   USEPKG += micro-ecc
   USEMODULE += psa_uecc
@@ -102,7 +112,9 @@ endif
 
 ## AES-128-ECB backend
 ifneq (,$(filter psa_cipher_aes_128_ecb,$(USEMODULE)))
-  USEMODULE += psa_cipher_aes_128_ecb_backend_riot
+  ifeq (,$(filter psa_cipher_aes_128_ecb_custom_backend,$(USEMODULE)))
+    USEMODULE += psa_cipher_aes_128_ecb_backend_riot
+  endif
 endif
 
 ifneq (,$(filter psa_cipher_aes_128_ecb_backend_riot,$(USEMODULE)))
@@ -110,6 +122,11 @@ ifneq (,$(filter psa_cipher_aes_128_ecb_backend_riot,$(USEMODULE)))
   USEMODULE += cipher_modes
   USEMODULE += psa_riot_cipher
   USEMODULE += psa_riot_cipher_aes_ecb
+endif
+
+ifneq (,$(filter psa_cipher_aes_128_ecb_backend_cryptoservice,$(USEMODULE)))
+  USEPKG += cryptoservice
+  USEMODULE += psa_cryptoservice_aes_128_ecb
 endif
 
 ## AES-128-CBC
@@ -124,6 +141,11 @@ ifneq (,$(filter psa_cipher_aes_128_cbc,$(USEMODULE)))
       USEMODULE += psa_cipher_aes_128_cbc_backend_riot
     endif
   endif
+endif
+
+ifneq (,$(filter psa_cipher_aes_128_cbc_backend_cryptoservice,$(USEMODULE)))
+  USEPKG += cryptoservice
+  USEMODULE += psa_cryptoservice_aes_128_cbc
 endif
 
 ifneq (,$(filter psa_cipher_aes_128_cbc_backend_periph,$(USEMODULE)))
@@ -319,6 +341,11 @@ endif
 
 ifneq (,$(filter psa_hash_sha_256_backend_periph,$(USEMODULE)))
   FEATURES_REQUIRED += periph_hash_sha_256
+endif
+
+ifneq (,$(filter psa_hash_sha_256_backend_cryptoservice,$(USEMODULE)))
+  USEPKG += cryptoservice
+  USEMODULE += psa_cryptoservice_hashes_sha256
 endif
 
 ifneq (,$(filter psa_hash_sha_256_backend_riot,$(USEMODULE)))

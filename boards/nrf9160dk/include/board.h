@@ -16,6 +16,7 @@
  */
 
 #include "cpu.h"
+#include "periph_cpu.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -50,7 +51,7 @@ extern "C" {
 #define LED2_MASK           (1 << 4)       /**< LED2 PORT bitmask */
 #define LED3_MASK           (1 << 5)       /**< LED3 PORT bitmask */
 
-#define LED_PORT            (NRF_P0_S) /**< Default LED PORT */
+#define LED_PORT            (NRF_P0) /**< Default LED PORT */
 
 #define LED0_ON             (LED_PORT->OUTSET = LED0_MASK) /**< LED0 ON macro */
 #define LED0_OFF            (LED_PORT->OUTCLR = LED0_MASK) /**< LED0 OFF macro */

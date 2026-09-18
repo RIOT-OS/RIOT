@@ -100,6 +100,20 @@ psa_status_t psa_derive_ecc_p256r1_public_key(  const uint8_t *priv_key_buffer, 
                                                 size_t *pub_key_buffer_length);
 
 /**
+ * @brief   Low level wrapper function to call a driver to import and seal an ECC
+ *          key pair with a SECP 256 R1 key.
+ *          See @ref psa_import_key()
+ */
+psa_status_t psa_import_ecc_p256r1_key_pair(const psa_key_attributes_t *attributes,
+                                            const uint8_t *key_data,
+                                            size_t key_data_length,
+                                            uint8_t *priv_key_buffer,
+                                            size_t priv_key_size,
+                                            size_t *priv_key_buffer_length,
+                                            uint8_t *pub_key_buffer,
+                                            size_t *pub_key_buffer_length);
+
+/**
  * @brief   Low level wrapper function to call a driver for an ECC hash signature
  *          with a SECP 256 R1 key.
  *          See @ref psa_sign_hash()
