@@ -357,16 +357,6 @@ static int _get(netdev_t *netdev, netopt_t opt, void *val, size_t max_len)
                 !!(dev->flags & AT86RF215_OPT_AUTOACK);
             return sizeof(netopt_enable_t);
 
-        case NETOPT_CHANNEL_PAGE:
-            assert(max_len >= sizeof(uint16_t));
-            if (at86rf215_get_phy_mode(dev) != IEEE802154_PHY_OQPSK) {
-                return -ENOTSUP;
-            }
-
-            ((uint8_t *)val)[1] = 0;
-            ((uint8_t *)val)[0] = is_subGHz(dev) ? 2 : 0;
-            return sizeof(uint16_t);
-
         case NETOPT_AUTOCCA:
             *((netopt_enable_t *)val) =
                 !!(dev->flags & AT86RF215_OPT_CCATX);
