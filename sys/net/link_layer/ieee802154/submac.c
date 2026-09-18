@@ -666,13 +666,29 @@ static inline uint16_t _mr_fsk_ack_timeout_us(const ieee802154_mr_fsk_conf_t *co
          + ((fsk_pl * 8 + 2) + ack_len) * 8 * IEEE802154_MR_FSK_SYMBOL_TIME_US;
 }
 
+static uint32_t _calculate_csma_backoff_period(ieee802154_submac_t *submac)
+{
+    return ieee802154_get_turnaround_time(submac)
+         + ieee802154_get_cca_time(submac);
+}
+
+static uint32_t _calculate_ack_wait_duration(ieee802154_submac_t *submac)
+{
+    return ieee802154_get_unit_backoff_period(submac)
+         + ieee802154_get_turnaround_time(submac)
+         + ieee802154_get_shr_duration(submac)
+         /* ack psdu with phr included */
+         + ieee802154_get_psdu_duration(submac, 1 + IEEE802154_ACK_FRAME_LEN);
+}
+
 static int ieee802154_submac_config_phy(ieee802154_submac_t *submac,
                                         const ieee802154_phy_conf_t *conf)
 {
     switch (conf->phy_mode) {
     case IEEE802154_PHY_OQPSK:
-        submac->ack_timeout_us = ACK_TIMEOUT_US;
-        submac->csma_backoff_us = CSMA_SENDER_BACKOFF_PERIOD_UNIT_US;
+    case IEEE802154_PHY_BPSK:
+        submac->ack_timeout_us = _calculate_ack_wait_duration(submac);
+        submac->csma_backoff_us = _calculate_csma_backoff_period(submac);
         break;
 #ifdef MODULE_NETDEV_IEEE802154_MR_OQPSK
     case IEEE802154_PHY_MR_OQPSK:
@@ -760,10 +776,6 @@ int ieee802154_submac_init(ieee802154_submac_t *submac, const network_uint16_t *
 
         submac->phy_mode = ieee802154_cap_to_phy_mode(1 << bit);
     }
-
-    /* Calculate aUnitBackoffPeriod and macAckWaitDuration values */
-    submac->unit_backoff_period = _calculate_unit_backoff_period(submac);
-    submac->ack_wait_duration = _calculate_ack_wait_duration(submac);
 
     /* If the radio is still not in TRX_OFF state, spin */
     while (ieee802154_radio_confirm_on(dev) == -EAGAIN) {}
@@ -924,21 +936,4 @@ int ieee802154_set_idle(ieee802154_submac_t *submac)
 
 }
 
-static uint32_t _calculate_unit_backoff_period(ieee802154_submac_t *submac)
-{
-    return ieee802154_get_turnaround_time(submac)
-         + ieee802154_get_cca_time(submac);
-}
-
-    /* same as 62.5 ksymbol/s in case this list isn't updated */
-    return 16;
-}
-
-static uint32_t _calculate_ack_wait_duration(ieee802154_submac_t *submac)
-{
-    return ieee802154_get_unit_backoff_period(submac)
-         + ieee802154_get_turnaround_time(submac)
-         + ieee802154_get_shr_duration(submac)
-         + ieee802154_get_psdu_duration(submac, 6);
-}
 /** @} */
