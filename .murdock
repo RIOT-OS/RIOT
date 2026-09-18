@@ -327,20 +327,48 @@ toolchain_capabilities_cache_key() {
     echo "toolchain_capabilities-${CI_JOB_UID}-${1}-${2}"
 }
 
+# local, per-worker cache file backing toolchain_capabilities_get/_put below.
+# Jobs for the same board:toolchain combination usually land on the same
+# worker many times per run, so this avoids a redis round trip (a network
+# call) for every single one of them.
+: ${TOOLCHAIN_CAPABILITIES_CACHE_DIR:=/tmp/murdock-toolchain-capabilities}
+toolchain_capabilities_cache_file() {
+    echo "${TOOLCHAIN_CAPABILITIES_CACHE_DIR}/$(toolchain_capabilities_cache_key "$1" "$2")"
+}
+
 # print the cached 'key=value' toolchain capability lines for $board:$toolchain,
 # if any. Empty output means a cache miss (or the cache being disabled).
+# Checked in the local, per-worker cache file first, only falling back to
+# redis (and populating the local file from it) on a local miss.
 toolchain_capabilities_get() {
     test "${ENABLE_TEST_CACHE}" = "1" || return 0
-    redis-cli -h ${MURDOCK_REDIS_HOST} get "$(toolchain_capabilities_cache_key "$1" "$2")"
+
+    local cache_file="$(toolchain_capabilities_cache_file "$1" "$2")"
+    if [ -f "${cache_file}" ]; then
+        cat "${cache_file}"
+        return
+    fi
+
+    local capabilities="$(redis-cli -h ${MURDOCK_REDIS_HOST} get "$(toolchain_capabilities_cache_key "$1" "$2")")"
+    if [ -n "${capabilities}" ]; then
+        mkdir -p "${TOOLCHAIN_CAPABILITIES_CACHE_DIR}"
+        echo "${capabilities}" > "${cache_file}"
+    fi
+    echo "${capabilities}"
 }
 
 # store 'key=value' toolchain capability lines, read from stdin, for
-# $board:$toolchain. Entries expire after 12 hours, which should be more
-# than enough
+# $board:$toolchain, both in redis (shared across workers) and in the local,
+# per-worker cache file (so later jobs on this worker skip redis entirely).
+# Redis entries expire after 12 hours, which should be more than enough.
 toolchain_capabilities_put() {
     local ttl=43200
+    local capabilities="$(cat)"
+    local cache_file="$(toolchain_capabilities_cache_file "$1" "$2")"
 
-    redis-cli -h ${MURDOCK_REDIS_HOST} set "$(toolchain_capabilities_cache_key "$1" "$2")" "$(cat)" EX ${ttl} > /dev/null
+    mkdir -p "${TOOLCHAIN_CAPABILITIES_CACHE_DIR}"
+    echo "${capabilities}" > "${cache_file}"
+    redis-cli -h ${MURDOCK_REDIS_HOST} set "$(toolchain_capabilities_cache_key "$1" "$2")" "${capabilities}" EX ${ttl} > /dev/null
 }
 
 # run the "info-toolchain-capabilities" target to retrieve 'key=value' pairs of
