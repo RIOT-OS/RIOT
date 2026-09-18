@@ -685,8 +685,8 @@ static int ieee802154_submac_config_phy(ieee802154_submac_t *submac,
     switch (conf->phy_mode) {
     case IEEE802154_PHY_OQPSK:
     case IEEE802154_PHY_BPSK:
-        submac->ack_timeout_us = _calculate_ack_wait_duration(submac);
         submac->csma_backoff_us = _calculate_csma_backoff_period(submac);
+        submac->ack_timeout_us = _calculate_ack_wait_duration(submac);
         break;
 #ifdef MODULE_NETDEV_IEEE802154_MR_OQPSK
     case IEEE802154_PHY_MR_OQPSK:
