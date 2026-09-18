@@ -260,24 +260,35 @@ for http based packages.
 
 Assuming your upstream library resides in a git repository, you can create the
 patch files as follows:
- - checkout the targeted version of the upstream application
- - create a new branch (e.g. `riot-port` by executing `git checkout -b riot-port`)
- - conduct necessary changes (e.g. edit, add, or remove some files)
- - commit your changes using `git commit`. Remember to add a detailed
-   description in your commit, as this will be added to the patch as well.
- - create the patch files using `git format-patch -n riot-port`
- - move the resulting patch files to the `patches/` directory of your package
- - see [patches/](#patches) for more information about how to name your
-   patch files
+ - Checkout the targeted version of the upstream application.
+ - Create a new branch (e.g. `riot-port` by executing `git checkout -b riot-port`).
+ - Conduct necessary changes (e.g. edit, add, or remove some files).
+ - Commit your changes using `git commit -m "your commit message"`.
+   Remember to add a detailed description in your commit, as this will be
+   added to the patch file as well.
+ - Create the patch files using `git format-patch -<n> riot-port`.
+   Replace `<n>` with the number of commits you have made previously.
+   A separate patch file will be created for each commit.
+ - Move the resulting patch files to the `patches/` directory of your package.
+ - See [patches/](#patches) for more information about how to name your
+   patch files.
 
-Try to keep the patches of reasonable size to help with the review process.
+:::note
+While it is possible to perform changes in the `build/` directory itself and
+to create the patches there, keep in mind that a rebuild or `make clean` will
+override or delete the changes you have made in that folder!
+Use the `PKG_SOURCE_LOCAL` variable instead (as described above).
+:::
+
+Try to keep each patch a reasonable size to help with the review process.
 Patches often have to be updated when changes in the upstream repository were
 made and having specific patches can make the update process a lot easier.
 
 If you have discovered any bugs or changes that the upstream repository would
 also benefit from, you should of course create a Pull Request at the upstream
 repository and keep the patch singled out. Once your Pull Request was merged,
-you can remove the individual patch file.
+you can remove that patch file individually, without having to modify the
+other patches.
 
 ## Packages outside of RIOTPKG
 
