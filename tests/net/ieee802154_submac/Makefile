@@ -34,6 +34,7 @@ BOARDS_SUPPORTED += adafruit-clue \
                    remote-reva \
                    remote-revb \
                    samr21-xpro \
+                   samr30-xpro \
                    seeedstudio-xiao-esp32c6 \
                    usb-kw41z \
                    zigduino \
