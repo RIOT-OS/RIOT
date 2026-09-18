@@ -100,18 +100,6 @@ int ifconfig_list(int idx)
     }
     printf("\n           Channel: %u", dev->chan);
 
-    res = netdev_ieee802154_minimal_get(netdev, NETOPT_CHANNEL_PAGE, &u16_val, sizeof(u16_val));
-    if (res == -ENOTSUP) {
-        puts(", Ch.page: ENOTSUP");
-    }
-    else if (res < 0) {
-        printf(", Ch.page: %i", (int)res);
-        return 1;
-    }
-    else {
-        printf(", Ch.page: %u", (unsigned)u16_val);
-    }
-
     res = netdev_ieee802154_minimal_get(netdev, NETOPT_TX_POWER, &u16_val, sizeof(u16_val));
     if (res == -ENOTSUP) {
         puts(", TXPower: ENOTSUP");
