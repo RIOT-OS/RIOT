@@ -153,8 +153,8 @@ int openwsn_radio_init(void *radio_dev)
 
     /* Configure PHY settings (channel, TX power) */
     ieee802154_phy_conf_t conf =
-    { .channel = CONFIG_IEEE802154_DEFAULT_CHANNEL,
-      .page = CONFIG_IEEE802154_DEFAULT_CHANNEL,
+    { .phy_mode = CONFIG_IEEE802154_DEFAULT_PHY_MODE,
+      .channel = CONFIG_IEEE802154_DEFAULT_CHANNEL,
       .pow = CONFIG_IEEE802154_DEFAULT_TXPOWER };
 
     ieee802154_radio_config_phy(dev, &conf);
@@ -187,8 +187,8 @@ void radio_setFrequency(uint8_t frequency, radio_freq_t tx_or_rx)
     (void)tx_or_rx;
 
     ieee802154_phy_conf_t conf =
-    { .channel = frequency,
-      .page = CONFIG_IEEE802154_DEFAULT_CHANNEL,
+    { .phy_mode = CONFIG_IEEE802154_DEFAULT_PHY_MODE,
+      .channel = frequency,
       .pow = CONFIG_IEEE802154_DEFAULT_TXPOWER };
 
     ieee802154_radio_config_phy(openwsn_radio.dev, &conf);
