@@ -370,11 +370,6 @@ typedef enum {
     NETOPT_DEVICE_TYPE,
 
     /**
-     * @brief   (uint16_t) channel page as defined by IEEE 802.15.4
-     */
-    NETOPT_CHANNEL_PAGE,
-
-    /**
      * @brief   (int8_t) CCA threshold for the radio transceiver
      *
      * This is the value, in dBm, that the radio transceiver uses to decide
