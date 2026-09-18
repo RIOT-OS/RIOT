@@ -24,8 +24,6 @@
 #define ENABLE_DEBUG 0
 #include "debug.h"
 
-#define CSMA_SENDER_BACKOFF_PERIOD_UNIT_US  (320U)
-#define ACK_TIMEOUT_US                      (864U)
 /* 2.4 GHz, 250 kb/s, O-QPSK 62.5 ksymbols/s, 1 / 62 500 s = 16 µs */
 /* 12 symbols -> 12 * 16us = 192us */
 #define SIFS_PERIOD_US                      (192U)
