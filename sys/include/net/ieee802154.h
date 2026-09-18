@@ -320,13 +320,6 @@ extern const uint8_t ieee802154_addr_bcast[IEEE802154_ADDR_BCAST_LEN];
 #endif
 
 /**
- * @brief IEEE802.15.4 default sub-GHZ page
- */
-#ifndef CONFIG_IEEE802154_DEFAULT_SUBGHZ_PAGE
-#define CONFIG_IEEE802154_DEFAULT_SUBGHZ_PAGE      (2U)
-#endif
-
-/**
  * @brief IEEE802.15.4 MR-OQPSK default chip rate
  */
 #ifndef CONFIG_IEEE802154_MR_OQPSK_DEFAULT_CHIPS

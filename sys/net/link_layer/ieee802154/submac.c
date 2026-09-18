@@ -728,13 +728,9 @@ int ieee802154_submac_init(ieee802154_submac_t *submac, const network_uint16_t *
 
     if (ieee802154_radio_has_24_ghz(dev)) {
         submac->channel_num = CONFIG_IEEE802154_DEFAULT_CHANNEL;
-
-        /* 2.4 GHz only use page 0 */
-        submac->channel_page = 0;
     }
     else {
         submac->channel_num = CONFIG_IEEE802154_DEFAULT_SUBGHZ_CHANNEL;
-        submac->channel_page = CONFIG_IEEE802154_DEFAULT_SUBGHZ_PAGE;
     }
 
     /* Get supported PHY modes */
@@ -806,7 +802,6 @@ int ieee802154_submac_init(ieee802154_submac_t *submac, const network_uint16_t *
 
     conf.super.phy_mode = submac->phy_mode;
     conf.super.channel = submac->channel_num;
-    conf.super.page = submac->channel_page;
     conf.super.pow = submac->tx_pow;
 
     ieee802154_submac_config_phy(submac, &conf.super);
@@ -851,7 +846,6 @@ int ieee802154_set_phy_conf(ieee802154_submac_t *submac, const ieee802154_phy_co
 
     if (res >= 0) {
         submac->channel_num = conf->channel;
-        submac->channel_page = conf->page;
         submac->tx_pow = conf->pow;
         if (conf->phy_mode != IEEE802154_PHY_NO_OP) {
             submac->phy_mode = conf->phy_mode;
