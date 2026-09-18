@@ -16,6 +16,7 @@
  *
  */
 
+#include "board.h"
 #include "periph_cpu.h"
 #include "cfg_clock_32_0.h"
 #include "cfg_rtt_default.h"
@@ -109,6 +110,19 @@ static const spi_conf_t spi_config[] = {
  * @brief   Number of SPI peripherals.
  */
 #define SPI_NUMOF           ARRAY_SIZE(spi_config)
+/** @} */
+
+/**
+ * @name    PDM pin configuration
+ * @{
+ */
+/**
+ * @brief   PDM pin configuration
+ */
+static const pdm_conf_t pdm_config = {
+    .din_pin = PDM_DIN_PIN,
+    .clk_pin = PDM_CLK_PIN,
+};
 /** @} */
 
 #ifdef __cplusplus
