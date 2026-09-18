@@ -171,6 +171,10 @@
  * `arduino_spi`, `arduino_shield_uno` and the `arduino_shield_isp` feature.
  * It should work out of the box for any fully Arduino UNO compatible board
  * (including the ISP header) and correct I/O mapping (`arduino_*`) features.
+ *
+ * Some shield clones require the interrupt solder jumper to be closed, as the
+ * W5100 driver relies on interrupts. On most clones, this interrupt solder
+ * jumper is indicated as INT, close to pin D0.
  */
 
 /**
