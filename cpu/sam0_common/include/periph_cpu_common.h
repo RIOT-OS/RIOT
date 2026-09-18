@@ -1375,8 +1375,12 @@ void rtc_tamper_pin_disable(gpio_t pin);
 
 /**
  * @brief   Enable Tamper Detection IRQs
+ *
+ * @param   cb      Callback function (only executed when not in
+ *                  Hibernation/Backup Sleep
+ * @param   arg     Callback argument
  */
-void rtc_tamper_enable(void);
+void rtc_tamper_enable(void(*cb)(void *), void *arg);
 
 /**
  * @brief   Get and clear the RTC tamper event that has woken the CPU
