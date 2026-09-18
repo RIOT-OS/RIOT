@@ -324,7 +324,7 @@ test_cache_put() {
 # cache key for the toolchain capability discovery below, keyed on board,
 # toolchain and job ID
 toolchain_capabilities_cache_key() {
-    echo "toolchain_capabilities-${DWQ_JOBID}-${1}-${2}"
+    echo "toolchain_capabilities-${CI_JOB_UID}-${1}-${2}"
 }
 
 # print the cached 'key=value' toolchain capability lines for $board:$toolchain,
