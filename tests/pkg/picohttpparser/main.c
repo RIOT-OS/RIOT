@@ -53,13 +53,12 @@ static void test_picohttpparser_request_simple(void)
 
 static void test_picohttpparser_request_headers(void)
 {
-    static const char request[] =
-        "POST /api/data HTTP/1.1\r\n"
-        "Host: example.com\r\n"
-        "Content-Type: application/json\r\n"
-        "Content-Length: 13\r\n"
-        "X-Custom-Header: CustomValue\r\n"
-        "\r\n";
+    static const char request[] = "POST /api/data HTTP/1.1\r\n"
+                                  "Host: example.com\r\n"
+                                  "Content-Type: application/json\r\n"
+                                  "Content-Length: 13\r\n"
+                                  "X-Custom-Header: CustomValue\r\n"
+                                  "\r\n";
 
     const char *method;
     size_t method_len;
@@ -122,11 +121,10 @@ static void test_picohttpparser_request_partial(void)
 
 static void test_picohttpparser_request_body(void)
 {
-    static const char request[] =
-        "POST /api/data HTTP/1.1\r\n"
-        "Content-Length: 13\r\n"
-        "\r\n"
-        "Hello, World!";
+    static const char request[] = "POST /api/data HTTP/1.1\r\n"
+                                  "Content-Length: 13\r\n"
+                                  "\r\n"
+                                  "Hello, World!";
 
     const char *method;
     size_t method_len;
@@ -179,12 +177,11 @@ static void test_picohttpparser_response_simple(void)
 
 static void test_picohttpparser_response_headers(void)
 {
-    static const char response[] =
-        "HTTP/1.1 404 Not Found\r\n"
-        "Content-Type: text/plain\r\n"
-        "Content-Length: 9\r\n"
-        "X-Custom-Header: CustomValue\r\n"
-        "\r\n";
+    static const char response[] = "HTTP/1.1 404 Not Found\r\n"
+                                   "Content-Type: text/plain\r\n"
+                                   "Content-Length: 9\r\n"
+                                   "X-Custom-Header: CustomValue\r\n"
+                                   "\r\n";
 
     int minor_version;
     int status;
@@ -238,11 +235,10 @@ static void test_picohttpparser_response_partial(void)
 
 static void test_picohttpparser_response_body(void)
 {
-    static const char response[] =
-        "HTTP/1.1 200 OK\r\n"
-        "Content-Length: 13\r\n"
-        "\r\n"
-        "Hello, World!";
+    static const char response[] = "HTTP/1.1 200 OK\r\n"
+                                   "Content-Length: 13\r\n"
+                                   "\r\n"
+                                   "Hello, World!";
 
     int minor_version;
     int status;
@@ -271,11 +267,10 @@ static void test_picohttpparser_response_body(void)
 
 static void test_picohttpparser_headers_simple(void)
 {
-    static const char raw_headers[] =
-        "Host: example.com\r\n"
-        "Connection: close\r\n"
-        "X-Custom-Header: CustomValue\r\n"
-        "\r\n";
+    static const char raw_headers[] = "Host: example.com\r\n"
+                                      "Connection: close\r\n"
+                                      "X-Custom-Header: CustomValue\r\n"
+                                      "\r\n";
 
     struct phr_header headers[MAX_HEADERS];
     size_t num_headers = MAX_HEADERS;
