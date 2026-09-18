@@ -21,6 +21,20 @@ be installed.
 
 The process is automated in the usual `make flash` target.
 
+### Running as the TrustZone-M non-secure image
+
+The nRF9160 implements ARM TrustZone-M. Selecting the `trustzone_m_nonsecure`
+module makes the shared nRF and Cortex-M code use the non-secure peripheral
+aliases, so that the application can run as the *non-secure* image.
+
+```make
+USEMODULE += trustzone_m_nonsecure
+```
+
+A secure image has to be present in flash; the non-secure application does not
+boot on its own. The secure image configures which flash, RAM and
+peripherals are handed over to the non-secure world.
+
 ### Accessing STDIO via UART
 
 The STDIO is directly accessible via the USB port. On a Linux host, it's

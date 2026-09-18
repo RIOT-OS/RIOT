@@ -85,6 +85,10 @@ groups:
         help: A hardware floating point unit is available.
       - name: cortexm_mpu
         help: A memory protection unit (MPU) is available.
+      - name: trustzone_m
+        help: The ARM TrustZone-M security extension is available. Code can run
+              in a secure and a non-secure state, with the secure state being
+              able to hide memory and peripherals from the non-secure state.
       groups:
       - title: nRF Capabilities
         help: These features are only available on (some) nordic nRF MCUs
