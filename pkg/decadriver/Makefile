@@ -1,7 +1,7 @@
 PKG_NAME=decadriver
 PKG_URL=https://github.com/br101/dw3000-decadriver-source
-# Commit from July 22nd 2026
-PKG_VERSION=effcf6e601d20c323e8932575692bd7d565b8720
+# Commit from September 18th 2026
+PKG_VERSION=67dfbb7f2c5b1a4157b8c265b19f08776e91b1cc
 # The code by br101 is licensed under ISC while the original Qorvo code has a
 # custom license from Qorvo. The license is attached to the sources.
 PKG_LICENSE=ISC AND LicenseRef-QORVO-2
