@@ -54,6 +54,14 @@ e.g. `/mnt/d/` if the ST-Link is mounted under Windows, you can not use the
 VCP (Virtual COM Port) via `usbipd` inside of WSL at the same time.
 :::
 
+:::note
+This programmer requires ST-Link firmware version 2.37.26 or newer.
+Firmware updates can be found on
+[the ST-Link page](https://www.st.com/en/development-tools/stsw-link007.html)
+or performed with
+[STM32CubeProg](https://www.st.com/en/development-tools/stm32cubeprog.html).
+:::
+
 The on-board ST-Link programmer found on all Nucleo32, 64 and 144 boards
 will show up as a mass storage device when plugged in via USB.
 Copying a HEX file to the mass storage device will trigger the flashing
