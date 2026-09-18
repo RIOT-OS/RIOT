@@ -66,28 +66,33 @@ int gnrc_netif_pktq_put(gnrc_netif_t *netif, gnrc_pktsnip_t *pkt)
     return 0;
 }
 
+static void _timer_pktq_sched(void *arg)
+{
+    gnrc_netif_t *netif = arg;
+    event_post(&netif->evq[GNRC_NETIF_EVQ_INDEX_PRIO_LOW], &netif->event_pktq);
+}
+
+void gnrc_netif_pktq_init(gnrc_netif_t *netif)
+{
+    (void) netif;
+#if CONFIG_GNRC_NETIF_PKTQ_TIMER_US > 0
+    netif->send_queue.dequeue_timer.callback = _timer_pktq_sched;
+    netif->send_queue.dequeue_timer.arg = netif;
+#endif  /* CONFIG_GNRC_NETIF_PKTQ_TIMER_US >= 0 */
+}
+
 void gnrc_netif_pktq_sched_get(gnrc_netif_t *netif)
 {
 #if CONFIG_GNRC_NETIF_PKTQ_TIMER_US > 0
     assert(netif != NULL);
-    netif->send_queue.dequeue_msg.type = GNRC_NETIF_PKTQ_DEQUEUE_MSG;
-    /* Prevent timer from firing while we add this.
-     * Otherwise the system might crash: The timer handler sets
-     * netif->send_queue.dequeue_msg.sender_pid to KERNEL_PID_ISR while
-     * the message is added to the timer, causing the next round of the timer
-     * handler to try to send the message to IPC, leaving the system in an
-     * invalid state. */
+    /* Prevent timer from firing while we add this */
     unsigned state = irq_disable();
-    xtimer_set_msg(&netif->send_queue.dequeue_timer,
-                   CONFIG_GNRC_NETIF_PKTQ_TIMER_US,
-                   &netif->send_queue.dequeue_msg, netif->pid);
+    xtimer_set(&netif->send_queue.dequeue_timer,
+               CONFIG_GNRC_NETIF_PKTQ_TIMER_US);
     irq_restore(state);
 #elif CONFIG_GNRC_NETIF_PKTQ_TIMER_US == 0
     assert(netif != NULL);
-    netif->send_queue.dequeue_msg.type = GNRC_NETIF_PKTQ_DEQUEUE_MSG;
-    if (msg_send(&netif->send_queue.dequeue_msg, netif->pid) < 0) {
-        DEBUG("gnrc_netif_pktq: couldn't schedule packet (msg queue is full)\n");
-    }
+    event_post(&netif->evq[GNRC_NETIF_EVQ_INDEX_PRIO_LOW], &netif->event_pktq);
 #else
     (void)netif;
 #endif  /* CONFIG_GNRC_NETIF_PKTQ_TIMER_US >= 0 */

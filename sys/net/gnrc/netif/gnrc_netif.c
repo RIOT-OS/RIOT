@@ -1726,6 +1726,13 @@ static void _event_handler_isr(event_t *evp)
     netif->dev->driver->isr(netif->dev);
 }
 
+/**
+ * @brief   Call the ISR handler from an event
+ *
+ * @param[in]   evp     pointer to the event
+ */
+
+
 static void _process_receive_stats(gnrc_netif_t *netdev, gnrc_pktsnip_t *pkt)
 {
     if (!IS_USED(MODULE_NETSTATS_NEIGHBOR)) {
@@ -1805,6 +1812,21 @@ static void _send_queued_pkt(gnrc_netif_t *netif)
     }
 #endif /* IS_USED(MODULE_GNRC_NETIF_PKTQ) */
 }
+
+#if IS_USED(MODULE_GNRC_NETIF_PKTQ) || defined(DOXYGEN)
+/**
+ * @brief   Send a queued packet
+ *
+ * @param[in]   evp     pointer to the event
+ */
+static void _event_handler_pktq(event_t *evp)
+{
+    gnrc_netif_t *netif = container_of(evp, gnrc_netif_t, event_pktq);
+    DEBUG("gnrc_netif: send from packet send queue\n");
+    _send_queued_pkt(netif);
+}
+#endif /* IS_USED(MODULE_GNRC_NETIF_PKTQ) */
+
 
 static netstats_nb_result_t _res_to_nb_result(int res)
 {
@@ -2018,6 +2040,10 @@ static void *_gnrc_netif_thread(void *args)
     netif->pid = thread_getpid();
 
     netif->event_isr.handler = _event_handler_isr;
+#if IS_USED(MODULE_GNRC_NETIF_PKTQ)
+    netif->event_pktq.handler = _event_handler_pktq;
+    gnrc_netif_pktq_init(netif);
+#endif
 #if IS_USED(MODULE_NETDEV_NEW_API)
     netif->event_tx_done.handler = _event_handler_tx_done;
 #endif
@@ -2049,12 +2075,6 @@ static void *_gnrc_netif_thread(void *args)
         /* dispatch netdev, MAC and gnrc_netapi messages */
         DEBUG("gnrc_netif: message %u\n", (unsigned)msg.type);
         switch (msg.type) {
-#if IS_USED(MODULE_GNRC_NETIF_PKTQ)
-            case GNRC_NETIF_PKTQ_DEQUEUE_MSG:
-                DEBUG("gnrc_netif: send from packet send queue\n");
-                _send_queued_pkt(netif);
-                break;
-#endif  /* IS_USED(MODULE_GNRC_NETIF_PKTQ) */
             case GNRC_NETAPI_MSG_TYPE_SND:
                 DEBUG("gnrc_netif: GNRC_NETDEV_MSG_TYPE_SND received\n");
                 _send(netif, msg.content.ptr, false);

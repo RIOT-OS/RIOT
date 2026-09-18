@@ -33,7 +33,6 @@ extern "C" {
 typedef struct {
     gnrc_pktqueue_t *queue;     /**< the actual packet queue class */
 #if CONFIG_GNRC_NETIF_PKTQ_TIMER_US >= 0
-    msg_t dequeue_msg;          /**< message for gnrc_netif_pktq_t::dequeue_timer to send */
     xtimer_t dequeue_timer;     /**< timer to schedule next sending of
                                  *   queued packets */
 #endif
