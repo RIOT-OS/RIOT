@@ -529,5 +529,5 @@ ifneq (,$(filter gnrc_netif_%,$(filter-out gnrc_netif_pktq,$(USEMODULE))))
 endif
 
 ifneq (,$(filter gnrc_netif_pktq,$(USEMODULE)))
-  USEMODULE += ztimer
+  USEMODULE += ztimer_usec
 endif
