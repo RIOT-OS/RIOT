@@ -87,7 +87,7 @@ void gnrc_netif_pktq_sched_get(gnrc_netif_t *netif)
     assert(netif != NULL);
     /* Prevent timer from firing while we add this */
     unsigned state = irq_disable();
-    xtimer_set(&netif->send_queue.dequeue_timer,
+    ztimer_set(ZTIMER_USEC, &netif->send_queue.dequeue_timer,
                CONFIG_GNRC_NETIF_PKTQ_TIMER_US);
     irq_restore(state);
 #elif CONFIG_GNRC_NETIF_PKTQ_TIMER_US == 0
