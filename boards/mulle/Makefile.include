@@ -27,5 +27,5 @@ DEBUG_ADAPTER_ID ?= $(PROGRAMMER_SERIAL)
 
 # Define the default port depending on the host OS
 PORT_LINUX ?= /dev/ttyUSB0
-PORT_DARWIN ?= $(firstword $(sort $(wildcard /dev/tty.usbserial*)))
+PORT_DARWIN ?= $(firstword $(sort $(wildcard /dev/cu.usbserial*)))
 TTY_BOARD_FILTER := --model 'Mulle Programmer' --iface-num 0

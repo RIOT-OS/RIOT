@@ -1,6 +1,6 @@
 # configure the terminal program
 PORT_LINUX  ?= /dev/ttyUSB0
-PORT_DARWIN ?= $(firstword $(sort $(wildcard /dev/tty.usbmodem*)))
+
 # refine serial port information for pyterm
 BAUD        ?= 115200
 AVR_RSS2_BOOTLOADER ?= stk500v2
