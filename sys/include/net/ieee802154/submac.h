@@ -495,6 +495,159 @@ static inline bool ieee802154_submac_state_is_idle(ieee802154_submac_t *submac)
 }
 
 /**
+ * @brief   Get the symbol duration for the current PHY configuration.
+ *          (according to 2024 Standard)
+ *
+ * @param[in] submac pointer to the SubMAC descriptor
+ *
+ * @return symbol duration in microseconds.
+ */
+static inline uint16_t ieee802154_get_symbol_duration(const ieee802154_submac_t *submac)
+{
+    switch (submac->phy_mode) {
+        case IEEE802154_PHY_OQPSK:
+            /* 868 MHz (channel 0): 25 ksymbol/s
+             * 780/915/2380/2450 MHz: 62.5 ksymbol/s */
+            return (submac->channel_num == 0) ? 40 : 16;
+
+        case IEEE802154_PHY_BPSK:
+            /* 868 MHz (channel 0): 20 ksymbol/s
+             * 915 MHz (channels 1-10): 40 ksymbol/s */
+            return (submac->channel_num == 0) ? 50 : 25;
+
+        default:
+            /* other PHYs not supported yet */
+            assert(0);
+            return 16;
+    }
+}
+
+/**
+ * @brief   Get the _phySHRDuration_ PHY constant value in microseconds.
+ *          (according to 2024 Standard)
+ *
+ * @param[in] submac pointer to the SubMAC descriptor
+ *
+ * @return constant value in microseconds.
+ */
+static inline uint32_t ieee802154_get_shr_duration(const ieee802154_submac_t *submac)
+{
+    uint32_t sym_dur = ieee802154_get_symbol_duration(submac);
+
+    switch (submac->phy_mode) {
+        case IEEE802154_PHY_BPSK:
+            /* 14.1: preamble 32 symbols (4 octets),
+             * 13.1.2.3: SFD 1 octet -> 8 symbols (1 bit per symbol) */
+            return (32 + 8) * sym_dur;
+        case IEEE802154_PHY_OQPSK:
+            /* 13.1.2.2: preamble 8 symbols (4 octets),
+             * 13.1.2.3: SFD 1 octet -> 2 symbols (4 bits per symbol) */
+            return (8 + 2) * sym_dur;
+        default:
+            /* other PHYs not supported yet */
+            assert(0);
+            return 0;
+    }
+}
+
+/**
+ * @brief   Calculate the PHY PSDU duration value in microseconds.
+ *          (according to 2024 Standard)
+ *
+ * @param[in] submac pointer to the SubMAC descriptor
+ * @param[in] length PSDU length in bytes
+ *
+ * @return PSDU duration in microseconds.
+ */
+static inline uint32_t ieee802154_get_psdu_duration(const ieee802154_submac_t *submac,
+                                                    uint16_t length)
+{
+    uint32_t sym_dur = ieee802154_get_symbol_duration(submac);
+
+    switch (submac->phy_mode) {
+        case IEEE802154_PHY_BPSK:
+            /* 1 bit per symbol -> 8 symbols per octet */
+            return sym_dur * length * 8;
+        case IEEE802154_PHY_OQPSK:
+            /* 4 bits per symbol -> 2 symbols per octet */
+            return sym_dur * length * 2;
+        default:
+            /* other PHYs not supported yet */
+            assert(0);
+            return 0;
+    }
+}
+
+/**
+ * @brief   Get the _aTurnaroundTime_ PHY constant value in microseconds.
+ *          (according to 2024 Standard)
+ *
+ * @param[in] submac pointer to the SubMAC descriptor
+ *
+ * @return constant value in microseconds.
+ */
+static inline uint32_t ieee802154_get_turnaround_time(const ieee802154_submac_t *submac)
+{
+    switch (submac->phy_mode) {
+        case IEEE802154_PHY_BPSK:
+        case IEEE802154_PHY_OQPSK:
+            /* Table 12-1: 12 symbol periods */
+            return IEEE802154_ATURNAROUNDTIME_IN_SYMBOLS * ieee802154_get_symbol_duration(submac);
+        default:
+            /* other PHYs not supported yet */
+            assert(0);
+            return IEEE802154G_ATURNAROUNDTIME_US;
+    }
+}
+
+/**
+ * @brief   Get the _phyCcaDuration_ value in microseconds.
+ *          (according to 2024 Standard)
+ *
+ * @param[in] submac pointer to the SubMAC descriptor
+ *
+ * @return CCA duration in microseconds.
+ */
+static inline uint32_t ieee802154_get_cca_time(const ieee802154_submac_t *submac)
+{
+    switch (submac->phy_mode) {
+    case IEEE802154_PHY_BPSK:
+    case IEEE802154_PHY_OQPSK:
+        /* Table 12-2: 8 symbol periods if not specified by the PHY clause */
+        return IEEE802154_CCA_DURATION_IN_SYMBOLS * ieee802154_get_symbol_duration(submac);
+    default:
+        /* other PHYs not supported yet */
+        assert(0);
+        return 0;
+    }
+}
+
+/**
+ * @brief   Get the _aUnitBackoffPeriod_ MAC constant value in microseconds.
+ *
+ * @param[in] submac pointer to the SubMAC descriptor
+ *
+ * @return constant value in microseconds.
+ */
+static inline uint32_t ieee802154_get_unit_backoff_period(const ieee802154_submac_t *submac)
+{
+    /* XXX: for SUN PHY 920 MHz bands use phyCcaDuration */
+    return submac->csma_backoff_us;
+}
+
+/**
+ * @brief   Get the _macAckWaitDuration_ MAC attribute value in microseconds.
+ *
+ * @param[in] submac pointer to the SubMAC descriptor
+ *
+ * @return attribute value in microseconds.
+ */
+static inline uint32_t ieee802154_get_ack_wait_duration(const ieee802154_submac_t *submac)
+{
+    return submac->ack_timeout_us;
+}
+
+/**
  * @brief Init the IEEE 802.15.4 SubMAC
  *
  * The SubMAC state machine starts in RX state.
