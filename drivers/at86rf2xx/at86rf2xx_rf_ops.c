@@ -46,8 +46,7 @@ static ieee802154_dev_t *at86rf2xx_periph;
  * @param[in] key               Encryption key to be used
  * @param[in] key_size          Size of the encryption key in bytes
  */
-static void _at86rf2xx_set_key(ieee802154_sec_dev_t *dev,
-                               const uint8_t *key, uint8_t key_size)
+static void _at86rf2xx_set_key(ieee802154_sec_dev_t *dev, const uint8_t *key, uint8_t key_size)
 {
     (void)key_size;
     ieee802154_dev_t *hal = dev->ctx;
@@ -63,19 +62,12 @@ static void _at86rf2xx_set_key(ieee802154_sec_dev_t *dev,
  * @param[in]       plain       Input data blocks
  * @param[in]       nblocks     Number of blocks
  */
-static void _at86rf2xx_cbc(const ieee802154_sec_dev_t *dev,
-                           uint8_t *cipher,
-                           uint8_t *iv,
-                           const uint8_t *plain,
-                           uint8_t nblocks)
+static void _at86rf2xx_cbc(const ieee802154_sec_dev_t *dev, uint8_t *cipher, uint8_t *iv,
+                           const uint8_t *plain, uint8_t nblocks)
 {
     ieee802154_dev_t *hal = dev->ctx;
 
-    at86rf2xx_aes_cbc_encrypt(hal->priv,
-                              (aes_block_t *)cipher,
-                              NULL,
-                              iv,
-                              (aes_block_t *)plain,
+    at86rf2xx_aes_cbc_encrypt(hal->priv, (aes_block_t *)cipher, NULL, iv, (aes_block_t *)plain,
                               nblocks);
 }
 
@@ -126,7 +118,7 @@ static int _write(ieee802154_dev_t *hal, const iolist_t *psdu)
         /* current packet data + FCS too long */
         if ((len + iol->iol_len + IEEE802154_FCS_LEN) > AT86RF2XX_MAX_PKT_LENGTH) {
             DEBUG("[at86rf2xx] error: packet too large (%" PRIuSIZE " byte) to be send\n",
-                    (size_t)len + IEEE802154_FCS_LEN);
+                 (size_t)len + IEEE802154_FCS_LEN);
 
             mutex_unlock(&dev->lock);
             return -EOVERFLOW;
@@ -398,7 +390,7 @@ static int _confirm_transmit(at86rf2xx_t *dev, ieee802154_tx_info_t *info)
 #if AT86RF2XX_HAVE_RETRIES && AT86RF2XX_HAVE_RETRIES_REG
         info->retrans = (at86rf2xx_reg_read(dev, AT86RF2XX_REG__XAH_CTRL_2) &
                          AT86RF2XX_XAH_CTRL_2__ARET_FRAME_RETRIES_MASK) >>
-                         AT86RF2XX_XAH_CTRL_2__ARET_FRAME_RETRIES_OFFSET;
+                        AT86RF2XX_XAH_CTRL_2__ARET_FRAME_RETRIES_OFFSET;
 #endif
         switch (trac_status) {
         case AT86RF2XX_TRX_STATE__TRAC_SUCCESS:
@@ -504,8 +496,8 @@ static int _config_phy(ieee802154_dev_t *hal, const ieee802154_phy_conf_t *conf)
     uint8_t page = (AT86RF2XX_HAVE_SUBGHZ && conf->phy_mode == IEEE802154_PHY_OQPSK) ? 2 : 0;
     int8_t txpower = conf->pow;
 
-    if (txpower < (-AT86RF2XX_TXPOWER_OFF_OFFSET)
-        || (txpower + AT86RF2XX_TXPOWER_OFF_OFFSET) > AT86RF2XX_TXPOWER_MAX_INDEX) {
+    if (txpower < (-AT86RF2XX_TXPOWER_OFF_OFFSET) ||
+       (txpower + AT86RF2XX_TXPOWER_OFF_OFFSET) > AT86RF2XX_TXPOWER_MAX_INDEX) {
         return -EINVAL;
     }
 
@@ -533,7 +525,6 @@ static int _set_csma_params(ieee802154_dev_t *hal, const ieee802154_csma_be_t *b
 
 static int _config_addr_filter(ieee802154_dev_t *hal, ieee802154_af_cmd_t cmd, const void *value)
 {
-
     at86rf2xx_t *dev = hal->priv;
     const uint16_t *pan_id = value;
     const network_uint16_t *short_addr = value;
@@ -543,10 +534,8 @@ static int _config_addr_filter(ieee802154_dev_t *hal, ieee802154_af_cmd_t cmd, c
     mutex_lock(&dev->lock);
     switch (cmd) {
     case IEEE802154_AF_SHORT_ADDR:
-        at86rf2xx_reg_write(dev, AT86RF2XX_REG__SHORT_ADDR_0,
-                            short_addr->u8[1]);
-        at86rf2xx_reg_write(dev, AT86RF2XX_REG__SHORT_ADDR_1,
-                            short_addr->u8[0]);
+        at86rf2xx_reg_write(dev, AT86RF2XX_REG__SHORT_ADDR_0, short_addr->u8[1]);
+        at86rf2xx_reg_write(dev, AT86RF2XX_REG__SHORT_ADDR_1, short_addr->u8[0]);
         DEBUG("SHORT_ADDR: %04x\n", byteorder_ntohs(*short_addr));
         break;
     case IEEE802154_AF_EXT_ADDR:
@@ -563,8 +552,8 @@ static int _config_addr_filter(ieee802154_dev_t *hal, ieee802154_af_cmd_t cmd, c
         at86rf2xx_reg_write(dev, AT86RF2XX_REG__PAN_ID_0, le_pan.u8[0]);
         at86rf2xx_reg_write(dev, AT86RF2XX_REG__PAN_ID_1, le_pan.u8[1]);
         DEBUG("PANID: %04x\n", *pan_id);
+        break;
     }
-    break;
     case IEEE802154_AF_PAN_COORD:
         mutex_unlock(&dev->lock);
         return -ENOTSUP;
@@ -577,7 +566,6 @@ static int _config_addr_filter(ieee802154_dev_t *hal, ieee802154_af_cmd_t cmd, c
 static int _config_src_addr_match(ieee802154_dev_t *hal, ieee802154_src_match_t cmd,
                                   const void *value)
 {
-
     at86rf2xx_t *dev = hal->priv;
     int res;
 
@@ -598,7 +586,6 @@ static int _config_src_addr_match(ieee802154_dev_t *hal, ieee802154_src_match_t 
 
 static int _set_frame_filter_mode(ieee802154_dev_t *hal, ieee802154_filter_mode_t mode)
 {
-
     at86rf2xx_t *dev = hal->priv;
     bool promisc = false;
 
