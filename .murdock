@@ -361,6 +361,7 @@ toolchain_capabilities_available() {
 
     if [ -z "$capabilities" ]; then
         capabilities="$(toolchain_capabilities_discover "$appdir" "$board" "$toolchain")"
+        echo "-- toolchain capability cache miss for $board:$toolchain, discovering..."
         echo "$capabilities" | toolchain_capabilities_put "$board" "$toolchain"
     fi
 
