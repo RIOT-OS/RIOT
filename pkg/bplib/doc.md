@@ -82,6 +82,9 @@ CONFIG_BPLIB_CLA_UDP_TIMEOUT | Timeout [ms] after which the UDP CLA will termina
 CONFIG_BPLIB_MEMPOOL_LEN | Mempool size available for bplib bundles in send / delivery queues. Increasing this means more bundles can be queued, since bundles ingressed when to mempool is full, are dropped. Note: Each bundle is at least `sizeof BPLib_BBlocks_t` (around 700) + the blocks allocated for the actual payload. | `bplib_init`
 CONFIG_BPLIB_GEN_WORKER_TIMEOUT | Timeout [ms] after which the generic worker times out after bplib termination | `bplib_init`
 CONFIG_BPLIB_GENERIC_STACK_SIZE | Stack size of the generic worker. | `bplib_init`
+CONFIG_BPLIB_MAINTENANCE_STACK_SIZE | Stack size of the maintenance worker. | `bplib_init`
+CONFIG_BPLIB_MAINTENANCE_INTERVAL | Interval [ms] of maintenance task. Since this task also egresses bundles from storage, this should not be too high if bundles should be forwarded in reasonable times. | `bplib_init`
+CONFIG_BPLIB_MAINTENANCE_MAX_BUNDLES | Maximum number of bundles to egress per contact and channel per maintenance call. Might be used to prevent spending long times egressing from storage. | `bplib_init`
 CONFIG_BPLIB_MAX_SEQ_NUM | Maximum sequence number, after which it will wrap back to 0 | `bplib_nc`
 CONFIG_BPLIB_SUPPORT_CUSTODY | Whether this node shall allow custody bundles or not [bool] | `bplib_nc`
 CONFIG_BPLIB_STOR_BASE | File path prefix of the folder where the bundles will be stored. | `bplib_stor_vfs_*`

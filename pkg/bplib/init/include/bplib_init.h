@@ -80,6 +80,33 @@ extern "C" {
 #endif
 
 /**
+ * @brief Stack size of the bplib maintenance thread.
+ *
+ * This worker thread calls the storage extraction and cleanup functions and
+ * this may need a larger stack size.
+ */
+#ifndef CONFIG_BPLIB_MAINTENANCE_STACK_SIZE
+#  define CONFIG_BPLIB_MAINTENANCE_STACK_SIZE THREAD_STACKSIZE_LARGE
+#endif
+
+/**
+ * @brief Interval [ms] at which maintenance activities take place.
+ *
+ * These activities also include pulling bundles from storage. A value in the
+ * area of multiple seconds is probably a good place to start.
+ */
+#ifndef CONFIG_BPLIB_MAINTENANCE_INTERVAL
+#  define CONFIG_BPLIB_MAINTENANCE_INTERVAL 10000
+#endif
+
+/**
+ * @brief Maximum number of bundles to egress from storage per contact / channel
+ */
+#ifndef CONFIG_BPLIB_MAINTENANCE_MAX_BUNDLES
+#  define CONFIG_BPLIB_MAINTENANCE_MAX_BUNDLES 8
+#endif
+
+/**
  * @brief State of the bplib instance.
  */
 typedef struct {
