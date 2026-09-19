@@ -270,9 +270,19 @@ info-programmers-supported:
 # Prints the values discovered by the CC_SUPPORTS_*/LINKER_SUPPORTS_*/etc.
 # `?=` checks, one KEY=VALUE pair per line. This lets the discovery be forced
 # once (e.g. per BOARD/TOOLCHAIN) and the result be fed back into subsequent
-# builds via the environment, instead of every build re-running the checks.
+# builds, instead of every build re-running the checks.
 info-toolchain-capabilities:
 	@$(foreach v,$(TOOLCHAIN_CAPABILITY_VARS),echo $(v)=$($(v));)
+
+# Optional makefile fragment with pre-discovered toolchain capability
+# variables for this exact BOARD/TOOLCHAIN combination, e.g. the output of
+# `make info-toolchain-capabilities` above, saved to a file by an external
+# caller (such as CI). This must be included before the CC_SUPPORTS_*/
+# LINKER_SUPPORTS_*/etc. `?=` checks below and in the other makefiles that
+# populate TOOLCHAIN_CAPABILITY_VARS, so their checks are skipped once the
+# values are already known. Silently does nothing if unset or the file does
+# not exist.
+-include $(TOOLCHAIN_CAPABILITIES_MK)
 
 info-rust:
 	cargo version
