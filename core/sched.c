@@ -278,6 +278,18 @@ void sched_set_status(thread_t *process, thread_status_t status)
 void sched_switch(uint16_t other_prio)
 {
     thread_t *active_thread = thread_get_active();
+
+    /* If a thread exists and no other thread is runnable, we may end up in
+     * a situation with no active thread. This can not occur if there is an
+     * idle thread, which is always runnable, though */
+    if (!IS_USED(MODULE_CORE_IDLE_THREAD) && unlikely(active_thread == NULL)) {
+        /* we are in IRQ context, as `active_thread == NULL` in thread context
+         * makes no sense */
+        DEBUG("sched_switch: setting sched_context_switch_request.\n");
+        sched_context_switch_request = 1;
+        return;
+    }
+
     uint16_t current_prio = active_thread->priority;
     int on_runqueue = (active_thread->status >= STATUS_ON_RUNQUEUE);
 
