@@ -519,15 +519,8 @@ include $(RIOTMAKE)/cflags.inc.mk
 -include $(RIOTBASE)/EXTRAVERSION
 
 include $(RIOTMAKE)/git_version.inc.mk
-RIOT_VERSION_GIT := $(or $(GIT_VERSION),'UNKNOWN (builddir: $(RIOTBASE))')
 RIOT_VERSION ?= $(RIOT_VERSION_GIT)
 RIOT_EXTRAVERSION ?= 0
-
-# Deprecate using RIOT_VERSION_OVERRIDE but currently keep the behavior
-ifneq (,$(RIOT_VERSION_OVERRIDE))
-  $(warning 'RIOT_VERSION_OVERRIDE' is deprecated, it can now be set with 'RIOT_VERSION' directly.)
-  RIOT_VERSION = $(RIOT_VERSION_OVERRIDE)
-endif
 
 # Generate machine readable RIOT VERSION macro
 RIOT_VERSION_CODE ?= $(shell echo $(RIOT_VERSION) | \

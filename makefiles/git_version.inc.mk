@@ -9,3 +9,9 @@ GIT_BRANCH = $(call memoized,GIT_BRANCH,$(shell git --git-dir="$(RIOTBASE)/.git"
 _GIT_VERSION = $(GIT_DESCRIBE)$(addprefix -,$(GIT_BRANCH:master=))
 
 GIT_VERSION ?= $(if $(GIT_DESCRIBE),$(_GIT_VERSION))
+
+# This variable is recursively expanded on purpose. It is only expanded when
+# $(RIOT_VERSION) has not been set already. For CI builds, $(GIT_VERSION) has a
+# fixed value, set by Makefile.include before this file is included. This will
+# then skip the expansion of $(GIT_VERSION) and therefore save two shell calls.
+RIOT_VERSION_GIT = $(or $(GIT_VERSION),'UNKNOWN (builddir: $(RIOTBASE))')
