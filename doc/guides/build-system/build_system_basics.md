@@ -288,8 +288,11 @@ endif
 
 A special target `make info-toolchain-capabilities` will print `key=value`
 pairs for the toolchain capabilities that were detected. The continuous
-integration system will cache this once, and then inject it into the
-environment for all subsequent builds. Local builds will not be affected.
+integration system will cache this once per BOARD/TOOLCHAIN combination, and
+point `TOOLCHAIN_CAPABILITIES_MK` at the cached file for subsequent builds of
+that combination. `makefiles/info.inc.mk` includes that file, if set, before
+any of the checks run, so they are skipped in favor of the cached values.
+Local builds will not be affected.
 
 An example output of
 `BOARD=slstk3701a make info-toolchain-capabilities -C examples/basic/default --no-print-directory`:

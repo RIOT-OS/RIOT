@@ -362,7 +362,20 @@ toolchain_capabilities_available() {
     if [ ! -f "${cache_file}" ]; then
         echo "-- toolchain capability cache miss for $board:$toolchain, discovering..."
         mkdir -p "${TOOLCHAIN_CAPABILITIES_CACHE_DIR}"
-        toolchain_capabilities_discover "$appdir" "$board" "$toolchain" > "${cache_file}"
+
+        # write to a per-process temp file and rename it into place
+        # atomically: several jobs for the same board:toolchain can race to
+        # discover concurrently, and a plain '> ${cache_file}' would let
+        # their writes interleave and corrupt the file. Redundant discovery
+        # is harmless; a corrupted cache file breaks every subsequent build
+        # that includes it.
+        local tmp_file="${cache_file}.$$"
+        toolchain_capabilities_discover "$appdir" "$board" "$toolchain" > "${tmp_file}"
+        if [ -s "${tmp_file}" ]; then
+            mv -f "${tmp_file}" "${cache_file}"
+        else
+            rm -f "${tmp_file}"
+        fi
     fi
 
     export TOOLCHAIN_CAPABILITIES_MK="${cache_file}"
