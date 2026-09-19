@@ -128,6 +128,13 @@ BPLib_Status_t BPLib_STOR_StoreBundle(BPLib_Instance_t* inst, BPLib_Bundle_t* bu
         goto free_bundle;
     }
 
+    /* Write bundle metadata */
+    written = vfs_write(fd, &bundle->Meta, sizeof(BPLib_BundleMetaData_t));
+    if (written < 0 || written != (ssize_t) sizeof(BPLib_BundleMetaData_t)) {
+        failed = true;
+        goto close_file;
+    }
+
     /* Write bundle blocks */
     written = vfs_write(fd, &bundle->blocks, sizeof(BPLib_BBlocks_t));
     if (written < 0 || written != (ssize_t) sizeof(BPLib_BBlocks_t)) {
@@ -138,7 +145,7 @@ BPLib_Status_t BPLib_STOR_StoreBundle(BPLib_Instance_t* inst, BPLib_Bundle_t* bu
     /* Write chunks */
     curr_mem_block = bundle->blob;
     while (curr_mem_block != NULL) {
-        written = vfs_write(fd, curr_mem_block->user_data.raw_bytes, curr_mem_block->used_len);
+        written = vfs_write(fd, curr_mem_block->user_data.BigData, curr_mem_block->used_len);
         if (written < 0 || written != (ssize_t) curr_mem_block->used_len) {
             failed = true;
             goto close_file;
@@ -459,14 +466,21 @@ static BPLib_Status_t _load_next_bundle(BPLib_Instance_t* inst, BPLib_Bundle_t**
     }
 
     /* Allocate bundle blocks */
-    bundle_head = BPLib_MEM_BlockAlloc(pool);
+    bundle_head = BPLib_MEM_BlockAlloc(pool, BPLIB_MEM_BIG_BLK_SIZE);
     if (bundle_head == NULL) {
         ret = BPLIB_STOR_NO_MEM_ERR;
         goto close_file;
     }
 
+    /* Read bundle metadata */
+    bytes_read = vfs_read(fd, &bundle_head->user_data.Bundle.Meta, sizeof(BPLib_BundleMetaData_t));
+    if (bytes_read != sizeof(BPLib_BundleMetaData_t)) {
+        ret = BPLIB_OS_ERROR;
+        goto close_file;
+    }
+
     /* Read bundle blocks */
-    bytes_read = vfs_read(fd, &bundle_head->user_data.bundle.blocks, sizeof(BPLib_BBlocks_t));
+    bytes_read = vfs_read(fd, &bundle_head->user_data.Bundle.blocks, sizeof(BPLib_BBlocks_t));
     if (bytes_read != sizeof(BPLib_BBlocks_t)) {
         ret = BPLIB_OS_ERROR;
         goto close_file;
@@ -477,14 +491,14 @@ static BPLib_Status_t _load_next_bundle(BPLib_Instance_t* inst, BPLib_Bundle_t**
 
     while (1) {
         /* Read all the remaining actual data blocks */
-        next_block = BPLib_MEM_BlockAlloc(pool);
+        next_block = BPLib_MEM_BlockAlloc(pool, BPLIB_MEM_BIG_BLK_SIZE);
         if (next_block == NULL) {
             ret = BPLIB_STOR_NO_MEM_ERR;
             goto close_file;
         }
         curr_block->next = next_block;
 
-        bytes_read = vfs_read(fd, &next_block->user_data.raw_bytes, sizeof(next_block->user_data.raw_bytes));
+        bytes_read = vfs_read(fd, &next_block->user_data.BigData, sizeof(next_block->user_data.BigData));
         if (bytes_read < 0) {
             ret = BPLIB_OS_ERROR;
             goto close_file;
@@ -493,7 +507,7 @@ static BPLib_Status_t _load_next_bundle(BPLib_Instance_t* inst, BPLib_Bundle_t**
         curr_block = next_block;
         curr_block->used_len = bytes_read;
 
-        if (bytes_read < (ssize_t) sizeof(next_block->user_data.raw_bytes)) {
+        if (bytes_read < (ssize_t) sizeof(next_block->user_data.BigData)) {
             break;
         }
     }
@@ -510,7 +524,7 @@ close_file:
             BPLib_MEM_BlockListFree(pool, bundle_head);
         }
     } else {
-        ret_bundle = (BPLib_Bundle_t*)(bundle_head);
+        ret_bundle = (BPLib_Bundle_t*)(&bundle_head->user_data.Bundle);
         ret_bundle->blob = bundle_head->next;
         *bundle = ret_bundle;
     }
@@ -645,10 +659,14 @@ BPLib_Status_t BPLib_STOR_GarbageCollect(BPLib_Instance_t* inst)
                 vfs_unlink(iterator.path);
                 continue;
             }
-            /* Read relevant bundle info */
-            vfs_lseek(fd, offsetof(BPLib_BBlocks_t, PrimaryBlock.Lifetime), SEEK_SET);
+            /* Read relevant bundle info.
+             * Since 7.0.5 each bundle has a BPLib_BundleMetaData_t in front, but the containing
+             * BPLib_Bundle_t might not be packed, but it is on disk. */
+            vfs_lseek(fd, offsetof(BPLib_BBlocks_t, PrimaryBlock.Lifetime) +
+                          sizeof(BPLib_BundleMetaData_t), SEEK_SET);
             bytes_read = vfs_read(fd, &lifetime, sizeof(uint64_t));
-            vfs_lseek(fd, offsetof(BPLib_BBlocks_t, PrimaryBlock.MonoTime), SEEK_SET);
+            vfs_lseek(fd, offsetof(BPLib_BBlocks_t, PrimaryBlock.MonoTime) +
+                          sizeof(BPLib_BundleMetaData_t), SEEK_SET);
             bytes_read += vfs_read(fd, &bundle_creation_time, sizeof(BPLib_TIME_MonotonicTime_t));
 
             if (vfs_close(fd) < 0 ||
@@ -706,6 +724,66 @@ void BPLib_STOR_UpdateHkPkt(BPLib_Instance_t* inst)
 BPLib_Status_t BPLib_STOR_StorageTblValidateFunc(void *tbl_data)
 {
     (void) tbl_data;
+    return BPLIB_SUCCESS;
+}
+
+void BPLib_STOR_AddToCustodialUpdateBatch(BPLib_Instance_t *Inst,
+                                          uint32_t BundleId,
+                                          BPLib_CT_StorOp_t Op)
+{
+    (void) Inst;
+    (void) BundleId;
+    (void) Op;
+    return;
+}
+
+void BPLib_STOR_UpdateCustodialBundles(BPLib_Instance_t* Inst)
+{
+    (void) Inst;
+    return;
+}
+
+BPLib_Status_t BPLib_STOR_SetNewRetransmitTrigger(BPLib_Instance_t *Inst,
+                                                  uint32_t ContactId)
+{
+    (void) Inst;
+    (void) ContactId;
+    return BPLIB_SUCCESS;
+}
+
+BPLib_Status_t BPLib_STOR_Egress(BPLib_Instance_t *Instance, size_t MaxBundles)
+{
+    BPLib_Status_t Status;
+    uint32_t ChanId, ContId;
+    size_t NumLoaded;
+    BPLib_CLA_ContactRunState_t ConState;
+
+    for (ChanId = 0; ChanId < BPLIB_MAX_NUM_CHANNELS; ChanId++)
+    {
+        if (BPLib_NC_GetAppState(ChanId) == BPLIB_NC_APP_STATE_STARTED &&
+            BPLib_PI_GetRegistrationState(Instance, ChanId) == BPLIB_PI_ACTIVE)
+        {
+            Status = BPLib_STOR_EgressForID(Instance, ChanId, true, &NumLoaded);
+            if (Status != BPLIB_SUCCESS || NumLoaded >= MaxBundles)
+            {
+                return Status;
+            }
+        }
+    }
+
+    for (ContId = 0; ContId < BPLIB_MAX_NUM_CONTACTS; ContId++)
+    {
+        (void) BPLib_CLA_GetContactRunState(ContId, &ConState);
+        if (ConState == BPLIB_CLA_STARTED)
+        {
+            Status = BPLib_STOR_EgressForID(Instance, ContId, false, &NumLoaded);
+            if (Status != BPLIB_SUCCESS || NumLoaded >= MaxBundles)
+            {
+                return Status;
+            }
+        }
+    }
+
     return BPLIB_SUCCESS;
 }
 
