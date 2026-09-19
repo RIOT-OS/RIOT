@@ -1,3 +1,7 @@
 ifneq (,$(filter netdev_default,$(USEMODULE)))
   USEMODULE += sx1272
 endif
+
+ifneq (,$(filter mtd,$(USEMODULE)))
+  USEMODULE  += mtd_eeprom
+endif

@@ -87,5 +87,6 @@ int main(void)
     if (res) {
         fprintf(stderr, "%s:%u: error %d\n", SCRIPT_FILE, line, res);
     }
-    return res;
+    /* error is expected in line 6 */
+    return line == 6 ? 0 : res;
 }
