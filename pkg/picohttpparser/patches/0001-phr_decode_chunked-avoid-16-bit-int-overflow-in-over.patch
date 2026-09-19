@@ -1,0 +1,32 @@
+From 33709b2c171e6ec6dc0dc94224aa9a8ed35bc575 Mon Sep 17 00:00:00 2001
+From: Bas Stottelaar <basstottelaar@gmail.com>
+Date: Wed, 16 Sep 2026 15:12:41 +0200
+Subject: [PATCH 1/2] phr_decode_chunked: avoid 16-bit int overflow in overhead
+ check
+
+100 * 1024 is computed as a plain (signed) int literal expression,
+which overflows on platforms where int is 16 bits wide, such as AVR,
+turning the overhead threshold negative. Comparing that against the
+uint64_t total also triggers a sign-compare warning there.
+
+Widening the literal to unsigned long avoids both.
+---
+ picohttpparser.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/picohttpparser.c b/picohttpparser.c
+index 26e4ccf..357474e 100644
+--- a/picohttpparser.c
++++ b/picohttpparser.c
+@@ -691,7 +691,7 @@ Exit:
+     /* if incomplete but the overhead of the chunked encoding is >=100KB and >80%, signal an error */
+     if (ret == -2) {
+         decoder->_total_overhead += bufsz - dst;
+-        if (decoder->_total_overhead >= 100 * 1024 && decoder->_total_read - decoder->_total_overhead < decoder->_total_read / 4)
++        if (decoder->_total_overhead >= 100UL * 1024 && decoder->_total_read - decoder->_total_overhead < decoder->_total_read / 4)
+             ret = -1;
+     }
+     return ret;
+-- 
+2.55.0
+
