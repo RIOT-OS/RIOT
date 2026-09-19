@@ -41,3 +41,6 @@ bplib_cla_ble:
 
 bplib_cla_udp:
 	+"$(MAKE)" -C $(RIOTPKG)/bplib/cla/udp
+
+bplib_cla_uwb:
+	+"$(MAKE)" -C $(RIOTPKG)/bplib/cla/uwb
