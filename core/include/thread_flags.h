@@ -91,12 +91,20 @@ extern "C" {
  *      }
  */
 #define THREAD_FLAG_MSG_WAITING     (1u << 15)
+
 /**
  * @brief Set by @ref xtimer_set_timeout_flag() when the timer expires
  *
  * @see xtimer_set_timeout_flag
  */
 #define THREAD_FLAG_TIMEOUT         (1u << 14)
+
+/**
+ * @brief Thread flag use to notify available events in an event queue
+ *
+ * This flag is used by the `event` module.
+ */
+#define THREAD_FLAG_EVENT           (1u << 13)
 
 /**
  * @brief Comprehensive set of all predefined flags
@@ -109,7 +117,12 @@ extern "C" {
  * When using custom flags, asserting that they are not in this set can help
  * avoid conflict with future additions to the predefined flags.
  */
-#define THREAD_FLAG_PREDEFINED_MASK (THREAD_FLAG_MSG_WAITING | THREAD_FLAG_TIMEOUT)
+#define THREAD_FLAG_PREDEFINED_MASK (\
+    THREAD_FLAG_EVENT |\
+    THREAD_FLAG_MSG_WAITING |\
+    THREAD_FLAG_TIMEOUT\
+    )
+
 /** @} */
 
 /**
