@@ -1,0 +1,6 @@
+ifneq (,$(filter az_riot_pnp_iface,$(USEMODULE)))
+  INCLUDES += -I$(RIOTBASE)/modules/az_riot_pnp_iface
+  DIRS += $(RIOTBASE)/modules/az_riot_pnp_iface
+endif
+
+
