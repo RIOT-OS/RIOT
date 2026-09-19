@@ -4,3 +4,7 @@ USEMODULE += ztimer_usec
 FEATURES_REQUIRED += periph_i2c
 
 DEFAULT_MODULE += sgp30_strict
+
+USEMODULE += event_timeout
+USEMODULE += event_callback
+USEMODULE += event_thread

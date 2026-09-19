@@ -45,17 +45,30 @@
 #include "periph/i2c.h"
 #include "ztimer.h"
 
+#ifdef MODULE_SGP30_STRICT
+#  include "event/thread.h"
+#  include "event/callback.h"
+#  include "event/timeout.h"
+#endif
+
 #ifdef __cplusplus
 extern "C" {
+#endif
+
+/**
+ * @brief   The event queue if 'sgp30_strict' is used
+ */
+#ifndef CONFIG_SGP30_STRICT_EVENT_THREAD_QUEUE
+#  define CONFIG_SGP30_STRICT_EVENT_THREAD_QUEUE     EVENT_PRIO_MEDIUM
 #endif
 
 /**
  * @brief     Set of measured values
  */
 typedef struct {
-    uint16_t tvoc;      /**< The last measurement of the IAQ-calculated Total
+    uint16_t tvoc; /**< The last measurement of the IAQ-calculated Total
                              Volatile Organic Compounds in ppb. */
-    uint16_t eco2;      /**< The last measurement of the IAQ-calculated
+    uint16_t eco2; /**< The last measurement of the IAQ-calculated
                              equivalent CO2 in ppm */
 #ifdef MODULE_SGP30_STRICT
     uint32_t timestamp; /**< Timestamp of last measured value */
@@ -66,26 +79,27 @@ typedef struct {
  * @brief     Set of measured raw values
  */
 typedef struct {
-    uint16_t raw_h2;        /**< raw H2 signal, only for testing purposes */
-    uint16_t raw_ethanol;   /**< raw Ethanol signal, only for testing purposes */
+    uint16_t raw_h2;      /**< raw H2 signal, only for testing purposes */
+    uint16_t raw_ethanol; /**< raw Ethanol signal, only for testing purposes */
 } sgp30_raw_data_t;
 
 /**
  * @brief   Device initialization parameters
  */
 typedef struct {
-    i2c_t i2c_dev;              /**< I2C dev the sensor is connected to */
+    i2c_t i2c_dev; /**< I2C dev the sensor is connected to */
 } sgp30_params_t;
 
 /**
  * @brief   Device descriptor for the driver
  */
 typedef struct {
-    sgp30_params_t params;      /**< parameters of the sensor device */
+    sgp30_params_t params; /**< parameters of the sensor device */
 #ifdef MODULE_SGP30_STRICT
-    bool ready;                 /**< if initialization phase is over*/
-    ztimer_t _timer;            /**< timer */
-    sgp30_data_t _data;         /**< internal current data */
+    bool ready;               /**< if initialization phase is over*/
+    event_callback_t _event;  /**< event callback */
+    event_timeout_t _timeout; /**< event timeout */
+    sgp30_data_t _data;       /**< internal current data */
 #endif
 } sgp30_t;
 
