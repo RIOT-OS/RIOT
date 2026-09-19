@@ -28,7 +28,7 @@
 #define NETIF_TAP_NUMOF        (NETDEV_TAP_MAX)
 
 static lwip_netif_t netif[NETIF_TAP_NUMOF];
-static netdev_tap_t netdev_taps[NETIF_TAP_NUMOF];
+netdev_tap_t netdev_taps[NETIF_TAP_NUMOF];
 
 static void auto_init_netdev_tap(void)
 {
