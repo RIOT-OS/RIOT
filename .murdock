@@ -341,10 +341,15 @@ toolchain_capabilities_cache_file() {
 # run the "info-toolchain-capabilities" target to retrieve 'key=value' pairs of
 # all the toolchain capabilities for $board:$toolchain
 toolchain_capabilities_discover() {
-    local appdir=$1 board=$2 toolchain=$3
+    local appdir=$1 board=$2 toolchain=$3 out=$4
 
-    BOARD=$board TOOLCHAIN=$toolchain \
-        make -s --no-print-directory -C${appdir} info-toolchain-capabilities 2>/dev/null
+    # Have the target write directly to $out (see makefiles/info.inc.mk),
+    # rather than capturing this make invocation's own stdout: GNU Make also
+    # prints any '$(info ...)' encountered elsewhere while parsing the
+    # makefiles (e.g. sys/ztimer/Makefile.include) to stdout, regardless of
+    # target, which would otherwise risk ending up in the cached file.
+    BOARD=$board TOOLCHAIN=$toolchain TOOLCHAIN_CAPABILITIES_MK="$out" \
+        make -s --no-print-directory -C${appdir} info-toolchain-capabilities > /dev/null 2>/dev/null
 }
 
 # ensure a toolchain capabilities makefile fragment exists (discovering and
@@ -370,7 +375,7 @@ toolchain_capabilities_available() {
         # is harmless; a corrupted cache file breaks every subsequent build
         # that includes it.
         local tmp_file="${cache_file}.$$"
-        toolchain_capabilities_discover "$appdir" "$board" "$toolchain" > "${tmp_file}"
+        toolchain_capabilities_discover "$appdir" "$board" "$toolchain" "${tmp_file}"
         if [ -s "${tmp_file}" ]; then
             mv -f "${tmp_file}" "${cache_file}"
         else
