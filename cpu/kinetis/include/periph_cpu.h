@@ -868,6 +868,10 @@ typedef struct {
 /**
  * @brief   CPU internal function for initializing PORTs
  *
+ * Sets the pin's PORT.PCR to the specified value, excluding PCR.IRQC
+ * which is not allowed to be set with this function. If pcr has GPIO_AF_ANALOG
+ * then PCR.IRQC will be cleared, as interrupts do not work in analog mode.
+ *
  * @param[in] pin       pin to initialize
  * @param[in] pcr       value for the PORT's PCR register
  */
