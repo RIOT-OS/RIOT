@@ -71,6 +71,13 @@ extern "C" {
 #endif
 
 /**
+ * @brief Whether this node should support taking custody [bool].
+ */
+#ifndef CONFIG_BPLIB_SUPPORT_CUSTODY
+#  define CONFIG_BPLIB_SUPPORT_CUSTODY 1
+#endif
+
+/**
  * @brief block type indicator for bplib_channel_set_block_*() functions
  */
 typedef enum {
