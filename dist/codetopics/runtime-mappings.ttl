@@ -1,0 +1,22 @@
+@prefix topic: <topcis.ttl#>.
+@prefix dct: <http://purl.org/dc/terms/>.
+@prefix issues: <issues.ttl#>.
+@prefix foaf: <http://xmlns.com/foaf/0.1/>.
+@prefix : <#>.
+@prefix user: <#user->.
+
+# These are not expected to be kept in code, but associated to issues somehow, possibly via GitHub tags.
+
+<https://github.com/RIOT-OS/RIOT/pull/16234> dct:subject topic:board-microbit-v2, issues:type-enhancement.
+
+# As are these (if we need them at all)
+
+:riot-members a foaf:Group;
+  foaf:member user:daniel-k, user:chrysn .#, ..., ...
+
+# These could also be identified with <https://github.com/${USER}>, but a) see
+# the "but" in the foaf:OnlineAccount definition, and b) makes it needlessly
+# hard to extract the user names in a simple query.
+
+user:daniel-k foaf:account [ foaf:accountServiceHomepage <https://github.com/>; foaf:accountName "daniel-k" ].
+user:chrysn foaf:account [ foaf:accountServiceHomepage <https://github.com/>; foaf:accountName "chrysn" ].
