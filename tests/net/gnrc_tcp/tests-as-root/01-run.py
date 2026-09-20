@@ -8,6 +8,7 @@ import sys
 import random
 import pexpect
 import base64
+import time
 
 from scapy.all import Ether, IPv6, TCP, raw, sendp
 
@@ -78,6 +79,128 @@ def test_gnrc_tcp_listen_tcb_discards_unread_data_on_reuse(child):
             riot_srv.receive(timeout_ms=1000, sent_payload=payload)
 
             riot_srv.close()
+
+
+@Runner(timeout=15)
+def test_gnrc_tcp_listen_tcb_accepts_after_rst_in_syn_rcvd(child):
+    """
+    Ensure that a listening TCB still accepts connections after an RST in
+    SYN_RCVD.
+
+    An RST that aborts the handshake moves the TCB from SYN_RCVD directly back
+    to LISTEN, while the connection timeout of SYN_RCVD is still scheduled.
+    That timeout must therefore be unscheduled when entering LISTEN, before
+    the TCB is reused for the next handshake.
+    """
+    with RiotTcpServer(child, generate_port_number()) as riot_srv:
+        host_probe = HostTcpClient(riot_srv)
+
+        ether_ipv6 = (
+            Ether(dst=riot_srv.mac) /
+            IPv6(src=host_probe.address, dst=riot_srv.address)
+        )
+
+        # Abort the handshake with an unexpected RST right after SYN+ACK.
+        for i in range(3):
+            sport = generate_port_number()
+            syn_seq = 1000 + i * 100
+
+            syn = TCP(
+                sport=sport, dport=int(riot_srv.listen_port),
+                flags='S', seq=syn_seq
+            )
+
+            sendp(ether_ipv6 / syn, iface=host_probe.interface, verbose=0)
+            time.sleep(0.2)
+
+            rst = TCP(
+                sport=sport, dport=int(riot_srv.listen_port),
+                flags='R', seq=syn_seq + 1
+            )
+
+            sendp(ether_ipv6 / rst, iface=host_probe.interface, verbose=0)
+            time.sleep(0.2)
+
+        host_probe.sock.close()
+
+        # If the shared event timer got corrupted, the following actual
+        # handshake will never be able to complete.
+        host_final = HostTcpClient(riot_srv)
+        host_final.sock.settimeout(5)
+
+        try:
+            host_final.open()
+        except OSError as exc:
+            raise RuntimeError(
+                'a real, complete handshake could not be established '
+                'after the repeated aborted handshakes: the listening '
+                'TCB (and its shared event timer) is likely corrupted'
+            ) from exc
+
+        riot_srv.accept(timeout_ms=2000)
+        riot_srv.close()
+        host_final.close()
+
+
+@Runner(timeout=15)
+def test_gnrc_tcp_listen_tcb_accepts_after_syn_in_syn_rcvd(child):
+    """
+    Ensure that a listening TCB still accepts connections after a SYN in
+    SYN_RCVD.
+
+    A SYN that aborts the handshake moves the TCB from SYN_RCVD back to LISTEN
+    by way of CLOSED, while the connection timeout of SYN_RCVD is still
+    scheduled. That timeout must therefore be unscheduled when entering
+    LISTEN, before the TCB is reused for the next handshake.
+    """
+    with RiotTcpServer(child, generate_port_number()) as riot_srv:
+        host_probe = HostTcpClient(riot_srv)
+
+        ether_ipv6 = (
+            Ether(dst=riot_srv.mac) /
+            IPv6(src=host_probe.address, dst=riot_srv.address)
+        )
+
+        # Abort the handshake with an unexpected SYN right after SYN+ACK.
+        for i in range(3):
+            sport = generate_port_number()
+            syn_seq = 1000 + i * 100
+
+            syn = TCP(
+                sport=sport, dport=int(riot_srv.listen_port),
+                flags='S', seq=syn_seq
+            )
+
+            sendp(ether_ipv6 / syn, iface=host_probe.interface, verbose=0)
+            time.sleep(0.2)
+
+            unexpected_syn = TCP(
+                sport=sport, dport=int(riot_srv.listen_port),
+                flags='S', seq=syn_seq + 1
+            )
+
+            sendp(ether_ipv6 / unexpected_syn, iface=host_probe.interface, verbose=0)
+            time.sleep(0.2)
+
+        host_probe.sock.close()
+
+        # If the shared event timer got corrupted, the following actual
+        # handshake will never be able to complete.
+        host_final = HostTcpClient(riot_srv)
+        host_final.sock.settimeout(5)
+
+        try:
+            host_final.open()
+        except OSError as exc:
+            raise RuntimeError(
+                'a real, complete handshake could not be established '
+                'after the repeated unexpected SYNs: the listening '
+                'TCB (and its shared event timer) is likely corrupted'
+            ) from exc
+
+        riot_srv.accept(timeout_ms=2000)
+        riot_srv.close()
+        host_final.close()
 
 
 @Runner(timeout=5)
