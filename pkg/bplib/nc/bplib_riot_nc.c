@@ -166,6 +166,8 @@ static BPLib_PI_CanBlkConfig_t* map_block(uint32_t channel,
         return &ChanTbl.Configs[channel].HopCountBlkConfig;
     case BPLIB_PAYLOAD_BLOCK:
         return &ChanTbl.Configs[channel].PayloadBlkConfig;
+    case BPLIB_CUSTODY_TRANSFER_BLOCK:
+        return &ChanTbl.Configs[channel].CustodyTransferBlkConfig;
     default:
         return NULL;
     }
@@ -272,6 +274,45 @@ BPLib_Status_t bplib_contact_set_in_addr(uint32_t contact,
     if (status == BPLIB_SUCCESS) {
         strncpy(ContactsTbl.ContactSet[contact].ClaInAddr, addr, BPLIB_MAX_IP_LENGTH);
         ContactsTbl.ContactSet[contact].ClaInPort = port;
+    }
+    return status;
+}
+
+BPLib_Status_t bplib_contact_set_cs_time_trigger(uint32_t contact, uint32_t millis)
+{
+    BPLib_Status_t status = _contact_ok_and_stopped(contact);
+    if (status == BPLIB_SUCCESS) {
+        if ((millis > BPLIB_MAX_CS_TIME_TRIGGER_ALLOWED) ||
+            (millis < BPLIB_MIN_CS_TIME_TRIGGER_ALLOWED)) {
+            return BPLIB_INVALID_CONFIG_ERR;
+        }
+        ContactsTbl.ContactSet[contact].CSTimeTrigger = millis;
+    }
+    return status;
+}
+
+BPLib_Status_t bplib_contact_set_cs_size_trigger(uint32_t contact, uint32_t size)
+{
+    BPLib_Status_t status = _contact_ok_and_stopped(contact);
+    if (status == BPLIB_SUCCESS) {
+        if ((size > BPLIB_MAX_CS_SIZE_TRIGGER_ALLOWED) ||
+            (size < BPLIB_MIN_CS_SIZE_TRIGGER_ALLOWED)) {
+            return BPLIB_INVALID_CONFIG_ERR;
+        }
+        ContactsTbl.ContactSet[contact].CSSizeTrigger = size;
+    }
+    return status;
+}
+
+BPLib_Status_t bplib_contact_set_cs_retransmit_time(uint32_t contact, uint32_t millis)
+{
+    BPLib_Status_t status = _contact_ok_and_stopped(contact);
+    if (status == BPLIB_SUCCESS) {
+        if ((millis > BPLIB_MAX_RETRANSMIT_ALLOWED) ||
+            (millis < BPLIB_MIN_RETRANSMIT_ALLOWED)) {
+            return BPLIB_INVALID_CONFIG_ERR;
+        }
+        ContactsTbl.ContactSet[contact].RetransmitTimeout = millis;
     }
     return status;
 }

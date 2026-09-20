@@ -84,7 +84,8 @@ typedef enum {
     BPLIB_PREVIOUS_NODE_BLOCK = 0,
     BPLIB_BUNDLE_AGE_BLOCK = 1,
     BPLIB_HOP_COUNT_BLOCK = 2,
-    BPLIB_PAYLOAD_BLOCK = 3
+    BPLIB_PAYLOAD_BLOCK = 3,
+    BPLIB_CUSTODY_TRANSFER_BLOCK = 4
 } bplib_nc_canonical_block_t;
 
 /**
@@ -319,6 +320,54 @@ BPLib_Status_t bplib_contact_set_out_addr(uint32_t contact,
  */
 BPLib_Status_t bplib_contact_set_in_addr(uint32_t contact,
             const char* addr, uint16_t port);
+
+/**
+ * @brief Set the time after which a custody acknowledgement signal will be sent
+ *
+ * The idea of this is to aggregate multiple custody acknowledgements into one transmit,
+ * but at least after this time.
+ *
+ * This has to be in the bound of the BPLIB_MIN_CS_TIME_TRIGGER_ALLOWED and
+ * BPLIB_MAX_CS_TIME_TRIGGER_ALLOWED config values.
+ *
+ * @param contact Index of the contact
+ * @param millis Custody signal trigger time [ms]
+ * @retval BPLIB_SUCCESS on success
+ * @retval BPLIB_INVALID_CONT_ID_ERR if contact >= BPLIB_MAX_NUM_CONTACTS
+ * @retval BPLIB_INVALID_CONFIG_ERR if value is outside of the valid bounds
+ */
+BPLib_Status_t bplib_contact_set_cs_time_trigger(uint32_t contact, uint32_t millis);
+
+/**
+ * @brief Set the bytes received after which a custody acknowledgement signal will be sent
+ *
+ * The idea of this is to aggregate multiple custody acknowledgements into one transmit,
+ * but at least if the custody report reaches this size
+ *
+ * This has to be in the bound of the BPLIB_MIN_CS_SIZE_TRIGGER_ALLOWED and
+ * BPLIB_MAX_CS_SIZE_TRIGGER_ALLOWED config values.
+ *
+ * @param contact Index of the contact
+ * @param size Custody signal size trigger [bytes]
+ * @retval BPLIB_SUCCESS on success
+ * @retval BPLIB_INVALID_CONT_ID_ERR if contact >= BPLIB_MAX_NUM_CONTACTS
+ * @retval BPLIB_INVALID_CONFIG_ERR if value is outside of the valid bounds
+ */
+BPLib_Status_t bplib_contact_set_cs_size_trigger(uint32_t contact, uint32_t size);
+
+/**
+ * @brief Set the time after which custody will attempt a retransmission
+ *
+ * This has to be in the bound of the BPLIB_MIN_RETRANSMIT_ALLOWED and
+ * BPLIB_MAX_RETRANSMIT_ALLOWED config values.
+ *
+ * @param contact Index of the contact
+ * @param millis Time [ms] after which a retransmission happens
+ * @retval BPLIB_SUCCESS on success
+ * @retval BPLIB_INVALID_CONT_ID_ERR if contact >= BPLIB_MAX_NUM_CONTACTS
+ * @retval BPLIB_INVALID_CONFIG_ERR if value is outside of the valid bounds
+ */
+BPLib_Status_t bplib_contact_set_cs_retransmit_time(uint32_t contact, uint32_t millis);
 
 #ifdef __cplusplus
 }
