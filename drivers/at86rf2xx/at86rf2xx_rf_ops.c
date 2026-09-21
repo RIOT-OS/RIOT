@@ -19,14 +19,15 @@
 #include <stddef.h>
 #include <stdint.h>
 #include <stdio.h>
+
 #include "at86rf2xx.h"
 #include "at86rf2xx_internal.h"
 #include "at86rf2xx_registers.h"
+#include "atomic_utils.h"
 #include "macros/utils.h"
 #include "net/ieee802154/radio.h"
 #include "sched.h"
 #include "thread.h"
-#include "atomic_utils.h"
 #if IS_USED(MODULE_AT86RF2XX_AES_SPI)
 #  include "at86rf2xx_aes.h"
 #endif
@@ -34,14 +35,13 @@
 #define ENABLE_DEBUG (0)
 #include "debug.h"
 
-#define IEEE802154_PAGE_24GHZ_OQPSK 2           /**< page value for 2.4 GHz O-QPSK PHY */
-#define IEEE802154_PAGE_SUB_GHZ_OQPSK_BPSK 0    /**< page value for Sub GHz O-QPSK or BPSK PHY */
+#define IEEE802154_PAGE_24GHZ_OQPSK        2 /**< page value for 2.4 GHz O-QPSK PHY */
+#define IEEE802154_PAGE_SUB_GHZ_OQPSK_BPSK 0 /**< page value for Sub GHz O-QPSK or BPSK PHY */
 
 static const ieee802154_radio_ops_t at86rf2xx_ops;
 static ieee802154_dev_t *at86rf2xx_periph;
 
-#if IS_USED(MODULE_AT86RF2XX_AES_SPI) && \
-    IS_USED(MODULE_IEEE802154_SECURITY)
+#if IS_USED(MODULE_AT86RF2XX_AES_SPI) && IS_USED(MODULE_IEEE802154_SECURITY)
 /**
  * @brief   Pass the 802.15.4 encryption key to the transceiver hardware
  *
@@ -49,8 +49,7 @@ static ieee802154_dev_t *at86rf2xx_periph;
  * @param[in] key               Encryption key to be used
  * @param[in] key_size          Size of the encryption key in bytes
  */
-static void _at86rf2xx_set_key(ieee802154_sec_dev_t *dev,
-                               const uint8_t *key, uint8_t key_size)
+static void _at86rf2xx_set_key(ieee802154_sec_dev_t *dev, const uint8_t *key, uint8_t key_size)
 {
     (void)key_size;
     ieee802154_dev_t *hal = dev->ctx;
@@ -66,19 +65,12 @@ static void _at86rf2xx_set_key(ieee802154_sec_dev_t *dev,
  * @param[in]       plain       Input data blocks
  * @param[in]       nblocks     Number of blocks
  */
-static void _at86rf2xx_cbc(const ieee802154_sec_dev_t *dev,
-                           uint8_t *cipher,
-                           uint8_t *iv,
-                           const uint8_t *plain,
-                           uint8_t nblocks)
+static void _at86rf2xx_cbc(const ieee802154_sec_dev_t *dev, uint8_t *cipher, uint8_t *iv,
+                           const uint8_t *plain, uint8_t nblocks)
 {
     ieee802154_dev_t *hal = dev->ctx;
 
-    at86rf2xx_aes_cbc_encrypt(hal->priv,
-                              (aes_block_t *)cipher,
-                              NULL,
-                              iv,
-                              (aes_block_t *)plain,
+    at86rf2xx_aes_cbc_encrypt(hal->priv, (aes_block_t *)cipher, NULL, iv, (aes_block_t *)plain,
                               nblocks);
 }
 
@@ -90,30 +82,22 @@ static void _at86rf2xx_cbc(const ieee802154_sec_dev_t *dev,
  * @param[in]       plain       Plain blocks
  * @param[in]       nblocks     Number of blocks
  */
-static void _at86rf2xx_ecb(const ieee802154_sec_dev_t *dev,
-                           uint8_t *cipher,
-                           const uint8_t *plain,
+static void _at86rf2xx_ecb(const ieee802154_sec_dev_t *dev, uint8_t *cipher, const uint8_t *plain,
                            uint8_t nblocks)
 {
     ieee802154_dev_t *hal = dev->ctx;
 
-    at86rf2xx_aes_ecb_encrypt(hal->priv,
-                              (aes_block_t *)cipher,
-                              NULL,
-                              (aes_block_t *)plain,
+    at86rf2xx_aes_ecb_encrypt(hal->priv, (aes_block_t *)cipher, NULL, (aes_block_t *)plain,
                               nblocks);
-
 }
 /**
  * @brief   Struct that contains IEEE 802.15.4 security operations
  *          which are implemented, using the transceiver´s hardware
  *          crypto capabilities
  */
-static const ieee802154_radio_cipher_ops_t _at86rf2xx_cipher_ops = {
-    .set_key = _at86rf2xx_set_key,
-    .ecb = _at86rf2xx_ecb,
-    .cbc = _at86rf2xx_cbc
-};
+static const ieee802154_radio_cipher_ops_t _at86rf2xx_cipher_ops = { .set_key = _at86rf2xx_set_key,
+                                                                     .ecb = _at86rf2xx_ecb,
+                                                                     .cbc = _at86rf2xx_cbc };
 #endif /* IS_USED(MODULE_AT86RF2XX_AES_SPI) && \
           IS_USED(MODULE_IEEE802154_SECURITY) */
 
@@ -128,8 +112,8 @@ static int _write(ieee802154_dev_t *hal, const iolist_t *psdu)
     for (const iolist_t *iol = psdu; iol; iol = iol->iol_next) {
         /* current packet data + FCS too long */
         if ((len + iol->iol_len + IEEE802154_FCS_LEN) > AT86RF2XX_MAX_PKT_LENGTH) {
-            DEBUG("[at86rf2xx] error: packet too large (%" PRIuSIZE
-                  " byte) to be send\n", (size_t)len + IEEE802154_FCS_LEN);
+            DEBUG("[at86rf2xx] error: packet too large (%" PRIuSIZE " byte) to be send\n",
+                  (size_t)len + IEEE802154_FCS_LEN);
 
             mutex_unlock(&dev->lock);
             return -EOVERFLOW;
@@ -219,7 +203,8 @@ static int _read(ieee802154_dev_t *hal, void *buf, size_t size, ieee802154_rx_in
 #endif
         info->rssi = RSSI_BASE_VAL + ed;
         DEBUG("[at86rf2xx] LQI:%d high is good, RSSI:%d high is either good or "
-              "too much interference.\n", info->lqi, info->rssi);
+              "too much interference.\n",
+              info->lqi, info->rssi);
 #if AT86RF2XX_IS_PERIPH && IS_USED(MODULE_IEEE802154_RX_TIMESTAMP)
         /* AT86RF2XX_IS_PERIPH means the MCU is ATmegaRFR2 that has symbol counter */
         {
@@ -229,8 +214,8 @@ static int _read(ieee802154_dev_t *hal, void *buf, size_t size, ieee802154_rx_in
             /* convert counter value to ns */
             uint64_t timestamp = SC_TO_NS * (uint64_t)rx_sc;
             info->timestamp = timestamp;
-            DEBUG("[at86rf2xx] CS: %" PRIu32 " timestamp: %" PRIu32 ".%09" PRIu32 " ",
-                  rx_sc, (uint32_t)(info->timestamp / NS_PER_SEC),
+            DEBUG("[at86rf2xx] CS: %" PRIu32 " timestamp: %" PRIu32 ".%09" PRIu32 " ", rx_sc,
+                  (uint32_t)(info->timestamp / NS_PER_SEC),
                   (uint32_t)(info->timestamp % NS_PER_SEC));
         }
 #endif
@@ -272,8 +257,8 @@ static int _confirm_on(ieee802154_dev_t *hal)
     DEBUG("at86rf2xx_rf_ops: confirm_on\n");
     at86rf2xx_t *dev = hal->priv;
     mutex_lock(&dev->lock);
-    int status = at86rf2xx_reg_read(dev, AT86RF2XX_REG__TRX_STATUS)
-                 & AT86RF2XX_TRX_STATUS_MASK__TRX_STATUS;
+    int status = at86rf2xx_reg_read(dev, AT86RF2XX_REG__TRX_STATUS) &
+                 AT86RF2XX_TRX_STATUS_MASK__TRX_STATUS;
 
     if (status != AT86RF2XX_TRX_STATUS__TRX_OFF) {
         mutex_unlock(&dev->lock);
@@ -365,8 +350,7 @@ static int _request_op(ieee802154_dev_t *hal, ieee802154_hal_op_t op, void *ctx)
         dev->tx_retries = -1;
 #endif
         /* trigger sending of pre-loaded frame */
-        at86rf2xx_reg_write(dev, AT86RF2XX_REG__TRX_STATE,
-                            AT86RF2XX_TRX_STATE__TX_START);
+        at86rf2xx_reg_write(dev, AT86RF2XX_REG__TRX_STATE, AT86RF2XX_TRX_STATE__TX_START);
         res = 0;
         break;
     case IEEE802154_HAL_OP_SET_RX:
@@ -396,12 +380,12 @@ static int _confirm_transmit(at86rf2xx_t *dev, ieee802154_tx_info_t *info)
     }
 
     if (info) {
-        uint8_t trac_status = at86rf2xx_reg_read(dev, AT86RF2XX_REG__TRX_STATE)
-                              & AT86RF2XX_TRX_STATE_MASK__TRAC;
+        uint8_t trac_status = at86rf2xx_reg_read(dev, AT86RF2XX_REG__TRX_STATE) &
+                              AT86RF2XX_TRX_STATE_MASK__TRAC;
 #if AT86RF2XX_HAVE_RETRIES && AT86RF2XX_HAVE_RETRIES_REG
-        info->retrans = (at86rf2xx_reg_read(dev, AT86RF2XX_REG__XAH_CTRL_2)
-                         & AT86RF2XX_XAH_CTRL_2__ARET_FRAME_RETRIES_MASK)
-                        >> AT86RF2XX_XAH_CTRL_2__ARET_FRAME_RETRIES_OFFSET;
+        info->retrans = (at86rf2xx_reg_read(dev, AT86RF2XX_REG__XAH_CTRL_2) &
+                         AT86RF2XX_XAH_CTRL_2__ARET_FRAME_RETRIES_MASK) >>
+                        AT86RF2XX_XAH_CTRL_2__ARET_FRAME_RETRIES_OFFSET;
 #endif
         switch (trac_status) {
         case AT86RF2XX_TRX_STATE__TRAC_SUCCESS:
@@ -505,11 +489,12 @@ static int _config_phy(ieee802154_dev_t *hal, const ieee802154_phy_conf_t *conf)
     at86rf2xx_t *dev = hal->priv;
     uint16_t channel = conf->channel;
     uint8_t page = (AT86RF2XX_HAVE_SUBGHZ && conf->phy_mode == IEEE802154_PHY_OQPSK) ?
-                    IEEE802154_PAGE_24GHZ_OQPSK : IEEE802154_PAGE_SUB_GHZ_OQPSK_BPSK;
+                       IEEE802154_PAGE_24GHZ_OQPSK :
+                       IEEE802154_PAGE_SUB_GHZ_OQPSK_BPSK;
     int8_t txpower = conf->pow;
 
-    if (txpower < (-AT86RF2XX_TXPOWER_OFF_OFFSET)
-        || (txpower + AT86RF2XX_TXPOWER_OFF_OFFSET) > AT86RF2XX_TXPOWER_MAX_INDEX) {
+    if (txpower < (-AT86RF2XX_TXPOWER_OFF_OFFSET) ||
+        (txpower + AT86RF2XX_TXPOWER_OFF_OFFSET) > AT86RF2XX_TXPOWER_MAX_INDEX) {
         return -EINVAL;
     }
 
@@ -537,7 +522,6 @@ static int _set_csma_params(ieee802154_dev_t *hal, const ieee802154_csma_be_t *b
 
 static int _config_addr_filter(ieee802154_dev_t *hal, ieee802154_af_cmd_t cmd, const void *value)
 {
-
     at86rf2xx_t *dev = hal->priv;
     const uint16_t *pan_id = value;
     const network_uint16_t *short_addr = value;
@@ -547,10 +531,8 @@ static int _config_addr_filter(ieee802154_dev_t *hal, ieee802154_af_cmd_t cmd, c
     mutex_lock(&dev->lock);
     switch (cmd) {
     case IEEE802154_AF_SHORT_ADDR:
-        at86rf2xx_reg_write(dev, AT86RF2XX_REG__SHORT_ADDR_0,
-                            short_addr->u8[1]);
-        at86rf2xx_reg_write(dev, AT86RF2XX_REG__SHORT_ADDR_1,
-                            short_addr->u8[0]);
+        at86rf2xx_reg_write(dev, AT86RF2XX_REG__SHORT_ADDR_0, short_addr->u8[1]);
+        at86rf2xx_reg_write(dev, AT86RF2XX_REG__SHORT_ADDR_1, short_addr->u8[0]);
         DEBUG("SHORT_ADDR: %04x\n", byteorder_ntohs(*short_addr));
         break;
     case IEEE802154_AF_EXT_ADDR:
@@ -562,7 +544,8 @@ static int _config_addr_filter(ieee802154_dev_t *hal, ieee802154_af_cmd_t cmd, c
         }
         DEBUG("\n");
         break;
-    case IEEE802154_AF_PANID: {
+    case IEEE802154_AF_PANID:
+    {
         le_uint16_t le_pan = byteorder_btols(byteorder_htons(*pan_id));
         at86rf2xx_reg_write(dev, AT86RF2XX_REG__PAN_ID_0, le_pan.u8[0]);
         at86rf2xx_reg_write(dev, AT86RF2XX_REG__PAN_ID_1, le_pan.u8[1]);
@@ -581,7 +564,6 @@ static int _config_addr_filter(ieee802154_dev_t *hal, ieee802154_af_cmd_t cmd, c
 static int _config_src_addr_match(ieee802154_dev_t *hal, ieee802154_src_match_t cmd,
                                   const void *value)
 {
-
     at86rf2xx_t *dev = hal->priv;
     int res;
 
@@ -602,7 +584,6 @@ static int _config_src_addr_match(ieee802154_dev_t *hal, ieee802154_src_match_t 
 
 static int _set_frame_filter_mode(ieee802154_dev_t *hal, ieee802154_filter_mode_t mode)
 {
-
     at86rf2xx_t *dev = hal->priv;
     bool promisc = false;
 
@@ -635,6 +616,7 @@ int at86rf2xx_init(at86rf2xx_t *dev, const at86rf2xx_params_t *params, ieee80215
                    void (*cb)(void *), void *ctx)
 {
     uint8_t tmp;
+
     (void)tmp;
     (void)at86rf2xx_periph;
 
@@ -672,8 +654,7 @@ int at86rf2xx_init(at86rf2xx_t *dev, const at86rf2xx_params_t *params, ieee80215
     }
 
     at86rf2xx_set_state(dev, AT86RF2XX_STATE_FORCE_TRX_OFF);
-    at86rf2xx_reg_write(dev, AT86RF2XX_REG__TRX_CTRL_2,
-                        AT86RF2XX_TRX_CTRL_2_MASK__RX_SAFE_MODE);
+    at86rf2xx_reg_write(dev, AT86RF2XX_REG__TRX_CTRL_2, AT86RF2XX_TRX_CTRL_2_MASK__RX_SAFE_MODE);
 
 #if !AT86RF2XX_IS_PERIPH
     /* don't populate masked interrupt flags to IRQ_STATUS register */
@@ -690,13 +671,11 @@ int at86rf2xx_init(at86rf2xx_t *dev, const at86rf2xx_params_t *params, ieee80215
 
     /* enable interrupts */
     at86rf2xx_reg_write(dev, AT86RF2XX_REG__IRQ_MASK,
-                        AT86RF2XX_IRQ_STATUS_MASK__TRX_END
-                        | AT86RF2XX_IRQ_STATUS_MASK__RX_START);
+                        AT86RF2XX_IRQ_STATUS_MASK__TRX_END | AT86RF2XX_IRQ_STATUS_MASK__RX_START);
 
     /* enable TX start interrupt for retry counter */
 #if AT86RF2XX_HAVE_TX_START_IRQ
-    at86rf2xx_reg_write(dev, AT86RF2XX_REG__IRQ_MASK1,
-                        AT86RF2XX_IRQ_STATUS_MASK1__TX_START);
+    at86rf2xx_reg_write(dev, AT86RF2XX_REG__IRQ_MASK1, AT86RF2XX_IRQ_STATUS_MASK1__TX_START);
 #endif
 
     /* clear interrupt flags */
@@ -730,7 +709,6 @@ static inline void _isr_recv_complete(ieee802154_dev_t *hal)
     at86rf2xx_t *dev = hal->priv;
 
     if (IS_ACTIVE(AT86RF2XX_BASIC_MODE)) {
-
         uint8_t phy_status = at86rf2xx_reg_read(dev, AT86RF2XX_REG__PHY_RSSI);
         bool crc_ok = phy_status & AT86RF2XX_PHY_RSSI_MASK__RX_CRC_VALID;
 
@@ -825,27 +803,27 @@ int at86rf2xx_init_event(at86rf2xx_bhp_ev_t *bhp, const at86rf2xx_params_t *para
 static const ieee802154_radio_ops_t at86rf2xx_ops = {
     .caps =
 #if AT86RF2XX_HAVE_SUBGHZ
-            IEEE802154_CAP_SUB_GHZ
-            | IEEE802154_CAP_PHY_BPSK
+        IEEE802154_CAP_SUB_GHZ
+        | IEEE802154_CAP_PHY_BPSK
 #else
-            IEEE802154_CAP_24_GHZ
+        IEEE802154_CAP_24_GHZ
 #endif
-            | IEEE802154_CAP_IRQ_CRC_ERROR
-            | IEEE802154_CAP_IRQ_RX_START
-            | IEEE802154_CAP_IRQ_TX_DONE
-#if ! IS_ACTIVE(AT86RF2XX_BASIC_MODE)
-            | IEEE802154_CAP_FRAME_RETRANS
-            | IEEE802154_CAP_AUTO_CSMA
+        | IEEE802154_CAP_IRQ_CRC_ERROR
+        | IEEE802154_CAP_IRQ_RX_START
+        | IEEE802154_CAP_IRQ_TX_DONE
+#if !IS_ACTIVE(AT86RF2XX_BASIC_MODE)
+        | IEEE802154_CAP_FRAME_RETRANS
+        | IEEE802154_CAP_AUTO_CSMA
 #  if AT86RF2XX_HAVE_RETRIES
-            | IEEE802154_CAP_FRAME_RETRANS_INFO
+        | IEEE802154_CAP_FRAME_RETRANS_INFO
 #  endif
 #endif
 
 #if AT86RF2XX_IS_PERIPH && IS_USED(MODULE_IEEE802154_RX_TIMESTAMP)
-            | IEEE802154_CAP_RX_TIMESTAMP
+        | IEEE802154_CAP_RX_TIMESTAMP
 #endif
-            | IEEE802154_CAP_PHY_OQPSK
-            | IEEE802154_CAP_REG_RETENTION,
+        | IEEE802154_CAP_PHY_OQPSK
+        | IEEE802154_CAP_REG_RETENTION,
     .write = _write,
     .read = _read,
     .request_on = _request_on,
@@ -879,12 +857,13 @@ static const ieee802154_radio_ops_t at86rf2xx_ops = {
  * Flow Diagram Manual p. 52 / 63
  */
 #  if AT86RF2XX_HAVE_RETRIES
-ISR(TRX24_TX_START_vect){
+ISR(TRX24_TX_START_vect)
+{
     /* __enter_isr(); is not necessary as there is nothing which causes a
      * thread_yield and the interrupt can not be interrupted by an other ISR */
     at86rf2xx_t *dev = at86rf2xx_periph->priv;
 
-    dev->tx_retries ++;
+    dev->tx_retries++;
 }
 #  endif
 
@@ -989,7 +968,6 @@ AVR8_ISR(TRX24_XAH_AMI_vect, txr24_xah_ami_handler)
  */
 static inline void txr24_tx_end_handler(void)
 {
-
     uint8_t status = *AT86RF2XX_REG__TRX_STATE & AT86RF2XX_TRX_STATUS_MASK__TRX_STATUS;
     DEBUG("TRX24_TX_END 0x%x\n", status);
 
@@ -998,8 +976,6 @@ static inline void txr24_tx_end_handler(void)
     if (status != AT86RF2XX_PHY_STATE_RX) {
         at86rf2xx_periph->cb(at86rf2xx_periph, IEEE802154_RADIO_CONFIRM_TX_DONE);
     }
-
-
 }
 AVR8_ISR(TRX24_TX_END_vect, txr24_tx_end_handler);
 /**
