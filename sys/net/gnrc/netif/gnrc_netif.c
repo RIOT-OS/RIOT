@@ -2092,7 +2092,11 @@ static void *_gnrc_netif_thread(void *args)
                 DEBUG("gnrc_netif: GNRC_NETDEV_MSG_TYPE_SND received\n");
                 for (unsigned i=0; i<netif->num_components; i++) {
                     res = netif->components[i].ops->send(netif, msg.content.ptr, netif->components[i].ctx);
-                    if (res < 0) {
+                    if (res == GNRC_NETIF_COMP_CONSUMED) {
+                        break;
+                    }
+                    else if (res < 0) {
+                        gnrc_netif_tx_done(netif, msg.content.ptr, res);
                         break;
                     }
                 }
@@ -2182,15 +2186,7 @@ void gnrc_netif_rx_done(gnrc_netif_t *netif, gnrc_pktsnip_t *pkt)
         }
     }
 
-    /* all layers passed it through — dispatch to upper layers via netreg */
-    if (pkt == NULL) {
-        return;
-    }
-
-    if (!gnrc_netapi_dispatch_receive(pkt->type, GNRC_NETREG_DEMUX_CTX_ALL, pkt)) {
-        DEBUG("gnrc_netif: unable to forward packet of type %i\n", pkt->type);
-        gnrc_pktbuf_release(pkt);
-    }
+    assert(pkt == NULL);
 }
 
 #if IS_USED(MODULE_NETDEV_LEGACY_API)

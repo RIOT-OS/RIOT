@@ -78,7 +78,7 @@
 extern "C" {
 #endif
 
-#define GNRC_NETIF_LAYER_HANDLED   (-255)
+#define GNRC_NETIF_COMP_CONSUMED   (-255)
 
 /**
  * @brief Index of the high priority queue
@@ -151,7 +151,7 @@ typedef enum {
 typedef struct gnrc_netif_ops gnrc_netif_ops_t;
 
 /**
- * @brief   Holds components of the GNRC Netif interface
+ * @brief   Holds the component operations and the context.
  */
 typedef struct gnrc_netif_comp gnrc_netif_comp_t;
 
@@ -161,8 +161,11 @@ typedef struct gnrc_netif_comp gnrc_netif_comp_t;
 typedef struct {
     netif_t netif;                          /**< network interface descriptor */
     const gnrc_netif_ops_t *ops;            /**< Operations of the network interface */
+    /**
+     * @brief   Components of the GNRC Netif interface
+     */
     const gnrc_netif_comp_t *components;
-    size_t num_components;
+    size_t num_components;                  /**< Number of components */
     netdev_t *dev;                          /**< Network device of the network interface */
     rmutex_t mutex;                         /**< Mutex of the interface */
 #if IS_USED(MODULE_NETSTATS_L2) || defined(DOXYGEN)
@@ -259,29 +262,137 @@ typedef struct {
 } gnrc_netif_t;
 
 typedef struct gnrc_netif_comp_ops {
-    gnrc_netif_comp_type_t type;
+    gnrc_netif_comp_type_t type;            /**< Component type */
+    /**
+     * @brief   Initializes the GNRC Netif component
+     *
+     * @pre `netif != NULL`
+     *
+     * @param[in] netif The network interface.
+     *
+     * This function should init the GNRC Netif component.
+     * This is called right before the interface's thread starts receiving
+     * messages. It is not necessary to lock the interface's mutex
+     * gnrc_netif_t::mutex, since it is already locked.
+     *
+     * @return 0 if the initialization of the component was successful
+     * @return negative errno on error.
+     */
     int  (*init)(gnrc_netif_t *netif, void *ctx);
-
-    /* netapi interception — ascending, first non-negative wins */
+    /**
+     * @brief   Gets an option from the netif component.
+     *
+     * @param[in] netif     The network interface.
+     * @param[in] opt       The option parameters.
+     * @param[in] ctx       Context of the component.
+     *
+     * @return  Number of bytes in @p data.
+     * @return  -EOVERFLOW, if @p max_len is lesser than the required space.
+     * @return  -ENOTSUP, if @p opt is not supported to be set.
+     * @return  Any negative error code
+     */
     int  (*get)(gnrc_netif_t *netif, gnrc_netapi_opt_t *opt, void *ctx);
+    /**
+     * @brief   Sets an option from the netif component.
+     *
+     * @param[in] netif     The network interface.
+     * @param[in] opt       The option parameters.
+     * @param[in] ctx       Context of this component.
+     *
+     * @return  Number of bytes written.
+     * @return  -EOVERFLOW, if @p data_len is greater than the allocated space in
+     *          the component.
+     * @return  -ENOTSUP, if @p opt is not supported by the component.
+     * @return  Any negative error code.
+     */
     int  (*set)(gnrc_netif_t *netif, const gnrc_netapi_opt_t *opt, void *ctx);
-    void (*msg_handler)(gnrc_netif_t *netif, msg_t *msg, void *ctx);
 
-    /* send: descending (outer → inner → terminal).
-     *   0                       : continue, *pkt may be transformed
-     *   <0                      : abort TX with this error
-     *   GNRC_NETIF_LAYER_HANDLED: consumed, layer drives continuation
-     *                             (sync: calls tx_done itself;
-     *                              async: calls tx_done later)
+    /**
+     * @brief   Send a packet down through this layer
+     *
+     * Called by the pipeline as part of the descending send chain. This layer
+     * may transform the packet, queue it, fragment it, or pass it through
+     * unchanged. The packet arrives to the first component with a netif header
+     * snip (@ref GNRC_NETTYPE_NETIF) as the outermost snip.
+     *
+     * The layer receives @p pkt by reference and may replace it (e.g. after
+     * stripping a header, compressing, or producing a different
+     * representation). If it replaces @p pkt, the new value continues down
+     * the pipeline.
+     *
+     * @param[in]     netif  The network interface
+     * @param[in,out] pkt    The packet to send. The component may modify the
+     *                       contents.
+     * @param[in]     ctx    context of this component.
+     *
+     * @return  0                         packet is ready for the next layer
+     * @return  <0                        error code. TX is aborted and
+     *                                    @ref gnrc_netif_tx_done is called
+     *                                    with this error.
+     * @return  GNRC_NETIF_COMP_CONSUMED  this layer has taken ownership and
+     *                                    will drive the rest of the send
+     *                                    itself. The core does nothing
+     *                                    further with @p pkt prior sending.
      */
     int  (*send)(gnrc_netif_t *netif, gnrc_pktsnip_t *pkt, void *ctx);
 
-    /* TX completion — ascending (terminal → outer). Terminal: NULL. */
+    /**
+     * @brief   TX completion notification
+     *
+     * Called by gnrc_netif_tx_done() after the terminal component completes
+     * a transmission (or the core aborts with an error). Called in
+     * ascending order: the terminal fires first, the outermost layer
+     * fires last. All components run (there is no short-circuit)
+     *
+     * This is a notification, not a transform. The packet has already
+     * been sent (or the send failed). The layer should not modify the
+     * packet. Typical uses:
+     *
+     * - update statistics (tx_bytes, tx_success, tx_failed)
+     * - release per-layer resources attached during send
+     * - handle re-queue on error (e.g. push_back on -EBUSY)
+     *
+     * If a layer re-queues the packet (e.g. pktq on -EBUSY), it must
+     * have called @ref gnrc_pktbuf_hold during send() so the held
+     * reference survives the core's release in gnrc_netif_tx_done().
+     * The core always releases exactly one reference after all
+     * post_send hooks return.
+     *
+     * @param[in] netif  the interface
+     * @param[in] ctx    context of this component.
+     * @param[in] pkt    the packet that was sent. Read-only (do not
+     *                   modify!). The core releases it after all hooks
+     *                   return.
+     * @param[in] res    >= 0               bytes sent (success).
+     *                   < 0                negative errno.
+     */
     void (*post_send)(gnrc_netif_t *netif, gnrc_pktsnip_t *pkt, int res, void *ctx);
 
-    /* RX — ascending (terminal → outer). Terminal: NULL (it pushes).
-     *   return pkt : pass up (may be transformed)
-     *   return NULL: consumed (e.g. fragment buffered, not complete)
+    /**
+     * @brief   RX processing hook
+     *
+     * Called by @ref gnrc_netif_rx_done as part of the ascending receive chain.
+     * Called in ascending order: the terminal fires first, the outermost
+     * layer fires last.
+     *
+     * Unlike @ref gnrc_netif_comp_ops_t::post_send, this is a transform (the
+     * component may modify the packet or consume
+     * it).
+     *
+     * Typical uses:
+     *
+     * - forward packet using netapi/netreg dispatch
+     * - update receive statistics
+     *
+     * @note at least one layer MUST consume the packet.
+     *
+     * @param[in] netif     The network interface
+     * @param[in] ctx       Context of this component.
+     * @param[in] pkt       The received packet.
+     *
+     * @return  a packet pointer to pass up.
+     *
+     * @return  NULL if the packet was consumed (chain stops)
      */
     gnrc_pktsnip_t *(*post_recv)(gnrc_netif_t *netif, gnrc_pktsnip_t *pkt, void *ctx);
 } gnrc_netif_comp_ops_t;
