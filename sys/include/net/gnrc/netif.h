@@ -78,6 +78,8 @@
 extern "C" {
 #endif
 
+#define GNRC_NETIF_LAYER_HANDLED   (-255)
+
 /**
  * @brief Index of the high priority queue
  */
@@ -139,8 +141,9 @@ typedef enum {
 #if IS_USED(MODULE_GNRC_NETIF_LORAWAN) || defined(DOXYGEN)
     GNRC_NETIF_COMP_LORAWAN,                /**< LoRaWAN component */
 #endif
+    GNRC_NETIF_COMP_LEGACY,                 /**< Legacy component */
     GNRC_NETIF_COMP_NUMOF,                  /**< Number of netif components */
-} gnrc_netif_comp_t;
+} gnrc_netif_comp_type_t;
 
 /**
  * @brief   Operations to an interface
@@ -148,11 +151,18 @@ typedef enum {
 typedef struct gnrc_netif_ops gnrc_netif_ops_t;
 
 /**
+ * @brief   Holds components of the GNRC Netif interface
+ */
+typedef struct gnrc_netif_comp gnrc_netif_comp_t;
+
+/**
  * @brief   Representation of a network interface
  */
 typedef struct {
     netif_t netif;                          /**< network interface descriptor */
     const gnrc_netif_ops_t *ops;            /**< Operations of the network interface */
+    const gnrc_netif_comp_t *components;
+    size_t num_components;
     netdev_t *dev;                          /**< Network device of the network interface */
     rmutex_t mutex;                         /**< Mutex of the interface */
 #if IS_USED(MODULE_NETSTATS_L2) || defined(DOXYGEN)
@@ -247,6 +257,39 @@ typedef struct {
     uint8_t device_type;                    /**< Device type */
     kernel_pid_t pid;                       /**< PID of the network interface's thread */
 } gnrc_netif_t;
+
+typedef struct gnrc_netif_comp_ops {
+    gnrc_netif_comp_type_t type;
+    int  (*init)(gnrc_netif_t *netif, void *ctx);
+
+    /* netapi interception — ascending, first non-negative wins */
+    int  (*get)(gnrc_netif_t *netif, gnrc_netapi_opt_t *opt, void *ctx);
+    int  (*set)(gnrc_netif_t *netif, const gnrc_netapi_opt_t *opt, void *ctx);
+    void (*msg_handler)(gnrc_netif_t *netif, msg_t *msg, void *ctx);
+
+    /* send: descending (outer → inner → terminal).
+     *   0                       : continue, *pkt may be transformed
+     *   <0                      : abort TX with this error
+     *   GNRC_NETIF_LAYER_HANDLED: consumed, layer drives continuation
+     *                             (sync: calls tx_done itself;
+     *                              async: calls tx_done later)
+     */
+    int  (*send)(gnrc_netif_t *netif, gnrc_pktsnip_t *pkt, void *ctx);
+
+    /* TX completion — ascending (terminal → outer). Terminal: NULL. */
+    void (*post_send)(gnrc_netif_t *netif, gnrc_pktsnip_t *pkt, int res, void *ctx);
+
+    /* RX — ascending (terminal → outer). Terminal: NULL (it pushes).
+     *   return pkt : pass up (may be transformed)
+     *   return NULL: consumed (e.g. fragment buffered, not complete)
+     */
+    gnrc_pktsnip_t *(*post_recv)(gnrc_netif_t *netif, gnrc_pktsnip_t *pkt, void *ctx);
+} gnrc_netif_comp_ops_t;
+
+struct gnrc_netif_comp {
+    const gnrc_netif_comp_ops_t *ops;
+    void *ctx;
+};
 
 /**
  * @brief   Check if the device belonging to the given netif uses the legacy
