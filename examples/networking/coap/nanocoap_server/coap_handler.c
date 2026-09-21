@@ -352,23 +352,3 @@ void setup_observe_event(void)
     event_periodic_start(&pev, MS_PER_SEC);
 }
 #endif /* MODULE_NANOCOAP_SERVER_OBSERVE */
-
-/* we can also include the fileserver module */
-#ifdef MODULE_NANOCOAP_FILESERVER
-#include "net/nanocoap/fileserver.h"
-#include "vfs_default.h"
-
-NANOCOAP_RESOURCE(fileserver) {
-    .path = "/vfs",
-    .methods = COAP_GET
-#if IS_USED(MODULE_NANOCOAP_FILESERVER_PUT)
-      | COAP_PUT
-#endif
-#if IS_USED(MODULE_NANOCOAP_FILESERVER_DELETE)
-      | COAP_DELETE
-#endif
-      | COAP_MATCH_SUBTREE,
-    .handler = nanocoap_fileserver_handler,
-    .context = VFS_DEFAULT_DATA
-};
-#endif
