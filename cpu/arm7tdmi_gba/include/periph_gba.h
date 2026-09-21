@@ -1,9 +1,6 @@
 /*
- * Copyright (C) 2023 HAW Hamburg. All rights reserved.
- *
- * This file is subject to the terms and conditions of the GNU Lesser
- * General Public License v2.1. See the file LICENSE in the top level
- * directory for more details.
+ * SPDX-FileCopyrightText: 2023-2026 HAW Hamburg
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
 
 #pragma once
@@ -39,6 +36,47 @@ extern "C"
  * @brief   Type for 16-bit memory addresses
  */
 #define MEM16(ADDR) ((uint16_t(*))(ADDR))
+
+#define GBA_IE REG16(0x4000200)
+#define GBA_IE_TIMERS (0x0F << 3)
+
+#define GBA_IF REG16(0x4000202)
+#define GBA_IF_TIMERS (0x0F << 3)
+
+#define GBA_IME REG16(0x4000208) /* Technically 32 bit reg, but only bit 0 is used */
+
+#define GBA_PTR_TO_IRQ_HANDLER REG32(0x3007ffc) /* Pointer to user IRQ handler (32bit ARM code) */
+
+#define GBA_TM0_CNT_L REG16(0x4000100)
+#define GBA_TM0_CNT_H REG16(0x4000102)
+#define GBA_TM1_CNT_L REG16(0x4000104)
+#define GBA_TM1_CNT_H REG16(0x4000106)
+#define GBA_TM2_CNT_L REG16(0x4000108)
+#define GBA_TM2_CNT_H REG16(0x400010A)
+#define GBA_TM3_CNT_L REG16(0x400010C)
+#define GBA_TM3_CNT_H REG16(0x400010E)
+
+#define GBA_TIMER_MAX_TICKS (0xFFFF)
+
+typedef struct {
+    uint16_t current_value;
+    uint16_t prescaler : 2;
+    uint16_t count_up_on_neighbour_overflow: 1;
+    uint16_t unused_3_5 : 3;
+    uint16_t irq_enable : 1;
+    uint16_t run : 1;
+    uint16_t unused_8_15 : 8;
+} gba_timer;
+/* I don't trust bit-fields over all compilers & toolchains */
+_Static_assert(sizeof(gba_timer) == 4, "2 x Timer register should be 4 bytes");
+
+typedef gba_timer volatile gba_timer_t;
+
+#define GBA_TIMER_0 ((gba_timer_t volatile *) 0x4000100)
+#define GBA_TIMER_1 ((gba_timer_t volatile *) 0x4000104)
+#define GBA_TIMER_2 ((gba_timer_t volatile *) 0x4000108)
+#define GBA_TIMER_3 ((gba_timer_t volatile *) 0x400010C)
+
 
 /**
  * @brief    Screen dimension in pixel
