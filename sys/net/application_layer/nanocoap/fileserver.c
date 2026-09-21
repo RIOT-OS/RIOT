@@ -228,7 +228,9 @@ static ssize_t _get_file(coap_pkt_t *pdu, uint8_t *buf, size_t len,
     }
     if (request->options.exists.etag &&
         !memcmp(&etag, &request->options.etag, sizeof(etag))) {
-        _resp_init(pdu, buf, len, COAP_CODE_VALID);
+        if (_resp_init(pdu, buf, len, COAP_CODE_VALID)) {
+            return -1;
+        }
         coap_opt_add_opaque(pdu, COAP_OPT_ETAG, &etag, sizeof(etag));
         return coap_opt_finish(pdu, COAP_OPT_FINISH_NONE);
     }
@@ -238,7 +240,10 @@ static ssize_t _get_file(coap_pkt_t *pdu, uint8_t *buf, size_t len,
         return _error_handler(pdu, buf, len, fd);
     }
 
-    _resp_init(pdu, buf, len, COAP_CODE_CONTENT);
+    if (_resp_init(pdu, buf, len, COAP_CODE_CONTENT)) {
+        vfs_close(fd);
+        return -1;
+    }
     coap_opt_add_opaque(pdu, COAP_OPT_ETAG, &etag, sizeof(etag));
     coap_block_slicer_t slicer;
     _calc_szx2(pdu,
@@ -398,11 +403,15 @@ static ssize_t _put_file(coap_pkt_t *pdu, uint8_t *buf, size_t len,
         _event_file(NANOCOAP_FILESERVER_PUT_FILE_END, request);
 
         stat_etag(&stat, &etag); /* Etag after write */
-        _resp_init(pdu, buf, len, create ? COAP_CODE_CREATED : COAP_CODE_CHANGED);
+        if (_resp_init(pdu, buf, len, create ? COAP_CODE_CREATED : COAP_CODE_CHANGED)) {
+            return -1;
+        }
         coap_opt_add_opaque(pdu, COAP_OPT_ETAG, &etag, sizeof(etag));
     }
     else {
-        _resp_init(pdu, buf, len, COAP_CODE_CONTINUE);
+        if (_resp_init(pdu, buf, len, COAP_CODE_CONTINUE)) {
+            return -1;
+        }
         block1.more = true; /* resource is created atomically */
         coap_opt_add_block1_control(pdu, &block1);
     }
@@ -440,7 +449,9 @@ static ssize_t _delete_file(coap_pkt_t *pdu, uint8_t *buf, size_t len,
     if ((ret = vfs_unlink(request->namebuf)) < 0) {
         return _error_handler(pdu, buf, len, ret);
     }
-    _resp_init(pdu, buf, len, COAP_CODE_DELETED);
+    if (_resp_init(pdu, buf, len, COAP_CODE_DELETED)) {
+        return -1;
+    }
     return coap_opt_finish(pdu, COAP_OPT_FINISH_NONE);
 }
 #endif
@@ -483,7 +494,10 @@ static ssize_t _get_directory(coap_pkt_t *pdu, uint8_t *buf, size_t len,
     }
     DEBUG("nanocoap_fileserver: Serving directory listing\n");
 
-    _resp_init(pdu, buf, len, COAP_CODE_CONTENT);
+    if (_resp_init(pdu, buf, len, COAP_CODE_CONTENT)) {
+        vfs_closedir(&dir);
+        return -1;
+    }
     coap_opt_add_format(pdu, COAP_FORMAT_LINK);
     _calc_szx2(pdu,
                5 + 1 /* reserve BLOCK2 size + payload marker */,
@@ -542,7 +556,9 @@ static ssize_t _put_directory(coap_pkt_t *pdu, uint8_t *buf, size_t len,
         if (request->options.exists.if_match && request->options.if_match_len) {
             return _error_handler(pdu, buf, len, COAP_CODE_PRECONDITION_FAILED);
         }
-        _resp_init(pdu, buf, len, COAP_CODE_CHANGED);
+        if (_resp_init(pdu, buf, len, COAP_CODE_CHANGED)) {
+            return -1;
+        }
     }
     else {
         if (request->options.exists.if_match) {
@@ -552,7 +568,9 @@ static ssize_t _put_directory(coap_pkt_t *pdu, uint8_t *buf, size_t len,
         if ((err = vfs_mkdir(request->namebuf, 0777)) < 0) {
             return _error_handler(pdu, buf, len, err);
         }
-        _resp_init(pdu, buf, len, COAP_CODE_CREATED);
+        if (_resp_init(pdu, buf, len, COAP_CODE_CREATED)) {
+            return -1;
+        }
     }
     return coap_opt_finish(pdu, COAP_OPT_FINISH_NONE);
 }
@@ -578,7 +596,9 @@ static ssize_t _delete_directory(coap_pkt_t *pdu, uint8_t *buf, size_t len,
             return _error_handler(pdu, buf, len, err);
         }
     }
-    _resp_init(pdu, buf, len, COAP_CODE_DELETED);
+    if (_resp_init(pdu, buf, len, COAP_CODE_DELETED)) {
+        return -1;
+    }
     return coap_opt_finish(pdu, COAP_OPT_FINISH_NONE);
 }
 #endif
