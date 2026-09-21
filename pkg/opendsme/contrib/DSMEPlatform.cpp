@@ -601,7 +601,6 @@ bool DSMEPlatform::setChannelNumber(uint8_t channel)
     ieee802154_phy_conf_t conf = {
         .phy_mode = IEEE802154_PHY_OQPSK,
         .channel = channel,
-        .page = 0,
         .pow = CONFIG_IEEE802154_DEFAULT_TXPOWER,
     };
     int res;
