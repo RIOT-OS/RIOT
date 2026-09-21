@@ -166,7 +166,6 @@ static int _set(gnrc_netif_t *netif, const gnrc_netapi_opt_t *opt)
 static int _init(gnrc_netif_t *netif)
 {
     netif->flags = 0;
-    netif_register(&netif->netif);
     return 0;
 }
 

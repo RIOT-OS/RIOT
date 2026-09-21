@@ -1698,7 +1698,6 @@ int gnrc_netif_default_init(gnrc_netif_t *netif)
     if (res < 0) {
         return res;
     }
-    netif_register(&netif->netif);
     _check_netdev_capabilities(dev, gnrc_netif_netdev_legacy_api(netif));
     _init_from_device(netif);
 #ifdef DEVELHELP
@@ -2073,6 +2072,7 @@ static void *_gnrc_netif_thread(void *args)
         LOG_ERROR("gnrc_netif: init %u failed: %d\n", thread_getpid(), ctx->result);
         return NULL;
     }
+    netif_register(&netif->netif);
 #ifdef MODULE_NETSTATS_L2
     memset(&netif->stats, 0, sizeof(netstats_t));
 #endif
