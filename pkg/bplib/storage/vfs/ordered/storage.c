@@ -65,14 +65,12 @@ typedef struct __attribute__((packed)) {
     uint8_t payload;
 } bundle_file_structure_t;
 
-// TODO remove, replace with bundle ID
-#ifndef CONFIG_BPLIB_STOR_MAX_DUPLICATE_CHECKS
-#  define CONFIG_BPLIB_STOR_MAX_DUPLICATE_CHECKS 64
-#endif
+/* 16 chars each for 64 bit hex numbers, 1 for all / and the last 1 + 8 + 1 is used
+ * for the _[bundle-id] suffix and the null terminator */
+#define BPLIB_STOR_PATHLEN_DAT (BPLIB_STOR_DATA_LEN + 1 + 16 + 1 + 16 + 1 + 16 + 1 + 8 + 1)
 
-/* 16 chars each for 64 bit hex numbers, 1 for all / and the last 1 + 2 + 1 is used
- * for the _xx deduplicator in case of identical times + the null terminator */
-#define BPLIB_STOR_PATHLEN (BPLIB_STOR_DATA_LEN + 1 + 16 + 1 + 16 + 1 + 16 + 1 + 2 + 1)
+/* 1 for the /, 8 for the 32bit ID and the terminator */
+#define BPLIB_STOR_PATHLEN_IDX (BPLIB_STOR_INDEX_LEN + 1 + 8 + 1)
 
 BPLib_Status_t BPLib_STOR_Init(BPLib_Instance_t* inst)
 {
@@ -110,7 +108,129 @@ void BPLib_STOR_Destroy(BPLib_Instance_t* inst)
 }
 
 /**
+ * @brief Creates the index file for the bundle to store
+ *
+ * If this fails, no index file will have been created (or it has been deleted again).
+ *
+ * @param[in] bundle Bundle to work with
+ * @retval 0 on success
+ * @retval -ERRNO on vfs errors
+ */
+static int _create_index_file(BPLib_Bundle_t* bundle)
+{
+    char path[BPLIB_STOR_PATHLEN_IDX] = BPLIB_STOR_PATH_INDEX;
+    int fd;
+    ssize_t written = 0;
+    bool failed = false;
+    uint64_t deletion_timestamp = bundle->blocks.PrimaryBlock.Timestamp.CreateTime +
+                                  bundle->blocks.PrimaryBlock.Lifetime;
+
+    /* First create the index file / check if it exists */
+    sprintf(path + BPLIB_STOR_INDEX_LEN, "/%" PRIx32, bundle->blocks.PrimaryBlock.BundleId);
+    fd = vfs_open(path, O_CREAT | O_EXCL | O_WRONLY, 0777);
+    if (fd == -EEXIST) {
+        return -EEXIST;
+    }
+
+    written = vfs_write(fd, &bundle->blocks.PrimaryBlock.DestEID.Node, sizeof(uint64_t));
+    if (written < 0 || written != (ssize_t) sizeof(uint64_t)) {
+        failed = true;
+        goto close_file;
+    }
+
+    written = vfs_write(fd, &bundle->blocks.PrimaryBlock.DestEID.Service, sizeof(uint64_t));
+    if (written < 0 || written != (ssize_t) sizeof(uint64_t)) {
+        failed = true;
+        goto close_file;
+    }
+
+    written = vfs_write(fd, &deletion_timestamp, sizeof(uint64_t));
+    if (written < 0 || written != (ssize_t) sizeof(uint64_t)) {
+        failed = true;
+        goto close_file;
+    }
+
+close_file:
+    fd = vfs_close(fd);
+
+    /* Atomic, if somthing failed delete the file again */
+    if (failed || fd < 0) {
+        vfs_unlink(path);
+        return -ENOENT;
+    }
+
+    return 0;
+}
+
+/**
+ * @brief Delete a bundle from storage
+ *
+ * Will (try to) delete the index file and the bundle data.
+ *
+ * If the index file is gone, but the blob is still there, this cannot delete the
+ * bundle data.
+ *
+ * @param bundle_id ID of the bundle
+ */
+static void _delete_bundle(uint32_t bundle_id)
+{
+    char path_idx[BPLIB_STOR_PATHLEN_IDX] = BPLIB_STOR_PATH_INDEX;
+    char path_dat[BPLIB_STOR_PATHLEN_DAT] = BPLIB_STOR_PATH_DATA;
+    ssize_t bytes_read;
+    int fd;
+    uint64_t node, service, time;
+    bool failed = false;
+
+    sprintf(path_idx + BPLIB_STOR_INDEX_LEN, "/%" PRIx32, bundle_id);
+    fd = vfs_open(path_idx, O_RDONLY, 0777);
+    if (fd < 0) {
+        /* Index does not exist */
+        return;
+    }
+
+    bytes_read = vfs_read(fd, &node, sizeof(uint64_t));
+    if (bytes_read != sizeof(uint64_t)) {
+        failed = true;
+        goto close_file;
+    }
+
+    bytes_read = vfs_read(fd, &service, sizeof(uint64_t));
+    if (bytes_read != sizeof(uint64_t)) {
+        failed = true;
+        goto close_file;
+    }
+
+    bytes_read = vfs_read(fd, &time, sizeof(uint64_t));
+    if (bytes_read != sizeof(uint64_t)) {
+        failed = true;
+        goto close_file;
+    }
+
+close_file:
+    vfs_close(fd);
+
+    if (!failed) {
+        /* The read results are valid, can delete the data file */
+        sprintf(path_dat + BPLIB_STOR_DATA_LEN, "/%" PRIx64 "/%" PRIx64 "/%" PRIx64 "_%" PRIx32, 
+            node, service, time, bundle_id);
+        vfs_unlink(path_dat);
+    }
+
+    vfs_unlink(path_idx);
+}
+
+/**
  * @brief Stores the bundle, does not free it
+ *
+ * This creates the bundle on vfs. It stores the bundle data under the correct
+ * subdirectory in the /dat subdirectory of CONFIG_BPLIB_STOR_BASE.
+ * Moreover, it also stores a single file in the /idx subdirectory. This file
+ * contains the mapping from the 32 bit bundle_id to the actual file in the /dat
+ * subdirectory. The index file contains 24 Bytes (node, service and deletion
+ * timestamp), which uniquely identifies the bundle in the /dat directory.
+ *
+ * The /idx is assumed to be unique and storage will fail if a bundle with the
+ * same is is already present in the index.
  *
  * @param bundle The bundle to store
  * @retval BPLIB_SUCCESS on success
@@ -118,18 +238,20 @@ void BPLib_STOR_Destroy(BPLib_Instance_t* inst)
  */
 static BPLib_Status_t _bplib_stor_impl(BPLib_Bundle_t* bundle)
 {
-    /* Since both node and service are 64 bit, one might have to increase the max path length
-     * for this to work with truly all. Each needs 16 digits of hexadecimal numbers plus the
-     * path separators. The file name itself might also be 16 characters long, as it is the delivery
-     * timestamp. */
-    int res = 0;
+    int res;
+    int res_idx;
     ssize_t written = 0;
     bool failed = false;
-    char path[BPLIB_STOR_PATHLEN] = BPLIB_STOR_PATH_DATA;
+    char path[BPLIB_STOR_PATHLEN_DAT] = BPLIB_STOR_PATH_DATA;
     int len = BPLIB_STOR_DATA_LEN;
     int fd = -1;
     BPLib_MEM_Block_t* curr_mem_block;
     bundle_file_header_t header;
+
+    res_idx = _create_index_file(bundle);
+    if (res_idx != 0) {
+        goto end_storage;
+    }
 
     /* Create node directory */
     len += sprintf(path + len, "/%" PRIx64, (int64_t) bundle->blocks.PrimaryBlock.DestEID.Node);
@@ -148,23 +270,13 @@ static BPLib_Status_t _bplib_stor_impl(BPLib_Bundle_t* bundle)
     }
 
     /* Write bundle */
-    len += sprintf(path + len, "/%" PRIx64 "_",
+    len += sprintf(path + len, "/%" PRIx64 "_%" PRIx32,
         (int64_t) bundle->blocks.PrimaryBlock.Timestamp.CreateTime +
-        (int64_t) bundle->blocks.PrimaryBlock.Lifetime);
+        (int64_t) bundle->blocks.PrimaryBlock.Lifetime,
+        bundle->blocks.PrimaryBlock.BundleId);
 
-    /* See if the file already exists */
-    for (uint8_t i = 0; i < CONFIG_BPLIB_STOR_MAX_DUPLICATE_CHECKS; i++) {
-        sprintf(path + len, "%02" PRIx8, i);
-        fd = vfs_open(path, O_RDONLY, 0777);
-        if (fd == -ENOENT) {
-            break;
-        } else if (fd < 0) {
-            goto end_storage;
-        } else {
-            vfs_close(fd);
-        }
-    }
-    len += 2;
+    /* Assume now that the ID does not exist, because it did not exist in the index.
+     * If it does wrongly exist, just overwrite it. */
     fd = vfs_open(path, O_CREAT | O_TRUNC | O_WRONLY, 0777);
     if (fd < 0) {
         failed = true;
@@ -220,6 +332,9 @@ close_file:
 
 end_storage:
     if (res < 0 || failed) {
+        /* On any error, delete both the index and the bundle again */
+        _delete_bundle(bundle->blocks.PrimaryBlock.BundleId);
+
         BPLib_AS_Increment(BPLIB_EID_INSTANCE, BUNDLE_COUNT_DELETED, 1);
         BPLib_AS_Increment(BPLIB_EID_INSTANCE, BUNDLE_COUNT_DISCARDED, 1);
         BPLib_EM_SendEvent(BPLIB_STOR_SQL_STORE_ERR_EID, BPLib_EM_EventType_INFORMATION,
@@ -291,7 +406,7 @@ BPLib_Status_t BPLib_STOR_StoreBundle(BPLib_Instance_t* inst, BPLib_Bundle_t* bu
 }
 
 typedef struct {
-    char path[BPLIB_STOR_PATHLEN];
+    char path[BPLIB_STOR_PATHLEN_DAT];
     unsigned node_len;
     unsigned service_len;
     vfs_DIR node_dir;
@@ -425,7 +540,7 @@ static int _next_bundle_path(bundle_path_iterator_t* iterator,
         }
 
         snprintf(iterator->path + BPLIB_STOR_DATA_LEN,
-            BPLIB_STOR_PATHLEN - BPLIB_STOR_DATA_LEN,
+            BPLIB_STOR_PATHLEN_DAT - BPLIB_STOR_DATA_LEN,
             "/%s", entry.d_name);
         iterator->node_val = strtoull(entry.d_name, NULL, 16);
         res = vfs_opendir(&iterator->service_dir, iterator->path);
@@ -472,7 +587,7 @@ static int _next_bundle_path(bundle_path_iterator_t* iterator,
 
         acc_len = BPLIB_STOR_DATA_LEN + 1 + iterator->node_len;
         snprintf(iterator->path + acc_len,
-            BPLIB_STOR_PATHLEN - acc_len,
+            BPLIB_STOR_PATHLEN_DAT - acc_len,
             "/%s", entry.d_name);
         iterator->service_val = strtoull(entry.d_name, NULL, 16);
         res = vfs_opendir(&iterator->bundle_dir, iterator->path);
@@ -511,10 +626,12 @@ static int _next_bundle_path(bundle_path_iterator_t* iterator,
             continue;
         }
         // TODO test how this behaves with restarts
+        // preliminary answer: not great, but bplib currently cannot handle restarts
+        // + custody anyways.
 
         acc_len = BPLIB_STOR_DATA_LEN + 1 + iterator->node_len + 1 + iterator->service_len;
         snprintf(iterator->path + acc_len,
-            BPLIB_STOR_PATHLEN - acc_len,
+            BPLIB_STOR_PATHLEN_DAT - acc_len,
             "/%s", entry.d_name);
         int len = strlen(entry.d_name);
         iterator->index_val = strtol(entry.d_name + len - 2, NULL, 16);
@@ -782,7 +899,7 @@ BPLib_Status_t BPLib_STOR_EgressForID(BPLib_Instance_t* inst, uint32_t egress_id
 
     mutex_lock(&caches_lock);
 
-    char path[BPLIB_STOR_PATHLEN];
+    char path[BPLIB_STOR_PATHLEN_DAT];
     if (!cache->all_bundles_queued && bplib_cache_is_empty(cache)) {
         _fill_bundle_cache(dest_eids, num_eids, cache, local_delivery);
     }
@@ -800,7 +917,12 @@ BPLib_Status_t BPLib_STOR_EgressForID(BPLib_Instance_t* inst, uint32_t egress_id
          * Since for RIOT both the Storage and the CLAs can be user defined, this could be
          * prevented by only unlinking after the CLA has really sent the bundle. */
         bplib_cache_mark_front_consumed(cache);
-        vfs_unlink(path);
+
+        /* In contrast to the SQLite based implementation of bplib, just delete the bundle
+         * here directly and not mark it as deletable. */
+        if (local_delivery || !curr_bundle->Meta.IsCustodial) {
+            _delete_bundle(curr_bundle->blocks.PrimaryBlock.BundleId);
+        }
         egress_count++;
     }
 
@@ -854,6 +976,7 @@ BPLib_Status_t BPLib_STOR_GarbageCollect(BPLib_Instance_t* inst)
             if (fd < 0) {
                 /* Since we just found it by the iterator but it can't seem to open
                  * try to remove it */
+                // TODO delete index file if exists, get id from path
                 vfs_unlink(iterator.path);
                 continue;
             }
@@ -932,14 +1055,30 @@ static void _bplib_stor_update_custodial_unlocked(BPLib_Instance_t* inst,
                                 BPLib_STOR_CtUpdateBatch_t* custody_batch)
 {
     BPLib_Status_t status;
-    //status = BPLib_SQL_UpdateCustodialBundles(inst, custody_batch);
+
+    for (size_t i = 0; i < custody_batch->Size; i++) {
+        if (custody_batch->Ops[i] == BPLIB_CT_MARK_DELETE) {
+            _delete_bundle(custody_batch->BundleIDs[i]);
+        }
+    }
+
+    for (size_t i = 0; i < custody_batch->Size; i++) {
+        if (custody_batch->Ops[i] == BPLIB_CT_START_RETRANSMIT) {
+            // TODO
+            puts("Start retransmit");
+        }
+        else if (custody_batch->Ops[i] == BPLIB_CT_STOP_RETRANSMIT) {
+            puts("Stop retransmit");
+        }
+    }
+
     (void) status;
     (void) inst;
     status = BPLIB_SUCCESS;
 
     if (status != BPLIB_SUCCESS) {
         BPLib_EM_SendEvent(BPLIB_STOR_CCS_ERR_EID, BPLib_EM_EventType_ERROR,
-                "Error performing CCS storage operations, Status = %d.", status);
+                "Error on CCS storage ops, Status = %d.", status);
     }
 
     custody_batch->Size = 0;
@@ -999,6 +1138,9 @@ void BPLib_STOR_UpdateCustodialBundles(BPLib_Instance_t* inst)
 BPLib_Status_t BPLib_STOR_SetNewRetransmitTrigger(BPLib_Instance_t *inst,
                                                   uint32_t contact_id)
 {
+    /* This function SHOULD update all of the bundles retransmit times and is
+     * called when a CLA is setup. In practice this only decreases the time to
+     * the next retransmission, so it is not super important for now. */
     (void) inst;
     (void) contact_id;
     return BPLIB_SUCCESS;
