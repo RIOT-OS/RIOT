@@ -329,6 +329,56 @@ void dma_resume(dma_t dma)
 #endif
 }
 
+#if MODULE_PERIPH_DMA_EVENT
+void dma_event_use(dma_t dma, event_channel_t ch)
+{
+    periph_event_attach(ch, EVENT_USER_DMAC_CH_0 + dma);
+}
+
+void dma_event_disuse(dma_t dma, event_channel_t ch)
+{
+    periph_event_detach(ch, EVENT_USER_DMAC_CH_0 + dma);
+}
+
+void dma_event_setup(dma_t dma, dma_evact_t evact)
+{
+#ifdef DMAC_CHCTRLB_EVACT
+    unsigned state = irq_disable();
+    DMAC->CHID.reg = DMAC_CHID_ID(dma);
+    DMAC->CHCTRLB.reg
+        = (DMAC->CHCTRLB.reg & ~DMAC_CHCTRLB_EVACT_Msk) | (evact << DMAC_CHCTRLB_EVACT_Pos);
+    irq_restore(state);
+#else
+    DMAC->Channel[dma].CHEVCTRL.reg
+        = (DMAC->Channel[dma].CHEVCTRL.reg & ~DMAC_CHEVCTRL_EVACT_Msk) | (evact << DMAC_CHEVCTRL_EVACT_Pos);
+#endif
+}
+
+void dma_event_input_enable(dma_t dma)
+{
+#ifdef DMAC_CHCTRLB_EVIE
+    unsigned state = irq_disable();
+    DMAC->CHID.reg = DMAC_CHID_ID(dma);
+    DMAC->CHCTRLB.reg |= DMAC_CHCTRLB_EVIE;
+    irq_restore(state);
+#else
+    DMAC->Channel[dma].CHEVCTRL.reg |= DMAC_CHEVCTRL_EVIE;
+#endif
+}
+
+void dma_event_input_disable(dma_t dma)
+{
+#ifdef DMAC_CHCTRLB_EVIE
+    unsigned state = irq_disable();
+    DMAC->CHID.reg = DMAC_CHID_ID(dma);
+    DMAC->CHCTRLB.reg &= ~DMAC_CHCTRLB_EVIE;
+    irq_restore(state);
+#else
+    DMAC->Channel[dma].CHEVCTRL.reg &= ~DMAC_CHEVCTRL_EVIE;
+#endif
+}
+#endif /* MODULE_PERIPH_DMA_EVENT */
+
 void isr_dmac(void)
 {
     /* Always holds the interrupt status for the highest priority channel with

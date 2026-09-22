@@ -517,6 +517,8 @@ groups:
           a certain cut-off). The main benefit is that other threads can run
           while the thread issuing the, say SPI transfer, is blocked until the
           transfer is completed. It often also speeds up longer transfers.
+  - name: periph_dma_event
+    help: The DMA peripheral supports peripheral events
   - name: periph_pm
     help: The MCU supports power management (PM) and RIOT can make use of that.
   - name: periph_ltdc
