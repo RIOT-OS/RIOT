@@ -6,7 +6,7 @@
 #pragma once
 
 /**
- * @ingroup     boards_zedboard_noelv
+ * @ingroup     boards_zedboard-noelv
  * @{
  *
  * @file
