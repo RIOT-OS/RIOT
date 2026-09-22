@@ -540,6 +540,13 @@ int32_t adc_sample(adc_t line, adc_res_t res)
 }
 
 #if MODULE_PERIPH_ADC_DMA
+
+#if defined(DMAC_CHCTRLB_TRIGACT_BURST_Val) || defined(DMAC_CHCTRLA_TRIGACT_BURST_Val)
+#define ADC_DMA_TRIGACT DMA_TRIGACT_BURST
+#else
+#define ADC_DMA_TRIGACT DMA_TRIGACT_BEAT
+#endif
+
 int adc_dma_setup(adc_t line, dma_cb_t cb, void *arg, adc_res_t res)
 {
     uint8_t dmac_id;
@@ -556,7 +563,7 @@ int adc_dma_setup(adc_t line, dma_cb_t cb, void *arg, adc_res_t res)
         return -ENOMEM;
     }
     _adc_configure(_dev(line), res);
-    dma_setup(tx_dma[line], dmac_id, 0, cb, arg);
+    dma_setup(tx_dma[line], ADC_DMA_TRIGACT, dmac_id, 0, cb, arg);
     return 0;
 }
 
