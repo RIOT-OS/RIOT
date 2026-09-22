@@ -79,7 +79,9 @@ void gnrc_lorawan_mlme_confirm(gnrc_lorawan_t *mac, mlme_confirm_t *confirm)
 
     if (confirm->type == MLME_JOIN) {
         if (confirm->status == 0) {
-            gnrc_netif_lorawan_t *lw_netif = container_of(mac, gnrc_netif_lorawan_t, mac);
+            gnrc_netif_lorawan_t *lw_netif = container_of(mac,
+                                                          gnrc_netif_lorawan_t,
+                                                          mac);
             gnrc_netif_t *netif = container_of(lw_netif, gnrc_netif_t, lorawan);
 
             DEBUG("gnrc_lorawan: join succeeded %d\n", netif->pid);
@@ -136,7 +138,8 @@ void gnrc_lorawan_mcps_indication(gnrc_lorawan_t *mac, mcps_indication_t *ind)
     gnrc_nettype_t nettype = GNRC_NETTYPE_UNDEF;
     uint32_t demux = GNRC_NETREG_DEMUX_CTX_ALL;
 
-    assert(ind->data.port >= LORAMAC_PORT_MIN && ind->data.port <= LORAMAC_PORT_MAX);
+    assert(ind->data.port >= LORAMAC_PORT_MIN
+           && ind->data.port <= LORAMAC_PORT_MAX);
 
     gnrc_pktsnip_t *pkt = gnrc_pktbuf_add(NULL, ind->data.pkt->iol_base,
                                           ind->data.pkt->iol_len,
@@ -221,7 +224,8 @@ static void _driver_cb(netdev_t *dev, netdev_event_t event)
     gnrc_lorawan_t *mac = &netif->lorawan.mac;
 
     if (event == NETDEV_EVENT_ISR) {
-        event_post(&netif->evq[GNRC_NETIF_EVQ_INDEX_PRIO_LOW], &netif->event_isr);
+        event_post(&netif->evq[GNRC_NETIF_EVQ_INDEX_PRIO_LOW],
+                   &netif->event_isr);
     }
     else {
         DEBUG("gnrc_netif: event triggered -> %i\n", event);
@@ -234,7 +238,8 @@ static void _driver_cb(netdev_t *dev, netdev_event_t event)
             break;
         case NETDEV_EVENT_LINK_UP: {
             if (IS_USED(MODULE_GNRC_IPV6)) {
-                msg_t msg = { .type = GNRC_IPV6_NIB_IFACE_UP, .content = { .ptr = netif } };
+                msg_t msg = { .type = GNRC_IPV6_NIB_IFACE_UP,
+                              .content = { .ptr = netif } };
 
                 msg_send(&msg, gnrc_ipv6_pid);
             }
@@ -242,7 +247,8 @@ static void _driver_cb(netdev_t *dev, netdev_event_t event)
         }
         case NETDEV_EVENT_LINK_DOWN: {
             if (IS_USED(MODULE_GNRC_IPV6)) {
-                msg_t msg = { .type = GNRC_IPV6_NIB_IFACE_DOWN, .content = { .ptr = netif } };
+                msg_t msg = { .type = GNRC_IPV6_NIB_IFACE_DOWN,
+                              .content = { .ptr = netif } };
 
                 msg_send(&msg, gnrc_ipv6_pid);
             }
@@ -295,8 +301,14 @@ static int _init(gnrc_netif_t *netif)
     netif->dev->event_callback = _driver_cb;
     netif->lorawan.event_timeout.handler = _event_handler_timeout;
     netif->lorawan.event_backoff_expire.handler = _event_handler_backoff_expire;
-    event_timeout_ztimer_init(&netif->lorawan.ev_timeout_to, ZTIMER_MSEC, &netif->evq[GNRC_NETIF_EVQ_INDEX_PRIO_LOW], &netif->lorawan.event_timeout);
-    event_timeout_ztimer_init(&netif->lorawan.ev_timeout_backoff_exp, ZTIMER_MSEC, &netif->evq[GNRC_NETIF_EVQ_INDEX_PRIO_LOW], &netif->lorawan.event_backoff_expire);
+    event_timeout_ztimer_init(&netif->lorawan.ev_timeout_to,
+                              ZTIMER_MSEC,
+                              &netif->evq[GNRC_NETIF_EVQ_INDEX_PRIO_LOW],
+                              &netif->lorawan.event_timeout);
+    event_timeout_ztimer_init(&netif->lorawan.ev_timeout_backoff_exp,
+                              ZTIMER_MSEC,
+                              &netif->evq[GNRC_NETIF_EVQ_INDEX_PRIO_LOW],
+                              &netif->lorawan.event_backoff_expire);
 
     _reset(netif);
 
@@ -328,8 +340,10 @@ static int _init(gnrc_netif_t *netif)
 
     if (IS_USED(MODULE_GNRC_LORAWAN_1_1)) {
         gnrc_netif_lorawan_set_appkey(&netif->lorawan, _appkey, sizeof(_appkey));
-        gnrc_netif_lorawan_set_snwksintkey(&netif->lorawan, _snwksintkey, sizeof(_snwksintkey));
-        gnrc_netif_lorawan_set_nwksenckey(&netif->lorawan, _nwksenckey, sizeof(_nwksenckey));
+        gnrc_netif_lorawan_set_snwksintkey(&netif->lorawan, _snwksintkey,
+                                           sizeof(_snwksintkey));
+        gnrc_netif_lorawan_set_nwksenckey(&netif->lorawan, _nwksenckey,
+                                          sizeof(_nwksenckey));
     }
 
     _set_be_addr(&netif->lorawan.mac, _devaddr);
@@ -562,8 +576,11 @@ static int _set(gnrc_netif_t *netif, const gnrc_netapi_opt_t *opt)
                 mlme_request.join.nwkkey = netif->lorawan.nwkkey;
 
                 if (IS_USED(MODULE_GNRC_LORAWAN_1_1)) {
-                    gnrc_lorawan_mlme_join_set_appkey(&mlme_request.join, gnrc_netif_lorawan_get_appkey(
-                                                          &netif->lorawan));
+                    gnrc_lorawan_mlme_join_set_appkey(
+                            &mlme_request.join,
+                            gnrc_netif_lorawan_get_appkey(
+                            &netif->lorawan)
+                            );
                 }
 
                 mlme_request.join.dr = netif->lorawan.datarate;
