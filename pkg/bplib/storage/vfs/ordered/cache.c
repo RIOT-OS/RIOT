@@ -104,7 +104,7 @@ int bplib_cache_get(cache_list_t* cache, char* bundle_path)
         return 1;
     }
     cache_list_node_t * entry = container_of(node, cache_list_node_t, list);
-    sprintf(bundle_path, CONFIG_BPLIB_STOR_BASE
+    sprintf(bundle_path, BPLIB_STOR_PATH_DATA
         "/%"PRIx64"/%"PRIx64"/%"PRIx64"_%02"PRIx8,
         entry->node, entry->service, entry->expiry, entry->index);
     return 0;
