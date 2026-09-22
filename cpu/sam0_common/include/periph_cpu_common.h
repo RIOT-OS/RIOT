@@ -1245,6 +1245,62 @@ typedef enum {
 } dma_evact_t;
 
 /**
+ * @brief   Available DMA trigger granularity
+ */
+typedef enum {
+    /**
+     * @brief   One trigger required for each block transfer
+     */
+#if defined(DMAC_CHCTRLB_TRIGACT_BLOCK_Val)
+    DMA_TRIGACT_BLOCK = DMAC_CHCTRLB_TRIGACT_BLOCK_Val,
+#elif defined(DMAC_CHCTRLA_TRIGACT_BLOCK_Val)
+    DMA_TRIGACT_BLOCK = DMAC_CHCTRLA_TRIGACT_BLOCK_Val,
+#endif
+    /**
+     * @brief   One trigger required for each beat transfer
+     */
+#if defined(DMAC_CHCTRLB_TRIGACT_BEAT_Val)
+    DMA_TRIGACT_BEAT  = DMAC_CHCTRLB_TRIGACT_BEAT_Val,
+#elif defined(DMAC_CHCTRLA_TRIGACT_BEAT_Val)
+    DMA_TRIGACT_BEAT  = DMAC_CHCTRLA_TRIGACT_BEAT_Val,
+#endif
+    /**
+     * @brief   Back-to-back beat transfers without CPU interference
+     */
+#if defined(DMAC_CHCTRLB_TRIGACT_BURST_Val)
+    DMA_TRIGACT_BURST  = DMAC_CHCTRLB_TRIGACT_BURST_Val,
+#elif defined(DMAC_CHCTRLA_TRIGACT_BURST_Val)
+    DMA_TRIGACT_BURST  = DMAC_CHCTRLA_TRIGACT_BURST_Val,
+#endif
+    /**
+     * @brief   One trigger required for each transaction
+     */
+#if defined(DMAC_CHCTRLB_TRIGACT_TRANSACTION_Val)
+    DMA_TRIGACT_TRANSACTION = DMAC_CHCTRLB_TRIGACT_TRANSACTION_Val,
+#elif defined(DMAC_CHCTRLA_TRIGACT_TRANSACTION_Val)
+    DMA_TRIGACT_TRANSACTION = DMAC_CHCTRLA_TRIGACT_TRANSACTION_Val,
+#endif
+} dma_trigact_t;
+
+/**
+ * @brief   DMA channel status structure
+ */
+typedef struct dma_channel_status {
+#ifdef DMAC_CHSTATUS_PEND
+    uint8_t pending;
+#endif
+#ifdef DMAC_CHSTATUS_BUSY
+    uint8_t busy;
+#endif
+#ifdef DMAC_CHSTATUS_FERR
+    uint8_t ferr;
+#endif
+#ifdef DMAC_CHSTATUS_CRCERR
+    uint8_t crcerr;
+#endif
+} dma_channel_status_t;
+
+/**
  * @brief   Signature of event callback functions triggered from interrupts
  *
  * @param[in] arg       optional context for the callback
@@ -1279,12 +1335,14 @@ void dma_release_channel(dma_t dma);
  * @brief   Initialize a previously allocated DMA channel with one-time settings
  *
  * @param   dma     DMA channel reference
+ * @param   granularity  Trigger action granularity for this DMA channel
  * @param   trigger Trigger to use for this DMA channel
  * @param   prio    Channel priority
  * @param   cb      Callback to call when DMA transfer is done, may be NULL
  * @param   ctx     Callback context
  */
-void dma_setup(dma_t dma, unsigned trigger, uint8_t prio, dma_cb_t cb, void *ctx);
+void dma_setup(dma_t dma, dma_trigact_t granularity, unsigned trigger, uint8_t prio,
+               dma_cb_t cb, void *ctx);
 
 /**
  * @brief   Update the DMA Completion callback context
@@ -1450,6 +1508,66 @@ void dma_start(dma_t dma);
  * @param[in]   dma     DMA channel reference
  */
 void dma_cancel(dma_t dma);
+
+/**
+ * @brief   Get the current status of a DMA channel
+ *
+ * @param[in]   dma     DMA channel reference
+ * @return  Current status of the DMA channel
+ */
+dma_channel_status_t dma_channel_status(dma_t dma);
+
+/**
+ * @brief   Initialize a DMA descriptor
+ *
+ * @note    When increment is enabled for source or destination, the @p src
+ *          and/or @p dst must point to the **end** of the array.
+ *
+ * @param   desc    DMA descriptor
+ * @param   width   Transfer beat size to use
+ * @param   src     Source address for the transfer
+ * @param   dst     Destination address for the transfer
+ * @param   num     Number of beats to transfer
+ * @param   incr    Which of the addresses to increment after a beat
+ * @param   blockact Action to take when the block transfer is complete
+ *                   (e.g., suspend, interrupt, etc.)
+ */
+void dma_prepare_descriptor(void *desc, uint8_t width, const void *src, void *dst,
+                            size_t num, dma_incr_t incr, dma_blockact_t blockact);
+
+/**
+ * @brief   Get the default DMA descriptor for a given channel
+ *
+ * @param[in]   dma     DMA channel reference
+ *
+ * @return  Pointer to the default DMA descriptor for the given channel
+ */
+const void *dma_descriptor(dma_t dma);
+
+/**
+ * @brief   Get the next DMA descriptor for a given channel
+ *
+ * @param[in]   dma     DMA channel reference
+ *
+ * @return  Pointer to the next DMA descriptor, or NULL if there is no next descriptor
+ */
+const void *dma_get_next_descriptor(const void *desc);
+
+/**
+ * @brief   Set the next DMA descriptor for a given channel
+ *
+ * @param[in]   dma     DMA channel reference
+ * @param[in]   next    Pointer to the next DMA descriptor
+ */
+void dma_set_next_descriptor(void *desc, const void *next);
+
+/**
+ * @brief   Append a DMA descriptor to the end of the descriptor chain
+ *
+ * @param[in]   desc    Pointer to the current DMA descriptor
+ * @param[in]   next    Pointer to the next DMA descriptor to append
+ */
+void dma_append_descriptor(void *desc, const void *next);
 
 /**
  * @brief   Resume a suspended DMA transfer
