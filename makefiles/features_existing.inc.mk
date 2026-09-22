@@ -176,6 +176,7 @@ FEATURES_EXISTING := \
     periph_fmc_sdram \
     periph_freqm \
     periph_gpio \
+    periph_gpio_event \
     periph_gpio_fast_read \
     periph_gpio_irq \
     periph_gpio_ll \

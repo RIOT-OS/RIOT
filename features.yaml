@@ -541,6 +541,8 @@ groups:
       features:
       - name: periph_gpio
         help: The classic GPIO API is implemented
+      - name: periph_gpio_event
+        help: GPIO driver supports event generation on defined flanks.
       - name: periph_gpio_irq
         help: The classic GPIO driver supports external interrupts.
       - name: periph_gpio_tamper_wake
