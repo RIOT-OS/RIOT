@@ -72,7 +72,7 @@ typedef struct __attribute__((packed)) {
 
 /* 16 chars each for 64 bit hex numbers, 1 for all / and the last 1 + 2 + 1 is used
  * for the _xx deduplicator in case of identical times + the null terminator */
-#define BPLIB_STOR_PATHLEN (BPLIB_STOR_BASELEN + 1 + 16 + 1 + 16 + 1 + 16 + 1 + 2 + 1)
+#define BPLIB_STOR_PATHLEN (BPLIB_STOR_DATA_LEN + 1 + 16 + 1 + 16 + 1 + 16 + 1 + 2 + 1)
 
 BPLib_Status_t BPLib_STOR_Init(BPLib_Instance_t* inst)
 {
@@ -82,11 +82,20 @@ BPLib_Status_t BPLib_STOR_Init(BPLib_Instance_t* inst)
     memset(contact_caches, 0, sizeof(contact_caches));
     memset(channel_caches, 0, sizeof(channel_caches));
 
-    char *path = CONFIG_BPLIB_STOR_BASE;
     int res;
 
-    /* Create bplib subfolder */
-    res = vfs_mkdir(path, 0777);
+    /* Create bplib subfolder and its two subfolders */
+    res = vfs_mkdir(CONFIG_BPLIB_STOR_BASE, 0777);
+    if (res < 0 && res != -EEXIST) {
+        return BPLIB_OS_ERROR;
+    }
+
+    res = vfs_mkdir(BPLIB_STOR_PATH_DATA, 0777);
+    if (res < 0 && res != -EEXIST) {
+        return BPLIB_OS_ERROR;
+    }
+
+    res = vfs_mkdir(BPLIB_STOR_PATH_INDEX, 0777);
     if (res < 0 && res != -EEXIST) {
         return BPLIB_OS_ERROR;
     }
@@ -116,8 +125,8 @@ static BPLib_Status_t _bplib_stor_impl(BPLib_Bundle_t* bundle)
     int res = 0;
     ssize_t written = 0;
     bool failed = false;
-    char path[BPLIB_STOR_PATHLEN] = CONFIG_BPLIB_STOR_BASE;
-    int len = BPLIB_STOR_BASELEN;
+    char path[BPLIB_STOR_PATHLEN] = BPLIB_STOR_PATH_DATA;
+    int len = BPLIB_STOR_DATA_LEN;
     int fd = -1;
     BPLib_MEM_Block_t* curr_mem_block;
     bundle_file_header_t header;
@@ -298,7 +307,7 @@ typedef struct {
 } bundle_path_iterator_t;
 
 static bundle_path_iterator_t BUNDLE_PATH_ITER_INIT = {
-    .path = CONFIG_BPLIB_STOR_BASE,
+    .path = BPLIB_STOR_PATH_DATA,
     .node_len = 0,
     .service_len = 0,
     .node_open = false,
@@ -376,7 +385,7 @@ static int _next_bundle_path(bundle_path_iterator_t* iterator,
             return -EINVAL;
         }
 
-        res = vfs_opendir(&iterator->node_dir, CONFIG_BPLIB_STOR_BASE);
+        res = vfs_opendir(&iterator->node_dir, BPLIB_STOR_PATH_DATA);
         if (res < 0) {
             return res;
         }
@@ -415,8 +424,8 @@ static int _next_bundle_path(bundle_path_iterator_t* iterator,
             continue;
         }
 
-        snprintf(iterator->path + BPLIB_STOR_BASELEN,
-            BPLIB_STOR_PATHLEN - BPLIB_STOR_BASELEN,
+        snprintf(iterator->path + BPLIB_STOR_DATA_LEN,
+            BPLIB_STOR_PATHLEN - BPLIB_STOR_DATA_LEN,
             "/%s", entry.d_name);
         iterator->node_val = strtoull(entry.d_name, NULL, 16);
         res = vfs_opendir(&iterator->service_dir, iterator->path);
@@ -461,7 +470,7 @@ static int _next_bundle_path(bundle_path_iterator_t* iterator,
             continue;
         }
 
-        acc_len = BPLIB_STOR_BASELEN + 1 + iterator->node_len;
+        acc_len = BPLIB_STOR_DATA_LEN + 1 + iterator->node_len;
         snprintf(iterator->path + acc_len,
             BPLIB_STOR_PATHLEN - acc_len,
             "/%s", entry.d_name);
@@ -503,7 +512,7 @@ static int _next_bundle_path(bundle_path_iterator_t* iterator,
         }
         // TODO test how this behaves with restarts
 
-        acc_len = BPLIB_STOR_BASELEN + 1 + iterator->node_len + 1 + iterator->service_len;
+        acc_len = BPLIB_STOR_DATA_LEN + 1 + iterator->node_len + 1 + iterator->service_len;
         snprintf(iterator->path + acc_len,
             BPLIB_STOR_PATHLEN - acc_len,
             "/%s", entry.d_name);
