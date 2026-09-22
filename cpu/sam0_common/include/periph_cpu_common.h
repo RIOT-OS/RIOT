@@ -1175,6 +1175,76 @@ typedef enum {
 } dma_blockact_t;
 
 /**
+ * @brief   DMA action on peripheral event
+ */
+typedef enum {
+    /**
+     * @brief   No action
+     */
+#if defined(DMAC_CHCTRLB_EVACT_NOACT_Val)
+    DMA_EVACT_NONE  = DMAC_CHCTRLB_EVACT_NOACT_Val,
+#elif defined(DMAC_CHEVCTRL_EVACT_NOACT_Val)
+    DMA_EVACT_NONE  = DMAC_CHEVCTRL_EVACT_NOACT_Val,
+#endif
+    /**
+     * @brief   Event triggers DMA transfer
+     */
+#if defined(DMAC_CHCTRLB_EVACT_TRIG_Val)
+    DMA_EVACT_TRIG  = DMAC_CHCTRLB_EVACT_TRIG_Val,
+#elif defined(DMAC_CHEVCTRL_EVACT_TRIG_Val)
+    DMA_EVACT_TRIG  = DMAC_CHEVCTRL_EVACT_TRIG_Val,
+#endif
+    /**
+     * @brief   Event triggers conditional DMA transfer
+     */
+#if defined(DMAC_CHCTRLB_EVACT_CTRIG_Val)
+    DMA_EVACT_CTRIG  = DMAC_CHCTRLB_EVACT_CTRIG_Val,
+#elif defined(DMAC_CHEVCTRL_EVACT_CTRIG_Val)
+    DMA_EVACT_CTRIG  = DMAC_CHEVCTRL_EVACT_CTRIG_Val,
+#endif
+    /**
+     * @brief   Event triggers conditional block transfer
+     */
+#if defined(DMAC_CHCTRLB_EVACT_CBLOCK_Val)
+    DMA_EVACT_CBLOCK  = DMAC_CHCTRLB_EVACT_CBLOCK_Val,
+#elif defined(DMAC_CHEVCTRL_EVACT_CBLOCK_Val)
+    DMA_EVACT_CBLOCK  = DMAC_CHEVCTRL_EVACT_CBLOCK_Val,
+#endif
+    /**
+     * @brief   Event triggers DMA suspension
+     */
+#if defined(DMAC_CHCTRLB_EVACT_SUSPEND_Val)
+    DMA_EVACT_SUSPEND  = DMAC_CHCTRLB_EVACT_SUSPEND_Val,
+#elif defined(DMAC_CHEVCTRL_EVACT_SUSPEND_Val)
+    DMA_EVACT_SUSPEND  = DMAC_CHEVCTRL_EVACT_SUSPEND_Val,
+#endif
+    /**
+     * @brief   Event triggers DMA resumption
+     */
+#if defined(DMAC_CHCTRLB_EVACT_RESUME_Val)
+    DMA_EVACT_RESUME  = DMAC_CHCTRLB_EVACT_RESUME_Val,
+#elif defined(DMAC_CHEVCTRL_EVACT_RESUME_Val)
+    DMA_EVACT_RESUME  = DMAC_CHEVCTRL_EVACT_RESUME_Val,
+#endif
+    /**
+     * @brief   Event triggers DMA suspension skip
+     */
+#if defined(DMAC_CHCTRLB_EVACT_SSKIP_Val)
+    DMA_EVACT_SSKIP  = DMAC_CHCTRLB_EVACT_SSKIP_Val,
+#elif defined(DMAC_CHEVCTRL_EVACT_SSKIP_Val)
+    DMA_EVACT_SSKIP  = DMAC_CHEVCTRL_EVACT_SSKIP_Val,
+#endif
+    /**
+     * @brief   Event triggers DMA priority increment
+     */
+#if defined(DMAC_CHCTRLB_EVACT_INCPRI_Val)
+    DMA_EVACT_INCPRI  = DMAC_CHCTRLB_EVACT_INCPRI_Val,
+#elif defined(DMAC_CHEVCTRL_EVACT_INCPRI_Val)
+    DMA_EVACT_INCPRI  = DMAC_CHEVCTRL_EVACT_INCPRI_Val,
+#endif
+} dma_evact_t;
+
+/**
  * @brief   Signature of event callback functions triggered from interrupts
  *
  * @param[in] arg       optional context for the callback
@@ -1390,6 +1460,56 @@ void dma_cancel(dma_t dma);
  * @param[in]   dma     DMA channel reference
  */
 void dma_resume(dma_t dma);
+
+#if defined(MODULE_PERIPH_DMA_EVENT) || defined(DOXYGEN)
+/**
+ * @brief   Set DMA peripheral as user of peripheral events for a given event channel
+ *
+ * @note requires feature periph_dma_event
+ *
+ * @param[in]   dma     DMA channel reference
+ * @param[in]   ch      Event channel to be used by the DMA peripheral
+ */
+void dma_event_use(dma_t dma, event_channel_t ch);
+
+/**
+ * @brief   Remove DMA peripheral as user of peripheral events for a given event channel
+ *
+ * @note requires feature periph_dma_event
+ *
+ * @param[in]   dma     DMA channel reference
+ * @param[in]   ch      Event channel to be removed from the DMA peripheral
+ */
+void dma_event_disuse(dma_t dma, event_channel_t ch);
+
+/**
+ * @brief   Configure the DMA event action for a given channel
+ *
+ * @note requires feature periph_dma_event
+ *
+ * @param[in]   dma     DMA channel reference
+ * @param[in]   evact   Event action to be configured for the DMA channel
+ */
+void dma_event_setup(dma_t dma, dma_evact_t evact);
+
+/**
+ * @brief   Enable DMA event input for a given channel
+ *
+ * @note requires feature periph_dma_event
+ *
+ * @param[in]   dma     DMA channel reference
+ */
+void dma_event_input_enable(dma_t dma);
+
+/**
+ * @brief   Disable DMA event input for a given channel
+ *
+ * @note requires feature periph_dma_event
+ *
+ * @param[in]   dma     DMA channel reference
+ */
+void dma_event_input_disable(dma_t dma);
+#endif /* MODULE_PERIPH_DMA_EVENT */
 /** @} */
 #endif /* REV_DMAC || DOXYGEN */
 
