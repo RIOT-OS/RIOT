@@ -398,90 +398,90 @@ int gnrc_netif_get_from_netdev(gnrc_netif_t *netif, gnrc_netapi_opt_t *opt)
 
     gnrc_netif_acquire(netif);
     switch (opt->opt) {
-        case NETOPT_6LO:
-            assert(opt->data_len == sizeof(netopt_enable_t));
-            *((netopt_enable_t *)opt->data) =
-                    (netopt_enable_t)gnrc_netif_is_6lo(netif);
-            res = sizeof(netopt_enable_t);
-            break;
-        case NETOPT_HOP_LIMIT:
-            assert(opt->data_len == sizeof(uint8_t));
-            *((uint8_t *)opt->data) = netif->cur_hl;
-            res = sizeof(uint8_t);
-            break;
-        case NETOPT_STATS:
-            switch ((int16_t)opt->context) {
-            case NETSTATS_IPV6:
-                if (IS_USED(MODULE_NETSTATS_IPV6) && IS_USED(MODULE_GNRC_NETIF_IPV6))
-                {
-                    res = _get_ipv6_stats(netif, opt);
-                }
-                break;
-            case NETSTATS_LAYER2:
-                if (IS_USED(MODULE_NETSTATS_L2)) {
-                    res = _get_l2_stats(netif, opt);
-                }
-                break;
-            default:
-                /* take from device */
-                break;
+    case NETOPT_6LO:
+        assert(opt->data_len == sizeof(netopt_enable_t));
+        *((netopt_enable_t *)opt->data) =
+                (netopt_enable_t)gnrc_netif_is_6lo(netif);
+        res = sizeof(netopt_enable_t);
+        break;
+    case NETOPT_HOP_LIMIT:
+        assert(opt->data_len == sizeof(uint8_t));
+        *((uint8_t *)opt->data) = netif->cur_hl;
+        res = sizeof(uint8_t);
+        break;
+    case NETOPT_STATS:
+        switch ((int16_t)opt->context) {
+        case NETSTATS_IPV6:
+            if (IS_USED(MODULE_NETSTATS_IPV6) && IS_USED(MODULE_GNRC_NETIF_IPV6))
+            {
+                res = _get_ipv6_stats(netif, opt);
             }
             break;
-        case NETOPT_IPV6_ADDR:
-            if (IS_USED(MODULE_GNRC_NETIF_IPV6)) {
-                res = _get_ipv6_addr(netif, opt);
-            }
-            break;
-        case NETOPT_IPV6_ADDR_FLAGS:
-            if (IS_USED(MODULE_GNRC_NETIF_IPV6)) {
-                res = _get_ipv6_addr_flags(netif, opt);
-            }
-            break;
-        case NETOPT_IPV6_GROUP:
-            if (IS_USED(MODULE_GNRC_NETIF_IPV6)) {
-                res =_get_ipv6_group(netif, opt);
-            }
-            break;
-        case NETOPT_IPV6_IID:
-            if (IS_USED(MODULE_GNRC_NETIF_IPV6)) {
-                res = _get_ipv6_iid(netif, opt);
-            }
-            break;
-        case NETOPT_MAX_PDU_SIZE:
-            if (IS_USED(MODULE_GNRC_NETIF_IPV6)) {
-                if (_nettype_is_ipv6(netif, opt)) {
-                    res = _get_ipv6_max_pdu_size(netif, opt);
-                }
-            }
-            /* else ask device */
-            break;
-        case NETOPT_IPV6_FORWARDING:
-            if (IS_USED(MODULE_GNRC_NETIF_IPV6)
-                    && IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_ROUTER)) {
-                res = _get_ipv6_forwarding(netif, opt);
-            }
-            break;
-        case NETOPT_IPV6_SND_RTR_ADV:
-            if (IS_USED(MODULE_GNRC_NETIF_IPV6)
-                    && IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_ROUTER)) {
-                assert(opt->data_len == sizeof(netopt_enable_t));
-                *((netopt_enable_t *)opt->data) = (gnrc_netif_is_rtr_adv(netif)) ?
-                                                  NETOPT_ENABLE : NETOPT_DISABLE;
-                res = _get_ipv6_snd_rtr_adv(netif, opt);
-            }
-            break;
-        case NETOPT_6LO_IPHC:
-            if (IS_USED(MODULE_GNRC_SIXLOWPAN_IPHC)) {
-                res = _get_6lo_iphc(netif, opt);
-            }
-            break;
-        case NETOPT_6LO_ABR:
-            if (IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_6LBR)) {
-                res = _get_6lo_abr(netif, opt);
+        case NETSTATS_LAYER2:
+            if (IS_USED(MODULE_NETSTATS_L2)) {
+                res = _get_l2_stats(netif, opt);
             }
             break;
         default:
+            /* take from device */
             break;
+        }
+        break;
+    case NETOPT_IPV6_ADDR:
+        if (IS_USED(MODULE_GNRC_NETIF_IPV6)) {
+            res = _get_ipv6_addr(netif, opt);
+        }
+        break;
+    case NETOPT_IPV6_ADDR_FLAGS:
+        if (IS_USED(MODULE_GNRC_NETIF_IPV6)) {
+            res = _get_ipv6_addr_flags(netif, opt);
+        }
+        break;
+    case NETOPT_IPV6_GROUP:
+        if (IS_USED(MODULE_GNRC_NETIF_IPV6)) {
+            res =_get_ipv6_group(netif, opt);
+        }
+        break;
+    case NETOPT_IPV6_IID:
+        if (IS_USED(MODULE_GNRC_NETIF_IPV6)) {
+            res = _get_ipv6_iid(netif, opt);
+        }
+        break;
+    case NETOPT_MAX_PDU_SIZE:
+        if (IS_USED(MODULE_GNRC_NETIF_IPV6)) {
+            if (_nettype_is_ipv6(netif, opt)) {
+                res = _get_ipv6_max_pdu_size(netif, opt);
+            }
+        }
+        /* else ask device */
+        break;
+    case NETOPT_IPV6_FORWARDING:
+        if (IS_USED(MODULE_GNRC_NETIF_IPV6)
+                && IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_ROUTER)) {
+            res = _get_ipv6_forwarding(netif, opt);
+        }
+        break;
+    case NETOPT_IPV6_SND_RTR_ADV:
+        if (IS_USED(MODULE_GNRC_NETIF_IPV6)
+                && IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_ROUTER)) {
+            assert(opt->data_len == sizeof(netopt_enable_t));
+            *((netopt_enable_t *)opt->data) = (gnrc_netif_is_rtr_adv(netif)) ?
+                                              NETOPT_ENABLE : NETOPT_DISABLE;
+            res = _get_ipv6_snd_rtr_adv(netif, opt);
+        }
+        break;
+    case NETOPT_6LO_IPHC:
+        if (IS_USED(MODULE_GNRC_SIXLOWPAN_IPHC)) {
+            res = _get_6lo_iphc(netif, opt);
+        }
+        break;
+    case NETOPT_6LO_ABR:
+        if (IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_6LBR)) {
+            res = _get_6lo_abr(netif, opt);
+        }
+        break;
+    default:
+        break;
     }
     if (res == -ENOTSUP) {
         res = netif->dev->driver->get(netif->dev, opt->opt, opt->data,
@@ -689,108 +689,108 @@ int gnrc_netif_set_from_netdev(gnrc_netif_t *netif,
 
     gnrc_netif_acquire(netif);
     switch (opt->opt) {
-        case NETOPT_HOP_LIMIT:
-            assert(opt->data_len == sizeof(uint8_t));
-            netif->cur_hl = *((uint8_t *)opt->data);
-            res = sizeof(uint8_t);
-            break;
-        case NETOPT_IPV6_ADDR:
-            if (IS_USED(MODULE_GNRC_NETIF_IPV6)) {
-                res = _set_ipv6_addr(netif, opt);
+    case NETOPT_HOP_LIMIT:
+        assert(opt->data_len == sizeof(uint8_t));
+        netif->cur_hl = *((uint8_t *)opt->data);
+        res = sizeof(uint8_t);
+        break;
+    case NETOPT_IPV6_ADDR:
+        if (IS_USED(MODULE_GNRC_NETIF_IPV6)) {
+            res = _set_ipv6_addr(netif, opt);
+        }
+        break;
+    case NETOPT_IPV6_ADDR_REMOVE:
+        if (IS_USED(MODULE_GNRC_NETIF_IPV6)) {
+            res = _set_ipv6_addr_remove(netif, opt);
+        }
+        break;
+    case NETOPT_IPV6_GROUP:
+        if (IS_USED(MODULE_GNRC_NETIF_IPV6)) {
+            res = _set_ipv6_group(netif, opt);
+        }
+        break;
+    case NETOPT_IPV6_GROUP_LEAVE:
+        if (IS_USED(MODULE_GNRC_NETIF_IPV6)) {
+            res = _set_ipv6_group_leave(netif, opt);
+        }
+        break;
+    case NETOPT_MAX_PDU_SIZE:
+        if (IS_USED(MODULE_GNRC_NETIF_IPV6)) {
+            res = _set_ipv6_max_pdu_size(netif, opt);
+        }
+        /* else set device */
+        break;
+    case NETOPT_IPV6_FORWARDING:
+        if (IS_USED(MODULE_GNRC_NETIF_IPV6)
+                && IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_ROUTER)) {
+            res = _set_ipv6_forwarding(netif, opt);
+        }
+        break;
+    case NETOPT_IPV6_SND_RTR_ADV:
+        if (IS_USED(MODULE_GNRC_NETIF_IPV6)
+                && IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_ROUTER)) {
+            res = _set_ipv6_snd_rtr_adv(netif, opt);
+        }
+        break;
+    case NETOPT_6LO_IPHC:
+        if (IS_USED(MODULE_GNRC_SIXLOWPAN_IPHC)) {
+            res = _set_6lo_iphc(netif, opt);
+        }
+        break;
+    case NETOPT_6LO_ABR:
+        if (IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_6LBR)) {
+            res = _set_6lo_abr(netif, opt);
+        }
+        break;
+    case NETOPT_RAWMODE:
+        if (*(((netopt_enable_t *)opt->data)) == NETOPT_ENABLE) {
+            netif->flags |= GNRC_NETIF_FLAGS_RAWMODE;
+        }
+        else {
+            netif->flags &= ~GNRC_NETIF_FLAGS_RAWMODE;
+        }
+        /* Also propagate to the netdev device */
+        netif->dev->driver->set(netif->dev, NETOPT_RAWMODE, opt->data,
+                                  opt->data_len);
+        res = sizeof(netopt_enable_t);
+        break;
+    case NETOPT_STATS:
+        switch ((int16_t)opt->context) {
+        case NETSTATS_IPV6:
+            if (IS_USED(MODULE_NETSTATS_IPV6) && IS_USED(MODULE_GNRC_NETIF_IPV6))
+            {
+                res = _set_ipv6_stats(netif);
             }
             break;
-        case NETOPT_IPV6_ADDR_REMOVE:
-            if (IS_USED(MODULE_GNRC_NETIF_IPV6)) {
-                res = _set_ipv6_addr_remove(netif, opt);
-            }
-            break;
-        case NETOPT_IPV6_GROUP:
-            if (IS_USED(MODULE_GNRC_NETIF_IPV6)) {
-                res = _set_ipv6_group(netif, opt);
-            }
-            break;
-        case NETOPT_IPV6_GROUP_LEAVE:
-            if (IS_USED(MODULE_GNRC_NETIF_IPV6)) {
-                res = _set_ipv6_group_leave(netif, opt);
-            }
-            break;
-        case NETOPT_MAX_PDU_SIZE:
-            if (IS_USED(MODULE_GNRC_NETIF_IPV6)) {
-                res = _set_ipv6_max_pdu_size(netif, opt);
-            }
-            /* else set device */
-            break;
-        case NETOPT_IPV6_FORWARDING:
-            if (IS_USED(MODULE_GNRC_NETIF_IPV6)
-                    && IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_ROUTER)) {
-                res = _set_ipv6_forwarding(netif, opt);
-            }
-            break;
-        case NETOPT_IPV6_SND_RTR_ADV:
-            if (IS_USED(MODULE_GNRC_NETIF_IPV6)
-                    && IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_ROUTER)) {
-                res = _set_ipv6_snd_rtr_adv(netif, opt);
-            }
-            break;
-        case NETOPT_6LO_IPHC:
-            if (IS_USED(MODULE_GNRC_SIXLOWPAN_IPHC)) {
-                res = _set_6lo_iphc(netif, opt);
-            }
-            break;
-        case NETOPT_6LO_ABR:
-            if (IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_6LBR)) {
-                res = _set_6lo_abr(netif, opt);
-            }
-            break;
-        case NETOPT_RAWMODE:
-            if (*(((netopt_enable_t *)opt->data)) == NETOPT_ENABLE) {
-                netif->flags |= GNRC_NETIF_FLAGS_RAWMODE;
-            }
-            else {
-                netif->flags &= ~GNRC_NETIF_FLAGS_RAWMODE;
-            }
-            /* Also propagate to the netdev device */
-            netif->dev->driver->set(netif->dev, NETOPT_RAWMODE, opt->data,
-                                      opt->data_len);
-            res = sizeof(netopt_enable_t);
-            break;
-        case NETOPT_STATS:
-            switch ((int16_t)opt->context) {
-            case NETSTATS_IPV6:
-                if (IS_USED(MODULE_NETSTATS_IPV6) && IS_USED(MODULE_GNRC_NETIF_IPV6))
-                {
-                    res = _set_ipv6_stats(netif);
-                }
-                break;
-            case NETSTATS_LAYER2:
-                if (IS_USED(MODULE_NETSTATS_L2)) {
-                    res = _set_l2_stats(netif);
-                }
-                break;
-            default:
-                /* take from device */
-                break;
+        case NETSTATS_LAYER2:
+            if (IS_USED(MODULE_NETSTATS_L2)) {
+                res = _set_l2_stats(netif);
             }
             break;
         default:
+            /* take from device */
             break;
+        }
+        break;
+    default:
+        break;
     }
     if (res == -ENOTSUP) {
         res = netif->dev->driver->set(netif->dev, opt->opt, opt->data,
                                       opt->data_len);
         if (res > 0) {
             switch (opt->opt) {
-                case NETOPT_ADDRESS:
-                case NETOPT_ADDRESS_LONG:
-                case NETOPT_ADDR_LEN:
-                case NETOPT_SRC_LEN:
-                    _update_l2addr_from_dev(netif);
-                    break;
-                case NETOPT_IEEE802154_PHY:
-                    gnrc_netif_ipv6_init_mtu(netif);
-                    break;
-                default:
-                    break;
+            case NETOPT_ADDRESS:
+            case NETOPT_ADDRESS_LONG:
+            case NETOPT_ADDR_LEN:
+            case NETOPT_SRC_LEN:
+                _update_l2addr_from_dev(netif);
+                break;
+            case NETOPT_IEEE802154_PHY:
+                gnrc_netif_ipv6_init_mtu(netif);
+                break;
+            default:
+                break;
             }
         }
     }
@@ -2411,59 +2411,59 @@ static void *_gnrc_netif_thread(void *args)
         /* dispatch netdev, MAC and gnrc_netapi messages */
         DEBUG("gnrc_netif: message %u\n", (unsigned)msg.type);
         switch (msg.type) {
-            case GNRC_NETIF_PKTQ_DEQUEUE_MSG:
-                DEBUG("gnrc_netif: send from packet send queue\n");
-                if (IS_USED(MODULE_GNRC_NETIF_PKTQ)) {
-                    _send_queued_pkt(netif);
-                }
-                break;
-            case GNRC_NETAPI_MSG_TYPE_SND:
-                DEBUG("gnrc_netif: GNRC_NETDEV_MSG_TYPE_SND received\n");
-                _send(netif, msg.content.ptr, false);
-                break;
-            case GNRC_NETAPI_MSG_TYPE_SET:
-                opt = msg.content.ptr;
-                if (IS_USED(MODULE_NETOPT)) {
-                    DEBUG("gnrc_netif: GNRC_NETAPI_MSG_TYPE_SET received.\
-                           opt=%s\n", netopt2str(opt->opt));
-                }
-                else {
-                    DEBUG("gnrc_netif: GNRC_NETAPI_MSG_TYPE_SET received.\
-                           opt=%d\n", opt->opt);
-                }
-                /* set option for device driver */
-                res = netif->ops->set(netif, opt);
-                DEBUG("gnrc_netif: response of netif->ops->set(): %i\n", res);
-                reply.content.value = (uint32_t)res;
-                msg_reply(&msg, &reply);
-                break;
-            case GNRC_NETAPI_MSG_TYPE_GET:
-                opt = msg.content.ptr;
-                if (IS_USED(MODULE_NETOPT)) {
-                    DEBUG("gnrc_netif: GNRC_NETAPI_MSG_TYPE_GET received.\
-                           opt=%s\n", netopt2str(opt->opt));
-                } else {
-                    DEBUG("gnrc_netif: GNRC_NETAPI_MSG_TYPE_GET received.\
-                           opt=%d\n", opt->opt);
+        case GNRC_NETIF_PKTQ_DEQUEUE_MSG:
+            DEBUG("gnrc_netif: send from packet send queue\n");
+            if (IS_USED(MODULE_GNRC_NETIF_PKTQ)) {
+                _send_queued_pkt(netif);
+            }
+            break;
+        case GNRC_NETAPI_MSG_TYPE_SND:
+            DEBUG("gnrc_netif: GNRC_NETDEV_MSG_TYPE_SND received\n");
+            _send(netif, msg.content.ptr, false);
+            break;
+        case GNRC_NETAPI_MSG_TYPE_SET:
+            opt = msg.content.ptr;
+            if (IS_USED(MODULE_NETOPT)) {
+                DEBUG("gnrc_netif: GNRC_NETAPI_MSG_TYPE_SET received.\
+                       opt=%s\n", netopt2str(opt->opt));
+            }
+            else {
+                DEBUG("gnrc_netif: GNRC_NETAPI_MSG_TYPE_SET received.\
+                       opt=%d\n", opt->opt);
+            }
+            /* set option for device driver */
+            res = netif->ops->set(netif, opt);
+            DEBUG("gnrc_netif: response of netif->ops->set(): %i\n", res);
+            reply.content.value = (uint32_t)res;
+            msg_reply(&msg, &reply);
+            break;
+        case GNRC_NETAPI_MSG_TYPE_GET:
+            opt = msg.content.ptr;
+            if (IS_USED(MODULE_NETOPT)) {
+                DEBUG("gnrc_netif: GNRC_NETAPI_MSG_TYPE_GET received.\
+                       opt=%s\n", netopt2str(opt->opt));
+            } else {
+                DEBUG("gnrc_netif: GNRC_NETAPI_MSG_TYPE_GET received.\
+                       opt=%d\n", opt->opt);
 
-                }
-                /* get option from device driver */
-                res = netif->ops->get(netif, opt);
-                DEBUG("gnrc_netif: response of netif->ops->get(): %i\n", res);
-                reply.content.value = (uint32_t)res;
-                msg_reply(&msg, &reply);
-                break;
-            default:
-                if (netif->ops->msg_handler) {
-                    DEBUG("gnrc_netif: delegate message of type 0x%04x to "
-                          "netif->ops->msg_handler()\n", msg.type);
-                    netif->ops->msg_handler(netif, &msg);
-                }
-                else {
-                    DEBUG("gnrc_netif: unknown message type 0x%04x"
-                          "(no message handler defined)\n", msg.type);
-                }
-                break;
+            }
+            /* get option from device driver */
+            res = netif->ops->get(netif, opt);
+            DEBUG("gnrc_netif: response of netif->ops->get(): %i\n", res);
+            reply.content.value = (uint32_t)res;
+            msg_reply(&msg, &reply);
+            break;
+        default:
+            if (netif->ops->msg_handler) {
+                DEBUG("gnrc_netif: delegate message of type 0x%04x to "
+                      "netif->ops->msg_handler()\n", msg.type);
+                netif->ops->msg_handler(netif, &msg);
+            }
+            else {
+                DEBUG("gnrc_netif: unknown message type 0x%04x"
+                      "(no message handler defined)\n", msg.type);
+            }
+            break;
         }
     }
     /* never reached */
