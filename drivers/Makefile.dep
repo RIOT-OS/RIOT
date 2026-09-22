@@ -325,6 +325,11 @@ ifneq (,$(filter periph_uart_nonblocking,$(USEMODULE)))
   FEATURES_REQUIRED += periph_uart
 endif
 
+ifneq (,$(filter periph_gpio_event,$(USEMODULE)))
+  FEATURES_REQUIRED += periph_event
+  FEATURES_REQUIRED += periph_gpio
+endif
+
 # Enable periph_gpio when periph_gpio_irq is enabled
 ifneq (,$(filter periph_gpio_irq,$(USEMODULE)))
   FEATURES_REQUIRED += periph_gpio
