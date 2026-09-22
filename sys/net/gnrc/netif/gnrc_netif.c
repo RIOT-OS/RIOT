@@ -310,6 +310,17 @@ static inline size_t _get_ipv6_iid(gnrc_netif_t *netif, gnrc_netapi_opt_t *opt)
 #endif
 }
 
+static inline bool _nettype_is_ipv6(gnrc_netif_t *netif, gnrc_netapi_opt_t *opt)
+{
+    (void) netif;
+    (void) opt;
+    bool out = false;
+#if IS_USED(MODULE_GNRC_NETIF_IPV6)
+    out = (opt->context == GNRC_NETTYPE_IPV6);
+#endif
+    return out;
+}
+
 static inline size_t _get_ipv6_max_pdu_size(gnrc_netif_t *netif, gnrc_netapi_opt_t *opt)
 {
 #if IS_USED(MODULE_GNRC_NETIF_IPV6)
@@ -438,7 +449,7 @@ int gnrc_netif_get_from_netdev(gnrc_netif_t *netif, gnrc_netapi_opt_t *opt)
             break;
         case NETOPT_MAX_PDU_SIZE:
             if (IS_USED(MODULE_GNRC_NETIF_IPV6)) {
-                if (opt->context == GNRC_NETTYPE_IPV6) {
+                if (_nettype_is_ipv6(netif, opt)) {
                     res = _get_ipv6_max_pdu_size(netif, opt);
                 }
             }
