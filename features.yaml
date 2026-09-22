@@ -643,6 +643,8 @@ groups:
       features:
       - name: periph_spi
         help: An SPI peripheral is present.
+      - name: periph_spi_dma
+        help: More fine granular control of SPI transfers over DMA.
       - name: periph_spi_on_qspi
         help: The QSPI peripheral can be used in SPI mode.
       - name: periph_spi_reconfigure

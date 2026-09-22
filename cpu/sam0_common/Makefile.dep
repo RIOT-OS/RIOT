@@ -28,6 +28,14 @@ endif
 
 ifneq (,$(filter periph_spi,$(USEMODULE)))
   USEMODULE += periph_spi_gpio_mode
+  ifneq (,$(filter periph_dma,$(USEMODULE)))
+    USEMODULE += bitfield
+  endif
+endif
+
+ifneq (,$(filter periph_spi_dma,$(USEMODULE)))
+  FEATURES_REQUIRED += periph_spi
+  FEATURES_REQUIRED += periph_dma
 endif
 
 ifneq (,$(filter periph_sdmmc,$(USEMODULE)))

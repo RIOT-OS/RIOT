@@ -242,6 +242,7 @@ FEATURES_EXISTING := \
     periph_sdmmc_mmc \
     periph_sdmmc_sdhc \
     periph_spi \
+    periph_spi_dma \
     periph_spi_gpio_mode \
     periph_spi_on_qspi \
     periph_spi_reconfigure \

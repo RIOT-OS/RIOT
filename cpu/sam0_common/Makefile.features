@@ -6,6 +6,7 @@ CPU_MODELS_WITHOUT_DMA = samd20%
 ifeq (,$(filter $(CPU_MODELS_WITHOUT_DMA),$(CPU_MODEL)))
   FEATURES_PROVIDED += periph_dma
   FEATURES_PROVIDED += periph_dma_event
+  FEATURES_PROVIDED += periph_spi_dma
 endif
 
 FEATURES_PROVIDED += periph_adc_continuous
