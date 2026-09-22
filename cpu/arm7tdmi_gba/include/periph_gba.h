@@ -72,11 +72,37 @@ _Static_assert(sizeof(gba_timer) == 4, "2 x Timer register should be 4 bytes");
 
 typedef gba_timer volatile gba_timer_t;
 
-#define GBA_TIMER_0 ((gba_timer_t volatile *) 0x4000100)
-#define GBA_TIMER_1 ((gba_timer_t volatile *) 0x4000104)
-#define GBA_TIMER_2 ((gba_timer_t volatile *) 0x4000108)
-#define GBA_TIMER_3 ((gba_timer_t volatile *) 0x400010C)
+#define GBA_TIMER_0 ((gba_timer_t *) 0x4000100)
+#define GBA_TIMER_1 ((gba_timer_t *) 0x4000104)
+#define GBA_TIMER_2 ((gba_timer_t *) 0x4000108)
+#define GBA_TIMER_3 ((gba_timer_t *) 0x400010C)
 
+#define GBA_SIO_SCNT REG16(0x4000128)
+#define GBA_SIO_DATA REG16(0x400012A)
+#define GBA_SIO_RCNT REG16(0x4000134)
+
+typedef struct {
+    uint16_t baud : 2;
+    uint16_t cts : 1;
+    uint16_t parity : 1;
+    uint16_t send_data : 1;
+    uint16_t receive_data : 1;
+    uint16_t error : 1;
+    uint16_t data_bits : 1;
+    uint16_t fifo_enable : 1;
+    uint16_t parity_enable : 1;
+    uint16_t send_enable : 1;
+    uint16_t receive_enable : 1;
+    uint16_t must_be_1_for_uart : 2;
+    uint16_t irq_enable : 1;
+    uint16_t unused_15 : 1;
+    uint16_t data;
+} gba_uart;
+/* I don't trust bit-fields over all compilers & toolchains */
+_Static_assert(sizeof(gba_uart) == 4, "uart register should be 4 bytes");
+
+typedef gba_uart volatile gba_uart_t;
+#define GBA_UART ((gba_uart_t *) 0x4000128)
 
 /**
  * @brief    Screen dimension in pixel

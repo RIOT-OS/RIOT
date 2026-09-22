@@ -47,6 +47,8 @@ void gba_irq_init(void)
     irq_enable();
 }
 
+#include "periph/uart.h"
+
 /**
  * @brief Initialize the CPU, set IRQ priorities, clocks
  */
