@@ -40,6 +40,32 @@ static mutex_t caches_lock = MUTEX_INIT;
 static cache_list_t contact_caches[BPLIB_MAX_NUM_CONTACTS];
 static cache_list_t channel_caches[BPLIB_MAX_NUM_CHANNELS];
 
+#define STORAGE_HEADER_FLAG_DELETE      0x01    /* == egress_attempted */
+#define STORAGE_HEADER_FLAG_CUSTODIAL   0x02    /* == is_custodial */
+
+/**
+ * @brief Header including fields from the sqlite based implementation
+ */
+typedef struct {
+    uint64_t retransmit_timestamp;
+    uint32_t retransmit_trigger;
+    uint8_t  flags;
+} bundle_file_header_t;
+
+/**
+ * @brief Helper to mirror the layout of bundles in a file (hence packed)
+ *
+ * This packed struct should only be used for offset calculation and not for
+ * storing data
+ */
+typedef struct __attribute__((packed)) {
+    bundle_file_header_t header;
+    BPLib_BundleMetaData_t meta;
+    BPLib_BBlocks_t bblocks;
+    uint8_t payload;
+} bundle_file_structure_t;
+
+// TODO remove, replace with bundle ID
 #ifndef CONFIG_BPLIB_STOR_MAX_DUPLICATE_CHECKS
 #  define CONFIG_BPLIB_STOR_MAX_DUPLICATE_CHECKS 64
 #endif
@@ -74,7 +100,14 @@ void BPLib_STOR_Destroy(BPLib_Instance_t* inst)
     return;
 }
 
-BPLib_Status_t BPLib_STOR_StoreBundle(BPLib_Instance_t* inst, BPLib_Bundle_t* bundle)
+/**
+ * @brief Stores the bundle, does not free it
+ *
+ * @param bundle The bundle to store
+ * @retval BPLIB_SUCCESS on success
+ * @retval other on error
+ */
+static BPLib_Status_t _bplib_stor_impl(BPLib_Bundle_t* bundle)
 {
     /* Since both node and service are 64 bit, one might have to increase the max path length
      * for this to work with truly all. Each needs 16 digits of hexadecimal numbers plus the
@@ -87,13 +120,14 @@ BPLib_Status_t BPLib_STOR_StoreBundle(BPLib_Instance_t* inst, BPLib_Bundle_t* bu
     int len = BPLIB_STOR_BASELEN;
     int fd = -1;
     BPLib_MEM_Block_t* curr_mem_block;
+    bundle_file_header_t header;
 
     /* Create node directory */
     len += sprintf(path + len, "/%" PRIx64, (int64_t) bundle->blocks.PrimaryBlock.DestEID.Node);
     res = vfs_mkdir(path, 0777);
     if (res < 0 && res != -EEXIST) {
         failed = true;
-        goto free_bundle;
+        goto end_storage;
     }
 
     /* Create service directory */
@@ -101,7 +135,7 @@ BPLib_Status_t BPLib_STOR_StoreBundle(BPLib_Instance_t* inst, BPLib_Bundle_t* bu
     res = vfs_mkdir(path, 0777);
     if (res < 0 && res != -EEXIST) {
         failed = true;
-        goto free_bundle;
+        goto end_storage;
     }
 
     /* Write bundle */
@@ -116,7 +150,7 @@ BPLib_Status_t BPLib_STOR_StoreBundle(BPLib_Instance_t* inst, BPLib_Bundle_t* bu
         if (fd == -ENOENT) {
             break;
         } else if (fd < 0) {
-            goto free_bundle;
+            goto end_storage;
         } else {
             vfs_close(fd);
         }
@@ -125,7 +159,21 @@ BPLib_Status_t BPLib_STOR_StoreBundle(BPLib_Instance_t* inst, BPLib_Bundle_t* bu
     fd = vfs_open(path, O_CREAT | O_TRUNC | O_WRONLY, 0777);
     if (fd < 0) {
         failed = true;
-        goto free_bundle;
+        goto end_storage;
+    }
+
+    header.flags = 0;
+    header.flags |= bundle->Meta.IsCustodial ? STORAGE_HEADER_FLAG_CUSTODIAL : 0;
+
+    header.retransmit_timestamp = (int64_t)BPLib_TIME_GetMonotonicTime()
+                                + bundle->Meta.RetransmitTime;
+    header.retransmit_trigger = bundle->Meta.RetransmitTime;
+
+    /* Write header specific to this storage implementation */
+    written = vfs_write(fd, &header, sizeof(bundle_file_header_t));
+    if (written < 0 || written != (ssize_t) sizeof(bundle_file_header_t)) {
+        failed = true;
+        goto close_file;
     }
 
     /* Write bundle metadata */
@@ -161,10 +209,7 @@ BPLib_Status_t BPLib_STOR_StoreBundle(BPLib_Instance_t* inst, BPLib_Bundle_t* bu
 close_file:
     res = vfs_close(fd);
 
-free_bundle:
-    /* Free bundle since it is now persistent */
-    BPLib_MEM_BundleFree(&inst->pool, bundle);
-
+end_storage:
     if (res < 0 || failed) {
         BPLib_AS_Increment(BPLIB_EID_INSTANCE, BUNDLE_COUNT_DELETED, 1);
         BPLib_AS_Increment(BPLIB_EID_INSTANCE, BUNDLE_COUNT_DISCARDED, 1);
@@ -174,6 +219,66 @@ free_bundle:
     }
 
     return BPLIB_SUCCESS;
+}
+
+static void _bplib_stor_finalize_custody(BPLib_Instance_t* inst, BPLib_Bundle_t* bundle,
+                                         BPLib_CT_DispositionCode_t disp_code)
+{
+    BPLib_CLA_ContactRunState_t con_state;
+    bool pushed_bundle = true;
+    bool bundle_stored = true;
+
+    if (disp_code == BPLib_CT_CustodyRefused) {
+        bundle_stored = false;
+    }
+
+    /* Finalize custodial transfer for custodial bundles */
+    (void) BPLib_CT_SignalCustody(inst, bundle, disp_code, bundle_stored);
+
+    /* Custodial bundles with an egress path should get sent out instead of freed */
+    (void) BPLib_CLA_GetContactRunState(bundle->Meta.EgressID, &con_state);
+    if (bundle->Meta.EgressID < BPLIB_MAX_NUM_CONTACTS &&
+        con_state == BPLIB_CLA_STARTED && disp_code == BPLib_CT_CustodyAccepted) {
+        pushed_bundle = BPLib_QM_WaitQueueTryPush(&(inst->ContactEgressJobs[bundle->Meta.EgressID]), 
+                                    &bundle, QM_WAIT_FOREVER);
+    }
+    /* There's no egress path, free memory */
+    else {
+        pushed_bundle = false;
+    }
+
+    if (pushed_bundle == false) {
+        BPLib_MEM_BundleFree(&inst->pool, bundle);
+    }
+
+    return;
+}
+
+BPLib_Status_t BPLib_STOR_StoreBundle(BPLib_Instance_t* inst, BPLib_Bundle_t* bundle)
+{
+    // TODO add size check (ll 284 in bplib_stor.c) and update the size counter correctly
+    BPLib_Status_t status;
+
+    // This should be on the else branch of the above already.
+
+    status = _bplib_stor_impl(bundle);
+    
+    /* Free bundle since it is now persistent. Custodial bundles should not be
+     * freed. This is copied from the bplib storage implementation. */
+    if (!bundle->Meta.IsCustodial) {
+        BPLib_MEM_BundleFree(&inst->pool, bundle);
+    }
+    else {
+        if (status == BPLIB_SUCCESS) {
+            /* Storage successful, custody accepted */
+            _bplib_stor_finalize_custody(inst, bundle, BPLib_CT_CustodyAccepted);
+        }
+        else {
+            _bplib_stor_finalize_custody(inst, bundle, BPLib_CT_CustodyRefused);
+        }
+    }
+
+    return status;
 }
 
 typedef struct {
@@ -238,6 +343,10 @@ static BPLib_Status_t _destroy_iterator(bundle_path_iterator_t* iterator)
 
 /**
  * @brief Advance the iterator to the next bundle path
+ *
+ * These bundles will already be filtered by the dest_eids, but will not yet be
+ * filtered by the other conditions of the original SQL query, like the custodial
+ * retransmit times. This has to happen outside of this function
  *
  * @param[inout] iterator Iterator over the whole storage
  * @param[in] dest_eids Destination EID patterns to filter by
@@ -387,11 +496,17 @@ static int _next_bundle_path(bundle_path_iterator_t* iterator,
             continue;
         }
 
+        /* Also ignore all bundles that have already expired */
+        iterator->expiry_val = strtoull(entry.d_name, NULL, 16);
+        if (iterator->expiry_val <= (uint64_t) BPLib_TIME_GetMonotonicTime()) {
+            continue;
+        }
+        // TODO test how this behaves with restarts
+
         acc_len = BPLIB_STOR_BASELEN + 1 + iterator->node_len + 1 + iterator->service_len;
         snprintf(iterator->path + acc_len,
             BPLIB_STOR_PATHLEN - acc_len,
             "/%s", entry.d_name);
-        iterator->expiry_val = strtoull(entry.d_name, NULL, 16);
         int len = strlen(entry.d_name);
         iterator->index_val = strtol(entry.d_name + len - 2, NULL, 16);
 
@@ -399,8 +514,72 @@ static int _next_bundle_path(bundle_path_iterator_t* iterator,
     }
 }
 
+/**
+ * @brief Check second part of conditions; if custodial bundles should be retransmitted
+ *
+ * This check is different for bundles that are forwarded and bundles that are
+ * locally delivered (channels vs contacts).
+ *
+ * @param[in] iter Valid iterator result from _next_bundle_path()
+ * @param local_delivery true if this bundle is local (this is a channel not a contact)
+ *
+ * @retval 0  If the bundle SHOULD NOT be loaded
+ * @retval >0 If the bundle SHOULD be loaded
+ * @retval -ERRNO On vfs errors, it should also not be loaded in that case
+ */
+static int _should_bundle_be_loaded(bundle_path_iterator_t* iter, bool local_delivery)
+{
+    int fd;
+    int res = 1;
+    bundle_file_header_t header;
+    ssize_t bytes_read;
+
+    fd = vfs_open(iter->path, O_RDONLY, 0777);
+    if (fd < 0) {
+        return fd;
+    }
+
+    if (!local_delivery) {
+        /* The header is the first thing, so no seek is needed. Local delivery
+         * does not care about the retransmit intervals, just deliver it as fast
+         * as possible. */
+        bytes_read = vfs_read(fd, &header, sizeof(bundle_file_header_t));
+        if (bytes_read != sizeof(bundle_file_header_t)) {
+            res = -EINVAL;
+            goto close_file;
+        }
+
+        if (!((header.flags & STORAGE_HEADER_FLAG_CUSTODIAL) &&
+            (header.retransmit_trigger != BPLIB_NO_RETRANSMIT_TRIGGER) &&
+            (header.retransmit_timestamp <= (uint64_t)BPLib_TIME_GetMonotonicTime())))
+        {
+            res = 0;
+        }
+    }
+    
+
+close_file:
+    fd = vfs_close(fd);
+    if (fd < 0) {
+        res = fd;
+    }
+
+    return res;
+}
+
+/**
+ * @brief Fills the bundle cache, iterating over all bundles that match the filter
+ *
+ * This fills the bundle cache (which sorts by urgency). It iterates over all
+ * bundles in storage, filtered by the EID patterns.
+ *
+ * @param[in] dest_eids The patterns by which to filter
+ * @param num_eids Number of pattern provided
+ * @param[out] cache The cache to fill
+ * @param local_delivery true if this egresses for a channel, false for a contact
+ */
 static void _fill_bundle_cache(const BPLib_EID_Pattern_t* dest_eids,
-    size_t num_eids, cache_list_t* cache)
+    size_t num_eids, cache_list_t* cache, bool local_delivery)
 {
     bundle_path_iterator_t iterator = BUNDLE_PATH_ITER_INIT;
     int res;
@@ -412,6 +591,11 @@ static void _fill_bundle_cache(const BPLib_EID_Pattern_t* dest_eids,
         } while (res == -EAGAIN);
         /* bundle was found, is in the iterator or nothing was found */
         if (res == 0) {
+            res = _should_bundle_be_loaded(&iterator, local_delivery);
+            if (res <= 0) {
+                continue;
+            }
+
             res = bplib_cache_add(cache, iterator.node_val, iterator.service_val,
                 iterator.expiry_val, iterator.index_val);
 
@@ -433,7 +617,7 @@ static void _fill_bundle_cache(const BPLib_EID_Pattern_t* dest_eids,
 }
 
 /**
- * @brief Allocate and load the bundle data from vfs.
+ * @brief Allocate and load the bundle data from vfs from the cache values.
  *
  * @param[in] inst bplib instance
  * @param[out] bundle output bundle
@@ -471,6 +655,9 @@ static BPLib_Status_t _load_next_bundle(BPLib_Instance_t* inst, BPLib_Bundle_t**
         ret = BPLIB_STOR_NO_MEM_ERR;
         goto close_file;
     }
+
+    /* Skip over the header. It is not needed here where the actual bundle is read */
+    vfs_lseek(fd, offsetof(bundle_file_structure_t, meta), SEEK_SET);
 
     /* Read bundle metadata */
     bytes_read = vfs_read(fd, &bundle_head->user_data.Bundle.Meta, sizeof(BPLib_BundleMetaData_t));
@@ -588,7 +775,7 @@ BPLib_Status_t BPLib_STOR_EgressForID(BPLib_Instance_t* inst, uint32_t egress_id
 
     char path[BPLIB_STOR_PATHLEN];
     if (!cache->all_bundles_queued && bplib_cache_is_empty(cache)) {
-        _fill_bundle_cache(dest_eids, num_eids, cache);
+        _fill_bundle_cache(dest_eids, num_eids, cache, local_delivery);
     }
 
     while (_load_next_bundle(inst, &curr_bundle, cache, path) == BPLIB_SUCCESS) {
@@ -631,6 +818,8 @@ BPLib_Status_t BPLib_STOR_GarbageCollect(BPLib_Instance_t* inst)
         .MinService   = 0,
         .MaxService   = 0xFFFFFFFFFFFFFFFF,
     };
+
+    // TODO update GC
 
     uint64_t time_ref_dtn = BPLib_TIME_GetCurrentDtnTime();
     uint64_t lifetime;
@@ -697,6 +886,9 @@ BPLib_Status_t BPLib_STOR_GarbageCollect(BPLib_Instance_t* inst)
             break;
         }
     }
+    // TODO add deletion of partial bundles, i.e. bundles where only the metadata
+    // has been written to a file
+    // TODO deletion AS
 
     memset(contact_caches, 0, sizeof(contact_caches));
     memset(channel_caches, 0, sizeof(channel_caches));
@@ -727,59 +919,106 @@ BPLib_Status_t BPLib_STOR_StorageTblValidateFunc(void *tbl_data)
     return BPLIB_SUCCESS;
 }
 
-void BPLib_STOR_AddToCustodialUpdateBatch(BPLib_Instance_t *Inst,
-                                          uint32_t BundleId,
-                                          BPLib_CT_StorOp_t Op)
+static void _bplib_stor_update_custodial_unlocked(BPLib_Instance_t* inst,
+                                BPLib_STOR_CtUpdateBatch_t* custody_batch)
 {
-    (void) Inst;
-    (void) BundleId;
-    (void) Op;
+    BPLib_Status_t status;
+    //status = BPLib_SQL_UpdateCustodialBundles(inst, custody_batch);
+    (void) status;
+    (void) inst;
+    status = BPLIB_SUCCESS;
+
+    if (status != BPLIB_SUCCESS) {
+        BPLib_EM_SendEvent(BPLIB_STOR_CCS_ERR_EID, BPLib_EM_EventType_ERROR,
+                "Error performing CCS storage operations, Status = %d.", status);
+    }
+
+    custody_batch->Size = 0;
     return;
 }
 
-void BPLib_STOR_UpdateCustodialBundles(BPLib_Instance_t* Inst)
+void BPLib_STOR_AddToCustodialUpdateBatch(BPLib_Instance_t *inst,
+                                          uint32_t bundle_id,
+                                          BPLib_CT_StorOp_t op)
 {
-    (void) Inst;
+    BPLib_STOR_CtUpdateBatch_t *custody_batch;
+
+    if (inst == NULL || inst->BundleStorage.CustodyUpdateBatch.Size >= BPLIB_STOR_CT_BATCH_SIZE)
+    {
+        return;
+    }
+
+    mutex_lock(&(inst->BundleStorage.lock));
+
+    custody_batch = &(inst->BundleStorage.CustodyUpdateBatch);
+
+    custody_batch->BundleIDs[custody_batch->Size] = bundle_id;
+    custody_batch->Ops[custody_batch->Size] = op;
+    custody_batch->Size++;
+
+    if (custody_batch->Size >= BPLIB_STOR_CT_BATCH_SIZE)
+    {
+        _bplib_stor_update_custodial_unlocked(inst, custody_batch);
+    }
+
+    mutex_unlock(&(inst->BundleStorage.lock));
+
     return;
 }
 
-BPLib_Status_t BPLib_STOR_SetNewRetransmitTrigger(BPLib_Instance_t *Inst,
-                                                  uint32_t ContactId)
+void BPLib_STOR_UpdateCustodialBundles(BPLib_Instance_t* inst)
 {
-    (void) Inst;
-    (void) ContactId;
+    BPLib_STOR_CtUpdateBatch_t *custody_batch;
+
+    if (inst == NULL) {
+        return;
+    }
+
+    mutex_lock(&(inst->BundleStorage.lock));
+
+    custody_batch = &(inst->BundleStorage.CustodyUpdateBatch);
+
+    if ((custody_batch->Size <= BPLIB_STOR_CT_BATCH_SIZE) && (custody_batch->Size > 0)) {
+        _bplib_stor_update_custodial_unlocked(inst, custody_batch);
+    }
+
+    mutex_unlock(&(inst->BundleStorage.lock));
+    
+    return;
+}
+
+BPLib_Status_t BPLib_STOR_SetNewRetransmitTrigger(BPLib_Instance_t *inst,
+                                                  uint32_t contact_id)
+{
+    (void) inst;
+    (void) contact_id;
     return BPLIB_SUCCESS;
 }
 
-BPLib_Status_t BPLib_STOR_Egress(BPLib_Instance_t *Instance, size_t MaxBundles)
+BPLib_Status_t BPLib_STOR_Egress(BPLib_Instance_t *instance, size_t max_bundles)
 {
-    BPLib_Status_t Status;
-    uint32_t ChanId, ContId;
-    size_t NumLoaded;
-    BPLib_CLA_ContactRunState_t ConState;
+    BPLib_Status_t status;
+    uint32_t c;
+    size_t num_loaded;
+    BPLib_CLA_ContactRunState_t con_state;
 
-    for (ChanId = 0; ChanId < BPLIB_MAX_NUM_CHANNELS; ChanId++)
-    {
-        if (BPLib_NC_GetAppState(ChanId) == BPLIB_NC_APP_STATE_STARTED &&
-            BPLib_PI_GetRegistrationState(Instance, ChanId) == BPLIB_PI_ACTIVE)
+    for (c = 0; c < BPLIB_MAX_NUM_CHANNELS; c++) {
+        if (BPLib_NC_GetAppState(c) == BPLIB_NC_APP_STATE_STARTED &&
+            BPLib_PI_GetRegistrationState(instance, c) == BPLIB_PI_ACTIVE)
         {
-            Status = BPLib_STOR_EgressForID(Instance, ChanId, true, &NumLoaded);
-            if (Status != BPLIB_SUCCESS || NumLoaded >= MaxBundles)
-            {
-                return Status;
+            status = BPLib_STOR_EgressForID(instance, c, true, &num_loaded);
+            if (status != BPLIB_SUCCESS || num_loaded >= max_bundles) {
+                return status;
             }
         }
     }
 
-    for (ContId = 0; ContId < BPLIB_MAX_NUM_CONTACTS; ContId++)
-    {
-        (void) BPLib_CLA_GetContactRunState(ContId, &ConState);
-        if (ConState == BPLIB_CLA_STARTED)
-        {
-            Status = BPLib_STOR_EgressForID(Instance, ContId, false, &NumLoaded);
-            if (Status != BPLIB_SUCCESS || NumLoaded >= MaxBundles)
-            {
-                return Status;
+    for (c = 0; c < BPLIB_MAX_NUM_CONTACTS; c++) {
+        (void) BPLib_CLA_GetContactRunState(c, &con_state);
+        if (con_state == BPLIB_CLA_STARTED) {
+            status = BPLib_STOR_EgressForID(instance, c, false, &num_loaded);
+            if (status != BPLIB_SUCCESS || num_loaded >= max_bundles) {
+                return status;
             }
         }
     }
