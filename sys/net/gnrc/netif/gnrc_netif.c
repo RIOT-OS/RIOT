@@ -59,7 +59,7 @@ typedef struct {
     int result;
 } _netif_ctx_t;
 
-static inline void gnrc_netif_bus_init(gnrc_netif_t *netif)
+static inline void _netif_bus_init(gnrc_netif_t *netif)
 {
     (void) netif;
 #ifdef MODULE_GNRC_NETIF_BUS
@@ -90,7 +90,7 @@ int gnrc_netif_create(gnrc_netif_t *netif, char *stack, int stacksize,
         assert(netif_iter(NULL) == NULL);
     }
     if (IS_USED(MODULE_GNRC_NETIF_BUS)) {
-        gnrc_netif_bus_init(netif);
+        _netif_bus_init(netif);
     }
     rmutex_init(&netif->mutex);
     netif->ops = ops;
@@ -169,11 +169,12 @@ gnrc_netif_t *gnrc_netif_get_by_type(netdev_type_t type, uint8_t index)
     while ((netif = gnrc_netif_iter(netif))) {
 
         if (IS_USED(MODULE_NETDEV_REGISTER)) {
-            if (netdev_get_type(netif->dev) != type && type != NETDEV_ANY) {
+            if ((netdev_get_type(netif->dev)) != (type && type != NETDEV_ANY)) {
                 continue;
             }
 
-            if (netdev_get_index(netif->dev) != index && index != NETDEV_INDEX_ANY) {
+            if ((netdev_get_index(netif->dev) != index)
+                && (index != NETDEV_INDEX_ANY)) {
                 continue;
             }
         }
@@ -212,8 +213,7 @@ static inline size_t _get_l2_stats(gnrc_netif_t *netif, gnrc_netapi_opt_t *opt)
     assert(opt->data_len == sizeof(netstats_t));
     /* this is only accesses from the netif thread (us), so no need
      * to lock this */
-    memcpy(opt->data, &netif->stats,
-           sizeof(netif->stats));
+    memcpy(opt->data, &netif->stats, sizeof(netif->stats));
     return sizeof(netif->stats);
 #else
     (void) netif;
@@ -284,8 +284,7 @@ static inline size_t _get_ipv6_group(gnrc_netif_t *netif, gnrc_netapi_opt_t *opt
          (i < GNRC_NETIF_IPV6_GROUPS_NUMOF);
          i++) {
         if (!ipv6_addr_is_unspecified(&netif->ipv6.groups[i])) {
-            memcpy(tgt, &netif->ipv6.groups[i],
-                   sizeof(ipv6_addr_t));
+            memcpy(tgt, &netif->ipv6.groups[i], sizeof(ipv6_addr_t));
             res += sizeof(ipv6_addr_t);
             tgt++;
         }
@@ -366,9 +365,8 @@ static inline size_t _get_6lo_iphc(gnrc_netif_t *netif, gnrc_netapi_opt_t *opt)
 {
 #if IS_USED(MODULE_GNRC_SIXLOWPAN_IPHC)
     assert(opt->data_len == sizeof(netopt_enable_t));
-    *((netopt_enable_t *)opt->data) = (netif->flags &
-                                       GNRC_NETIF_FLAGS_6LO_HC)
-                                    ? NETOPT_ENABLE : NETOPT_DISABLE;
+    *((netopt_enable_t *)opt->data) = (netif->flags & GNRC_NETIF_FLAGS_6LO_HC) ?
+                                      NETOPT_ENABLE : NETOPT_DISABLE;
     return sizeof(netopt_enable_t);
 #else
     (void) netif;
@@ -381,9 +379,9 @@ static inline size_t _get_6lo_abr(gnrc_netif_t *netif, gnrc_netapi_opt_t *opt)
 {
 #if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_6LBR)
     assert(opt->data_len == sizeof(netopt_enable_t));
-    *((netopt_enable_t *)opt->data) = (netif->flags & GNRC_NETIF_FLAGS_6LO_ABR)
-                                    ? NETOPT_ENABLE
-                                    : NETOPT_DISABLE;
+    *((netopt_enable_t *)opt->data) = (netif->flags &
+                                      GNRC_NETIF_FLAGS_6LO_ABR) ?
+                                      NETOPT_ENABLE : NETOPT_DISABLE;
     return sizeof(netopt_enable_t);
 #else
     (void) netif;
@@ -456,14 +454,14 @@ int gnrc_netif_get_from_netdev(gnrc_netif_t *netif, gnrc_netapi_opt_t *opt)
         /* else ask device */
         break;
     case NETOPT_IPV6_FORWARDING:
-        if (IS_USED(MODULE_GNRC_NETIF_IPV6)
-                && IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_ROUTER)) {
+        if (IS_USED(MODULE_GNRC_NETIF_IPV6) &&
+            IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_ROUTER)) {
             res = _get_ipv6_forwarding(netif, opt);
         }
         break;
     case NETOPT_IPV6_SND_RTR_ADV:
-        if (IS_USED(MODULE_GNRC_NETIF_IPV6)
-                && IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_ROUTER)) {
+        if (IS_USED(MODULE_GNRC_NETIF_IPV6) &&
+            IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_ROUTER)) {
             assert(opt->data_len == sizeof(netopt_enable_t));
             *((netopt_enable_t *)opt->data) = (gnrc_netif_is_rtr_adv(netif)) ?
                                               NETOPT_ENABLE : NETOPT_DISABLE;
@@ -757,8 +755,8 @@ int gnrc_netif_set_from_netdev(gnrc_netif_t *netif,
     case NETOPT_STATS:
         switch ((int16_t)opt->context) {
         case NETSTATS_IPV6:
-            if (IS_USED(MODULE_NETSTATS_IPV6) && IS_USED(MODULE_GNRC_NETIF_IPV6))
-            {
+            if (IS_USED(MODULE_NETSTATS_IPV6) &&
+                IS_USED(MODULE_GNRC_NETIF_IPV6)) {
                 res = _set_ipv6_stats(netif);
             }
             break;
@@ -2174,19 +2172,19 @@ static void _tx_done(gnrc_netif_t *netif, gnrc_pktsnip_t *pkt,
             netstats_nb_update_tx(&netif->netif, NETSTATS_NB_BUSY, 0);
         }
     }
-    else if(IS_USED(MODULE_NETSTATS_L2)) {
+    else if (IS_USED(MODULE_NETSTATS_L2)) {
         _netstats_add_tx_bytes(netif, res);
     }
     if (IS_USED(MODULE_GNRC_NETIF_PKTQ)) {
         if (res == -EBUSY) {
             int put_res;
 
-            /* Lower layer was busy.
-             * Since "busy" could also mean that the lower layer is currently
-             * receiving, trying to wait for the device not being busy any more
-             * could run into the risk of overriding the received packet on send
-             * Rather, queue the packet within the netif now and try to send them
-             * again after the device completed its busy state. */
+            /* Lower layer was busy. Since "busy" could also mean that the
+             * lower layer is currently receiving, trying to wait for the
+             * device not being busy any more could run into the risk of
+             * overriding the received packet on send. Rather, queue the packet
+             * within the netif now and try to send them again after the device
+             * completed its busy state. */
             if (push_back) {
                 put_res = gnrc_netif_pktq_push_back(netif, pkt);
             }
@@ -2268,8 +2266,7 @@ static inline void _netif_set_pending_pkt(gnrc_netif_t *netif,
 
 static void _send(gnrc_netif_t *netif, gnrc_pktsnip_t *pkt, bool push_back)
 {
-    if (IS_USED(MODULE_NETDEV_NEW_API)
-        && _netif_has_pending_pkt(netif)) {
+    if (IS_USED(MODULE_NETDEV_NEW_API) && _netif_has_pending_pkt(netif)) {
         /* Upper layer is handing out frames faster than hardware can transmit.
          * Note that not only doesn't it make sense to bother the driver if it
          * is still busy, but overwriting netif->tx_pkt would leak the memory
@@ -2424,12 +2421,12 @@ static void *_gnrc_netif_thread(void *args)
         case GNRC_NETAPI_MSG_TYPE_SET:
             opt = msg.content.ptr;
             if (IS_USED(MODULE_NETOPT)) {
-                DEBUG("gnrc_netif: GNRC_NETAPI_MSG_TYPE_SET received.\
-                       opt=%s\n", netopt2str(opt->opt));
+                DEBUG("gnrc_netif: GNRC_NETAPI_MSG_TYPE_SET received. opt=%s\n",
+                      netopt2str(opt->opt));
             }
             else {
-                DEBUG("gnrc_netif: GNRC_NETAPI_MSG_TYPE_SET received.\
-                       opt=%d\n", opt->opt);
+                DEBUG("gnrc_netif: GNRC_NETAPI_MSG_TYPE_SET received. opt=%d\n",
+                      opt->opt);
             }
             /* set option for device driver */
             res = netif->ops->set(netif, opt);
@@ -2440,11 +2437,11 @@ static void *_gnrc_netif_thread(void *args)
         case GNRC_NETAPI_MSG_TYPE_GET:
             opt = msg.content.ptr;
             if (IS_USED(MODULE_NETOPT)) {
-                DEBUG("gnrc_netif: GNRC_NETAPI_MSG_TYPE_GET received.\
-                       opt=%s\n", netopt2str(opt->opt));
+                DEBUG("gnrc_netif: GNRC_NETAPI_MSG_TYPE_GET received.opt=%s\n",
+                      netopt2str(opt->opt));
             } else {
-                DEBUG("gnrc_netif: GNRC_NETAPI_MSG_TYPE_GET received.\
-                       opt=%d\n", opt->opt);
+                DEBUG("gnrc_netif: GNRC_NETAPI_MSG_TYPE_GET received. opt=%d\n",
+                      opt->opt);
 
             }
             /* get option from device driver */
