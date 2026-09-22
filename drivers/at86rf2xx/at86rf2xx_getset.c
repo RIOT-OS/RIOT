@@ -156,7 +156,8 @@ static inline void _set_txpower(const at86rf2xx_t *dev, int16_t txpower, uint8_t
 #endif
 }
 
-void at86rf2xx_configure_phy(at86rf2xx_t *dev, uint8_t chan, ieee802154_phy_mode_t mode, int16_t txpower)
+void at86rf2xx_configure_phy(at86rf2xx_t *dev, uint8_t chan, ieee802154_phy_mode_t mode,
+                             int16_t txpower)
 {
     /* we must be in TRX_OFF before changing the PHY configuration */
     uint8_t prev_state = at86rf2xx_set_state(dev, AT86RF2XX_STATE_TRX_OFF);
