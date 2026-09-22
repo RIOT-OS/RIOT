@@ -578,9 +578,7 @@ static int _set(gnrc_netif_t *netif, const gnrc_netapi_opt_t *opt)
                 if (IS_USED(MODULE_GNRC_LORAWAN_1_1)) {
                     gnrc_lorawan_mlme_join_set_appkey(
                             &mlme_request.join,
-                            gnrc_netif_lorawan_get_appkey(
-                            &netif->lorawan)
-                            );
+                            gnrc_netif_lorawan_get_appkey(&netif->lorawan));
                 }
 
                 mlme_request.join.dr = netif->lorawan.datarate;
