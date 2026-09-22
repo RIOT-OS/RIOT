@@ -2602,7 +2602,8 @@ static inline void _netdev_event_tx_failure(gnrc_netif_t *netif,
                 result = NETSTATS_NB_NOACK;
                 dev->driver->get(dev, NETOPT_TX_RETRIES_NEEDED,
                                  &retries, sizeof(retries));
-            } else {
+            }
+            else {
                 result = NETSTATS_NB_BUSY;
             }
             netstats_nb_update_tx(&netif->netif, result, retries + 1);
