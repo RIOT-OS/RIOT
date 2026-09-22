@@ -49,14 +49,16 @@ static int _init(gnrc_netif_t *netif);
 
 static void _event_handler_backoff_expire(event_t *evp)
 {
-    gnrc_netif_lorawan_t *lw_netif = container_of(evp, gnrc_netif_lorawan_t, event_backoff_expire);
+    gnrc_netif_lorawan_t *lw_netif = container_of(evp, gnrc_netif_lorawan_t,
+                                                  event_backoff_expire);
     gnrc_netif_t *netif = container_of(lw_netif, gnrc_netif_t, lorawan);
     gnrc_lorawan_mlme_backoff_expire_cb(&netif->lorawan.mac);
 }
 
 static void _event_handler_timeout(event_t *evp)
 {
-    gnrc_netif_lorawan_t *lw_netif = container_of(evp, gnrc_netif_lorawan_t, event_timeout);
+    gnrc_netif_lorawan_t *lw_netif = container_of(evp, gnrc_netif_lorawan_t,
+                                                  event_timeout);
     gnrc_netif_t *netif = container_of(lw_netif, gnrc_netif_t, lorawan);
     gnrc_lorawan_timeout_cb(&netif->lorawan.mac);
 }
@@ -99,14 +101,16 @@ void gnrc_lorawan_mlme_confirm(gnrc_lorawan_t *mac, mlme_confirm_t *confirm)
 
 void gnrc_lorawan_set_timer(gnrc_lorawan_t *mac, uint32_t us)
 {
-    gnrc_netif_lorawan_t *lw_netif = container_of(mac, gnrc_netif_lorawan_t, mac);
+    gnrc_netif_lorawan_t *lw_netif = container_of(mac, gnrc_netif_lorawan_t,
+                                                  mac);
 
     event_timeout_set(&lw_netif->ev_timeout_to, us / 1000);
 }
 
 void gnrc_lorawan_remove_timer(gnrc_lorawan_t *mac)
 {
-    gnrc_netif_lorawan_t *lw_netif = container_of(mac, gnrc_netif_lorawan_t, mac);
+    gnrc_netif_lorawan_t *lw_netif = container_of(mac, gnrc_netif_lorawan_t,
+                                                  mac);
 
     event_timeout_clear(&lw_netif->ev_timeout_to);
 }
@@ -275,7 +279,8 @@ netdev_t *gnrc_lorawan_get_netdev(gnrc_lorawan_t *mac)
 
 static void _schedule_backoff_tick(gnrc_netif_lorawan_t *lw_netif)
 {
-    event_timeout_set(&lw_netif->ev_timeout_backoff_exp, GNRC_LORAWAN_BACKOFF_WINDOW_TICK / 1000);
+    event_timeout_set(&lw_netif->ev_timeout_backoff_exp,
+                      GNRC_LORAWAN_BACKOFF_WINDOW_TICK / 1000);
 }
 
 static int _init(gnrc_netif_t *netif)
