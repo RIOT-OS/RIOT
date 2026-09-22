@@ -14,6 +14,8 @@
  *
  * @}
  */
+#include <stdint.h>
+#include <stdio.h>
 
 #include "periph_cpu.h"
 #include "periph_conf.h"
@@ -131,7 +133,7 @@ static inline void _set_num(DmacDescriptor *descr, size_t num)
     descr->BTCNT.reg = num;
 }
 
-static inline void _set_next_descriptor(DmacDescriptor *descr, void *next)
+static inline void _set_next_descriptor(DmacDescriptor *descr, const DmacDescriptor *next)
 {
     descr->DESCADDR.reg = (uint32_t)next;
 }
@@ -146,13 +148,14 @@ void dma_set_cb_arg(dma_t dma, void *ctx)
     dma_ctx[dma].ctx = ctx;
 }
 
-void dma_setup(dma_t dma, unsigned trigger, uint8_t prio, dma_cb_t cb, void *ctx)
+void dma_setup(dma_t dma, dma_trigact_t granularity, unsigned trigger, uint8_t prio,
+               dma_cb_t cb, void *ctx)
 {
 #ifdef REG_DMAC_CHID
     /* Ensure that this set of register writes is atomic */
     unsigned state = irq_disable();
     DMAC->CHID.reg = dma;
-    DMAC->CHCTRLB.reg = DMAC_CHCTRLB_TRIGACT_BEAT |
+    DMAC->CHCTRLB.reg = (granularity << DMAC_CHCTRLB_TRIGACT_Pos) |
                         (trigger << DMAC_CHCTRLB_TRIGSRC_Pos) |
                         (prio << DMAC_CHCTRLB_LVL_Pos);
     /* Clear everything in case a previous user left it configured */
@@ -162,12 +165,12 @@ void dma_setup(dma_t dma, unsigned trigger, uint8_t prio, dma_cb_t cb, void *ctx
     }
     irq_restore(state);
 #else
-    DMAC->Channel[dma].CHCTRLA.reg = DMAC_CHCTRLA_TRIGACT_BURST |
+    DMAC->Channel[dma].CHCTRLA.reg = (granularity << DMAC_CHCTRLA_TRIGACT_Pos) |
                                      (trigger << DMAC_CHCTRLA_TRIGSRC_Pos);
     DMAC->Channel[dma].CHPRILVL.reg = prio;
     DMAC->Channel[dma].CHINTENCLR.reg = 0xFF;
     if (cb) {
-        DMAC->Channel[dma].CHINTENSET.reg = DMAC_CHINTENSET_TCMPL;
+        DMAC->Channel[dma].CHINTENSET.reg = cb ? DMAC_CHINTENSET_TCMPL : 0;
     }
 #endif
 
@@ -178,16 +181,7 @@ void dma_setup(dma_t dma, unsigned trigger, uint8_t prio, dma_cb_t cb, void *ctx
 void dma_prepare(dma_t dma, uint8_t width, const void *src, void *dst,
                  size_t num, dma_incr_t incr, dma_blockact_t blockact)
 {
-    DEBUG("[DMA]: Prepare %u, num: %u\n", dma, (unsigned)num);
-    DmacDescriptor *descr = &descriptors[dma];
-    _set_num(descr, num);
-    _set_source(descr, src);
-    _set_destination(descr, dst);
-    descr->DESCADDR.reg = (uint32_t)NULL;
-    descr->BTCTRL.reg = width << DMAC_BTCTRL_BEATSIZE_Pos |
-                        incr << DMAC_BTCTRL_SRCINC_Pos |
-                        blockact << DMAC_BTCTRL_BLOCKACT_Pos |
-                        DMAC_BTCTRL_VALID;
+    dma_prepare_descriptor(&descriptors[dma], width, src, dst, num, incr, blockact);
 }
 
 void dma_prepare_src(dma_t dma, const void *src, size_t num, bool incr)
@@ -227,6 +221,9 @@ void dma_append(dma_t dma, DmacDescriptor *next, uint8_t width,
                 const void *src, void *dst, size_t num, dma_incr_t incr)
 {
     DmacDescriptor *descr = &descriptors[dma];
+    while (_get_next_descriptor(descr)) {
+        descr = _get_next_descriptor(descr);
+    }
 
     next->BTCTRL.reg = width << DMAC_BTCTRL_BEATSIZE_Pos |
                        incr << DMAC_BTCTRL_SRCINC_Pos |
@@ -238,7 +235,9 @@ void dma_append_src(dma_t dma, DmacDescriptor *next, const void *src,
                     size_t num, bool incr)
 {
     DmacDescriptor *descr = &descriptors[dma];
-
+    while (_get_next_descriptor(descr)) {
+        descr = _get_next_descriptor(descr);
+    }
     /* Copy the original descriptor config and modify the increment */
     next->BTCTRL.reg = (descr->BTCTRL.reg & ~DMAC_BTCTRL_SRCINC) |
                        (incr << DMAC_BTCTRL_SRCINC_Pos);
@@ -249,7 +248,9 @@ void dma_append_dst(dma_t dma, DmacDescriptor *next, void *dst, size_t num,
                     bool incr)
 {
     DmacDescriptor *descr = &descriptors[dma];
-
+    while (_get_next_descriptor(descr)) {
+        descr = _get_next_descriptor(descr);
+    }
     /* Copy the original descriptor config and modify the increment */
     next->BTCTRL.reg = (descr->BTCTRL.reg & ~DMAC_BTCTRL_DSTINC) |
                        (incr << DMAC_BTCTRL_DSTINC_Pos);
@@ -318,7 +319,6 @@ void dma_cancel(dma_t dma)
 void dma_resume(dma_t dma)
 {
     DEBUG("[dma]: resuming: %u\n", dma);
-
 #ifdef REG_DMAC_CHID
     unsigned state = irq_disable();
     DMAC->CHID.reg = DMAC_CHID_ID(dma);
@@ -327,6 +327,91 @@ void dma_resume(dma_t dma)
 #else
     DMAC->Channel[dma].CHCTRLB.reg |= DMAC_CHCTRLB_CMD_RESUME;
 #endif
+}
+
+dma_channel_status_t dma_channel_status(dma_t dma)
+{
+    dma_channel_status_t ch_status;
+#ifdef REG_DMAC_CHID
+    unsigned state = irq_disable();
+    DMAC->CHID.reg = DMAC_CHID_ID(dma);
+    uint8_t status = DMAC->CHSTATUS.reg;
+    irq_restore(state);
+#else
+    uint8_t status = DMAC->Channel[dma].CHSTATUS.reg;
+#endif
+#ifdef DMAC_CHSTATUS_PEND_Pos
+    ch_status.pending = (status & DMAC_CHSTATUS_PEND) >> DMAC_CHSTATUS_PEND_Pos;
+#endif
+#ifdef DMAC_CHSTATUS_BUSY_Pos
+    ch_status.busy = (status & DMAC_CHSTATUS_BUSY) >> DMAC_CHSTATUS_BUSY_Pos;
+#endif
+#ifdef DMAC_CHSTATUS_FERR_Pos
+    ch_status.ferr = (status & DMAC_CHSTATUS_FERR) >> DMAC_CHSTATUS_FERR_Pos;
+#endif
+#ifdef DMAC_CHSTATUS_CRCERR_Pos
+    ch_status.crcerr = (status & DMAC_CHSTATUS_CRCERR) >> DMAC_CHSTATUS_CRCERR_Pos;
+#endif
+    return ch_status;
+}
+
+void dma_prepare_descriptor(void *desc, uint8_t width, const void *src, void *dst,
+                            size_t num, dma_incr_t incr, dma_blockact_t blockact)
+{
+    DEBUG("[DMA]: Prepare desc %p, num: %u\n", desc, (unsigned)num);
+    DmacDescriptor *d = (DmacDescriptor *)desc;
+    _set_num(d, num);
+    _set_source(d, src);
+    _set_destination(d, dst);
+    d->DESCADDR.reg = (uint32_t)NULL;
+    d->BTCTRL.reg = width << DMAC_BTCTRL_BEATSIZE_Pos |
+                    incr << DMAC_BTCTRL_SRCINC_Pos |
+                    blockact << DMAC_BTCTRL_BLOCKACT_Pos |
+                    DMAC_BTCTRL_VALID;
+}
+
+const void *dma_descriptor(dma_t dma)
+{
+    return &descriptors[dma];
+}
+
+const void *dma_get_next_descriptor(const void *desc)
+{
+    return _get_next_descriptor(desc);
+}
+
+void dma_set_next_descriptor(void *desc, const void *next)
+{
+    _set_next_descriptor(desc, next);
+}
+
+void dma_append_descriptor(void *desc, const void *next)
+{
+    while (_get_next_descriptor(desc)) {
+        desc = _get_next_descriptor(desc);
+    }
+    _set_next_descriptor(desc, next);
+}
+
+void dma_print_descriptor(const void *desc)
+{
+    DmacDescriptor *d = (DmacDescriptor *)desc;
+    do {
+        /* print descriptor information */
+        printf("BTCTRL: 0x%08x\n", (unsigned)d->BTCTRL.reg);
+        printf("\tVALID: %u\n", (unsigned)d->BTCTRL.bit.VALID);
+        printf("\tEVOSEL: %u\n", (unsigned)d->BTCTRL.bit.EVOSEL);
+        printf("\tBLOCKACT: %u\n", (unsigned)d->BTCTRL.bit.BLOCKACT);
+        printf("\tBEATSIZE: %u\n", (unsigned)d->BTCTRL.bit.BEATSIZE);
+        printf("\tSRCINC: %u\n", (unsigned)d->BTCTRL.bit.SRCINC);
+        printf("\tDSTINC: %u\n", (unsigned)d->BTCTRL.bit.DSTINC);
+        printf("\tSTEPSEL: %u\n", (unsigned)d->BTCTRL.bit.STEPSEL);
+        printf("\tSTEPSIZE: %u\n", (unsigned)d->BTCTRL.bit.STEPSIZE);
+        printf("BTCNT: 0x%08x\n", (unsigned)d->BTCNT.reg);
+        printf("SRCADDR: 0x%08x\n", (unsigned )d->SRCADDR.reg);
+        printf("DSTADDR: 0x%08x\n", (unsigned )d->DSTADDR.reg);
+        printf("DESCADDR: 0x%08x\n", (unsigned )d->DESCADDR.reg);
+    } while ((d = (DmacDescriptor *)d->DESCADDR.reg));
 }
 
 #if MODULE_PERIPH_DMA_EVENT
