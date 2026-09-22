@@ -1726,13 +1726,6 @@ static void _event_handler_isr(event_t *evp)
     netif->dev->driver->isr(netif->dev);
 }
 
-/**
- * @brief   Call the ISR handler from an event
- *
- * @param[in]   evp     pointer to the event
- */
-
-
 static void _process_receive_stats(gnrc_netif_t *netdev, gnrc_pktsnip_t *pkt)
 {
     if (!IS_USED(MODULE_NETSTATS_NEIGHBOR)) {
