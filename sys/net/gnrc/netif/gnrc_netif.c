@@ -2530,20 +2530,20 @@ static void _event_cb(netdev_t *dev, netdev_event_t event)
     else {
         DEBUG("gnrc_netif: event triggered -> %i\n", event);
         switch (event) {
-            case NETDEV_EVENT_LINK_UP:
-                _dispatch_link_up(netif);
-                break;
-            case NETDEV_EVENT_LINK_DOWN:
-                _dispatch_link_down(netif);
-                break;
-            case NETDEV_EVENT_RX_COMPLETE:
-                _netdev_event_rx_complete(netif);
-                break;
-            case NETDEV_EVENT_TX_COMPLETE:
-                _netif_schedule_confirm_send(netif);
-                break;
-            default:
-                DEBUG("gnrc_netif: warning: unhandled event %u.\n", event);
+        case NETDEV_EVENT_LINK_UP:
+            _dispatch_link_up(netif);
+            break;
+        case NETDEV_EVENT_LINK_DOWN:
+            _dispatch_link_down(netif);
+            break;
+        case NETDEV_EVENT_RX_COMPLETE:
+            _netdev_event_rx_complete(netif);
+            break;
+        case NETDEV_EVENT_TX_COMPLETE:
+            _netif_schedule_confirm_send(netif);
+            break;
+        default:
+            DEBUG("gnrc_netif: warning: unhandled event %u.\n", event);
         }
     }
 }
@@ -2630,26 +2630,26 @@ static void _event_cb(netdev_t *dev, netdev_event_t event)
     else {
         DEBUG("gnrc_netif: event triggered -> %i\n", event);
         switch (event) {
-            case NETDEV_EVENT_LINK_UP:
-                _dispatch_link_up(netif);
-                break;
-            case NETDEV_EVENT_LINK_DOWN:
-                _dispatch_link_down(netif);
-                break;
-            case NETDEV_EVENT_RX_COMPLETE:
-                _netdev_event_rx_complete(netif);
-                break;
-            case NETDEV_EVENT_TX_COMPLETE:
-            case NETDEV_EVENT_TX_COMPLETE_DATA_PENDING:
-                _netdev_event_tx_successful(netif);
-                break;
-            case NETDEV_EVENT_TX_MEDIUM_BUSY:
-            case NETDEV_EVENT_TX_NOACK:
-                /* update neighbor statistics */
-                _netdev_event_tx_failure(netif, dev,
-                                         event == NETDEV_EVENT_TX_NOACK);
-            default:
-                DEBUG("gnrc_netif: warning: unhandled event %u.\n", event);
+        case NETDEV_EVENT_LINK_UP:
+            _dispatch_link_up(netif);
+            break;
+        case NETDEV_EVENT_LINK_DOWN:
+            _dispatch_link_down(netif);
+            break;
+        case NETDEV_EVENT_RX_COMPLETE:
+            _netdev_event_rx_complete(netif);
+            break;
+        case NETDEV_EVENT_TX_COMPLETE:
+        case NETDEV_EVENT_TX_COMPLETE_DATA_PENDING:
+            _netdev_event_tx_successful(netif);
+            break;
+        case NETDEV_EVENT_TX_MEDIUM_BUSY:
+        case NETDEV_EVENT_TX_NOACK:
+            /* update neighbor statistics */
+            _netdev_event_tx_failure(netif, dev,
+                                     event == NETDEV_EVENT_TX_NOACK);
+        default:
+            DEBUG("gnrc_netif: warning: unhandled event %u.\n", event);
         }
     }
 }
