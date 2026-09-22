@@ -2478,7 +2478,8 @@ static void _pass_on_packet(gnrc_pktsnip_t *pkt)
     }
 }
 
-static inline void _dispatch_link_up(gnrc_netif_t *netif) {
+static inline void _dispatch_link_up(gnrc_netif_t *netif)
+{
     if (IS_USED(MODULE_GNRC_IPV6)) {
         msg_t msg = { .type = GNRC_IPV6_NIB_IFACE_UP, .content = { .ptr = netif } };
 
@@ -2486,7 +2487,8 @@ static inline void _dispatch_link_up(gnrc_netif_t *netif) {
     }
 }
 
-static inline void _dispatch_link_down(gnrc_netif_t *netif) {
+static inline void _dispatch_link_down(gnrc_netif_t *netif)
+{
     if (IS_USED(MODULE_GNRC_IPV6)) {
         msg_t msg = { .type = GNRC_IPV6_NIB_IFACE_DOWN, .content = { .ptr = netif } };
 
@@ -2590,9 +2592,8 @@ static inline void _netdev_event_tx_successful(gnrc_netif_t *netif,
 static inline void _netdev_event_tx_failure(gnrc_netif_t *netif,
                                             netdev_t *dev, bool noack)
 {
-
-    if (IS_USED(MODULE_NETSTATS_L2) || IS_USED(MODULE_GNRC_NETIF_PKTQ)
-            || IS_USED(MODULE_NETSTATS_NEIGHBOR)) {
+    if (IS_USED(MODULE_NETSTATS_L2) || IS_USED(MODULE_GNRC_NETIF_PKTQ) ||
+        IS_USED(MODULE_NETSTATS_NEIGHBOR)) {
         /* update neighbor statistics */
         if (IS_USED(MODULE_NETSTATS_NEIGHBOR)) {
             int8_t retries = -1;
