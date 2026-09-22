@@ -31,8 +31,6 @@
 #define ENABLE_DEBUG 0
 #include "debug.h"
 
-#define MSG_TYPE_MLME_BACKOFF_EXPIRE (0x3458)           /**< Backoff timer expiration message type */
-
 static uint8_t _appskey[LORAMAC_APPSKEY_LEN];
 static uint8_t _appkey[LORAMAC_APPKEY_LEN];
 static uint8_t _snwksintkey[LORAMAC_SNWKSINTKEY_LEN];
