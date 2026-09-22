@@ -2547,7 +2547,7 @@ static void _event_cb(netdev_t *dev, netdev_event_t event)
         }
     }
 }
-#else
+#elif IS_USED(MODULE_NETDEV_LEGACY_API)
 static inline void _netstats_increment_tx_success(gnrc_netif_t *netif)
 {
     (void) netif;
@@ -2558,6 +2558,7 @@ static inline void _netstats_increment_tx_success(gnrc_netif_t *netif)
 
 static inline void _netstats_increment_tx_failed(gnrc_netif_t *netif)
 {
+    (void) netif;
 #if IS_USED(MODULE_NETSTATS_L2)
     /* we are the only ones supposed to touch this variable,
      * so no acquire necessary */
@@ -2577,7 +2578,7 @@ static inline void _netdev_event_tx_successful(gnrc_netif_t *netif,
         if (IS_USED(MODULE_NETSTATS_L2)) {
             /* we are the only ones supposed to touch this variable,
              * so no acquire necessary */
-            netif->stats.tx_success++;
+            _netstats_increment_tx_success(netif);
         }
         if (IS_USED(MODULE_NETSTATS_NEIGHBOR)) {
             int8_t retries = -1;
@@ -2640,7 +2641,7 @@ static void _event_cb(netdev_t *dev, netdev_event_t event)
                 break;
             case NETDEV_EVENT_TX_COMPLETE:
             case NETDEV_EVENT_TX_COMPLETE_DATA_PENDING:
-                _netdev_event_tx_successful(netif)
+                _netdev_event_tx_successful(netif);
                 break;
             case NETDEV_EVENT_TX_MEDIUM_BUSY:
             case NETDEV_EVENT_TX_NOACK:
@@ -2651,6 +2652,12 @@ static void _event_cb(netdev_t *dev, netdev_event_t event)
                 DEBUG("gnrc_netif: warning: unhandled event %u.\n", event);
         }
     }
+}
+#else
+static void _event_cb(netdev_t *dev, netdev_event_t event)
+{
+    (void) dev;
+    (void) event;
 }
 #endif /* IS_USED(MODULE_NETDEV_NEW_API) */
 /** @} */
