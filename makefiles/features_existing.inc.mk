@@ -163,6 +163,7 @@ FEATURES_EXISTING := \
     periph_ecc_p256r1 \
     periph_eeprom \
     periph_eth \
+    periph_event \
     periph_flashpage \
     periph_flashpage_aux \
     periph_flashpage_in_address_space \

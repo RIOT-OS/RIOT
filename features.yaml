@@ -498,6 +498,8 @@ groups:
           is a globally unique ID, in the worst case it is some calibration
           parameters to compensate production variance that may or may not allow
           telling the CPU apart from any given other.
+  - name: periph_event
+    help: An event system peripheral is present.
   - name: periph_pwm
     help: A Pulse-Width Modulation (PWM) peripheral is present.
   - name: periph_qdec

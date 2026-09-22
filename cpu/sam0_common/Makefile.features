@@ -10,6 +10,7 @@ endif
 FEATURES_PROVIDED += periph_adc_continuous
 FEATURES_PROVIDED += periph_adc_dma
 FEATURES_PROVIDED += periph_dac_play
+FEATURES_PROVIDED += periph_event
 FEATURES_PROVIDED += periph_flashpage
 FEATURES_PROVIDED += periph_flashpage_in_address_space
 FEATURES_PROVIDED += periph_flashpage_pagewise

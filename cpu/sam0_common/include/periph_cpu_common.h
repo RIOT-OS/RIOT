@@ -20,6 +20,9 @@
 #include "cpu.h"
 #include "exti_config.h"
 #include "timer_config.h"
+#if MODULE_PERIPH_EVENT
+#include "periph_event.h"
+#endif
 
 #ifdef __cplusplus
 extern "C" {
