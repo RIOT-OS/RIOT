@@ -402,9 +402,8 @@ static inline netdev_type_t netdev_get_type(netdev_t *dev)
  *
  * @param[in] dev Network device to get the index of
  *
- * @return  The index of the network device if @ref netdev_register is
- *          enabled
- * @return  UINT8_MAX if @ref netdev_register is not enabled.
+ * @retval  The index of the network device if @ref netdev_register is enabled
+ * @retval  UINT8_MAX if @ref netdev_register is not enabled.
  */
 static inline uint8_t netdev_get_index(netdev_t *dev)
 {
