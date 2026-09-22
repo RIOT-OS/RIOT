@@ -132,7 +132,7 @@ int netdev_ieee802154_minimal_init_devs(netdev_event_cb_t cb) {
     for (unsigned i = 0; i < KW2XRF_NUM; i++) {
         printf("%d out of %d\n", i + 1, KW2XRF_NUM);
         netdev_register(&kw2xrf_netdev[i].dev.netdev, NETDEV_KW2XRF, 0);
-        netdev_ieee802154_submac_init(&kw2xrf_netdev[i]);
+        netdev_ieee802154_submac_init(&kw2xrf_netdev[i], NULL);
 
         /* set the application-provided callback */
         kw2xrf_netdev[i].dev.netdev.event_callback = cb;
