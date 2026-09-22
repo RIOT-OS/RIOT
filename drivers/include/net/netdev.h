@@ -383,9 +383,9 @@ struct netdev {
  *
  * @param[in] dev Network device to get the type of
  *
- * @return  The type of the network device if @ref MODULE_NETDEV_REGISTER is
+ * @return  The type of the network device if @ref netdev_register is
  *          enabled
- * @return  @ref NETDEV_ANY if @ref MODULE_NETDEV_REGISTER is not enabled.
+ * @return  @ref NETDEV_ANY if @ref netdev_register is not enabled.
  */
 static inline netdev_type_t netdev_get_type(netdev_t *dev)
 {
@@ -402,9 +402,9 @@ static inline netdev_type_t netdev_get_type(netdev_t *dev)
  *
  * @param[in] dev Network device to get the index of
  *
- * @return  The index of the network device if @ref MODULE_NETDEV_REGISTER is
+ * @return  The index of the network device if @ref netdev_register is
  *          enabled
- * @return  @ref UINT8_MAX if @ref MODULE_NETDEV_REGISTER is not enabled.
+ * @return  UINT8_MAX if @ref netdev_register is not enabled.
  */
 static inline uint8_t netdev_get_index(netdev_t *dev)
 {
