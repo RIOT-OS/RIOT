@@ -348,6 +348,21 @@ static inline size_t _get_6lo_abr(gnrc_netif_t *netif, gnrc_netapi_opt_t *opt)
     return sizeof(netopt_enable_t);
 }
 
+static inline size_t _get_6lo(gnrc_netif_t *netif, gnrc_netapi_opt_t *opt)
+{
+    assert(opt->data_len == sizeof(netopt_enable_t));
+    *((netopt_enable_t *)opt->data) =
+            (netopt_enable_t)gnrc_netif_is_6lo(netif);
+    return sizeof(netopt_enable_t);
+}
+
+static inline size_t _get_hop_limit(gnrc_netif_t *netif, gnrc_netapi_opt_t *opt)
+{
+    assert(opt->data_len == sizeof(uint8_t));
+    *((uint8_t *)opt->data) = netif->cur_hl;
+    return sizeof(uint8_t);
+}
+
 int gnrc_netif_get_from_netdev(gnrc_netif_t *netif, gnrc_netapi_opt_t *opt)
 {
     int res = -ENOTSUP;
@@ -355,15 +370,10 @@ int gnrc_netif_get_from_netdev(gnrc_netif_t *netif, gnrc_netapi_opt_t *opt)
     gnrc_netif_acquire(netif);
     switch (opt->opt) {
     case NETOPT_6LO:
-        assert(opt->data_len == sizeof(netopt_enable_t));
-        *((netopt_enable_t *)opt->data) =
-                (netopt_enable_t)gnrc_netif_is_6lo(netif);
-        res = sizeof(netopt_enable_t);
+        res = _get_6lo(netif, opt);
         break;
     case NETOPT_HOP_LIMIT:
-        assert(opt->data_len == sizeof(uint8_t));
-        *((uint8_t *)opt->data) = netif->cur_hl;
-        res = sizeof(uint8_t);
+        res = _get_hop_limit(netif, opt);
         break;
     case NETOPT_STATS:
         switch ((int16_t)opt->context) {
@@ -420,9 +430,6 @@ int gnrc_netif_get_from_netdev(gnrc_netif_t *netif, gnrc_netapi_opt_t *opt)
     case NETOPT_IPV6_SND_RTR_ADV:
         if (IS_USED(MODULE_GNRC_NETIF_IPV6) &&
             IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_ROUTER)) {
-            assert(opt->data_len == sizeof(netopt_enable_t));
-            *((netopt_enable_t *)opt->data) = (gnrc_netif_is_rtr_adv(netif)) ?
-                                              NETOPT_ENABLE : NETOPT_DISABLE;
             res = _get_ipv6_snd_rtr_adv(netif, opt);
         }
         break;
@@ -620,6 +627,14 @@ static inline int _set_l2_stats(gnrc_netif_t *netif)
 #endif
 }
 
+static inline int _set_hop_limit(gnrc_netif_t *netif,
+                                 const gnrc_netapi_opt_t *opt)
+{
+    assert(opt->data_len == sizeof(uint8_t));
+    netif->cur_hl = *((uint8_t *)opt->data);
+    return sizeof(uint8_t);
+}
+
 int gnrc_netif_set_from_netdev(gnrc_netif_t *netif,
                                const gnrc_netapi_opt_t *opt)
 {
@@ -628,9 +643,7 @@ int gnrc_netif_set_from_netdev(gnrc_netif_t *netif,
     gnrc_netif_acquire(netif);
     switch (opt->opt) {
     case NETOPT_HOP_LIMIT:
-        assert(opt->data_len == sizeof(uint8_t));
-        netif->cur_hl = *((uint8_t *)opt->data);
-        res = sizeof(uint8_t);
+        res = _set_hop_limit(netif, opt);
         break;
     case NETOPT_IPV6_ADDR:
         if (IS_USED(MODULE_GNRC_NETIF_IPV6)) {
