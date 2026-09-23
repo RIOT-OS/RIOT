@@ -1,0 +1,51 @@
+From 08db99075ca9e82ed136df20bfc9855623c9b361 Mon Sep 17 00:00:00 2001
+From: Marian Buschsieweke <marian.buschsieweke@posteo.net>
+Date: Sun, 30 Nov 2025 11:29:21 +0100
+Subject: [PATCH] asm_avr.inc: fix compilation on GCC 15.2.0
+
+Compilation with GCC 15.2.0 failed with:
+
+    asm_avr.inc:915:5: error: cannot find a register in class 'POINTER_Y_REGS' while reloading 'asm'
+
+This works around the issue by manually placing right into the Y
+register before the inline assembly.
+---
+ asm_avr.inc | 9 +++++++--
+ 1 file changed, 7 insertions(+), 2 deletions(-)
+
+diff --git a/asm_avr.inc b/asm_avr.inc
+index c14bf55..6259d36 100644
+--- a/asm_avr.inc
++++ b/asm_avr.inc
+@@ -905,13 +905,18 @@ uECC_VLI_API void uECC_vli_mult(uECC_word_t *result,
+                                 const uECC_word_t *left,
+                                 const uECC_word_t *right,
+                                 wordcount_t num_words) {
+-    volatile uECC_word_t *r = result;
+     uint8_t r0 = 0;
+     uint8_t r1 = 0;
+     uint8_t r2 = 0;
+     uint8_t zero = 0;
+     uint8_t k, i;
+ 
++    /* manually allocate right to register Y to work around bug in GCC 15.2 */
++    register uint8_t yl asm("r28");
++    register uint8_t yh asm("r29");
++    yl = (uint8_t)(unsigned)right;
++    yh = (uint8_t)(((unsigned)right) >> 8);
++
+     __asm__ volatile (
+         "ldi %[k], 1 \n\t" /* k = 1; k < num_words; ++k */
+ 
+@@ -986,7 +991,7 @@ uECC_VLI_API void uECC_vli_mult(uECC_word_t *result,
+         "st z+, %[r0] \n\t"  /* Store last result byte. */
+         "eor r1, r1 \n\t" /* fix r1 to be 0 again */
+ 
+-        : "+z" (result), "+x" (left), "+y" (right),
++        : "+z" (result), "+x" (left), "+r" (yl), "+r" (yh),
+           [r0] "+r" (r0), [r1] "+r" (r1), [r2] "+r" (r2),
+           [zero] "+r" (zero), [num] "+r" (num_words),
+           [k] "=&r" (k), [i] "=&r" (i)
+-- 
+2.52.0
+
