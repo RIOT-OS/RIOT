@@ -187,7 +187,8 @@ static int _dfu_class_control_req(usbus_t *usbus, usbus_dfu_device_t *dfu, usb_s
                 /* Set DFU to manifest sync */
                 dfu->dfu_state = USB_DFU_STATE_DFU_MANIFEST_SYNC;
                 riotboot_flashwrite_flush(&dfu->writer);
-                riotboot_flashwrite_finish(&dfu->writer);
+                riotboot_flashwrite_finish(&dfu->writer,
+                                           riotboot_slot_get_hdr(riotboot_slot_current())->version + 1);
             }
             else if (dfu->dfu_state != USB_DFU_STATE_DFU_DL_SYNC) {
                 dfu->dfu_state = USB_DFU_STATE_DFU_DL_SYNC;
@@ -199,17 +200,10 @@ static int _dfu_class_control_req(usbus_t *usbus, usbus_dfu_device_t *dfu, usb_s
                 uint8_t *data = usbus_control_get_out_data(usbus, &len);
                  /* skip writing the riotboot signature */
                 if (dfu->skip_signature) {
-                    /* Avoid underflow condition */
-                    if (len < RIOTBOOT_FLASHWRITE_SKIPLEN) {
-                        dfu->dfu_state = USB_DFU_STATE_DFU_ERROR;
-                        return -1;
-                    }
                     riotboot_flashwrite_init(&dfu->writer, dfu->selected_slot);
-                    len -= RIOTBOOT_FLASHWRITE_SKIPLEN;
                     dfu->skip_signature = false;
                     ret = riotboot_flashwrite_putbytes(&dfu->writer,
-                                                 &data[RIOTBOOT_FLASHWRITE_SKIPLEN],
-                                                 len, true);
+                                                       data, len, true);
                 }
                 else {
                     ret = riotboot_flashwrite_putbytes(&dfu->writer, data, len, true);
