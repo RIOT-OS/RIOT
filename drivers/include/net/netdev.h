@@ -196,6 +196,7 @@ extern "C" {
 #include "iolist.h"
 #include "net/netopt.h"
 #include "kernel_defines.h"
+#include "net/netif.h"
 
 #ifdef MODULE_L2FILTER
 #include "net/l2filter.h"
@@ -295,55 +296,58 @@ typedef void (*netdev_event_cb_t)(netdev_t *dev, netdev_event_t event);
 /**
  * @brief   Driver types for netdev.
  *
- * @warning New entries must be added at the bottom of the list
- *          because the values need to remain constant to
- *          generate stable L2 addresses.
- * @{
- */
-typedef enum {
-    NETDEV_ANY = 0,         /**< Will match any device type */
-    NETDEV_AT86RF215,
-    NETDEV_AT86RF2XX,
-    NETDEV_CC2538,
-    NETDEV_DOSE,
-    NETDEV_ENC28J60,
-    NETDEV_KW41ZRF,
-    NETDEV_MRF24J40,
-    NETDEV_NRF802154,
-    NETDEV_STM32_ETH,
-    NETDEV_CC110X,
-    NETDEV_SX127X,
-    NETDEV_SAM0_ETH,
-    NETDEV_ESP_NOW,
-    NETDEV_NRF24L01P_NG,
-    NETDEV_SOCKET_ZEP,
-    NETDEV_SX126X,
-    NETDEV_SX1280,
-    NETDEV_CC2420,
-    NETDEV_ETHOS,
-    NETDEV_SLIPDEV,
-    NETDEV_TAP,
-    NETDEV_W5100,
-    NETDEV_ENCX24J600,
-    NETDEV_ATWINC15X0,
-    NETDEV_KW2XRF,
-    NETDEV_ESP_ETH,
-    NETDEV_ESP_WIFI,
-    NETDEV_CDC_ECM,
-    NETDEV_TINYUSB,
-    NETDEV_W5500,
-    NETDEV_ESP_IEEE802154,
-    NETDEV_LPC1768_ETH,
-    NETDEV_GRETH,
-    NETDEV_EFM32_ETH,
-    /* add more if needed */
-} netdev_type_t;
+ * @deprecated   The registration data of a network device is now managed by
+ *               @ref net_netif. Use @ref netif_type_t instead. This type and
+ *               the value aliases below will be removed for the 2027.04
+ *               release.
+ * @{ */
+typedef netif_type_t netdev_type_t;
 /** @} */
 
 /**
- * @brief   Will match any device index
- */
-#define NETDEV_INDEX_ANY    (0xFF)
+ * @brief   Driver type value aliases
+ *
+ * @deprecated   Aliases for the values of @ref netif_type_t, provided for
+ *               backward compatibility. They will be removed for the
+ *               2027.04 release.
+ * @{ */
+#define NETDEV_ANY              NETIF_ANY
+#define NETDEV_AT86RF215        NETIF_AT86RF215
+#define NETDEV_AT86RF2XX        NETIF_AT86RF2XX
+#define NETDEV_CC2538           NETIF_CC2538
+#define NETDEV_DOSE             NETIF_DOSE
+#define NETDEV_ENC28J60         NETIF_ENC28J60
+#define NETDEV_KW41ZRF          NETIF_KW41ZRF
+#define NETDEV_MRF24J40         NETIF_MRF24J40
+#define NETDEV_NRF802154        NETIF_NRF802154
+#define NETDEV_STM32_ETH        NETIF_STM32_ETH
+#define NETDEV_CC110X           NETIF_CC110X
+#define NETDEV_SX127X           NETIF_SX127X
+#define NETDEV_SAM0_ETH         NETIF_SAM0_ETH
+#define NETDEV_ESP_NOW          NETIF_ESP_NOW
+#define NETDEV_NRF24L01P_NG     NETIF_NRF24L01P_NG
+#define NETDEV_SOCKET_ZEP       NETIF_SOCKET_ZEP
+#define NETDEV_SX126X           NETIF_SX126X
+#define NETDEV_SX1280           NETIF_SX1280
+#define NETDEV_CC2420           NETIF_CC2420
+#define NETDEV_ETHOS            NETIF_ETHOS
+#define NETDEV_SLIPDEV          NETIF_SLIPDEV
+#define NETDEV_TAP              NETIF_TAP
+#define NETDEV_W5100            NETIF_W5100
+#define NETDEV_ENCX24J600       NETIF_ENCX24J600
+#define NETDEV_ATWINC15X0       NETIF_ATWINC15X0
+#define NETDEV_KW2XRF           NETIF_KW2XRF
+#define NETDEV_ESP_ETH          NETIF_ESP_ETH
+#define NETDEV_ESP_WIFI         NETIF_ESP_WIFI
+#define NETDEV_CDC_ECM          NETIF_CDC_ECM
+#define NETDEV_TINYUSB          NETIF_TINYUSB
+#define NETDEV_W5500            NETIF_W5500
+#define NETDEV_ESP_IEEE802154   NETIF_ESP_IEEE802154
+#define NETDEV_LPC1768_ETH      NETIF_LPC1768_ETH
+#define NETDEV_GRETH            NETIF_GRETH
+#define NETDEV_EFM32_ETH        NETIF_EFM32_ETH
+#define NETDEV_INDEX_ANY        NETIF_INDEX_ANY
+/** @} */
 
 #if DOXYGEN
 /**

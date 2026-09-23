@@ -61,6 +61,59 @@ extern "C" {
 /** @} */
 
 /**
+ * @brief   Driver types for network interfaces.
+ *
+ * @warning New entries must be added at the bottom of the list
+ *          because the values need to remain constant to
+ *          generate stable L2 addresses.
+ * @{
+ */
+typedef enum {
+    NETIF_ANY = 0,         /**< Will match any interface type */
+    NETIF_AT86RF215,
+    NETIF_AT86RF2XX,
+    NETIF_CC2538,
+    NETIF_DOSE,
+    NETIF_ENC28J60,
+    NETIF_KW41ZRF,
+    NETIF_MRF24J40,
+    NETIF_NRF802154,
+    NETIF_STM32_ETH,
+    NETIF_CC110X,
+    NETIF_SX127X,
+    NETIF_SAM0_ETH,
+    NETIF_ESP_NOW,
+    NETIF_NRF24L01P_NG,
+    NETIF_SOCKET_ZEP,
+    NETIF_SX126X,
+    NETIF_SX1280,
+    NETIF_CC2420,
+    NETIF_ETHOS,
+    NETIF_SLIPDEV,
+    NETIF_TAP,
+    NETIF_W5100,
+    NETIF_ENCX24J600,
+    NETIF_ATWINC15X0,
+    NETIF_KW2XRF,
+    NETIF_ESP_ETH,
+    NETIF_ESP_WIFI,
+    NETIF_CDC_ECM,
+    NETIF_TINYUSB,
+    NETIF_W5500,
+    NETIF_ESP_IEEE802154,
+    NETIF_LPC1768_ETH,
+    NETIF_GRETH,
+    NETIF_EFM32_ETH,
+    /* add more if needed */
+} netif_type_t;
+/** @} */
+
+/**
+ * @brief   Will match any interface index
+ */
+#define NETIF_INDEX_ANY    (0xFF)
+
+/**
  * @brief Network interface descriptor.
  *
  * @note All network interfaces should inherit from this structure.
