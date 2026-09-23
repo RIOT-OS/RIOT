@@ -1,1 +1,10 @@
 FLASHFILE = $(BINFILE)
+
+RIOT_EMULATOR ?= mgba
+
+ifneq (,$(filter term,$(MAKECMDGOALS)))
+  ifneq (1,$(EMULATE))
+    $(call echowarn,("There is no terminal access without EMULATE=1. Quitting."))
+    RIOT_TERMINAL=none
+  endif
+endif
