@@ -5,3 +5,6 @@ CPU_MODEL   = rp2350_cortexm
 
 include $(RIOTCPU)/rp2350_common/Makefile.features
 include $(RIOTCPU)/cortexm_common/Makefile.features
+
+# Explicitly *not* supported, see <https://github.com/RIOT-OS/RIOT/issues/22294>
+FEATURES_PROVIDED := $(filter-out rust_target,$(FEATURES_PROVIDED))
