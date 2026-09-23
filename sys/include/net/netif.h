@@ -120,6 +120,10 @@ typedef enum {
  */
 typedef struct {
     list_node_t node;               /**< Pointer to the next interface */
+#ifdef MODULE_NETDEV_REGISTER
+    netif_type_t type;              /**< driver type used for the netif */
+    uint8_t index;                  /**< instance number of the netif */
+#endif
 #ifdef MODULE_NETSTATS_NEIGHBOR
     netstats_nb_table_t neighbors;  /**< Structure containing all L2 neighbors */
 #endif
@@ -246,11 +250,16 @@ int netif_set_opt(const netif_t *netif, netopt_t opt, uint16_t context,
  * @note    This functions should be called when initializing an interface.
  *
  * @param[in] netif     Interface to be registered
+ * @param[in] type      driver type of the interface, can be @ref NETIF_ANY
+ *                      if unknown or if the `netdev_register` module is not
+ *                      used
+ * @param[in] index     index of the interface of the given type, can be
+ *                      @ref NETIF_INDEX_ANY
  *
  * @return  0 on success
  * @return  -EINVAL if @p netif is NULL.
  */
-int netif_register(netif_t *netif);
+int netif_register(netif_t *netif, netif_type_t type, uint8_t index);
 
 /**
  * @brief   Get IPv6 address(es) of the given interface
