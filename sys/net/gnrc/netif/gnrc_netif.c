@@ -573,7 +573,6 @@ static inline int _set_6lo_iphc(gnrc_netif_t *netif, const gnrc_netapi_opt_t *op
 
 static inline int _set_6lo_abr(gnrc_netif_t *netif, const gnrc_netapi_opt_t *opt)
 {
-#if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_6LBR)
     assert(opt->data_len == sizeof(netopt_enable_t));
     if (*(((netopt_enable_t *)opt->data)) == NETOPT_ENABLE) {
         if (!(netif->flags & GNRC_NETIF_FLAGS_6LO_ABR)) {
@@ -591,11 +590,6 @@ static inline int _set_6lo_abr(gnrc_netif_t *netif, const gnrc_netapi_opt_t *opt
         netif->flags &= ~GNRC_NETIF_FLAGS_6LO_ABR;
     }
     return sizeof(netopt_enable_t);
-#else
-    (void) netif;
-    (void) opt;
-    return -ENOTSUP;
-#endif
 }
 
 static inline int _set_ipv6_stats(gnrc_netif_t *netif)
