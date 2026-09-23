@@ -30,6 +30,7 @@
 #define ENABLE_DEBUG 0
 #include "debug.h"
 
+/* Fixed by hardware, see PDMCLKCTRL nRF52840 PS */
 #define PDM_SRC_CLOCK_HZ 32000000
 
 /* PDM clock = PDM_SRC_CLOCK_HZ / divisor. Keeps the clock inside a typical
