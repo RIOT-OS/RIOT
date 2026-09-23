@@ -449,6 +449,16 @@ static int _init(netdev_t *netdev)
     _mmio_write(&regs->tx_desc, (uint32_t)(uintptr_t)dev->tx_desc);
     _mmio_write(&regs->rx_desc, (uint32_t)(uintptr_t)dev->rx_desc);
 
+    /* Clear leftover status bits (W1C) before unmasking the interrupt. The
+     * software reset does not touch this register, grmon 'run' does not reset
+     * peripherals and the EDCL keeps the MAC busy, so a stale RX bit is
+     * unmasked into an immediate interrupt that reports a frame which no
+     * descriptor holds. */
+    _mmio_write(&regs->status, GRETH_STATUS_RXERR | GRETH_STATUS_TXERR |
+                               GRETH_STATUS_RXIRQ | GRETH_STATUS_TXIRQ |
+                               GRETH_STATUS_PHYIRQ);
+    _greth_pending_status = 0;
+
     _greth_dev_ptr = dev;
     plic_set_priority(dev->params->irq, 1);
     plic_set_isr_cb(dev->params->irq, _greth_isr);
