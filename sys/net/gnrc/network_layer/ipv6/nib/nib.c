@@ -136,11 +136,11 @@ static bool _add_static_lladdr(gnrc_netif_t *netif)
 #ifndef MODULE_NETDEV_REGISTER
 #error "Use of CONFIG_GNRC_IPV6_STATIC_LLADDR_NETDEV_MASK requires MODULE_NETDEV_REGISTER"
 #endif
-    if (! (((CONFIG_GNRC_IPV6_STATIC_LLADDR_NETDEV_MASK) & (1ULL << netif->dev->type)) ||
-           ((CONFIG_GNRC_IPV6_STATIC_LLADDR_NETDEV_MASK) & (1ULL << NETDEV_ANY)))) {
+    if (! (((CONFIG_GNRC_IPV6_STATIC_LLADDR_NETDEV_MASK) & (1ULL << netif->netif.type)) ||
+           ((CONFIG_GNRC_IPV6_STATIC_LLADDR_NETDEV_MASK) & (1ULL << NETIF_ANY)))) {
         DEBUG("nib: interface #%u: not setting static link-local address "
-                "(netdev type %u not included)\n",
-                netif->pid, netif->dev->type);
+                "(netif type %u not included)\n",
+                netif->pid, netif->netif.type);
         return false;
     }
 #endif
