@@ -4,6 +4,17 @@ menu "CoAP Unified Suite (unicoap)"
     comment "******************"
     comment "SUITE"
 
+    menu "Timing"
+
+        config UNICOAP_TIMEOUT_CLIENT_RESPONSE_MS
+            int "Time to wait for a response (ms)"
+            range 1 9999999
+            default 7000
+            help
+                Client only
+
+    endmenu
+
     menu "Buffers"
 
         config UNICOAP_OPTIONS_FULL_SUPPORT
@@ -13,6 +24,13 @@ menu "CoAP Unified Suite (unicoap)"
                 Allows to change, remove and add options in any order. This comes with
                 some implementation cost and can therefore be disabled. In that case,
                 altering or adding an option out-of-order results in a runtime error.
+
+        config UNICOAP_CLIENT_MEMOS_MAX
+            int "Maximum parallel exchanges"
+            range 0 9999999
+            default 2
+            help
+                Maximum number of pending requests started using the client API.
 
         config UNICOAP_OPTIONS_MAX
             int "Maximum number of options in a message"
