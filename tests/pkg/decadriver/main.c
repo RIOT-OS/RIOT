@@ -166,7 +166,8 @@ static int _dw_addr(int argc, char **argv)
 
     _self_address = scn_u32_hex(argv[1], 4);
     dwt_setaddress16(_self_address);
-    addr = dwt_read_reg(PANADR_ID); /* read back the address to see if it was actually set */
+    /* read back the address to check if it was actually set */
+    addr = (dwt_read_reg(PANADR_ID) & PANADR_SHORTADDR_BIT_MASK) >> PANADR_SHORTADDR_BIT_OFFSET;
 
     if (_self_address != addr) {
         puts("Address change unsuccessful.");
