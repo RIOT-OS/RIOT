@@ -115,7 +115,7 @@ void chacha_keystream_bytes(chacha_ctx *ctx, void *x)
     }
 }
 
-void chacha_encrypt_bytes(chacha_ctx *ctx, const uint8_t *m, uint8_t *c)
+void chacha_encrypt_bytes(chacha_ctx *ctx, const uint8_t m[64], uint8_t c[64])
 {
     uint8_t x[64];
 

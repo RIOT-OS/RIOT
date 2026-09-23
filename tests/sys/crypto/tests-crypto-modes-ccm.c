@@ -1249,9 +1249,9 @@ static void test_crypto_modes_ccm_decrypt(void)
     do_test_decrypt_op(CUSTOM_1);
 }
 
-typedef int (*func_ccm_t)(const cipher_t *, const uint8_t *, uint32_t,
-                          uint8_t, uint8_t, const uint8_t *, size_t,
-                          const uint8_t *, size_t, uint8_t *);
+typedef ssize_t (*func_ccm_t)(const cipher_t *, const uint8_t *, size_t,
+                              uint8_t, cipher_ccm_q_t, const uint8_t *, size_t,
+                              const uint8_t *, size_t, uint8_t *);
 
 static int _test_ccm_len(func_ccm_t func, uint8_t len_encoding,
                          const uint8_t *input, size_t input_len,
