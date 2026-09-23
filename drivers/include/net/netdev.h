@@ -198,7 +198,7 @@ extern "C" {
 #include "kernel_defines.h"
 
 #if IS_USED(MODULE_L2FILTER)
-#include "net/l2filter.h"
+#  include "net/l2filter.h"
 #endif
 
 /**
