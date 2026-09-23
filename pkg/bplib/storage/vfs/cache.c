@@ -63,7 +63,7 @@ static void _bplib_cache_insert(clist_node_t* list, cache_list_node_t* new_node)
 }
 
 int bplib_cache_add(cache_list_t* cache,
-    uint64_t node, uint64_t service, uint64_t expiry, uint8_t index)
+    uint64_t node, uint64_t service, uint64_t expiry, uint32_t id)
 {
     cache_list_node_t* elem = _get_free_cache_elem(cache);
 
@@ -81,7 +81,7 @@ int bplib_cache_add(cache_list_t* cache,
     }
 
     elem->expiry = expiry;
-    elem->index = index;
+    elem->id = id;
     elem->node = node;
     elem->service = service;
 
@@ -105,8 +105,8 @@ int bplib_cache_get(cache_list_t* cache, char* bundle_path)
     }
     cache_list_node_t * entry = container_of(node, cache_list_node_t, list);
     sprintf(bundle_path, BPLIB_STOR_PATH_DATA
-        "/%"PRIx64"/%"PRIx64"/%"PRIx64"_%02"PRIx8,
-        entry->node, entry->service, entry->expiry, entry->index);
+        "/%"PRIx64"/%"PRIx64"/%"PRIx64"_%"PRIx32,
+        entry->node, entry->service, entry->expiry, entry->id);
     return 0;
 }
 
