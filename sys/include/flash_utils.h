@@ -15,18 +15,18 @@
  * that map flash into the data address space (e.g. ARM) and those which
  * doesn't (e.g. most AVR, Xtensa).
  *
- * # Usage
+ * ## Usage
  *
- * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~{.c}
+ * ```c
  * #include "flash_utils.h"
- * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+ * ```
  *
  * No module needs to be selected, this is a header-only implementation that
  * is always available.
  *
- * # Porting Code to Use `flash_utils`
+ * ## Porting Code to use `flash_utils`
  *
- * This is mainly targeting applications developers to ease developing apps
+ * This is mainly targeting application developers to ease developing apps
  * that work well on both legacy modified Harvard architectures (e.g. ATmega)
  * and modern modified Harvard architectures (e.g. ARM, ATtiny, ...) as well
  * as von-Neumann machines.
@@ -46,11 +46,12 @@
 #include <stdio.h>
 #include <string.h>
 
+#include "compiler_hints.h"
 #include "cpu_conf.h"
 #include "kernel_defines.h"
 
 #if IS_ACTIVE(HAS_FLASH_UTILS_ARCH)
-#include "flash_utils_arch.h" /* IWYU pragma: export */
+#  include "flash_utils_arch.h" /* IWYU pragma: export */
 #endif
 
 #ifdef __cplusplus
@@ -62,136 +63,144 @@ extern "C" {
  * @brief   C type qualifier required to place a variable in flash
  */
 #define FLASH_ATTR <IMPLEMTATION_DEFINED>
+#  define FLASH_ATTR <IMPLEMTATION_DEFINED>
+
 /**
  * @brief   Format specifier for printing `FLASH CONST char *`
  *
  * Usage:
  *
- * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~{.c}
- *     FLASH_ATTR const char fmt[] = "I am printing \"%" PRIsflash "\" from flash\n";
- *     FLASH_ATTR const char msg[] = "message from flash";
- *     flash_printf(fmt, msg);
- * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+ * ```c
+ * FLASH_ATTR const char fmt[] = "I am printing \"%" PRIsflash "\" from flash\n";
+ * FLASH_ATTR const char msg[] = "message from flash";
+ * flash_printf(fmt, msg);
+ * ```
  */
-#define PRIsflash <IMPLEMTATION_DEFINED>
+#  define PRIsflash <IMPLEMTATION_DEFINED>
 
 /**
  * @brief   Macro to allocate a string literal on flash and return a
  *          `FLASH_ATTR const char *` pointer to it
  * Usage:
  *
- * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~{.c}
- *     flash_puts(TO_FLASH("Hello world"));
- * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+ * ```c
+ * flash_puts(TO_FLASH("Hello world"));
+ * ```c
  */
-#define TO_FLASH(str_literal) <IMPLEMTATION_DEFINED>
+#  define TO_FLASH(str_literal) <IMPLEMTATION_DEFINED>
 
 /**
  * @brief   Like `strcmp()`, but the second string resides in flash
  *
- * @details This will be a zero-overhead wrapper on top of `strcmp()` for
- *          von-Neumann architectures or Harvard architectures that also map
- *          their flash into the data address space.
+ * This will be a zero-overhead wrapper on top of `strcmp()` for
+ * von-Neumann architectures or Harvard architectures that also map
+ * their flash into the data address space.
  */
 int flash_strcmp(const char *ram, FLASH_ATTR const char *flash);
 
 /**
  * @brief   Like `strncmp()`, but the first string resides in flash
  *
- * @details This will be a zero-overhead wrapper on top of `strncmp()` for
- *          von-Neumann architectures or Harvard architectures that also map
- *          their flash into the data address space.
+ * This will be a zero-overhead wrapper on top of `strncmp()` for
+ * von-Neumann architectures or Harvard architectures that also map
+ * their flash into the data address space.
  */
+ACCESS(read_only, 1, 3)
+ACCESS(read_only, 2, 3)
 int flash_strncmp(const char *ram, FLASH_ATTR const char *flash, size_t n);
 
 /**
  * @brief   Like `strlen()`, but the string resides in flash
  *
- * @details This will be a zero-overhead wrapper on top of `strlen()` for
- *          von-Neumann architectures or Harvard architectures that also map
- *          their flash into the data address space.
+ * This will be a zero-overhead wrapper on top of `strlen()` for
+ * von-Neumann architectures or Harvard architectures that also map
+ * their flash into the data address space.
  */
 size_t flash_strlen(FLASH_ATTR const char *flash);
 
 /**
  * @brief   Like `strcpy()`, but the source flash resides in flash
  *
- * @details This will be a zero-overhead wrapper on top of `strcpy()` for
- *          von-Neumann architectures or Harvard architectures that also map
- *          their flash into the data address space.
+ * This will be a zero-overhead wrapper on top of `strcpy()` for
+ * von-Neumann architectures or Harvard architectures that also map
+ * their flash into the data address space.
  */
 char * flash_strcpy(char *ram, FLASH_ATTR const char *flash);
 
 /**
  * @brief   Like `strncpy()`, but the source flash resides in flash
  *
- * @details This will be a zero-overhead wrapper on top of `strncpy()` for
- *          von-Neumann architectures or Harvard architectures that also map
- *          their flash into the data address space.
+ * This will be a zero-overhead wrapper on top of `strncpy()` for
+ * von-Neumann architectures or Harvard architectures that also map
+ * their flash into the data address space.
  */
+ACCESS(write_only, 1, 3)
+ACCESS(read_only, 2, 3)
 char * flash_strncpy(char *ram, FLASH_ATTR const char *flash, size_t n);
 
 /**
  * @brief   Like `printf()`, but the format string resides in flash
  *
- * @details This will be a zero-overhead wrapper on top of `printf()` for
- *          von-Neumann architectures or Harvard architectures that also map
- *          their flash into the data address space.
+ * This will be a zero-overhead wrapper on top of `printf()` for
+ * von-Neumann architectures or Harvard architectures that also map
+ * their flash into the data address space.
  */
 int flash_printf(FLASH_ATTR const char *flash, ...);
 
 /**
  * @brief   Like `vprintf()`, but the format string resides in flash
  *
- * @details This will be a zero-overhead wrapper on top of `vprintf()` for
- *          von-Neumann architectures or Harvard architectures that also map
- *          their flash into the data address space.
+ * This will be a zero-overhead wrapper on top of `vprintf()` for
+ * von-Neumann architectures or Harvard architectures that also map
+ * their flash into the data address space.
  */
 int flash_vprintf(FLASH_ATTR const char *flash, va_list args);
 
 /**
  * @brief   Like `fprintf()`, but the format string resides in flash
  *
- * @details This will be a zero-overhead wrapper on top of `fprintf()` for
- *          von-Neumann architectures or Harvard architectures that also map
- *          their flash into the data address space.
+ * This will be a zero-overhead wrapper on top of `fprintf()` for
+ * von-Neumann architectures or Harvard architectures that also map
+ * their flash into the data address space.
  */
 int flash_fprintf(FILE *stream, FLASH_ATTR const char *flash, ...);
 
 /**
  * @brief   Like `vfprintf()`, but the format string resides in flash
  *
- * @details This will be a zero-overhead wrapper on top of `vfprintf()` for
- *          von-Neumann architectures or Harvard architectures that also map
- *          their flash into the data address space.
+ * This will be a zero-overhead wrapper on top of `vfprintf()` for
+ * von-Neumann architectures or Harvard architectures that also map
+ * their flash into the data address space.
  */
 int flash_vfprintf(FILE *stream, FLASH_ATTR const char *flash, va_list args);
 
 /**
  * @brief   Like `snprintf()`, but the format string resides in flash
  *
- * @details This will be a zero-overhead wrapper on top of `snprintf()` for
- *          von-Neumann architectures or Harvard architectures that also map
- *          their flash into the data address space.
+ * This will be a zero-overhead wrapper on top of `snprintf()` for
+ * von-Neumann architectures or Harvard architectures that also map
+ * their flash into the data address space.
  */
+ACCESS(write_only, 1, 2)
 int flash_snprintf(char *buf, size_t buf_len, FLASH_ATTR const char *flash, ...);
 
 /**
  * @brief   Like `vsnprintf()`, but the format string resides in flash
  *
- * @details This will be a zero-overhead wrapper on top of `vsnprintf()` for
- *          von-Neumann architectures or Harvard architectures that also map
- *          their flash into the data address space.
+ * This will be a zero-overhead wrapper on top of `vsnprintf()` for
+ * von-Neumann architectures or Harvard architectures that also map
+ * their flash into the data address space.
  */
+ACCESS(write_only, 1, 2)
 int flash_vsnprintf(char *buf, size_t buf_len, FLASH_ATTR const char *flash,
                     va_list args);
 
 /**
  * @brief   Like `puts()`, but the string resides in flash
  *
- * @details This will be a zero-overhead wrapper on top of `puts()` for
- *          von-Neumann architectures or Harvard architectures that also map
- *          their flash into the data address space.
+ * This will be a zero-overhead wrapper on top of `puts()` for
+ *  von-Neumann architectures or Harvard architectures that also map
+ *  their flash into the data address space.
  */
 void flash_puts(FLASH_ATTR const char *flash);
 
@@ -229,7 +238,7 @@ void * flash_memcpy(void *dest, FLASH_ATTR const void *src, size_t n);
  * @brief   A convenience wrapper for `flash_puts(TO_FLASH("str literal"))`
  *
  * Usage:
- * ```
+ * ```c
  * FLASH_PUTS("Hello world!");
  * ```
  */
