@@ -26,6 +26,7 @@
 #include <inttypes.h>
 #include <stdalign.h>
 #include <stdbool.h>
+#include <stdint.h>
 #include <string.h>
 
 #include "net/netdev/eth.h"
@@ -404,10 +405,12 @@ static int _init(netdev_t *netdev)
     /* The GRETH descriptor and buffer pointers are programmed into 32-bit
      * hardware registers. On a 64-bit host the DMA engine cannot reach memory
      * above 4 GiB, so the descriptor tables and buffers must live in the low
-     * 4 GiB. Fail loudly if a future memory layout violates this. */
-    assert(((uintptr_t)dev->tx_desc >> 32) == 0);
-    assert(((uintptr_t)dev->rx_desc >> 32) == 0);
-    assert(((uintptr_t)dev->tx_buf  >> 32) == 0);
+     * 4 GiB. Fail loudly if a future memory layout violates this. The cast to
+     * uint64_t keeps the shift defined where uintptr_t is only 32 bits wide,
+     * in which case the check folds away. */
+    assert(((uint64_t)(uintptr_t)dev->tx_desc >> 32) == 0);
+    assert(((uint64_t)(uintptr_t)dev->rx_desc >> 32) == 0);
+    assert(((uint64_t)(uintptr_t)dev->tx_buf  >> 32) == 0);
 
     uint32_t cap  = _mmio_read(&regs->ctrl);
     dev->gbit     = (cap & GRETH_CTRL_GBIT_CAP) != 0;
