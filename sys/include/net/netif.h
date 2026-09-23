@@ -120,7 +120,7 @@ typedef enum {
  */
 typedef struct {
     list_node_t node;               /**< Pointer to the next interface */
-#ifdef MODULE_NETDEV_REGISTER
+#ifdef MODULE_NETIF_REGISTER
     netif_type_t type;              /**< driver type used for the netif */
     uint8_t index;                  /**< instance number of the netif */
 #endif
@@ -251,7 +251,7 @@ int netif_set_opt(const netif_t *netif, netopt_t opt, uint16_t context,
  *
  * @param[in] netif     Interface to be registered
  * @param[in] type      driver type of the interface, can be @ref NETIF_ANY
- *                      if unknown or if the `netdev_register` module is not
+ *                      if unknown or if the `netif_register` module is not
  *                      used
  * @param[in] index     index of the interface of the given type, can be
  *                      @ref NETIF_INDEX_ANY

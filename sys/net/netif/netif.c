@@ -28,7 +28,7 @@ int netif_register(netif_t *netif, netif_type_t type, uint8_t index)
         return -EINVAL;
     }
 
-#ifdef MODULE_NETDEV_REGISTER
+#ifdef MODULE_NETIF_REGISTER
     netif->type = type;
     netif->index = index;
 #else

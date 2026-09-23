@@ -146,7 +146,7 @@ gnrc_netif_t *gnrc_netif_get_by_type(netif_type_t type, uint8_t index)
     gnrc_netif_t *netif = NULL;
     while ((netif = gnrc_netif_iter(netif))) {
 
-#ifdef MODULE_NETDEV_REGISTER
+#ifdef MODULE_NETIF_REGISTER
         if (netif->netif.type != type && type != NETIF_ANY) {
             continue;
         }
@@ -1694,7 +1694,7 @@ int gnrc_netif_default_init(gnrc_netif_t *netif)
     if (res < 0) {
         return res;
     }
-#ifdef MODULE_NETDEV_REGISTER
+#ifdef MODULE_NETIF_REGISTER
     netif_register(&netif->netif, dev->type, dev->index);
 #else
     netif_register(&netif->netif, NETIF_ANY, 0);

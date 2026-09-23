@@ -376,7 +376,7 @@ struct netdev {
 #ifdef MODULE_L2FILTER
     l2filter_t filter[CONFIG_L2FILTER_LISTSIZE];   /**< link layer address filters */
 #endif
-#ifdef MODULE_NETDEV_REGISTER
+#ifdef MODULE_NETIF_REGISTER
     netdev_type_t type;                     /**< driver type used for netdev */
     uint8_t index;                          /**< instance number of the device */
 #endif
@@ -407,7 +407,7 @@ void netdev_register_signal(struct netdev *dev, netdev_type_t type, uint8_t inde
  */
 static inline void netdev_register(struct netdev *dev, netdev_type_t type, uint8_t index)
 {
-#ifdef MODULE_NETDEV_REGISTER
+#ifdef MODULE_NETIF_REGISTER
     dev->type = type;
     dev->index = index;
 #else
