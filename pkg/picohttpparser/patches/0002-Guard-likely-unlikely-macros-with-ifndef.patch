@@ -1,0 +1,46 @@
+From 6f56fd426142f90c6a710f157ea2c77354a081ed Mon Sep 17 00:00:00 2001
+From: Bas Stottelaar <basstottelaar@gmail.com>
+Date: Wed, 16 Sep 2026 21:11:52 +0200
+Subject: [PATCH 2/2] Guard likely/unlikely macros with #ifndef
+
+Some environments ship with their own (but identical) versions of
+likely and unlikely. Since these headers are often globally included
+as part of 'the system', they cause problems when redefined. By
+guarding them, this problem can be prevented.
+
+The assumption is that the other versions provides the same feature,
+which is not guaranteed. Given that likely/unlikely are common in
+code bases such as the Linux kernel, I do not think this is an issue
+anytime soon, and worth the portability benefit.
+---
+ picohttpparser.c | 8 ++++++++
+ 1 file changed, 8 insertions(+)
+
+diff --git a/picohttpparser.c b/picohttpparser.c
+index 357474e..cdd24e5 100644
+--- a/picohttpparser.c
++++ b/picohttpparser.c
+@@ -37,12 +37,20 @@
+ #include "picohttpparser.h"
+ 
+ #if __GNUC__ >= 3
++#ifndef likely
+ #define likely(x) __builtin_expect(!!(x), 1)
++#endif
++#ifndef unlikely
+ #define unlikely(x) __builtin_expect(!!(x), 0)
++#endif
+ #else
++#ifndef likely
+ #define likely(x) (x)
++#endif
++#ifndef unlikely
+ #define unlikely(x) (x)
+ #endif
++#endif
+ 
+ #ifdef _MSC_VER
+ #define ALIGNED(n) _declspec(align(n))
+-- 
+2.55.0
+

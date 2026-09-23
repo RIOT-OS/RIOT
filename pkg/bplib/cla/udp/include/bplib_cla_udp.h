@@ -19,6 +19,9 @@
  * active, so you also have to call BPLib_CLA_ContactSetup() and
  * BPLib_CLA_ContactStart().
  *
+ * @note It will only receive from the given remote, UDP messages from other IPs
+ *       are silently ignored.
+ *
  * @{
  *
  * @file

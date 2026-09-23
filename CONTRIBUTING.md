@@ -10,6 +10,7 @@ of this document using the following links:
 * [Writing Documentation][writing-documentation]
 * [Working with Git][working with git]
 * [Mediate Conflicts][mediate-conflicts]
+* [Extractive Contributions][extractive-contributions]
 
 If you have questions, please write a post over at our [forum] or chat on
 `#riot-os:matrix.org` on [Matrix].
@@ -433,3 +434,22 @@ Note: Violations of our [code of conduct][code-of-conduct] should be reported
 [code-of-conduct]: https://guide.riot-os.org/general/code_of_conduct/
 [email-mediator]: mailto:mediation@riot-os.org
 [email-coc]: mailto:conduct@riot-os.org
+
+## Extractive Contributions
+[extractive-contributions]: #extractive-contributions
+
+Please be aware that we may close issues and pull requests
+that we consider as [extractive contribution][guide-extracitve-contributions].
+
+[guide-extractive-contributions]: https://guides.riot-os.org/general/ai_policy/#extractive-contributions
+
+If your contribution has been closed as extractive contribution, this does not mean
+that you are not welcome to our community. If you are willing to invest time
+and to learn, we are more than happy to guide and help you. A good first step to
+show that you are willing to invest time is to follow [our guide][guide] to set
+up your development system, so that you can compile and test your contributions.
+A good second step would be to go [through our tutorials][tutorials] with little
+to no help of an LLM. We are also happy to answer your questions about the
+tutorials, if you get stuck.
+
+[tutorials]: https://github.com/riot-os/tutorials

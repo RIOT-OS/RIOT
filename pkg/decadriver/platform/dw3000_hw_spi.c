@@ -43,7 +43,6 @@
 #  define CONFIG_DECADRIVER_ISR_THREAD_PRIO     (THREAD_PRIORITY_MAIN - 5)
 #endif
 
-
 static spi_clk_t _spi_speed = DW3000_PARAM_SPI_SPEED_SLOW;
 static bool _irq_active = false;
 static char _rx_stack[CONFIG_DECADRIVER_STACK_SIZE];

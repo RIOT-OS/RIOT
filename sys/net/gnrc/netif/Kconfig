@@ -26,13 +26,6 @@ config GNRC_NETIF_DEFAULT_HL
     int "Default hop limit"
     default 64
 
-config GNRC_NETIF_MIN_WAIT_AFTER_SEND_US
-    int "Minimum wait time after a send operation"
-    default 0
-    help
-        This value is expressed in microseconds. It is purely meant as a debugging
-        feature to slow down a radios sending.
-
 config GNRC_NETIF_NONSTANDARD_6LO_MTU
     bool "Enable usage of non standard MTU for 6LoWPAN network interfaces"
     depends on USEMODULE_GNRC_NETIF_6LO

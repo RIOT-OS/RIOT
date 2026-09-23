@@ -115,21 +115,6 @@ ifneq ($(abspath $(RIOTBASE)/boards),$(abspath $(RIOTBOARD)))
   __DIRECTORY_VARIABLES += RIOTBOARD
 endif
 
-# Only warn users, not the CI.
-ifneq ($(RIOT_CI_BUILD),1)
-  # Do not warn when set from sub-make
-  ifeq ($(MAKELEVEL),0)
-    ifneq (,$(BOARDSDIR))
-      $(warning Using BOARDSDIR is deprecated use EXTERNAL_BOARD_DIRS instead)
-    endif
-  endif
-endif
-
-# Needed for backward compatibility:
-ifneq (,$(BOARDSDIR))
-  EXTERNAL_BOARD_DIRS += $(BOARDSDIR)
-endif
-
 # Make all paths absolute.
 override RIOTBASE               := $(abspath $(RIOTBASE))
 override RIOTCPU                := $(abspath $(RIOTCPU))
@@ -207,8 +192,8 @@ include $(RIOTMAKE)/dependencies_debug.inc.mk
 # Use TOOLCHAIN environment variable to select the toolchain to use.
 ifneq (,$(filter native native32 native64,$(BOARD)))
   ifeq ($(OS),Darwin)
-    $(call echoerr,("Building on macOS is not supported. We recommend vagrant for building:"))
-    $(call echoinfo,("https://github.com/RIOT-OS/RIOT/blob/master/dist/tools/vagrant/README.md"))
+    $(call echoerr,("Building on macOS is not supported. We recommend Docker for building:"))
+    $(call echoinfo,("https://doc.riot-os.org/build-system/build-in-docker/"))
   endif
 endif
 # Use override so that we can redefine a variable set on the command line (as
@@ -251,10 +236,6 @@ BOARDSDIRS := $(EXTERNAL_BOARD_DIRS) $(RIOTBOARD)
 BOARDDIR := $(word 1,$(foreach dir,$(BOARDSDIRS),$(wildcard $(dir)/$(BOARD)/.)))
 # Sanitize folder
 BOARDDIR := $(abspath $(BOARDDIR))
-
-# Also provide BOARDSDIR for compatibility and for accessing common folders
-# (e.g. include $(BOARDSDIR)/common/external_common/Makefile.dep)
-BOARDSDIR := $(dir $(BOARDDIR))
 
 ifeq (,$(BOARDDIR))
   $(info Folders searched for the board: $(BOARDSDIRS))
@@ -337,18 +318,15 @@ APPLICATION := $(strip $(APPLICATION))
 
 DOWNLOAD_TO_FILE ?= $(DLCACHE)
 
-# Check whether `which` is installed
-ifeq ($(shell command -v which 2>/dev/null),)
-  $(error 'which' is required but not found in PATH.)
-endif
-
 # Check whether unzip or 7z is installed, and set UNZIP_HERE to the command to use
 ifeq (,$(UNZIP_HERE))
-  ifeq (0,$(shell which unzip > /dev/null 2>&1 ; echo $$?))
-    UNZIP_HERE = $(call memoized,UNZIP_HERE,$(shell which unzip) -q)
+  _UNZIP := $(shell command -v unzip 2>/dev/null)
+  ifneq (,$(_UNZIP))
+    UNZIP_HERE := $(_UNZIP) -q
   else
-    ifeq (0,$(shell which 7z > /dev/null 2>&1 ; echo $$?))
-      UNZIP_HERE = $(call memoized,UNZIP_HERE,$(shell which 7z) x -bd)
+    _7Z := $(shell command -v 7z 2>/dev/null)
+    ifneq (,$(_7Z))
+      UNZIP_HERE := $(_7Z) x -bd
     else
       $(warning Neither unzip nor 7z is installed.)
     endif
@@ -385,6 +363,7 @@ endif
 
 # Add standard include directories
 INCLUDES += -I$(APPDIR)
+INCLUDES += $(addprefix -I,$(wildcard $(APPDIR)/include))
 INCLUDES += -I$(RIOTBASE)/core/lib/include
 INCLUDES += -I$(RIOTBASE)/core/include
 INCLUDES += -I$(RIOTBASE)/drivers/include

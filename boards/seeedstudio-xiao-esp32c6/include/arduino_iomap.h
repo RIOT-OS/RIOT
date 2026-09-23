@@ -24,7 +24,6 @@
 extern "C" {
 #endif
 
-
 /**
  * @name    XIAO's UART buses
  * @{

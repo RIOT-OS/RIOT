@@ -2,6 +2,10 @@
 @ingroup     boards
 @brief       Support for the Lobaro LoraBox with stm32l151cb-a
 
+@warning The lobaro-lorabox board is deprecated and will be removed after the
+         2027.04 Release! If you are still using it actively, please
+         notify the maintainers.
+
 ## Hardware
 
 ![LoraBox](https://www.lobaro.com/wp/wp-content/uploads/2017/03/Lobaro_wMBUS_LoRaWAN_Bridge.jpg)

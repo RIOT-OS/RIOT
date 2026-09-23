@@ -1,4 +1,4 @@
-@defgroup    boards_zedboard_noelv Gaisler NOEL-V ZedBoard
+@defgroup    boards_zedboard-noelv Gaisler NOEL-V ZedBoard
 @ingroup     boards
 @brief       Support for the Gaisler NOEL-V RISC-V on the ZedBoard FPGA
 @author      Matvii Ivashchenko

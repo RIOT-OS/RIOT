@@ -126,5 +126,8 @@ ifneq (,$(RAM_START_ADDR))
   CFLAGS += -DCPU_RAM_BASE=$(RAM_START_ADDR)
 endif
 ifneq (,$(RAM_LEN))
-  CFLAGS += -DCPU_RAM_SIZE=$(shell printf "0x%x" $$(($(RAM_LEN:%K=%*1024))))
+  # 'CFLAGS' is a deferred variable, so the shell call has to be memoized to
+  # keep it from being run again on every expansion of 'CFLAGS'.
+  CPU_RAM_SIZE = $(call memoized,CPU_RAM_SIZE,$(shell printf "0x%x" $$(($(RAM_LEN:%K=%*1024)))))
+  CFLAGS += -DCPU_RAM_SIZE=$(CPU_RAM_SIZE)
 endif

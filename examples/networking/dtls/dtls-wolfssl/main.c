@@ -22,7 +22,7 @@
 #include "log.h"
 
 #ifdef WITH_RIOT_SOCKETS
-#error RIOT-OS is set to use sockets but this DTLS app is configured for socks.
+#  error RIOT is set to use sockets but this DTLS app is configured with socks.
 #endif
 
 #define MAIN_QUEUE_SIZE     (8)

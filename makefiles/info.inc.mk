@@ -213,7 +213,7 @@ info-build-json:
 info-files: QUIET := 0
 info-files:
 	@( \
-	  echo "$(abspath $(shell echo "$(MAKEFILE_LIST)"))" | tr ' ' '\n'; \
+	  echo "$(abspath $(MAKEFILE_LIST))" | tr ' ' '\n'; \
 	  CSRC="$$($(MAKE) USEPKG="" -Bn | grep -o -e "[^ ]\+\.[csS]$$" -e "[^ ]\+\.[csS][ \']" | grep -v -e "^\s*-D")"; \
 	  echo "$$CSRC"; \
 	  echo "$(RIOTBASE)/Makefile.base"; \

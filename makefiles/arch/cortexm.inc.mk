@@ -34,30 +34,6 @@ LINKFLAGS += -T$(LINKER_SCRIPT) -Wl,--fatal-warnings
 LINKFLAGS += $(CFLAGS_CPU) $(CFLAGS_DBG) $(CFLAGS_OPT) -static -lgcc -nostartfiles
 LINKFLAGS += -Wl,--gc-sections
 
-# extract version inside the first parentheses
-ARM_GCC_VERSION = $(shell $(TARGET_ARCH)-gcc --version | sed -n '1 s/[^(]*(\([^\)]*\)).*/\1/p')
-
-# Ubuntu bionic gcc-arm-none-eabi compiler is not supported
-# Both when using gnu and llvm toolchains
-#
-#     /usr/bin/arm-none-eabi-gcc --version | head -n 1
-#     arm-none-eabi-gcc (15:6.3.1+svn253039-1build1) 6.3.1 20170620
-#
-ARM_GCC_UNSUPPORTED += 15:6.3.1%  # ubuntu bionic, ignore 'svn' build part
-
-# Should not raise an error on the host system version when building in docker
-ifneq (1,$(BUILD_IN_DOCKER))
-  ifneq (,$(filter $(ARM_GCC_UNSUPPORTED),$(ARM_GCC_VERSION)))
-    $(warning $(TARGET_ARCH)-gcc version not supported)
-    $(warning $(shell $(TARGET_ARCH)-gcc --version | head -n 1))
-    $(warning The currently recommanded version is the one installed in the riotdocker image)
-    $(warning https://github.com/RIOT-OS/riotdocker/blob/master/Dockerfile)
-    ifeq (1,$(WERROR))
-      $(error This check can be ignored by building with 'WERROR=0')
-    endif # WERROR
-  endif # ARM_GCC_UNSUPPORTED
-endif # BUILD_IN_DOCKER
-
 CFLAGS += -DCPU_MODEL_$(call uppercase_and_underscore,$(CPU_MODEL))
 CFLAGS += -DCPU_CORE_$(call uppercase_and_underscore,$(CPU_CORE))
 

@@ -1,10 +1,8 @@
 /*
- * Copyright (C) 2019 Freie Universität Berlin
- *
- * This file is subject to the terms and conditions of the GNU Lesser
- * General Public License v2.1. See the file LICENSE in the top level
- * directory for more details.
+ * SPDX-FileCopyrightText: 2019 Freie Universität Berlin
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
+
 /**
  * @ingroup  pkg_tlsf_malloc
  * @ingroup  pkg
@@ -34,7 +32,7 @@
                                                  * attribute */
 
 #define ATTR_MALLOC  __attribute__((malloc, alloc_size(1)))
-#define ATTR_CALLOC  __attribute__((malloc, alloc_size(1,2)))
+#define ATTR_CALLOC  __attribute__((malloc, alloc_size(1, 2)))
 #define ATTR_MALIGN  __attribute__((alloc_align(1), alloc_size(2), malloc))
 #define ATTR_REALLOC  __attribute__((alloc_size(2)))
 

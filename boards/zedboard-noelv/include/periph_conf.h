@@ -6,7 +6,7 @@
 #pragma once
 
 /**
- * @ingroup     boards_zedboard_noelv
+ * @ingroup     boards_zedboard-noelv
  * @{
  *
  * @file
@@ -84,7 +84,6 @@ static const uart_conf_t uart_config[] = {
 #define GRETH_PARAM_BASE    (0xff984000UL)  /**< GRETH base address */
 #define GRETH_PARAM_IRQ     (5U)            /**< GRETH interrupt line */
 /** @} */
-
 
 #ifdef __cplusplus
 }

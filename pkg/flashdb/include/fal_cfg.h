@@ -1,9 +1,6 @@
 /*
- * Copyright (C) 2022 ML!PA Consulting GmbH
- *
- * This file is subject to the terms and conditions of the GNU Lesser
- * General Public License v2.1. See the file LICENSE in the top level
- * directory for more details.
+ * SPDX-FileCopyrightText: 2022 ML!PA Consulting GmbH
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
 
 #pragma once
@@ -97,11 +94,12 @@ extern struct fal_flash_dev mtd_flash0;
  *          and a multiple of the virtual sector size.
  *
  * The virtual sector size is however bound to the physical sector size of @ref FAL_MTD.
- * So make sure that @ref CONFIG_FLASHDB_MIN_SECTOR_SIZE_DEFAULT_KiB times 1024 is a multiple of the MTD sector size.
- * For example if the MTD sector size is 4KiB, then @ref CONFIG_FLASHDB_MIN_SECTOR_SIZE_DEFAULT_KiB must be a multiple of 4.
- * If the MTD sector size is 1KiB, then you have all options for @ref CONFIG_FLASHDB_MIN_SECTOR_SIZE_DEFAULT_KiB.
+ * So make sure that @ref CONFIG_FLASHDB_MIN_SECTOR_SIZE_DEFAULT_KiB times 1024 is a multiple
+ * of the MTD sector size. For example if the MTD sector size is 4KiB, then
+ * @ref CONFIG_FLASHDB_MIN_SECTOR_SIZE_DEFAULT_KiB must be a multiple of 4. If the MTD sector
+ * size is 1KiB, then you have all options for @ref CONFIG_FLASHDB_MIN_SECTOR_SIZE_DEFAULT_KiB.
  */
-#define FAL_PART0_LENGTH                            (2 * (CONFIG_FLASHDB_MIN_SECTOR_SIZE_DEFAULT_KiB * KiB(1)))
+#define FAL_PART0_LENGTH            (2 * (CONFIG_FLASHDB_MIN_SECTOR_SIZE_DEFAULT_KiB * KiB(1)))
 #endif
 
 /**

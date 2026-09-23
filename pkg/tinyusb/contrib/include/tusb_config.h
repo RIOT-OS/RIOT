@@ -45,7 +45,8 @@
 
 #if !DOXYGEN
 
-#if MODULE_TINYUSB_CLASS_NET_CDC_NCM && (MODULE_TINYUSB_CLASS_NET_CDC_ECM || MODULE_TINYUSB_CLASS_NET_RNDIS)
+#if MODULE_TINYUSB_CLASS_NET_CDC_NCM && (MODULE_TINYUSB_CLASS_NET_CDC_ECM \
+                                        || MODULE_TINYUSB_CLASS_NET_RNDIS)
 #error "CDC NCM device class cannot be used together with CDC ECM or RNDIS device class"
 #endif
 

@@ -157,7 +157,6 @@ check_not_exporting_variables() {
     # only place that should export common variables
     pathspec+=('*')
     pathspec+=(':!makefiles/vars.inc.mk')
-    pathspec+=(':!**/Vagrantfile')
 
     patterns=()
     for variable in "${EXPORTED_VARIABLES_ONLY_IN_VARS[@]}"; do
@@ -288,7 +287,7 @@ check_files_in_boards_not_reference_board_var() {
     pathspec+=(':!boards/common/nrf52/Makefile.include')
 
     git -C "${RIOTBASE}" grep -n "${patterns[@]}" -- "${pathspec[@]}" \
-        | error_with_message "Code in boards/ should not use \$(BOARDS) to reference files since this breaks external BOARDS changing BOARDSDIR"
+        | error_with_message "Code in boards/ should not use \$(BOARDS) to reference files since this breaks external BOARDS changing EXTERNAL_BOARD_DIRS"
 }
 
 check_no_pseudomodules_in_makefile_dep() {
@@ -390,10 +389,19 @@ check_pinned_docker_version_is_up_to_date() {
     fi
     local pinned_repo_digest
     local upstream_repo_digest
+    local -a version_args=()
+
+    # Check if a VERSION file exists (and we therefore are on a Release branch).
+    # If we are, use the version tag instead of "latest" to compare to the
+    # hash stored in $RIOTMAKE/docker.inc.mk.
+    if [ -f "${RIOTBASE}/VERSION" ]; then
+        version_args=("$(awk -F' *= *' '/^RIOT_VERSION/ { print $2; exit }' "${RIOTBASE}/VERSION")")
+    fi
+
     pinned_repo_digest="$(awk '/^DOCKER_TESTED_IMAGE_REPO_DIGEST := (.*)$/ { print substr($0, index($0, $3)); exit }' "$RIOTMAKE/docker.inc.mk")"
     # not using docker and jq here but a python script to not have to install
     # more stuff for the static test docker image
-    IFS=' ' read -r upstream_repo_digest <<< "$("$RIOTTOOLS/buildsystem_sanity_check/get_dockerhub_digests.py" "riot/riotbuild")"
+    IFS=' ' read -r upstream_repo_digest <<< "$("$RIOTTOOLS/buildsystem_sanity_check/get_dockerhub_digests.py" "riot/riotbuild" "${version_args[@]}")"
 
     if [ "$pinned_repo_digest" != "$upstream_repo_digest" ]; then
         git -C "${RIOTBASE}" grep -n '^DOCKER_TESTED_IMAGE_REPO_DIGEST :=' "$RIOTMAKE/docker.inc.mk" \

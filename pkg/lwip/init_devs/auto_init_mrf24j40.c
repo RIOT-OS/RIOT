@@ -1,10 +1,6 @@
 /*
- * Copyright (C) 2017 Neo Nenaco <neo@nenaco.de>
- *
- * This file is subject to the terms and conditions of the GNU Lesser
- * General Public License v2.1. See the file LICENSE in the top level
- * directory for more details.
- *
+ * SPDX-FileCopyrightText: 2017 Neo Nenaco <neo@nenaco.de>
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
 
 /**
@@ -42,7 +38,6 @@ static void auto_init_mrf24j40(void)
                        &mrf24j40_netdev[i].submac.dev);
         mrf24j40_init(&mrf24j40_devs[i], &mrf24j40_params[i], &mrf24j40_netdev[i].submac.dev,
                       bhp_event_isr_cb, &netif[i].bhp);
-
 
         netdev_register(&mrf24j40_netdev[i].dev.netdev, NETDEV_MRF24J40, i);
         netdev_ieee802154_submac_init(&mrf24j40_netdev[i]);
