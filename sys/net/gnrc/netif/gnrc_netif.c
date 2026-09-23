@@ -317,30 +317,18 @@ static inline size_t _get_ipv6_max_pdu_size(gnrc_netif_t *netif, gnrc_netapi_opt
 
 static inline size_t _get_ipv6_forwarding(gnrc_netif_t *netif, gnrc_netapi_opt_t *opt)
 {
-#if IS_USED(MODULE_GNRC_NETIF_IPV6) && IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_ROUTER)
     assert(opt->data_len == sizeof(netopt_enable_t));
     *((netopt_enable_t *)opt->data) = (gnrc_netif_is_rtr(netif)) ?
                                       NETOPT_ENABLE : NETOPT_DISABLE;
     return sizeof(netopt_enable_t);
-#else
-    (void) netif;
-    (void) opt;
-    return 0;
-#endif
 }
 
 static inline size_t _get_ipv6_snd_rtr_adv(gnrc_netif_t *netif, gnrc_netapi_opt_t *opt)
 {
-#if IS_USED(MODULE_GNRC_NETIF_IPV6) && IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_ROUTER)
     assert(opt->data_len == sizeof(netopt_enable_t));
     *((netopt_enable_t *)opt->data) = (gnrc_netif_is_rtr_adv(netif)) ?
                                       NETOPT_ENABLE : NETOPT_DISABLE;
     return sizeof(netopt_enable_t);
-#else
-    (void) netif;
-    (void) opt;
-    return 0;
-#endif
 }
 
 static inline size_t _get_6lo_iphc(gnrc_netif_t *netif, gnrc_netapi_opt_t *opt)
@@ -566,7 +554,6 @@ static inline int _set_ipv6_snd_rtr_adv(gnrc_netif_t *netif, const gnrc_netapi_o
 
 static inline int _set_6lo_iphc(gnrc_netif_t *netif, const gnrc_netapi_opt_t *opt)
 {
-#if IS_USED(MODULE_GNRC_SIXLOWPAN_IPHC)
     assert(opt->data_len == sizeof(netopt_enable_t));
     if (*(((netopt_enable_t *)opt->data)) == NETOPT_ENABLE) {
         netif->flags |= GNRC_NETIF_FLAGS_6LO_HC;
@@ -575,11 +562,6 @@ static inline int _set_6lo_iphc(gnrc_netif_t *netif, const gnrc_netapi_opt_t *op
         netif->flags &= ~GNRC_NETIF_FLAGS_6LO_HC;
     }
     return sizeof(netopt_enable_t);
-#else
-    (void) netif;
-    (void) opt;
-    return -ENOTSUP;
-#endif
 }
 
 static inline int _set_6lo_abr(gnrc_netif_t *netif, const gnrc_netapi_opt_t *opt)
