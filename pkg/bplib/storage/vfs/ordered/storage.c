@@ -40,15 +40,27 @@ static mutex_t caches_lock = MUTEX_INIT;
 static cache_list_t contact_caches[BPLIB_MAX_NUM_CONTACTS];
 static cache_list_t channel_caches[BPLIB_MAX_NUM_CHANNELS];
 
-#define STORAGE_HEADER_FLAG_DELETE      0x01    /* == egress_attempted */
-#define STORAGE_HEADER_FLAG_CUSTODIAL   0x02    /* == is_custodial */
+/** @brief If the bundle is a custodial bundle */
+#define STORAGE_HEADER_FLAG_CUSTODIAL       0x01
+/**
+ * @brief If retransmissions are turned off 
+ *
+ * This can happen if custody at a next hop was rejected. In that case no
+ * retransmissions to the same node are done. This only changes when the CLA
+ * changes.
+ */
+#define STORAGE_HEADER_FLAG_RETRANS_OFF     0x02
 
 /**
  * @brief Header including fields from the sqlite based implementation
  */
 typedef struct {
+    /**
+     * @brief Timestamp in monotonic time after which a retransmit can happen 
+     *
+     * This currently does not work with restarts.
+     */
     uint64_t retransmit_timestamp;
-    uint32_t retransmit_trigger;
     uint8_t  flags;
 } bundle_file_header_t;
 
@@ -71,6 +83,12 @@ typedef struct __attribute__((packed)) {
 
 /* 1 for the /, 8 for the 32bit ID and the terminator */
 #define BPLIB_STOR_PATHLEN_IDX (BPLIB_STOR_INDEX_LEN + 1 + 8 + 1)
+
+/* Size of the index file. 3 * uint64_t => 24 */
+#define BUNDLE_STORAGE_INDEX_SIZE       24
+/* Size of a whole bundle is storage. This of course still ignores the directories created etc. */
+#define BUNDLE_STORAGE_USAGE(payload)   (payload + (sizeof(bundle_file_structure_t) - 1) + \
+                                         BUNDLE_STORAGE_INDEX_SIZE)
 
 BPLib_Status_t BPLib_STOR_Init(BPLib_Instance_t* inst)
 {
@@ -97,6 +115,15 @@ BPLib_Status_t BPLib_STOR_Init(BPLib_Instance_t* inst)
     if (res < 0 && res != -EEXIST) {
         return BPLIB_OS_ERROR;
     }
+
+    /* TODOs for future efforts: Iterate over all bundles to: 
+     * - Read the current storage usage of bundles that remained in storage
+     *   acrosss restarts
+     * - Somehow build this CTDB from storage bundles. Currently, custodial bundles
+     *   in storage after a restart will be ignored since there is no reference
+     *   in RAM. Upstream bplib 7.0.5 also currently does not support this.
+     *   For this possibly use BPLib_STOR_Destroy to write the CTDB to VFS such
+     *   that at least in planned shutdowns nothing is lost. */
 
     return BPLIB_SUCCESS;
 }
@@ -206,6 +233,8 @@ static void _delete_bundle(uint32_t bundle_id)
         goto close_file;
     }
 
+    // TODO decrease counters IFF the bundles fully lived
+
 close_file:
     vfs_close(fd);
 
@@ -232,11 +261,15 @@ close_file:
  * The /idx is assumed to be unique and storage will fail if a bundle with the
  * same is is already present in the index.
  *
+ * This function will increment the counters regarding storage space.
+ *
+ * @param inst bplib instance
  * @param bundle The bundle to store
+ *
  * @retval BPLIB_SUCCESS on success
  * @retval other on error
  */
-static BPLib_Status_t _bplib_stor_impl(BPLib_Bundle_t* bundle)
+static BPLib_Status_t _bplib_stor_impl(BPLib_Instance_t* inst, BPLib_Bundle_t* bundle)
 {
     int res;
     int res_idx;
@@ -288,7 +321,6 @@ static BPLib_Status_t _bplib_stor_impl(BPLib_Bundle_t* bundle)
 
     header.retransmit_timestamp = (int64_t)BPLib_TIME_GetMonotonicTime()
                                 + bundle->Meta.RetransmitTime;
-    header.retransmit_trigger = bundle->Meta.RetransmitTime;
 
     /* Write header specific to this storage implementation */
     written = vfs_write(fd, &header, sizeof(bundle_file_header_t));
@@ -342,6 +374,11 @@ end_storage:
         return BPLIB_OS_ERROR;
     }
 
+    /* The TotalBytes fields already includes the BPLib_BBlocks_t, don't count it twice */
+    inst->BundleStorage.BytesStorageInUse +=
+        BUNDLE_STORAGE_USAGE(bundle->Meta.TotalBytes - sizeof(BPLib_BBlocks_t));
+    inst->BundleStorage.BundleCountStored++;
+
     return BPLIB_SUCCESS;
 }
 
@@ -385,7 +422,7 @@ BPLib_Status_t BPLib_STOR_StoreBundle(BPLib_Instance_t* inst, BPLib_Bundle_t* bu
 
     // This should be on the else branch of the above already.
 
-    status = _bplib_stor_impl(bundle);
+    status = _bplib_stor_impl(inst, bundle);
     
     /* Free bundle since it is now persistent. Custodial bundles should not be
      * freed. This is copied from the bplib storage implementation. */
@@ -418,7 +455,7 @@ typedef struct {
     uint64_t node_val;
     uint64_t service_val;
     uint64_t expiry_val;
-    uint8_t index_val;
+    uint32_t id_val;
 } bundle_path_iterator_t;
 
 static bundle_path_iterator_t BUNDLE_PATH_ITER_INIT = {
@@ -633,8 +670,7 @@ static int _next_bundle_path(bundle_path_iterator_t* iterator,
         snprintf(iterator->path + acc_len,
             BPLIB_STOR_PATHLEN_DAT - acc_len,
             "/%s", entry.d_name);
-        int len = strlen(entry.d_name);
-        iterator->index_val = strtol(entry.d_name + len - 2, NULL, 16);
+        iterator->id_val = strtol(strchr(entry.d_name, '_') + 1, NULL, 16);
 
         return 0;
     }
@@ -656,7 +692,7 @@ static int _next_bundle_path(bundle_path_iterator_t* iterator,
 static int _should_bundle_be_loaded(bundle_path_iterator_t* iter, bool local_delivery)
 {
     int fd;
-    int res = 1;
+    int res = 0;
     bundle_file_header_t header;
     ssize_t bytes_read;
 
@@ -666,21 +702,30 @@ static int _should_bundle_be_loaded(bundle_path_iterator_t* iter, bool local_del
     }
 
     if (!local_delivery) {
-        /* The header is the first thing, so no seek is needed. Local delivery
-         * does not care about the retransmit intervals, just deliver it as fast
-         * as possible. */
+        /* The header is the first thing, so no seek is needed. */
         bytes_read = vfs_read(fd, &header, sizeof(bundle_file_header_t));
         if (bytes_read != sizeof(bundle_file_header_t)) {
             res = -EINVAL;
             goto close_file;
         }
 
-        if (!((header.flags & STORAGE_HEADER_FLAG_CUSTODIAL) &&
-            (header.retransmit_trigger != BPLIB_NO_RETRANSMIT_TRIGGER) &&
-            (header.retransmit_timestamp <= (uint64_t)BPLib_TIME_GetMonotonicTime())))
-        {
-            res = 0;
+        if (header.flags & STORAGE_HEADER_FLAG_CUSTODIAL) {
+            if (!(header.flags & STORAGE_HEADER_FLAG_RETRANS_OFF) &&
+                (header.retransmit_timestamp <= (uint64_t)BPLib_TIME_GetMonotonicTime()))
+            {
+                /* Load custodial bundles only if retransmissions are not turned off
+                 * and the time for a retransmission is reached */
+                res = 1;
+            }
         }
+        else {
+            /* Always load non-custodial bundles */
+            res = 1;
+        }
+    }
+    else {
+        /* Always load local delivery bundles*/
+        res = 1;
     }
     
 
@@ -719,11 +764,13 @@ static void _fill_bundle_cache(const BPLib_EID_Pattern_t* dest_eids,
         if (res == 0) {
             res = _should_bundle_be_loaded(&iterator, local_delivery);
             if (res <= 0) {
+                /* A custodial bundle should not yet be retransmitted. */
+                cache->all_bundles_queued = false;
                 continue;
             }
 
             res = bplib_cache_add(cache, iterator.node_val, iterator.service_val,
-                iterator.expiry_val, iterator.index_val);
+                iterator.expiry_val, iterator.id_val);
 
             if (res > 0) {
                 /* Some bundle is now not in cache anymore */
@@ -845,6 +892,57 @@ close_file:
     return ret;
 }
 
+/**
+ * @brief Update the retransmission timestamp of the custodial bundle at path 
+ *
+ * The next retransmission will happen NOT BEFORE the current time +
+ * retrans_interval [ms]. One exception to this is the case where retrans_interval
+ * == 0. Then retransmissions will be turned off, until this function is called
+ * again with non zero value.
+ *
+ * @param path Path of the bundle
+ * @param retrans_interval Time [ms] in which to do the next retransmission
+ *
+ * @return bool success of operation
+ */
+static bool _update_retransmission_time(const char* path, uint32_t retrans_interval)
+{
+    int fd;
+    ssize_t written;
+    uint64_t next_retransmission;
+    bool res = true;
+
+    fd = vfs_open(path, O_RDWR, 0777);
+    if (fd < 0) {
+        return false;
+    }
+
+    // TODO case retrans_interval == 0. Also unset flag in non zero case
+    if (retrans_interval != 0) {
+        written = vfs_lseek(fd, offsetof(bundle_file_structure_t, header.retransmit_timestamp),
+                            SEEK_SET);
+        if (written < 0) {
+            res = false;
+            goto close_file;
+        }                
+
+        next_retransmission = retrans_interval + BPLib_TIME_GetMonotonicTime();
+
+        written = vfs_write(fd, &next_retransmission, sizeof(uint64_t));
+        if (written < 0 || written != (ssize_t) sizeof(uint64_t)) {
+            res = false;
+            goto close_file;
+        }
+    }
+
+close_file:
+    if (vfs_close(fd) < 0) {
+        res = false;
+    }
+
+    return res;
+}
+
 BPLib_Status_t BPLib_STOR_EgressForID(BPLib_Instance_t* inst, uint32_t egress_id,
     bool local_delivery, size_t* num_egressed)
 {
@@ -922,6 +1020,13 @@ BPLib_Status_t BPLib_STOR_EgressForID(BPLib_Instance_t* inst, uint32_t egress_id
          * here directly and not mark it as deletable. */
         if (local_delivery || !curr_bundle->Meta.IsCustodial) {
             _delete_bundle(curr_bundle->blocks.PrimaryBlock.BundleId);
+        }
+
+        /* Update the retransmission timestamp. Local delivery custody bundles should
+         * be instantly delivered and dont have a timeout. */
+        if (curr_bundle->Meta.IsCustodial && !local_delivery) {
+            _update_retransmission_time(path,
+                BPLib_NC_ConfigPtrs.ContactsConfigPtr->ContactSet[egress_id].RetransmitTimeout);
         }
         egress_count++;
     }
@@ -1064,11 +1169,12 @@ static void _bplib_stor_update_custodial_unlocked(BPLib_Instance_t* inst,
 
     for (size_t i = 0; i < custody_batch->Size; i++) {
         if (custody_batch->Ops[i] == BPLIB_CT_START_RETRANSMIT) {
-            // TODO
+            // TODO Unset STORAGE_HEADER_FLAG_RETRANS_OFF
             puts("Start retransmit");
         }
         else if (custody_batch->Ops[i] == BPLIB_CT_STOP_RETRANSMIT) {
             puts("Stop retransmit");
+            // Set STORAGE_HEADER_FLAG_RETRANS_OFF
         }
     }
 
@@ -1141,6 +1247,7 @@ BPLib_Status_t BPLib_STOR_SetNewRetransmitTrigger(BPLib_Instance_t *inst,
     /* This function SHOULD update all of the bundles retransmit times and is
      * called when a CLA is setup. In practice this only decreases the time to
      * the next retransmission, so it is not super important for now. */
+    // TODO
     (void) inst;
     (void) contact_id;
     return BPLIB_SUCCESS;
