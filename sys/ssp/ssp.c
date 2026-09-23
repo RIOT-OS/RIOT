@@ -22,8 +22,10 @@
 
 #include "panic.h"
 
+__attribute__((used)) /* fixes linker errors when building with LTO */
 uintptr_t __stack_chk_guard = (uintptr_t) STACK_CHK_GUARD;
 
+__attribute__((used)) /* fixes linker errors when building with LTO */
 __attribute__((noreturn)) void __stack_chk_fail(void)
 {
     core_panic(PANIC_SSP, "ssp: stack smashing detected");
