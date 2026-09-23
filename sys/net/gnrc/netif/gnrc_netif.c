@@ -157,7 +157,7 @@ gnrc_netif_t *gnrc_netif_get_by_type(netdev_type_t type, uint8_t index)
     while ((netif = gnrc_netif_iter(netif))) {
 
         if (IS_USED(MODULE_NETDEV_REGISTER)) {
-            if ((netdev_get_type(netif->dev)) != (type && type != NETDEV_ANY)) {
+            if ((netdev_get_type(netif->dev) != type) && (type != NETDEV_ANY)) {
                 continue;
             }
 
