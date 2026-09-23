@@ -95,6 +95,14 @@
 
 #endif /* defined(ESP_WIFI_AP) || defined(DOXYGEN) */
 
+/**
+ * @brief   Maximum number of supported entries in a scan result of
+ *          an ATWINC15x0 transceiver
+ */
+#ifndef CONFIG_ESP_WIFI_SCAN_LIST_NUMOF
+#define CONFIG_ESP_WIFI_SCAN_LIST_NUMOF     (8)
+#endif
+
 /**@}*/
 
 #ifdef __cplusplus
