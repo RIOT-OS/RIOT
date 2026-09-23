@@ -21,7 +21,6 @@
 #include "thread.h"
 #include "fmt.h"
 #include "net/sock/udp.h"
-#include "shell.h"
 #include "net/ipv6/addr.h"
 
 #define MAIN_QUEUE_SIZE     (8)
@@ -114,9 +113,6 @@ int main(void)
     thread_create(server_thread_stack, sizeof(server_thread_stack),
                   THREAD_PRIORITY_MAIN - 1, 0,
                   server_thread, NULL, "UDP echo server");
-
-    char line_buf[SHELL_DEFAULT_BUFSIZE];
-    shell_run(NULL, line_buf, SHELL_DEFAULT_BUFSIZE);
 
     return 0;
 }

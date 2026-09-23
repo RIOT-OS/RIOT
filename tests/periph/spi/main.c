@@ -594,9 +594,5 @@ int main(void)
     /* reset local SPI configuration */
     spiconf.dev = SPI_UNDEF;
 
-    /* run the shell */
-    char line_buf[SHELL_DEFAULT_BUFSIZE];
-    shell_run(NULL, line_buf, SHELL_DEFAULT_BUFSIZE);
-
     return 0;
 }

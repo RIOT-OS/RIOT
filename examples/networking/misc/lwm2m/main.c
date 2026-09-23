@@ -22,7 +22,6 @@
 
 #include "board.h"
 #include "msg.h"
-#include "shell.h"
 
 #define SHELL_QUEUE_SIZE (8)
 static msg_t _shell_queue[SHELL_QUEUE_SIZE];
@@ -35,8 +34,6 @@ int main(void)
     lwm2m_cli_init();
 
     msg_init_queue(_shell_queue, SHELL_QUEUE_SIZE);
-    char line_buf[SHELL_DEFAULT_BUFSIZE];
-    shell_run(NULL, line_buf, SHELL_DEFAULT_BUFSIZE);
 
     return 0;
 }
