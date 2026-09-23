@@ -2470,11 +2470,8 @@ static inline void _netdev_event_rx_complete(gnrc_netif_t *netif)
 #if IS_USED(MODULE_NETDEV_NEW_API)
 static inline void _netif_schedule_confirm_send(gnrc_netif_t *netif)
 {
-    (void) netif;
-#if IS_USED(MODULE_NETDEV_NEW_API)
     event_post(&netif->evq[GNRC_NETIF_EVQ_INDEX_PRIO_LOW],
                &netif->event_tx_done);
-#endif
 }
 
 static void _event_cb(netdev_t *dev, netdev_event_t event)
@@ -2508,9 +2505,9 @@ static void _event_cb(netdev_t *dev, netdev_event_t event)
 static inline void _netstats_increment_tx_success(gnrc_netif_t *netif)
 {
     (void) netif;
-#if IS_USED(MODULE_NETSTATS_L2)
+#  if IS_USED(MODULE_NETSTATS_L2)
     netif->stats.tx_success++;
-#endif  /* IS_USED(MODULE_NETSTATS_L2) */
+#  endif  /* IS_USED(MODULE_NETSTATS_L2) */
 }
 
 static inline void _netstats_increment_tx_failed(gnrc_netif_t *netif)
@@ -2520,7 +2517,7 @@ static inline void _netstats_increment_tx_failed(gnrc_netif_t *netif)
     /* we are the only ones supposed to touch this variable,
      * so no acquire necessary */
     netif->stats.tx_failed++;
-#endif  /* IS_USED(MODULE_NETSTATS_L2) */
+#  endif  /* IS_USED(MODULE_NETSTATS_L2) */
 }
 
 static inline void _netdev_event_tx_successful(gnrc_netif_t *netif,
