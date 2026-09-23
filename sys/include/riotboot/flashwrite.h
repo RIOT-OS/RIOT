@@ -55,12 +55,14 @@
  * @}
  */
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+#include <stdalign.h>
 
 #include "riotboot/slot.h"
 #include "periph/flashpage.h"
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /**
  * @brief Enable/disable raw writes to flash
@@ -90,7 +92,7 @@ extern "C" {
  * @brief Extra attributes required for the firmware intermediate buffer
  */
 #define RIOTBOOT_FLASHPAGE_BUFFER_ATTRS \
-    __attribute__((aligned(FLASHPAGE_WRITE_BLOCK_ALIGNMENT)))
+    alignas(FLASHPAGE_WRITE_BLOCK_ALIGNMENT)
 
 /**
  * @brief   firmware update state structure
