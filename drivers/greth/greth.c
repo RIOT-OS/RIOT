@@ -42,15 +42,6 @@
 #define ENABLE_DEBUG    0
 #include "debug.h"
 
-/* GRLIB requirement: descriptor table base must be aligned to at least the
- * table byte size (128 descriptors × 8 bytes = 1024 bytes). */
-static alignas(1024) greth_desc_t _tx_desc[CONFIG_GRETH_TX_DESC_NUM];
-
-static alignas(1024) greth_desc_t _rx_desc[CONFIG_GRETH_RX_DESC_NUM];
-
-static uint8_t _tx_buf[GRETH_BUF_SIZE];
-static uint8_t _rx_buf[CONFIG_GRETH_RX_DESC_NUM][GRETH_BUF_SIZE];
-
 /*
  * D-cache coherency (Zicbom extension)
  *
@@ -64,6 +55,20 @@ static uint8_t _rx_buf[CONFIG_GRETH_RX_DESC_NUM][GRETH_BUF_SIZE];
  * cbo.inval — discard cached copy before CPU reads DMA-written data (RX path).
  */
 #define GRETH_CACHE_LINE_SIZE   32u
+
+static_assert((GRETH_BUF_SIZE % GRETH_CACHE_LINE_SIZE) == 0,
+              "GRETH_BUF_SIZE must be a multiple of the cache line size");
+
+/* GRLIB requirement: descriptor table base must be aligned to at least the
+ * table byte size (128 descriptors × 8 bytes = 1024 bytes). */
+static alignas(1024) greth_desc_t _tx_desc[CONFIG_GRETH_TX_DESC_NUM];
+
+static alignas(1024) greth_desc_t _rx_desc[CONFIG_GRETH_RX_DESC_NUM];
+
+/* Must be line aligned: cbo.inval discards whole lines, unaligned buffer
+ * would take the neighbor object in .bss down. */
+static alignas(GRETH_CACHE_LINE_SIZE) uint8_t _tx_buf[GRETH_BUF_SIZE];
+static alignas(GRETH_CACHE_LINE_SIZE) uint8_t _rx_buf[CONFIG_GRETH_RX_DESC_NUM][GRETH_BUF_SIZE];
 
 /**
  * @name    Busy-wait iteration bounds for hardware polling (not time-based)
