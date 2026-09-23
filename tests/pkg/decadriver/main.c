@@ -28,6 +28,7 @@
 #include "shell.h"
 
 #include "dw3000.h"
+#include "dw3000/dw3000_deca_regs.h"
 #include "deca_device_api.h"
 
 /* PAN ID/short address */
@@ -165,7 +166,7 @@ static int _dw_addr(int argc, char **argv)
 
     _self_address = scn_u32_hex(argv[1], 4);
     dwt_setaddress16(_self_address);
-    addr = dwt_read_reg(PANADR_ID) /* read back the address to see if it was actually set */
+    addr = dwt_read_reg(PANADR_ID); /* read back the address to see if it was actually set */
 
     if (_self_address != addr) {
         puts("Address change unsuccessful.");
