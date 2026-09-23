@@ -657,57 +657,18 @@ static int _send(netdev_t *netdev, const iolist_t *iolist)
     return (int)total;
 }
 
-static int _recv(netdev_t *netdev, void *buf, size_t len, void *info)
+/* Hand a descriptor back to the DMA and advance to the next one. */
+static void _rx_rearm(greth_t *dev, unsigned idx)
 {
-    (void)info;
-    greth_t *dev = (greth_t *)(void *)netdev;
-
-    unsigned idx = dev->rx_idx;
     greth_desc_t *desc = &dev->rx_desc[idx];
+    uint32_t new_ctrl = GRETH_BD_EN | GRETH_BD_IE;
 
-    /* Invalidate so we read the DMA's write (EN=0 + length), not stale EN=1. */
-    _cbo_inval((void *)desc);
-    uint32_t ctrl = _mmio_read(&desc->ctrl);
-
-    DEBUG("[greth] _recv: idx=%u ctrl=0x%08" PRIx32 "\n", idx, ctrl);
-
-    if (ctrl & GRETH_BD_EN) {
-        return 0;
+    if (idx == (CONFIG_GRETH_RX_DESC_NUM - 1)) {
+        new_ctrl |= GRETH_BD_WR;
     }
-
-    int frame_len = (int)(ctrl & GRETH_BD_LEN_MASK);
-
-    if (buf == NULL && len == 0) {
-        return frame_len;
-    }
-
-    if (ctrl & GRETH_RXBD_ERR_MASK) {
-        DEBUG("[greth] RX error ctrl=0x%08" PRIx32 "\n", ctrl);
-        frame_len = -EIO;
-        goto rearm;
-    }
-
-    if (buf == NULL || (size_t)frame_len > len) {
-        if (buf != NULL) {
-            frame_len = -ENOBUFS;
-        }
-        goto rearm;
-    }
-
-    /* Invalidate RX buffer so memcpy reads DMA-written DRAM, not stale cache. */
-    _dcache_inval_range(_rx_buf[idx], (size_t)frame_len);
-    memcpy(buf, _rx_buf[idx], (size_t)frame_len);
-
-rearm:
-    {
-        uint32_t new_ctrl = GRETH_BD_EN | GRETH_BD_IE;
-        if (idx == CONFIG_GRETH_RX_DESC_NUM - 1) {
-            new_ctrl |= GRETH_BD_WR;
-        }
-        desc->addr = (uint32_t)(uintptr_t)_rx_buf[idx];
-        desc->ctrl = new_ctrl;
-        _dcache_flush_range(desc, sizeof(*desc));
-    }
+    desc->addr = (uint32_t)(uintptr_t)_rx_buf[idx];
+    desc->ctrl = new_ctrl;
+    _dcache_flush_range(desc, sizeof(*desc));
 
     dev->rx_idx = (idx + 1) % CONFIG_GRETH_RX_DESC_NUM;
 
@@ -715,6 +676,58 @@ rearm:
     greth_regs_t *regs = GRETH_REGS(dev);
     uint32_t mac_ctrl = _mmio_read(&regs->ctrl);
     _mmio_write(&regs->ctrl, mac_ctrl | GRETH_CTRL_RXEN);
+}
+
+static int _recv(netdev_t *netdev, void *buf, size_t len, void *info)
+{
+    (void)info;
+    greth_t *dev = (greth_t *)(void *)netdev;
+
+    unsigned idx;
+    uint32_t ctrl;
+    int frame_len;
+
+    /* Skip and re-arm broken descriptor, they report len 0, the
+     * size probe (buf == NULL) would return 0 and them won't be re-armed. */
+    while (true) {
+        idx = dev->rx_idx;
+        greth_desc_t *desc = &dev->rx_desc[idx];
+
+        /* Invalidate so we read the DMA's write (EN=0 + length), not a stale
+         * EN=1 (EN set = descriptor still owned by the DMA, no frame yet). */
+        _cbo_inval((void *)desc);
+        ctrl = _mmio_read(&desc->ctrl);
+
+        DEBUG("[greth] _recv: idx=%u ctrl=0x%08" PRIx32 "\n", idx, ctrl);
+
+        if (ctrl & GRETH_BD_EN) {
+            return 0;
+        }
+
+        frame_len = (int)(ctrl & GRETH_BD_LEN_MASK);
+
+        if (!(ctrl & GRETH_RXBD_ERR_MASK) && (frame_len > 0)) {
+            break;
+        }
+
+        DEBUG("[greth] RX error ctrl=0x%08" PRIx32 "\n", ctrl);
+        _rx_rearm(dev, idx);
+    }
+
+    if ((buf == NULL) && (len == 0)) {
+        return frame_len;
+    }
+
+    if ((buf == NULL) || ((size_t)frame_len > len)) {
+        _rx_rearm(dev, idx);
+        return (buf == NULL) ? frame_len : -ENOBUFS;
+    }
+
+    /* Invalidate RX buffer so memcpy reads DMA-written DRAM, not stale cache. */
+    _dcache_inval_range(_rx_buf[idx], (size_t)frame_len);
+    memcpy(buf, _rx_buf[idx], (size_t)frame_len);
+
+    _rx_rearm(dev, idx);
 
     return frame_len;
 }
@@ -736,10 +749,20 @@ static void _isr(netdev_t *netdev)
 
     DEBUG("[greth] _isr: pending=0x%08" PRIx32 "\n", status);
 
-    if (status & GRETH_STATUS_RXIRQ) {
+    /* Drain by descriptor state, not RXIRQ one irq may cover several
+     * frames and the TX poll loop eats bit too. Bounded in case if
+     * callback never calls recv().*/
+    greth_t *dev = (greth_t *)(void *)netdev;
+    for (unsigned i = 0; i < CONFIG_GRETH_RX_DESC_NUM; i++) {
+        greth_desc_t *desc = &dev->rx_desc[dev->rx_idx];
+        _cbo_inval((void *)desc);
+        if (_mmio_read(&desc->ctrl) & GRETH_BD_EN) {
+            break;
+        }
         DEBUG("[greth] _isr: RX_COMPLETE!\n");
         netdev->event_callback(netdev, NETDEV_EVENT_RX_COMPLETE);
     }
+
     if (status & (GRETH_STATUS_RXERR | GRETH_STATUS_TXERR)) {
         DEBUG("[greth] error status: 0x%08" PRIx32 "\n", status);
     }
