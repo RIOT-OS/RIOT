@@ -2008,6 +2008,32 @@ static inline int coap_builder_add_payload_marker(coap_builder_t *state)
 }
 
 /**
+ * @brief   Insert a CoAP option into buffer
+ *
+ * This function writes a CoAP option with nr. @p onum to the buffer managed
+ * by @p state and also does proper delta-encoding based on the most recently
+ * added option as per @p state. Both the option header is added and the option
+ * data from @p odata is copied.
+ *
+ * @param[in,out]   state       the data structure used to handle the state
+ * @param[in]       onum        number of the option to add
+ * @param[in]       odata       ptr to raw option data (or NULL)
+ * @param[in]       olen        length of @p odata (if any)
+ *
+ * @retval          0           Success
+ * @retval          -EOVERFLOW  Not enough space in buffer
+ * @retval          <0          Other error
+ *
+ * @pre     @p onum is greater than or equal to the option number of the option
+ *          most recently put into @p state.
+ *
+ * @note   If at the end of the response handler @ref coap_builder_msg_size is
+ *         used, it is safe to ignore the return value: @p state is marked
+ *         as overflown by setting `state->size` to `0` on overflow.
+ */
+int coap_opt_put(coap_builder_t *state, uint16_t onum, const void *odata, size_t olen);
+
+/**
  * @brief   Insert block option into buffer
  *
  * @param[in,out]   state       the data structure used to handle the state
@@ -2164,6 +2190,27 @@ static inline int coap_opt_put_observe(coap_builder_t *state, uint32_t obs)
 }
 
 /**
+ * @brief   Insert an CoAP Size2 Option into the buffer
+ *
+ * @param[in,out]   state       the data structure used to handle the state
+ * @param[in]       size2       total size of the resource in bytes
+ *
+ * @retval          0           Success
+ * @retval          -EOVERFLOW  Not enough space in buffer
+ * @retval          <0          Other error
+ *
+ * @pre     The option most recently added to @p state must be smaller than 28.
+ *
+ * @note   If at the end of the response handler @ref coap_builder_msg_size is
+ *         used, it is safe to ignore the return value: @p state is marked
+ *         as overflown by setting `state->size` to `0` on overflow.
+ */
+static inline int coap_opt_put_size2(coap_builder_t *state, uint32_t size2)
+{
+    return coap_opt_put_uint(state, COAP_OPT_SIZE2, size2);
+}
+
+/**
  * @brief   Encode the given string as multi-part option into buffer
  *
  * @param[in,out]   state       the data structure used to handle the state
@@ -2255,6 +2302,29 @@ static inline int coap_opt_put_location_query(coap_builder_t *state,
 {
     return coap_opt_put_string(state, COAP_OPT_LOCATION_QUERY,
                                location, '&');
+}
+
+/**
+ * @brief   Convenience function to insert an ETAG option
+ *
+ * @param[in,out]   state       the data structure used to handle the state
+ * @param[in]       etag        the ETAG to add
+ * @param[in]       etag_len    length of @p etag in bytes
+ *
+ * @retval          0           Success
+ * @retval          -EOVERFLOW  Not enough space in buffer
+ * @retval          <0          Other error
+ *
+ * @pre     The option most recently added to @p state must be smaller than 4.
+ *
+ * @note   If at the end of the response handler @ref coap_builder_msg_size is
+ *         used, it is safe to ignore the return value: @p state is marked
+ *         as overflown by setting `state->size` to `0` on overflow.
+ */
+ACCESS(read_only, 2, 3)
+static inline int coap_opt_put_etag(coap_builder_t *state, const void *etag, size_t etag_len)
+{
+    return coap_opt_put(state, COAP_OPT_ETAG, etag, etag_len);
 }
 
 /**
@@ -2371,32 +2441,6 @@ static inline int coap_opt_put_proxy_uri(coap_builder_t *state, const char *uri)
  *         as overflown by setting `state->size` to `0` on overflow.
  */
 int coap_put_block1_ok(coap_builder_t *state, coap_block1_t *block1);
-
-/**
- * @brief   Insert a CoAP option into buffer
- *
- * This function writes a CoAP option with nr. @p onum to the buffer managed
- * by @p state and also does proper delta-encoding based on the most recently
- * added option as per @p state. Both the option header is added and the option
- * data from @p odata is copied.
- *
- * @param[in,out]   state       the data structure used to handle the state
- * @param[in]       onum        number of the option to add
- * @param[in]       odata       ptr to raw option data (or NULL)
- * @param[in]       olen        length of @p odata (if any)
- *
- * @retval          0           Success
- * @retval          -EOVERFLOW  Not enough space in buffer
- * @retval          <0          Other error
- *
- * @pre     @p onum is greater than or equal to the option number of the option
- *          most recently put into @p state.
- *
- * @note   If at the end of the response handler @ref coap_builder_msg_size is
- *         used, it is safe to ignore the return value: @p state is marked
- *         as overflown by setting `state->size` to `0` on overflow.
- */
-int coap_opt_put(coap_builder_t *state, uint16_t onum, const void *odata, size_t olen);
 
 /**
  * @brief   Insert block1 option into buffer
