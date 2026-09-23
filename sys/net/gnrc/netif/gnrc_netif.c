@@ -62,7 +62,7 @@ typedef struct {
 static inline void _netif_bus_init(gnrc_netif_t *netif)
 {
     (void) netif;
-#ifdef MODULE_GNRC_NETIF_BUS
+#if IS_USED(MODULE_GNRC_NETIF_BUS)
     for (int i = 0; i < GNRC_NETIF_BUS_NUMOF; ++i) {
         msg_bus_init(&netif->bus[i]);
     }
@@ -71,10 +71,7 @@ static inline void _netif_bus_init(gnrc_netif_t *netif)
 
 static inline void _nb_init(gnrc_netif_t *netif)
 {
-    (void) netif;
-#ifdef MODULE_NETSTATS_NEIGHBOR
     netstats_nb_init(&netif->netif);
-#endif
 }
 
 int gnrc_netif_create(gnrc_netif_t *netif, char *stack, int stacksize,
