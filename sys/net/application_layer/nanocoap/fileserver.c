@@ -217,18 +217,18 @@ static ssize_t _get_file(coap_pkt_t *pdu, uint8_t *buf, size_t len,
         return _error_handler(pdu, buf, len, fd);
     }
 
-    coap_builder_t resp;
-    err = coap_builder_init_reply(&resp, buf, len, pdu, COAP_CODE_CONTENT);
-    if (err) {
-        vfs_close(fd);
-        return err;
-    }
-
     coap_block_slicer_t slicer;
     err = coap_block2_init(pdu, &slicer);
     if (err) {
         return err;
         goto late_err;
+    }
+
+   coap_builder_t resp;
+    err = coap_builder_init_reply(&resp, buf, len, pdu, COAP_CODE_CONTENT);
+    if (err) {
+        vfs_close(fd);
+        return err;
     }
 
     coap_opt_put_etag(&resp, &etag, sizeof(etag));
@@ -473,7 +473,7 @@ static ssize_t _get_directory(coap_pkt_t *pdu, uint8_t *buf, size_t len,
     coap_block_slicer_t slicer;
     coap_block1_t block2 = { .szx = CONFIG_NANOCOAP_BLOCK_SIZE_MAX };
     if (request->options.exists.block2 && !coap_get_block2(pdu, &block2)) {
-        return _error_handler(pdu, buf, len, COAP_OPT_FINISH_NONE);
+        return _error_handler(pdu, buf, len, COAP_CODE_BAD_OPTION);
     }
     if ((err = vfs_opendir(&dir, request->namebuf)) < 0) {
         return _error_handler(pdu, buf, len, err);
@@ -483,6 +483,10 @@ static ssize_t _get_directory(coap_pkt_t *pdu, uint8_t *buf, size_t len,
     }
     DEBUG("nanocoap_fileserver: Serving directory listing\n");
 
+    err = coap_block2_init(pdu, &slicer);
+    if (err) {
+        return _error_handler(pdu, buf, len, err);
+    }
     coap_builder_t resp;
     err = coap_builder_init_reply(&resp, buf, len, pdu, COAP_CODE_CONTENT);
     if (err) {
@@ -490,10 +494,6 @@ static ssize_t _get_directory(coap_pkt_t *pdu, uint8_t *buf, size_t len,
         return err;
     }
     coap_opt_put_ct(&resp, COAP_FORMAT_LINK);
-    err = coap_block2_init(pdu, &slicer);
-    if (err) {
-        return _error_handler(pdu, buf, len, err);
-    }
     coap_opt_put_block2(&resp, &slicer);
 
     size_t root_len = root ? strlen(root) : 0;
@@ -588,7 +588,7 @@ static ssize_t _delete_directory(coap_pkt_t *pdu, uint8_t *buf, size_t len,
     }
 
     coap_builder_t resp;
-    err = coap_builder_init_reply(&resp, buf, len, pdu COAP_CODE_DELETED);
+    err = coap_builder_init_reply(&resp, buf, len, pdu, COAP_CODE_DELETED);
     if (err) {
         return err;
     }

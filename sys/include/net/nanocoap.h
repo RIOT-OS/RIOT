@@ -2190,7 +2190,7 @@ static inline int coap_opt_put_observe(coap_builder_t *state, uint32_t obs)
 }
 
 /**
- * @brief   Insert an CoAP Size2 Option into the buffer
+ * @brief   Insert a CoAP Size2 Option into the buffer
  *
  * @param[in,out]   state       the data structure used to handle the state
  * @param[in]       size2       total size of the resource in bytes
