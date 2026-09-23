@@ -152,7 +152,9 @@ static int _dw_send(int argc, char **argv)
 
 static int _dw_addr(int argc, char **argv)
 {
-    printf("[deca] Current address: '%"PRIx16"'\n", _self_address);
+    uint16_t addr;
+    dwt_getaddress16(&addr);
+    printf("[deca] Current address: '%"PRIx16"'\n", addr);
     if (argc < 2) {
         puts("Usage: dw_addr <addr (hex without 0x)>");
         return 0;
@@ -164,6 +166,14 @@ static int _dw_addr(int argc, char **argv)
 
     _self_address = scn_u32_hex(argv[1], 4);
     dwt_setaddress16(_self_address);
+    dwt_getaddress16(&addr); /* read back the address to see if it was actually set */
+
+    if (_self_address != addr) {
+        puts("Address change unsuccessful.");
+        return 0;
+    }
+
+    printf("[deca] New address: '%"PRIx16"'\n", addr);
 
     return 0;
 }
