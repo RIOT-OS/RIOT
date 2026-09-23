@@ -11,5 +11,5 @@ USEMODULE += nrf24l01p_ng_diagnostics
 USEMODULE += netstats_l2
 USEMODULE += gnrc_txtsnd
 
-CFLAGS += -DDEBUG_ASSERT_VERBOSE=1
+CFLAGS += -DCONFIG_ASSERT_VERBOSE=1
 include $(RIOTBASE)/Makefile.include
