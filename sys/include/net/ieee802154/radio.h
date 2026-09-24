@@ -587,6 +587,38 @@ struct ieee802154_radio_ops {
      * @retval -ENOBUFS if the frame doesn't fit in @p buf
      */
     int (*read)(ieee802154_dev_t *dev, void *buf, size_t size, ieee802154_rx_info_t *info);
+
+    /**
+     * @brief Peek a part of a received frame from the internal framebuffer
+     *
+     * This function copies @p size bytes of the received PSDU frame, starting
+     * at @p offset, into @p buf **without consuming the frame** (see @ref
+     * ieee802154_radio_ops::read): the received frame remains in the
+     * framebuffer until the reception is closed. Unlike @ref
+     * ieee802154_radio_ops::read, this function MUST NOT release any kind
+     * of framebuffer protection and MUST NOT change the state of the radio.
+     *
+     * This function MAY be NULL if the radio doesn't provide random access
+     * to the received frame.
+     *
+     * @pre the device is on
+     * @pre a reception is pending and the radio was set to IDLE beforehand
+     *      (see @ref ieee802154_radio_ops::read).
+     * @pre @p offset + @p size doesn't exceed the length of the received
+     *      frame.
+     *
+     * @param[in] dev IEEE802.15.4 device descriptor
+     * @param[out] buf buffer to write the peeked bytes into.
+     * @param[in] offset offset of the first byte to peek, relative to the
+     *                  start of the PSDU frame.
+     * @param[in] size number of bytes to peek
+     *
+     * @retval number of bytes written in @p buf
+     * @retval -EINVAL if @p offset + @p size exceeds the length of the
+     *         received frame
+     */
+    int (*peek)(ieee802154_dev_t *dev, void *buf, size_t offset, size_t size);
+
     /**
      * @brief Turn off the device
      *
@@ -851,6 +883,20 @@ static inline bool ieee802154_radio_has_capability(ieee802154_dev_t *dev, uint32
 }
 
 /**
+ * @brief Check if the device implements the peek function
+ *
+ * Internally this function reads @ref ieee802154_radio_ops::peek and
+ * checks whether it's not NULL.
+ *
+ * @retval true if the device supports @ref ieee802154_radio_ops::peek
+ * @retval false if it doesn't
+ */
+static inline bool ieee802154_radio_has_peek(ieee802154_dev_t *dev)
+{
+    return dev->driver->peek != NULL;
+}
+
+/**
  * @brief Shortcut to @ref ieee802154_radio_ops::write
  *
  * @param[in] dev IEEE802.15.4 device descriptor
@@ -947,6 +993,26 @@ static inline int ieee802154_radio_read(ieee802154_dev_t *dev,
                                                  ieee802154_rx_info_t *info)
 {
     return dev->driver->read(dev, buf, size, info);
+}
+
+/**
+ * @brief Shortcut to @ref ieee802154_radio_ops::peek
+ *
+ * @pre this function MUST be called before @ref ieee802154_radio_read, since
+ *      the frame is consumed by the latter.
+ *
+ * @param[in] dev IEEE802.15.4 device descriptor
+ * @param[out] buf buffer to write the peeked bytes into.
+ * @param[in] offset offset of the first byte to peek, relative to the
+ *                   start of the PSDU frame.
+ * @param[in] size number of bytes to peek
+ *
+ * @return result of @ref ieee802154_radio_ops::peek
+ */
+static inline int ieee802154_radio_peek(ieee802154_dev_t *dev,
+                                        void *buf, size_t offset, size_t size)
+{
+    return dev->driver->peek(dev, buf, offset, size);
 }
 
 /**
