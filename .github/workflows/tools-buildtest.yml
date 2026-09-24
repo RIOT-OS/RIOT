@@ -64,4 +64,5 @@ jobs:
     - name: tools-build succeeded
       uses: re-actors/alls-green@release/v1
       with:
+        allowed-skips: tools-build
         jobs: ${{ toJSON(needs) }}
