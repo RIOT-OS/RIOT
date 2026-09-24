@@ -543,11 +543,11 @@ int32_t adc_sample(adc_t line, adc_res_t res)
 int adc_dma_setup(adc_t line, dma_cb_t cb, void *arg, adc_res_t res)
 {
     uint8_t dmac_id;
-#ifdef ADC1_DMAC_ID_RESRDY
+#  ifdef ADC1_DMAC_ID_RESRDY
     dmac_id = (_dev(line) == ADC1) ? ADC1_DMAC_ID_RESRDY : ADC0_DMAC_ID_RESRDY;
-#else
+#  else
     dmac_id = ADC_DMAC_ID_RESRDY;
-#endif
+#  endif
     if (tx_dma[line] != UINT8_MAX) {
         return -EEXIST;
     }
@@ -584,11 +584,11 @@ int adc_dma_start(adc_t line, uint16_t *dst[], size_t dst_size, unsigned dst_num
                 DMA_INCR_DEST, DMA_BLOCKACT_BOTH);
 
     /* Enable FREERUN */
-#ifdef ADC_CTRLB_FREERUN
+#  ifdef ADC_CTRLB_FREERUN
     dev->CTRLB.reg |= ADC_CTRLB_FREERUN;
-#else
+#  else
     dev->CTRLA.reg |= ADC_CTRLA_FREERUN;
-#endif
+#  endif
     _wait_syncbusy(dev);
 
     if (dst_numof > 1) {
@@ -616,11 +616,11 @@ int adc_dma_stop(adc_t line)
     dma_disable_loop(tx_dma[line]);
 
     Adc *dev = _dev(line);
-#ifdef ADC_CTRLB_FREERUN
+#  ifdef ADC_CTRLB_FREERUN
     dev->CTRLB.reg &= ~ADC_CTRLB_FREERUN;
-#else
+#  else
     dev->CTRLA.reg &= ~ADC_CTRLA_FREERUN;
-#endif
+#  endif
     _wait_syncbusy(dev);
 
     return 0;
