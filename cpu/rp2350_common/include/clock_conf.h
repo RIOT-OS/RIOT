@@ -61,7 +61,7 @@
 #define PLL_PWR_POSTDIVPD_BITS 0x00000008u
 /** Enable bit for the peripheral clock control register */
 #define CLK_PERI_CTRL_ENABLE_BIT (1u << 11u)
-/** Default CPU frequency in Hz, set to 125 MHz as per hardware manual */
+/** Default CPU frequency in Hz, set to 150 MHz as per hardware manual */
 #define CPUFREQ 125000000u
 /** Maximum crystal frequency */
 #define CLOCK_XOSC_MAX MHZ(15u)
@@ -91,6 +91,17 @@
 /** Selected field value for the system clock control register
  * to select the peripheral clock */
 #define CLK_SYS_SELECTED_PERI_FIELD_VALUE 2u
+/** SRC field value of the reference clock control register that selects the
+ * crystal oscillator */
+#define CLK_REF_CTRL_SRC_XOSC_VALUE 2u
+/** Selected field value of the reference clock, one decoded bit per source
+ * just like CLK_SYS_SELECTED */
+#define CLK_REF_SELECTED_XOSC_FIELD_VALUE (1u << CLK_REF_CTRL_SRC_XOSC_VALUE)
+/** LSB of the integer divider in the reference clock divider register */
+#define CLK_REF_DIV_INT_LSB 16u
+/** Integer divider for the reference clock, the tick generators expect an
+ * undivided crystal */
+#define CLK_REF_DIV_INT_VALUE 1u
 /** RIOT core clock frequency defined as the CPU frequency */
 #define CLOCK_CORECLOCK MHZ(12u)
 
