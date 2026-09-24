@@ -2594,6 +2594,7 @@ static void _event_cb(netdev_t *dev, netdev_event_t event)
             /* update neighbor statistics */
             _netdev_event_tx_failure(netif, dev,
                                      event == NETDEV_EVENT_TX_NOACK);
+            break;
         default:
             DEBUG("gnrc_netif: warning: unhandled event %u.\n", event);
         }
