@@ -38,10 +38,10 @@ extern "C" {
 #endif
 
 /**
- * @brief Driver type to match with EUI-48 provider
+ * @brief Interface type to match with EUI-48 provider
  */
 #ifndef EUI48_PROVIDER_TYPE
-#define EUI48_PROVIDER_TYPE   NETDEV_ANY
+#define EUI48_PROVIDER_TYPE   NETIF_ANY
 #endif
 
 /**
@@ -49,7 +49,7 @@ extern "C" {
  *        be assigned the EUI-48
  */
 #ifndef EUI48_PROVIDER_INDEX
-#define EUI48_PROVIDER_INDEX  NETDEV_INDEX_ANY
+#define EUI48_PROVIDER_INDEX  NETIF_INDEX_ANY
 #endif
 
 /**

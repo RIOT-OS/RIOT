@@ -39,10 +39,10 @@ extern "C" {
 #endif
 
 /**
- * @brief Driver type to match with EUI-64 provider
+ * @brief Interface type to match with EUI-64 provider
  */
 #ifndef EUI64_PROVIDER_TYPE
-#define EUI64_PROVIDER_TYPE   NETDEV_ANY
+#define EUI64_PROVIDER_TYPE   NETIF_ANY
 #endif
 
 /**
@@ -50,7 +50,7 @@ extern "C" {
  *        be assigned the EUI-64
  */
 #ifndef EUI64_PROVIDER_INDEX
-#define EUI64_PROVIDER_INDEX  NETDEV_INDEX_ANY
+#define EUI64_PROVIDER_INDEX  NETIF_INDEX_ANY
 #endif
 
 /**

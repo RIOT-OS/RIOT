@@ -47,12 +47,12 @@
  * #define EUI64_PROVIDER_PARAMS {              \
  *              .provider = _board_get_eui,     \
  *              .arg      = BOARD_ADDR_SUBGHZ,  \
- *              .type     = NETDEV_AT86RF215,   \
+ *              .type     = NETIF_AT86RF215,    \
  *              .index    = 0,   },             \
  *                               {              \
  *              .provider = _board_get_eui,     \
  *              .arg      = BOARD_ADDR_24GHZ,   \
- *              .type     = NETDEV_AT86RF215,   \
+ *              .type     = NETIF_AT86RF215,    \
  *              .index    = 1,   }
  * ```
  *
