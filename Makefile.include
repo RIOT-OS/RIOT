@@ -523,9 +523,7 @@ RIOT_VERSION ?= $(RIOT_VERSION_GIT)
 RIOT_EXTRAVERSION ?= 0
 
 # Generate machine readable RIOT VERSION macro
-RIOT_VERSION_CODE ?= $(shell echo $(RIOT_VERSION) | \
-                      sed -E 's/([0-9]+)\.([0-9]+)\.?([0-9]+)?.*/RIOT_VERSION_NUM\\\(\1,\2,0\3,$(RIOT_EXTRAVERSION)\\\)/' | \
-                      grep RIOT_VERSION_NUM || echo "$(RIOT_VERSION_DUMMY_CODE)")
+RIOT_VERSION_CODE ?= $(or $(call format_macro,RIOT_VERSION_NUM,$(call version_tuple,$(RIOT_VERSION)),$(RIOT_EXTRAVERSION)),$(RIOT_VERSION_DUMMY_CODE))
 
 # Set module by prepending APPLICATION name with 'application_'.
 # It prevents conflict with application and modules with the same name.
