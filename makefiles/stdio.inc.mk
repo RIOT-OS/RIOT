@@ -5,6 +5,7 @@ STDIO_MODULES = \
   stdio_cdc_acm \
   stdio_ethos \
   stdio_fb \
+  stdio_mgba \
   stdio_native \
   stdio_nimble \
   stdio_null \
