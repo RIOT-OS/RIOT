@@ -114,28 +114,28 @@ export BASE_BRANCH="${CI_BASE_BRANCH}"
 
 should_run always ./dist/tools/whitespacecheck/check.sh "${BASE_BRANCH}"
 # licenses runs twice with different DIFFFILTER, needs explicit check
-if should_run all_c_files; then
+if should_run any_c_files; then
     DIFFFILTER="MR" ERROR_EXIT_CODE=0 run ./dist/tools/licenses/check.sh
     DIFFFILTER="AC" run ./dist/tools/licenses/check.sh
 fi
 should_run features ./dist/tools/ci/check_features_existing_inc_mk_is_up_to_date.sh
 should_run doccheck ./dist/tools/doccheck/check.sh
-should_run all_c_headers ./dist/tools/externc/check.sh
-should_run all_c_files ./dist/tools/vera++/check.sh
-should_run all_c_sources ./dist/tools/coccinelle/check.sh
-should_run all_python_files ./dist/tools/flake8/check.sh
-should_run all_c_headers ./dist/tools/headerguards/check.sh
+should_run any_c_headers ./dist/tools/externc/check.sh
+should_run any_c_files ./dist/tools/vera++/check.sh
+should_run any_c_sources ./dist/tools/coccinelle/check.sh
+should_run any_python_files ./dist/tools/flake8/check.sh
+should_run any_c_headers ./dist/tools/headerguards/check.sh
 should_run always ./dist/tools/buildsystem_sanity_check/check.sh
-should_run all_build_files ./dist/tools/feature_resolution/check.sh
-should_run all_build_files ./dist/tools/boards_supported/check.sh
+should_run any_build_files ./dist/tools/feature_resolution/check.sh
+should_run any_build_files ./dist/tools/boards_supported/check.sh
 should_run board_doc ./dist/tools/board_doc_check/check.sh
 should_run codespell ./dist/tools/codespell/check.sh
-should_run all_rust_files ./dist/tools/cargo-checks/check.sh
-should_run all_example_files ./dist/tools/examples_check/check_has_readme.sh
-should_run all_example_files ./dist/tools/examples_check/check_in_readme.sh
+should_run any_rust_files ./dist/tools/cargo-checks/check.sh
+should_run any_example_files ./dist/tools/examples_check/check_has_readme.sh
+should_run any_example_files ./dist/tools/examples_check/check_in_readme.sh
 should_run code_in_guides ./dist/tools/code_in_guides_check/check_for_code.sh
 # uncrustify args depend on the environment, needs explicit check
-if should_run all_c_files; then
+if should_run any_c_files; then
     if [ -z "${GITHUB_RUN_ID}" ]; then
         run ./dist/tools/uncrustify/uncrustify.sh --check
     else
@@ -144,7 +144,7 @@ if should_run all_c_files; then
 fi
 # clang-format is only advisory for now: remove the ERROR_EXIT_CODE (and add
 # clang-format to DEPS above) once all CI workers ship clang-format >= 17
-ERROR_EXIT_CODE=0 should_run all_c_sources ./dist/tools/clang_format/check.sh
-ERROR_EXIT_CODE=0 should_run all_shell_files ./dist/tools/shellcheck/check.sh
+ERROR_EXIT_CODE=0 should_run any_c_sources ./dist/tools/clang_format/check.sh
+ERROR_EXIT_CODE=0 should_run any_shell_files ./dist/tools/shellcheck/check.sh
 
 exit "$RESULT"
