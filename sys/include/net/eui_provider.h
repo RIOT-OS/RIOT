@@ -74,10 +74,10 @@
  * Recommendations
  * ===============
  *
- * Do not use `NETDEV_ANY` as EUI device type. Otherwise if you have two
+ * Do not use `NETIF_ANY` as EUI interface type. Otherwise if you have two
  * interfaces both will match the same EUI.
  *
- * It is however possible to use `NETDEV_INDEX_ANY` if you have multiple
+ * It is however possible to use `NETIF_INDEX_ANY` if you have multiple
  * interfaces of the same type and your EUI provider function takes the index
  * into account (or returns error if the index is out of bounds with the
  * available ids).
@@ -97,6 +97,7 @@
 
 #include "net/eui48.h"
 #include "net/eui64.h"
+#include "net/netif.h"
 #include "net/netdev.h"
 
 #ifdef __cplusplus
@@ -104,49 +105,102 @@ extern "C" {
 #endif
 
 /**
- * @brief   Function for providing a EUI-48 to a device
+ * @brief   Function for providing a EUI-48 to an interface
  *
- * @param[in]   index   index of the netdev
+ * @param[in]   index   index of the interface
  * @param[out]  addr    Destination pointer for the EUI-48 address
  *
  * @return      0 on success, next provider in eui48_conf_t will be
  *              used otherwise.
  *              Will fall back to @see luid_get_eui48 eventually.
  */
-typedef int (*netdev_get_eui48_cb_t)(uint8_t index, eui48_t *addr);
+typedef int (*netif_get_eui48_cb_t)(uint8_t index, eui48_t *addr);
 
 /**
- * @brief   Function for providing a EUI-64 to a device
+ * @brief   Function for providing a EUI-64 to an interface
  *
- * @param[in]   index   index of the netdev
+ * @param[in]   index   index of the interface
  * @param[out]  addr    Destination pointer for the EUI-64 address
  *
  * @return      0 on success, next provider in eui64_conf_t will be
  *              used otherwise.
  *              Will fall back to @see luid_get_eui64 eventually.
  */
-typedef int (*netdev_get_eui64_cb_t)(uint8_t index, eui64_t *addr);
+typedef int (*netif_get_eui64_cb_t)(uint8_t index, eui64_t *addr);
+
+/**
+ * @brief   Function for providing a EUI-48 to an interface
+ *
+ * @deprecated  Use @ref netif_get_eui48_cb_t instead. Will be removed
+ *              after the 2027.04 release.
+ */
+typedef netif_get_eui48_cb_t netdev_get_eui48_cb_t;
+
+/**
+ * @brief   Function for providing a EUI-64 to an interface
+ *
+ * @deprecated  Use @ref netif_get_eui64_cb_t instead. Will be removed
+ *              after the 2027.04 release.
+ */
+typedef netif_get_eui64_cb_t netdev_get_eui64_cb_t;
 
 /**
  * @brief Structure to hold providers for EUI-48 addresses
  */
 typedef struct {
-    netdev_get_eui48_cb_t provider; /**< function to provide an EUI-48                  */
-    netdev_type_t type;             /**< device type to match                           */
-    uint8_t index;                  /**< device index to match or `NETDEV_INDEX_ANY`    */
+    netif_get_eui48_cb_t provider;  /**< function to provide an EUI-48                  */
+    netif_type_t type;              /**< interface type to match                        */
+    uint8_t index;                  /**< interface index to match or `NETIF_INDEX_ANY`  */
 } eui48_conf_t;
 
 /**
  * @brief Structure to hold providers for EUI-64 addresses
  */
 typedef struct {
-    netdev_get_eui64_cb_t provider; /**< function to provide an EUI-64                  */
-    netdev_type_t type;             /**< device type to match                           */
-    uint8_t index;                  /**< device index to match or `NETDEV_INDEX_ANY`    */
+    netif_get_eui64_cb_t provider;  /**< function to provide an EUI-64                  */
+    netif_type_t type;              /**< interface type to match                        */
+    uint8_t index;                  /**< interface index to match or `NETIF_INDEX_ANY`  */
 } eui64_conf_t;
 
 /**
+ * @brief Generates an EUI-48 address for the netif.
+ *
+ * @note It is possible to supply a board-specific, constant address
+ *       by implementing a EUI-48 provider function.
+ *       If no such function is available, this will fall back to
+ *       @ref luid_get_eui48.
+ *
+ * @pre The interface registered itself with @ref netif_register
+ *
+ * @param[in] netif     The network interface for which the address is
+ *                      generated.
+ * @param[out] addr     The generated EUI-48 address
+ *
+ */
+void netif_eui48_get(netif_t *netif, eui48_t *addr);
+
+/**
+ * @brief Generates an EUI-64 address for the netif.
+ *
+ * @note It is possible to supply a board-specific, constant address
+ *       by implementing a EUI-64 provider function.
+ *       If no such function is available, this will fall back to
+ *       @ref luid_get_eui64.
+ *
+ * @pre The interface registered itself with @ref netif_register
+ *
+ * @param[in] netif     The network interface for which the address is
+ *                      generated.
+ * @param[out] addr     The generated EUI-64 address
+ *
+ */
+void netif_eui64_get(netif_t *netif, eui64_t *addr);
+
+/**
  * @brief Generates an EUI-48 address for the netdev interface.
+ *
+ * @deprecated  Use @ref netif_eui48_get instead. Will be removed after
+ *              the 2027.04 release.
  *
  * @note It is possible to supply a board-specific, constant address
  *       by implementing a EUI-48 provider function.
@@ -162,6 +216,9 @@ void netdev_eui48_get(netdev_t *netdev, eui48_t *addr);
 
 /**
  * @brief Generates an EUI-64 address for the netdev interface.
+ *
+ * @deprecated  Use @ref netif_eui64_get instead. Will be removed after
+ *              the 2027.04 release.
  *
  * @note It is possible to supply a board-specific, constant address
  *       by implementing a EUI-64 provider function.

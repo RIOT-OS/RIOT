@@ -25,7 +25,7 @@ extern "C" {
 #endif
 
 /**
- * @brief A `netdev_get_eui64_cb_t` function
+ * @brief A `netif_get_eui64_cb_t` function
  */
 #ifndef EUI64_PROVIDER_FUNC
 #define EUI64_PROVIDER_FUNC   NULL
