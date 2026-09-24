@@ -29,9 +29,6 @@ bplib_init:
 bplib_stor_vfs_ordered:
 	+"$(MAKE)" -C $(RIOTPKG)/bplib/storage/vfs/ordered
 
-bplib_stor_vfs_unordered:
-	+"$(MAKE)" -C $(RIOTPKG)/bplib/storage/vfs/unordered
-
 bplib_stor_void:
 	+"$(MAKE)" -C $(RIOTPKG)/bplib/storage/mem/void
 

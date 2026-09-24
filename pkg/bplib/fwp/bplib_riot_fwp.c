@@ -24,7 +24,7 @@
 #include "bplib.h"
 
 /* Signal the vfs based storage when a contact / channel terminates to flush the caches */
-#if defined(MODULE_BPLIB_STOR_VFS_ORDERED) || defined(MODULE_BPLIB_STOR_VFS_UNORDERED)
+#if defined(MODULE_BPLIB_STOR_VFS_ORDERED)
 #  include "bplib_stor_vfs.h"
 #endif
 
@@ -172,7 +172,7 @@ static BPLib_Status_t BPA_ADUP_AddApplication(uint32_t ChanId)
 
 static BPLib_Status_t BPA_ADUP_StartApplication(uint32_t ChanId)
 {
-#if defined(MODULE_BPLIB_STOR_VFS_ORDERED) || defined(MODULE_BPLIB_STOR_VFS_UNORDERED)
+#if defined(MODULE_BPLIB_STOR_VFS_ORDERED)
         bplib_stor_vfs_channel_changed(ChanId);
 #endif
     (void) ChanId;
@@ -199,7 +199,7 @@ static BPLib_Status_t BPA_CLAP_ContactSetup(uint32_t ContactId)
 
 static BPLib_Status_t BPA_CLAP_ContactStart(uint32_t ContactId)
 {
-#if defined(MODULE_BPLIB_STOR_VFS_ORDERED) || defined(MODULE_BPLIB_STOR_VFS_UNORDERED)
+#if defined(MODULE_BPLIB_STOR_VFS_ORDERED)
         bplib_stor_vfs_contact_changed(ContactId);
 #endif
     (void) ContactId;
