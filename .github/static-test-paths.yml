@@ -1,0 +1,99 @@
+# Maps each static test to the files it watches. Consumed by the `changes`
+# job in .github/workflows/static-test.yml via dorny/paths-filter. The filter
+# names must match the names understood by dist/tools/ci/static_tests.sh.
+
+# Shared path groups, reused through YAML anchors.
+_all: &all
+  - '**'
+
+_sources: &sources
+  - '**/*.c'
+  - '**/*.h'
+  - '**/*.s'
+  - '**/*.S'
+  - '**/*.cpp'
+
+_headers: &headers
+  - '**/*.h'
+
+whitespacecheck: *all
+
+licenses: *sources
+
+features:
+  - 'features.yaml'
+  - 'makefiles/features_existing.inc.mk'
+
+doccheck:
+  - 'doc/**'
+  - '**/*.c'
+  - '**/*.h'
+  - '**/*.hpp'
+  - '**/*.md'
+  - '**/*.mdx'
+  - '**/*.txt'
+  - 'makefiles/pseudomodules.inc.mk'
+
+externc: *headers
+
+vera:
+  - '**/*.[cChH]'
+  - '**/*.cpp'
+  - '**/*.hpp'
+
+coccinelle:
+  - '**/*.c'
+
+flake8:
+  - '**/*.py'
+  - '**/pyterm'
+
+headerguards: *headers
+
+buildsystem: *all
+
+feature_resolution:
+  - 'features.yaml'
+  - 'Makefile*'
+  - 'makefiles/**'
+  - 'boards/**'
+  - 'cpu/**'
+
+boards_supported:
+  - 'Makefile*'
+  - 'makefiles/**'
+  - 'boards/**'
+  - 'cpu/**'
+
+board_doc:
+  - 'boards/**'
+
+codespell:
+  - '**/*.[cChH]'
+  - '**/*.cpp'
+  - '**/*.hpp'
+  - '**/*.sh'
+  - '**/*.py'
+  - '**/*.md'
+  - '**/*.txt'
+
+cargo:
+  - '**/Cargo.toml'
+  - '**/*.rs'
+
+examples_readme:
+  - 'examples/**'
+
+examples_in_readme:
+  - 'examples/**'
+
+code_in_guides:
+  - 'doc/guides/**'
+  - 'examples/**'
+
+uncrustify:
+  - '**/*.c'
+  - '**/*.h'
+
+shellcheck:
+  - '**/*.sh'

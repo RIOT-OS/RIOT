@@ -91,6 +91,10 @@ function run {
     fi
 }
 
+function should_run {
+    [ -z "${STATIC_TESTS}" ] || printf '%s\n' "${STATIC_TESTS}" | tr ' ' '\n' | grep -qx "$1"
+}
+
 RESULT=0
 
 if [ -n "${CI_BASE_COMMIT}" ]; then
@@ -108,36 +112,40 @@ fi
 
 export BASE_BRANCH="${CI_BASE_BRANCH}"
 
-run ./dist/tools/whitespacecheck/check.sh "${BASE_BRANCH}"
-DIFFFILTER="MR" ERROR_EXIT_CODE=0 run ./dist/tools/licenses/check.sh
-DIFFFILTER="AC" run ./dist/tools/licenses/check.sh
-run ./dist/tools/ci/check_features_existing_inc_mk_is_up_to_date.sh
-run ./dist/tools/doccheck/check.sh
-run ./dist/tools/externc/check.sh
+should_run whitespacecheck && run ./dist/tools/whitespacecheck/check.sh "${BASE_BRANCH}"
+if should_run licenses; then
+    DIFFFILTER="MR" ERROR_EXIT_CODE=0 run ./dist/tools/licenses/check.sh
+    DIFFFILTER="AC" run ./dist/tools/licenses/check.sh
+fi
+should_run features && run ./dist/tools/ci/check_features_existing_inc_mk_is_up_to_date.sh
+should_run doccheck && run ./dist/tools/doccheck/check.sh
+should_run externc && run ./dist/tools/externc/check.sh
 # broken configuration produces many false positives
 # TODO: fix config and re-enable
 # run ./dist/tools/cppcheck/check.sh
-run ./dist/tools/vera++/check.sh
-run ./dist/tools/coccinelle/check.sh
-run ./dist/tools/flake8/check.sh
-run ./dist/tools/headerguards/check.sh
-run ./dist/tools/buildsystem_sanity_check/check.sh
-run ./dist/tools/feature_resolution/check.sh
-run ./dist/tools/boards_supported/check.sh
-run ./dist/tools/board_doc_check/check.sh
-run ./dist/tools/codespell/check.sh
-run ./dist/tools/cargo-checks/check.sh
-run ./dist/tools/examples_check/check_has_readme.sh
-run ./dist/tools/examples_check/check_in_readme.sh
-run ./dist/tools/code_in_guides_check/check_for_code.sh
-if [ -z "${GITHUB_RUN_ID}" ]; then
-    run ./dist/tools/uncrustify/uncrustify.sh --check
-else
-    run ./dist/tools/uncrustify/uncrustify.sh
+should_run vera && run ./dist/tools/vera++/check.sh
+should_run coccinelle && run ./dist/tools/coccinelle/check.sh
+should_run flake8 && run ./dist/tools/flake8/check.sh
+should_run headerguards && run ./dist/tools/headerguards/check.sh
+should_run buildsystem && run ./dist/tools/buildsystem_sanity_check/check.sh
+should_run feature_resolution && run ./dist/tools/feature_resolution/check.sh
+should_run boards_supported && run ./dist/tools/boards_supported/check.sh
+should_run board_doc && run ./dist/tools/board_doc_check/check.sh
+should_run codespell && run ./dist/tools/codespell/check.sh
+should_run cargo && run ./dist/tools/cargo-checks/check.sh
+should_run examples_readme && run ./dist/tools/examples_check/check_has_readme.sh
+should_run examples_in_readme && run ./dist/tools/examples_check/check_in_readme.sh
+should_run code_in_guides && run ./dist/tools/code_in_guides_check/check_for_code.sh
+if should_run uncrustify; then
+    if [ -z "${GITHUB_RUN_ID}" ]; then
+        run ./dist/tools/uncrustify/uncrustify.sh --check
+    else
+        run ./dist/tools/uncrustify/uncrustify.sh
+    fi
 fi
 # clang-format is only advisory for now: remove the ERROR_EXIT_CODE (and add
 # clang-format to DEPS above) once all CI workers ship clang-format >= 17
 ERROR_EXIT_CODE=0 run ./dist/tools/clang_format/check.sh
-ERROR_EXIT_CODE=0 run ./dist/tools/shellcheck/check.sh
+should_run shellcheck && ERROR_EXIT_CODE=0 run ./dist/tools/shellcheck/check.sh
 
 exit "$RESULT"

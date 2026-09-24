@@ -16,7 +16,22 @@ on:
   merge_group:
 
 jobs:
+  changes:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: read
+    outputs:
+      tests: ${{ steps.filter.outputs.changes }}
+    steps:
+    - uses: actions/checkout@main
+    - name: Detect changed files
+      uses: dorny/paths-filter@v4
+      id: filter
+      with:
+        filters: .github/static-test-paths.yml
   static-tests:
+    needs: changes
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@main
@@ -52,14 +67,103 @@ jobs:
         git config apply.whitespace nowarn
     - name: Fetch riot/static-test-tools Docker image
       run: docker pull riot/static-test-tools:latest
-    - name: Run static-tests on `riot/static-test-tools`
-      run: |
-        # Start docker container and run tests...
-
-        # Note: ${CI_BASE_BRANCH} is empty when not in a PR
-        docker run --rm                             \
-          -e CI_BASE_BRANCH                         \
-          -e GITHUB_RUN_ID=${GITHUB_RUN_ID}         \
-          -v $(pwd):/data/riotbuild                 \
-          riot/static-test-tools:latest             \
-          make static-test
+    - name: whitespacecheck
+      if: github.event_name == 'push' || contains(fromJSON(needs.changes.outputs.tests), 'whitespacecheck')
+      uses: ./.github/actions/static-test
+      with:
+        tests: whitespacecheck
+    - name: licenses
+      if: github.event_name == 'push' || contains(fromJSON(needs.changes.outputs.tests), 'licenses')
+      uses: ./.github/actions/static-test
+      with:
+        tests: licenses
+    - name: features
+      if: github.event_name == 'push' || contains(fromJSON(needs.changes.outputs.tests), 'features')
+      uses: ./.github/actions/static-test
+      with:
+        tests: features
+    - name: doccheck
+      if: github.event_name == 'push' || contains(fromJSON(needs.changes.outputs.tests), 'doccheck')
+      uses: ./.github/actions/static-test
+      with:
+        tests: doccheck
+    - name: externc
+      if: github.event_name == 'push' || contains(fromJSON(needs.changes.outputs.tests), 'externc')
+      uses: ./.github/actions/static-test
+      with:
+        tests: externc
+    - name: vera
+      if: github.event_name == 'push' || contains(fromJSON(needs.changes.outputs.tests), 'vera')
+      uses: ./.github/actions/static-test
+      with:
+        tests: vera
+    - name: coccinelle
+      if: github.event_name == 'push' || contains(fromJSON(needs.changes.outputs.tests), 'coccinelle')
+      uses: ./.github/actions/static-test
+      with:
+        tests: coccinelle
+    - name: flake8
+      if: github.event_name == 'push' || contains(fromJSON(needs.changes.outputs.tests), 'flake8')
+      uses: ./.github/actions/static-test
+      with:
+        tests: flake8
+    - name: headerguards
+      if: github.event_name == 'push' || contains(fromJSON(needs.changes.outputs.tests), 'headerguards')
+      uses: ./.github/actions/static-test
+      with:
+        tests: headerguards
+    - name: buildsystem
+      if: github.event_name == 'push' || contains(fromJSON(needs.changes.outputs.tests), 'buildsystem')
+      uses: ./.github/actions/static-test
+      with:
+        tests: buildsystem
+    - name: feature_resolution
+      if: github.event_name == 'push' || contains(fromJSON(needs.changes.outputs.tests), 'feature_resolution')
+      uses: ./.github/actions/static-test
+      with:
+        tests: feature_resolution
+    - name: boards_supported
+      if: github.event_name == 'push' || contains(fromJSON(needs.changes.outputs.tests), 'boards_supported')
+      uses: ./.github/actions/static-test
+      with:
+        tests: boards_supported
+    - name: board_doc
+      if: github.event_name == 'push' || contains(fromJSON(needs.changes.outputs.tests), 'board_doc')
+      uses: ./.github/actions/static-test
+      with:
+        tests: board_doc
+    - name: codespell
+      if: github.event_name == 'push' || contains(fromJSON(needs.changes.outputs.tests), 'codespell')
+      uses: ./.github/actions/static-test
+      with:
+        tests: codespell
+    - name: cargo
+      if: github.event_name == 'push' || contains(fromJSON(needs.changes.outputs.tests), 'cargo')
+      uses: ./.github/actions/static-test
+      with:
+        tests: cargo
+    - name: examples_readme
+      if: github.event_name == 'push' || contains(fromJSON(needs.changes.outputs.tests), 'examples_readme')
+      uses: ./.github/actions/static-test
+      with:
+        tests: examples_readme
+    - name: examples_in_readme
+      if: github.event_name == 'push' || contains(fromJSON(needs.changes.outputs.tests), 'examples_in_readme')
+      uses: ./.github/actions/static-test
+      with:
+        tests: examples_in_readme
+    - name: code_in_guides
+      if: github.event_name == 'push' || contains(fromJSON(needs.changes.outputs.tests), 'code_in_guides')
+      uses: ./.github/actions/static-test
+      with:
+        tests: code_in_guides
+    - name: uncrustify
+      if: github.event_name == 'push' || contains(fromJSON(needs.changes.outputs.tests), 'uncrustify')
+      uses: ./.github/actions/static-test
+      with:
+        tests: uncrustify
+    - name: shellcheck
+      if: github.event_name == 'push' || contains(fromJSON(needs.changes.outputs.tests), 'shellcheck')
+      uses: ./.github/actions/static-test
+      with:
+        tests: shellcheck

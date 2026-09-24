@@ -1,0 +1,23 @@
+name: Run static test
+description: Run a subset of the RIOT static tests in the CI container
+
+inputs:
+  tests:
+    description: Space separated list of static test names to run
+    required: true
+
+runs:
+  using: composite
+  steps:
+  - name: static test
+    shell: bash
+    env:
+      STATIC_TESTS: ${{ inputs.tests }}
+    run: |
+      docker run --rm \
+        -e CI_BASE_BRANCH \
+        -e STATIC_TESTS \
+        -e GITHUB_RUN_ID=${{ github.run_id }} \
+        -v "$(pwd)":/data/riotbuild \
+        riot/static-test-tools:latest \
+        ./dist/tools/ci/static_tests.sh
