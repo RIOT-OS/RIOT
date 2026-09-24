@@ -142,9 +142,7 @@ if should_run any_c_files; then
         run ./dist/tools/uncrustify/uncrustify.sh
     fi
 fi
-# clang-format is only advisory for now: remove the ERROR_EXIT_CODE (and add
-# clang-format to DEPS above) once all CI workers ship clang-format >= 17
-ERROR_EXIT_CODE=0 should_run any_c_sources ./dist/tools/clang_format/check.sh
+ERROR_EXIT_CODE=0 should_run any_c_files ./dist/tools/clang_format/check.sh
 ERROR_EXIT_CODE=0 should_run any_shell_files ./dist/tools/shellcheck/check.sh
 
 exit "$RESULT"
