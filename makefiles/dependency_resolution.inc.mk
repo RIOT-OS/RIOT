@@ -2,6 +2,18 @@
 # until no new modules, pkgs, or features are pull in order to catch all
 # transient dependencies
 
+# Print error messages when these false friends have been set instead of
+# `EXTERNAL_MODULE_DIRS`.
+ifneq (,$(EXTERNAL_MODULES_DIRS))
+  $(error You hava set 'EXTERNAL_MODULES_DIRS', did you mean 'EXTERNAL_MODULE_DIRS'?)
+endif
+ifneq (,$(EXTERNAL_MODULES_DIR))
+  $(error You hava set 'EXTERNAL_MODULES_DIR', did you mean 'EXTERNAL_MODULE_DIRS'?)
+endif
+ifneq (,$(EXTERNAL_MODULE_DIR))
+  $(error You have set 'EXTERNAL_MODULE_DIR', did you mean 'EXTERNAL_MODULE_DIRS'?)
+endif
+
 # Locate used modules in $(EXTERNAL_MODULE_DIRS).
 EXTERNAL_MODULE_PATHS := $(sort $(foreach dir,$(EXTERNAL_MODULE_DIRS),\
   $(foreach mod,$(USEMODULE),$(dir $(wildcard $(dir)/$(mod)/Makefile)))))
