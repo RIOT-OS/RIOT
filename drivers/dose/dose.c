@@ -447,14 +447,30 @@ static int _recv(netdev_t *dev, void *buf, size_t len, void *info)
     return res;
 }
 
+static uint8_t _load_state(const dose_t *ctx)
+{
+    unsigned irq_state = irq_disable();
+    uint8_t state = ctx->state;
+
+    irq_restore(irq_state);
+    return state;
+}
+
 static uint8_t wait_for_state(dose_t *ctx, uint8_t state)
 {
+    uint8_t cur;
+
     do {
         /* This mutex is unlocked by the state machine
          * after every state transition */
         mutex_lock(&ctx->state_mtx);
-    } while (state != DOSE_STATE_ANY && ctx->state != state);
-    return ctx->state;
+        unsigned irq_state = irq_disable();
+
+        cur = ctx->state;
+        irq_restore(irq_state);
+    } while (state != DOSE_STATE_ANY && cur != state);
+
+    return cur;
 }
 
 static int send_octet(dose_t *ctx, uint8_t c)
@@ -541,13 +557,16 @@ static int _send(netdev_t *dev, const iolist_t *iolist)
     size_t pktlen;
     uint16_t crc;
 
+    /* One snapshot. The UART ISR stores ctx->state from state(). */
+    uint8_t state = _load_state(ctx);
+
     /* discard data when interface is in SLEEP mode */
-    if (ctx->state == DOSE_STATE_SLEEP) {
+    if (state == DOSE_STATE_SLEEP) {
         return -ENETDOWN;
     }
 
     /* sending data wakes the interface from STANDBY */
-    if (ctx->state == DOSE_STATE_STANDBY) {
+    if (state == DOSE_STATE_STANDBY) {
         _poweron(ctx);
     }
 
@@ -652,11 +671,20 @@ static int _get(netdev_t *dev, netopt_t opt, void *value, size_t max_len)
 
 static void _poweron(dose_t *ctx)
 {
+    unsigned irq_state = irq_disable();
+    uint8_t state = ctx->state;
+
     /* interface is already powered on - do nothing */
-    if (ctx->state != DOSE_STATE_STANDBY &&
-        ctx->state != DOSE_STATE_SLEEP) {
+    if (state != DOSE_STATE_STANDBY &&
+        state != DOSE_STATE_SLEEP) {
+        irq_restore(irq_state);
         return;
     }
+
+    /* Publish IDLE before the RX callback is armed. A byte handled
+     * after uart_poweron() would otherwise be overwritten here. */
+    ctx->state = DOSE_STATE_IDLE;
+    irq_restore(irq_state);
 
     if (gpio_is_valid(ctx->standby_pin)) {
         gpio_clear(ctx->standby_pin);
@@ -664,20 +692,20 @@ static void _poweron(dose_t *ctx)
 
     uart_poweron(ctx->uart);
     _enable_sense(ctx);
-
-    ctx->state = DOSE_STATE_IDLE;
 }
 
 static void _poweroff(dose_t *ctx, dose_state_t sleep_state)
 {
+    uint8_t state = _load_state(ctx);
+
     /* interface is already powered off - do nothing */
-    if (ctx->state == DOSE_STATE_STANDBY ||
-        ctx->state == DOSE_STATE_SLEEP) {
+    if (state == DOSE_STATE_STANDBY ||
+        state == DOSE_STATE_SLEEP) {
         return;
     }
 
     /* allow powering off without a state transition */
-    if (ctx->state != DOSE_STATE_IDLE) {
+    if (state != DOSE_STATE_IDLE) {
         wait_for_state(ctx, DOSE_STATE_IDLE);
     }
 
