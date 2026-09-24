@@ -20,6 +20,8 @@ COMPILE_TESTS += test-chars_from
 COMPILE_TESTS += test-chars_upto
 COMPILE_TESTS += test-ensure_value test-ensure_value-negative
 COMPILE_TESTS += test-exported-variables
+COMPILE_TESTS += test-format_macro
+COMPILE_TESTS += test-is_number
 COMPILE_TESTS += test-lowercase
 COMPILE_TESTS += test-max_number
 COMPILE_TESTS += test-memoized-variables
@@ -28,6 +30,7 @@ COMPILE_TESTS += test-uppercase
 COMPILE_TESTS += test-uppercase_and_underscore
 COMPILE_TESTS += test-version_is_greater
 COMPILE_TESTS += test-version_is_greater_or_equal
+COMPILE_TESTS += test-version_tuple
 
 # Tests will be run both in the host machine and in `docker`
 all: build-system-utils-tests
@@ -75,3 +78,12 @@ test-version_is_greater_or_equal:
 
 test-max_number:
 	$(Q)$(call command_should_succeed,"$(MAKE)" -C $(MAKEFILES_UTILS) -f test-strings.mk test-max_number)
+
+test-is_number:
+	$(Q)$(call command_should_succeed,"$(MAKE)" -C $(MAKEFILES_UTILS) -f test-strings.mk test-is_number)
+
+test-version_tuple:
+	$(Q)$(call command_should_succeed,"$(MAKE)" -C $(MAKEFILES_UTILS) -f test-strings.mk test-version_tuple)
+
+test-format_macro:
+	$(Q)$(call command_should_succeed,"$(MAKE)" -C $(MAKEFILES_UTILS) -f test-strings.mk test-format_macro)
