@@ -21,6 +21,29 @@ DEPS["./dist/tools/codespell/check.sh"]="codespell"
 DEPS["./dist/tools/uncrustify/uncrustify.sh"]="uncrustify"
 DEPS["./dist/tools/shellcheck/shellcheck.sh"]="shellcheck"
 
+declare -A TEST_PATHS
+
+TEST_PATHS[whitespacecheck]=""
+TEST_PATHS[licenses]="*.c *.h *.s *.S *.cpp"
+TEST_PATHS[features]="features.yaml makefiles/features_existing.inc.mk"
+TEST_PATHS[doccheck]="doc/* *.c *.h *.hpp *.md *.mdx *.txt makefiles/pseudomodules.inc.mk"
+TEST_PATHS[externc]="*.h"
+TEST_PATHS[vera]="*.c *.h *.C *.H *.cpp *.hpp"
+TEST_PATHS[coccinelle]="*.c"
+TEST_PATHS[flake8]="*.py *pyterm"
+TEST_PATHS[headerguards]="*.h"
+TEST_PATHS[buildsystem]=""
+TEST_PATHS[feature_resolution]="features.yaml *Makefile* makefiles/* boards/* cpu/*"
+TEST_PATHS[boards_supported]="*Makefile* makefiles/* boards/* cpu/*"
+TEST_PATHS[board_doc]="boards/*"
+TEST_PATHS[codespell]="*.c *.h *.C *.H *.cpp *.hpp *.sh *.py *.md *.txt"
+TEST_PATHS[cargo]="*Cargo.toml *.rs"
+TEST_PATHS[examples_readme]="examples/*"
+TEST_PATHS[examples_in_readme]="examples/*"
+TEST_PATHS[code_in_guides]="doc/guides/* examples/*"
+TEST_PATHS[uncrustify]="*.c *.h"
+TEST_PATHS[shellcheck]="*.sh"
+
 if ! command -v git &>/dev/null; then
     echo -n "Required command 'git' for all static tests not found in PATH "
     print_warning
@@ -91,8 +114,29 @@ function run {
     fi
 }
 
+function is_path_changed {
+    local base
+
+    [ -z "${BASE_BRANCH}" ] && return 0
+
+    base=$(git merge-base "${BASE_BRANCH}" HEAD 2>/dev/null) || return 0
+    [ -n "${base}" ] || return 0
+
+    [ -n "$(git diff --name-only "${base}" -- "$@")" ]
+}
+
 function should_run {
-    [ -z "${STATIC_TESTS}" ] || printf '%s\n' "${STATIC_TESTS}" | tr ' ' '\n' | grep -qx "$1"
+    local name="$1"
+    local -a paths
+
+    if [ -n "${STATIC_TESTS}" ]; then
+        [ "${STATIC_TESTS}" = "all" ] && return 0
+        printf '%s\n' "${STATIC_TESTS}" | tr ' ' '\n' | grep -qx "${name}"
+        return
+    fi
+
+    read -ra paths <<< "${TEST_PATHS[${name}]}"
+    is_path_changed "${paths[@]}"
 }
 
 RESULT=0
