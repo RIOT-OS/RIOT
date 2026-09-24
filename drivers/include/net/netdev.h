@@ -198,7 +198,7 @@ extern "C" {
 #include "kernel_defines.h"
 #include "net/netif.h"
 
-#ifdef MODULE_L2FILTER
+#if IS_USED(MODULE_L2FILTER)
 #include "net/l2filter.h"
 #endif
 
@@ -370,13 +370,13 @@ struct netdev {
     const struct netdev_driver *driver;             /**< ptr to that driver's interface. */
     netdev_event_cb_t event_callback;               /**< callback for device events */
     void *context;                                  /**< ptr to network stack context */
-#ifdef MODULE_NETDEV_LAYER
+#if IS_USED(MODULE_NETDEV_LAYER)
     netdev_t *lower;                                /**< ptr to the lower netdev layer */
 #endif
-#ifdef MODULE_L2FILTER
+#if IS_USED(MODULE_L2FILTER)
     l2filter_t filter[CONFIG_L2FILTER_LISTSIZE];   /**< link layer address filters */
 #endif
-#ifdef MODULE_NETIF_REGISTER
+#if IS_USED(MODULE_NETIF_REGISTER)
     netdev_type_t type;                     /**< driver type used for netdev */
     uint8_t index;                          /**< instance number of the device */
 #endif
@@ -407,7 +407,7 @@ void netdev_register_signal(struct netdev *dev, netdev_type_t type, uint8_t inde
  */
 static inline void netdev_register(struct netdev *dev, netdev_type_t type, uint8_t index)
 {
-#ifdef MODULE_NETIF_REGISTER
+#if IS_USED(MODULE_NETIF_REGISTER)
     dev->type = type;
     dev->index = index;
 #else
