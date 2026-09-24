@@ -170,6 +170,17 @@ typedef enum {
      * @brief the devices records timestamps on received frames
      */
     IEEE802154_CAP_RX_TIMESTAMP         = BIT20,
+    /**
+     * @brief the received frame remains valid until the reception is closed
+     *
+     * A device that declares this capability keeps the received frame in
+     * the framebuffer while a reception is pending (see @ref
+     * ieee802154_radio_ops::read), regardless of any other operation
+     * performed in between (e.g. a transmission). This is required to
+     * transmit a frame before reading the received one, which is needed
+     * e.g. for software handling of the ACK reply.
+     */
+    IEEE802154_CAP_FRAME_RETENTION      = BIT21,
 } ieee802154_rf_caps_t;
 
 /**
@@ -581,7 +592,10 @@ struct ieee802154_radio_ops {
      *   provide non-destructive access to the received frame.
      * - the received frame remains valid until the reception is closed,
      *   unless another operation overwrites the framebuffer (e.g. a
-     *   transmission).
+     *   transmission). Radios that declare @ref
+     *   IEEE802154_CAP_FRAME_RETENTION keep the received frame valid
+     *   regardless of interleaved operations between reception and calling
+     *   this function.
      * - new frame receptions might be blocked (framebuffer protection).
      *
      * If @p buf is not NULL, the received PSDU frame is copied into @p buf
