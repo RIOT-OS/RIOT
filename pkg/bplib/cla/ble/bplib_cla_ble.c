@@ -91,10 +91,10 @@ static void _change_bplib_contact_state(int state)
     if (_manage_contact_state) {
         switch (state) {
         case CONTACT_STATE_START:
-            BPLib_CLA_ContactStart(_contact_id);
+            bplib_contact_set_state(_contact_id, BPLIB_CLA_STARTED);
             break;
         case CONTACT_STATE_STOP:
-            BPLib_CLA_ContactStop(_contact_id);
+            bplib_contact_set_state(_contact_id, BPLIB_CLA_STOPPED);
             break;
         default:
             break;
