@@ -87,6 +87,14 @@ static void _config_nc(void)
     bplib_channel_set_block_num(0, BPLIB_PREVIOUS_NODE_BLOCK, 4);
     bplib_channel_set_block_crc_type(0, BPLIB_PREVIOUS_NODE_BLOCK, BPLib_CRC_Type_None);
 
+    bplib_channel_set_block_include(0, BPLIB_CUSTODY_TRANSFER_BLOCK, true);
+    bplib_channel_set_block_num(0, BPLIB_CUSTODY_TRANSFER_BLOCK, 5);
+    bplib_channel_set_block_crc_type(0, BPLIB_CUSTODY_TRANSFER_BLOCK, BPLib_CRC_Type_CRC16);
+    bplib_contact_set_cs_retransmit_time(0, 30000);
+    bplib_contact_set_cs_time_trigger(0, 10000);
+
+    /* Note: If you use custody transfer, be sure to include a route to the 0 service
+     * number. This is where the ACKs are sent */
     BPLib_EID_Pattern_t reachable_eids = {
         .Scheme       = BPLIB_EID_SCHEME_IPN,
         .IpnSspFormat = BPLIB_EID_IPN_SSP_FORMAT_TWO_DIGIT,
@@ -95,7 +103,7 @@ static void _config_nc(void)
         .MaxNode      = 10000,
         .MinNode      = 1,
         .MaxService   = 10000,
-        .MinService   = 1
+        .MinService   = 0
     };
     bplib_contact_set_destinations(0, 0, reachable_eids);
     bplib_contact_set_out_addr(0, BPLIB_EXAMPLE_IP_REMOTE, BPLIB_EXAMPLE_PORT);
@@ -119,12 +127,10 @@ int main(void)
     }
 
     /* Add and start the application level I/O */
-    BPLib_PI_AddApplication(0);
-    BPLib_PI_StartApplication(0);
+    bplib_channel_set_state(0, BPLIB_NC_APP_STATE_STARTED);
 
     /* Let bplib know the contact started */
-    BPLib_CLA_ContactSetup(0);
-    BPLib_CLA_ContactStart(0);
+    bplib_contact_set_state(0, BPLIB_CLA_STARTED);
 
     /* Consume the incoming bundles */
     thread_create(stack_egress, sizeof(stack_egress),
@@ -137,12 +143,10 @@ int main(void)
     /* Note: Make sure to call BPLib_CLA_ContactTeardown and BPLib_PI_RemoveApplication
      * in production, since this includes some measures to push bundles not yet sent, but queued,
      * back into storage. This is not reachable here due to the shell. */
-    BPLib_CLA_ContactStop(0);
-    BPLib_CLA_ContactTeardown(&bplib_instance_data.BPLibInst, 0);
+    bplib_contact_set_state(0, BPLIB_CLA_TORNDOWN);
     bplib_cla_udp_stop(&cla_udp1);
 
-    BPLib_PI_StopApplication(0);
-    BPLib_PI_RemoveApplication(&bplib_instance_data.BPLibInst, 0);
+    bplib_channel_set_state(0, BPLIB_NC_APP_STATE_REMOVED);
 
     bplib_terminate();
 }
