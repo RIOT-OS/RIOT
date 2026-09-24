@@ -287,6 +287,9 @@ static inline size_t _get_ipv6_group(gnrc_netif_t *netif, gnrc_netapi_opt_t *opt
 
 static inline size_t _get_ipv6_iid(gnrc_netif_t *netif, gnrc_netapi_opt_t *opt)
 {
+    /* gnrc_netif_ipv6_get_iid falls back to a macro. Therefore casting to
+     * void is needed here to avoid a warning */
+    (void) netif;
     assert(opt->data_len >= sizeof(eui64_t));
     return gnrc_netif_ipv6_get_iid(netif, opt->data);
 }
