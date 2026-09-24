@@ -265,9 +265,6 @@ typedef enum {
      * passes the address matching filter (this includes ACK and Beacon frames).
      * The latter only applies if the radio is not in promiscuous mode.
      *
-     * The transceiver or driver MUST handle the ACK reply if the Ack Request
-     * bit is set in the received frame and promiscuous mode is disabled.
-     *
      * The transceiver might be in a "FB Lock" state where no more frames are
      * received. This is done in order to avoid overwriting the Frame Buffer
      * with new frame arrivals.  In order to leave this state, the upper layer
