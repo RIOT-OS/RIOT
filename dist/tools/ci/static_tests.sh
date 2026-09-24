@@ -112,7 +112,7 @@ fi
 
 export BASE_BRANCH="${CI_BASE_BRANCH}"
 
-should_run whitespacecheck ./dist/tools/whitespacecheck/check.sh "${BASE_BRANCH}"
+should_run always ./dist/tools/whitespacecheck/check.sh "${BASE_BRANCH}"
 # licenses runs twice with different DIFFFILTER, needs explicit check
 if should_run licenses; then
     DIFFFILTER="MR" ERROR_EXIT_CODE=0 run ./dist/tools/licenses/check.sh
@@ -147,7 +147,7 @@ if should_run uncrustify; then
 fi
 # clang-format is only advisory for now: remove the ERROR_EXIT_CODE (and add
 # clang-format to DEPS above) once all CI workers ship clang-format >= 17
-ERROR_EXIT_CODE=0 should_run true ./dist/tools/clang_format/check.sh
+ERROR_EXIT_CODE=0 should_run always ./dist/tools/clang_format/check.sh
 ERROR_EXIT_CODE=0 should_run shellcheck ./dist/tools/shellcheck/check.sh
 
 exit "$RESULT"

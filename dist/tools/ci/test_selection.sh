@@ -6,7 +6,6 @@
 # path patterns that trigger each test
 declare -A TEST_PATHS
 
-TEST_PATHS[whitespacecheck]=""
 TEST_PATHS[licenses]="*.c *.h *.s *.S *.cpp"
 TEST_PATHS[features]="features.yaml makefiles/features_existing.inc.mk"
 TEST_PATHS[doccheck]="doc/* *.c *.h *.hpp *.md *.mdx *.txt makefiles/pseudomodules.inc.mk"
@@ -26,6 +25,8 @@ TEST_PATHS[examples_in_readme]="examples/*"
 TEST_PATHS[code_in_guides]="doc/guides/* examples/*"
 TEST_PATHS[uncrustify]="*.c *.h"
 TEST_PATHS[shellcheck]="*.sh"
+# special value: runs unconditionally
+TEST_PATHS[always]=""
 
 # true if any given path changed vs BASE_BRANCH; true if base unknown
 function is_path_changed {
@@ -40,20 +41,23 @@ function is_path_changed {
 }
 
 # without command: true if the test should run.
-# with command: run() it if so; name "true" runs unconditionally.
+# with command: run() it if so; name "always" runs unconditionally.
+# parameters:
+#   $1: name of the test (key in TEST_PATHS)
+#   $@: command to run if the test should run
 function should_run {
     local name="$1"
     local skip=1
     shift
 
-    if [ "${name}" = "true" ]; then
-        skip=0
-    elif [ -n "${STATIC_TESTS}" ]; then
+    if [ -n "${STATIC_TESTS}" ]; then
         # explicit selection: STATIC_TESTS is "all" or space-separated names
         if [ "${STATIC_TESTS}" = "all" ] || \
            printf '%s\n' "${STATIC_TESTS}" | tr ' ' '\n' | grep -qx "${name}"; then
             skip=0
         fi
+    elif [ "${TEST_PATHS[${name}]}" = "always" ]; then
+        skip=0
     else
         local -a paths
         read -ra paths <<< "${TEST_PATHS[${name}]}"
