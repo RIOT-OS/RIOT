@@ -150,10 +150,13 @@ of many hours of work.
 
 To avoid having to set up a separate development repository, you can temporarily
 specify a local folder using the `PKG_SOURCE_LOCAL` variable in your package's
-`Makefile` or by setting `PKG_SOURCE_LOCAL_<pkgname>` in your environment.
+`Makefile` or by setting `PKG_SOURCE_LOCAL_<PKG_NAME>` in your environment.
+The package name has to be specified in capital letters and hypens have to be
+replaced with underscores. For the `awesome-package` package, you will have to
+use `PKG_SOURCE_LOCAL_AWESOME_PACKAGE`.
 
 ```shell
-PKG_SOURCE_LOCAL_<pkgname>=~/customized_package_folder make -C tests/pkg/<pkgname>
+PKG_SOURCE_LOCAL_<PKG_NAME>=~/customized_package_folder make -C tests/pkg/<pkgname>
 ```
 
 It is recommended to specify an absolute path to avoid path confusion, depending
