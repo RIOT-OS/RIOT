@@ -2,6 +2,18 @@
 RIOTBOARD ?= $(or $(RIOTBASE),$(CURDIR))/boards
 BOARDSDIRS ?= $(EXTERNAL_BOARD_DIRS) $(RIOTBOARD)
 
+# Print error messages when these false friends have been set instead of
+# `EXTERNAL_BOARD_DIRS`.
+ifneq (,$(EXTERNAL_BOARDS_DIRS))
+  $(error You hava set 'EXTERNAL_BOARDS_DIRS', did you mean 'EXTERNAL_BOARD_DIRS'?)
+endif
+ifneq (,$(EXTERNAL_BOARDS_DIR))
+  $(error You have set 'EXTERNAL_BOARD_DIR', did you mean 'EXTERNAL_BOARD_DIRS'?)
+endif
+ifneq (,$(EXTERNAL_BOARD_DIR))
+  $(error You have set 'EXTERNAL_BOARD_DIR', did you mean 'EXTERNAL_BOARD_DIRS'?)
+endif
+
 # List all boards in a directory
 # By default, all directories in board directory except 'common'
 #   use 'wildcard */.' to only list directories
