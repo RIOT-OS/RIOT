@@ -20,4 +20,4 @@ runs:
         -e GITHUB_RUN_ID=${{ github.run_id }} \
         -v "$(pwd)":/data/riotbuild \
         riot/static-test-tools:latest \
-        ./dist/tools/ci/static_tests.sh
+        make static-test
