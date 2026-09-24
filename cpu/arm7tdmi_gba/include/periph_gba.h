@@ -37,16 +37,76 @@ extern "C"
  */
 #define MEM16(ADDR) ((uint16_t(*))(ADDR))
 
+/**
+ * @brief   Pointer to our IRQ handler, must be in 32bit ARM code
+ */
+#define GBA_PTR_TO_IRQ_HANDLER REG32(0x3007ffc)
+
+/**
+ * @brief   Interrupt enable register
+ * 
+ * Bit   Expl.
+ * 0     LCD V-Blank
+ * 1     LCD H-Blank
+ * 2     LCD V-Counter Match
+ * 3     Timer 0 Overflow
+ * 4     Timer 1 Overflow
+ * 5     Timer 2 Overflow
+ * 6     Timer 3 Overflow
+ * 7     Serial Communication
+ * 8     DMA 0
+ * 9     DMA 1
+ * 10    DMA 2
+ * 11    DMA 3
+ * 12    Keypad
+ * 13    Game Pak (external IRQ source)
+ * 14-15 Not used
+ */
 #define GBA_IE REG16(0x4000200)
+
+/**
+ * @brief   Bit mask for the timer interrupts enable-flag
+ */
 #define GBA_IE_TIMERS (0x0F << 3)
 
+/**
+ * @brief   Type for 16-bit memory addresses
+ * 
+ * Bit   Expl.
+ * 0     LCD V-Blank
+ * 1     LCD H-Blank
+ * 2     LCD V-Counter Match
+ * 3     Timer 0 Overflow
+ * 4     Timer 1 Overflow
+ * 5     Timer 2 Overflow
+ * 6     Timer 3 Overflow
+ * 7     Serial Communication
+ * 8     DMA 0
+ * 9     DMA 1
+ * 10    DMA 2
+ * 11    DMA 3
+ * 12    Keypad
+ * 13    Game Pak (external IRQ source)
+ * 14-15 Not used
+ */
 #define GBA_IF REG16(0x4000202)
+
+/**
+ * @brief   Bit mask for the timer interrupts has-fired-flag
+ */
 #define GBA_IF_TIMERS (0x0F << 3)
 
+/**
+ * @brief   Interrupt Master Enable, globally enables / disables interrupts
+ * 
+ * We usually keep this register enabled but use the "official" ARM IME register for our needs
+ */
 #define GBA_IME REG16(0x4000208) /* Technically 32 bit reg, but only bit 0 is used */
 
-#define GBA_PTR_TO_IRQ_HANDLER REG32(0x3007ffc) /* Pointer to user IRQ handler (32bit ARM code) */
-
+/**
+ * @name Timer control register
+ * @{
+ */
 #define GBA_TM0_CNT_L REG16(0x4000100)
 #define GBA_TM0_CNT_H REG16(0x4000102)
 #define GBA_TM1_CNT_L REG16(0x4000104)
@@ -55,7 +115,11 @@ extern "C"
 #define GBA_TM2_CNT_H REG16(0x400010A)
 #define GBA_TM3_CNT_L REG16(0x400010C)
 #define GBA_TM3_CNT_H REG16(0x400010E)
+/** @} */
 
+/**
+ * @brief We have 16 bit timer
+ */
 #define GBA_TIMER_MAX_TICKS (0xFFFF)
 
 typedef struct {
@@ -72,11 +136,15 @@ _Static_assert(sizeof(gba_timer) == 4, "2 x Timer register should be 4 bytes");
 
 typedef gba_timer volatile gba_timer_t;
 
+/**
+ * @brief    The four timers of the GBA
+ * @{
+ */
 #define GBA_TIMER_0 ((gba_timer_t volatile *) 0x4000100)
 #define GBA_TIMER_1 ((gba_timer_t volatile *) 0x4000104)
 #define GBA_TIMER_2 ((gba_timer_t volatile *) 0x4000108)
 #define GBA_TIMER_3 ((gba_timer_t volatile *) 0x400010C)
-
+/** @} */
 
 /**
  * @brief    Screen dimension in pixel

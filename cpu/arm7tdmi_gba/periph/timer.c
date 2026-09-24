@@ -57,7 +57,7 @@ void gba_timer_isr(uint16_t interrupt_flags_timer)
     interrupt_flags_timer >>= 3;
 
     int timer_num = 0;
-    while (timer_num < 4 && interrupt_flags_timer > 0) {
+    while ((timer_num < 4) && (interrupt_flags_timer > 0)) {
         if (interrupt_flags_timer & 1) {
             gba_timer_t *dev = get_dev(timer_num);
             if (timer_one_shot[timer_num]) {
@@ -65,9 +65,9 @@ void gba_timer_isr(uint16_t interrupt_flags_timer)
                 dev->run = 0;
                 /* call the call back */
                 isr_ctx[timer_num].cb(isr_ctx[timer_num].arg, 0);
-                /* disable this one shot timer. Since we need the timer itself running */
-                /* to continue to track the time, we need to prevent the next overflow */
-                /* from doing stuff during the IRQ / ISR */
+                /* disable this one shot timer. Since we need the timer itself running
+                 * to continue to track the time, we need to prevent the next overflow
+                 * from doing stuff during the IRQ / ISR */
                 timer_one_shot[timer_num] = 0;
                 dev->irq_enable = 0;
                 /* Add the passed time to our inter-irq-time-tracker */
@@ -140,7 +140,7 @@ int timer_set(tim_t tim, int channel, unsigned int timeout)
     (void)channel;
 
     /* Interrupt will only be generated on overflow,
-       so a 0 timeout is not possible */
+     * so a 0 timeout is not possible */
     if (timeout < 5) {
         timeout = 5;
     }
@@ -174,9 +174,9 @@ int timer_set(tim_t tim, int channel, unsigned int timeout)
 
 int timer_set_absolute(tim_t dev, int channel, unsigned int value)
 {
-    /* we don't have any channels or marker values, setting anything means */
-    /* repurposing the entire timer. That is why we have to transform the  */
-    /* absolute value into a relative timeout. */
+    /* we don't have any channels or marker values, setting anything means
+     * repurposing the entire timer. That is why we have to transform the
+     * absolute value into a relative timeout. */
 
     uint16_t relative_value_to_set = 0;
     uint16_t current_value = timer_read(dev);
@@ -220,16 +220,16 @@ unsigned int timer_read(tim_t tim)
         return -1;
     }
 
-    /* Get mmapped value into cpu register, so it doesn't change during calculation */
+    /* Get mapped value into cpu register, so it doesn't change during calculation */
     uint16_t current_value = dev->current_value;
     uint16_t ret = timer_last_value[tim];
 
     if (timer_one_shot[tim]) {
         if (current_value >= timer_start_value[tim]) {
-            /* The timer api implicitly expects to counting up towards the timeout. */
-            /* Since we have to rewrite the current value to implement the timeout, */
-            /* any naive read out, to determine how far we are from the timeout,    */
-            /* would return an unexpected high value. Therefore we correct for it.  */
+            /* The timer api implicitly expects to counting up towards the timeout.
+             * Since we have to rewrite the current value to implement the timeout,
+             * any naive read out, to determine how far we are from the timeout,
+             * would return an unexpected high value. Therefore we correct for it. */
             ret += current_value - timer_start_value[tim];
         }
     }

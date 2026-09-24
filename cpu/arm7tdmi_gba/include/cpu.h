@@ -17,7 +17,14 @@ extern "C" {
 
 extern uintptr_t __stack_start; /**< end of user stack memory space */
 
+/**
+ * @brief   Initialize the timer hardware
+ */
 void gba_timer_init(void);
+
+/**
+ * @brief   The interrupt service routine for the timer interrupts
+ */
 void gba_timer_isr(uint16_t interrupt_flags_timer);
 
 #ifdef __cplusplus
