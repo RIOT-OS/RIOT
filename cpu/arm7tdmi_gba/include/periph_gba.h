@@ -44,7 +44,7 @@ extern "C"
 
 /**
  * @brief   Interrupt enable register
- * 
+ *
  * Bit   Expl.
  * 0     LCD V-Blank
  * 1     LCD H-Blank
@@ -70,8 +70,8 @@ extern "C"
 #define GBA_IE_TIMERS (0x0F << 3)
 
 /**
- * @brief   Type for 16-bit memory addresses
- * 
+ * @brief   Interrupt flags register
+ *
  * Bit   Expl.
  * 0     LCD V-Blank
  * 1     LCD H-Blank
@@ -98,7 +98,7 @@ extern "C"
 
 /**
  * @brief   Interrupt Master Enable, globally enables / disables interrupts
- * 
+ *
  * We usually keep this register enabled but use the "official" ARM IME register for our needs
  */
 #define GBA_IME REG16(0x4000208) /* Technically 32 bit reg, but only bit 0 is used */
@@ -107,14 +107,14 @@ extern "C"
  * @name Timer control register
  * @{
  */
-#define GBA_TM0_CNT_L REG16(0x4000100)
-#define GBA_TM0_CNT_H REG16(0x4000102)
-#define GBA_TM1_CNT_L REG16(0x4000104)
-#define GBA_TM1_CNT_H REG16(0x4000106)
-#define GBA_TM2_CNT_L REG16(0x4000108)
-#define GBA_TM2_CNT_H REG16(0x400010A)
-#define GBA_TM3_CNT_L REG16(0x400010C)
-#define GBA_TM3_CNT_H REG16(0x400010E)
+#define GBA_TM0_CNT_L REG16(0x4000100) /**< current value */
+#define GBA_TM0_CNT_H REG16(0x4000102) /**< settings */
+#define GBA_TM1_CNT_L REG16(0x4000104) /**< current value */
+#define GBA_TM1_CNT_H REG16(0x4000106) /**< settings */
+#define GBA_TM2_CNT_L REG16(0x4000108) /**< current value */
+#define GBA_TM2_CNT_H REG16(0x400010A) /**< settings */
+#define GBA_TM3_CNT_L REG16(0x400010C) /**< current value */
+#define GBA_TM3_CNT_H REG16(0x400010E) /**< settings */
 /** @} */
 
 /**
@@ -122,28 +122,34 @@ extern "C"
  */
 #define GBA_TIMER_MAX_TICKS (0xFFFF)
 
+/**
+ * @brief Struct whose members map onto the timer register
+ */
 typedef struct {
-    uint16_t current_value;
-    uint16_t prescaler : 2;
-    uint16_t count_up_on_neighbour_overflow: 1;
-    uint16_t unused_3_5 : 3;
-    uint16_t irq_enable : 1;
-    uint16_t run : 1;
-    uint16_t unused_8_15 : 8;
+    uint16_t current_value; /**< The counter / current value of this timer */
+    uint16_t prescaler : 2; /**< The prescaler sets the devider for this timer */
+    uint16_t count_up_on_neighbour_overflow: 1; /**< If set, counts up this timer when the previous overflowed */
+    uint16_t unused_3_5 : 3; /**< unused */
+    uint16_t irq_enable : 1; /**< enables interrupt request for this timer on overflow */
+    uint16_t run : 1; /**< starts the timer */
+    uint16_t unused_8_15 : 8; /**< unused */
 } gba_timer;
 /* I don't trust bit-fields over all compilers & toolchains */
 _Static_assert(sizeof(gba_timer) == 4, "2 x Timer register should be 4 bytes");
 
+/**
+ * @brief The type for the GBA timers
+ */
 typedef gba_timer volatile gba_timer_t;
 
 /**
  * @brief    The four timers of the GBA
  * @{
  */
-#define GBA_TIMER_0 ((gba_timer_t volatile *) 0x4000100)
-#define GBA_TIMER_1 ((gba_timer_t volatile *) 0x4000104)
-#define GBA_TIMER_2 ((gba_timer_t volatile *) 0x4000108)
-#define GBA_TIMER_3 ((gba_timer_t volatile *) 0x400010C)
+#define GBA_TIMER_0 ((gba_timer_t *) 0x4000100) /**< A GBA timer */
+#define GBA_TIMER_1 ((gba_timer_t *) 0x4000104) /**< A GBA timer */
+#define GBA_TIMER_2 ((gba_timer_t *) 0x4000108) /**< A GBA timer */
+#define GBA_TIMER_3 ((gba_timer_t *) 0x400010C) /**< A GBA timer */
 /** @} */
 
 /**
