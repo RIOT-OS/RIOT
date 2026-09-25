@@ -547,8 +547,8 @@ struct ieee802154_radio_ops {
      * This function provides non-destructive access to the received frame
      * while a reception is pending (see @ref ieee802154_radio_ops::read).
      *
-     * @pre the device is on
-     * @pre a reception is pending and the radio was set to IDLE beforehand
+     * @pre The device is on
+     * @pre A reception is pending and the radio was set to IDLE beforehand
      *      (see @ref ieee802154_radio_ops::read).
      *
      * @post the frame buffer is still protected against new frame arrivals.
@@ -575,8 +575,8 @@ struct ieee802154_radio_ops {
      * While a reception is pending:
      * - the upper layer SHOULD set the radio to IDLE (@ref
      *   ieee802154_radio_set_idle) before any framebuffer access, since
-     *   the behavior of radios after frame reception is otherwise
-     *   undefined.
+     *   the behavior of radios after frame reception is undefined
+     *   otherwise.
      * - @ref ieee802154_radio_ops::len and @ref ieee802154_radio_ops::peek
      *   provide non-destructive access to the received frame.
      * - the received frame remains valid until the reception is closed,
@@ -615,7 +615,7 @@ struct ieee802154_radio_ops {
      * @param[in] info information of the received frame (LQI, RSSI). Can be
      *            NULL if this information is not needed.
      *
-     * @retval number of bytes written in @p buf (0 if @p buf == NULL)
+     * @return number of bytes written in @p buf (0 if @p buf == NULL)
      * @retval -ENOBUFS if the frame doesn't fit in @p buf. In this case
      *         nothing is consumed: the reception stays pending and the
      *         received frame is not modified.
@@ -1423,7 +1423,7 @@ static inline int ieee802154_radio_request_cca(ieee802154_dev_t *dev)
  *
  * @return status of the CCA procedure
  *
- * @retval positive number if the channel is clear
+ * @return positive number if the channel is clear
  * @retval 0 if the channel is busy
  * @retval -EAGAIN if the CCA procedure hasn't finished.
  */
@@ -1449,7 +1449,7 @@ static inline int ieee802154_radio_confirm_cca(ieee802154_dev_t *dev)
  *
  * @return status of the CCA
  *
- * @retval positive number if the channel is clear
+ * @return positive number if the channel is clear
  * @retval 0 if the channel is busy
  * @retval negative errno on error
  */
