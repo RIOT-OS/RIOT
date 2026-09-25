@@ -64,6 +64,9 @@ NRFX_VENDOR_HEADERS := $(addprefix $(VENDOR_FOLDER)/, $(notdir $(NRFX_SPARSE_PAT
 # Always copy the vendor headers in the preparation step. When we
 # use nrfx, we can safely assume that we are using an nRF microcontroller that needs
 # vendor headers too.
+# Note: This has to be done in the preparation step, not in the `all` target
+#       because the `all` target builds the package during the compilation run,
+#       but at that point we already have to have them in place.
 $(PKG_PREPARED): $(NRFX_VENDOR_HEADERS)
 
 # Make sure the folder REALLY exists before trying to copy to it.
