@@ -30,6 +30,11 @@ extern "C" {
 #include "psa_periph_aes_ctx.h"
 #endif
 
+#if IS_USED(MODULE_PSA_CRYPTOSERVICE_AES_128_CBC) || \
+    IS_USED(MODULE_PSA_CRYPTOSERVICE_AES_128_ECB)
+#include "CYS_ciphers.h"
+#endif
+
 #if IS_USED(MODULE_PSA_SECURE_ELEMENT_ATECCX08A)
 #include "atca_params.h"
 #endif

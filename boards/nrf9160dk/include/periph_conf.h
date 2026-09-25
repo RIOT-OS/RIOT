@@ -17,6 +17,7 @@
  */
 
 #include "periph_cpu.h"
+#include "kernel_defines.h"
 
 #include "board.h"
 
@@ -30,7 +31,7 @@ extern "C" {
  */
 static const i2c_conf_t i2c_config[] = {
     {
-        .dev = NRF_TWIM3_S,
+        .dev = NRF_TWIM3,
         .scl = GPIO_PIN(0, 31),
         .sda = GPIO_PIN(0, 30),
         .speed = I2C_SPEED_NORMAL
@@ -45,7 +46,7 @@ static const i2c_conf_t i2c_config[] = {
  */
 static const spi_conf_t spi_config[] = {
     {
-        .dev  = NRF_SPIM2_S,
+        .dev  = NRF_SPIM2,
         .sclk = GPIO_PIN(0, 13),
         .mosi = GPIO_PIN(0, 11),
         .miso = GPIO_PIN(0, 12),
@@ -61,14 +62,14 @@ static const spi_conf_t spi_config[] = {
  */
 static const timer_conf_t timer_config[] = {
     {
-        .dev      = NRF_TIMER0_S,
+        .dev      = NRF_TIMER0,
         /* using last channel for timer_read(), so only 5 of 6 channels available */
         .channels = 5,
         .bitmode  = TIMER_BITMODE_BITMODE_32Bit,
         .irqn     = TIMER0_IRQn
     },
     {
-        .dev      = NRF_TIMER1_S,
+        .dev      = NRF_TIMER1,
         /* using last channel for timer_read(), so only 5 of 6 channels available */
         .channels = 5,
         .bitmode  = TIMER_BITMODE_BITMODE_08Bit,
@@ -93,7 +94,7 @@ static const timer_conf_t timer_config[] = {
  */
 static const uart_conf_t uart_config[] = {
     {
-        .dev        = NRF_UARTE0_S,
+        .dev        = NRF_UARTE0,
         .rx_pin     = GPIO_PIN(0, 28),
         .tx_pin     = GPIO_PIN(0, 29),
 #ifdef MODULE_PERIPH_UART_HW_FC
@@ -103,7 +104,7 @@ static const uart_conf_t uart_config[] = {
         .irqn       = UARTE0_SPIM0_SPIS0_TWIM0_TWIS0_IRQn,
     },
     {
-        .dev        = NRF_UARTE1_S,
+        .dev        = NRF_UARTE1,
         .rx_pin     = GPIO_PIN(0, 0),
         .tx_pin     = GPIO_PIN(0, 1),
 #ifdef MODULE_PERIPH_UART_HW_FC
@@ -141,7 +142,7 @@ static const uart_conf_t uart_config[] = {
  */
 static const pwm_conf_t pwm_config[] = {
     {
-        .dev = NRF_PWM0_S,
+        .dev = NRF_PWM0,
         .pin = {
                     LED0_PIN,
                     LED1_PIN,
