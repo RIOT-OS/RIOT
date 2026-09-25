@@ -635,8 +635,8 @@ struct ieee802154_radio_ops {
      * This function MAY be NULL if the radio doesn't provide random access
      * to the received frame.
      *
-     * @pre the device is on
-     * @pre a reception is pending and the radio was set to IDLE beforehand
+     * @pre The device is on
+     * @pre A reception is pending and the radio was set to IDLE beforehand
      *      (see @ref ieee802154_radio_ops::read).
      * @pre @p offset + @p size doesn't exceed the length of the received
      *      frame.
