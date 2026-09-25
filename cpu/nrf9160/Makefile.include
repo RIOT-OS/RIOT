@@ -2,6 +2,15 @@
 ROM_LEN ?= 0x100000
 RAM_LEN ?= 0x40000
 
+PSEUDOMODULES += trustzone_m_nonsecure
+
+ifneq (,$(filter trustzone_m_nonsecure,$(USEMODULE)))
+
+# Shared nRF/Cortex-M code has to select the non-secure peripheral aliases.
+CFLAGS += -DNRF_TRUSTZONE_NONSECURE
+
+endif
+
 FLASHFILE ?= $(BINFILE)
 
 PROGRAMMER ?= jlink
