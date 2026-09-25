@@ -358,7 +358,14 @@ PSEUDOMODULES += netdev_eth
 PSEUDOMODULES += netdev_layer
 PSEUDOMODULES += netdev_legacy_api
 PSEUDOMODULES += netdev_new_api
+## @defgroup pseudomodule_netdev_register netdev_register
+## @ingroup drivers_netdev_api
+## @{
+## @deprecated  Use @ref pseudomodule_netif_register "netif_register" instead.
+##              Will be removed after the 2027.04 release.
 PSEUDOMODULES += netdev_register
+## @}
+PSEUDOMODULES += netif_register
 PSEUDOMODULES += netstats
 PSEUDOMODULES += netstats_ipv6
 PSEUDOMODULES += netstats_l2
