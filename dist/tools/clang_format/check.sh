@@ -47,17 +47,18 @@ trap 'rm -f "${FORMATTED}"' EXIT
 _annotate_hunk() {
     DIFFFILE="$1"
     DIFFLINE="$2"
-    DIFFHUNK="$3"
-
+    DIFFLEN="$3"
+    DIFFHUNK="$4"
+    DIFFENDL=$((DIFFLINE+DIFFLEN))
+    ANOTATION_MESSAGE="${DIFFHUNK}"
     # for pure insertions the hunk starts at line 0, which is not a valid
     # annotation target
     if [ "${DIFFLINE}" -eq 0 ]; then
         DIFFLINE=1
     fi
-    github_annotate_warning "${DIFFFILE}" "${DIFFLINE}" \
-        "clang-format proposes the following patch:
-
-${DIFFHUNK}"
+    github_annotate "$ANOTATION_MESSAGE" warning \
+    "file=${DIFFFILE},line=${DIFFLINE},endLine=${DIFFENDL},title=clang-format proposes\
+the following patch"
 }
 
 EXIT_CODE=0
@@ -79,14 +80,17 @@ for F in "${FILES_ARR[@]}"; do
         if github_annotate_is_on && [ -s "${FORMATTED}" ]; then
             DIFFLINE=
             DIFFHUNK=
+            DIFFLEN=
             while IFS= read -r LINE; do
                 case "${LINE}" in
                     @@*)
                         if [ -n "${DIFFLINE}" ]; then
-                            _annotate_hunk "${F}" "${DIFFLINE}" "${DIFFHUNK}"
+                            _annotate_hunk "${F}" "${DIFFLINE}" "${DIFFLEN}" "${DIFFHUNK}"
                         fi
                         DIFFLINE="${LINE#@@ -}"
                         DIFFLINE="${DIFFLINE%%[!0-9]*}"
+                        DIFFLEN="${LINE#@@ -*,}"
+                        DIFFLEN="${DIFFLEN%%[!0-9]*}"
                         DIFFHUNK="${LINE}"
                         ;;
                     *)
@@ -97,7 +101,7 @@ for F in "${FILES_ARR[@]}"; do
                 esac
             done < <(diff -u "${RIOTBASE}/${F}" "${FORMATTED}")
             if [ -n "${DIFFLINE}" ]; then
-                _annotate_hunk "${F}" "${DIFFLINE}" "${DIFFHUNK}"
+                _annotate_hunk "${F}" "${DIFFLINE}" "${DIFFLEN}" "${DIFFHUNK}"
             fi
         fi
     fi
