@@ -91,6 +91,7 @@ for F in "${FILES_ARR[@]}"; do
                         DIFFLINE="${DIFFLINE%%[!0-9]*}"
                         DIFFLEN="${LINE#@@ -*,}"
                         DIFFLEN="${DIFFLEN%%[!0-9]*}"
+                        DIFFLEN=$(( DIFFLEN==0?1:DIFFLEN ))
                         DIFFHUNK="${LINE}"
                         ;;
                     *)
