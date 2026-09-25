@@ -678,6 +678,8 @@ groups:
       help: An ADC peripheral is present.
     - name: periph_adc_continuous
       help: The ADC peripheral can be left on between measurements.
+    - name: periph_adc_dma
+      help: The ADC peripheral can be used with DMA to transfer samples into memory.
     - name: periph_dac
       help: A DAC peripheral is present.
     - name: periph_dac_play
