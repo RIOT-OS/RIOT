@@ -96,10 +96,13 @@ exec_uncrustify () {
     fi
 }
 
-if [ "$1" == "--check" ] ; then
-    check
-else
+# The mode depends on the environment: when running in GitHub, uncrustify is
+# applied and any proposed patch is annotated as a warning. Otherwise only a
+# non-mutating check is performed.
+if [ -n "${GITHUB_RUN_ID}" ] ; then
     github_annotate_setup
     exec_uncrustify
     github_annotate_teardown
+else
+    check
 fi
