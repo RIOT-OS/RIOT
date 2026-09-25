@@ -1,0 +1,45 @@
+From f23ccd1b7ea5bb8b42096f39eb6cc16ba79a8018 Mon Sep 17 00:00:00 2001
+From: crasbe <crasbe@gmail.com>
+Date: Fri, 25 Sep 2026 12:29:46 +0200
+Subject: [PATCH] add stm32f030x4 support
+
+The stm32f030x6.h header file is generally applicable for the F030x4
+as well, other than the other flash end address. The x4 only has 16K
+of Flash whereas the x6 has 32K.
+---
+ Include/stm32f030x6.h | 6 +++++-
+ Include/stm32f0xx.h   | 2 +-
+ 2 files changed, 6 insertions(+), 2 deletions(-)
+
+diff --git a/Include/stm32f030x6.h b/Include/stm32f030x6.h
+index 8db15e3..d24c46d 100644
+--- a/Include/stm32f030x6.h
++++ b/Include/stm32f030x6.h
+@@ -424,7 +424,11 @@ typedef struct
+   */
+
+ #define FLASH_BASE            0x08000000UL              /*!< FLASH base address in the alias region */
+-#define FLASH_BANK1_END       0x08007FFFUL /*!< FLASH END address of bank1 */
++#ifdef CPU_LINE_STM32F030x4
++#  define FLASH_BANK1_END     0x08003FFFUL              /*!< FLASH END address of bank1 for STM32F030x4 */
++#else
++#  define FLASH_BANK1_END     0x08007FFFUL              /*!< FLASH END address of bank1 for STM32F030x6 */
++#endif
+ #define SRAM_BASE             0x20000000UL              /*!< SRAM base address in the alias region */
+ #define PERIPH_BASE           0x40000000UL              /*!< Peripheral base address in the alias region */
+
+diff --git a/Include/stm32f0xx.h b/Include/stm32f0xx.h
+index 7d69804..b666a66 100644
+--- a/Include/stm32f0xx.h
++++ b/Include/stm32f0xx.h
+@@ -121,7 +121,7 @@
+   * @{
+   */
+
+-#if defined(STM32F030x6)
++#if defined(STM32F030x4) || defined(STM32F030x6)
+   #include "stm32f030x6.h"
+ #elif defined(STM32F030x8)
+   #include "stm32f030x8.h"
+--
+2.34.1

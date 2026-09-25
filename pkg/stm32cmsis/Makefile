@@ -45,8 +45,8 @@ PKG_LICENSE=Apache-2
 
 # Store the cloned repositories under the stm32 directory to prevent downloads
 # for each builds.
-PKG_SOURCE_DIR = $(BUILD_DIR)/stm32/cmsis/$(CPU_FAM)
-PKG_PATCH_DIR = $(RIOTCPU)/stm32/include/vendor/patches/$(CPU_FAM)
+PKG_SOURCE_DIR = $(PKGDIRBASE)/$(PKG_NAME)/$(CPU_FAM)
+PKG_PATCH_DIR = $(CURDIR)/patches/$(CPU_FAM)
 
 include $(RIOTBASE)/pkg/pkg.mk
 
