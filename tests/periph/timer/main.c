@@ -15,12 +15,12 @@
  * @}
  */
 
-#include <stdio.h>
 #include <stdint.h>
+#include <stdio.h>
 #include <stdlib.h>
 
-#include "atomic_utils.h"
 #include "architecture.h"
+#include "atomic_utils.h"
 #include "clk.h"
 #include "periph/timer.h"
 #include "test_utils/expect.h"
@@ -30,23 +30,23 @@
  * @brief   Make sure, the maximum number of timers is defined
  */
 #ifndef TIMER_NUMOF
-#error "TIMER_NUMOF not defined!"
+#  error "TIMER_NUMOF not defined!"
 #endif
 
 /* backward compatibility with legacy drivers */
 #if !defined(TIMER_CHANNEL_NUMOF) && !IS_USED(MODULE_PERIPH_TIMER_QUERY_FREQS)
-#define TIMER_CHANNEL_NUMOF 10U
+#  define TIMER_CHANNEL_NUMOF 10U
 #endif
 
-#define CHAN_OFFSET_MS      5U          /* fire channels with 5 ms offset */
+#define CHAN_OFFSET_MS     5U /* fire channels with 5 ms offset */
 /* The minimum timeout to set and still being able to clear the timer
  * before it fires. This should be conservative, as wasting a few milliseconds
  * in the test is less annoying than false test failures */
-#define MINIMUM_TIMEOUT_MS  2
-#define COOKIE              (100U)      /* for checking if arg is passed */
+#define MINIMUM_TIMEOUT_MS 2
+#define COOKIE             (100U) /* for checking if arg is passed */
 /* Setting a timer for less than two ticks may cause it to fire right away,
  * e.g. when the timer was about to tick anyway */
-#define MINIMUM_TICKS       2
+#define MINIMUM_TICKS      2
 
 static uint8_t fired;
 static uint32_t sw_count;
@@ -87,7 +87,7 @@ static unsigned milliseconds_to_ticks(uint32_t timer_freq, unsigned millisecs)
 
 static int test_timer(unsigned num, uint32_t timer_freq)
 {
-    int set = 0;
+    unsigned set = 0;
 
     /* reset state */
     atomic_store_u32(&sw_count, 0);
@@ -98,19 +98,20 @@ static int test_timer(unsigned num, uint32_t timer_freq)
         args[i] = UINT_MAX;
     }
 
-    printf("  - Calling timer_init(%u, %" PRIu32 ")\n    ",
-               num, timer_freq);
+    printf("  - Calling timer_init(%u, %" PRIu32 ")\n    ", num, timer_freq);
     /* initialize and halt timer */
     if (timer_init(TIMER_DEV(num), timer_freq, cb, (void *)(uintptr_t)(COOKIE * num)) != 0) {
         printf("ERROR: timer_init() failed\n\n");
         return 0;
     }
     else {
+        /* timer might fire too early if stdio is super slow!
+         * So we stop first before printing */
+        timer_stop(TIMER_DEV(num));
         printf("initialization successful\n");
+        printf("  - timer_stop(%u): stopped\n", num);
     }
 
-    timer_stop(TIMER_DEV(num));
-    printf("  - timer_stop(%u): stopped\n", num);
     unsigned chan_offset_ticks = milliseconds_to_ticks(timer_freq, CHAN_OFFSET_MS);
 
     /* set each available channel */
@@ -118,11 +119,9 @@ static int test_timer(unsigned num, uint32_t timer_freq)
         unsigned timeout = ((i + 1) * chan_offset_ticks);
         printf("  - timer_set(%u, %u, %u)\n    ", num, i, timeout);
         if (timer_set(TIMER_DEV(num), i, timeout) < 0) {
-            printf("ERROR: Couldn't set timeout %u for channel %u\n",
-                   timeout, i);
+            printf("ERROR: Couldn't set timeout %u for channel %u\n", timeout, i);
             /* If the timer supports the periph_timer_query_freqs feature, we
-             * expect it to correctly report the number of supported channels
-             */
+             * expect it to correctly report the number of supported channels */
             if (IS_USED(MODULE_PERIPH_TIMER_QUERY_FREQS)) {
                 return 0;
             }
@@ -130,13 +129,21 @@ static int test_timer(unsigned num, uint32_t timer_freq)
         }
         else {
             ++set;
-            printf("Successfully set timeout %u for channel %u\n",
-                   timeout, i);
+            printf("Successfully set timeout %u for channel %u\n", timeout, i);
         }
     }
 
     if (set == 0) {
         printf("  ERROR setting timeout failed for *ALL* channels\n\n");
+        return 0;
+    }
+
+    /* We use the CPU to delay execution and wait for timers to (not) fire */
+    uint32_t loops = 10000 * (coreclk() / timer_freq);
+    for (volatile uint32_t i = 0; i < loops; i++) {}
+
+    if (atomic_load_u8(&fired) != 0) {
+        puts("ERROR: Callbacks have fired but timer should be stopped!\n");
         return 0;
     }
 
@@ -151,18 +158,18 @@ static int test_timer(unsigned num, uint32_t timer_freq)
 
     /* collect results */
     printf("  - Results:\n");
-    for (int i = 0; i < set; i++) {
+    for (unsigned i = 0; i < set; i++) {
         if (args[i] != ((COOKIE * num) + i)) {
-            printf("    ERROR: Callback for channel %u on timer %u has incorrect argument\n",
-                   i, num);
+            printf("    ERROR: Callback for channel %u on timer %u has incorrect argument\n", i,
+                   num);
             return 0;
         }
-        printf("    - channel %i fired at SW count %8u",
-               i, (unsigned)timeouts[i]);
+        printf("    - channel %i fired at SW count %8" PRIu32, i, timeouts[i]);
         if (i == 0) {
             printf("      - init: %8" PRIu32 "\n", atomic_load_u32(&timeouts[i]));
         }
         else {
+            assume((i >= 1) && (i < ARRAY_SIZE(timeouts)));
             printf("      - diff: %8" PRIu32 "\n",
                    atomic_load_u32(&timeouts[i]) - atomic_load_u32(&timeouts[i - 1]));
         }
@@ -217,7 +224,8 @@ static int test_timer(unsigned num, uint32_t timer_freq)
      * early and there are still more than MINIMUM_TICKS ticks left */
     if (fired_early && (remaining > MINIMUM_TICKS) && (remaining <= duration)) {
         printf("    ERROR: Spurious timer fired on re-arm (3/3), %u of %u "
-               "ticks left\n", remaining, duration);
+               "ticks left\n",
+               remaining, duration);
         return 0;
     }
 
@@ -258,7 +266,7 @@ static void print_supported_frequencies(tim_t dev)
     }
 
     uword_t end = query_freq_numof(dev);
-        printf("  - supported frequencies:\n");
+    printf("  - supported frequencies:\n");
     for (uword_t i = 0; i < MIN(end, 3); i++) {
         printf("    %u: %" PRIu32 "\n", (unsigned)i, timer_query_freqs(dev, i));
     }
@@ -320,8 +328,7 @@ int main(void)
     int failed = 0;
     /* test all configured timers */
     for (unsigned i = 0; i < TIMER_NUMOF; i++) {
-        printf("\nTIMER %u\n"
-                 "=======\n\n", i);
+        printf("\nTIMER %u\n=======\n\n", i);
         print_supported_frequencies(TIMER_DEV(i));
 
         /* test querying of frequencies, but only if supported by the driver */
