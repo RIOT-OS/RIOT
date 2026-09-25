@@ -599,8 +599,8 @@ struct ieee802154_radio_ops {
      * ieee802154_radio_set_rx). If the radio provides any kind of
      * framebuffer protection, this function releases it.
      *
-     * @pre the device is on
-     * @pre a reception is pending and the radio was set to IDLE beforehand
+     * @pre The device is on
+     * @pre A reception is pending and the radio was set to IDLE beforehand
      *      (@ref ieee802154_radio_set_idle), since the behavior of radios
      *      after frame reception is otherwise undefined.
      *
@@ -746,7 +746,7 @@ struct ieee802154_radio_ops {
     /**
      * @brief Set the threshold for the Energy Detection (first mode of CCA)
      *
-     * @pre the device is on
+     * @pre The device is on
      *
      * @param[in] dev IEEE802.15.4 device descriptor
      * @param[in] threshold the threshold in dBm.
@@ -761,7 +761,7 @@ struct ieee802154_radio_ops {
      *
      * All radios MUST at least implement the first CCA mode (ED Threshold).
      *
-     * @pre the device is on
+     * @pre The device is on
      *
      * @param[in] dev IEEE802.15.4 device descriptor
      * @param[in] mode the CCA mode
@@ -781,8 +781,8 @@ struct ieee802154_radio_ops {
      * In case a configuration is not valid (e.g parameters out of range), this
      * function should return -EINVAL
      *
-     * @pre the device is on
-     * @pre the transceiver state is IDLE.
+     * @pre The device is on
+     * @pre The transceiver state is IDLE.
      *
      * @param[in] dev IEEE802.15.4 device descriptor
      * @param[in] conf the PHY configuration
@@ -796,9 +796,9 @@ struct ieee802154_radio_ops {
     /**
      * @brief Set number of frame retransmissions
      *
-     * @pre the device is on
+     * @pre The device is on
      *
-     * @note this function pointer can be NULL if the device doesn't support
+     * @note This function pointer can be NULL if the device doesn't support
      *       frame retransmissions
      *
      * @param[in] dev IEEE802.15.4 device descriptor
@@ -812,7 +812,7 @@ struct ieee802154_radio_ops {
     /**
      * @brief Set the CSMA-CA parameters.
      *
-     * @pre the device is on
+     * @pre The device is on
      *
      * @param[in] dev IEEE802.15.4 device descriptor
      * @param[in] bd parameters of the exponential backoff. If NULL, the
@@ -833,7 +833,7 @@ struct ieee802154_radio_ops {
     /**
      * @brief Set the frame filter mode.
      *
-     * @pre the device is on
+     * @pre The device is on
      *
      * @param[in] dev IEEE802.15.4 device descriptor
      * @param[in] mode address filter mode
@@ -846,7 +846,7 @@ struct ieee802154_radio_ops {
     /**
      * @brief Get the frame filter mode.
      *
-     * @pre the device is on
+     * @pre The device is on
      *
      * @param[in] dev IEEE802.15.4 device descriptor
      * @param[out] mode address filter mode
@@ -862,7 +862,7 @@ struct ieee802154_radio_ops {
      * This functions is used for configuring the address filter parameters
      * required by the IEEE 802.15.4 standard.
      *
-     * @pre the device is on
+     * @pre The device is on
      *
      * @param[in] dev IEEE802.15.4 device descriptor
      * @param[in] cmd command for the address filter
@@ -882,7 +882,7 @@ struct ieee802154_radio_ops {
      * this functions is used to activate the Frame Pending bit for all ACK
      * frames (in order to be compliant with the IEEE 802.15.4 standard).
      *
-     * @pre the device is on
+     * @pre The device is on
      *
      * @param[in] dev IEEE802.15.4 device descriptor
      * @param[in] cmd command for the source address match configuration
@@ -952,7 +952,7 @@ static inline int ieee802154_radio_write(ieee802154_dev_t *dev, const iolist_t *
  * @pre The upper layer should have called set the transceiver to IDLE (see
  * @ref ieee802154_radio_set_idle) and the frame is already in the framebuffer
  * (@ref ieee802154_radio_ops_t::write).
- * @pre the device is on
+ * @pre The device is on
  *
  * @note @ref ieee802154_radio_confirm_transmit MUST be used to
  * finish the transmission.
@@ -977,8 +977,8 @@ static inline int ieee802154_radio_request_transmit(ieee802154_dev_t *dev)
  * This functions calls ieee802154_radio_ops::confirm_op with @ref
  * IEEE802154_HAL_OP_TRANSMIT and sets the context to @p info.
  *
- * @pre the device is on
- * @pre call to @ref ieee802154_radio_request_transmit was successful.
+ * @pre The device is on
+ * @pre Call to @ref ieee802154_radio_request_transmit was successful.
  *
  * @param[in] dev IEEE802.15.4 device descriptor
  * @param[out] info the TX information. Pass NULL
@@ -1096,7 +1096,7 @@ static inline int ieee802154_radio_config_phy(ieee802154_dev_t *dev,
 /**
  * @brief Shortcut to @ref ieee802154_radio_ops::config_src_addr_match
  *
- * @pre the device is on
+ * @pre The device is on
  *
  * @param[in] dev IEEE802.15.4 device descriptor
  * @param[in] cmd command for the source address match configuration
@@ -1128,7 +1128,7 @@ static inline int ieee802154_radio_off(ieee802154_dev_t *dev)
 /**
  * @brief Shortcut to @ref ieee802154_radio_ops::config_addr_filter
  *
- * @pre the device is on
+ * @pre The device is on
  *
  * @param[in] dev IEEE802.15.4 device descriptor
  * @param[in] cmd command for the address filter
@@ -1146,7 +1146,7 @@ static inline int ieee802154_radio_config_addr_filter(ieee802154_dev_t *dev,
 /**
  * @brief Shortcut to @ref ieee802154_radio_ops::set_frame_filter_mode
  *
- * @pre the device is on
+ * @pre The device is on
  *
  * @param[in] dev IEEE802.15.4 device descriptor
  * @param[in] mode frame filter mode
@@ -1162,7 +1162,7 @@ static inline int ieee802154_radio_set_frame_filter_mode(ieee802154_dev_t *dev,
 /**
  * @brief Shortcut to @ref ieee802154_radio_ops::get_frame_filter_mode
  *
- * @pre the device is on
+ * @pre The device is on
  *
  * @param[in] dev IEEE802.15.4 device descriptor
  * @param[out] mode frame filter mode
@@ -1181,7 +1181,7 @@ static inline int ieee802154_radio_get_frame_filter_mode(ieee802154_dev_t *dev,
 /**
  * @brief Shortcut to @ref ieee802154_radio_ops::set_frame_retrans
  *
- * @pre the device is on
+ * @pre The device is on
  * @pre the device supports frame retransmissions
  *      (@ref ieee802154_radio_has_frame_retrans() == true)
  *
@@ -1199,7 +1199,7 @@ static inline int ieee802154_radio_set_frame_retrans(ieee802154_dev_t *dev,
 /**
  * @brief Shortcut to @ref ieee802154_radio_ops::set_csma_params
  *
- * @pre the device is on
+ * @pre The device is on
  * @pre the device supports frame retransmissions
  *      (@ref ieee802154_radio_has_frame_retrans() == true)
  *
@@ -1250,7 +1250,7 @@ static inline int ieee802154_radio_confirm_on(ieee802154_dev_t *dev)
  * This functions calls ieee802154_radio_ops::request_op with @ref
  * IEEE802154_HAL_OP_SET_IDLE and sets the context to @p force
  *
- * @pre the device is on
+ * @pre The device is on
  *
  * @note @ref ieee802154_radio_confirm_set_idle MUST be used to
  * finish the state transition.
@@ -1273,7 +1273,7 @@ static inline int ieee802154_radio_request_set_idle(ieee802154_dev_t *dev, bool 
  * @brief Confirmation function for @ref ieee802154_radio_request_set_idle
  *
  * @pre call to @ref ieee802154_radio_request_set_idle was successful.
- * @pre the device is on
+ * @pre The device is on
  *
  * @param[in] dev IEEE802.15.4 device descriptor
  *
@@ -1295,7 +1295,7 @@ static inline int ieee802154_radio_confirm_set_idle(ieee802154_dev_t *dev)
  * This functions calls ieee802154_radio_ops::request_op with @ref
  * IEEE802154_HAL_OP_SET_RX and NULL context.
  *
- * @pre the device is on
+ * @pre The device is on
  *
  * @note @ref ieee802154_radio_confirm_set_rx MUST be used to
  * finish the state transition.
@@ -1315,8 +1315,8 @@ static inline int ieee802154_radio_request_set_rx(ieee802154_dev_t *dev)
 /**
  * @brief Confirmation function for @ref ieee802154_radio_request_set_rx
  *
- * @pre call to @ref ieee802154_radio_request_set_rx was successful.
- * @pre the device is on
+ * @pre Call to @ref ieee802154_radio_request_set_rx was successful.
+ * @pre The device is on
  *
  * @param[in] dev IEEE802.15.4 device descriptor
  *
@@ -1336,7 +1336,7 @@ static inline int ieee802154_radio_confirm_set_rx(ieee802154_dev_t *dev)
  * This function will internally call @ref ieee802154_radio_request_set_idle
  * and poll @ref ieee802154_radio_confirm_set_idle.
  *
- * @pre the device is on
+ * @pre The device is on
  *
  * @param[in] dev IEEE802.15.4 device descriptor
  * @param[in] force whether the state transition should be forced or not. If
@@ -1364,7 +1364,7 @@ static inline int ieee802154_radio_set_idle(ieee802154_dev_t *dev, bool force)
  * This function will internally call @ref ieee802154_radio_request_set_rx
  * and poll @ref ieee802154_radio_confirm_set_rx.
  *
- * @pre the device is on
+ * @pre The device is on
  *
  * @param[in] dev IEEE802.15.4 device descriptor
  *
@@ -1390,7 +1390,7 @@ static inline int ieee802154_radio_set_rx(ieee802154_dev_t *dev)
  * This functions calls ieee802154_radio_ops::request_op with @ref
  * IEEE802154_HAL_OP_CCA and NULL context.
  *
- * @pre the device is on
+ * @pre The device is on
  *
  * @note @ref ieee802154_radio_confirm_cca MUST be used to
  * finish the CCA procedure and get the channel status.
@@ -1416,8 +1416,8 @@ static inline int ieee802154_radio_request_cca(ieee802154_dev_t *dev)
  * IEEE802154_HAL_OP_CCA and sets the context to a boolean where the result
  * of the CCA should be store. Setting it to true means the channel is clear.
  *
- * @pre call to @ref ieee802154_radio_request_cca was successful.
- * @pre the device is on
+ * @pre Call to @ref ieee802154_radio_request_cca was successful.
+ * @pre The device is on
  *
  * @param[in] dev IEEE802.15.4 device descriptor
  *
@@ -1443,7 +1443,7 @@ static inline int ieee802154_radio_confirm_cca(ieee802154_dev_t *dev)
  * This function will internally call @ref ieee802154_radio_request_cca
  * and poll @ref ieee802154_radio_confirm_cca.
  *
- * @pre the device is on
+ * @pre The device is on
  *
  * @param[in] dev IEEE802.15.4 device descriptor
  *
