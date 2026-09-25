@@ -58,13 +58,13 @@ endif
 
 include $(RIOTBASE)/pkg/pkg.mk
 
-ifeq (1,$(NRFX_VENDOR_HEADERS_ONLY))
 VENDOR_FOLDER = $(PKG_BUILD_DIR)/vendor
 NRFX_VENDOR_HEADERS := $(addprefix $(VENDOR_FOLDER)/, $(notdir $(NRFX_SPARSE_PATHS)))
 
-all: $(NRFX_VENDOR_HEADERS)
-
-$(PKG_PREPARED): $(VENDOR_FOLDER)
+# Always copy the vendor headers in the preparation step. When we
+# use nrfx, we can safely assume that we are using an nRF microcontroller that needs
+# vendor headers too.
+$(PKG_PREPARED): $(NRFX_VENDOR_HEADERS)
 
 # Make sure the folder REALLY exists before trying to copy to it.
 $(VENDOR_FOLDER): | $(PKG_PATCHED)
@@ -74,6 +74,4 @@ $(VENDOR_FOLDER): | $(PKG_PATCHED)
 $(VENDOR_FOLDER)/%: $(PKG_PATCHED) | $(VENDOR_FOLDER)
 	@cp $(PKG_SOURCE_DIR)/mdk/$* $@
 
-else
 all:
-endif
