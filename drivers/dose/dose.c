@@ -558,15 +558,15 @@ static int _send(netdev_t *dev, const iolist_t *iolist)
     uint16_t crc;
 
     /* One snapshot. The UART ISR stores ctx->state from state(). */
-    uint8_t state = _load_state(ctx);
+    uint8_t snapshot = _load_state(ctx);
 
     /* discard data when interface is in SLEEP mode */
-    if (state == DOSE_STATE_SLEEP) {
+    if (snapshot == DOSE_STATE_SLEEP) {
         return -ENETDOWN;
     }
 
     /* sending data wakes the interface from STANDBY */
-    if (state == DOSE_STATE_STANDBY) {
+    if (snapshot == DOSE_STATE_STANDBY) {
         _poweron(ctx);
     }
 
