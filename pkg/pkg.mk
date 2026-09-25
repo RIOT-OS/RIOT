@@ -110,17 +110,19 @@ $(BUILD_DIR)/CACHEDIR.TAG:
 	$(Q)echo "Signature: 8a477f597d28d172789f06886806bc55" > "$@"
 	$(Q)echo "# This folder contains RIOT's build cache" >> "$@"
 
-# This snippet ensures that for packages that have dynamic sparse paths (e.g.,
-# pkg/cmsis) or can be built sparse and non-sparse (e.g. nrfx), the (sparse) paths
-# of the time of checkout are the same as needed now.
-# Example 1: build a) only needs CMSIS/Core. Build b) also needs CMSIS/DSP.
-# If b) is built after a) and the cmsis checkout does not contain CMSIS/DSP,
-# the sources need to be checked out again.
-# Example 2: build a) only needs nRF vendor headers. Build b) needs the full nrfx
-# package. If b) is built after a), the required headers are missing and the
-# sources need to be checked out again.
-# (Inside, this is doing an ad-hoc "|$(LAZYSPONGE)", but using the Python
-# version turned out to be significantly slower).
+# Ensure that packages that have dynamic sparse paths (e.g., pkg/cmsis) or
+# packages that can be built sparse and non-sparse (e.g. nrfx) are rebuilt
+# when the (sparse) paths of the time of checkout are not the same as needed now.
+# Example 1: Build a) only needs CMSIS/Core. Build b) also needs CMSIS/DSP.
+#   If b) is built after a), the sources need to be checked out again.
+# Example 2: Build a) only needs nRF vendor headers. Build b) needs the full nrfx
+#   package. If b) is built after a), the package is incomplete and the sources
+#   need to be checked out again.
+#
+# This snippet is doing an ad-hoc (but faster) "|$(LAZYSPONGE)". The sparse
+# paths (also the empty list!) of a compilation run are saved in
+# `$(PKG_SOURCE_DIR).sparse` as `$(PKG_SPARSE_TAG)` and compared to the current
+# sparse paths in `$(PKG_SPARSE_PATHS)`. A mismatch triggers a rebuild.
 PKG_SPARSE_TAG = $(PKG_SOURCE_DIR).sparse
 $(PKG_SPARSE_TAG): FORCE
 	$(Q)if test -f $@; then \
@@ -143,7 +145,8 @@ GIT_IN_PKG = git -C $(PKG_SOURCE_DIR) --git-dir=.git --work-tree=.
 
 # When $(PKG_PATCHED).d is included $(PKG_PATCHED) prerequisites will include
 # the old prerequisites forcing a rebuild on prerequisite removal, but we do
-# not want to generate $(PKG_PATCHED).d with the old prerequisites
+# not want to generate $(PKG_PATCHED).d with the old prerequisites.
+# If the git repo changes, the files have to be patched again.
 PKG_PATCHED_PREREQUISITES = $(PKG_PATCHES) $(PKG_DOWNLOADED) $(PKG_SOURCE_DIR)/.git $(MAKEFILE_LIST)
 
 # Generate dependency file. Force rebuilding on dependency deletion
