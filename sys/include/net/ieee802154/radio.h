@@ -170,6 +170,17 @@ typedef enum {
      * @brief the devices records timestamps on received frames
      */
     IEEE802154_CAP_RX_TIMESTAMP         = BIT20,
+    /**
+     * @brief the received frame remains valid until the reception is closed
+     *
+     * A device that declares this capability keeps the received frame in
+     * the framebuffer while a reception is pending (see @ref
+     * ieee802154_radio_ops::read), regardless of any other operation
+     * performed in between (e.g. a transmission). This is required to
+     * transmit a frame before reading the received one, which is needed
+     * e.g. for software handling of the ACK reply.
+     */
+    IEEE802154_CAP_FRAME_RETENTION      = BIT21,
 } ieee802154_rf_caps_t;
 
 /**
@@ -238,13 +249,10 @@ typedef enum {
     /**
      * @brief the transceiver received a frame with an invalid crc.
      *
-     * @note some radios won't flush the framebuffer on reception of a frame
-     * with invalid CRC. Therefore it's required to call @ref
-     * ieee802154_radio_read.
-     *
-     * @note since the behavior of radios after frame reception is undefined,
-     * the upper layer should set the transceiver state to IDLE as soon as
-     * possible before calling @ref ieee802154_radio_read
+     * This indication opens a reception (see @ref
+     * ieee802154_radio_ops::read). Some radios won't flush the framebuffer
+     * on reception of a frame with invalid CRC, so the reception MUST be
+     * closed by calling @ref ieee802154_radio_read with a NULL buffer.
      */
     IEEE802154_RADIO_INDICATION_CRC_ERROR,
 
@@ -265,17 +273,10 @@ typedef enum {
      * passes the address matching filter (this includes ACK and Beacon frames).
      * The latter only applies if the radio is not in promiscuous mode.
      *
-     * The transceiver or driver MUST handle the ACK reply if the Ack Request
-     * bit is set in the received frame and promiscuous mode is disabled.
-     *
-     * The transceiver might be in a "FB Lock" state where no more frames are
-     * received. This is done in order to avoid overwriting the Frame Buffer
-     * with new frame arrivals.  In order to leave this state, the upper layer
-     * must call @ref ieee802154_radio_read
-     *
-     * @note since the behavior of radios after frame reception is undefined,
-     * the upper layer should set the transceiver state to IDLE as soon as
-     * possible before calling @ref ieee802154_radio_read
+     * This indication opens a reception (see @ref
+     * ieee802154_radio_ops::read). While the reception is pending, the
+     * transceiver might block new frame receptions in order to avoid
+     * overwriting the Frame Buffer with new frame arrivals.
      */
     IEEE802154_RADIO_INDICATION_RX_DONE,
 
@@ -552,11 +553,14 @@ struct ieee802154_radio_ops {
     int (*write)(ieee802154_dev_t *dev, const iolist_t *psdu);
 
     /**
-     * @brief Get the length of the received PSDU frame.
+     * @brief Get the length of the received PSDU frame
+     *
+     * This function provides non-destructive access to the received frame
+     * while a reception is pending (see @ref ieee802154_radio_ops::read).
      *
      * @pre the device is on
-     * @pre the radio already received a frame (e.g
-     *      @ref ieee802154_dev::cb with @ref IEEE802154_RADIO_INDICATION_RX_DONE).
+     * @pre a reception is pending and the radio was set to IDLE beforehand
+     *      (see @ref ieee802154_radio_ops::read).
      *
      * @post the frame buffer is still protected against new frame arrivals.
      *
@@ -567,29 +571,102 @@ struct ieee802154_radio_ops {
     int (*len)(ieee802154_dev_t *dev);
 
     /**
-     * @brief Read a frame from the internal framebuffer
+     * @brief Read or discard the received frame and close the reception
      *
-     * This function reads the received frame from the internal framebuffer.
-     * It should try to copy the received PSDU frame into @p buf. The FCS
-     * field will **not** be copied and its size **not** be taken into account
-     * for the return value. If the radio provides any kind of framebuffer
-     * protection, this function should release it.
+     * Reception lifecycle: a reception is opened by an indication
+     * (@ref IEEE802154_RADIO_INDICATION_RX_DONE or @ref
+     * IEEE802154_RADIO_INDICATION_CRC_ERROR) and MUST be closed by exactly
+     * one call to this function:
      *
-     * @post Don't call this function if there was no reception event
-     * (either @ref IEEE802154_RADIO_INDICATION_RX_DONE or @ref
-     * IEEE802154_RADIO_INDICATION_CRC_ERROR). Otherwise there's risk of RX
+     * ```
+     *        RX_DONE / CRC_ERROR                read
+     * NONE ---------------------> PENDING ---------------------> NONE
+     * ```
+     *
+     * While a reception is pending:
+     * - the upper layer SHOULD set the radio to IDLE (@ref
+     *   ieee802154_radio_set_idle) before any framebuffer access, since
+     *   the behavior of radios after frame reception is otherwise
+     *   undefined.
+     * - @ref ieee802154_radio_ops::len and @ref ieee802154_radio_ops::peek
+     *   provide non-destructive access to the received frame.
+     * - the received frame remains valid until the reception is closed,
+     *   unless another operation overwrites the framebuffer (e.g. a
+     *   transmission). Radios that declare @ref
+     *   IEEE802154_CAP_FRAME_RETENTION keep the received frame valid
+     *   regardless of interleaved operations between reception and calling
+     *   this function.
+     * - new frame receptions might be blocked (framebuffer protection).
+     *
+     * If @p buf is not NULL, the received PSDU frame is copied into @p buf
+     * and, if @p info is not NULL, the frame information (LQI, RSSI) is
+     * filled in. The FCS field is **not** copied and its size is **not**
+     * taken into account for the return value.
+     *
+     * If @p buf is NULL, the received frame is discarded. This is the only
+     * way to close a reception without copying the frame (e.g. after @ref
+     * IEEE802154_RADIO_INDICATION_CRC_ERROR, or when the upper layer
+     * doesn't need the frame).
+     *
+     * Once this function returns, the reception is closed: the framebuffer
+     * may be reused and the transceiver can be set back to RX (@ref
+     * ieee802154_radio_set_rx). If the radio provides any kind of
+     * framebuffer protection, this function releases it.
+     *
+     * @pre the device is on
+     * @pre a reception is pending and the radio was set to IDLE beforehand
+     *      (@ref ieee802154_radio_set_idle), since the behavior of radios
+     *      after frame reception is otherwise undefined.
+     *
+     * @post The reception is closed. Don't call this function again until a
+     * new reception event is indicated, otherwise there's risk of RX
      * underflow.
      *
      * @param[in] dev IEEE802.15.4 device descriptor
-     * @param[out] buf buffer to write the received PSDU frame into.
+     * @param[out] buf buffer to write the received PSDU frame into, or NULL
+     *             to discard the frame
      * @param[in] size size of @p buf
      * @param[in] info information of the received frame (LQI, RSSI). Can be
      *            NULL if this information is not needed.
      *
-     * @retval number of bytes written in @p buffer (0 if @p buf == NULL)
-     * @retval -ENOBUFS if the frame doesn't fit in @p buf
+     * @retval number of bytes written in @p buf (0 if @p buf == NULL)
+     * @retval -ENOBUFS if the frame doesn't fit in @p buf. In this case
+     *         nothing is consumed: the reception stays pending and the
+     *         received frame is not modified.
      */
     int (*read)(ieee802154_dev_t *dev, void *buf, size_t size, ieee802154_rx_info_t *info);
+
+    /**
+     * @brief Peek a part of a received frame from the internal framebuffer
+     *
+     * This function copies @p size bytes of the received PSDU frame, starting
+     * at @p offset, into @p buf **without consuming the frame** (see @ref
+     * ieee802154_radio_ops::read): the received frame remains in the
+     * framebuffer until the reception is closed. Unlike @ref
+     * ieee802154_radio_ops::read, this function MUST NOT release any kind
+     * of framebuffer protection and MUST NOT change the state of the radio.
+     *
+     * This function MAY be NULL if the radio doesn't provide random access
+     * to the received frame.
+     *
+     * @pre the device is on
+     * @pre a reception is pending and the radio was set to IDLE beforehand
+     *      (see @ref ieee802154_radio_ops::read).
+     * @pre @p offset + @p size doesn't exceed the length of the received
+     *      frame.
+     *
+     * @param[in] dev IEEE802.15.4 device descriptor
+     * @param[out] buf buffer to write the peeked bytes into.
+     * @param[in] offset offset of the first byte to peek, relative to the
+     *                  start of the PSDU frame.
+     * @param[in] size number of bytes to peek
+     *
+     * @retval number of bytes written in @p buf
+     * @retval -EINVAL if @p offset + @p size exceeds the length of the
+     *         received frame
+     */
+    int (*peek)(ieee802154_dev_t *dev, void *buf, size_t offset, size_t size);
+
     /**
      * @brief Turn off the device
      *
@@ -854,6 +931,20 @@ static inline bool ieee802154_radio_has_capability(ieee802154_dev_t *dev, uint32
 }
 
 /**
+ * @brief Check if the device implements the peek function
+ *
+ * Internally this function reads @ref ieee802154_radio_ops::peek and
+ * checks whether it's not NULL.
+ *
+ * @retval true if the device supports @ref ieee802154_radio_ops::peek
+ * @retval false if it doesn't
+ */
+static inline bool ieee802154_radio_has_peek(ieee802154_dev_t *dev)
+{
+    return dev->driver->peek != NULL;
+}
+
+/**
  * @brief Shortcut to @ref ieee802154_radio_ops::write
  *
  * @param[in] dev IEEE802.15.4 device descriptor
@@ -950,6 +1041,26 @@ static inline int ieee802154_radio_read(ieee802154_dev_t *dev,
                                                  ieee802154_rx_info_t *info)
 {
     return dev->driver->read(dev, buf, size, info);
+}
+
+/**
+ * @brief Shortcut to @ref ieee802154_radio_ops::peek
+ *
+ * @pre this function MUST be called before @ref ieee802154_radio_read, since
+ *      the frame is consumed by the latter.
+ *
+ * @param[in] dev IEEE802.15.4 device descriptor
+ * @param[out] buf buffer to write the peeked bytes into.
+ * @param[in] offset offset of the first byte to peek, relative to the
+ *                   start of the PSDU frame.
+ * @param[in] size number of bytes to peek
+ *
+ * @return result of @ref ieee802154_radio_ops::peek
+ */
+static inline int ieee802154_radio_peek(ieee802154_dev_t *dev,
+                                        void *buf, size_t offset, size_t size)
+{
+    return dev->driver->peek(dev, buf, offset, size);
 }
 
 /**

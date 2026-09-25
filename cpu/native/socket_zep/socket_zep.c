@@ -609,6 +609,27 @@ static int _read(ieee802154_dev_t *dev, void *buf, size_t max_size,
     return res;
 }
 
+static int _peek(ieee802154_dev_t *dev, void *buf, size_t offset, size_t size)
+{
+    socket_zep_t *zepdev = dev->priv;
+    zep_v2_data_hdr_t *zep = (zep_v2_data_hdr_t *)zepdev->rcv_buf;
+
+    /* report size without ZEP header and checksum */
+    size_t len = zep->length - IEEE802154_FCS_LEN;
+
+    DEBUG("socket_zep::peek: %zu bytes at offset %zu\n", size, offset);
+
+    if ((offset + size) > len) {
+        return -EINVAL;
+    }
+
+    /* skip the ZEP header, just copy payload without FCS */
+    const void *payload = zep + 1;
+    memcpy(buf, (const uint8_t *)payload + offset, size);
+
+    return size;
+}
+
 static int _request_op(ieee802154_dev_t *dev, ieee802154_hal_op_t op, void *ctx)
 {
     socket_zep_t *zepdev = dev->priv;
@@ -698,10 +719,12 @@ static const ieee802154_radio_ops_t socket_zep_rf_ops = {
           | IEEE802154_CAP_IRQ_TX_DONE
           | IEEE802154_CAP_IRQ_TX_START
           | IEEE802154_CAP_IRQ_RX_START
-          | IEEE802154_CAP_PHY_OQPSK,
+          | IEEE802154_CAP_PHY_OQPSK
+          | IEEE802154_CAP_FRAME_RETENTION,
 
     .write = _write,
     .read = _read,
+    .peek = _peek,
     .request_op = _request_op,
     .confirm_op = _confirm_op,
     .len = _len,
