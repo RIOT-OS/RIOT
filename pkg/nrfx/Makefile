@@ -39,7 +39,7 @@ else ifeq (nrf52,$(CPU_FAM))
   NRFX_SPARSE_PATHS += mdk/nrf52840_name_change.h
   NRFX_SPARSE_PATHS += mdk/nrf52840_peripherals.h
 
-else ifneq (nrf53%,$(CPU_FAM))
+else ifneq (,$(filter nrf53%,$(CPU_FAM)))
   NRFX_SPARSE_PATHS += mdk/nrf5340_application.h
   NRFX_SPARSE_PATHS += mdk/nrf5340_application_bitfields.h
   NRFX_SPARSE_PATHS += mdk/nrf5340_application_name_change.h
@@ -67,7 +67,7 @@ NRFX_VENDOR_HEADERS := $(addprefix $(VENDOR_FOLDER)/, $(notdir $(NRFX_SPARSE_PAT
 # Note: This has to be done in the preparation step, not in the `all` target
 #       because the `all` target builds the package during the compilation run,
 #       but at that point we already have to have them in place.
-$(PKG_PREPARED): $(NRFX_VENDOR_HEADERS)
+$(PKG_PREPARED): $(VENDOR_FOLDER) $(NRFX_VENDOR_HEADERS)
 
 # Make sure the folder REALLY exists before trying to copy to it.
 $(VENDOR_FOLDER): | $(PKG_PATCHED)
