@@ -1,1 +1,6 @@
+# Warning! For nRF CPUs, the nrfx package is included at a very late stage in
+# the build process if it is only used to fetch the headers. Therefore, this
+# file will only be evaluated when an application or package explicitly
+# specifies USEPKG+=nrfx.
+
 FEATURES_REQUIRED_ANY += cpu_nrf51|cpu_nrf52|cpu_nrf53|cpu_nrf9160
