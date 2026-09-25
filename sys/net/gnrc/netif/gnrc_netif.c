@@ -141,17 +141,17 @@ gnrc_netif_t *gnrc_netif_iter(const gnrc_netif_t *prev)
     return (result) ? container_of(result, gnrc_netif_t, netif) : NULL;
 }
 
-gnrc_netif_t *gnrc_netif_get_by_type(netdev_type_t type, uint8_t index)
+gnrc_netif_t *gnrc_netif_get_by_type(netif_type_t type, uint8_t index)
 {
     gnrc_netif_t *netif = NULL;
     while ((netif = gnrc_netif_iter(netif))) {
 
-#ifdef MODULE_NETDEV_REGISTER
-        if (netif->dev->type != type && type != NETDEV_ANY) {
+#ifdef MODULE_NETIF_REGISTER
+        if (netif->netif.type != type && type != NETIF_ANY) {
             continue;
         }
 
-        if (netif->dev->index != index && index != NETDEV_INDEX_ANY) {
+        if (netif->netif.index != index && index != NETIF_INDEX_ANY) {
             continue;
         }
 #else
@@ -1694,7 +1694,11 @@ int gnrc_netif_default_init(gnrc_netif_t *netif)
     if (res < 0) {
         return res;
     }
-    netif_register(&netif->netif);
+#ifdef MODULE_NETIF_REGISTER
+    netif_register(&netif->netif, dev->type, dev->index);
+#else
+    netif_register(&netif->netif, NETIF_ANY, 0);
+#endif
     _check_netdev_capabilities(dev, gnrc_netif_netdev_legacy_api(netif));
     _init_from_device(netif);
 #ifdef DEVELHELP

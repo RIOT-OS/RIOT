@@ -166,7 +166,10 @@ static int _set(gnrc_netif_t *netif, const gnrc_netapi_opt_t *opt)
 static int _init(gnrc_netif_t *netif)
 {
     netif->flags = 0;
-    netif_register(&netif->netif);
+    /* So far the nrf802154 is the only device supporting openDSME.
+     * This will change as soon as the interface is registered before calling
+     * the init function */
+    netif_register(&netif->netif, NETIF_NRF802154, 0);
     return 0;
 }
 
