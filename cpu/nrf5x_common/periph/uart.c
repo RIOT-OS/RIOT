@@ -57,7 +57,7 @@
  * @brief Chunk size used for transferring data from ROM [in bytes]
  */
 #ifndef NRF_UARTE_CHUNK_SIZE
-#define NRF_UARTE_CHUNK_SIZE    (32U)
+#  define NRF_UARTE_CHUNK_SIZE  (32U)
 #endif
 
 /**
@@ -70,7 +70,7 @@ static uint8_t rx_buf[UART_NUMOF];
 
 #ifdef MODULE_PERIPH_UART_NONBLOCKING
 
-#include "tsrb.h"
+#  include "tsrb.h"
 /**
  * @brief   Allocate for tx ring buffers
  */
@@ -140,18 +140,28 @@ int uart_init(uart_t uart, uint32_t baudrate, uart_rx_cb_t rx_cb, void *arg)
 
     /* configure RX pin */
     if (rx_cb) {
-        gpio_init(uart_config[uart].rx_pin, GPIO_IN);
-        dev->PSEL_RXD = uart_config[uart].rx_pin;
+        if (gpio_is_valid(uart_config[uart].rx_pin)) {
+            gpio_init(uart_config[uart].rx_pin, GPIO_IN);
+            dev->PSEL_RXD = uart_config[uart].rx_pin;
+        }
+        else {
+            dev->PSEL_RXD = 0xFFFFFFFF;
+        }
     }
 
     /* configure TX pin */
-    gpio_init(uart_config[uart].tx_pin, GPIO_OUT);
-    dev->PSEL_TXD = uart_config[uart].tx_pin;
+    if (gpio_is_valid(uart_config[uart].tx_pin)) {
+        gpio_init(uart_config[uart].tx_pin, GPIO_OUT);
+        dev->PSEL_TXD = uart_config[uart].tx_pin;
+    }
+    else {
+        dev->PSEL_TXD = 0xFFFFFFFF;
+    }
 
     /* enable HW-flow control if defined */
- #ifdef MODULE_PERIPH_UART_HW_FC
+#ifdef MODULE_PERIPH_UART_HW_FC
     /* set pin mode for RTS and CTS pins */
-    if (uart_config[uart].rts_pin != GPIO_UNDEF && uart_config[uart].cts_pin != GPIO_UNDEF) {
+    if (gpio_is_valid(uart_config[uart].rts_pin) && gpio_is_valid(uart_config[uart].cts_pin)) {
         gpio_init(uart_config[uart].rts_pin, GPIO_OUT);
         gpio_init(uart_config[uart].cts_pin, GPIO_IN);
         /* configure RTS and CTS pins to use */
@@ -242,7 +252,7 @@ int uart_init(uart_t uart, uint32_t baudrate, uart_rx_cb_t rx_cb, void *arg)
     }
 
     if (rx_cb || IS_USED(MODULE_PERIPH_UART_NONBLOCKING)) {
-#if  defined(CPU_NRF53) || defined(CPU_NRF9160)
+#if defined(CPU_NRF53) || defined(CPU_NRF9160)
         shared_irq_register_uart(dev, uart_isr_handler, (void *)(uintptr_t)uart);
 #else
         NVIC_EnableIRQ(uart_config[uart].irqn);
@@ -356,7 +366,7 @@ void uart_write(uart_t uart, const uint8_t *data, size_t len)
         /* Device is powered down. Writing anyway would deadlock */
         return;
     }
-#ifdef MODULE_PERIPH_UART_NONBLOCKING
+#  ifdef MODULE_PERIPH_UART_NONBLOCKING
     for (size_t i = 0; i < len; i++) {
         /* in IRQ or interrupts disabled */
         if (irq_is_in() || __get_PRIMASK()) {
@@ -390,7 +400,7 @@ void uart_write(uart_t uart, const uint8_t *data, size_t len)
             _write_buf(uart, &tx_buf[uart], 1);
         }
     }
-#else
+#  else
     /* EasyDMA can only transfer data from RAM (see ref. manual, sec. 6.34.1).
      * So if the given `data` buffer resides in ROM, we need to copy it to RAM
      * before being able to transfer it. To make sure the stack does not
@@ -409,7 +419,7 @@ void uart_write(uart_t uart, const uint8_t *data, size_t len)
     else {
         _write_buf(uart, data, len);
     }
-#endif
+#  endif
 }
 
 static void irq_handler(uart_t uart)
@@ -424,20 +434,21 @@ static void irq_handler(uart_t uart)
         }
     }
 
-#ifdef MODULE_PERIPH_UART_NONBLOCKING
+#  ifdef MODULE_PERIPH_UART_NONBLOCKING
     if (uart_config[uart].dev->EVENTS_ENDTX) {
-        /* reset flags and idsable ISR on EVENTS_ENDTX */
+        /* reset flags and disable ISR on EVENTS_ENDTX */
         uart_config[uart].dev->EVENTS_ENDTX = 0;
         uart_config[uart].dev->EVENTS_TXSTARTED = 0;
         uart_config[uart].dev->INTENCLR = UARTE_INTENSET_ENDTX_Msk;
         if (tsrb_empty(&uart_tx_rb[uart])) {
             uart_config[uart].dev->TASKS_STOPTX = 1;
-        } else {
+        }
+        else {
             tx_buf[uart] = tsrb_get_one(&uart_tx_rb[uart]);
             _write_buf(uart, &tx_buf[uart], 1);
         }
     }
-#endif
+#  endif
 
     cortexm_isr_end();
 }
@@ -492,18 +503,18 @@ void uart_isr_handler(void *arg)
     irq_handler(uart);
 }
 #else
-#ifdef UART_0_ISR
+#  ifdef UART_0_ISR
 void UART_0_ISR(void)
 {
     irq_handler(UART_DEV(0));
 }
-#endif
+#  endif
 
-#ifdef UART_1_ISR
+#  ifdef UART_1_ISR
 void UART_1_ISR(void)
 {
     irq_handler(UART_DEV(1));
 }
-#endif
+#  endif
 
 #endif /* def CPU_NRF53 || CPU_NRF9160 */
