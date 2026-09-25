@@ -49,7 +49,7 @@ _annotate_hunk() {
     DIFFLINE="$2"
     DIFFLEN="$3"
     DIFFHUNK="$4"
-    DIFFENDL=$((DIFFLINE+DIFFLEN))
+    DIFFENDL=$((DIFFLINE+DIFFLEN-1))
     ANOTATION_MESSAGE="${DIFFHUNK}"
     # for pure insertions the hunk starts at line 0, which is not a valid
     # annotation target
@@ -57,7 +57,7 @@ _annotate_hunk() {
         DIFFLINE=1
     fi
     github_annotate "$ANOTATION_MESSAGE" warning \
-    "file=${DIFFFILE},line=${DIFFLINE},endLine=${DIFFENDL},title=clang-format proposes\
+    "file=${DIFFFILE},line=${DIFFLINE},endLine=${DIFFENDL},title=clang-format proposes \
 the following patch"
 }
 
