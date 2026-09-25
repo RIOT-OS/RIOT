@@ -603,6 +603,7 @@ struct ieee802154_radio_ops {
      * @pre A reception is pending and the radio was set to IDLE beforehand
      *      (@ref ieee802154_radio_set_idle), since the behavior of radios
      *      after frame reception is otherwise undefined.
+     * @pre @p buf != NULL
      *
      * @post The reception is closed. Don't call this function again until a
      * new reception event is indicated, otherwise there's risk of RX
