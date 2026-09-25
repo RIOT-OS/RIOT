@@ -115,11 +115,7 @@ fi
 export BASE_BRANCH="${CI_BASE_BRANCH}"
 
 should_run always ./dist/tools/whitespacecheck/check.sh "${BASE_BRANCH}"
-# licenses runs twice with different DIFFFILTER, needs explicit check
-if should_run any_c_files; then
-    DIFFFILTER="MR" ERROR_EXIT_CODE=0 run ./dist/tools/licenses/check.sh
-    DIFFFILTER="AC" run ./dist/tools/licenses/check.sh
-fi
+should_run any_c_files ./dist/tools/licenses/check.sh
 should_run features ./dist/tools/ci/check_features_existing_inc_mk_is_up_to_date.sh
 should_run doccheck ./dist/tools/doccheck/check.sh
 should_run any_c_headers ./dist/tools/externc/check.sh
