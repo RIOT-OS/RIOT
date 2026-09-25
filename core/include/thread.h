@@ -146,14 +146,15 @@ extern "C" {
 #define THREAD_MAYBE_INLINE
 #endif /* THREAD_API_INLINED */
 
-#if defined(DEVELHELP) && !defined(CONFIG_THREAD_NAMES)
 /**
  * @brief   This global macro enable storage of thread names to help developers.
  *
- *          To activate it set environment variable `THREAD_NAMES=1`, or use Kconfig.
- *          It is automatically enabled if `DEVELHELP` is.
+ * To activate it, add `CFLAGS += -DCONFIG_THREAD_NAMES` to your application's
+ * Makefile or use Kconfig.
+ * It is automatically enabled if `DEVELHELP` is enabled.
  */
-#define CONFIG_THREAD_NAMES
+#if (defined(DEVELHELP) && !defined(CONFIG_THREAD_NAMES)) || defined(DOXYGEN)
+#  define CONFIG_THREAD_NAMES
 #endif
 
 /**
@@ -374,7 +375,7 @@ void thread_sleep(void);
  *
  * @see     thread_yield_higher()
  */
-#if defined(MODULE_CORE_THREAD) || DOXYGEN
+#if defined(MODULE_CORE_THREAD) || defined(DOXYGEN)
 void thread_yield(void);
 #else
 static inline void thread_yield(void)
@@ -484,22 +485,22 @@ char *thread_stack_init(thread_task_func_t task_func, void *arg,
 void thread_add_to_list(list_node_t *list, thread_t *thread);
 
 /**
- * @brief Returns the name of a process
+ * @brief Returns the name of a thread with PID @p pid
  *
- * @note when compiling without DEVELHELP, this *always* returns NULL!
+ * @note when compiling without @ref CONFIG_THREAD_NAMES, this *always* returns "?"!
  *
  * @param[in] pid   the PID of the thread to get the name from
  *
- * @return          the threads name
- * @return          `NULL` if pid is unknown
+ * @retval          the thread's name
+ * @retval          `"?"` if pid is unknown
  */
-#if defined(MODULE_CORE_THREAD) || DOXYGEN
+#if defined(MODULE_CORE_THREAD) || defined(DOXYGEN)
 const char *thread_getname(kernel_pid_t pid);
 #else
 static inline const char *thread_getname(kernel_pid_t pid)
 {
     (void)pid;
-    return "(none)";
+    return "?";
 }
 #endif
 
@@ -674,7 +675,7 @@ static inline kernel_pid_t thread_getpid_of(const thread_t *thread)
  * Get name of thread.
  *
  * @param   thread thread to work on
- * @returns thread name or NULL if not available
+ * @returns thread name or "?" if not available
  */
 static inline const char *thread_get_name(const thread_t *thread)
 {
@@ -682,7 +683,7 @@ static inline const char *thread_get_name(const thread_t *thread)
     return thread->name;
 #else
     (void)thread;
-    return NULL;
+    return "?";
 #endif
 }
 
