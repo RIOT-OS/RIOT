@@ -24,8 +24,6 @@
 #define ENABLE_DEBUG 0
 #include "debug.h"
 
-#define CSMA_SENDER_BACKOFF_PERIOD_UNIT_US  (320U)
-#define ACK_TIMEOUT_US                      (864U)
 /* 2.4 GHz, 250 kb/s, O-QPSK 62.5 ksymbols/s, 1 / 62 500 s = 16 µs */
 /* 12 symbols -> 12 * 16us = 192us */
 #define SIFS_PERIOD_US                      (192U)
@@ -666,13 +664,29 @@ static inline uint16_t _mr_fsk_ack_timeout_us(const ieee802154_mr_fsk_conf_t *co
          + ((fsk_pl * 8 + 2) + ack_len) * 8 * IEEE802154_MR_FSK_SYMBOL_TIME_US;
 }
 
+static uint32_t _calculate_csma_backoff_period(ieee802154_submac_t *submac)
+{
+    return ieee802154_get_turnaround_time(submac)
+         + ieee802154_get_cca_time(submac);
+}
+
+static uint32_t _calculate_ack_wait_duration(ieee802154_submac_t *submac)
+{
+    return ieee802154_get_unit_backoff_period(submac)
+         + ieee802154_get_turnaround_time(submac)
+         + ieee802154_get_shr_duration(submac)
+         /* ack psdu with phr included */
+         + ieee802154_get_psdu_duration(submac, 1 + IEEE802154_ACK_FRAME_LEN);
+}
+
 static int ieee802154_submac_config_phy(ieee802154_submac_t *submac,
                                         const ieee802154_phy_conf_t *conf)
 {
     switch (conf->phy_mode) {
     case IEEE802154_PHY_OQPSK:
-        submac->ack_timeout_us = ACK_TIMEOUT_US;
-        submac->csma_backoff_us = CSMA_SENDER_BACKOFF_PERIOD_UNIT_US;
+    case IEEE802154_PHY_BPSK:
+        submac->csma_backoff_us = _calculate_csma_backoff_period(submac);
+        submac->ack_timeout_us = _calculate_ack_wait_duration(submac);
         break;
 #ifdef MODULE_NETDEV_IEEE802154_MR_OQPSK
     case IEEE802154_PHY_MR_OQPSK:
