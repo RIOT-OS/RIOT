@@ -126,7 +126,7 @@ extern "C" {
  */
 typedef struct {
     uint16_t current_value;                      /**< The counter / current value of this timer */
-    uint16_t prescaler : 2;                      /**< The prescaler sets the devider for this timer */
+    uint16_t prescaler : 2;                      /**< The prescaler sets the divider for this timer */
     uint16_t count_up_on_neighbour_overflow : 1; /**< If set, counts up this timer when the previous overflowed */
     uint16_t unused_3_5 : 3;                     /**< unused */
     uint16_t irq_enable : 1;                     /**< enables interrupt request for this timer on overflow */
