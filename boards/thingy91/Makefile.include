@@ -1,0 +1,16 @@
+# write here the flasher tool and stdio configurations
+#INCLUDES += -I$(RIOTBOARD)/thingy91/include
+
+# HACK: replicate dependency resolution in Makefile.dep, only works
+# if `USEMODULE` or `DEFAULT_MODULE` is set by the command line or in the
+# application Makefile.
+ifeq (,$(filter stdio_%,$(DISABLE_MODULE) $(USEMODULE)))
+  RIOT_TERMINAL ?= jlink
+endif
+
+#TERMPROG = $(RIOTOOLS)/jlink/jlink.sh
+#TERMFLAGS = term-rtt
+#RIOT_TERMINAL ?= jlink 
+
+# use shared Makefile.include
+#include $(RIOTCPU)/nrf9160/Makefile.include

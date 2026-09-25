@@ -1,0 +1,16 @@
+# Copyright (c) 2021 HAW-Hamburg
+#
+# This file is subject to the terms and conditions of the GNU Lesser
+# General Public License v2.1. See the file LICENSE in the top level
+# directory for more details.
+
+config BOARD
+    default "thingy91" if BOARD_THINGY91
+
+config BOARD_THINGY91
+    bool
+    default y
+    select NRF9160
+
+    # Put defined MCU peripherals here (in alphabetical order)
+    # Put other features for this board (in alphabetical order)
