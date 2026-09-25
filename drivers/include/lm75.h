@@ -10,37 +10,40 @@
  *
  * @{
  * @file
- * @brief       Driver for the LM75 temperature sensor.
+ * @brief       Driver for the LM75 and TMP1075 temperature sensors.
  *
  * @author      Vitor Batista <vitor.batista@ml-pa.com>
  *
  */
 
 /**
- * @defgroup    drivers_lm75     LM75 Temperature Sensor driver compile configuration
+ * @defgroup    drivers_lm75     LM75 and TMP1075 Temperature Sensor Driver
  * @ingroup     drivers_sensors
- * @brief       Driver for the lm75 temperature sensors.
+ * @brief       Driver for the LM75 and TMP1075 temperature sensors.
  */
 
+#include <errno.h> /* IWYU pragma: keep needed for EIO etc. */
 #include <stdbool.h>
-#include "periph/i2c.h"
+
 #include "periph/gpio.h"
+#include "periph/i2c.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
 /**
- * @name LM75 return values
+ * @name        Backwards compatible LM75 return values
+ * @deprecated  Use `errno` directly instead
+ * @{
  */
-enum {
-    LM75_SUCCESS = 0,
-    LM75_ERROR_I2C,
-    LM75_ERROR
-};
+#define LM75_SUCCESS   0         /**< Success */
+#define LM75_ERROR_I2C (-EIO)    /**< I2C communication error */
+#define LM75_ERROR     (-EINVAL) /**< Other error */
+/** @} */
 
 /**
- * @brief temperature reading properties/resolutions struct of the LM75 sensors
+ * @brief Temperature reading properties/resolutions struct of the LM75 sensors
  */
 typedef struct lm75_properties {
     uint16_t    os_res;      /**< resolution of the OS and HYST registers */
@@ -55,14 +58,19 @@ extern lm75_properties_t lm75a_properties;      /**< declaration present in lm75
 extern lm75_properties_t tmp1075_properties;    /**< declaration present in lm75.c */
 
 /**
- * @brief params required for initialization
+ * @brief Parameters required for initialization
  */
 typedef struct lm75_params {
     const    lm75_properties_t *res;      /**< Temperature resolutions */
-    uint16_t conv_rate;                   /**< Conversion rate in ms */
+    /**
+     * @brief   Device Conversion Rate register
+     *
+     * @warning Only configurable for the TM1075 and ignored for other devices
+     */
+    uint16_t conv_rate;
     gpio_t   gpio_alarm;                  /**< Over-temperature alarm */
     i2c_t    i2c_bus;                     /**< I2C Bus used */
-    uint8_t  i2c_addr;                    /**< i2c address */
+    uint8_t  i2c_addr;                    /**< I2C address */
     uint8_t  shutdown_mode;               /**< Shutdown mode register */
     uint8_t  tm_mode;                     /**< Thermistor Mode */
     uint8_t  polarity;                    /**< OS polarity register */
@@ -72,7 +80,7 @@ typedef struct lm75_params {
 } lm75_params_t;
 
 /**
- * @brief lm75 device descriptor
+ * @brief LM75 device descriptor
  */
 typedef struct lm75 {
     lm75_params_t    lm75_params; /**< Configuration Parameters */
@@ -81,158 +89,167 @@ typedef struct lm75 {
 /**
  * @brief Initialization of the LM75 sensor
  *
- * Initializes the sensor according to specific input parameters.
+ * Initializes the sensor according to the specified input parameters.
  *
- * @param[out] dev        device structure to initialize
- * @param[in] params      initialization parameters
+ * @param[out]  dev         device structure to initialize
+ * @param[in]   params      initialization parameters
  *
- * @return LM75_SUCCESS, on success
- * @return LM75_ERROR_I2C, on I2C related error
- * @return LM75_ERROR, on initialization related error
+ * @retval      0           success
+ * @retval      -EINVAL     Not an LM75 or TMP1075 sensor (value in ID register
+ *                          does not match)
+ * @retval      <0          Error from I2C, see @ref i2c_read_reg
  */
 int lm75_init(lm75_t *dev, const lm75_params_t *params);
 
 /**
  * @brief Temperature values of LM75 sensor
  *
- * Reads the sensor temperature values from TEMP_REG
- * the value is given with the full precision the device is capable of
- * If divided by the device's mult property, the result will be the temperature in ºC
- * and the remainder of that division will be the decimal part of the temperature,
- * at the maximum resolution the device is capable of.
+ * Reads the sensor temperature values from TEMP_REG. The value is given with
+ * the full precision the device is capable of. If divided by the device's
+ * temp_mult property, the result will be the temperature in ºC and the
+ * remainder of that division will be the decimal part of the temperature, at
+ * the maximum resolution the device is capable of.
  *
- * @param[in] dev                device structure
- * @param[in] temperature        buffer where temperature value will be written
+ * @param[in]   dev         device structure
+ * @param[out]  temperature buffer that the temperature value will be written to
  *
- * @return LM75_SUCCESS, on success
- * @return LM75_ERROR_I2C, on I2C related error
+ * @retval      0           success
+ * @retval      <0          Error from I2C, see @ref i2c_read_reg
  */
-int lm75_get_temperature_raw(lm75_t *dev, int *temperature);
+int lm75_get_temperature_raw(const lm75_t *dev, int32_t *temperature);
 
 /**
  * @brief Temperature values of LM75 sensor
  *
- * Gets the device's temperature register with the lm75_get_temperature_raw
- * function and then returns the values in mºC, truncating values smaller than this, if available
+ * Gets the device's temperature register with the @ref lm75_get_temperature_raw
+ * function and then returns the values in mºC, truncating values smaller than
+ * this, if available.
  *
- * @param[in] dev                device structure
- * @param[in] temperature        buffer where temperature value will be written in mºC
+ * @param[in]   dev         device structure
+ * @param[out]  temperature that the temperature value will be written to in mºC
  *
- * @return LM75_SUCCESS, on success
- * @return LM75_ERROR, on error
+ * @retval      0           success
+ * @retval      <0          Error from I2C, see @ref i2c_read_reg
  */
-int lm75_get_temperature(lm75_t *dev, int *temperature);
+int lm75_get_temperature(const lm75_t *dev, int32_t *temperature);
 
 /**
- * @brief Sets the values for Overtemperature shutdown(OS) and Hysteresis temperature(HYST).
- * OS gives the temperature's higher bound and HYST the lower bound
- * values are rounded to the lowest value that the device supports,
+ * @brief Sets the values for Overtemperature Shutdown (OS) and Hysteresis
+ *        Temperature (HYST).
  *
- * @param[in] dev           device structure
- * @param[in] temp_os       desired OS temperature in mºC
- * @param[in] temp_hyst     desired HYST temperature in mºC
- * @param[in] cb            callback that is called from interrupt context
- * @param[in] arg           optional arguments for the gpio_init_int function
+ * OS gives the temperature's upper bound and HYST the lower bound.
+ * The values are rounded to the lowest value that the device supports.
  *
- * @return LM75_SUCCESS, on success
- * @return LM75_ERROR_I2C, on I2C related error
- * @return LM75_ERROR, on temperature setting related error
+ * @param[in]   dev         device structure
+ * @param[in]   temp_hyst   desired HYST temperature in mºC
+ * @param[in]   temp_os     desired OS temperature in mºC
+ * @param[in]   cb          callback that is called from interrupt context
+ * @param[in]   arg         optional arguments for the @ref gpio_init_int function
+ *
+ * @retval      0           success
+ * @retval      -EINVAL     Invalid hysteresis or invalid GPIO config
+ * @retval      <0          Error from I2C, see @ref i2c_read_reg
  */
-int lm75_set_temp_limits(lm75_t *dev, int temp_hyst, int temp_os, gpio_cb_t cb, void *arg);
+int lm75_set_temp_limits(const lm75_t *dev, int32_t temp_hyst, int32_t temp_os,
+                         gpio_cb_t cb, void *arg);
 
 /**
- * @brief Overshutdown temperature value of LM75 sensor
+ * @brief Overtemperature Shutdown (OS) value of the LM75 sensor
  *
  * Reads the sensor OS temperature value from TOS_REG in ºC.
  *
- * @param[in] dev                 device structure
- * @param[out] temperature        buffer where OS temperature value will be written
+ * @param[in]   dev         device structure
+ * @param[out]  temperature buffer that the OS temperature value will be written to
  *
- * @return LM75_SUCCESS, on success
- * @return LM75_ERROR_I2C, on I2C related error
+ * @retval      0           success
+ * @retval      <0          Error from I2C, see @ref i2c_read_reg
  */
-int lm75_get_os_temp(lm75_t *dev, int *temperature);
+int lm75_get_os_temp(const lm75_t *dev, int32_t *temperature);
 
 /**
- * @brief Hysteresis temperature value of LM75 sensor
+ * @brief Hysteresis Temperature (HYST) value of the LM75 sensor
  *
  * Reads the sensor hysteresis temperature value from THYST_REG in ºC.
  *
- * @param[in] dev                 device structure
- * @param[out] temperature        buffer where HYST temperature value will be written
+ * @param[in]   dev         device structure
+ * @param[out]  temperature buffer that the HYST temperature value will be written to
  *
- * @return LM75_SUCCESS, on success
- * @return LM75_ERROR_I2C, on I2C related error
+ * @retval      0           success
+ * @retval      <0          Error from I2C, see @ref i2c_read_reg
  */
-int lm75_get_hyst_temp(lm75_t *dev, int *temperature);
+int lm75_get_hyst_temp(const lm75_t *dev, int32_t *temperature);
 
 /**
  * @brief Read the current state of the OS pin to see if it's active.
  *
- * Read the configuration register to see the OS pin's polarity and
+ * Reads the configuration register to see the OS pin's polarity and
  * then reads its state. Then outputs if the pin is active and whether
  * it's in the low and active or high and active.
  *
- * @param[in] dev               device structure
- * @param[out] os_pin_state     pointer to the state of the OS pin - 0 for inactive and 1 for active
+ * @param[in]   dev             device structure
+ * @param[out]  os_pin_state    pointer to the state of the OS pin - 0 for
+ *                              inactive and 1 for active
  *
- * @return LM75_SUCCESS, on success
- * @return LM75_ERROR, on pin reading error
+ * @retval      0               success
+ * @retval      <0              Error from I2C, see @ref i2c_read_reg
  */
-int lm75_get_os_pin(lm75_t *dev, bool *os_pin_state);
+int lm75_get_os_pin(const lm75_t *dev, bool *os_pin_state);
 
 /**
  * @brief Activate the LM75 sensor shutdown mode
  *
- * @param[in] dev      device structure to set into shutdown mode
+ * @param[in]   dev         device structure to set into shutdown mode
  *
- * @return LM75_SUCCESS, on success
- * @return LM75_ERROR, on mode switching related error
+ * @retval      0           success
+ * @retval      <0          Error from I2C, see @ref i2c_read_reg
  */
-int lm75_poweroff(lm75_t *dev);
+int lm75_poweroff(const lm75_t *dev);
 
 /**
  * @brief Deactivate the LM75 sensor shutdown mode
  *
- * @param[in] dev      device structure to wake up from shutdown mode
+ * @param[in]   dev         device structure to wake up from shutdown mode
  *
- * @return LM75_SUCCESS, on success
- * @return LM75_ERROR, on mode switching related error
+ * @retval      0           success
+ * @retval      <0          Error from I2C, see @ref i2c_read_reg
  */
-int lm75_poweron(lm75_t *dev);
+int lm75_poweron(const lm75_t *dev);
 
 /**
  * @brief Activates one shot conversion mode
  *
  * Wakes from shutdown mode, does a single temperature conversion
- * and writes in into the temperature register and then goes back into shutdown
+ * and writes in into the temperature register and then goes back into shutdown.
  *
- * @param[in] dev       device structure
+ * @param[in]   dev         device structure
  *
- * @return LM75_ERROR if unsuccessful
- * @return LM75_SUCCESS if successful
+ * @retval      0           success
+ * @retval      -ENOTSUP    feature not supported by hardware variant used
+ * @retval      <0          Error from I2C, see @ref i2c_read_reg
  */
-int tmp1075_one_shot(lm75_t *dev);
+int tmp1075_one_shot(const lm75_t *dev);
 
 /**
  * @brief Activates low power mode operation
  *
- * This function makes the device measure temperatures in a strictly discrete way
- * at a user definable rate, as opposed to performing continuous measurements
- * at the device's conversion rate.
- * It allows the device to stay in shutdown mode for the most part, therefore consuming less power.
- * In the tmp1075 and other devices which have the one shot feature this is done automatically.
- * In the LM75A sensor nd other sensors which lack the one shot mode feature this is done manually
- * by switching the device to and from shutdown mode and staying awake at least long enough
- * to perform one ne measurement.
+ * This function makes the device measure temperatures in a strictly
+ * discrete way at a user definable rate, as opposed to performing continuous
+ * measurements at the device's conversion rate.
  *
- * @param[in] dev           device structure
- * @param[in] interval      time interval in ms between measurements
+ * It allows the device to stay in shutdown mode for the most part, therefore
+ * consuming less power. In the TMP1075 and other devices which have the one
+ * shot feature this is done automatically. In the LM75A sensor and other
+ * sensors which lack the one shot mode feature this is done manually by
+ * switching the device to and from shutdown mode and staying awake at least
+ * long enough to perform one measurement.
  *
- * @return LM75_ERROR if unsuccessful
- * @return LM75_SUCCESS if successful
+ * @param[in]   dev         device structure
+ * @param[in]   interval    time interval in ms between measurements
+ *
+ * @retval      0           success
+ * @retval      <0          Error from I2C, see @ref i2c_read_reg
  */
-int lm75_low_power_mode(lm75_t *dev, uint16_t interval);
+int lm75_low_power_mode(const lm75_t *dev, uint16_t interval);
 
 #ifdef __cplusplus
 }
