@@ -38,6 +38,16 @@ void _gnrc_tcp_rcvbuf_init(void);
 int _gnrc_tcp_rcvbuf_get_buffer(gnrc_tcp_tcb_t *tcb);
 
 /**
+ * @brief Clear receive buffer.
+ *
+ * Clears the receive buffer for reuse, without releasing it first. If the
+ * receive buffer is not allocated, this function is a no-op.
+ *
+ * @param[in,out] tcb   TCB holding the receive buffer that should be cleared.
+ */
+void _gnrc_tcp_rcvbuf_clear_buffer(gnrc_tcp_tcb_t *tcb);
+
+/**
  * @brief Release allocated receive buffer.
  *
  * @param[in,out] tcb   TCB holding the receive buffer that should be released.

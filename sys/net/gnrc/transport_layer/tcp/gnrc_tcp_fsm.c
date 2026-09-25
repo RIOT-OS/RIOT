@@ -174,6 +174,12 @@ static int _transition_to(gnrc_tcp_tcb_t *tcb, _gnrc_tcp_fsm_state_t state)
             /* Clear Accepted Status */
             tcb->status &= ~(STATUS_ACCEPTED);
 
+            /* Clear receive buffer, if already allocated */
+            _gnrc_tcp_rcvbuf_clear_buffer(tcb);
+
+            /* Restore receive window size */
+            tcb->rcv_wnd = CONFIG_GNRC_TCP_DEFAULT_WINDOW;
+
             /* Clear address info */
 #ifdef MODULE_GNRC_IPV6
             if (tcb->address_family == AF_INET6) {
