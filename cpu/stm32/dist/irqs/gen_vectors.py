@@ -44,20 +44,28 @@ ISR_VECTOR(1) const isr_t vector_cpu[CPU_IRQ_NUMOF] = {{
 }};
 """
 
+# Some CPU lines don't ship their own CMSIS device header because they
+# are pin/memory-compatible with another line and share the exact same
+# vector table. Map such a line to the line whose CMSIS header it should
+# reuse when parsing.
+ALIASES = {
+    "STM32F030x4": "STM32F030x6",
+}
+
 
 def parse_cmsis(cmsis_dir, cpu_line):
     """Parse the CMSIS to get the list IRQs."""
-    if cpu_line == "STM32F030x4":
-        # STM32F030x4 is provided in the RIOT codebase in a different location
-        cpu_line_cmsis = os.path.join(
-            STM32_VENDOR_DIR, "{}.h".format(cpu_line.lower()))
-    elif cpu_line.startswith("STM32MP1"):
+    # Resolve the CMSIS header to actually parse: either the real line,
+    # or the line it is aliased to.
+    cmsis_line = ALIASES.get(cpu_line, cpu_line)
+
+    if cpu_line.startswith("STM32MP1"):
         # STM32MP157Cxx is provided in the RIOT codebase in a different location
         cpu_line_cmsis = os.path.join(
-            STM32_VENDOR_DIR, "{}_cm4.h".format(cpu_line.lower()))
+            STM32_VENDOR_DIR, "{}_cm4.h".format(cmsis_line.lower()))
     else:
         cpu_line_cmsis = os.path.join(
-            "{}/{}.h".format(cmsis_dir, cpu_line.lower())
+            "{}/{}.h".format(cmsis_dir, cmsis_line.lower())
         )
 
     with open(cpu_line_cmsis, 'rb') as cmsis:
