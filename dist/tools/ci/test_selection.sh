@@ -24,9 +24,11 @@ TEST_PATHS[any_build_files]="features.yaml ${TEST_PATHS[any_make_files]} boards/
 # Test specific path patterns, e.g. if multiple checks are needed.
 # Tests matching a single group use the group name directly.
 TEST_PATHS[features]="features.yaml makefiles/features_existing.inc.mk"
-TEST_PATHS[doccheck]="${TEST_PATHS[any_doc_files]} ${TEST_PATHS[any_c_files]} makefiles/pseudomodules.inc.mk"
+TEST_PATHS[doccheck]="${TEST_PATHS[any_doc_files]} ${TEST_PATHS[any_c_files]}"\
+                     "makefiles/pseudomodules.inc.mk"
 TEST_PATHS[board_doc]="boards/*"
-TEST_PATHS[codespell]="${TEST_PATHS[any_c_files]} ${TEST_PATHS[any_shell_files]} ${TEST_PATHS[any_python_files]} ${TEST_PATHS[any_text_files]}"
+TEST_PATHS[codespell]="${TEST_PATHS[any_c_files]} ${TEST_PATHS[any_shell_files]}"\
+                      "${TEST_PATHS[any_python_files]} ${TEST_PATHS[any_text_files]}"
 TEST_PATHS[code_in_guides]="doc/guides/* ${TEST_PATHS[any_example_files]}"
 
 # true if any given path changed vs BASE_BRANCH; true if base unknown
@@ -53,10 +55,11 @@ function should_run {
 
     if [ -n "${STATIC_TESTS}" ]; then
         # explicit selection: STATIC_TESTS is "all" or space-separated names
-        if [ "${STATIC_TESTS}" = "all" ] || \
-           printf '%s\n' "${STATIC_TESTS}" | tr ' ' '\n' | grep -qx "${name}"; then
-            skip=0
-        fi
+        case " ${STATIC_TESTS} " in
+            " all "|*" ${name} "*)
+                skip=0
+                ;;
+        esac
     elif [ -z "${TEST_PATHS[${name}]}" ]; then
         skip=0
     else
