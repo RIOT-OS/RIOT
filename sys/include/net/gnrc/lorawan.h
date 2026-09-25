@@ -142,6 +142,7 @@ typedef struct {
     int16_t status;     /**< status of the MCPS confirm */
     mcps_type_t type;   /**< type of the MCPS confirm */
     iolist_t *msdu;     /**< pointer to the msdu */
+    void *context;     /**< optional handle to the gnrc_pktsnip_t of the request */
 } mcps_confirm_t;
 
 /**
