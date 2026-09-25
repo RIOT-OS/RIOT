@@ -15,19 +15,18 @@
  * @}
  */
 
-#include <errno.h>
+#include <errno.h> /* IWYU pragma: keep */
 #include <stdalign.h>
 #include <stdio.h>
-#ifdef PICOLIBC_TLS
-#include <picotls.h>
-#endif
 
 #include "assert.h"
-#include "thread.h"
 #include "irq.h"
-
-#include "bitarithm.h"
 #include "sched.h"
+#include "thread.h"
+
+#ifdef PICOLIBC_TLS
+#  include <picotls.h>
+#endif
 
 #define ENABLE_DEBUG 0
 #include "debug.h"
@@ -234,7 +233,7 @@ uintptr_t measure_stack_free_internal(const char *stack, size_t size)
 }
 
 kernel_pid_t thread_create(char *stack, int stacksize, uint8_t priority,
-                           int flags, thread_task_func_t function, void *arg,
+                           int flags, thread_task_func_t task_func, void *arg,
                            const char *name)
 {
     if (priority >= SCHED_PRIO_LEVELS) {
@@ -272,24 +271,24 @@ kernel_pid_t thread_create(char *stack, int stacksize, uint8_t priority,
     thread_t *thread = (thread_t *)(uintptr_t)(stack + stacksize);
 
 #ifdef PICOLIBC_TLS
-#if __PICOLIBC_MAJOR__ > 1 || __PICOLIBC_MINOR__ >= 8
-#define TLS_ALIGN       (alignof(thread_t) > _tls_align() ? alignof(thread_t) : _tls_align())
-#else
-#define TLS_ALIGN       alignof(thread_t)
-#endif
-    char *tls = stack + stacksize - _tls_size();
-    /*
-     * Make sure the TLS area is aligned as required and that the
-     * resulting stack will also be aligned as required
-     */
-    thread->tls = (void *) ((uintptr_t) tls & ~ (TLS_ALIGN - 1));
-    stacksize = (char *) thread->tls - stack;
+#  if __PICOLIBC_MAJOR__ > 1 || __PICOLIBC_MINOR__ >= 8
+#    define TLS_ALIGN (alignof(thread_t) > _tls_align() ? alignof(thread_t) : _tls_align())
+#  else
+#    define TLS_ALIGN alignof(thread_t)
+#  endif
+    uintptr_t tls = (uintptr_t)stack + stacksize - _tls_size();
+    /* Make sure that the TLS area is aligned as required and that the
+     * resulting stack will also be aligned as required. */
+    tls &= ~(TLS_ALIGN - 1);
+    thread->tls = (void *)tls;
+    stacksize = tls - (uintptr_t)stack;
 
     _init_tls(thread->tls);
 #endif
 
 #if defined(DEVELHELP) || defined(SCHED_TEST_STACK) \
-    || defined(MODULE_TEST_UTILS_PRINT_STACK_USAGE)
+#if defined(DEVELHELP) || defined(SCHED_TEST_STACK) || \
+    defined(MODULE_TEST_UTILS_PRINT_STACK_USAGE)
     if (flags & THREAD_CREATE_NO_STACKTEST) {
         /* create stack guard. Alignment has been handled above, so silence
          * -Wcast-align */
@@ -328,7 +327,7 @@ kernel_pid_t thread_create(char *stack, int stacksize, uint8_t priority,
     sched_threads[pid] = thread;
 
     thread->pid = pid;
-    thread->sp = thread_stack_init(function, arg, stack, stacksize);
+    thread->sp = thread_stack_init(task_func, arg, stack, stacksize);
 
 #if defined(DEVELHELP) || IS_ACTIVE(SCHED_TEST_STACK) || \
     defined(MODULE_MPU_STACK_GUARD) || defined(MODULE_CORTEXM_STACK_LIMIT)
