@@ -585,9 +585,9 @@ struct ieee802154_radio_ops {
      * - new frame receptions might be blocked (framebuffer protection).
      *
      * If @p buf is not NULL, the received PSDU frame is copied into @p buf
-     * and, if @p info is not NULL, the frame information (LQI, RSSI) is
-     * filled in. The FCS field is **not** copied and its size is **not**
-     * taken into account for the return value.
+     * and, if @p info is not NULL, the frame information (RSSI and LQI, if
+     * supported) is filled in. The FCS field is **not** copied and its size is
+     * **not** taken into account for the return value.
      *
      * If @p buf is NULL, the received frame is discarded. This is the only
      * way to close a reception without copying the frame (e.g. after @ref
