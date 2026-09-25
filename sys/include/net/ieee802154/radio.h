@@ -1032,7 +1032,7 @@ static inline int ieee802154_radio_read(ieee802154_dev_t *dev,
 /**
  * @brief Shortcut to @ref ieee802154_radio_ops::peek
  *
- * @pre this function MUST be called before @ref ieee802154_radio_read, since
+ * @pre This function MUST be called before @ref ieee802154_radio_read, since
  *      the frame is consumed by the latter.
  *
  * @param[in] dev IEEE802.15.4 device descriptor
