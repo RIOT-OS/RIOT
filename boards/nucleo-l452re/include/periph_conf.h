@@ -23,7 +23,7 @@
 
 /* Add specific clock configuration (HSE, LSE) for this board here */
 #ifndef CONFIG_BOARD_HAS_LSE
-#define CONFIG_BOARD_HAS_LSE            1
+#  define CONFIG_BOARD_HAS_LSE          1
 #endif
 
 #include "periph_cpu.h"
@@ -31,6 +31,15 @@
 #include "cfg_i2c1_pb8_pb9.h"
 #include "cfg_rtt_default.h"
 #include "cfg_timer_tim2.h"
+
+
+/** some docs
+ *
+ */
+__attribute__((unused)) static void very_unused_function(void *arg)
+{
+    (void)arg;
+}
 
 #ifdef __cplusplus
 extern "C" {
