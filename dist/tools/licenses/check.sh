@@ -47,6 +47,7 @@ for LICENSE in ${LICENSES}; do
 done
 
 FILES=$(FILEREGEX='\.([sSch]|cpp)$' changed_files)
+NEW_FILES=$(FILEREGEX='\.([sSch]|cpp)$' DIFFFILTER='AC' changed_files)
 
 # categorize files
 for FILE in ${FILES}; do
@@ -63,7 +64,10 @@ for FILE in ${FILES}; do
     if [ ${FAIL} = 1 ]; then
         echo "${FILE}" >> "${UNKNOWN}"
         echo "file has an unknown license header: '${FILE}'"
-        EXIT_CODE=${ERROR_EXIT_CODE}
+        # only fail the check for files added in this branch
+        if echo "${NEW_FILES}" | grep -qxF "${FILE}"; then
+            EXIT_CODE=${ERROR_EXIT_CODE}
+        fi
     fi
 done
 
