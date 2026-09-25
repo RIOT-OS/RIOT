@@ -188,7 +188,7 @@ typedef enum {
  */
 typedef enum {
     /**
-     * @brief the transceiver successfully sent a frame.
+     * @brief The transceiver successfully sent a frame.
      *
      * Depending of the type of transmissions and available caps, this could
      * mean one of the following:
@@ -202,14 +202,14 @@ typedef enum {
      */
     TX_STATUS_SUCCESS,
     /**
-     * @brief the transceiver received a valid ACK with the frame pending bit
+     * @brief The transceiver received a valid ACK with the frame pending bit
      *
      * This status is present only if the device supports @ref
      * IEEE802154_CAP_FRAME_RETRANS or @ref IEEE802154_CAP_IRQ_ACK_TIMEOUT.
      */
     TX_STATUS_FRAME_PENDING,
     /**
-     * @brief the transceiver ran out of retransmission
+     * @brief The transceiver ran out of retransmission
      *
      * This status is present only if the device supports @ref
      * IEEE802154_CAP_FRAME_RETRANS or @ref IEEE802154_CAP_IRQ_ACK_TIMEOUT.
@@ -229,14 +229,14 @@ typedef enum {
  */
 typedef enum {
     /**
-     * @brief the transceiver detected a valid SFD
+     * @brief The transceiver detected a valid SFD
      *
      * This event is present if radio has @ref IEEE802154_CAP_IRQ_RX_START cap.
      */
     IEEE802154_RADIO_INDICATION_RX_START,
 
     /**
-     * @brief the transceiver received a frame with an invalid crc.
+     * @brief The transceiver received a frame with an invalid crc.
      *
      * This indication opens a reception (see @ref ieee802154_radio_ops::read).
      * Some radios won't flush the framebuffer on reception of a frame with
@@ -246,7 +246,7 @@ typedef enum {
     IEEE802154_RADIO_INDICATION_CRC_ERROR,
 
     /**
-     * @brief the transceiver sent out a valid SFD
+     * @brief The transceiver sent out a valid SFD
      *
      * This event is present if radio has @ref IEEE802154_CAP_IRQ_TX_START cap.
      *
@@ -255,7 +255,7 @@ typedef enum {
     IEEE802154_RADIO_INDICATION_TX_START,
 
     /**
-     * @brief the transceiver received a frame and lies in the
+     * @brief The transceiver received a frame and lies in the
      *        internal framebuffer.
      *
      * This indication should be generated only if CRC is valid and the frame
@@ -270,7 +270,7 @@ typedef enum {
     IEEE802154_RADIO_INDICATION_RX_DONE,
 
     /**
-     * @brief the transceiver either finished sending a frame, the retransmission
+     * @brief The transceiver either finished sending a frame, the retransmission
      *        procedure or the channel activity detection prior transmission.
      *
      * This event is present if radio has @ref IEEE802154_CAP_IRQ_TX_DONE cap.
@@ -673,7 +673,7 @@ struct ieee802154_radio_ops {
      * @note @ref ieee802154_radio_ops::confirm_on MUST be used to finish the
      * procedure.
      *
-     * @pre the init function of the radio succeeded.
+     * @pre The init function of the radio succeeded.
      *
      * @param[in] dev IEEE802.15.4 device descriptor
      *
@@ -685,9 +685,9 @@ struct ieee802154_radio_ops {
     /**
      * @brief Confirmation function for @ref ieee802154_radio_ops::request_on.
      *
-     * @pre call to @ref ieee802154_radio_ops::request_on was successful.
+     * @pre Call to @ref ieee802154_radio_ops::request_on was successful.
      *
-     * @post the transceiver state is IDLE
+     * @post The transceiver state is IDLE
      * During boot or in case the radio doesn't support @ref
      * IEEE802154_CAP_REG_RETENTION when @ref off was called, the
      * Physical Information Base will be undefined. Thus, take into
@@ -1080,7 +1080,7 @@ static inline int ieee802154_radio_set_cca_mode(ieee802154_dev_t *dev,
 /**
  * @brief Shortcut to @ref ieee802154_radio_ops::config_phy
  *
- * @pre the transceiver state is IDLE.
+ * @pre The transceiver state is IDLE.
  *
  * @param[in] dev IEEE802.15.4 device descriptor
  * @param[in] conf the PHY configuration
@@ -1116,7 +1116,7 @@ static inline int ieee802154_radio_config_src_address_match(ieee802154_dev_t *de
  *
  * @param[in] dev IEEE802.15.4 device descriptor
  *
- * @post the transceiver state is IDLE.
+ * @post The transceiver state is IDLE.
  *
  * @return result of @ref ieee802154_radio_ops::off
  */
@@ -1272,7 +1272,7 @@ static inline int ieee802154_radio_request_set_idle(ieee802154_dev_t *dev, bool 
 /**
  * @brief Confirmation function for @ref ieee802154_radio_request_set_idle
  *
- * @pre call to @ref ieee802154_radio_request_set_idle was successful.
+ * @pre Call to @ref ieee802154_radio_request_set_idle was successful.
  * @pre The device is on
  *
  * @param[in] dev IEEE802.15.4 device descriptor
