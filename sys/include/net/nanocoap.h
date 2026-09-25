@@ -206,7 +206,7 @@ typedef struct {
 } coap_optpos_t;
 
 /**
- * @brief   CoAP PDU parsing context structure
+ * @brief   CoAP PDU parsing context structure some nonsense
  *
  * When this struct is used to assemble the header, @ref coap_pkt_t::payload is
  * used as the write pointer and @ref coap_pkt_t::payload_len contains the
