@@ -34,8 +34,10 @@ info-boards:
 
 EMULATED_BOARDS_RENODE := $(wildcard $(BOARDSDIRS)/*/dist/board.resc)
 EMULATED_BOARDS_QEMU := microbit
+EMULATED_BOARDS_MGBA := gba_cartridge
 EMULATED_BOARDS := \
   $(EMULATED_BOARDS_QEMU) \
+  $(EMULATED_BOARDS_MGBA) \
   $(foreach board_path,$(EMULATED_BOARDS_RENODE),$(subst $(strip $(BOARDSDIRS)/),,$(subst /dist/board.resc,,$(board_path))))
   #
 
