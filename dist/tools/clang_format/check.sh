@@ -99,7 +99,7 @@ for F in "${FILES_ARR[@]}"; do
                         fi
                         ;;
                 esac
-            done < <(diff -u "${RIOTBASE}/${F}" "${FORMATTED}")
+            done < <(diff -u0 "${RIOTBASE}/${F}" "${FORMATTED}")
             if [ -n "${DIFFLINE}" ]; then
                 _annotate_hunk "${F}" "${DIFFLINE}" "${DIFFLEN}" "${DIFFHUNK}"
             fi
