@@ -647,7 +647,7 @@ struct ieee802154_radio_ops {
      *                  start of the PSDU frame.
      * @param[in] size number of bytes to peek
      *
-     * @retval number of bytes written in @p buf
+     * @return number of bytes written in @p buf
      * @retval -EINVAL if @p offset + @p size exceeds the length of the
      *         received frame
      */
