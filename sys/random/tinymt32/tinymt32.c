@@ -1,18 +1,8 @@
-/**
- * @file tinymt32.c
- *
- * @brief Tiny Mersenne Twister only 127 bit internal state
- *
- * @author Mutsuo Saito (Hiroshima University)
- * @author Makoto Matsumoto (The University of Tokyo)
- *
- * Copyright (C) 2011 Mutsuo Saito, Makoto Matsumoto,
- * Hiroshima University and The University of Tokyo.
- * All rights reserved.
- *
- * The 3-clause BSD License is applied to this software, see
- * LICENSE.txt
+/*
+ * SPDX-FileCopyrightText: 2011 Mutsuo Saito, Makoto Matsumoto,
+ * SPDX-License-Identifier: BSD-2-Clause
  */
+
 #include "tinymt32.h"
 #define MIN_LOOP 8
 #define PRE_LOOP 8
