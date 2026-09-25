@@ -49,6 +49,13 @@ else ifneq (,$(filter nrf53%,$(CPU_FAM)))
   NRFX_SPARSE_PATHS += mdk/nrf5340_network_name_change.h
   NRFX_SPARSE_PATHS += mdk/nrf5340_network_peripherals.h
 
+else ifeq (nrf9160,$(CPU_FAM))
+  NRFX_SPARSE_PATHS += mdk/nrf91_name_change.h
+
+  NRFX_SPARSE_PATHS += mdk/nrf9160.h
+  NRFX_SPARSE_PATHS += mdk/nrf9160_bitfields.h
+  NRFX_SPARSE_PATHS += mdk/nrf9160_peripherals.h
+
 endif
 
 # The sparse paths have to be set before calling `pkg/pkg.mk`
