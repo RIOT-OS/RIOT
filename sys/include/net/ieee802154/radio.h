@@ -644,7 +644,7 @@ struct ieee802154_radio_ops {
      * @param[in] dev IEEE802.15.4 device descriptor
      * @param[out] buf buffer to write the peeked bytes into.
      * @param[in] offset offset of the first byte to peek, relative to the
-     *                  start of the PSDU frame.
+     *                   start of the PSDU frame.
      * @param[in] size number of bytes to peek
      *
      * @return number of bytes written in @p buf
