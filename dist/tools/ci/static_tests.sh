@@ -10,6 +10,8 @@
 . "$(dirname "${0}")"/github_annotate.sh
 
 # provides should_run(): only runs tests affected by the branch's changes
+# also provides TEST_PATHS which you can append to add more should_run filters to check against
+# e.g. if you introduce a test for *.foo files you'd want to add a new TEST_PATHS[any_foo_files]
 # shellcheck source=dist/tools/ci/test_selection.sh
 . "$(dirname "${0}")"/test_selection.sh
 
