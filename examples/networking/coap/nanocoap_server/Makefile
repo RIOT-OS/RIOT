@@ -73,7 +73,7 @@ ifneq (,$(filter $(BOARD),$(LOW_MEMORY_BOARDS)))
   USEMODULE += prng_minstd
 endif
 
-# Enable fileserver for boards with plenty of memory
+# Enable resource intensive features for boards with plenty of memory
 HIGH_MEMORY_BOARDS := native native32 native64 same54-xpro mcb2388
 
 ifneq (,$(filter $(BOARD),$(HIGH_MEMORY_BOARDS)))
@@ -85,9 +85,6 @@ ifneq (,$(filter $(BOARD),$(HIGH_MEMORY_BOARDS)))
   USEMODULE += nanocoap_server_observe
   USEMODULE += nanocoap_server_separate
   USEMODULE += nanocoap_server_event_thread
-  # enable fileserver
-  USEMODULE += nanocoap_fileserver
-  USEMODULE += vfs_default
 
   # always enable auto-format for native
   ifneq (,$(filter native native32 native64,$(BOARD)))

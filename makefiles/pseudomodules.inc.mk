@@ -133,7 +133,6 @@ PSEUDOMODULES += fmt_%
 PSEUDOMODULES += fortuna_reseed
 
 PSEUDOMODULES += gcoap_dtls
-PSEUDOMODULES += gcoap_fileserver
 PSEUDOMODULES += gcoap_forward_proxy
 PSEUDOMODULES += gcoap_forward_proxy_thread
 ## @addtogroup net_gcoap_dns
@@ -346,9 +345,6 @@ PSEUDOMODULES += mpu_noexec_ram
 PSEUDOMODULES += mtd_write_page
 
 PSEUDOMODULES += nanocoap_%
-PSEUDOMODULES += nanocoap_fileserver_callback
-PSEUDOMODULES += nanocoap_fileserver_delete
-PSEUDOMODULES += nanocoap_fileserver_put
 PSEUDOMODULES += netdev_default
 PSEUDOMODULES += netdev_ieee802154
 PSEUDOMODULES += netdev_ieee802154_%
