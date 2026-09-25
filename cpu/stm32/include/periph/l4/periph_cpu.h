@@ -44,6 +44,9 @@ extern "C" {
 #  define ADC_T_ADCVREG_STUP_US (20)
 #endif
 
+/* determined with tests/periph/rtt_min */
+#define RTT_MIN_OFFSET (4U)
+
 #ifndef DOXYGEN
 
 /* see drivers/include/periph/rtt.h */
