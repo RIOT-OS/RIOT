@@ -78,6 +78,8 @@
 extern "C" {
 #endif
 
+#define GNRC_NETIF_COMP_CONSUMED   (-255)
+
 /**
  * @brief Index of the high priority queue
  */
@@ -127,9 +129,31 @@ typedef enum {
 } gnrc_ipv6_event_t;
 
 /**
+ * @brief   GNRC Netif components
+ */
+typedef enum {
+#if IS_USED(MODULE_GNRC_NETIF_IPV6) || defined(DOXYGEN)
+    GNRC_NETIF_COMP_IPV6,                   /**< IPv6 component */
+#endif
+#if IS_USED(MODULE_GNRC_NETIF_6LO) || defined(DOXYGEN)
+    GNRC_NETIF_COMP_6LO,                    /**< 6Lo component */
+#endif
+#if IS_USED(MODULE_GNRC_NETIF_LORAWAN) || defined(DOXYGEN)
+    GNRC_NETIF_COMP_LORAWAN,                /**< LoRaWAN component */
+#endif
+    GNRC_NETIF_COMP_LEGACY,                 /**< Legacy component */
+    GNRC_NETIF_COMP_NUMOF,                  /**< Number of netif components */
+} gnrc_netif_comp_type_t;
+
+/**
  * @brief   Operations to an interface
  */
 typedef struct gnrc_netif_ops gnrc_netif_ops_t;
+
+/**
+ * @brief   Holds the component operations and the context.
+ */
+typedef struct gnrc_netif_comp gnrc_netif_comp_t;
 
 /**
  * @brief   Representation of a network interface
@@ -137,6 +161,11 @@ typedef struct gnrc_netif_ops gnrc_netif_ops_t;
 typedef struct {
     netif_t netif;                          /**< network interface descriptor */
     const gnrc_netif_ops_t *ops;            /**< Operations of the network interface */
+    /**
+     * @brief   Components of the GNRC Netif interface
+     */
+    const gnrc_netif_comp_t *components;
+    size_t num_components;                  /**< Number of components */
     netdev_t *dev;                          /**< Network device of the network interface */
     rmutex_t mutex;                         /**< Mutex of the interface */
 #if IS_USED(MODULE_NETSTATS_L2) || defined(DOXYGEN)
@@ -165,6 +194,13 @@ typedef struct {
      * @brief   ISR event for the network device
      */
     event_t event_isr;
+#if IS_USED(MODULE_GNRC_NETIF_PKTQ) || defined(DOXYGEN)
+    /**
+     * @brief   Dequeue event for GNRC Pktq
+     */
+    event_t event_pktq;
+#endif
+
 #if IS_USED(MODULE_NETDEV_NEW_API) || defined(DOXYGEN)
     /**
      * @brief   TX done event for the network device
@@ -224,6 +260,147 @@ typedef struct {
     uint8_t device_type;                    /**< Device type */
     kernel_pid_t pid;                       /**< PID of the network interface's thread */
 } gnrc_netif_t;
+
+typedef struct gnrc_netif_comp_ops {
+    gnrc_netif_comp_type_t type;            /**< Component type */
+    /**
+     * @brief   Initializes the GNRC Netif component
+     *
+     * @pre `netif != NULL`
+     *
+     * @param[in] netif The network interface.
+     *
+     * This function should init the GNRC Netif component.
+     * This is called right before the interface's thread starts receiving
+     * messages. It is not necessary to lock the interface's mutex
+     * gnrc_netif_t::mutex, since it is already locked.
+     *
+     * @return 0 if the initialization of the component was successful
+     * @return negative errno on error.
+     */
+    int  (*init)(gnrc_netif_t *netif, void *ctx);
+    /**
+     * @brief   Gets an option from the netif component.
+     *
+     * @param[in] netif     The network interface.
+     * @param[in] opt       The option parameters.
+     * @param[in] ctx       Context of the component.
+     *
+     * @return  Number of bytes in @p data.
+     * @return  -EOVERFLOW, if @p max_len is lesser than the required space.
+     * @return  -ENOTSUP, if @p opt is not supported to be set.
+     * @return  Any negative error code
+     */
+    int  (*get)(gnrc_netif_t *netif, gnrc_netapi_opt_t *opt, void *ctx);
+    /**
+     * @brief   Sets an option from the netif component.
+     *
+     * @param[in] netif     The network interface.
+     * @param[in] opt       The option parameters.
+     * @param[in] ctx       Context of this component.
+     *
+     * @return  Number of bytes written.
+     * @return  -EOVERFLOW, if @p data_len is greater than the allocated space in
+     *          the component.
+     * @return  -ENOTSUP, if @p opt is not supported by the component.
+     * @return  Any negative error code.
+     */
+    int  (*set)(gnrc_netif_t *netif, const gnrc_netapi_opt_t *opt, void *ctx);
+
+    /**
+     * @brief   Send a packet down through this layer
+     *
+     * Called by the pipeline as part of the descending send chain. This layer
+     * may transform the packet, queue it, fragment it, or pass it through
+     * unchanged. The packet arrives to the first component with a netif header
+     * snip (@ref GNRC_NETTYPE_NETIF) as the outermost snip.
+     *
+     * The layer receives @p pkt by reference and may replace it (e.g. after
+     * stripping a header, compressing, or producing a different
+     * representation). If it replaces @p pkt, the new value continues down
+     * the pipeline.
+     *
+     * @param[in]     netif  The network interface
+     * @param[in,out] pkt    The packet to send. The component may modify the
+     *                       contents.
+     * @param[in]     ctx    context of this component.
+     *
+     * @return  0                         packet is ready for the next layer
+     * @return  <0                        error code. TX is aborted and
+     *                                    @ref gnrc_netif_tx_done is called
+     *                                    with this error.
+     * @return  GNRC_NETIF_COMP_CONSUMED  this layer has taken ownership and
+     *                                    will drive the rest of the send
+     *                                    itself. The core does nothing
+     *                                    further with @p pkt prior sending.
+     */
+    int  (*send)(gnrc_netif_t *netif, gnrc_pktsnip_t *pkt, void *ctx);
+
+    /**
+     * @brief   TX completion notification
+     *
+     * Called by gnrc_netif_tx_done() after the terminal component completes
+     * a transmission (or the core aborts with an error). Called in
+     * ascending order: the terminal fires first, the outermost layer
+     * fires last. All components run (there is no short-circuit)
+     *
+     * This is a notification, not a transform. The packet has already
+     * been sent (or the send failed). The layer should not modify the
+     * packet. Typical uses:
+     *
+     * - update statistics (tx_bytes, tx_success, tx_failed)
+     * - release per-layer resources attached during send
+     * - handle re-queue on error (e.g. push_back on -EBUSY)
+     *
+     * If a layer re-queues the packet (e.g. pktq on -EBUSY), it must
+     * have called @ref gnrc_pktbuf_hold during send() so the held
+     * reference survives the core's release in gnrc_netif_tx_done().
+     * The core always releases exactly one reference after all
+     * post_send hooks return.
+     *
+     * @param[in] netif  the interface
+     * @param[in] ctx    context of this component.
+     * @param[in] pkt    the packet that was sent. Read-only (do not
+     *                   modify!). The core releases it after all hooks
+     *                   return.
+     * @param[in] res    >= 0               bytes sent (success).
+     *                   < 0                negative errno.
+     */
+    void (*post_send)(gnrc_netif_t *netif, gnrc_pktsnip_t *pkt, int res, void *ctx);
+
+    /**
+     * @brief   RX processing hook
+     *
+     * Called by @ref gnrc_netif_rx_done as part of the ascending receive chain.
+     * Called in ascending order: the terminal fires first, the outermost
+     * layer fires last.
+     *
+     * Unlike @ref gnrc_netif_comp_ops_t::post_send, this is a transform (the
+     * component may modify the packet or consume
+     * it).
+     *
+     * Typical uses:
+     *
+     * - forward packet using netapi/netreg dispatch
+     * - update receive statistics
+     *
+     * @note at least one layer MUST consume the packet.
+     *
+     * @param[in] netif     The network interface
+     * @param[in] ctx       Context of this component.
+     * @param[in] pkt       The received packet.
+     *
+     * @return  a packet pointer to pass up.
+     *
+     * @return  NULL if the packet was consumed (chain stops)
+     */
+    gnrc_pktsnip_t *(*post_recv)(gnrc_netif_t *netif, gnrc_pktsnip_t *pkt, void *ctx);
+} gnrc_netif_comp_ops_t;
+
+struct gnrc_netif_comp {
+    const gnrc_netif_comp_ops_t *ops;
+    void *ctx;
+};
 
 /**
  * @brief   Check if the device belonging to the given netif uses the legacy
@@ -735,6 +912,64 @@ static inline int gnrc_netif_send(gnrc_netif_t *netif, gnrc_pktsnip_t *pkt)
 {
     return gnrc_netapi_send(netif->pid, pkt);
 }
+
+/**
+ * @brief   Get the IPv6 component of a network interface
+ *
+ * @param[in] netif  The network interface
+ *
+ * @return  Pointer to the IPv6 component of @p netif
+ * @return  NULL if @ref MODULE_GNRC_NETIF_IPV6 is not used
+ */
+static inline void *gnrc_netif_comp_get_ipv6(const gnrc_netif_t *netif)
+{
+#if IS_USED(MODULE_GNRC_NETIF_IPV6) || defined(DOXYGEN)
+        return (void*) &netif->ipv6;
+#else
+        (void) netif;
+        return NULL;
+#endif
+
+}
+
+/**
+ * @brief   Get the 6Lo component of a network interface
+ *
+ * @param[in] netif  The network interface
+ *
+ * @return  Pointer to the 6Lo component of @p netif
+ * @return  NULL if @ref MODULE_GNRC_NETIF_6LO is not used
+ */
+static inline void *gnrc_netif_comp_get_6lo(const gnrc_netif_t *netif)
+{
+#if IS_USED(MODULE_GNRC_NETIF_6LO) || defined(DOXYGEN)
+        return (void*) &netif->sixlo;
+#else
+        (void) netif;
+        return NULL;
+#endif
+
+}
+
+/**
+ * @brief   Get the LoRaWAN component of a network interface
+ *
+ * @param[in] netif  The network interface
+ *
+ * @return  Pointer to the LoRaWAN component of @p netif
+ * @return  NULL if @ref MODULE_GNRC_NETIF_LORAWAN is not used
+ */
+static inline void *gnrc_netif_comp_get_lorawan(const gnrc_netif_t *netif)
+{
+#if IS_USED(MODULE_GNRC_NETIF_LORAWAN) || defined(DOXYGEN)
+        return (void*) &netif->lorawan;
+#else
+        (void) netif;
+        return NULL;
+#endif
+
+}
+
 
 #if defined(MODULE_GNRC_NETIF_BUS) || DOXYGEN
 /**
