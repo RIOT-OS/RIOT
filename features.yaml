@@ -498,6 +498,8 @@ groups:
           is a globally unique ID, in the worst case it is some calibration
           parameters to compensate production variance that may or may not allow
           telling the CPU apart from any given other.
+  - name: periph_event
+    help: An event system peripheral is present.
   - name: periph_pwm
     help: A Pulse-Width Modulation (PWM) peripheral is present.
   - name: periph_qdec
@@ -515,6 +517,8 @@ groups:
           a certain cut-off). The main benefit is that other threads can run
           while the thread issuing the, say SPI transfer, is blocked until the
           transfer is completed. It often also speeds up longer transfers.
+  - name: periph_dma_event
+    help: The DMA peripheral supports peripheral events
   - name: periph_pm
     help: The MCU supports power management (PM) and RIOT can make use of that.
   - name: periph_ltdc
@@ -539,6 +543,8 @@ groups:
       features:
       - name: periph_gpio
         help: The classic GPIO API is implemented
+      - name: periph_gpio_event
+        help: GPIO driver supports event generation on defined flanks.
       - name: periph_gpio_irq
         help: The classic GPIO driver supports external interrupts.
       - name: periph_gpio_tamper_wake
@@ -637,6 +643,8 @@ groups:
       features:
       - name: periph_spi
         help: An SPI peripheral is present.
+      - name: periph_spi_dma
+        help: More fine granular control of SPI transfers over DMA.
       - name: periph_spi_on_qspi
         help: The QSPI peripheral can be used in SPI mode.
       - name: periph_spi_reconfigure
@@ -678,6 +686,8 @@ groups:
       help: An ADC peripheral is present.
     - name: periph_adc_continuous
       help: The ADC peripheral can be left on between measurements.
+    - name: periph_adc_dma
+      help: The ADC peripheral can be used with DMA to transfer samples into memory.
     - name: periph_dac
       help: A DAC peripheral is present.
     - name: periph_dac_play
