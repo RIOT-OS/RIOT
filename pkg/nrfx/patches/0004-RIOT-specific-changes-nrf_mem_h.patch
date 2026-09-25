@@ -1,0 +1,33 @@
+From b653d26c959c81e7154be07690cb4490165ab733 Mon Sep 17 00:00:00 2001
+From: crasbe <crasbe@gmail.com>
+Date: Fri, 25 Sep 2026 11:04:04 +0200
+Subject: [PATCH] drivers/nrfx_common: don't include unused nrf_mem.h
+
+The nrf_mem.h file was added in 3.2.0 but does not serve
+a purpose for RIOT or packages that need nrfx.
+Patching nrf_mem.h to use the CPU_MODEL_NRFxxxxxx macro does not
+help here, because not all CPU models are listed (yet) in that
+file, so it will still cause build errors.
+
+This patch can be removed for version 4.0.0 or newer, as the
+nrf_mem.h file got fixed there.
+---
+ drivers/nrfx_common.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/drivers/nrfx_common.h b/drivers/nrfx_common.h
+index 1064aff..fbddd72 100644
+--- a/drivers/nrfx_common.h
++++ b/drivers/nrfx_common.h
+@@ -43,7 +43,7 @@
+ #include <nrf.h>
+ #include "nrfx_utils.h"
+ #include <nrf_peripherals.h>
+-#include <nrf_mem.h>
++/*#include <nrf_mem.h>*/ /* Not needed by RIOT, causes build issues */
+ #include "nrfx_ext.h"
+ 
+ #ifdef __cplusplus
+-- 
+2.34.1
+
