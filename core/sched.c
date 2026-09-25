@@ -34,6 +34,7 @@
 #endif
 
 #define ENABLE_DEBUG 0
+#define DEBUG_PREFIX "sched"
 #include "debug.h"
 
 #ifdef PICOLIBC_TLS
@@ -168,7 +169,7 @@ thread_t *__attribute__((used)) sched_run(void)
 #endif
 
     DEBUG(
-        "sched_run: active thread: %" PRIkernel_pid ", next thread: %" PRIkernel_pid "\n",
+        "active thread: %" PRIkernel_pid ", next thread: %" PRIkernel_pid "\n",
         (kernel_pid_t)((active_thread == NULL)
                        ? KERNEL_PID_UNDEF
                        : active_thread->pid),
@@ -188,7 +189,7 @@ thread_t *__attribute__((used)) sched_run(void)
             sched_cb(KERNEL_PID_UNDEF, next_thread->pid);
         }
 #endif
-        DEBUG("sched_run: done, sched_active_thread was not changed.\n");
+        DEBUG_PUTS("done, sched_active_thread was not changed.");
     }
     else {
         if (active_thread) {
@@ -215,7 +216,7 @@ thread_t *__attribute__((used)) sched_run(void)
             MPU_ATTR(1, AP_RO_RO, 0, 1, 0, 1, MPU_SIZE_32B) /* Attributes and Size */
             );
 #endif
-        DEBUG("sched_run: done, changed sched_active_thread.\n");
+        DEBUG_PUTS("done, changed sched_active_thread.");
     }
 
     return next_thread;
@@ -281,29 +282,29 @@ void sched_switch(uint16_t other_prio)
     uint16_t current_prio = active_thread->priority;
     int on_runqueue = (active_thread->status >= STATUS_ON_RUNQUEUE);
 
-    DEBUG("sched_switch: active pid=%" PRIkernel_pid " prio=%" PRIu16 " on_runqueue=%i "
+    DEBUG("active pid=%" PRIkernel_pid " prio=%" PRIu16 " on_runqueue=%i "
           ", other_prio=%" PRIu16 "\n",
           active_thread->pid, current_prio, on_runqueue,
           other_prio);
 
     if (!on_runqueue || (current_prio > other_prio)) {
         if (irq_is_in()) {
-            DEBUG("sched_switch: setting sched_context_switch_request.\n");
+            DEBUG_PUTS("setting sched_context_switch_request.");
             sched_context_switch_request = 1;
         }
         else {
-            DEBUG("sched_switch: yielding immediately.\n");
+            DEBUG_PUTS("yielding immediately.");
             thread_yield_higher();
         }
     }
     else {
-        DEBUG("sched_switch: continuing without yield.\n");
+        DEBUG_PUTS("continuing without yield.");
     }
 }
 
 NORETURN void sched_task_exit(void)
 {
-    DEBUG("sched_task_exit: ending thread %" PRIkernel_pid "...\n",
+    DEBUG("ending thread %" PRIkernel_pid "...\n",
           thread_getpid());
 
 #if defined(MODULE_TEST_UTILS_PRINT_STACK_USAGE) && defined(DEVELHELP)
