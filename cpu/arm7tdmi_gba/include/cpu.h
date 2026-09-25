@@ -12,11 +12,13 @@
 #include "arm_cpu.h"
 
 #ifdef __cplusplus
-extern "C"
-{
+extern "C" {
 #endif
 
-extern uintptr_t __stack_start;     /**< end of user stack memory space */
+extern uintptr_t __stack_start; /**< end of user stack memory space */
+
+void gba_timer_init(void);
+void gba_timer_isr(uint16_t interrupt_flags_timer);
 
 #ifdef __cplusplus
 }
