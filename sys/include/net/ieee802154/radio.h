@@ -639,7 +639,7 @@ struct ieee802154_radio_ops {
      * @pre A reception is pending and the radio was set to IDLE beforehand
      *      (see @ref ieee802154_radio_ops::read).
      * @pre @p offset + @p size doesn't exceed the length of the received
-     *      frame.
+     *      frame, excluding FCS.
      *
      * @param[in] dev IEEE802.15.4 device descriptor
      * @param[out] buf buffer to write the peeked bytes into.
