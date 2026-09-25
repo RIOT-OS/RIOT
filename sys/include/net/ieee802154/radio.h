@@ -238,10 +238,10 @@ typedef enum {
     /**
      * @brief the transceiver received a frame with an invalid crc.
      *
-     * This indication opens a reception (see @ref
-     * ieee802154_radio_ops::read). Some radios won't flush the framebuffer
-     * on reception of a frame with invalid CRC, so the reception MUST be
-     * closed by calling @ref ieee802154_radio_read with a NULL buffer.
+     * This indication opens a reception (see @ref ieee802154_radio_ops::read).
+     * Some radios won't flush the framebuffer on reception of a frame with
+     * invalid CRC, so the reception MUST be closed by calling @ref
+     * ieee802154_radio_read with a NULL buffer.
      */
     IEEE802154_RADIO_INDICATION_CRC_ERROR,
 
