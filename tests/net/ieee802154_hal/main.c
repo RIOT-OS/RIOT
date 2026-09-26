@@ -326,8 +326,8 @@ static int _init(void)
     expect(res >= 0);
 
     /* Set PHY configuration */
-    ieee802154_phy_conf_t conf = { .channel=CONFIG_IEEE802154_DEFAULT_CHANNEL,
-                                   .page=CONFIG_IEEE802154_DEFAULT_SUBGHZ_PAGE,
+    ieee802154_phy_conf_t conf = { .phy_mode=CONFIG_IEEE802154_DEFAULT_PHY_MODE,
+                                   .channel=CONFIG_IEEE802154_DEFAULT_CHANNEL,
                                    .pow=CONFIG_IEEE802154_DEFAULT_TXPOWER};
 
     res = ieee802154_radio_config_phy(&_radio, &conf);
@@ -544,7 +544,7 @@ int config_phy(int argc, char **argv)
 
     ieee802154_dev_t *dev = &_radio;
     ieee802154_radio_set_idle(dev, true);
-    ieee802154_phy_conf_t conf = {.phy_mode=phy_mode, .channel=channel, .page=0, .pow=tx_pow};
+    ieee802154_phy_conf_t conf = {.phy_mode=phy_mode, .channel=channel, .pow=tx_pow};
     if (ieee802154_radio_config_phy(dev, &conf) < 0) {
         puts("Channel or TX power settings not supported");
     }
