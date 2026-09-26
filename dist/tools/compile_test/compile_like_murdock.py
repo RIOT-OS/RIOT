@@ -184,7 +184,7 @@ def _print_module_or_pkg_mismatch(app, board, lines, args):
                 print("    make has:", line[2:])
             if line.startswith('> '):
                 print("    kconfig has:", line[2:])
-    print(f"{app: <30} {board: <30} FAIL: Kconfig module or pkg mismatch")
+    print(f"{app: <40} {board: <40} FAIL: Kconfig module or pkg mismatch")
 
 
 def _modules_packages(app, board, jobs, env, cwd, args):
@@ -195,7 +195,7 @@ def _modules_packages(app, board, jobs, env, cwd, args):
                          stderr=subprocess.STDOUT)
         if args.very_very_verbose:
             print(out)
-        print(f"{app: <30} {board: <30} PASS")
+        print(f"{app: <40} {board: <40} PASS")
     except subprocess.CalledProcessError as err:
         err.output = err.output.decode("utf-8", errors="replace")
         lines = err.output.split("\n")
@@ -210,7 +210,7 @@ def _build(app, board, toolchain, jobs, env, cwd, args):
                          stderr=subprocess.STDOUT)
         if args.very_very_verbose:
             print(out)
-        print(f"{app: <30} {board: <30} PASS")
+        print(f"{app: <40} {board: <40} PASS")
         return True
     except subprocess.CalledProcessError as err:
         err.output = err.output.decode("utf-8", errors="replace")
@@ -221,9 +221,9 @@ def _build(app, board, toolchain, jobs, env, cwd, args):
         if lines[-3].startswith('< ') or lines[-3].startswith('> '):
             _print_module_or_pkg_mismatch(app, board, lines, args)
         elif "mismatch" in err.output:
-            print(f"{app: <30} {board: <30} FAIL: Kconfig hash mismatch")
+            print(f"{app: <40} {board: <40} FAIL: Kconfig hash mismatch")
         else:
-            print(f"{app: <30} {board: <30} FAIL")
+            print(f"{app: <40} {board: <40} FAIL")
         return False
 
 
@@ -285,7 +285,7 @@ def main():
     for app in apps:
         test_dir = str(pathlib.PurePath(riot_dir, app))
         if not pathlib.Path(test_dir).exists():
-            print(f"{test_dir: <60}  SKIP: Does not exists (typo?)")
+            print(f"{test_dir: <80}  SKIP: Does not exists (typo?)")
             continue
 
         if args.cpu:
@@ -297,18 +297,18 @@ def main():
 
         for board in target_boards:
             if args.dry_run:
-                print(f"{app: <30} {board: <30}")
+                print(f"{app: <40} {board: <40}")
             elif args.modules_packages:
                 _modules_packages(app, board, args.jobs, full_env, riot_dir, args)
             else:
                 if not args.no_memory_check and \
                         not _sufficient_memory(board, full_env, test_dir):
-                    print(f"{app: <60}  SKIP: Insufficient memory stored")
+                    print(f"{app: <40} {board: <40} SKIP: Insufficient memory stored")
                     continue
 
                 if not args.no_toolchain_check and \
                         not _supported_by_toolchain(board, args.toolchain, full_env, test_dir):
-                    print(f"{app: <60}  SKIP: Toolchain '{args.toolchain}' not supported")
+                    print(f"{app: <40} {board: <40} SKIP: Toolchain '{args.toolchain}' not supported")
                     continue
 
                 if not _build(app, board, args.toolchain, args.jobs, full_env,
