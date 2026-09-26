@@ -1,6 +1,7 @@
 # SPDX-FileCopyrightText: 2019 HAW Hamburg
 # SPDX-License-Identifier: LGPL-2.1-only
 
+menu "Packages"
 
 rsource "flashdb/Kconfig"
 rsource "libcoap/Kconfig"

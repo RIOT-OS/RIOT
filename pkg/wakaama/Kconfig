@@ -1,6 +1,7 @@
 # SPDX-FileCopyrightText: 2021 HAW Hamburg
 # SPDX-License-Identifier: LGPL-2.1-only
 
+menu "Wakaama LwM2M"
     depends on USEPKG_WAKAAMA
 
 menu "Remote server"
