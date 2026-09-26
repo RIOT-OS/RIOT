@@ -217,6 +217,11 @@ extern void auto_init_loramac(void);
 AUTO_INIT(auto_init_loramac,
           AUTO_INIT_PRIO_MOD_LORAMAC);
 #endif
+#if IS_USED(MODULE_AUTO_INIT_RADIOLIB)
+extern void auto_init_radiolib(void);
+AUTO_INIT(auto_init_radiolib,
+          AUTO_INIT_PRIO_MOD_RADIOLIB);
+#endif
 #if IS_USED(MODULE_DSM)
 extern void dsm_init(void);
 AUTO_INIT(dsm_init,

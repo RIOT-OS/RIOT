@@ -1,0 +1,3 @@
+MODULE = $(RADIOLIB_MODULE)
+
+include $(RIOTBASE)/Makefile.base
