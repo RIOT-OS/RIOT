@@ -24,7 +24,7 @@
 #include "bplib.h"
 
 /* Signal the vfs based storage when a contact / channel terminates to flush the caches */
-#if defined(MODULE_BPLIB_STOR_VFS_ORDERED) || defined(MODULE_BPLIB_STOR_VFS_UNORDERED)
+#if defined(MODULE_BPLIB_STOR_VFS_ORDERED)
 #  include "bplib_stor_vfs.h"
 #endif
 
@@ -89,6 +89,11 @@ static void BPA_PERFLOGP_Exit(uint32_t PerfLogID)
 {
     (void) PerfLogID;
     return;
+}
+
+BPLib_Status_t BPA_TABLEP_TableInit(void)
+{
+    return BPLIB_SUCCESS;
 }
 
 static BPLib_Status_t BPA_TABLEP_TableUpdate(uint8_t TableType, void** TblPtr)
@@ -167,7 +172,7 @@ static BPLib_Status_t BPA_ADUP_AddApplication(uint32_t ChanId)
 
 static BPLib_Status_t BPA_ADUP_StartApplication(uint32_t ChanId)
 {
-#if defined(MODULE_BPLIB_STOR_VFS_ORDERED) || defined(MODULE_BPLIB_STOR_VFS_UNORDERED)
+#if defined(MODULE_BPLIB_STOR_VFS_ORDERED)
         bplib_stor_vfs_channel_changed(ChanId);
 #endif
     (void) ChanId;
@@ -186,16 +191,15 @@ static BPLib_Status_t BPA_ADUP_RemoveApplication(uint32_t ChanId)
     return BPLIB_SUCCESS;
 }
 
-static BPLib_Status_t BPA_CLAP_ContactSetup(uint32_t ContactId, BPLib_CLA_ContactsSet_t ContactInfo)
+static BPLib_Status_t BPA_CLAP_ContactSetup(uint32_t ContactId)
 {
     (void) ContactId;
-    (void) ContactInfo;
     return BPLIB_SUCCESS;
 }
 
 static BPLib_Status_t BPA_CLAP_ContactStart(uint32_t ContactId)
 {
-#if defined(MODULE_BPLIB_STOR_VFS_ORDERED) || defined(MODULE_BPLIB_STOR_VFS_UNORDERED)
+#if defined(MODULE_BPLIB_STOR_VFS_ORDERED)
         bplib_stor_vfs_contact_changed(ContactId);
 #endif
     (void) ContactId;
@@ -214,7 +218,7 @@ static void BPA_CLAP_ContactTeardown(uint32_t ContactId)
     return;
 }
 
-static BPLib_FWP_ProxyCallbacks_t Callbacks = {
+BPLib_FWP_ProxyCallbacks_t bplib_fwp_callbacks = {
     /* Time Proxy */
     .BPA_TIMEP_GetMonotonicTime = BPA_TIMEP_GetMonotonicTime,
     .BPA_TIMEP_GetHostEpoch = BPA_TIMEP_GetHostEpoch,
@@ -226,6 +230,7 @@ static BPLib_FWP_ProxyCallbacks_t Callbacks = {
     .BPA_PERFLOGP_Exit = BPA_PERFLOGP_Exit,
 
     /* Table Proxy */
+    .BPA_TABLEP_TableInit = BPA_TABLEP_TableInit,
     .BPA_TABLEP_TableUpdate = BPA_TABLEP_TableUpdate,
 
     /* Event Proxy */
@@ -253,8 +258,3 @@ static BPLib_FWP_ProxyCallbacks_t Callbacks = {
     .BPA_CLAP_ContactStop = BPA_CLAP_ContactStop,
     .BPA_CLAP_ContactTeardown = BPA_CLAP_ContactTeardown,
 };
-
-BPLib_Status_t bplib_riot_fwp_init(void)
-{
-    return BPLib_FWP_Init(&Callbacks);
-}

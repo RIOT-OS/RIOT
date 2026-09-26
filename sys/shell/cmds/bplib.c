@@ -16,6 +16,7 @@
  */
 #include "bplib.h"
 #include "bplib_init.h"
+#include "bplib_riot_nc.h"
 
 #include "shell.h"
 
@@ -75,16 +76,16 @@ static void __bp_contact(int c, char* arg)
     BPLib_Status_t status;
 
     if (strcmp(arg, "setup") == 0) {
-        status = BPLib_CLA_ContactSetup(c);
+        status = bplib_contact_set_state(c, BPLIB_CLA_SETUP);
     }
     else if (strcmp(arg, "start") == 0) {
-        status = BPLib_CLA_ContactStart(c);
+        status = bplib_contact_set_state(c, BPLIB_CLA_STARTED);
     }
     else if (strcmp(arg, "stop") == 0) {
-        status = BPLib_CLA_ContactStop(c);
+        status = bplib_contact_set_state(c, BPLIB_CLA_STOPPED);
     }
     else if (strcmp(arg, "teardown") == 0) {
-        status = BPLib_CLA_ContactTeardown(&bplib_instance_data.BPLibInst, c);
+        status = bplib_contact_set_state(c, BPLIB_CLA_TORNDOWN);
     }
     else {
         printf(STR_INVALID_STATE_KW, arg);
@@ -99,16 +100,16 @@ static void __bp_channel(int c, char* arg)
     BPLib_Status_t status;
 
     if (strcmp(arg, "add") == 0) {
-        status = BPLib_PI_AddApplication(c);
+        status = bplib_channel_set_state(c, BPLIB_NC_APP_STATE_ADDED);
     }
     else if (strcmp(arg, "start") == 0) {
-        status = BPLib_PI_StartApplication(c);
+        status = bplib_channel_set_state(c, BPLIB_NC_APP_STATE_STARTED);
     }
     else if (strcmp(arg, "stop") == 0) {
-        status = BPLib_PI_StopApplication(c);
+        status = bplib_channel_set_state(c, BPLIB_NC_APP_STATE_STOPPED);
     }
     else if (strcmp(arg, "remove") == 0) {
-        status = BPLib_PI_RemoveApplication(&bplib_instance_data.BPLibInst, c);
+        status = bplib_channel_set_state(c, BPLIB_NC_APP_STATE_REMOVED);
     }
     else {
         printf(STR_INVALID_STATE_KW, arg);

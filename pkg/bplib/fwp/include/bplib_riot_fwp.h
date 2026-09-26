@@ -62,18 +62,9 @@ extern "C" {
 #endif
 
 /**
- * @brief Initializes the FWP callbacks for bplib.
- *
- * Notably provides callbacks for time, using ztimer64 and,
- * if enabled with the `bplib_walltime_available` module,
- * walltime. Also notified the VFS Storage when a contact
- * ends or a channel is closed, to flush the bundle in the
- * cache, so they won't get egressed on a possibly different
- * channel / contact.
- *
- * @return return value of BPLib_FWP_Init()
+ * @brief Callback functions used by bplib
  */
-BPLib_Status_t bplib_riot_fwp_init(void);
+extern BPLib_FWP_ProxyCallbacks_t bplib_fwp_callbacks;
 
 #ifdef __cplusplus
 }

@@ -41,8 +41,17 @@ extern "C" {
 #  define CONFIG_BPLIB_STOR_BASE "/nvm0/bp"
 #endif
 
-/** @brief Length of CONFIG_BPLIB_STOR_BASE without terminator */
-#define BPLIB_STOR_BASELEN (sizeof(CONFIG_BPLIB_STOR_BASE) - 1)
+/** @brief Data subdirectory, where bundles live */
+#define BPLIB_STOR_PATH_DATA    CONFIG_BPLIB_STOR_BASE "/dat"
+
+/** @brief Index subdirectory, where bundle_id -> bundle map lives */
+#define BPLIB_STOR_PATH_INDEX   CONFIG_BPLIB_STOR_BASE "/idx"
+
+/** @brief Length of BPLIB_STOR_PATH_DATA without terminator */
+#define BPLIB_STOR_DATA_LEN     (sizeof(BPLIB_STOR_PATH_DATA) - 1)
+
+/** @brief Length of BPLIB_STOR_PATH_INDEX without terminator */
+#define BPLIB_STOR_INDEX_LEN    (sizeof(BPLIB_STOR_PATH_INDEX) - 1)
 
 /**
  * @brief Notify the storage implementation to clear the cache for the given contact

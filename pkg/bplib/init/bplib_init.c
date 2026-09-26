@@ -26,17 +26,21 @@
 #include "bplib_riot_fwp.h"
 #include "bplib_riot_nc.h"
 
+#include "ztimer.h"
+
 #include <inttypes.h>
 
-static char generic_worker_stack[CONFIG_BPLIB_GENERIC_STACK_SIZE];
-static char mem_pool[CONFIG_BPLIB_MEMPOOL_LEN] __attribute__ ((aligned (8)));
+static char _generic_worker_stack[CONFIG_BPLIB_GENERIC_STACK_SIZE];
+static char _maintenance_stack[CONFIG_BPLIB_MAINTENANCE_STACK_SIZE];
+
+static char _mem_pool[CONFIG_BPLIB_MEMPOOL_LEN] __attribute__ ((aligned (8)));
 
 bplib_instance_data_t bplib_instance_data;
 
 #define ENABLE_DEBUG 0
 #include "debug.h"
 
-static void* generic_worker(void *arg)
+static void* _generic_worker(void *arg)
 {
     (void) arg;
     int32_t worker_id;
@@ -53,58 +57,63 @@ static void* generic_worker(void *arg)
     return NULL;
 }
 
-int bplib_init(void)
+static void* _maintenance_worker(void *arg)
+{
+    (void) arg;
+    BPLib_Status_t status;
+
+    while (bplib_instance_data.running)
+    {
+        ztimer_sleep(ZTIMER_MSEC, CONFIG_BPLIB_MAINTENANCE_INTERVAL);
+
+        status = BPLib_STOR_Egress(&bplib_instance_data.BPLibInst,
+                                   CONFIG_BPLIB_MAINTENANCE_MAX_BUNDLES);
+
+        if (status != BPLIB_SUCCESS) {
+            DEBUG_PUTS("bplib Error egressing from storage");
+        }
+        
+        BPLib_NC_RunMaintenanceActivities(&bplib_instance_data.BPLibInst);
+    }
+
+    return NULL;
+}
+
+BPLib_Status_t bplib_init(void)
 {
     BPLib_Status_t bplib_status;
 
     bplib_instance_data.running = 1;
+    
+    bplib_riot_nc_init(&bplib_instance_data.ConfigPtrs);
 
-    /* FWP */
-    bplib_status = bplib_riot_fwp_init();
+    /* Note: The 1 here could be any value, it is ignored in the patches. It gets
+     * passed on to QM, but there the compile time constant BPLIB_QM_MAX_JOBS is
+     * used instead to prevent dynamic memory allocation */
+    bplib_status = BPLib_NC_Init(&bplib_instance_data.ConfigPtrs,
+                                 &bplib_fwp_callbacks,
+                                 &bplib_instance_data.BPLibInst,
+                                 1, _mem_pool, (size_t)CONFIG_BPLIB_MEMPOOL_LEN);
     if (bplib_status != BPLIB_SUCCESS) {
-        return 1;
-    }
-
-    /* EM */
-    bplib_status = BPLib_EM_Init();
-    if (bplib_status != BPLIB_SUCCESS) {
-        return 2;
-    }
-
-    /* Time Management */
-    bplib_status = BPLib_TIME_Init();
-    if (bplib_status != BPLIB_SUCCESS) {
-        return 3;
-    }
-
-    /* Node Config */
-    bplib_status = bplib_riot_nc_init(&bplib_instance_data.ConfigPtrs);
-    if (bplib_status != BPLIB_SUCCESS) {
-        return 4;
-    }
-
-    /* MEM */
-    bplib_status = BPLib_MEM_PoolInit(&bplib_instance_data.BPLibInst.pool, mem_pool,
-        (size_t)CONFIG_BPLIB_MEMPOOL_LEN);
-    if (bplib_status != BPLIB_SUCCESS) {
-        return 5;
-    }
-
-    /* QM. The last arg is 0 since it (BPLIB_QM_MAX_JOBS) is now a compile time constant */
-    bplib_status = BPLib_QM_QueueTableInit(&bplib_instance_data.BPLibInst, 0);
-    if (bplib_status != BPLIB_SUCCESS) {
-        return 6;
+        return bplib_status;
     }
 
     /* Start Generic Worker */
-    int rc = thread_create(generic_worker_stack, CONFIG_BPLIB_GENERIC_STACK_SIZE,
-        THREAD_PRIORITY_MAIN - 1, 0, generic_worker,
+    int rc = thread_create(_generic_worker_stack, CONFIG_BPLIB_GENERIC_STACK_SIZE,
+        THREAD_PRIORITY_MAIN - 1, 0, _generic_worker,
         NULL, "bplib-generic");
     if (rc < 0) {
-        return 7;
+        return BPLIB_ERROR;
     }
 
-    return 0;
+    rc = thread_create(_maintenance_stack, CONFIG_BPLIB_MAINTENANCE_STACK_SIZE,
+        THREAD_PRIORITY_MAIN - 1, 0, _maintenance_worker,
+        NULL, "bplib-maintenance");
+    if (rc < 0) {
+        return BPLIB_ERROR;
+    }
+
+    return BPLIB_SUCCESS;
 }
 
 void bplib_terminate(void) {

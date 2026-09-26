@@ -29,20 +29,19 @@ static BPLib_NC_MibPerNodeConfig_t  MibPnTbl = {
     },
 
     .Configs = {
-        BPLIB_MAX_BUNDLE_LEN,       /* PARAM_BUNDLE_SIZE_NO_FRAGMENT      */
-        CONFIG_BPLIB_MAX_SEQ_NUM,   /* PARAM_SET_MAX_SEQUENCE NUM         */
-        BPLIB_MAX_PAYLOAD_SIZE,     /* PARAM_SET_MAX_PAYLOAD_LENGTH       */
-        BPLIB_MAX_BUNDLE_LEN,       /* PARAM_SET_MAX_BUNDLE_LENGTH        */
-        0,                          /* PARAM_SET_NODE_DTN_TIME            */
-        10,                         /* PARAM_SET_BEHAVIOR_EVENT_REPORTING */
-        BPLIB_MAX_LIFETIME_ALLOWED  /* PARAM_SET_MAX_LIFETIME             */
+        BPLIB_MAX_BUNDLE_LEN,           /* PARAM_BUNDLE_SIZE_NO_FRAGMENT */
+        CONFIG_BPLIB_MAX_SEQ_NUM,       /* PARAM_SET_MAX_SEQUENCE NUM */
+        BPLIB_MAX_PAYLOAD_SIZE,         /* PARAM_SET_MAX_PAYLOAD_LENGTH */
+        BPLIB_MAX_BUNDLE_LEN,           /* PARAM_SET_MAX_BUNDLE_LENGTH */
+        CONFIG_BPLIB_SUPPORT_CUSTODY,   /* PARAM_SUPPORT_CUSTODY */
+        BPLIB_MAX_LIFETIME_ALLOWED      /* PARAM_SET_MAX_LIFETIME */
     }
 };
 
-BPLib_Status_t bplib_riot_nc_init(BPLib_NC_ConfigPtrs_t* ConfigPtrs)
+void bplib_riot_nc_init(BPLib_NC_ConfigPtrs_t* ConfigPtrs)
 {
     if (ConfigPtrs == NULL) {
-        return BPLIB_NULL_PTR_ERROR;
+        return;
     }
 
     ConfigPtrs->ChanConfigPtr      = &ChanTbl;
@@ -56,8 +55,6 @@ BPLib_Status_t bplib_riot_nc_init(BPLib_NC_ConfigPtrs_t* ConfigPtrs)
     ConfigPtrs->AuthConfigPtr      = NULL;
     ConfigPtrs->LatConfigPtr       = NULL;
     ConfigPtrs->StorConfigPtr      = NULL;
-
-    return BPLib_NC_Init(ConfigPtrs);
 }
 
 static BPLib_Status_t _channel_ok_and_stopped(uint32_t channel)
@@ -169,6 +166,8 @@ static BPLib_PI_CanBlkConfig_t* map_block(uint32_t channel,
         return &ChanTbl.Configs[channel].HopCountBlkConfig;
     case BPLIB_PAYLOAD_BLOCK:
         return &ChanTbl.Configs[channel].PayloadBlkConfig;
+    case BPLIB_CUSTODY_TRANSFER_BLOCK:
+        return &ChanTbl.Configs[channel].CustodyTransferBlkConfig;
     default:
         return NULL;
     }
@@ -276,5 +275,129 @@ BPLib_Status_t bplib_contact_set_in_addr(uint32_t contact,
         strncpy(ContactsTbl.ContactSet[contact].ClaInAddr, addr, BPLIB_MAX_IP_LENGTH);
         ContactsTbl.ContactSet[contact].ClaInPort = port;
     }
+    return status;
+}
+
+BPLib_Status_t bplib_contact_set_cs_time_trigger(uint32_t contact, uint32_t millis)
+{
+    BPLib_Status_t status = _contact_ok_and_stopped(contact);
+    if (status == BPLIB_SUCCESS) {
+        if ((millis > BPLIB_MAX_CS_TIME_TRIGGER_ALLOWED) ||
+            (millis < BPLIB_MIN_CS_TIME_TRIGGER_ALLOWED)) {
+            return BPLIB_INVALID_CONFIG_ERR;
+        }
+        ContactsTbl.ContactSet[contact].CSTimeTrigger = millis;
+    }
+    return status;
+}
+
+BPLib_Status_t bplib_contact_set_cs_size_trigger(uint32_t contact, uint32_t size)
+{
+    BPLib_Status_t status = _contact_ok_and_stopped(contact);
+    if (status == BPLIB_SUCCESS) {
+        if ((size > BPLIB_MAX_CS_SIZE_TRIGGER_ALLOWED) ||
+            (size < BPLIB_MIN_CS_SIZE_TRIGGER_ALLOWED)) {
+            return BPLIB_INVALID_CONFIG_ERR;
+        }
+        ContactsTbl.ContactSet[contact].CSSizeTrigger = size;
+    }
+    return status;
+}
+
+BPLib_Status_t bplib_contact_set_cs_retransmit_time(uint32_t contact, uint32_t millis)
+{
+    BPLib_Status_t status = _contact_ok_and_stopped(contact);
+    if (status == BPLIB_SUCCESS) {
+        if ((millis > BPLIB_MAX_RETRANSMIT_ALLOWED) ||
+            (millis < BPLIB_MIN_RETRANSMIT_ALLOWED)) {
+            return BPLIB_INVALID_CONFIG_ERR;
+        }
+        ContactsTbl.ContactSet[contact].RetransmitTimeout = millis;
+    }
+    return status;
+}
+
+BPLib_Status_t bplib_channel_set_state(uint32_t channel, BPLib_NC_ApplicationState_t state)
+{
+    /* BPLIB_INVALID_CHAN_ID_ERR and BPLIB_APP_STATE_ERR are checked by the bplib PI functions */
+
+    BPLib_Status_t status = BPLIB_SUCCESS;
+    BPLib_NC_ApplicationState_t curr_state = BPLib_NC_GetAppState(channel);
+
+    /* For fast forward, try to call this function recursively once to change this state */
+    if (curr_state == BPLIB_NC_APP_STATE_REMOVED && state == BPLIB_NC_APP_STATE_STARTED) {
+        status = bplib_channel_set_state(channel, BPLIB_NC_APP_STATE_ADDED);
+    }
+    else if (curr_state == BPLIB_NC_APP_STATE_STARTED && state == BPLIB_NC_APP_STATE_REMOVED) {
+        status = bplib_channel_set_state(channel, BPLIB_NC_APP_STATE_STOPPED);
+    }
+
+    if (status != BPLIB_SUCCESS) {
+        /* Fast forward failed */
+        return status;
+    }
+
+    switch (state) {
+    case BPLIB_NC_APP_STATE_ADDED:
+        status = BPLib_PI_AddApplication(&bplib_instance_data.BPLibInst, channel);
+        break;
+    case BPLIB_NC_APP_STATE_STARTED:
+        status = BPLib_PI_StartApplication(channel);
+        break;
+    case BPLIB_NC_APP_STATE_STOPPED:
+        status = BPLib_PI_StopApplication(channel);
+        break;
+    case BPLIB_NC_APP_STATE_REMOVED:
+        status = BPLib_PI_RemoveApplication(&bplib_instance_data.BPLibInst, channel);
+        break;
+    default:
+        return BPLIB_INVALID_CONFIG_ERR;
+    }
+
+    return status;
+}
+
+BPLib_Status_t bplib_contact_set_state(uint32_t contact, BPLib_CLA_ContactRunState_t state)
+{
+    /* BPLIB_INVALID_CONT_ID_ERR and BPLIB_CLA_INCORRECT_STATE are checked
+     * by the bplib CLA functions */
+
+    BPLib_Status_t status = BPLIB_SUCCESS;
+    BPLib_CLA_ContactRunState_t curr_state;
+    status = BPLib_CLA_GetContactRunState(contact, &curr_state);
+    if (status != BPLIB_SUCCESS) {
+        return status;
+    }
+
+    /* For fast forward, try to call this function recursively once to change this state */
+    if (curr_state == BPLIB_CLA_TORNDOWN && state == BPLIB_CLA_STARTED) {
+        status = bplib_contact_set_state(contact, BPLIB_CLA_SETUP);
+    }
+    else if (curr_state == BPLIB_CLA_STARTED && state == BPLIB_CLA_TORNDOWN) {
+        status = bplib_contact_set_state(contact, BPLIB_CLA_STOPPED);
+    }
+
+    if (status != BPLIB_SUCCESS) {
+        /* Fast forward failed */
+        return status;
+    }
+
+    switch (state) {
+    case BPLIB_CLA_SETUP:
+        status = BPLib_CLA_ContactSetup(&bplib_instance_data.BPLibInst, contact);
+        break;
+    case BPLIB_CLA_STARTED:
+        status = BPLib_CLA_ContactStart(&bplib_instance_data.BPLibInst, contact);
+        break;
+    case BPLIB_CLA_STOPPED:
+        status = BPLib_CLA_ContactStop(&bplib_instance_data.BPLibInst, contact);
+        break;
+    case BPLIB_CLA_TORNDOWN:
+        status = BPLib_CLA_ContactTeardown(&bplib_instance_data.BPLibInst, contact);
+        break;
+    default:
+        return BPLIB_INVALID_CONFIG_ERR;
+    }
+
     return status;
 }
