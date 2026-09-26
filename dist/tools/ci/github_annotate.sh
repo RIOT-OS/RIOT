@@ -3,6 +3,8 @@
 # SPDX-FileCopyrightText: 2020 Martine S. Lenders <m.lenders@fu-berlin.de>
 # SPDX-License-Identifier: LGPL-2.1-only
 
+# docu: https://docs.github.com/en/actions/reference/workflows-and-actions/workflow-commands
+
 LOG="cat"
 LOGFILE=
 OUTFILE=github_annotate_outfile.log
@@ -38,6 +40,13 @@ _github_annotate() {
     LEVEL="${2:-error}"
     OPTS="${3:-}"
     echo "::${LEVEL} ${OPTS}::${MESSAGE}" >> ${OUTFILE}
+}
+
+# expose _github_annotate()
+github_annotate() {
+   if [[ -n "${GITHUB_RUN_ID}" ]]; then
+    _github_annotate "$@"
+   fi
 }
 
 github_annotate_error() {
