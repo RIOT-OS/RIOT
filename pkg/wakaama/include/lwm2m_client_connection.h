@@ -1,32 +1,15 @@
-/*******************************************************************************
-*
-* Copyright (c) 2015 Intel Corporation and others.
-* All rights reserved. This program and the accompanying materials
-* are made available under the terms of the Eclipse Public License v1.0
-* and Eclipse Distribution License v1.0 which accompany this distribution.
-*
-* The Eclipse Public License is available at:
-*    http://www.eclipse.org/legal/epl-v10.html
-* The Eclipse Distribution License is available at:
-*    http://www.eclipse.org/org/documents/edl-v10.php
-*
-* Contributors:
-*    Simon Bernard - initial API and implementation
-*    Christian Renz - Please refer to git log
-*    Christian Manal - Ported to RIOT OS
-*
-*******************************************************************************/
-
-#pragma once
+/*
+ * SPDX-FileCopyrightText: 2015 Intel Corporation and others
+ * SPDX-License-Identifier: EPL-1.0
+ */
 
 /*
- * Copyright (C) 2018 Beduino Master Projekt - University of Bremen
- * Copyright (C) 2019 HAW Hamburg
- *
- * This file is subject to the terms and conditions of the GNU Lesser
- * General Public License v2.1. See the file LICENSE in the top level
- * directory for more details.
+ * SPDX-FileCopyrightText: 2018 Beduino Master Projekt - University of Bremen
+ * SPDX-FileCopyrightText: 2019 HAW Hamburg
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
+
+#pragma once
 
 /**
  * @ingroup         lwm2m_client
