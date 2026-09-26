@@ -91,7 +91,7 @@ for F in "${FILES_ARR[@]}"; do
                         DIFFLINE="${DIFFLINE%%[!0-9]*}"
                         DIFFLEN="${LINE#@@ -*,}"
                         DIFFLEN="${DIFFLEN%%[!0-9]*}"
-                        DIFFLEN=$(( DIFFLEN==0?1:DIFFLEN ))
+                        DIFFLEN=$((DIFFLEN==0?1:DIFFLEN))
                         DIFFHUNK="${LINE}"
                         ;;
                     *)
@@ -100,7 +100,7 @@ for F in "${FILES_ARR[@]}"; do
                         fi
                         ;;
                 esac
-            done < <(diff -u0 "${RIOTBASE}/${F}" "${FORMATTED}")
+            done < <(diff -u1 "${RIOTBASE}/${F}" "${FORMATTED}")
             if [ -n "${DIFFLINE}" ]; then
                 _annotate_hunk "${F}" "${DIFFLINE}" "${DIFFLEN}" "${DIFFHUNK}"
             fi
