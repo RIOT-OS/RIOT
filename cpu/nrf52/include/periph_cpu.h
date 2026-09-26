@@ -85,6 +85,14 @@ typedef enum {
 #endif
 
 /**
+ * @brief   Structure for PDM configuration data
+ */
+typedef struct {
+    gpio_t din_pin;            /**< DIN pin */
+    gpio_t clk_pin;            /**< CLK pin */
+} pdm_conf_t;
+
+/**
  * @brief Common SPI/I2C interrupt callback
  *
  * @param   arg     Opaque context pointer

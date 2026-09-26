@@ -19,7 +19,6 @@
 
 #include "cpu.h"
 #include "board_common.h"
-#include "periph/gpio.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -95,6 +94,34 @@ extern "C" {
 #define LSM6DS3_PWR_PIN     GPIO_PIN(1, 8)  /**< Pin of the IMU supply pin */
 /** @} */
 #endif
+
+#if defined(BOARD_SEEEDSTUDIO_XIAO_NRF52840_SENSE) || defined(DOXYGEN)
+/**
+ * @name    PDM configuration (Sense variant only!)
+ * @{
+ */
+/**
+ * @brief   GPIO pin for the data line
+ */
+#  ifndef PDM_DIN_PIN
+#    define PDM_DIN_PIN GPIO_PIN(0, 16)
+#  endif
+
+/**
+ * @brief   GPIO pin for the clock
+ */
+#  ifndef PDM_CLK_PIN
+#    define PDM_CLK_PIN GPIO_PIN(1, 0)
+#  endif
+
+/**
+ * @brief   GPIO pin that powers the PDM microphone
+ */
+#  ifndef PDM_PWR_PIN
+#    define PDM_PWR_PIN GPIO_PIN(1, 10)
+#  endif
+/** @} */
+#endif /* defined(BOARD_SEEEDSTUDIO_XIAO_NRF52840_SENSE) || defined(DOXYGEN) */
 
 /**
  * @name    ztimer configuration values

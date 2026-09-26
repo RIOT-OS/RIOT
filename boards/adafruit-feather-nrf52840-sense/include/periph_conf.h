@@ -19,6 +19,7 @@
  *
  */
 
+#include "board.h"
 #include "periph_cpu.h"
 #include "cfg_clock_32_0.h"
 #include "cfg_rtt_default.h"
@@ -85,6 +86,19 @@ static const i2c_conf_t i2c_config[] = {
     }
 };
 #define I2C_NUMOF           ARRAY_SIZE(i2c_config)
+/** @} */
+
+/**
+ * @name    PDM pin configuration
+ * @{
+ */
+/**
+ * @brief   PDM pin configuration
+ */
+static const pdm_conf_t pdm_config = {
+    .din_pin = PDM_DIN_PIN,
+    .clk_pin = PDM_CLK_PIN,
+};
 /** @} */
 
 #ifdef __cplusplus

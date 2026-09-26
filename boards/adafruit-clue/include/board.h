@@ -111,6 +111,25 @@ extern "C" {
 #define ILI9341_PARAM_OFFSET_X  (80)
 /** @} */
 
+/**
+ * @name    PDM configuration
+ * @{
+ */
+/**
+ * @brief   GPIO pin for the data line
+ */
+#ifndef PDM_DIN_PIN
+#  define PDM_DIN_PIN GPIO_PIN(0, 0)
+#endif
+
+/**
+ * @brief   GPIO pin for the clock
+ */
+#ifndef PDM_CLK_PIN
+#  define PDM_CLK_PIN GPIO_PIN(0, 1)
+#endif
+/** @} */
+
 #ifdef __cplusplus
 }
 #endif

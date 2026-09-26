@@ -18,6 +18,7 @@
  *
  */
 
+#include "board.h"
 #include "periph_cpu.h"
 #include "cfg_clock_32_1.h"
 #include "cfg_rtt_default.h"
@@ -94,6 +95,21 @@ static const i2c_conf_t i2c_config[] = {
 
 #define I2C_NUMOF           ARRAY_SIZE(i2c_config)  /**< Number of (preconfigured) I2C Buses */
 /** @} */
+
+#if defined(BOARD_SEEEDSTUDIO_XIAO_NRF52840_SENSE) || defined(DOXYGEN)
+/**
+ * @name    PDM pin configuration (Sense variant only!)
+ * @{
+ */
+/**
+ * @brief   PDM pin configuration
+ */
+static const pdm_conf_t pdm_config = {
+    .din_pin = PDM_DIN_PIN,
+    .clk_pin = PDM_CLK_PIN,
+};
+/** @} */
+#endif /* defined(BOARD_SEEEDSTUDIO_XIAO_NRF52840_SENSE) || defined(DOXYGEN) */
 
 #ifdef __cplusplus
 }
