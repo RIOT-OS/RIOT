@@ -145,8 +145,9 @@ def _all_apps(cwd):
     return __exec_cmd(cmd, cwd=cwd).split()
 
 
-def _supported_by_toolchain(app, toolchain, env, cwd):
+def _supported_by_toolchain(board, toolchain, env, cwd):
     cmd = ('make', 'info-toolchains-supported', '--no-print-directory')
+    env["BOARD"] = board
     toolchains = __exec_cmd(cmd, env=env, cwd=cwd).split()
 
     return toolchain in toolchains
@@ -284,12 +285,7 @@ def main():
     for app in apps:
         test_dir = str(pathlib.PurePath(riot_dir, app))
         if not pathlib.Path(test_dir).exists():
-            print(f"{test_dir: <60} SKIP: Does not exists (typo?)")
-            continue
-
-        if not args.no_toolchain_check and \
-                not _supported_by_toolchain(app, args.toolchain, full_env, test_dir):
-            print(f"{app: <60} SKIP: Toolchain '{args.toolchain}' not supported")
+            print(f"{test_dir: <60}  SKIP: Does not exists (typo?)")
             continue
 
         if args.cpu:
@@ -307,7 +303,12 @@ def main():
             else:
                 if not args.no_memory_check and \
                         not _sufficient_memory(board, full_env, test_dir):
-                    print(f"{app: <60} SKIP: Insufficient memory stored")
+                    print(f"{app: <60}  SKIP: Insufficient memory stored")
+                    continue
+
+                if not args.no_toolchain_check and \
+                        not _supported_by_toolchain(board, args.toolchain, full_env, test_dir):
+                    print(f"{app: <60}  SKIP: Toolchain '{args.toolchain}' not supported")
                     continue
 
                 if not _build(app, board, args.toolchain, args.jobs, full_env,
