@@ -15,41 +15,52 @@
 
 #include "board.h"
 #include "mtd.h"
-
-#if MODULE_VFS
-#include <fcntl.h>
-#include <stdio.h>
-#include "vfs.h"
-#endif
-
-/* Define MTD_0 in board.h to use the board mtd if any */
-#ifdef MTD_0
-#define dev (MTD_0)
-#else
-
 #include "mtd_emulated.h"
 
-/* Test mock object implementing a simple RAM-based mtd */
+#if MODULE_VFS
+#  include <fcntl.h>
+#  include <stdio.h>
+#  include "vfs.h"
+#endif
+
+/* Test mock object using a mtd_emulated_t as the underlying device. */
 #ifndef SECTOR_COUNT
-#define SECTOR_COUNT 4
+#  define SECTOR_COUNT 4
 #endif
 #ifndef PAGE_PER_SECTOR
-#define PAGE_PER_SECTOR 4
+#  define PAGE_PER_SECTOR 4
 #endif
 #ifndef PAGE_SIZE
-#define PAGE_SIZE 128
+#  define PAGE_SIZE 128
 #endif
 
 MTD_EMULATED_DEV(0, SECTOR_COUNT, PAGE_PER_SECTOR, PAGE_SIZE);
 
-#define dev (&mtd_emulated_dev0.base)
-
-#endif /* MTD_0 */
+/**
+ * @brief   The device under test.
+ *
+ * The whole suite is run once per device, so that the emulated mtd is always
+ * covered, next to the mtd of the board, if any. */
+static mtd_dev_t *dev;
 
 static void setup_teardown(void)
 {
     mtd_erase(dev, 0, dev->pages_per_sector * dev->page_size);
 }
+
+static void setup_teardown_emulated(void)
+{
+    dev = &mtd_emulated_dev0.base;
+    setup_teardown();
+}
+
+#ifdef MTD_0
+static void setup_teardown_board(void)
+{
+    dev = MTD_0;
+    setup_teardown();
+}
+#endif /* MTD_0 */
 
 static void test_mtd_init(void)
 {
@@ -165,7 +176,6 @@ static void test_mtd_write_read(void)
     TEST_ASSERT_EQUAL_INT(0, ret);
 }
 
-#ifdef MTD_0
 static void test_mtd_write_read_flash(void)
 {
     const uint8_t buf1[] = {0xee, 0xdd, 0xcc};
@@ -175,7 +185,8 @@ static void test_mtd_write_read_flash(void)
     char buf_read[sizeof(buf_expected) + sizeof(buf_empty)];
     memset(buf_read, 0, sizeof(buf_read));
 
-    /* Test flash AND behavior. This test will fail if the mtd is not a flash */
+    /* Test flash AND behavior: programming a location a second time may only
+     * clear bits, it may never set a bit from 0 back to 1. */
 
     /* Basic write / read */
     int ret = mtd_write(dev, buf1, 0, sizeof(buf1));
@@ -188,7 +199,6 @@ static void test_mtd_write_read_flash(void)
     TEST_ASSERT_EQUAL_INT(0, memcmp(buf_expected, buf_read, sizeof(buf_expected)));
     TEST_ASSERT_EQUAL_INT(0, memcmp(buf_empty, buf_read + sizeof(buf_expected), sizeof(buf_empty)));
 }
-#endif
 
 #if MODULE_VFS
 static void test_mtd_vfs(void)
@@ -219,28 +229,40 @@ static void test_mtd_vfs(void)
 }
 #endif
 
-Test *tests_mtd_tests(void)
-{
-    EMB_UNIT_TESTFIXTURES(fixtures) {
-        new_TestFixture(test_mtd_init),
-        new_TestFixture(test_mtd_erase),
-        new_TestFixture(test_mtd_write_erase),
-        new_TestFixture(test_mtd_write_read),
-#ifdef MTD_0
-        new_TestFixture(test_mtd_write_read_flash),
-#endif
+EMB_UNIT_TESTFIXTURES(fixtures) {
+    new_TestFixture(test_mtd_init),
+    new_TestFixture(test_mtd_erase),
+    new_TestFixture(test_mtd_write_erase),
+    new_TestFixture(test_mtd_write_read),
+    new_TestFixture(test_mtd_write_read_flash),
 #if MODULE_VFS
-        new_TestFixture(test_mtd_vfs),
+    new_TestFixture(test_mtd_vfs),
 #endif
-    };
+};
 
-    EMB_UNIT_TESTCALLER(mtd_tests, setup_teardown, setup_teardown, fixtures);
+static Test *tests_mtd_emulated_tests(void)
+{
+    EMB_UNIT_TESTCALLER(mtd_emulated_tests, setup_teardown_emulated,
+                        setup_teardown_emulated, fixtures);
 
-    return (Test *)&mtd_tests;
+    return (Test *)&mtd_emulated_tests;
 }
+
+#ifdef MTD_0
+static Test *tests_mtd_board_tests(void)
+{
+    EMB_UNIT_TESTCALLER(mtd_board_tests, setup_teardown_board,
+                        setup_teardown_board, fixtures);
+
+    return (Test *)&mtd_board_tests;
+}
+#endif
 
 void tests_mtd(void)
 {
-    TESTS_RUN(tests_mtd_tests());
+    TESTS_RUN(tests_mtd_emulated_tests());
+#ifdef MTD_0
+    TESTS_RUN(tests_mtd_board_tests());
+#endif
 }
 /** @} */
