@@ -620,6 +620,22 @@ int _len(ieee802154_dev_t *dev)
     return (size_t)rxbuf[0] - IEEE802154_FCS_LEN;
 }
 
+int _peek(ieee802154_dev_t *dev, void *buf, size_t offset, size_t size)
+{
+    (void)dev;
+    DEBUG("[nrf802154] peek %zu bytes at offset %zu\n", size, offset);
+
+    size_t pktlen = (size_t)rxbuf[0] - IEEE802154_FCS_LEN;
+
+    if ((offset + size) > pktlen) {
+        return -EINVAL;
+    }
+
+    memcpy(buf, &rxbuf[1 + offset], size);
+
+    return size;
+}
+
 int _set_cca_mode(ieee802154_dev_t *dev, ieee802154_cca_mode_t mode)
 {
     (void)dev;
@@ -767,6 +783,7 @@ static const ieee802154_radio_ops_t nrf802154_ops = {
 
     .write = _write,
     .read = _read,
+    .peek = _peek,
     .request_on = _request_on,
     .confirm_on = _confirm_on,
     .len = _len,
