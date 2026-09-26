@@ -207,7 +207,6 @@ get_supported_boards() {
         fi
     else
         if [ -n "$BOARDS_CHANGED" ]; then
-            echo d
             # no changed apps, some changed boards -> build for changed boards
             only_changed=1
         else
@@ -218,10 +217,16 @@ get_supported_boards() {
 
     BOARDS_=${BOARDS}
     if [ $only_changed -eq 1 ]; then
-        # if can_fast_ci_run figured out changes to specific boards,
-        # only consider those
-        export BOARDS="$BOARDS_CHANGED"
-    elif [ -z "${BOARDS}" -a ${QUICK_BUILD} -eq 1 ]; then
+        if [ -z "${BOARDS}" ] && [ ${QUICK_BUILD} -eq 1 ]; then
+            # Quickbuild: add changed boards additionally to the quickbuild-list
+            #  rather than replacing them
+            export BOARDS="${QUICKBUILD_BOARDS} ${BOARDS_CHANGED}"
+        else
+            # if can_fast_ci_run figured out changes to specific boards,
+            # only consider those
+            export BOARDS="${BOARDS_CHANGED}"
+        fi
+    elif [ -z "${BOARDS}" ] && [ ${QUICK_BUILD} -eq 1 ]; then
         # quickbuild board filter is applied here
         export BOARDS="${QUICKBUILD_BOARDS}"
     fi
@@ -519,6 +524,12 @@ update_changed_modules() {
 
     # if this errors, it means we cannot skip any builds.
     if [ -n "$CFCR_ERROR" ]; then
+        # Although we can't skip builds, we might have gotten some insight about
+        # which boards have to be built. Therefore we pass BOARDS_CHANGED
+        # so it can be added to the boards list on quickbuilds.
+        if [ -n "$BOARDS_CHANGED" ]; then
+            export BOARDS_CHANGED="$(basename_list $BOARDS_CHANGED)"
+        fi
         return 0
     fi
 
@@ -528,8 +539,8 @@ update_changed_modules() {
         return 1
     fi
 
-    # can_fast_ci_run.py outputs "board/fooboard", but the rest of this script
-    # expects a board name without leading "board/".
+    # can_fast_ci_run.py outputs "boards/fooboard", but the rest of this script
+    # expects a board name without leading "boards/".
     if [ -n "$BOARDS_CHANGED" ]; then
         export BOARDS_CHANGED="$(basename_list $BOARDS_CHANGED)"
     fi
