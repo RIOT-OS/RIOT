@@ -51,3 +51,9 @@ endif
 ifneq (,$(filter bplib_cla_udp,$(USEMODULE)))
   USEMODULE += gnrc_sock_udp
 endif
+
+ifneq (,$(filter bplib_cla_uwb,$(USEMODULE)))
+  USEPKG += decadriver
+  USEMODULE += ieee802154
+  USEMODULE += fmt
+endif
