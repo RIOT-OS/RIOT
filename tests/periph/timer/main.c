@@ -106,11 +106,13 @@ static int test_timer(unsigned num, uint32_t timer_freq)
         return 0;
     }
     else {
+        /* timer might fire too early if stdio is super slow!
+         * So we stop first before printing */
+        timer_stop(TIMER_DEV(num));
         printf("initialization successful\n");
+        printf("  - timer_stop(%u): stopped\n", num);
     }
 
-    timer_stop(TIMER_DEV(num));
-    printf("  - timer_stop(%u): stopped\n", num);
     unsigned chan_offset_ticks = milliseconds_to_ticks(timer_freq, CHAN_OFFSET_MS);
 
     /* set each available channel */
@@ -137,6 +139,15 @@ static int test_timer(unsigned num, uint32_t timer_freq)
 
     if (set == 0) {
         printf("  ERROR setting timeout failed for *ALL* channels\n\n");
+        return 0;
+    }
+
+    /* we just use the CPU to delay execution and wait for timers to (not) fire */
+    uint32_t loops = 1000 * coreclk() / timer_freq;
+    for (volatile uint32_t i = 0; i < loops; i++) { }
+
+    if (atomic_load_u8(&fired) != 0) {
+        puts("ERROR: Callbacks have fired but timer should be stopped!\n");
         return 0;
     }
 
