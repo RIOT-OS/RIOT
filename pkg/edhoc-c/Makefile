@@ -7,6 +7,12 @@ include $(RIOTBASE)/pkg/pkg.mk
 
 CFLAGS += -Wno-newline-eof
 
+# LLVM20 complains about a variable length array folded to a constant,
+# this is something that should be fixed upstream.
+ifeq (llvm,$(TOOLCHAIN))
+  CFLAGS += -Wno-gnu-folding-constant
+endif
+
 .PHONY: edhoc-c_%
 
 EDHOC_C_MODULES := $(filter edhoc-c_%,$(USEMODULE))
