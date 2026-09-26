@@ -18,14 +18,21 @@
 #include <stdint.h>
 
 #ifdef __cplusplus
-extern "C"
-{
+extern "C" {
 #endif
 
 /**
  * @brief    Clock configuration
  */
-#define CLOCK_CORECLOCK (16780000U) /* 16.78MHz */
+#define CLOCK_CORECLOCK              (16780000U) /* 16.78MHz */
+
+#define TIMER_NUMOF                  (4U)
+#define TIMER_CHANNEL_NUMOF          (1U)
+
+/**
+ * @brief   A low-level timer_set() implementation is provided
+ */
+#define PERIPH_TIMER_PROVIDES_SET
 
 #ifdef __cplusplus
 }
