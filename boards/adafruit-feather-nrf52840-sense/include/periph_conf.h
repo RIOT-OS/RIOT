@@ -89,11 +89,11 @@ static const i2c_conf_t i2c_config[] = {
 /** @} */
 
 /**
- * @name    PDM pin configuration
+ * @name    PDM configuration
  * @{
  */
 /**
- * @brief   PDM pin configuration
+ * @brief   PDM configuration
  */
 static const pdm_conf_t pdm_config = {
     .din_pin = PDM_DIN_PIN,
