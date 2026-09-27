@@ -98,11 +98,11 @@ static const i2c_conf_t i2c_config[] = {
 
 #if defined(BOARD_SEEEDSTUDIO_XIAO_NRF52840_SENSE) || defined(DOXYGEN)
 /**
- * @name    PDM pin configuration (Sense variant only!)
+ * @name    PDM configuration (Sense variant only!)
  * @{
  */
 /**
- * @brief   PDM pin configuration
+ * @brief   PDM configuration
  */
 static const pdm_conf_t pdm_config = {
     .din_pin = PDM_DIN_PIN,

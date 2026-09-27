@@ -97,7 +97,9 @@ extern "C" {
 
 #if defined(BOARD_SEEEDSTUDIO_XIAO_NRF52840_SENSE) || defined(DOXYGEN)
 /**
- * @name    PDM configuration (Sense variant only!)
+ * @name    PDM microphone configuration (Sense variant only!)
+ *
+ * The board has a WMM7035DTTJ0 PDM microphone.
  * @{
  */
 /**
@@ -119,6 +121,22 @@ extern "C" {
  */
 #  ifndef PDM_PWR_PIN
 #    define PDM_PWR_PIN GPIO_PIN(1, 10)
+#  endif
+
+/**
+ * @brief   Minimum clock frequency of the WMM7035DTTJ0 in normal mode
+ * @see     https://files.seeedstudio.com/wiki/XIAO-BLE/mic_WMM7035DTTJ0_Datasheet.pdf.pdf
+ */
+#  ifndef PDM_MIC_CLK_MIN_HZ
+#    define PDM_MIC_CLK_MIN_HZ 1300000
+#  endif
+
+/**
+ * @brief   Maximum clock frequency of the WMM7035DTTJ0 in normal mode
+ * @see     https://files.seeedstudio.com/wiki/XIAO-BLE/mic_WMM7035DTTJ0_Datasheet.pdf.pdf
+ */
+#  ifndef PDM_MIC_CLK_MAX_HZ
+#    define PDM_MIC_CLK_MAX_HZ 4800000
 #  endif
 /** @} */
 #endif /* defined(BOARD_SEEEDSTUDIO_XIAO_NRF52840_SENSE) || defined(DOXYGEN) */
