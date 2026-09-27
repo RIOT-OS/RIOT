@@ -159,6 +159,8 @@ Each layer may keep references to state objects allocated in the
 respective other layer --- this ought to be an opaque reference (`void*`) in most instances.
 Generally, layers are not expected to know the memory layout and interface needed to control
 state objects of other layers.
+Layer A gets to know of opaque references to state owned by B through an allocation notification
+from B.
 For example, the exchange layer stores state objects called _memos_ that track an _exchange_ which
 may, in turn, encompass multiple _transmissions_ on the messaging layer in the case of a block-wise
 transfer. Once the messaging layer has sent a state release notification to the exchange layer,
