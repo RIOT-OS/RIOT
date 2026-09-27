@@ -21,22 +21,20 @@
 #include <errno.h>
 #include <inttypes.h>
 
+#include "board.h"
 #include "cpu.h"
 #include "macros/utils.h"
 #include "nrf_clock.h"
+#include "periph_conf.h"
 #include "periph/gpio.h"
 #include "periph/pdm.h"
 
 #define ENABLE_DEBUG 0
 #include "debug.h"
 
-/* Fixed by hardware, see PDMCLKCTRL nRF52840 PS */
+/* Fixed by hardware, see PDMCLKCTRL nRF52840 PS section 6.15.
+ * PDM clock = PDM_SRC_CLOCK_HZ / divisor */
 #define PDM_SRC_CLOCK_HZ 32000000
-
-/* PDM clock = PDM_SRC_CLOCK_HZ / divisor. Keeps the clock inside a typical
- * PDM MEMS mic clock range of [1.0, 3.25] MHz */
-#define PDM_CLK_DIV_MAX 32
-#define PDM_CLK_DIV_MIN 10
 
 /* Derived from Nordics own PDMCLKCTRL presets (lower 22 bits are always zero)
  * not otherwise documented, confirmed against measured hardware behavior. */
@@ -53,10 +51,48 @@
  */
 #define PDM_DIV_BITFIELD_CONST (1U << (32 - PDM_CLK_POS))
 
+/*
+ * PDM clock range of the PDM module:
+ * - max: above 4 MHz the module doesn't respond (measured on the nRF52840 with
+ *   two different microphones, one of them rated up to 4.8 MHz)
+ * - min: only up to divisor 37 (~0.86 MHz) can every divisor be set exactly
+ *   in PDMCLKCTRL
+ */
+#define PDM_MODULE_CLK_MAX_HZ 4000000
+#define PDM_MODULE_CLK_MIN_HZ (PDM_SRC_CLOCK_HZ / 37)
+
+/* PDM clock range of the microphone. It depends on the microphone used, so
+ * there is no default. */
+#if !defined(PDM_MIC_CLK_MIN_HZ) || !defined(PDM_MIC_CLK_MAX_HZ)
+#  error "PDM: Define PDM_MIC_CLK_MIN_HZ and PDM_MIC_CLK_MAX_HZ for the microphone used."
+#endif
+
+/* PDM clock range used by the driver: overlap of the module and microphone range */
+#if PDM_MIC_CLK_MIN_HZ < PDM_MODULE_CLK_MIN_HZ
+#  define PDM_CLK_MIN_HZ PDM_MODULE_CLK_MIN_HZ
+#else
+#  define PDM_CLK_MIN_HZ PDM_MIC_CLK_MIN_HZ
+#endif
+
+#if PDM_MIC_CLK_MAX_HZ > PDM_MODULE_CLK_MAX_HZ
+#  define PDM_CLK_MAX_HZ PDM_MODULE_CLK_MAX_HZ
+#else
+#  define PDM_CLK_MAX_HZ PDM_MIC_CLK_MAX_HZ
+#endif
+
+/* Divisor range for the used clock range, rounded so the clock stays inside it. */
+#define PDM_CLK_DIV_MIN ((PDM_SRC_CLOCK_HZ + PDM_CLK_MAX_HZ - 1) / PDM_CLK_MAX_HZ)
+#define PDM_CLK_DIV_MAX (PDM_SRC_CLOCK_HZ / PDM_CLK_MIN_HZ)
+
+#if PDM_CLK_DIV_MIN > PDM_CLK_DIV_MAX
+#  error "PDM: No usable PDM clock, check PDM_MIC_CLK_MIN_HZ and PDM_MIC_CLK_MAX_HZ."
+#endif
+
+/* Decimation ratios supported by the hardware, sample rate = PDM clock / ratio */
 #define PDM_RATIO_HIGH  80
 #define PDM_RATIO_LOW   64
 
-/* Achievable sample rate range, from divisor [10,32] x ratio {64,80} */
+/* Achievable sample rate range */
 #define PDM_SAMPLE_RATE_MIN (PDM_SRC_CLOCK_HZ / (PDM_CLK_DIV_MAX * PDM_RATIO_HIGH))
 #define PDM_SAMPLE_RATE_MAX (PDM_SRC_CLOCK_HZ / (PDM_CLK_DIV_MIN * PDM_RATIO_LOW))
 
