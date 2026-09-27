@@ -302,13 +302,13 @@ static _transmission_t* _transmission_find(const unicoap_endpoint_t* endpoint, u
 
 static int _disconnect(_transmission_t* transmission);
 
-static inline void _transmission_free(_transmission_t* transmission, bool failure)
+static inline void _transmission_free(_transmission_t* transmission, bool disconnect)
 {
     MESSAGING_7252_DEBUG(UNICOAP_MESSAGE_ID_FORMAT "transmission ended\n", transmission->id);
     if (transmission->pdu) {
         _carbon_copy_free(transmission->pdu);
     }
-    if (failure) {
+    if (disconnect) {
         _disconnect(transmission);
     }
     unicoap_event_cancel(&transmission->ack_timeout);
@@ -320,10 +320,10 @@ static inline void _transmission_free(_transmission_t* transmission, bool failur
 static inline void _transmission_free_notif(
     _transmission_t* transmission,
     unicoap_layer_notification_t type,
-    bool failure
+    bool disconnect
 ) {
     void* exchange = transmission->exchange;
-    _transmission_free(transmission, failure);
+    _transmission_free(transmission, disconnect);
     if (exchange) {
         unicoap_exchange_notify(exchange, type, NULL);
     }
