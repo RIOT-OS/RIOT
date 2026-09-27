@@ -204,7 +204,7 @@ static const fmc_bank_conf_t fmc_bank_config[] = {
         .sdram = {
             .clk_period = 2,                 /* SDCLK = 2 x HCLK */
             .row_bits = 12,                  /* A11..A0 used for row address */
-            .col_bits = 8,                   /* A8..A0 used for column address */
+            .col_bits = 8,                   /* A7..A0 used for column address */
             .cas_latency = 3,                /* CAS latency is 3 clock cycles */
             .read_delay = 0,                 /* No read delay after CAS */
             .four_banks = true,              /* SDRAM has four internal banks */
