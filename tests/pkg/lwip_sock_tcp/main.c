@@ -341,7 +341,7 @@ static void test_tcp_read4__EAGAIN(void)
     _server_addr.port = _TEST_PORT_REMOTE;
     _server_addr.netif = SOCK_ADDR_ANY_NETIF;
 
-    msg_send(&msg, _server);        /* start server on _TEST_PORT_LOCAL */
+    msg_send(&msg, _server);        /* start server on _TEST_PORT_REMOTE */
     msg.type = _SERVER_MSG_ACCEPT;
     msg_send(&msg, _server);        /* let server accept */
 
@@ -361,7 +361,7 @@ static void test_tcp_read4__ECONNRESET(void)
     _server_addr.port = _TEST_PORT_REMOTE;
     _server_addr.netif = SOCK_ADDR_ANY_NETIF;
 
-    msg_send(&msg, _server);        /* start server on _TEST_PORT_LOCAL */
+    msg_send(&msg, _server);        /* start server on _TEST_PORT_REMOTE */
     msg.type = _SERVER_MSG_ACCEPT;
     msg_send(&msg, _server);        /* let server accept */
 
@@ -391,7 +391,7 @@ static void test_tcp_read4__ETIMEDOUT(void)
     _server_addr.port = _TEST_PORT_REMOTE;
     _server_addr.netif = SOCK_ADDR_ANY_NETIF;
 
-    msg_send(&msg, _server);        /* start server on _TEST_PORT_LOCAL */
+    msg_send(&msg, _server);        /* start server on _TEST_PORT_REMOTE */
     msg.type = _SERVER_MSG_ACCEPT;
     msg_send(&msg, _server);        /* let server accept */
 
@@ -422,7 +422,7 @@ static void test_tcp_read4__success(void)
     _server_addr.port = _TEST_PORT_REMOTE;
     _server_addr.netif = SOCK_ADDR_ANY_NETIF;
 
-    msg_send(&msg, _server);        /* start server on _TEST_PORT_LOCAL */
+    msg_send(&msg, _server);        /* start server on _TEST_PORT_REMOTE */
     msg.type = _SERVER_MSG_ACCEPT;
     msg_send(&msg, _server);        /* let server accept */
 
@@ -450,7 +450,7 @@ static void test_tcp_read4__success_with_timeout(void)
     _server_addr.port = _TEST_PORT_REMOTE;
     _server_addr.netif = SOCK_ADDR_ANY_NETIF;
 
-    msg_send(&msg, _server);        /* start server on _TEST_PORT_LOCAL */
+    msg_send(&msg, _server);        /* start server on _TEST_PORT_REMOTE */
     msg.type = _SERVER_MSG_ACCEPT;
     msg_send(&msg, _server);        /* let server accept */
 
@@ -478,7 +478,7 @@ static void test_tcp_read4__success_non_blocking(void)
     _server_addr.port = _TEST_PORT_REMOTE;
     _server_addr.netif = SOCK_ADDR_ANY_NETIF;
 
-    msg_send(&msg, _server);        /* start server on _TEST_PORT_LOCAL */
+    msg_send(&msg, _server);        /* start server on _TEST_PORT_REMOTE */
     msg.type = _SERVER_MSG_ACCEPT;
     msg_send(&msg, _server);        /* let server accept */
 
@@ -513,7 +513,7 @@ static void test_tcp_write4__success(void)
     _server_addr.port = _TEST_PORT_REMOTE;
     _server_addr.netif = SOCK_ADDR_ANY_NETIF;
 
-    msg_send(&msg, _server);        /* start server on _TEST_PORT_LOCAL */
+    msg_send(&msg, _server);        /* start server on _TEST_PORT_REMOTE */
     msg.type = _SERVER_MSG_ACCEPT;
     msg_send(&msg, _server);        /* let server accept */
 
@@ -786,7 +786,7 @@ static void test_tcp_read6__EAGAIN(void)
     _server_addr.port = _TEST_PORT_REMOTE;
     _server_addr.netif = SOCK_ADDR_ANY_NETIF;
 
-    msg_send(&msg, _server);        /* start server on _TEST_PORT_LOCAL */
+    msg_send(&msg, _server);        /* start server on _TEST_PORT_REMOTE */
     msg.type = _SERVER_MSG_ACCEPT;
     msg_send(&msg, _server);        /* let server accept */
 
@@ -806,7 +806,7 @@ static void test_tcp_read6__ECONNRESET(void)
     _server_addr.port = _TEST_PORT_REMOTE;
     _server_addr.netif = SOCK_ADDR_ANY_NETIF;
 
-    msg_send(&msg, _server);        /* start server on _TEST_PORT_LOCAL */
+    msg_send(&msg, _server);        /* start server on _TEST_PORT_REMOTE */
     msg.type = _SERVER_MSG_ACCEPT;
     msg_send(&msg, _server);        /* let server accept */
 
@@ -835,7 +835,7 @@ static void test_tcp_read6__ETIMEDOUT(void)
     _server_addr.port = _TEST_PORT_REMOTE;
     _server_addr.netif = SOCK_ADDR_ANY_NETIF;
 
-    msg_send(&msg, _server);        /* start server on _TEST_PORT_LOCAL */
+    msg_send(&msg, _server);        /* start server on _TEST_PORT_REMOTE */
     msg.type = _SERVER_MSG_ACCEPT;
     msg_send(&msg, _server);        /* let server accept */
 
@@ -865,7 +865,7 @@ static void test_tcp_read6__success(void)
     _server_addr.port = _TEST_PORT_REMOTE;
     _server_addr.netif = SOCK_ADDR_ANY_NETIF;
 
-    msg_send(&msg, _server);        /* start server on _TEST_PORT_LOCAL */
+    msg_send(&msg, _server);        /* start server on _TEST_PORT_REMOTE */
     msg.type = _SERVER_MSG_ACCEPT;
     msg_send(&msg, _server);        /* let server accept */
 
@@ -893,7 +893,7 @@ static void test_tcp_read6__success_with_timeout(void)
     _server_addr.port = _TEST_PORT_REMOTE;
     _server_addr.netif = SOCK_ADDR_ANY_NETIF;
 
-    msg_send(&msg, _server);        /* start server on _TEST_PORT_LOCAL */
+    msg_send(&msg, _server);        /* start server on _TEST_PORT_REMOTE */
     msg.type = _SERVER_MSG_ACCEPT;
     msg_send(&msg, _server);        /* let server accept */
 
@@ -921,7 +921,7 @@ static void test_tcp_read6__success_non_blocking(void)
     _server_addr.port = _TEST_PORT_REMOTE;
     _server_addr.netif = SOCK_ADDR_ANY_NETIF;
 
-    msg_send(&msg, _server);        /* start server on _TEST_PORT_LOCAL */
+    msg_send(&msg, _server);        /* start server on _TEST_PORT_REMOTE */
     msg.type = _SERVER_MSG_ACCEPT;
     msg_send(&msg, _server);        /* let server accept */
 
@@ -956,7 +956,7 @@ static void test_tcp_write6__success(void)
     _server_addr.port = _TEST_PORT_REMOTE;
     _server_addr.netif = SOCK_ADDR_ANY_NETIF;
 
-    msg_send(&msg, _server);        /* start server on _TEST_PORT_LOCAL */
+    msg_send(&msg, _server);        /* start server on _TEST_PORT_REMOTE */
     msg.type = _SERVER_MSG_ACCEPT;
     msg_send(&msg, _server);        /* let server accept */
 
