@@ -49,8 +49,10 @@ static int _on_response(
         unicoap_message_payload_get_size(response));
 
     unicoap_content_format_t format;
-    if ((error = unicoap_options_get_content_format(response->options, &format)) >= 0
-        && unicoap_content_format_is_human_readable(format)) {
+    if (((error = unicoap_options_get_content_format(response->options, &format)) >= 0
+          && unicoap_content_format_is_human_readable(format))
+          || (error == -ENOENT && (((uint8_t)(uintptr_t)arg) & _SHELL_FLAG_TEXT)
+    )) {
         printf("text response: '%.*s'\n", 
             (int)unicoap_message_payload_get_size(response), 
             (char*)unicoap_message_payload_get((unicoap_message_t*)response));

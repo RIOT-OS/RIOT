@@ -738,6 +738,8 @@ void* unicoap_transport_dtls_get_socket(void)
  *
  * You can call this function at any time after `unicoap` has been initialized.
  *
+ * @warning Not fully supported yet.
+ *
  * @returns `0` on success or negative error value otherwise. The error value depends on the
  * DTLS implementation.
  */
@@ -761,6 +763,8 @@ int unicoap_transport_dtls_add_socket(sock_dtls_t* socket, sock_udp_t* base_sock
  *
  * @param[in,out] socket The socket pointer you have previously passed to
  *                       @ref unicoap_transport_dtls_add_socket
+ *
+ * @warning Not fully supported yet.
  *
  * @returns `0`, indicating a success. Future versions of this API may return a negative error.
  *
