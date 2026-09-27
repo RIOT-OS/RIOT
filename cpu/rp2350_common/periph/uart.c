@@ -24,13 +24,17 @@
 #define ENABLE_DEBUG 0
 #include "debug.h"
 
-static uart_isr_ctx_t ctx[UART_NUMOF];
+typedef struct {
+    uint32_t uartibrd;
+    uint32_t uartfbrd;
+    uint32_t uartlcr_h;
+    uint32_t uartcr;
+} _uart_backup_t;
 
-/* back up values of registers used during uart_poweroff() / uart_poweron() */
-static uint32_t uartibrd;
-static uint32_t uartfbrd;
-static uint32_t uartlcr_h;
-static uint32_t uartcr;
+static uart_isr_ctx_t _ctx[UART_NUMOF];
+
+/* Backup of the registers used during uart_poweroff() / uart_poweron() */
+static _uart_backup_t _backup[UART_NUMOF];
 
 void _irq_enable(uart_t uart)
 {
@@ -154,8 +158,8 @@ int uart_init(uart_t uart, uint32_t baud, uart_rx_cb_t rx_cb, void *arg)
     }
 
     UART0_Type *dev = uart_config[uart].dev;
-    ctx[uart].rx_cb = rx_cb;
-    ctx[uart].arg = arg;
+    _ctx[uart].rx_cb = rx_cb;
+    _ctx[uart].arg = arg;
 
     uart_init_pins(uart);
 
@@ -197,12 +201,12 @@ void uart_poweron(uart_t uart)
     _reset_uart(uart);
     UART0_Type *dev = uart_config[uart].dev;
     /* Restore config from registers */
-    dev->UARTIBRD = uartibrd;
-    dev->UARTFBRD = uartfbrd;
-    dev->UARTLCR_H = uartlcr_h;
-    dev->UARTCR = uartcr;
+    dev->UARTIBRD = _backup[uart].uartibrd;
+    dev->UARTFBRD = _backup[uart].uartfbrd;
+    dev->UARTLCR_H = _backup[uart].uartlcr_h;
+    dev->UARTCR = _backup[uart].uartcr;
     /* restore IRQs, if needed */
-    if (ctx[uart].rx_cb != NULL) {
+    if (_ctx[uart].rx_cb != NULL) {
         _irq_enable(uart);
     }
     uart_init_pins(uart);
@@ -214,7 +218,7 @@ void uart_deinit_pins(uart_t uart)
     /* @TODO: properly clear UART on deinit */
     /* gpio_reset_all_config(uart_config[uart].tx_pin); */
     SIO->GPIO_OE_CLR = 1LU << uart_config[uart].tx_pin;
-    if (ctx[uart].rx_cb) {
+    if (_ctx[uart].rx_cb) {
         /* gpio_reset_all_config(uart_config[uart].rx_pin); */
     }
 }
@@ -224,10 +228,10 @@ void uart_poweroff(uart_t uart)
     assert((unsigned)uart < UART_NUMOF);
     UART0_Type *dev = uart_config[uart].dev;
     /* backup configuration registers */
-    uartibrd = dev->UARTIBRD;
-    uartfbrd = dev->UARTFBRD;
-    uartlcr_h = dev->UARTLCR_H;
-    uartcr = dev->UARTCR;
+    _backup[uart].uartibrd = dev->UARTIBRD;
+    _backup[uart].uartfbrd = dev->UARTFBRD;
+    _backup[uart].uartlcr_h = dev->UARTLCR_H;
+    _backup[uart].uartcr = dev->UARTCR;
     /* disconnect GPIOs and power off peripheral */
     uart_deinit_pins(uart);
     rp_irq_disable(uart_config[uart].irqn);
@@ -247,7 +251,7 @@ void isr_handler(uint8_t num)
             puts("[rpx0xx] uart RX error (parity, break, or framing error");
         }
         else {
-            ctx[num].rx_cb(ctx[num].arg, (uint8_t)data);
+            _ctx[num].rx_cb(_ctx[num].arg, (uint8_t)data);
         }
     }
 }
