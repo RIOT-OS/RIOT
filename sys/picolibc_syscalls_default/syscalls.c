@@ -483,7 +483,7 @@ int fcntl(int fd, int cmd, int arg)
 off_t lseek(int fd, _off_t off, int whence)
 {
 #ifdef MODULE_VFS
-    int res = vfs_lseek(fd, off, whence);
+    off_t res = vfs_lseek(fd, off, whence);
     if (res < 0) {
         /* vfs returns negative error codes */
         errno = -res;
