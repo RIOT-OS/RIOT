@@ -105,7 +105,7 @@ static void test_nanocoap_cache__cachekey_blockwise(void)
                              &token[0], 2, COAP_METHOD_GET, msgid);
     coap_pkt_init(&pkt2, &buf2[0], sizeof(buf2), len);
     coap_opt_add_string(&pkt2, COAP_OPT_URI_PATH, &path[0], '/');
-    coap_opt_add_block1_control(&pkt1, &blockopt);
+    coap_opt_add_block1_control(&pkt2, &blockopt);
     coap_opt_finish(&pkt2, COAP_OPT_FINISH_NONE);
 
     nanocoap_cache_key_blockreq_options_generate((const coap_pkt_t *) &pkt1, digest1);
