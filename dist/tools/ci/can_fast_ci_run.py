@@ -74,7 +74,6 @@ class ChangeSet:
         while module != "":
             makefile = os.path.join(self._riotbase, module, "Makefile")
             if os.path.isfile(makefile) or module in EXCEPTION_MODULES:
-
                 # map all tests/unittests/* to just tests/unittests
                 # workaround for #18987
                 if module.startswith("tests/unittests/"):
@@ -233,10 +232,16 @@ if __name__ == "__main__":
     if args.debug:
         change_set.print_files_and_classifications()
 
+    # Some of the changes require a full build. However, when a full build is
+    # required, we still want to print changed boards (if there are any) to add
+    # them to the quickbuild list. Otherwise a combination of board and non-board
+    # changes might prevent the board to be built specifically.
+    postponed_return_value = 0
+
     if "kconfig" in change_set.other or "build-system" in change_set.other:
         if args.explain:
             print_err("General build system / KConfig changes require a full CI run")
-        sys.exit(1)
+        postponed_return_value = 1
 
     if "ci-murdock" in change_set.other:
         if args.explain:
@@ -245,22 +250,22 @@ if __name__ == "__main__":
         # only exit/error if MURDOCK_TEST_CHANGE_FILTER is not set.
         # useful for testing.
         if not os.environ.get("MURDOCK_TEST_CHANGE_FILTER"):
-            sys.exit(1)
+            postponed_return_value = 1
 
     if "public-headers" in change_set.other:
         if args.explain:
             print_err("Changes in public headers require a full CI run")
-        sys.exit(1)
+        postponed_return_value = 1
 
     if len(change_set.modules) > 0:
         if args.explain:
             print_err("Currently changing modules require a full CI run")
-        sys.exit(1)
+        postponed_return_value = 1
 
     if len(change_set.pkgs) > 0:
         if args.explain:
             print_err("Currently changing packages require a full CI run")
-        sys.exit(1)
+        postponed_return_value = 1
 
     if args.json or args.changed_boards or args.changed_apps:
         result = {
@@ -271,10 +276,14 @@ if __name__ == "__main__":
     if args.json:
         print(json.dumps(result, indent=2))
 
+    # always print changed boards
     if args.changed_boards:
         changed_boards = " ".join(result.get("boards", []))
         print(f"BOARDS_CHANGED=\"{changed_boards}\"")
 
-    if args.changed_apps:
+    # only print changed apps if everything succeeded
+    if args.changed_apps and postponed_return_value == 0:
         changed_apps = " ".join(result.get("apps", []))
         print(f"APPS_CHANGED=\"{changed_apps}\"")
+
+    sys.exit(postponed_return_value)
