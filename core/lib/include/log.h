@@ -5,8 +5,9 @@
 
 #pragma once
 
-#include "macros/xtstr.h"
 #include <string.h>
+
+#include "modules.h"
 
 /**
  * @defgroup     core_util_log Logging
@@ -117,7 +118,7 @@ typedef enum {
 
 /*   There are three tiers of selective logging: */
 #    if defined(LOG_UNITS_SELECTIVE_ALL)
-/*     1. LOG="*", i.e., enable all log units */
+/*     1. LOG="ALL", i.e., enable all log units */
 #      define _LOG_UNIT_ENABLED(unit) true
 #    elif defined(LOG_UNITS_SELECTIVE_PATTERNS)
 /*     2. LOG="core.irq ztimer", i.e., enable log units by prefix pattern */
