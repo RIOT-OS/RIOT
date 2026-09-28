@@ -72,7 +72,7 @@ ifneq (,$(filter periph_wdt,$(USEMODULE)))
 endif
 
 ifneq (,$(filter periph_can,$(FEATURES_USED)))
-  ifneq (,$(filter g4,$(CPU_FAM)))
+  ifneq (,$(filter g4 h7,$(CPU_FAM)))
 	SRC += fdcan.c
   else
 	SRC += classiccan.c
