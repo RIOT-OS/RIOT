@@ -368,6 +368,36 @@ typedef struct {
     uint8_t sample_period; /**< Sample period used, e.g. QDEC_SAMPLEPER_SAMPLEPER_128us */
     bool debounce_filter;  /**< Enable/disable debounce filter */
     bool led_active_state; /**< Active state of the LED. True is active high, false is active low */
+    /**
+     * @brief Period of sample reports
+     *
+     * Use, for instance, QDEC_REPORTPER_REPORTPER_10Smpl. See the note on the callback_threshold
+     * parameter to understand how this value affects the callback.
+     */
+    uint8_t report_period;
+    /**
+     * @brief  Threshold count for the user callback
+     *
+     * The callback is called once when the counter reaches or surpasses +callback_threshold or
+     * -callback_threshold. The counter is not reset by the interrupt on the driver side, so no
+     * further callback happens until it is back within the range. Users may reset the counter in
+     * the callback using @ref qdec_read_and_reset to get another callback after at least
+     * +/- callback_threshold counts. Setting this to 0 will disable interrupts. Set this value to 1
+     * to get a callback on every step (with the caveats noted below). A value of 4 is useful with
+     * many rotary knobs.
+     *
+     * @note   The counter is checked only once per report period to decide whether to call the user
+     *         callback. Depending on this period, the callback may be called when the counter is
+     *         already be beyond +/- callback_threshold. The upper limit of this deviation is one
+     *         report period's worth of steps. Since this interrupt will never reset the counter,
+     *         the user can read it via @ref qdec_read_and_reset. To mitigate the behaviour of
+     *         getting a callback when the counter is already beyond +/- callback_threshold, use
+     *         `QDEC_REPORTPER_REPORTPER_1Smpl` as a report period. With this configuration, the
+     *         driver will call the callback exactly at +callback_threshold or -callback_threshold,
+     *         at the cost of up to one interrupt (not callback!) per sample while the encoder is
+     *         moving.
+     */
+    uint32_t callback_threshold;
 } qdec_conf_t;
 
 /**
