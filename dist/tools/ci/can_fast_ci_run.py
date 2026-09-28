@@ -1,7 +1,9 @@
 #!/usr/bin/env python3
 """
-Command line utility to check if only a subset of board / application combinations
-need to be build in the CI
+Command line utility to check if a fast CI run is possible.
+
+A fast CI run is possible if only a subset of board / application combinations
+needs to be built in the CI.
 """
 import argparse
 import io
@@ -40,9 +42,7 @@ print_err = partial(print, file=sys.stderr)
 
 
 def print_change_set_section(name, contents):
-    """
-    Print the given change set section human reable
-    """
+    """Print the given change set section human readable."""
     if not contents:
         return
     print_err(name)
@@ -58,9 +58,8 @@ def print_change_set_section(name, contents):
 
 
 class ChangeSet:
-    """
-    Representation of the modules affected by a change set
-    """
+    """Representation of the modules affected by a change set."""
+
     def __init__(self, riotbase=os.getcwd()):
         self.apps = {}
         self.boards = {}
@@ -88,9 +87,7 @@ class ChangeSet:
         raise Exception("Module containing file \"{}\" not found".format(file))
 
     def add_file(self, file):
-        """
-        Add the given file to the change set
-        """
+        """Add the given file to the change set."""
         # normalize path
         file = os.path.normpath(file)
         if file.startswith('./'):
@@ -119,9 +116,7 @@ class ChangeSet:
             raise Exception("File \"{}\" doesn't match any known category".format(file))
 
     def print_files_and_classifications(self):
-        """
-        Print all files and their classification in human readable format
-        """
+        """Print all files and their classification in human readable format."""
         print_change_set_section("Other", self.other)
         print_change_set_section("Modules", self.modules)
         print_change_set_section("Packages", self.pkgs)
@@ -131,8 +126,10 @@ class ChangeSet:
 
 def classify_changes(riotbase=None, upstream_branch="master"):
     """
-    Runs the given compiler with -v -E on an no-op compilation unit and parses the built-in
-    include search directories and the GCC version from the output
+    Check if a fast CI run is possible for the changes in the current branch.
+
+    The changes between `HEAD` and the upstream branch are classified into a
+    `ChangeSet`.
 
     :param riotbase: path of the RIOT base directory
     :type riotbase: str
