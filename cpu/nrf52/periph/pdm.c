@@ -80,6 +80,10 @@
 #  define PDM_CLK_MAX_HZ PDM_MIC_CLK_MAX_HZ
 #endif
 
+#if PDM_MIC_CLK_MIN_HZ > PDM_MIC_CLK_MAX_HZ
+#  error "PDM: Minimum PDM clock is higher than maximum!"
+#endif
+
 /* Divisor range for the used clock range, rounded so the clock stays inside it. */
 #define PDM_CLK_DIV_MIN ((PDM_SRC_CLOCK_HZ + PDM_CLK_MAX_HZ - 1) / PDM_CLK_MAX_HZ)
 #define PDM_CLK_DIV_MAX (PDM_SRC_CLOCK_HZ / PDM_CLK_MIN_HZ)
