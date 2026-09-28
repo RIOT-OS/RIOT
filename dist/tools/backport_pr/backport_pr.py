@@ -35,7 +35,8 @@ BACKPORT_BRANCH = "backport/{release}/{origbranch}"
 
 
 def _get_labels(pull_request):
-    """
+    """Return the sorted labels for the backport of the given pull request.
+
     >>> _get_labels({'labels': [{'name': 'test'}, {'name': 'abcd'}]})
     ['Process: release backport', 'abcd', 'test']
     >>> _get_labels({'labels': [{'name': 'Reviewed: what'}, \
@@ -119,7 +120,7 @@ def _delete_worktree(repo, workdir):
 
 def main():
     # pylint:disable=too-many-locals,too-many-branches,too-many-statements
-    """Main function of this script."""
+    """Run the main function of this script."""
     keyfile = os.path.join(os.environ["HOME"], GITHUBTOKEN_FILE)
     parser = argparse.ArgumentParser()
     parser.add_argument(

@@ -1,6 +1,8 @@
 #!/usr/bin/env python
 
-'''
+"""
+Send a program to a Robotis board using the Robotis bootloader.
+
 MIT License
 
 Copyright (c) 2014 Gregoire Passault
@@ -22,7 +24,7 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
-'''
+"""
 
 # This script sends a program on a robotis board (OpenCM9.04 or CM900)
 # using the robotis bootloader (used in OpenCM IDE)
@@ -63,8 +65,7 @@ pgm, port, binary = sys.argv
 
 
 def progressBar(percent, precision=65):
-    """Prints a progress bar."""
-
+    """Print a progress bar."""
     threshold = precision*percent / 100.0
     sys.stdout.write('[ ')
     for x in range(precision):

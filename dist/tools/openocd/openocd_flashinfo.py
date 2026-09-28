@@ -1,7 +1,5 @@
 #!/usr/bin/env python3
-"""
-Utility to parse the output of OpenOCD's "flash list" command
-"""
+"""Utility to parse the output of OpenOCD's `flash list` command."""
 import argparse
 import sys
 
@@ -10,8 +8,9 @@ NUMERIC_FIELDS = {"base", "size", "bus_width", "chip_width"}
 
 def parse_flash_info(lines):
     """
-    Read output of OpenOCD's "flash list" command given in lines into a list
-    of dictionaries
+    Read output of OpenOCD's `flash list` command into a list of dictionaries.
+
+    The output is given in lines.
 
     :param lines: Output of "flash list" lines
 

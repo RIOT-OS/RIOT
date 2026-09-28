@@ -1,7 +1,5 @@
 #!/usr/bin/env python3
-"""
-Command line utility to list and filter TTYs
-"""
+"""Command line utility to list and filter TTYs."""
 import argparse
 import json
 import os
@@ -13,9 +11,10 @@ import pyudev
 
 
 def unescape(string):
-    """
-    Decodes unicode escaping in a string, e.g. "Hallo\\x20World" is decoded as
-    "Hallo World"
+    r"""
+    Decode unicode escaping in a string.
+
+    For example, "Hallo\x20World" is decoded as "Hallo World".
     """
     res = bytes(string, "utf8").decode("unicode_escape")
     res = res.encode("latin1").decode("utf8", errors="replace")
@@ -24,8 +23,9 @@ def unescape(string):
 
 def tty2dict(dev):
     """
-    Parse the given TTY udev interface into a dict() containing the most
-    relevant attributes
+    Parse the given TTY udev interface into a `dict()`.
+
+    The `dict()` contains the most relevant attributes.
     """
     result = {}
     result["path"] = dev.get("DEVNAME")
@@ -42,10 +42,7 @@ def tty2dict(dev):
 
 
 def filters_match(filters, tty):
-    """
-    Check if the given TTY interface matches all given filters
-    """
-
+    """Check if the given TTY interface matches all given filters."""
     for key, regex in filters:
         if tty[key] is None:
             return False
@@ -57,9 +54,7 @@ def filters_match(filters, tty):
 
 
 def parse_args(args):
-    """
-    Parse the given command line style arguments with argparse
-    """
+    """Parse the given command line style arguments with argparse."""
     desc = "List and filter TTY interfaces that might belong to boards"
     formats_combinable = {
         "path",
@@ -136,8 +131,9 @@ def parse_args(args):
 
 def print_table(data, headers):
     """
-    Print the list of dictionaries given in data as table, where headers is
-    a list of keys to that dict and also servers as table headers.
+    Print the list of dictionaries given in `data` as table.
+
+    The `headers` argument is a list of keys to that dict and also serves as table headers.
     """
     lengths = []
     for header in headers:
@@ -165,9 +161,7 @@ def print_table(data, headers):
 
 
 def print_results(args, ttys):
-    """
-    Print the given TTY devices according to the given args
-    """
+    """Print the given TTY devices according to the given `args`."""
     if len(args.format) == 1:
         if args.format[0] == "json":
             print(json.dumps(ttys, indent=2))
@@ -197,8 +191,9 @@ def print_results(args, ttys):
 
 def generate_filters(args):
     """
-    Generate filters for use in the filters_match function from the command
-    line arguments
+    Generate filters for use in the `filters_match` function.
+
+    The filters are generated from the command line arguments.
     """
     result = []
     if args.serial is not None:
@@ -227,9 +222,7 @@ def generate_filters(args):
 
 
 def print_ttys(args):
-    """
-    Print ttys as specified by the given command line arguments
-    """
+    """Print TTY devices as specified by the given command line arguments."""
     args = parse_args(args)
     filters = generate_filters(args)
 
