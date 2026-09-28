@@ -71,7 +71,7 @@ int congure_test_snd_setup(void congure_test_snd_t *c, unsigned id);
 /**
  * @brief   Pool size for the message list elements for a lost message report
  *
- * @see congure_snd_driver_t::report_msg_lost
+ * @see congure_snd_driver_t::report_msgs_lost
  *
  * This defines the maximum number of 3-tuples you can use with
  * @ref congure_test_call_report() when `argv[1] = "msg_lost"`.
@@ -239,8 +239,8 @@ int congure_test_msgs_reset(int argc, char **argv);
  *
  * @see congure_snd_driver_t::report_msg_sent()
  * @see congure_snd_driver_t::report_msg_discarded()
- * @see congure_snd_driver_t::report_msg_timeout()
- * @see congure_snd_driver_t::report_msg_lost()
+ * @see congure_snd_driver_t::report_msgs_timeout()
+ * @see congure_snd_driver_t::report_msgs_lost()
  * @see congure_snd_driver_t::report_msg_acked()
  * @see congure_snd_driver_t::report_ecn_ce()
  *

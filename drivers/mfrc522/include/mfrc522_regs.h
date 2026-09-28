@@ -940,7 +940,7 @@ typedef enum {
  *
  *        MFRC522_REG_RF_CFG[6:4]
  *
- * @see mfrc522_pcd_rx_gain
+ * @see mfrc522_pcd_rx_gain_t
  */
 #define MFRC522_BITMASK_RF_CFG_RX_GAIN  0x70
 

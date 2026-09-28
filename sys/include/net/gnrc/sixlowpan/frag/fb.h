@@ -112,10 +112,10 @@ extern kernel_pid_t gnrc_sixlowpan_get_pid(void);
 /**
  * @brief   Sends a message to pass a further fragment down the network stack
  *
- * @see GNRC_SIXLOWPAN_MSG_FRAG_SND
+ * @see GNRC_SIXLOWPAN_FRAG_FB_SND_MSG
  *
  * @param[in] fbuf  A fragmentation buffer entry
- *]
+ *
  * @return  true, when the message was sent
  * @return  false when sending the message failed.
  */
