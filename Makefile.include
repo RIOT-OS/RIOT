@@ -295,9 +295,11 @@ ifdef LOG_LEVEL
   ifeq (,$(filter -DLOG_LEVEL=%,$(CFLAGS)))
     ifneq (,$(filter 0 1 2 3 4 5 6 7 8 9 10,$(strip $(LOG_LEVEL))))
       CFLAGS += -DLOG_LEVEL=$(LOG_LEVEL)
-    else
+    else ifneq (,$(filter NONE ALL ERROR WARNING INFO DEBUG,$(patsubst LOG_%,%,$(LOG_LEVEL))))
       CFLAGS += -DLOG_LEVEL=LOG_$(patsubst LOG_%,%,$(LOG_LEVEL))
-      $(info -DLOG_LEVEL=LOG_$(patsubst LOG_%,%,$(LOG_LEVEL)))
+    else
+      $(info Value '$(strip $(LOG_LEVEL))' is not a valid log level.)
+      $(info +++ FIXIT: Pass DEBUG, INFO, WARNING, ERROR, ALL, or NONE as LOG_LEVEL.)
     endif
   endif
 endif

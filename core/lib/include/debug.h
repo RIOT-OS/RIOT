@@ -72,7 +72,7 @@ extern "C" {
  * @brief   This macro can be defined as 0 or other on a file-based level.
  *          @ref DEBUG() will generate output only if ENABLE_DEBUG is non-zero.
  */
-#ifndef ENABLE_DEBUG
+#if !defined(ENABLE_DEBUG) || defined(DOXYGEN)
 #  define ENABLE_DEBUG 0
 #endif
 
@@ -211,7 +211,7 @@ static inline const char *__debug_thread_name_or_isr(void)
  */
 
 #define DEBUG(...) do { __LOG_PROLOGUE                                                                 \
-        if ((ENABLE_DEBUG || _CAN_DEBUG_H(LOG_DEBUG, LOG_UNIT)) && __debug_sufficient_stack(false)) {        \
+        if (_CAN_DEBUG_H(LOG_DEBUG, LOG_UNIT) && __debug_sufficient_stack(false)) {        \
             log_write(LOG_DEBUG, LOG_UNIT, __VA_ARGS__);                                                                \
         }                                                                                          \
     } while (0) __LOG_EPILOGUE
@@ -227,14 +227,14 @@ static inline const char *__debug_thread_name_or_isr(void)
  * in conjunction with defining @ref DEBUG_.
  */
 #define DEBUG_CONT(...) do { __LOG_PROLOGUE                                                                      \
-        if ((ENABLE_DEBUG || _CAN_DEBUG_H(LOG_DEBUG, LOG_UNIT)) && __debug_sufficient_stack(false)) {\
+        if (_CAN_DEBUG_H(LOG_DEBUG, LOG_UNIT) && __debug_sufficient_stack(false)) {\
             log_write_continue(LOG_DEBUG, LOG_UNIT, __VA_ARGS__);                                                      \
         }                                                                                          \
     } while (0) __LOG_EPILOGUE
 
 
 #define DEBUG_PUTS(str) do { __LOG_PROLOGUE                                                                \
-        if ((ENABLE_DEBUG || _CAN_DEBUG_H(LOG_DEBUG, LOG_UNIT)) && __debug_sufficient_stack(false)) {\
+        if (_CAN_DEBUG_H(LOG_DEBUG, LOG_UNIT) && __debug_sufficient_stack(false)) {\
             log_write(LOG_DEBUG, LOG_UNIT, str "\n");                                                           \
         }                                                                                          \
     } while (0) __LOG_EPILOGUE

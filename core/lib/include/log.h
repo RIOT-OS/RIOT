@@ -114,7 +114,7 @@ typedef enum {
  *   - DEBUG() iff (ENABLE_DEBUG or [level and unit matches, just like LOG])
  */
 #    define _CAN_LOG_H(level, unit) (_LOG_LEVEL_MATCHES(level) && _LOG_UNIT_ENABLED(unit))
-#    define _CAN_DEBUG_H(level, unit) (IS_ACTIVE(ENABLE_DEBUG) || _CAN_LOG_H(level, unit))
+#    define _CAN_DEBUG_H(level, unit) (ENABLE_DEBUG || _CAN_LOG_H(level, unit))
 
 /*   There are three tiers of selective logging: */
 #    if defined(LOG_UNITS_SELECTIVE_ALL)
@@ -140,7 +140,7 @@ typedef enum {
  *   - LOG() iff level matches
  *   - DEBUG() iff ENABLE_DEBUG is on. */
 #    define _CAN_LOG_H(level, unit) _LOG_LEVEL_MATCHES(level)
-#    define _CAN_DEBUG_H(level, unit) IS_ACTIVE(ENABLE_DEBUG)
+#    define _CAN_DEBUG_H(level, unit) ENABLE_DEBUG
 #  endif /* defined(LOG_UNITS_SELECTIVE) */
 
 #  if defined(__clang__)
