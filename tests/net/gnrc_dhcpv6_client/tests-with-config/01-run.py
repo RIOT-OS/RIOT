@@ -65,14 +65,14 @@ def check_prefix(addr, prefix):
 
 
 def check_ia_na_addr(ia_na_addr, global_pfx):
-    """Check if the expected IA_NA address has been assigned"""
+    """Check if the expected IA_NA address has been assigned."""
     result = IPv6Address(ia_na_addr) in IPv6Network(f"{IA_NA_ADDRESS_POOL_PREFIX}/64")
     result = result and check_prefix(ia_na_addr, global_pfx)
     return result
 
 
 def check_ia_pd_addr(ia_pd_addr, global_pfx):
-    """Check if the expected IA_PD address has been assigned"""
+    """Check if the expected IA_PD address has been assigned."""
     result = IPv6Address(ia_pd_addr) in IPv6Network(f"{IA_PD_PREFIX}/33")
     result = result and check_prefix(ia_pd_addr, global_pfx)
     return result
