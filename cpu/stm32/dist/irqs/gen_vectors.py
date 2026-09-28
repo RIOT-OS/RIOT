@@ -142,7 +142,7 @@ def generate_vectors(context):
 
 
 def main(args):
-    """Main function."""
+    """Run the main function."""
     context = parse_cmsis(args.cmsis_dir, args.cpu_line)
     generate_vectors(context)
 
