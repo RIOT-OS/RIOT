@@ -13,7 +13,7 @@ from helpers import Runner, SockTcpServer, SockTcpClient, HostTcpServer, HostTcp
 
 @Runner(timeout=5)
 def test_connection_lifecycle_as_client(child):
-    """ Open/close a single connection as sock tcp client """
+    """Open/close a single connection as sock tcp client."""
     # Setup Host as server
     with HostTcpServer(generate_port_number()) as host_srv:
         # Setup Riot Node as client
@@ -39,7 +39,7 @@ def test_connection_lifecycle_as_client(child):
 
 @Runner(timeout=10)
 def test_connection_lifecycle_as_server(child):
-    """ Open/close a single connection as sock tcp server """
+    """Open/close a single connection as sock tcp server."""
     # Setup Riot Node as server
     with SockTcpServer(child, generate_port_number()) as sock_srv:
 
@@ -69,7 +69,7 @@ def test_connection_lifecycle_as_server(child):
 
 @Runner(timeout=5)
 def test_send_data_from_riot_to_host(child):
-    """ Send Data from RIOT Node to Host system """
+    """Send Data from RIOT Node to Host system."""
     # Setup Host as server
     with HostTcpServer(generate_port_number()) as host_srv:
         # Setup Riot as client
@@ -88,7 +88,7 @@ def test_send_data_from_riot_to_host(child):
 
 @Runner(timeout=5)
 def test_send_data_from_host_to_riot(child):
-    """ Send Data from Host system to RIOT node """
+    """Send Data from Host system to RIOT node."""
     # Setup Riot Node as server
     with SockTcpServer(child, generate_port_number()) as sock_srv:
         # Setup Host as client
@@ -106,8 +106,9 @@ def test_send_data_from_host_to_riot(child):
 
 @Runner(timeout=10)
 def test_connection_listen_accept_cycle(child, iterations=10):
-    """ This test verifies sock_tcp in a typical server role by
-        accepting a connection, exchange data, teardown connection, handle the next one
+    """Verify `sock_tcp` in a typical server role.
+
+    Accept a connection, exchange data, teardown connection, handle the next one.
     """
     # Setup RIOT Node as server
     with SockTcpServer(child, generate_port_number()) as sock_srv:

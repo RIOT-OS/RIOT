@@ -65,6 +65,8 @@ class TestCongUREBase(unittest.TestCase):
         # pylint: disable=invalid-name
         # trying to be in line with `unittest`
         """
+        Assert that the congestion state is in slow start.
+
         > The slow start algorithm is used when cwnd < ssthresh, while the
         > congestion avoidance algorithm is used when cwnd > ssthresh.  When
         > cwnd and ssthresh are equal, the sender may use either slow start or
@@ -76,6 +78,8 @@ class TestCongUREBase(unittest.TestCase):
         # pylint: disable=invalid-name
         # trying to be in line with `unittest`
         """
+        Assert that the congestion state is in fast retransmit.
+
         > The TCP sender SHOULD use the "fast retransmit" algorithm to detect
         > and repair loss, based on incoming duplicate ACKs.  The fast
         > retransmit algorithm uses the arrival of 3 duplicate ACKs [...] as
@@ -86,7 +90,7 @@ class TestCongUREBase(unittest.TestCase):
     def assertNotInFastRetransmit(self, state):
         # pylint: disable=invalid-name
         # trying to be in line with `unittest`
-        """Reverse of self.assertInFastRetransmit()"""
+        """Reverse of `assertInFastRetransmit()`."""
         self.assertLess(state['dup_acks'], state['consts']['frthresh'])
 
     def get_ff_calls(self):
@@ -164,6 +168,8 @@ class TestCongUREABEDefaultInitTests(TestCongUREBase):
 
     def test_init(self):
         """
+        Test the initial congestion state.
+
         This is inherited from `congure_reno`, so it should be the same as
         in `tests/congure_reno`.
 
@@ -196,10 +202,13 @@ class TestCongUREABEDefaultInitTests(TestCongUREBase):
 
 class TestCongUREABE(TestCongUREBase):
     """
+    Test cases for `congure_abe`.
+
     Most functionality should be the same as for `congure_reno`, except
     for the behavior of `report_ecn_ce`. So only test some basics from
-    `tests/congure_reno` and focus testing on `report_ecn_ce`
+    `tests/congure_reno` and focus testing on `report_ecn_ce`.
     """
+
     def setUp(self):
         super().setUp()
         res = self.shell.setup(0)
@@ -229,9 +238,7 @@ class TestCongUREABE(TestCongUREBase):
     def test_slow_start_increase(self):
         # pylint: disable=invalid-name
         # name chosen to be in line with RFC
-        """
-        See test_slow_start_increase_large_N() from `tests/congure_reno`
-        """
+        """See `test_slow_start_increase_large_N()` from `tests/congure_reno`."""
         state = self.cong_state()
         init_cwnd = state['cwnd']
         init_mss = state['mss']
@@ -251,10 +258,7 @@ class TestCongUREABE(TestCongUREBase):
         self.assertNotInFastRetransmit(state)
 
     def test_enter_fast_retransmit(self):
-        """
-        See self.test_enter_fast_retransmit_all_check_true() from
-        `tests/congure_reno`
-        """
+        """See `self.test_enter_fast_retransmit_all_check_true()` from `tests/congure_reno`."""
         state = self.cong_state()
         self.assertEqual(0, self.get_ff_calls())
         self.assertNotInFastRetransmit(state)
@@ -280,6 +284,8 @@ class TestCongUREABE(TestCongUREBase):
 
     def test_ecn_ce_small_flight_size(self):
         """
+        Test the reaction to an ECN-CE with a small flight size.
+
         https://tools.ietf.org/html/rfc8511#section-3
 
         > As permitted by RFC 8311, this document specifies a sender-side
@@ -309,8 +315,10 @@ class TestCongUREABE(TestCongUREBase):
 
     def test_ecn_ce_large_flight_size(self):
         """
+        Test the reaction to an ECN-CE with a large flight size.
+
         Same as test_ecn_ce_small_flight_size, but with flight size
-        larger than (2 * SMSS / 0.8)
+        larger than (2 * SMSS / 0.8).
         """
         state = self.cong_state()
         beta_ecn = (state['consts']['abe_multiplier_numerator'] /

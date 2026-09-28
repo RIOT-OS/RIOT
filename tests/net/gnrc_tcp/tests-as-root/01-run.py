@@ -21,7 +21,7 @@ _GNRC_TCP_NO_TIMEOUT = 1
 
 @Runner(timeout=5)
 def test_connection_lifecycle_as_client(child):
-    """ Open/close a single connection as tcp client """
+    """Open/close a single connection as TCP client."""
     # Setup Host as server
     with HostTcpServer(generate_port_number()) as host_srv:
         # Setup Riot as client
@@ -33,7 +33,7 @@ def test_connection_lifecycle_as_client(child):
 
 @Runner(timeout=10)
 def test_connection_lifecycle_as_server(child):
-    """ Open/close a single connection as tcp server """
+    """Open/close a single connection as TCP server."""
     # Setup RIOT as server
     with RiotTcpServer(child, generate_port_number()) as riot_srv:
         # Setup Host as client
@@ -80,7 +80,7 @@ def test_gnrc_tcp_listen_tcb_discards_unread_data_on_reuse(child):
 
 @Runner(timeout=5)
 def test_send_data_from_riot_to_host(child):
-    """ Send Data from RIOT Node to Host system """
+    """Send Data from RIOT Node to Host system."""
     # Setup Host as server
     with HostTcpServer(generate_port_number()) as host_srv:
         # Setup Riot as client
@@ -99,7 +99,7 @@ def test_send_data_from_riot_to_host(child):
 
 @Runner(timeout=5)
 def test_send_data_from_host_to_riot(child):
-    """ Send Data from Host system to RIOT node """
+    """Send Data from Host system to RIOT node."""
     # Setup RIOT as server
     with RiotTcpServer(child, generate_port_number()) as riot_srv:
         # Setup Host as client
@@ -117,8 +117,9 @@ def test_send_data_from_host_to_riot(child):
 
 @Runner(timeout=5)
 def test_gnrc_tcp_garbage_packets_short_payload(child):
-    """ Receive unusually short payload with timeout. Verifies fix for
-        https://github.com/RIOT-OS/RIOT/issues/11999
+    """Receive unusually short payload with timeout.
+
+    Verifies fix for https://github.com/RIOT-OS/RIOT/issues/11999
     """
     # Setup RIOT as server
     with RiotTcpServer(child, generate_port_number()) as riot_srv:
@@ -145,8 +146,9 @@ def test_gnrc_tcp_garbage_packets_short_payload(child):
 
 @Runner(timeout=5)
 def test_gnrc_tcp_garbage_packets_short_header(child):
-    """ This test verifies fix malformed tcp header. See
-        https://github.com/RIOT-OS/RIOT/issues/12086
+    """Verify fix for malformed TCP header.
+
+    See https://github.com/RIOT-OS/RIOT/issues/12086.
     """
     # Setup RIOT as server
     with RiotTcpServer(child, generate_port_number()) as riot_srv:
@@ -167,7 +169,7 @@ def test_gnrc_tcp_garbage_packets_short_header(child):
             tcp_hdr, iface=host_cli.interface, verbose=0
         )
 
-        # Establish normal tcp connection from host system to check if RIOT node
+        # Establish normal TCP connection from host system to check if RIOT node
         # was able to recover from malformed packet
         with host_cli:
             child.expect_exact('gnrc_tcp_accept: returns 0')
@@ -177,9 +179,7 @@ def test_gnrc_tcp_garbage_packets_short_header(child):
 
 @Runner(timeout=5)
 def test_gnrc_tcp_garbage_packets_ack_instead_of_sym(child):
-    """ This test verifies that sending and ACK instead of a SYN.
-        doesn't break GNRC_TCP.
-    """
+    """Verify that sending an ACK instead of a SYN does not break `gnrc_tcp`."""
     # Setup RIOT as server
     with RiotTcpServer(child, generate_port_number()) as riot_srv:
         # Construct HostTcpClient to lookup node properties
@@ -221,8 +221,9 @@ def test_gnrc_tcp_garbage_packets_ack_instead_of_sym(child):
 
 @Runner(timeout=5)
 def test_gnrc_tcp_garbage_packets_option_parsing(child):
-    """ This test verifies that malformed option don't break TCP
-        doesn't break GNRC_TCP. See: https://github.com/RIOT-OS/RIOT/issues/12086
+    """Verify that malformed options do not break `gnrc_tcp`.
+
+    See https://github.com/RIOT-OS/RIOT/issues/12086.
     """
     # Setup RIOT as server
     with RiotTcpServer(child, generate_port_number()) as riot_srv:
@@ -250,9 +251,7 @@ def test_gnrc_tcp_garbage_packets_option_parsing(child):
 
 @Runner(timeout=5)
 def test_gnrc_tcp_recv_behavior_on_closed_connection(child):
-    """ This test ensures that a gnrc_tcp_recv doesn't block if a connection
-        was closed already.
-    """
+    """Ensure that `gnrc_tcp_recv` does not block if a connection was closed already."""
     # Setup Host as server
     with HostTcpServer(generate_port_number()) as host_srv:
         # Setup Riot as client
@@ -289,9 +288,7 @@ def test_gnrc_tcp_recv_behavior_on_closed_connection(child):
 
 @Runner(timeout=5)
 def test_gnrc_tcp_recv_behavior_on_zero_length_buffer_size(child):
-    """ This test verifies that gnrc_tcp_recv accepts zero as buffer size
-        and returns 0.
-    """
+    """Verify that `gnrc_tcp_recv` accepts zero as buffer size and returns 0."""
     with HostTcpServer(generate_port_number()) as host_srv:
         riot_cli = RiotTcpClient(child, host_srv)
 
@@ -313,9 +310,7 @@ def test_gnrc_tcp_recv_behavior_on_zero_length_buffer_size(child):
 
 @Runner(timeout=5)
 def test_gnrc_tcp_send_behavior_on_zero_length_buffer_size(child):
-    """ This test verifies that gnrc_tcp_send accepts zero length payload
-        and returns 0.
-    """
+    """Verify that `gnrc_tcp_send` accepts zero length payload and returns 0."""
     with HostTcpServer(generate_port_number()) as host_srv:
         riot_cli = RiotTcpClient(child, host_srv)
 
@@ -337,7 +332,7 @@ def test_gnrc_tcp_send_behavior_on_zero_length_buffer_size(child):
 
 @Runner(timeout=1)
 def test_gnrc_tcp_ep_from_str(child):
-    """ Verify Endpoint construction from string """
+    """Verify Endpoint construction from string."""
     # Build funspec
     valid = '[::]'
     child.sendline('gnrc_tcp_ep_from_str {}'.format(valid))
@@ -377,7 +372,7 @@ def test_gnrc_tcp_ep_from_str(child):
 
 @Runner(timeout=0.5)
 def test_gnrc_tcp_ep_from_str_returns_EINVAL(child):
-    """ Verify faulty endpoint construction from string return -EINVAL"""
+    """Verify faulty endpoint construction from string returns `-EINVAL`."""
     # Error: No brackets
     invalid = '::'
     child.sendline('gnrc_tcp_ep_from_str {}'.format(invalid))
@@ -441,9 +436,7 @@ def test_gnrc_tcp_ep_from_str_returns_EINVAL(child):
 
 @Runner(timeout=0.5)
 def test_gnrc_tcp_accept_returns_EAGAIN(child):
-    """ gnrc_tcp_accept must return with -EAGAIN
-        if no connection is ready and timeout is 0
-    """
+    """`gnrc_tcp_accept` must return with `-EAGAIN` if no connection is ready and timeout is 0."""
     riot_srv = RiotTcpServer(child, generate_port_number())
     riot_srv.listen()
 
@@ -453,9 +446,7 @@ def test_gnrc_tcp_accept_returns_EAGAIN(child):
 
 @Runner(timeout=1.5)
 def test_gnrc_tcp_accept_returns_ETIMEDOUT(child):
-    """ gnrc_tcp_accept must return with -ETIMEDOUT
-        if no connection is ready and timeout is not 0
-    """
+    """`gnrc_tcp_accept` must return with `-ETIMEDOUT` if no connection is ready and timeout is not 0."""
     riot_srv = RiotTcpServer(child, generate_port_number())
     riot_srv.listen()
 
@@ -465,9 +456,7 @@ def test_gnrc_tcp_accept_returns_ETIMEDOUT(child):
 
 @Runner(timeout=1)
 def test_gnrc_tcp_accept_returns_ENOMEM(child):
-    """ gnrc_tcp_accept must return with -ENOMEM
-        if all TCBs already handle a connection
-    """
+    """`gnrc_tcp_accept` must return with `-ENOMEM` if all TCBs already handle a connection."""
     with RiotTcpServer(child, generate_port_number()) as riot_srv:
         # Establish connection to ensure that all TCBs are in use
         with HostTcpClient(riot_srv):
@@ -480,17 +469,16 @@ def test_gnrc_tcp_accept_returns_ENOMEM(child):
 
 @Runner(timeout=0.5)
 def test_gnrc_tcp_accept_returns_EINVAL(child):
-    """ gnrc_tcp_accept must return with -EINVAL
-        if listen was not called before.
-    """
+    """`gnrc_tcp_accept` must return with `-EINVAL` if `listen` was not called before."""
     child.sendline('gnrc_tcp_accept 0')
     child.expect_exact('gnrc_tcp_accept: returns -EINVAL')
 
 
 @Runner(timeout=5)
 def test_gnrc_tcp_get_local_returns_0(child):
-    """ This test verifies that get_local returns 0 in a connected state
-        and the used endpoint contains the expected connection parameters
+    """Verify that `get_local` returns 0 in a connected state.
+
+    The used endpoint contains the expected connection parameters.
     """
     local_port = 30423
 
@@ -514,17 +502,16 @@ def test_gnrc_tcp_get_local_returns_0(child):
 
 @Runner(timeout=1)
 def test_gnrc_tcp_get_local_returns_EADDRNOTAVAIL(child):
-    """ This Test verifies that get_local returns -EADDRNOTAVAIL
-        then not connected
-    """
+    """Verify that `get_local` returns `-EADDRNOTAVAIL` when not connected."""
     child.sendline('gnrc_tcp_get_local')
     child.expect_exact('gnrc_tcp_get_local: returns -EADDRNOTAVAIL')
 
 
 @Runner(timeout=5)
 def test_gnrc_tcp_get_remote_returns_0(child):
-    """ This test verifies that get_remote returns 0 in a connected state
-        and the used endpoint contains the expected connection parameters
+    """Verify that `get_remote` returns 0 in a connected state.
+
+    The used endpoint contains the expected connection parameters.
     """
     # Setup Host as server
     with HostTcpServer(generate_port_number()) as host_srv:
@@ -546,17 +533,16 @@ def test_gnrc_tcp_get_remote_returns_0(child):
 
 @Runner(timeout=1)
 def test_gnrc_tcp_get_remote_returns_ENOTCONN(child):
-    """ This test verifies that get_remote returns -ENOTCONN
-        then not connected
-    """
+    """Verify that `get_remote` returns `-ENOTCONN` when not connected."""
     child.sendline('gnrc_tcp_get_remote')
     child.expect_exact('gnrc_tcp_get_remote: returns -ENOTCONN')
 
 
 @Runner(timeout=1)
 def test_gnrc_tcp_queue_get_local_returns_0(child):
-    """ This test verifies that queue_get_local returns 0 then put after listen.
-        And the endpoint content is as are as expected.
+    """Verify that `queue_get_local` returns 0 when called after `listen`.
+
+    The endpoint content is as expected.
     """
     # Enter listen with accept all address
     listen_addr = '::'
@@ -583,19 +569,18 @@ def test_gnrc_tcp_queue_get_local_returns_0(child):
 
 @Runner(timeout=1)
 def test_gnrc_tcp_queue_get_local_returns_EADDRNOTAVAIL(child):
-    """ This Test verifies that queue_get_local returns -EADDRNOTAVAIL
-        then not listening
-    """
+    """Verify that `queue_get_local` returns `-EADDRNOTAVAIL` when not listening."""
     child.sendline('gnrc_tcp_queue_get_local')
     child.expect_exact('gnrc_tcp_queue_get_local: returns -EADDRNOTAVAIL')
 
 
 @Runner(timeout=5)
 def test_gnrc_tcp_accept_respects_GNRC_TCP_NO_TIMEOUT(child):
-    """ gnrc_tcp_accept timeout mechanism must be disabled if GNRC_TCP_NO_TIMEOUT
-        is set as timeout value.
-    """
+    """Verify that `gnrc_tcp_accept` respects `GNRC_TCP_NO_TIMEOUT`.
 
+    `gnrc_tcp_accept` timeout mechanism must be disabled if
+    `GNRC_TCP_NO_TIMEOUT` is set as timeout value.
+    """
     pexpect_timeout_sec = _GNRC_TCP_NO_TIMEOUT + 1
 
     riot_srv = RiotTcpServer(child, generate_port_number())
@@ -622,10 +607,11 @@ def test_gnrc_tcp_accept_respects_GNRC_TCP_NO_TIMEOUT(child):
 
 @Runner(timeout=5)
 def test_gnrc_tcp_recv_respects_GNRC_TCP_NO_TIMEOUT(child):
-    """ gnrc_tcp_recv timeout mechanism must be disabled if GNRC_TCP_NO_TIMEOUT
-        is set as timeout value.
-    """
+    """Verify that `gnrc_tcp_recv` respects `GNRC_TCP_NO_TIMEOUT`.
 
+    `gnrc_tcp_recv` timeout mechanism must be disabled if
+    `GNRC_TCP_NO_TIMEOUT` is set as timeout value.
+    """
     pexpect_timeout_sec = _GNRC_TCP_NO_TIMEOUT + 1
     payload = "12345"
 
@@ -657,8 +643,9 @@ def test_gnrc_tcp_recv_respects_GNRC_TCP_NO_TIMEOUT(child):
 
 @Runner(timeout=10)
 def test_connection_listen_accept_cycle(child, iterations=10):
-    """ This test verifies gnrc_tcp in a typical server role by
-        accepting a connection, exchange data, teardown connection, handle the next one
+    """Verify `gnrc_tcp` in a typical server role.
+
+    Accept a connection, exchange data, teardown connection, handle the next one.
     """
     # Setup RIOT Node as server
     with RiotTcpServer(child, generate_port_number()) as riot_srv:
