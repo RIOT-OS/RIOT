@@ -14,6 +14,10 @@ ifneq (,$(filter auto_init_loramac,$(USEMODULE)))
   DIRS += loramac
 endif
 
+ifneq (,$(filter auto_init_radiolib,$(USEMODULE)))
+  DIRS += radiolib
+endif
+
 ifneq (,$(filter auto_init_multimedia,$(USEMODULE)))
   DIRS += multimedia
 endif
