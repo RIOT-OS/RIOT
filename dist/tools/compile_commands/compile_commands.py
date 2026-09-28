@@ -1,7 +1,5 @@
 #!/usr/bin/env python3
-"""
-Command line utility to generate compile_commands.json for RIOT applications
-"""
+"""Command line utility to generate `compile_commands.json` for RIOT applications."""
 import argparse
 import json
 import os
@@ -17,8 +15,10 @@ REGEX_INCLUDES = re.compile(REGEX_INCLUDES, re.MULTILINE)
 
 def detect_includes_and_version_gcc(compiler):
     """
-    Runs the given compiler with -v -E on an no-op compilation unit and parses
-    the built-in include search directories and the GCC version from the output
+    Detect the built-in include search directories and the version of GCC.
+
+    Run the given compiler with `-v -E` on a no-op compilation unit and parse
+    the built-in include search directories and the GCC version from the output.
 
     :param compiler: name / path of the compiler to run
     :type compiler: str
@@ -62,8 +62,9 @@ def detect_includes_and_version_gcc(compiler):
 
 def detect_libstdcxx_includes(compiler, includes, version):
     """
-    Tries to detect the g++ libstdc++ built-in include search directories using
-    black magic and adds them to the list given in includes
+    Try to detect the g++ libstdc++ built-in include search directories.
+
+    This uses black magic and adds them to the list given in `includes`.
 
     :param compiler: Name or path of the compiler
     :type compiler: str
@@ -85,8 +86,7 @@ def detect_libstdcxx_includes(compiler, includes, version):
 
 def detect_built_in_includes(compiler, args):
     """
-    Tries to detect the built-in include search directories of the given
-    compiler
+    Try to detect the built-in include search directories of the given compiler.
 
     :param compiler: Name or path of the compiler
     :type compiler: str
@@ -121,6 +121,7 @@ class CompilationDetails:  # pylint: disable=too-few-public-methods,too-many-ins
     :param path: Path of the module to read compilation details from
     :type path: str
     """
+
     def __init__(self, path):  # pylint: disable=too-many-branches
         with open(os.path.join(path, "compile_cmds.txt"), "r") as file:
             for line in file.read().splitlines():
@@ -153,9 +154,8 @@ class CompilationDetails:  # pylint: disable=too-few-public-methods,too-many-ins
 
 
 class State:  # pylint: disable=too-few-public-methods
-    """
-    Entity to store the current programs state
-    """
+    """Entity to store the current program's state."""
+
     def __init__(self):
         self.def_includes = dict()
         self.is_first = True
@@ -175,7 +175,6 @@ def get_built_in_include_flags(compiler, state, args):
              dirs as list
     :rtype: list
     """
-
     result = []
     if compiler not in state.def_includes:
         state.def_includes[compiler] = detect_built_in_includes(compiler, args)
@@ -189,8 +188,9 @@ def get_built_in_include_flags(compiler, state, args):
 
 def write_compile_command(state, compiler, src, flags, cdetails, path):
     """
-    Write the compile command for the given source file with the given
-    parameters to stdout
+    Write the compile command for the given source file to stdout.
+
+    The compile command is generated using the given parameters.
 
     :param state: state of the program
     :param compiler: the C/C++ compiler used
@@ -229,8 +229,9 @@ def write_compile_command(state, compiler, src, flags, cdetails, path):
 
 def generate_module_compile_commands(path, state, args):
     """
-    Generate section of compile_commands.json for the module in path and write
-    it to stdout.
+    Generate section of `compile_commands.json` for the module in `path`.
+
+    The section is written to stdout.
 
     :param path: path of the module's bin folder to emit the
                  compile_commands.json chunk for
@@ -294,7 +295,7 @@ def generate_module_compile_commands(path, state, args):
 
 def generate_compile_commands(args):
     """
-    Generate the compile_commands.json content and write them to stdout
+    Generate the `compile_commands.json` content and write them to stdout.
 
     :param args: command line arguments
     """

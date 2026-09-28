@@ -25,15 +25,14 @@ class Installer(abc.ABC):
 
     @abc.abstractmethod
     def _install(self, package):
-        """
-        Executes the install command
-        """
+        """Execute the install command."""
         pass
 
     def install(self, package):
         """
-        Executes the install command, but asks the user before-hand if it is
-        okay to do so.
+        Execute the install command after asking the user.
+
+        The user is asked before-hand if it is okay to do so.
         """
         if self._ask(package):
             self._install(package)

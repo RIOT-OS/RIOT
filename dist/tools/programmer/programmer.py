@@ -91,7 +91,7 @@ class Programmer:
 
 
 def main(parser):
-    """Main function."""
+    """Run the main function."""
     programmer = Programmer()
     parser.parse_args(namespace=programmer)
     # Return with same return code as subprocess
