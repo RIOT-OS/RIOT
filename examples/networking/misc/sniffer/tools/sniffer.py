@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
+Capture packets from a RIOT sniffer node and output them in PCAP format.
+
 (C) 2012, Mariano Alvira <mar@devl.org>
 (C) 2014, Oliver Hahm <oliver.hahm@inria.fr>
 (C) 2015, Hauke Petersen <hauke.petersen@fu-berlin.de>
