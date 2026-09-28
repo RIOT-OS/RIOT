@@ -6,6 +6,11 @@
  *
  * # EDHOC-C RIOT package
  *
+ * @deprecated Warning: This module has not been maintained upstream since
+ *             ~2022 and the Python package has been archived. Therefore,
+ *             this package is deprecated and will be removed after the
+ *             2027.04 release.
+ *
  * ## Usage
  *
  * Just add it as a package in your application:
