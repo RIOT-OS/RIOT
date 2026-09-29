@@ -90,17 +90,20 @@ extern "C" {
 #endif
 
 /**
- * @brief   Common prefix for all debug messages, defaulting to an empty string.
- *          Expected to be set on a file-based level.
- * 
- * Defaults to `""` unless @ref 
+ * @brief Use `printf` and `puts` for @ref DEBUG, @ref DEBUG_CONT,
+ *        @ref DEBUG_PUTS instead of @ref LOG_DEBUG
+ *
+ * **Default**: Enabled (1)
+ *
+ * If turned on, `DEBUG` invocations route directly to `printf` and `puts`.
+ * If turned off, `DEBUG` is treated like @ref LOG_DEBUG.
+ *
+ * Some deployments may rely on a custom log backend that does not expect
+ * to handle all DEBUG messages additionally. To help the transition,
+ * turn on CONFIG_DEBUG_COMPAT for the old separate behavior of DEBUG and LOG.
  */
-#ifndef DEBUG_UNIT
-#  ifdef LOG_UNIT
-#    define DEBUG_UNIT LOG_UNIT
-#  else
-#    define DEBUG_UNIT ""
-#  endif
+#if !defined(CONFIG_DEBUG_COMPAT) || defined(DOXYGEN)
+#  define CONFIG_DEBUG_COMPAT 0
 #endif
 
 
@@ -205,15 +208,27 @@ static inline const char *__debug_thread_name_or_isr(void)
 
 /** @} */ /* end of section */
 
+#ifndef DOXYGEN
+#  if CONFIG_DEBUG_COMPAT
+#    define debug_write_fmt(unit, ...) printf(__VA_ARGS__)
+#    define debug_write_fmt_continue(unit, ...) printf(__VA_ARGS__)
+#    define debug_write_str(unit, str) puts(str)
+#  else /* CONFIG_DEBUG_AS_LOG */
+#    define debug_write_fmt(unit, ...) log_write(LOG_DEBUG, unit, __VA_ARGS__)
+#    define debug_write_fmt_continue(unit, ...) log_write(LOG_DEBUG, unit, __VA_ARGS__)
+#    define debug_write_str(unit, str) log_write(LOG_DEBUG, unit, str)
+#  endif /* CONFIG_DEBUG_AS_LOG */
+#endif /* !defined(DOXYGEN) */
+
 /**
  * @name User-facing debug print API
  * @{
  */
 
-#define DEBUG(...) do { __LOG_PROLOGUE                                                                 \
-        if (_CAN_DEBUG_H(LOG_DEBUG, LOG_UNIT) && __debug_sufficient_stack(false)) {        \
-            log_write(LOG_DEBUG, LOG_UNIT, __VA_ARGS__);                                                                \
-        }                                                                                          \
+#define DEBUG(...) do { __LOG_PROLOGUE                                              \
+        if (_CAN_DEBUG_H(LOG_DEBUG, LOG_UNIT) && __debug_sufficient_stack(false)) { \
+            debug_write_fmt(LOG_UNIT, __VA_ARGS__);                                 \
+        }                                                                           \
     } while (0) __LOG_EPILOGUE
 
 /**
@@ -226,17 +241,17 @@ static inline const char *__debug_thread_name_or_isr(void)
  * backend, in which case this function will not be defined by `debug.h`. This must be done
  * in conjunction with defining @ref DEBUG_.
  */
-#define DEBUG_CONT(...) do { __LOG_PROLOGUE                                                                      \
-        if (_CAN_DEBUG_H(LOG_DEBUG, LOG_UNIT) && __debug_sufficient_stack(false)) {\
-            log_write_continue(LOG_DEBUG, LOG_UNIT, __VA_ARGS__);                                                      \
-        }                                                                                          \
+#define DEBUG_CONT(...) do { __LOG_PROLOGUE                                         \
+        if (_CAN_DEBUG_H(LOG_DEBUG, LOG_UNIT) && __debug_sufficient_stack(false)) { \
+            debug_write_fmt_continue(LOG_UNIT, __VA_ARGS__);                        \
+        }                                                                           \
     } while (0) __LOG_EPILOGUE
 
 
-#define DEBUG_PUTS(str) do { __LOG_PROLOGUE                                                                \
-        if (_CAN_DEBUG_H(LOG_DEBUG, LOG_UNIT) && __debug_sufficient_stack(false)) {\
-            log_write(LOG_DEBUG, LOG_UNIT, str "\n");                                                           \
-        }                                                                                          \
+#define DEBUG_PUTS(str) do { __LOG_PROLOGUE                                         \
+        if (_CAN_DEBUG_H(LOG_DEBUG, LOG_UNIT) && __debug_sufficient_stack(false)) { \
+            debug_write_str(LOG_UNIT, str "\n");                                    \
+        }                                                                           \
     } while (0) __LOG_EPILOGUE
 
 /**
