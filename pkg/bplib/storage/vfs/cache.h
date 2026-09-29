@@ -30,6 +30,13 @@
 extern "C" {
 #endif
 
+/** @brief The bundle was added to the cache, no other cache entry was replaced */
+#define BPLIB_CACHE_ADD_ADDED       0
+/** @brief The bundle was NOT added to the cache, since it contains more urgent bundles */
+#define BPLIB_CACHE_ADD_IGNORED     1
+/** @brief The bundle was added to the cache, but another cache entry was dropped */
+#define BPLIB_CACHE_ADD_REPLACED    2
+
 /**
  * @brief Bundle Cache element, containing information to uniquely identify a bundle on vfs.
  *
@@ -79,9 +86,10 @@ typedef struct {
  * @param expiry Expiry DTN time of the bundle
  * @param id Unique ID of the bundle
  *
- * @retval 1 if the new entry was NOT stored, since the cache is full with more urgent bundles
- * @retval 2 if the new entry was stored and replaced another entry
- * @retval 0 if the new entry was stored but without replacement
+ * @retval BPLIB_CACHE_ADD_IGNORED if the new entry was NOT stored, since the
+ *         cache is full with more urgent bundles
+ * @retval BPLIB_CACHE_ADD_REPLACED if the new entry was stored and replaced another entry
+ * @retval BPLIB_CACHE_ADD_ADDED if the new entry was stored but without replacement
  */
 int bplib_cache_add(cache_list_t* cache,
     uint64_t node, uint64_t service, uint64_t expiry, uint32_t id);
