@@ -345,7 +345,7 @@ sudo ip link set tap0 up
 In a second terminal session, run
 
 ```sh
-AIOCOAP_DTLSSERVER_ENABLED=1 python3 server.py --interface tap0
+python3 server.py --interface tap0
 ```
 
 You should see output like this:
