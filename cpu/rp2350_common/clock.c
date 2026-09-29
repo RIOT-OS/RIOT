@@ -39,7 +39,8 @@ void cpu_clock_init(void)
     /* Set the post-dividers for the PLL output.*/
     PLL_SYS->PRIM = PDIV;
     /* Turn on PLL */
-    atomic_clear(&PLL_SYS->PWR, PLL_PWR_PD_BITS | PLL_PWR_VCOPD_BITS | PLL_PWR_POSTDIVPD_BITS);
+    atomic_clear(&PLL_SYS->PWR,
+                 PLL_PWR_PD_BITS | PLL_PWR_VCOPD_BITS | PLL_PWR_POSTDIVPD_BITS);
 
     /* sleep 10ms to allow the PLL to stabilize */
     xosc_sleep(10);
