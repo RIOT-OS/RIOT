@@ -17,9 +17,9 @@
  * @author      Kaspar Schleiser <kaspar@schleiser.de>
  */
 
+#include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
-#include <stdbool.h>
 
 #include "architecture.h"
 #include "kernel_defines.h"
@@ -40,8 +40,8 @@ typedef struct {
      * @internal
      */
     list_node_t queue;
-#if defined(DOXYGEN) || defined(MODULE_CORE_MUTEX_PRIORITY_INHERITANCE) \
-    || defined(MODULE_CORE_MUTEX_DEBUG)
+#if defined(DOXYGEN) || defined(MODULE_CORE_MUTEX_PRIORITY_INHERITANCE) || \
+    defined(MODULE_CORE_MUTEX_DEBUG)
     /**
      * @brief   The current owner of the mutex or `NULL`
      * @note    Only available if module core_mutex_priority_inheritance
@@ -101,9 +101,9 @@ bool mutex_lock_internal(mutex_t *mutex, bool block);
  * @note    The contents of this structure are internal.
  */
 typedef struct {
-    mutex_t *mutex;     /**< The mutex to lock */
-    thread_t *thread;   /**< The thread trying to lock the mutex */
-    uint8_t cancelled;  /**< Flag whether the mutex has been cancelled */
+    mutex_t *mutex;    /**< The mutex to lock */
+    thread_t *thread;  /**< The thread trying to lock the mutex */
+    uint8_t cancelled; /**< Flag whether the mutex has been cancelled */
 } mutex_cancel_t;
 
 #ifndef __cplusplus
@@ -111,15 +111,28 @@ typedef struct {
  * @brief Static initializer for mutex_t.
  * @details This initializer is preferable to mutex_init().
  */
-#  define MUTEX_INIT { .queue = { .next = NULL } }
+#  define MUTEX_INIT \
+      { \
+          .queue = {.next = NULL } \
+      }
 
 /**
  * @brief Static initializer for mutex_t with a locked mutex
  */
-#  define MUTEX_INIT_LOCKED { .queue = { .next = MUTEX_LOCKED } }
+#  define MUTEX_INIT_LOCKED \
+      { \
+          .queue = {.next = MUTEX_LOCKED } \
+      }
 #else
-#  define MUTEX_INIT {}
-#  define MUTEX_INIT_LOCKED { { MUTEX_LOCKED } }
+#  define MUTEX_INIT \
+      { \
+      }
+#  define MUTEX_INIT_LOCKED \
+      { \
+          { \
+              MUTEX_LOCKED \
+          } \
+      }
 #endif /* __cplusplus */
 
 /**
