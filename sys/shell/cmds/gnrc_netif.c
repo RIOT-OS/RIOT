@@ -737,7 +737,7 @@ static void _netif_list(netif_t *iface)
 #ifdef MODULE_IEEE802154_PHY_MR_OQPSK
         case IEEE802154_PHY_MR_OQPSK:
             printf("\n          ");
-            res = netif_get_opt(iface, NETOPT_MR_OQPSK_CHIPS, 0, &u8, sizeof(u16));
+            res = netif_get_opt(iface, NETOPT_MR_OQPSK_CHIPS, 0, &u8, sizeof(u8));
             if (res >= 0) {
                 printf(" chip rate: %s ", _netopt_chips_str[u8]);
             }
@@ -781,7 +781,7 @@ static void _netif_list(netif_t *iface)
             if (res >= 0) {
                 printf(" %u-FSK ", u8);
             }
-            res = netif_get_opt(iface, NETOPT_MR_FSK_SRATE, 0, &u8, sizeof(u16));
+            res = netif_get_opt(iface, NETOPT_MR_FSK_SRATE, 0, &u8, sizeof(u8));
             if (res >= 0) {
                 printf(" symbol rate: %s kHz ", _netopt_srate_str[u8]);
             }
