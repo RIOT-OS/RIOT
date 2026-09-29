@@ -17,16 +17,15 @@
  */
 
 #include "cpu.h"
-#include "periph_conf.h"
-
 #include "periph/gpio.h"
+#include "periph_conf.h"
 
 /** GPIO Pin ID for the onboard LED */
 #define LED0_PIN_ID 25u
-#define LED0_ON         gpio_set(LED0_PIN_ID)
-#define LED0_OFF        gpio_clear(LED0_PIN_ID)
-#define LED0_TOGGLE     gpio_toggle(LED0_PIN_ID)
-#define LED0_NAME       "LED(Green)"
+#define LED0_ON     gpio_set(LED0_PIN_ID)
+#define LED0_OFF    gpio_clear(LED0_PIN_ID)
+#define LED0_TOGGLE gpio_toggle(LED0_PIN_ID)
+#define LED0_NAME   "LED(Green)"
 
 #ifdef __cplusplus
 extern "C" {

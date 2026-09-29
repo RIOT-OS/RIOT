@@ -6,7 +6,8 @@
 
 #include "board.h"
 
-void board_init(void) {
+void board_init(void)
+{
     /* Re-enable the LED0 pin
      * Otherwise the LED will not work after a reset
      * This is needed, esp. when the LED is used via
