@@ -95,7 +95,7 @@ only makes sense for, e.g., the `PUT` and `POST` methods, as `GET` request do no
 unicoap <method> <uri> [<payload>]
 ```
 
-First, we ned to translate the method string to `unicoap`'s @ref unicoap_method_t type.
+First, we need to translate the method string to `unicoap`'s @ref unicoap_method_t type.
 Note that `argv[0]` will be the name of the command itself, i.e., the first overall command-line
 argument. Hence, the `method` argument will be at `argv[1]`.
 
