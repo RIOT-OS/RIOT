@@ -82,6 +82,15 @@ static inline gnrc_pktsnip_t *gnrc_netif_pktq_get(gnrc_netif_t *netif)
 }
 
 /**
+ * @brief   Inits the packet queue
+ *
+ * @pre `netif != NULL`
+ *
+ * @param[in] netif A network interface. May not be NULL.
+ */
+void gnrc_netif_pktq_init(gnrc_netif_t *netif);
+
+/**
  * @brief   Schedule a dequeue notification to network interface
  *
  * The notification will be scheduled in @ref CONFIG_GNRC_NETIF_PKTQ_TIMER_US
