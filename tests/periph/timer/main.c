@@ -142,9 +142,9 @@ static int test_timer(unsigned num, uint32_t timer_freq)
         return 0;
     }
 
-    /* we just use the CPU to delay execution and wait for timers to (not) fire */
-    uint32_t loops = 1000 * coreclk() / timer_freq;
-    for (volatile uint32_t i = 0; i < loops; i++) { }
+    /* We use the CPU to delay execution and wait for timers to (not) fire */
+    uint32_t loops = 10000 * (coreclk() / timer_freq);
+    for (volatile uint32_t i = 0; i < loops; i++) {}
 
     if (atomic_load_u8(&fired) != 0) {
         puts("ERROR: Callbacks have fired but timer should be stopped!\n");
