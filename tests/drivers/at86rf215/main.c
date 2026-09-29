@@ -15,6 +15,7 @@
  * @}
  */
 
+#include <assert.h>
 #include <stdio.h>
 
 #include "shell.h"
@@ -145,7 +146,8 @@ static int cmd_get_random(int argc, char **argv)
 {
     uint8_t values;
     uint8_t buffer[256];
-    at86rf215_t *dev = at86rf215_bhp[0].hal_24->priv;
+    at86rf215_t *dev = IS_USED(MODULE_AT86RF215_24GHZ) ?
+                at86rf215_bhp[0].hal_24->priv : at86rf215_bhp[0].hal_09->priv;
 
     if (argc > 1) {
         values = atoi(argv[1]);
