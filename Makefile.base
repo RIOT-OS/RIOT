@@ -137,6 +137,7 @@ include $(RIOTMAKE)/tools/fixdep.inc.mk
 # 'base.sub' as log unit STEM, otherwise use module name as log unit STEM
 LOG_UNIT_STEM ?= $(if $(filter $(BASE_MODULE)_%, $(MODULE)),$(BASE_MODULE).$(subst $(BASE_MODULE)_,,$(MODULE)),$(MODULE))
 # Make LOG_UNIT Makefile variable fall back to 'STEM.filename'
+# If the STEM already contains the filename, fall back to just STEM
 %.o: LOG_UNIT ?= $(if $(filter $(*F) %.$(*F),$(LOG_UNIT_STEM)),$(LOG_UNIT_STEM),$(LOG_UNIT_STEM).$(*F))
 # Make LOG_UNIT C macro fall back to LOG_UNIT Makefile variable
 %.o: RCFLAGS += -DLOG_UNIT_DEFAULT=\"$(LOG_UNIT)\"
