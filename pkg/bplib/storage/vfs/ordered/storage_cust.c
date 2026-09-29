@@ -18,7 +18,8 @@
 
 #include "bplib.h"
 
-static void _bplib_stor_update_custodial_unlocked(BPLib_STOR_CtUpdateBatch_t* custody_batch)
+static void _bplib_stor_update_custodial_unlocked(BPLib_Instance_t* inst,
+                                BPLib_STOR_CtUpdateBatch_t* custody_batch)
 {
     char path[BPLIB_STOR_PATHLEN_DAT];
 
@@ -26,6 +27,7 @@ static void _bplib_stor_update_custodial_unlocked(BPLib_STOR_CtUpdateBatch_t* cu
         if (custody_batch->Ops[i] == BPLIB_CT_MARK_DELETE) {
             /* This gets called when custody on a next node was accepted */
             bplib_stor_vfs_delete_bundle(custody_batch->BundleIDs[i]);
+            BPLib_CT_DeleteBundleFromCtdb(inst, custody_batch->BundleIDs[i]);
         }
     }
 
@@ -71,7 +73,7 @@ void BPLib_STOR_AddToCustodialUpdateBatch(BPLib_Instance_t *inst,
     custody_batch->Size++;
 
     if (custody_batch->Size >= BPLIB_STOR_CT_BATCH_SIZE) {
-        _bplib_stor_update_custodial_unlocked(custody_batch);
+        _bplib_stor_update_custodial_unlocked(inst, custody_batch);
     }
 
     mutex_unlock(&(inst->BundleStorage.lock));
@@ -92,7 +94,7 @@ void BPLib_STOR_UpdateCustodialBundles(BPLib_Instance_t* inst)
     custody_batch = &(inst->BundleStorage.CustodyUpdateBatch);
 
     if ((custody_batch->Size <= BPLIB_STOR_CT_BATCH_SIZE) && (custody_batch->Size > 0)) {
-        _bplib_stor_update_custodial_unlocked(custody_batch);
+        _bplib_stor_update_custodial_unlocked(inst, custody_batch);
     }
 
     mutex_unlock(&(inst->BundleStorage.lock));

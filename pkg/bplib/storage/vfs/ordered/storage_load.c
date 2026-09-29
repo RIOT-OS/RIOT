@@ -603,7 +603,8 @@ BPLib_Status_t BPLib_STOR_GarbageCollect(BPLib_Instance_t* inst)
      * - integrate other updates to the function from upstream
      * - check size of files to delete bundles that are less than expected (write failed)
      * - increment AS on deletion
-     * - handle errors in vfs_read*/
+     * - handle errors in vfs_read
+     * - call BPLib_CT_DeleteBundleFromCtdb for custodial bundles */
 
     uint64_t time_ref_dtn = BPLib_TIME_GetCurrentDtnTime();
     uint64_t lifetime;
