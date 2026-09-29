@@ -13,22 +13,72 @@
 #include "macros/utils.h"
 #include "modules.h"
 
+/**
+ * @brief Show log level in log messages printed
+ *
+ * **Default**: Enabled (1)
+ */
+#if !defined(CONFIG_LOG_SHOW_LEVEL) || defined(DOXYGEN)
+#  define CONFIG_LOG_SHOW_LEVEL 1
+#endif
+
+/**
+ * @brief Show log level only as letter instead of word
+ *
+ * **Default**: Disabled (0)
+ *
+ * If enabled, turns levels into letters:
+ * - `E` instead of `ERROR`
+ * - `W` instead of `WARN`
+ * - `I` instead of `INFO`
+ * - `D` instead of `DEBUG`
+ */
+#if !defined(CONFIG_LOG_SHOW_LEVEL_LETTER_ONLY) || defined(DOXYGEN)
+#  define CONFIG_LOG_SHOW_LEVEL_LETTER_ONLY 0
+#endif
+
+#if CONFIG_LOG_SHOW_LEVEL_LETTER_ONLY && !CONFIG_LOG_SHOW_LEVEL
+#  error "CONFIG_LOG_SHOW_LEVEL_LETTER_ONLY requires CONFIG_LOG_SHOW_LEVEL to be set"
+#endif
+
+/**
+ * @brief Show log unit in log messages printed, if log unit is set
+ *
+ * **Default**: Enabled (1)
+ */
 #if !defined(CONFIG_LOG_SHOW_UNIT) || defined(DOXYGEN)
 #  define CONFIG_LOG_SHOW_UNIT 1
 #endif
 
+/**
+ * @brief Show calling thread in log messages printed
+ *
+ * **Default**: Disabled (0)
+ */
 #if !defined(CONFIG_LOG_SHOW_THREAD) || defined(DOXYGEN)
-#  define CONFIG_LOG_SHOW_THREAD 1
+#  define CONFIG_LOG_SHOW_THREAD 0
 #endif
 
 #if CONFIG_LOG_SHOW_THREAD && !defined(CONFIG_THREAD_NAMES)
 #  error "CONFIG_LOG_SHOW_THREAD requires CONFIG_THREAD_NAMES to be set"
 #endif
 
+/**
+ * @brief Show calling function in log messages printed
+ *
+ * **Default**: Disabled (0)
+ */
 #if !defined(CONFIG_LOG_SHOW_FUNC) || defined(DOXYGEN)
 #  define CONFIG_LOG_SHOW_FUNC 1
 #endif
 
+/**
+ * @brief Show file containing call site in log messages printed
+ *
+ * **Default**: Disabled (0)
+ *
+ * The file path and line number will be printed above each log line.
+ */
 #if !defined(CONFIG_LOG_SHOW_FILE) || defined(DOXYGEN)
 #  define CONFIG_LOG_SHOW_FILE 1
 #endif
@@ -69,23 +119,50 @@
 #  define LOG_STYLE_LEVEL_LOG_DEBUG       ANSI_STYLE(BOLD, DIM, FOREGROUND(WHITE))
 #endif
 
-#define LOG_STRING_LEVEL_LOG_ERROR   "ERROR"
-#define LOG_STRING_LEVEL_LOG_WARNING "WARN "
-#define LOG_STRING_LEVEL_LOG_INFO    "INFO "
-#define LOG_STRING_LEVEL_LOG_DEBUG   "DEBUG"
+#if CONFIG_LOG_SHOW_LEVEL_LETTER_ONLY
+#  define LOG_STRING_LEVEL_LOG_ERROR   "E"
+#  define LOG_STRING_LEVEL_LOG_WARNING "W"
+#  define LOG_STRING_LEVEL_LOG_INFO    "I"
+#  define LOG_STRING_LEVEL_LOG_DEBUG   "D"
+#else
+#  define LOG_STRING_LEVEL_LOG_ERROR   "ERROR"
+#  define LOG_STRING_LEVEL_LOG_WARNING "WARN "
+#  define LOG_STRING_LEVEL_LOG_INFO    "INFO "
+#  define LOG_STRING_LEVEL_LOG_DEBUG   "DEBUG"
+#endif
 
+/**
+ * @brief ANSI style escape code for log unit prefix
+ *
+ * **Default**: bright green and bold
+ */
 #if !defined(LOG_STYLE_UNIT)|| defined(DOXYGEN)
 #  define LOG_STYLE_UNIT              ANSI_STYLE(BOLD, FOREGROUND_BRIGHT(GREEN))
 #endif
 
+/**
+ * @brief ANSI style escape code for colons and hashes in log messages
+ *
+ * **Default**: dim foreground color
+ */
 #if !defined(LOG_STYLE_EXTRAS) || defined(DOXYGEN)
 #  define LOG_STYLE_EXTRAS            ANSI_STYLE(DIM, FOREGROUND(WHITE))
 #endif
 
+/**
+ * @brief ANSI style escape code for file path in log messages
+ *
+ * **Default**: dim foreground color
+ */
 #if !defined(LOG_STYLE_FILE) || defined(DOXYGEN)
 #  define LOG_STYLE_FILE              ANSI_STYLE(DIM, FOREGROUND(WHITE))
 #endif
 
+/**
+ * @brief File/stream to output log messages to
+ *
+ * **Default**: `stdout`
+ */
 #if !defined(LOG_STREAM) || defined(DOXYGEN)
 #  define LOG_STREAM stdout
 #endif
