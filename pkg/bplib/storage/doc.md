@@ -26,7 +26,7 @@ The core usage of bplib *requires* the following functions to be implemented:
   or contact (when LocalDelivery = false) at table index EgressID.
   NumEgressed should be updated to the number of egressed bundles.
 
-Actual egress has to be done like this. Refer to unordered storage backend for
+Actual egress has to be done like this. Refer to vfs storage backend for
 an example:
 
 1. Find a bundle matching the EID of the target channel / contact.
@@ -68,6 +68,10 @@ is ready to take data directly (is in started state), the bundle will be dropped
 ### VFS Storage - Unordered Egress
 `bplib_stor_vfs_unordered` module.
 
+@warning Since the update to bplib 7.0.5 this storage backend was not updated and
+         will either not compile at all and certainly not support custody transfer.
+         It will be removed in the future.
+
 All data is stored in the `CONFIG_BPLIB_STOR_BASE` directory
 as up to 4 character hexadecimal number.
 
@@ -91,25 +95,49 @@ implementation.
 `bplib_stor_vfs_ordered` module.
 
 All data is stored in the `CONFIG_BPLIB_STOR_BASE` directory.
-In here, subdirectories as `node_no/service_no` are located. Each bundle is
-saved by its expiration time (creation time + lifetime).
+Bundle data is saved in the `dat` subdirectory.
+In there, subdirectories as `node_no/service_no` are located, by the destination
+EID. Each bundle is saved by its expiration time (creation time + lifetime). All
+of these values are represented in hexadecimal form, without leading zeros. A
+service number of 100 (decimal), would create the directory '64'.
 
-@attention Ordering provides no benefit when running with unknown absolute DTN
-           time. The ordered implementation has been shown to still be faster
-           due to its directory structure.
-           However, due to the way bundles are saved in this implementation, the
-           unordered implementation should be preferred for the case of unknown
-           time.
-           Consider this implementation experimental, it may be changed in the
-           future.
+Since bplib currently does not support 3 digit IPN values, this storage also
+currently assumes there is no allocator or rather that the node number is a FQNN.
+
+Since bplib version 7.0.5, a bundle_id was added, which can uniquely identify a
+bundle. For this, in the `CONFIG_BPLIB_STOR_BASE`, another subdirectoy `idx` was
+added. This contains files where the filename is such a bundle ID and references
+a bundle in the `dat` folder.
+
+```
+/nvm0/bp/                       Whatever CONFIG_BPLIB_STOR_BASE is
+  dat/
+    c8/                         Node No    200 as hex
+      7b/                       Service No 123 as hex
+        3795d4_68bf4c6a         [expiration_time]_[bundle_id]
+  idx/             ↑
+    68bf4c6a ──────┘            [bundle_id] as hex
+```
+
+The above for example may appear when a bundle with the destination ipn:200.123
+is stored. bplib computes the ID 68bf4c6a for this bundle. The index file then
+uniquely identifies the real data file.
 
 @note The subdirectories are currently not cleaned up when they are empty. When
       destination EID change a lot, many empty directories could be left.
+      At the same time, when they don't change, this might be better than to
+      recreate and delete the same directory many times.
 
 Bundles are discovered into a cache of length `CONFIG_BPLIB_EGRESS_CACHE_LEN`
-for each channel and contact, but iterating over ALL reachable bundles. Bundle
-data is not read yet, only the EID check is made. After this cache filling, the
-cache contains the bundle references ordered by urgency.
+for each channel and contact, but iterating over ALL reachable bundles. Due to
+the directory structure these can be filtered out early, e.g. if a contact only
+has a route to ipn:400.*, it will not iterate through the `c8/` node directory
+in the example above.
+
+The Bundle data is not read yet, only the EID check is made. After this cache
+filling, the cache contains the bundle references ordered by urgency. A larger
+cache will speed up egress when there are many bundles, because this full
+iteration and ordering happens less often.
 
 The order in which they are found by `vfs_readdir` is usually NOT the order in
 which they will be egressed.
