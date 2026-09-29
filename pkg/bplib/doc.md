@@ -53,7 +53,7 @@ Module name   | Description   | Requirements
 ### List of storage implementations
 Module name   | Description   | Requirements
 ------------- | ------------- | -----------
-`bplib_stor_vfs` | Stores bundles on the filesystem, in folders `node_id/service_id/`.<br> This path will be prefixed by `CONFIG_BPLIB_STOR_BASE`, which defaults to `/nvm0/bp`.<br> Bundles will be egressed ordered by urgency, which does not work when DTN time is not known.  | `vfs` and a filesystem
+`bplib_stor_vfs` | Stores bundles on the filesystem, in folders `node_id/service_id/`.<br> This path will be prefixed by `CONFIG_BPLIB_STOR_BASE`, which defaults to `/nvm0/bp`.<br> Bundles will be egressed ordered by urgency.  | `vfs` and a filesystem
 `bplib_stor_void` | Voids all bundles which cannot be delivered to a contact / channel immediately.<br> This kind of destroys the purpose of the bundle protocol but might be useful for leaf nodes and testing. | -
 
 ### List of CLA implementations

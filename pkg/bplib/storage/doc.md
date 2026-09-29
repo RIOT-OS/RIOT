@@ -100,11 +100,19 @@ uniquely identifies the real data file.
 
 @note The subdirectories are currently not cleaned up when they are empty. When
       destination EID change a lot, many empty directories could be left.
+      At the same time, when they don't change, this might be better than to
+      recreate and delete the same directory many times.
 
 Bundles are discovered into a cache of length `CONFIG_BPLIB_EGRESS_CACHE_LEN`
-for each channel and contact, but iterating over ALL reachable bundles. Bundle
-data is not read yet, only the EID check is made. After this cache filling, the
-cache contains the bundle references ordered by urgency.
+for each channel and contact, but iterating over ALL reachable bundles. Due to
+the directory structure these can be filtered out early, e.g. if a contact only
+has a route to ipn:400.*, it will not iterate through the `c8/` node directory
+in the example above.
+
+The Bundle data is not read yet, only the EID check is made. After this cache
+filling, the cache contains the bundle references ordered by urgency. A larger
+cache will speed up egress when there are many bundles, because this full
+iteration and ordering happens less often.
 
 The order in which they are found by `vfs_readdir` is usually NOT the order in
 which they will be egressed.
