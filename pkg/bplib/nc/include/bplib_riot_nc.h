@@ -21,19 +21,23 @@
  * This means the usual lifecycle of a channel / contact is as follows:
  *
  * 1. Configure the channel / contact with the functions in this module.
- * 2. Call BPLib_PI_AddApplication() or BPLib_CLA_ContactSetup() for a channel /
- *    contact. It can only be configured again (using functions in this module)
+ * 2. Call bplib_channel_set_state(i, BPLIB_NC_APP_STATE_ADDED) or
+ *    bplib_contact_set_state(i, BPLIB_CLA_SETUP)
+ *    It can only be configured again (using functions in this module)
  *    once it has been completely torn down (step 5). Tear down from this state
  *    is possible as well.
- * 3. Call BPLib_PI_StartApplication() or BPLib_CLA_ContactStart() respectively.
+ * 3. Call bplib_channel_set_state(i, BPLIB_NC_APP_STATE_STARTED) or
+ *    bplib_contact_set_state(i, BPLIB_CLA_STARTED) respectively.
  *    This makes the channel / contact active and bundles can flow through them.
- * 4. With BPLib_PI_StopApplication() or BPLib_CLA_ContactStop() respectively,
+ * 4. With bplib_channel_set_state(i, BPLIB_NC_APP_STATE_STOPPED) or
+ *    bplib_contact_set_state(i, BPLIB_CLA_STOPPED) respectively,
  *    the channel / contact can be stopped. This retains its configuration and
  *    it can be started again by step 3 if necessary. Bundles will not flow
  *    anymore. This is useful for
  *    contacts, when the configuration should stay the same (e.g. same network
  *    address to connect to), but the contact is currently disconnected.
- * 5. Call BPLib_PI_RemoveApplication() or BPLib_CLA_ContactTeardown(). This
+ * 5. Call bplib_channel_set_state(i, BPLIB_NC_APP_STATE_REMOVED) or
+ *    bplib_contact_set_state(i, BPLIB_CLA_TORNDOWN). This
  *    will tear down the channel / contact.
  *    Now goto 1 if the channel / contact should be changed, for example when a
  *    new neighbor has been discovered.

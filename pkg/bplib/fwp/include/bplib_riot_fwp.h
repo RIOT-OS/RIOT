@@ -41,10 +41,8 @@
  *
  * ### Overriding the default FWP
  *
- * bplib_riot_fwp_init() is called in @ref pkg_bplib_init, so if this module
- * is not enabled with `bplib_default_fwp`, a function with the signature of
- * bplib_riot_fwp_init() has to be provided by other means. The header will
- * always be in the include path of the bplib package.
+ * Provide a different bplib_fwp_callbacks and don't select the bplib_default_fwp
+ * module. This header will always be included.
  *
  *
  * @{
