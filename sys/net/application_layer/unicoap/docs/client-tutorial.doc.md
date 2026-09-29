@@ -304,7 +304,7 @@ Time to test it!
 The sample code includes a `server.py` script that uses [aiocoap](https://aiocoap.readthedocs.io).
 To use it we need to compile the client application, run it and then send a CoAP request.
 We're going to use RIOT's `native` board for this, i.e., both the client and server will run on your
-linux host and there will be no wireless network involved — no antenna needed.
+Linux host and there will be no wireless network involved — no antenna needed.
 To compile and run the app, run this shell command:
 
 ```sh
