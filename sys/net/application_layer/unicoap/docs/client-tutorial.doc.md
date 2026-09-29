@@ -362,6 +362,7 @@ And then type in the RIOT shell (the running example application)
 unicoap get coap://[fe80::dead:beef]
 ```
 
+You should see the following response:
 ```
 response 2.05 Content (26 bytes)
 text response: 'Welcome to the demo server'
