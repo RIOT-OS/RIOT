@@ -27,10 +27,10 @@ typedef uint32_t gpio_t;
  * @param port  The GPIO port (Currently only GPIO0)
  * @param pin   The GPIO pin number
  */
-#define GPIO_PIN(port, pin) (((port) & 0) | (pin))
+#define GPIO_PIN(port, pin)     (((port) & 0) | (pin))
 
 /** This is a define used throughout the pico sdk */
-#define _u(x)               ((uint32_t)(x))
+#define _u(x) ((uint32_t)(x))
 
 #ifdef RP2350_USE_RISCV
 #  include "periph_cpu_common.h"
@@ -58,28 +58,28 @@ extern "C" {
 #endif
 
 /** GPIO Pin ID for oscillator debugging */
-#define OSC_DEBUG_PIN_ID         15u
+#define OSC_DEBUG_PIN_ID 15u
 
 /** Reset bit for the system PLL */
-#define RESET_PLL_SYS            (1u << 14u)
+#define RESET_PLL_SYS (1u << 14u)
 
 /** Reset bit for the pads bank 0 */
-#define RESET_PADS_BANK0         (1u << 9u)
+#define RESET_PADS_BANK0 (1u << 9u)
 
 /** Reset bit for UART0 peripheral */
-#define RESET_UART0              (1u << 26u)
+#define RESET_UART0 (1u << 26u)
 
 /** Reset bit for UART1 peripheral */
-#define RESET_UART1              (1u << 27u)
+#define RESET_UART1 (1u << 27u)
 
 /** Reset bit for the IO bank 0 */
-#define RESET_IO_BANK0           (1u << 6u)
+#define RESET_IO_BANK0 (1u << 6u)
 
 /** Input enable bit for GPIO0 in PADS_BANK0 */
 #define PADS_BANK0_GPIO0_IE_BITS (1u << 6u)
 
 /** Isolation bits for PADS_BANK0 */
-#define PADS_BANK0_ISO_BITS      (1u << 8u)
+#define PADS_BANK0_ISO_BITS (1u << 8u)
 
 /**
  * @brief   Initialize RP2350 specific CPU peripherals that are not

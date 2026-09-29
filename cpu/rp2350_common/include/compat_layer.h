@@ -23,7 +23,7 @@
 #ifdef RP2350_USE_RISCV
 #  include "xh3irq.h"
 /** See RP2350 Datasheet 3.8.6.3.1 */
-#  define __h3_block()   __asm__("slt x0, x0, x0")
+#  define __h3_block() __asm__("slt x0, x0, x0")
 /** See RP2350 Datasheet 3.8.6.3.2 */
 #  define __h3_unblock() __asm__("slt x0, x0, x1")
 #else

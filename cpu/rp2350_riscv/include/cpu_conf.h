@@ -25,9 +25,9 @@ extern "C" {
  * we don't have different levels at the moment */
 #define CPU_DEFAULT_IRQ_PRIO 1u
 /** The RP2350 has 52 IRQs, see cpu/rp2350_common/vectors.c for more details */
-#define CPU_IRQ_NUMOF        52u
+#define CPU_IRQ_NUMOF 52u
 /** This tells rp2350_common that we are using the RISC-V core */
-#define RP2350_USE_RISCV     1
+#define RP2350_USE_RISCV 1
 
 #ifdef __cplusplus
 }

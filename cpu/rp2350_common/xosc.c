@@ -22,10 +22,10 @@
 #include "periph_cpu.h"
 
 /* Based on datasheet 8.2.4 (1ms wait time) */
-#define STARTUP_DELAY         47
+#define STARTUP_DELAY 47
 #define MAX_XOSC_COUNTER_SIZE 0xFFFF
-#define SLEEP_100HZ_SPEED     12000000UL
-#define CYCLES_PER_MS         (SLEEP_100HZ_SPEED / 1000)
+#define SLEEP_100HZ_SPEED 12000000UL
+#define CYCLES_PER_MS (SLEEP_100HZ_SPEED / 1000)
 
 void xosc_start(void)
 {

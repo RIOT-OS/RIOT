@@ -27,13 +27,13 @@ extern "C" {
  * @name JMP instruction conditions
  * @{
  */
-#define PIO_JMP_COND_ALWAYS         (0) /**< Always jump */
-#define PIO_JMP_COND_X_ZERO         (1) /**< Jump if X is zero (!X) */
-#define PIO_JMP_COND_X_DEC          (2) /**< Jump if X non-zero pre-decrement (X--) */
-#define PIO_JMP_COND_Y_ZERO         (3) /**< Jump if Y is zero (!Y) */
-#define PIO_JMP_COND_Y_DEC          (4) /**< Jump if Y non-zero pre-decrement (Y--) */
-#define PIO_JMP_COND_X_NE_Y         (5) /**< Jump if X not equal Y */
-#define PIO_JMP_COND_PIN            (6) /**< Jump if input pin is high */
+#define PIO_JMP_COND_ALWAYS     (0)     /**< Always jump */
+#define PIO_JMP_COND_X_ZERO     (1)     /**< Jump if X is zero (!X) */
+#define PIO_JMP_COND_X_DEC      (2)     /**< Jump if X non-zero pre-decrement (X--) */
+#define PIO_JMP_COND_Y_ZERO     (3)     /**< Jump if Y is zero (!Y) */
+#define PIO_JMP_COND_Y_DEC      (4)     /**< Jump if Y non-zero pre-decrement (Y--) */
+#define PIO_JMP_COND_X_NE_Y     (5)     /**< Jump if X not equal Y */
+#define PIO_JMP_COND_PIN        (6)     /**< Jump if input pin is high */
 #define PIO_JMP_COND_OSRE_NOT_EMPTY (7) /**< Jump if OSR not empty (!OSRE) */
 /** @} */
 
@@ -45,56 +45,57 @@ extern "C" {
  * @param[in] cond      Condition (PIO_JMP_COND_*)
  * @param[in] addr      Target address (0-31)
  */
-#define PIO_JMP(cond, addr)  (0b0000000000000000 | (((cond) & 0b111) << 5) | ((addr) & 0b11111))
+#define PIO_JMP(cond, addr) \
+    (0b0000000000000000 | (((cond) & 0b111) << 5) | ((addr) & 0b11111))
 
 /**
  * @brief JMP - unconditional jump
  *
  * @param[in] addr  Target address (0-31)
  */
-#define PIO_JMP_ALWAYS(addr) PIO_JMP(PIO_JMP_COND_ALWAYS, (addr))
+#define PIO_JMP_ALWAYS(addr)    PIO_JMP(PIO_JMP_COND_ALWAYS, (addr))
 
 /**
  * @brief JMP !X - jump if X is zero
  *
  * @param[in] addr  Target address (0-31)
  */
-#define PIO_JMP_X_ZERO(addr) PIO_JMP(PIO_JMP_COND_X_ZERO, (addr))
+#define PIO_JMP_X_ZERO(addr)    PIO_JMP(PIO_JMP_COND_X_ZERO, (addr))
 
 /**
  * @brief JMP X-- - jump if X non-zero, then decrement X
  *
  * @param[in] addr  Target address (0-31)
  */
-#define PIO_JMP_X_DEC(addr)  PIO_JMP(PIO_JMP_COND_X_DEC, (addr))
+#define PIO_JMP_X_DEC(addr)     PIO_JMP(PIO_JMP_COND_X_DEC, (addr))
 
 /**
  * @brief JMP !Y - jump if Y is zero
  *
  * @param[in] addr  Target address (0-31)
  */
-#define PIO_JMP_Y_ZERO(addr) PIO_JMP(PIO_JMP_COND_Y_ZERO, (addr))
+#define PIO_JMP_Y_ZERO(addr)    PIO_JMP(PIO_JMP_COND_Y_ZERO, (addr))
 
 /**
  * @brief JMP Y-- - jump if Y non-zero, then decrement Y
  *
  * @param[in] addr  Target address (0-31)
  */
-#define PIO_JMP_Y_DEC(addr)  PIO_JMP(PIO_JMP_COND_Y_DEC, (addr))
+#define PIO_JMP_Y_DEC(addr)     PIO_JMP(PIO_JMP_COND_Y_DEC, (addr))
 
 /**
  * @brief JMP X!=Y - jump if X not equal to Y
  *
  * @param[in] addr  Target address (0-31)
  */
-#define PIO_JMP_X_NE_Y(addr) PIO_JMP(PIO_JMP_COND_X_NE_Y, (addr))
+#define PIO_JMP_X_NE_Y(addr)    PIO_JMP(PIO_JMP_COND_X_NE_Y, (addr))
 
 /**
  * @brief JMP PIN - jump if input pin is high
  *
  * @param[in] addr  Target address (0-31)
  */
-#define PIO_JMP_PIN(addr)    PIO_JMP(PIO_JMP_COND_PIN, (addr))
+#define PIO_JMP_PIN(addr)       PIO_JMP(PIO_JMP_COND_PIN, (addr))
 
 /**
  * @brief JMP !OSRE - jump if OSR not empty
@@ -111,20 +112,20 @@ extern "C" {
  * @name WAIT instruction sources
  * @{
  */
-#define PIO_WAIT_SRC_GPIO            (0) /**< Wait on GPIO (absolute) */
-#define PIO_WAIT_SRC_PIN             (1) /**< Wait on PIN (mapped) */
-#define PIO_WAIT_SRC_IRQ             (2) /**< Wait on IRQ flag */
-#define PIO_WAIT_SRC_JMPPIN          (3) /**< Wait on JMPPIN */
+#define PIO_WAIT_SRC_GPIO       (0)     /**< Wait on GPIO (absolute) */
+#define PIO_WAIT_SRC_PIN        (1)     /**< Wait on PIN (mapped) */
+#define PIO_WAIT_SRC_IRQ        (2)     /**< Wait on IRQ flag */
+#define PIO_WAIT_SRC_JMPPIN     (3)     /**< Wait on JMPPIN */
 /** @} */
 
 /**
  * @name WAIT IRQ index modes (decoded from 2 MSBs of index)
  * @{
  */
-#define PIO_WAIT_IRQ_IDXMODE_DIRECT  (0) /**< Direct indexing (0-7) */
-#define PIO_WAIT_IRQ_IDXMODE_PREV    (1) /**< Previous PIO block */
-#define PIO_WAIT_IRQ_IDXMODE_REL     (2) /**< Relative (add state machine ID) */
-#define PIO_WAIT_IRQ_IDXMODE_NEXT    (3) /**< Next PIO block */
+#define PIO_WAIT_IRQ_IDXMODE_DIRECT (0) /**< Direct indexing (0-7) */
+#define PIO_WAIT_IRQ_IDXMODE_PREV   (1) /**< Previous PIO block */
+#define PIO_WAIT_IRQ_IDXMODE_REL    (2) /**< Relative (add state machine ID) */
+#define PIO_WAIT_IRQ_IDXMODE_NEXT   (3) /**< Next PIO block */
 /** @} */
 
 /**
@@ -137,8 +138,8 @@ extern "C" {
  * @param[in] index     Index value (interpretation depends on source)
  */
 #define PIO_WAIT(pol, src, index) \
-    (0b0010000000000000 | ((pol) ? 0b0000000010000000 : 0) | (((src) & 0b11) << 5) | \
-     ((index) & 0b11111))
+    (0b0010000000000000 | ((pol) ? 0b0000000010000000 : 0) | \
+     (((src) & 0b11) << 5) | ((index) & 0b11111))
 
 /**
  * @brief WAIT GPIO - wait on absolute GPIO pin
@@ -172,7 +173,8 @@ extern "C" {
  * @param[in] pol   Polarity (0 or 1)
  * @param[in] irq   IRQ number (0-7), low 2 bits added to state machine ID
  */
-#define PIO_WAIT_IRQ_REL(pol, irq)   PIO_WAIT_IRQ((pol), PIO_WAIT_IRQ_IDXMODE_REL, (irq))
+#define PIO_WAIT_IRQ_REL(pol, irq) \
+    PIO_WAIT_IRQ((pol), PIO_WAIT_IRQ_IDXMODE_REL, (irq))
 
 /**
  * @brief WAIT IRQ on previous PIO block
@@ -180,7 +182,8 @@ extern "C" {
  * @param[in] pol   Polarity (0 or 1)
  * @param[in] irq   IRQ number (0-7)
  */
-#define PIO_WAIT_IRQ_PREV(pol, irq)  PIO_WAIT_IRQ((pol), PIO_WAIT_IRQ_IDXMODE_PREV, (irq))
+#define PIO_WAIT_IRQ_PREV(pol, irq) \
+    PIO_WAIT_IRQ((pol), PIO_WAIT_IRQ_IDXMODE_PREV, (irq))
 
 /**
  * @brief WAIT IRQ on next PIO block
@@ -188,7 +191,8 @@ extern "C" {
  * @param[in] pol   Polarity (0 or 1)
  * @param[in] irq   IRQ number (0-7)
  */
-#define PIO_WAIT_IRQ_NEXT(pol, irq)  PIO_WAIT_IRQ((pol), PIO_WAIT_IRQ_IDXMODE_NEXT, (irq))
+#define PIO_WAIT_IRQ_NEXT(pol, irq) \
+    PIO_WAIT_IRQ((pol), PIO_WAIT_IRQ_IDXMODE_NEXT, (irq))
 
 /**
  * @brief WAIT JMPPIN - wait on jump pin
@@ -196,7 +200,8 @@ extern "C" {
  * @param[in] pol       Polarity (0 or 1)
  * @param[in] offset    Offset added to PINCTRL_JMP_PIN (0-3)
  */
-#define PIO_WAIT_JMPPIN(pol, offset) PIO_WAIT((pol), PIO_WAIT_SRC_JMPPIN, (offset))
+#define PIO_WAIT_JMPPIN(pol, offset) \
+    PIO_WAIT((pol), PIO_WAIT_SRC_JMPPIN, (offset))
 
 /* ========================================================================== */
 /* IN Instruction - Section 11.4.4                                            */
@@ -206,12 +211,12 @@ extern "C" {
  * @name IN instruction sources
  * @{
  */
-#define PIO_IN_SRC_PINS              (0) /**< PINS */
-#define PIO_IN_SRC_X                 (1) /**< Scratch register X */
-#define PIO_IN_SRC_Y                 (2) /**< Scratch register Y */
-#define PIO_IN_SRC_NULL              (3) /**< NULL (all zeroes) */
-#define PIO_IN_SRC_ISR               (6) /**< Input shift register */
-#define PIO_IN_SRC_OSR               (7) /**< Output shift register */
+#define PIO_IN_SRC_PINS         (0)     /**< PINS */
+#define PIO_IN_SRC_X            (1)     /**< Scratch register X */
+#define PIO_IN_SRC_Y            (2)     /**< Scratch register Y */
+#define PIO_IN_SRC_NULL         (3)     /**< NULL (all zeroes) */
+#define PIO_IN_SRC_ISR          (6)     /**< Input shift register */
+#define PIO_IN_SRC_OSR          (7)     /**< Output shift register */
 /** @} */
 
 /**
@@ -222,49 +227,50 @@ extern "C" {
  * @param[in] src       Source (PIO_IN_SRC_*)
  * @param[in] bitcount  Number of bits to shift (1-32, 32 encoded as 0)
  */
-#define PIO_IN(src, bitcount) (0b0100000000000000 | (((src) & 0b111) << 5) | ((bitcount) & 0b11111))
+#define PIO_IN(src, bitcount) \
+    (0b0100000000000000 | (((src) & 0b111) << 5) | ((bitcount) & 0b11111))
 
 /**
  * @brief IN PINS - shift bits from pins into ISR
  *
  * @param[in] bits  Number of bits (1-32)
  */
-#define PIO_IN_PINS(bits)     PIO_IN(PIO_IN_SRC_PINS, (bits) & 0b11111)
+#define PIO_IN_PINS(bits)       PIO_IN(PIO_IN_SRC_PINS, (bits) & 0b11111)
 
 /**
  * @brief IN X - shift bits from X into ISR
  *
  * @param[in] bits  Number of bits (1-32)
  */
-#define PIO_IN_X(bits)        PIO_IN(PIO_IN_SRC_X, (bits) & 0b11111)
+#define PIO_IN_X(bits)          PIO_IN(PIO_IN_SRC_X, (bits) & 0b11111)
 
 /**
  * @brief IN Y - shift bits from Y into ISR
  *
  * @param[in] bits  Number of bits (1-32)
  */
-#define PIO_IN_Y(bits)        PIO_IN(PIO_IN_SRC_Y, (bits) & 0b11111)
+#define PIO_IN_Y(bits)          PIO_IN(PIO_IN_SRC_Y, (bits) & 0b11111)
 
 /**
  * @brief IN NULL - shift zero bits into ISR
  *
  * @param[in] bits  Number of bits (1-32)
  */
-#define PIO_IN_NULL(bits)     PIO_IN(PIO_IN_SRC_NULL, (bits) & 0b11111)
+#define PIO_IN_NULL(bits)       PIO_IN(PIO_IN_SRC_NULL, (bits) & 0b11111)
 
 /**
  * @brief IN ISR - shift bits from ISR into ISR
  *
  * @param[in] bits  Number of bits (1-32)
  */
-#define PIO_IN_ISR(bits)      PIO_IN(PIO_IN_SRC_ISR, (bits) & 0b11111)
+#define PIO_IN_ISR(bits)        PIO_IN(PIO_IN_SRC_ISR, (bits) & 0b11111)
 
 /**
  * @brief IN OSR - shift bits from OSR into ISR
  *
  * @param[in] bits  Number of bits (1-32)
  */
-#define PIO_IN_OSR(bits)      PIO_IN(PIO_IN_SRC_OSR, (bits) & 0b11111)
+#define PIO_IN_OSR(bits)        PIO_IN(PIO_IN_SRC_OSR, (bits) & 0b11111)
 
 /* ========================================================================== */
 /* OUT Instruction - Section 11.4.5                                           */
@@ -274,14 +280,14 @@ extern "C" {
  * @name OUT instruction destinations
  * @{
  */
-#define PIO_OUT_DEST_PINS     (0) /**< PINS */
-#define PIO_OUT_DEST_X        (1) /**< Scratch register X */
-#define PIO_OUT_DEST_Y        (2) /**< Scratch register Y */
-#define PIO_OUT_DEST_NULL     (3) /**< NULL (discard data) */
-#define PIO_OUT_DEST_PINDIRS  (4) /**< PINDIRS */
-#define PIO_OUT_DEST_PC       (5) /**< Program counter */
-#define PIO_OUT_DEST_ISR      (6) /**< Input shift register */
-#define PIO_OUT_DEST_EXEC     (7) /**< Execute as instruction */
+#define PIO_OUT_DEST_PINS       (0)     /**< PINS */
+#define PIO_OUT_DEST_X          (1)     /**< Scratch register X */
+#define PIO_OUT_DEST_Y          (2)     /**< Scratch register Y */
+#define PIO_OUT_DEST_NULL       (3)     /**< NULL (discard data) */
+#define PIO_OUT_DEST_PINDIRS    (4)     /**< PINDIRS */
+#define PIO_OUT_DEST_PC         (5)     /**< Program counter */
+#define PIO_OUT_DEST_ISR        (6)     /**< Input shift register */
+#define PIO_OUT_DEST_EXEC       (7)     /**< Execute as instruction */
 /** @} */
 
 /**
@@ -300,56 +306,56 @@ extern "C" {
  *
  * @param[in] bits  Number of bits (1-32)
  */
-#define PIO_OUT_PINS(bits)    PIO_OUT(PIO_OUT_DEST_PINS, (bits) & 0b11111)
+#define PIO_OUT_PINS(bits)      PIO_OUT(PIO_OUT_DEST_PINS, (bits) & 0b11111)
 
 /**
  * @brief OUT X - shift bits from OSR to X
  *
  * @param[in] bits  Number of bits (1-32)
  */
-#define PIO_OUT_X(bits)       PIO_OUT(PIO_OUT_DEST_X, (bits) & 0b11111)
+#define PIO_OUT_X(bits)         PIO_OUT(PIO_OUT_DEST_X, (bits) & 0b11111)
 
 /**
  * @brief OUT Y - shift bits from OSR to Y
  *
  * @param[in] bits  Number of bits (1-32)
  */
-#define PIO_OUT_Y(bits)       PIO_OUT(PIO_OUT_DEST_Y, (bits) & 0b11111)
+#define PIO_OUT_Y(bits)         PIO_OUT(PIO_OUT_DEST_Y, (bits) & 0b11111)
 
 /**
  * @brief OUT NULL - discard bits from OSR
  *
  * @param[in] bits  Number of bits (1-32)
  */
-#define PIO_OUT_NULL(bits)    PIO_OUT(PIO_OUT_DEST_NULL, (bits) & 0b11111)
+#define PIO_OUT_NULL(bits)      PIO_OUT(PIO_OUT_DEST_NULL, (bits) & 0b11111)
 
 /**
  * @brief OUT PINDIRS - shift bits from OSR to pin directions
  *
  * @param[in] bits  Number of bits (1-32)
  */
-#define PIO_OUT_PINDIRS(bits) PIO_OUT(PIO_OUT_DEST_PINDIRS, (bits) & 0b11111)
+#define PIO_OUT_PINDIRS(bits)   PIO_OUT(PIO_OUT_DEST_PINDIRS, (bits) & 0b11111)
 
 /**
  * @brief OUT PC - shift bits from OSR to program counter (jump)
  *
  * @param[in] bits  Number of bits (1-32)
  */
-#define PIO_OUT_PC(bits)      PIO_OUT(PIO_OUT_DEST_PC, (bits) & 0b11111)
+#define PIO_OUT_PC(bits)        PIO_OUT(PIO_OUT_DEST_PC, (bits) & 0b11111)
 
 /**
  * @brief OUT ISR - shift bits from OSR to ISR
  *
  * @param[in] bits  Number of bits (1-32)
  */
-#define PIO_OUT_ISR(bits)     PIO_OUT(PIO_OUT_DEST_ISR, (bits) & 0b11111)
+#define PIO_OUT_ISR(bits)       PIO_OUT(PIO_OUT_DEST_ISR, (bits) & 0b11111)
 
 /**
  * @brief OUT EXEC - execute bits from OSR as instruction
  *
  * @param[in] bits  Number of bits (1-32)
  */
-#define PIO_OUT_EXEC(bits)    PIO_OUT(PIO_OUT_DEST_EXEC, (bits) & 0b11111)
+#define PIO_OUT_EXEC(bits)      PIO_OUT(PIO_OUT_DEST_EXEC, (bits) & 0b11111)
 
 /* ========================================================================== */
 /* PUSH Instruction - Section 11.4.6                                          */
@@ -370,17 +376,17 @@ extern "C" {
 /**
  * @brief PUSH instruction - block by default
  */
-#define PIO_PUSH_BLOCK()          PIO_PUSH(0, 1)
+#define PIO_PUSH_BLOCK()        PIO_PUSH(0, 1)
 
 /**
  * @brief PUSH instruction - non-blocking
  */
-#define PIO_PUSH_NOBLOCK()        PIO_PUSH(0, 0)
+#define PIO_PUSH_NOBLOCK()      PIO_PUSH(0, 0)
 
 /**
  * @brief PUSH instruction - if full, blocking
  */
-#define PIO_PUSH_IFFULL()         PIO_PUSH(1, 1)
+#define PIO_PUSH_IFFULL()       PIO_PUSH(1, 1)
 
 /**
  * @brief PUSH instruction - if full, non-blocking
@@ -405,17 +411,17 @@ extern "C" {
 /**
  * @brief PULL instruction - block by default
  */
-#define PIO_PULL_BLOCK()           PIO_PULL(0, 1)
+#define PIO_PULL_BLOCK()        PIO_PULL(0, 1)
 
 /**
  * @brief PULL instruction - non-blocking
  */
-#define PIO_PULL_NOBLOCK()         PIO_PULL(0, 0)
+#define PIO_PULL_NOBLOCK()      PIO_PULL(0, 0)
 
 /**
  * @brief PULL instruction - if empty, blocking
  */
-#define PIO_PULL_IFEMPTY()         PIO_PULL(1, 1)
+#define PIO_PULL_IFEMPTY()      PIO_PULL(1, 1)
 
 /**
  * @brief PULL instruction - if empty, non-blocking
@@ -441,7 +447,7 @@ extern "C" {
 /**
  * @brief MOV rxfifo[y], isr - index by Y register
  */
-#define PIO_MOV_RXFIFO_Y_ISR()      PIO_MOV_RXFIFO_ISR(0, 0)
+#define PIO_MOV_RXFIFO_Y_ISR()  PIO_MOV_RXFIFO_ISR(0, 0)
 
 /**
  * @brief MOV rxfifo[index], isr - index by immediate value
@@ -469,7 +475,7 @@ extern "C" {
 /**
  * @brief MOV osr, rxfifo[y] - index by Y register
  */
-#define PIO_MOV_OSR_RXFIFO_Y()      PIO_MOV_OSR_RXFIFO(0, 0)
+#define PIO_MOV_OSR_RXFIFO_Y()  PIO_MOV_OSR_RXFIFO(0, 0)
 
 /**
  * @brief MOV osr, rxfifo[index] - index by immediate value
@@ -486,36 +492,36 @@ extern "C" {
  * @name MOV instruction destinations
  * @{
  */
-#define PIO_MOV_DEST_PINS           (0) /**< PINS (uses same pin mapping as OUT) */
-#define PIO_MOV_DEST_X              (1) /**< Scratch register X */
-#define PIO_MOV_DEST_Y              (2) /**< Scratch register Y */
-#define PIO_MOV_DEST_PINDIRS        (3) /**< PINDIRS (uses same pin mapping as OUT) */
-#define PIO_MOV_DEST_EXEC           (4) /**< Execute data as instruction */
-#define PIO_MOV_DEST_PC             (5) /**< Program counter */
-#define PIO_MOV_DEST_ISR            (6) /**< Input shift register */
-#define PIO_MOV_DEST_OSR            (7) /**< Output shift register */
+#define PIO_MOV_DEST_PINS       (0)     /**< PINS (uses same pin mapping as OUT) */
+#define PIO_MOV_DEST_X          (1)     /**< Scratch register X */
+#define PIO_MOV_DEST_Y          (2)     /**< Scratch register Y */
+#define PIO_MOV_DEST_PINDIRS    (3)     /**< PINDIRS (uses same pin mapping as OUT) */
+#define PIO_MOV_DEST_EXEC       (4)     /**< Execute data as instruction */
+#define PIO_MOV_DEST_PC         (5)     /**< Program counter */
+#define PIO_MOV_DEST_ISR        (6)     /**< Input shift register */
+#define PIO_MOV_DEST_OSR        (7)     /**< Output shift register */
 /** @} */
 
 /**
  * @name MOV instruction operations
  * @{
  */
-#define PIO_MOV_OP_NONE             (0) /**< No operation */
-#define PIO_MOV_OP_INVERT           (1) /**< Bitwise complement */
-#define PIO_MOV_OP_BITREV           (2) /**< Bit-reverse */
+#define PIO_MOV_OP_NONE         (0)     /**< No operation */
+#define PIO_MOV_OP_INVERT       (1)     /**< Bitwise complement */
+#define PIO_MOV_OP_BITREV       (2)     /**< Bit-reverse */
 /** @} */
 
 /**
  * @name MOV instruction sources
  * @{
  */
-#define PIO_MOV_SRC_PINS            (0) /**< PINS (uses same pin mapping as IN) */
-#define PIO_MOV_SRC_X               (1) /**< Scratch register X */
-#define PIO_MOV_SRC_Y               (2) /**< Scratch register Y */
-#define PIO_MOV_SRC_NULL            (3) /**< NULL (all zeroes) */
-#define PIO_MOV_SRC_STATUS          (5) /**< STATUS (configured by EXECCTRL_STATUS_SEL) */
-#define PIO_MOV_SRC_ISR             (6) /**< Input shift register */
-#define PIO_MOV_SRC_OSR             (7) /**< Output shift register */
+#define PIO_MOV_SRC_PINS        (0)     /**< PINS (uses same pin mapping as IN) */
+#define PIO_MOV_SRC_X           (1)     /**< Scratch register X */
+#define PIO_MOV_SRC_Y           (2)     /**< Scratch register Y */
+#define PIO_MOV_SRC_NULL        (3)     /**< NULL (all zeroes) */
+#define PIO_MOV_SRC_STATUS      (5)     /**< STATUS (configured by EXECCTRL_STATUS_SEL) */
+#define PIO_MOV_SRC_ISR         (6)     /**< Input shift register */
+#define PIO_MOV_SRC_OSR         (7)     /**< Output shift register */
 /** @} */
 
 /**
@@ -538,10 +544,10 @@ extern "C" {
  * @name IRQ instruction index modes
  * @{
  */
-#define PIO_IRQ_IDXMODE_DIRECT (0) /**< Direct indexing (0-7) */
-#define PIO_IRQ_IDXMODE_PREV   (1) /**< Previous PIO block */
-#define PIO_IRQ_IDXMODE_REL    (2) /**< Relative (add state machine ID) */
-#define PIO_IRQ_IDXMODE_NEXT   (3) /**< Next PIO block */
+#define PIO_IRQ_IDXMODE_DIRECT  (0)     /**< Direct indexing (0-7) */
+#define PIO_IRQ_IDXMODE_PREV    (1)     /**< Previous PIO block */
+#define PIO_IRQ_IDXMODE_REL     (2)     /**< Relative (add state machine ID) */
+#define PIO_IRQ_IDXMODE_NEXT    (3)     /**< Next PIO block */
 /** @} */
 
 /**
@@ -563,56 +569,56 @@ extern "C" {
  *
  * @param[in] num   IRQ number (0-7)
  */
-#define PIO_IRQ_SET(num)      PIO_IRQ(0, 0, PIO_IRQ_IDXMODE_DIRECT, (num))
+#define PIO_IRQ_SET(num)        PIO_IRQ(0, 0, PIO_IRQ_IDXMODE_DIRECT, (num))
 
 /**
  * @brief IRQ nowait - raise IRQ without waiting (same as SET)
  *
  * @param[in] num   IRQ number (0-7)
  */
-#define PIO_IRQ_NOWAIT(num)   PIO_IRQ(0, 0, PIO_IRQ_IDXMODE_DIRECT, (num))
+#define PIO_IRQ_NOWAIT(num)     PIO_IRQ(0, 0, PIO_IRQ_IDXMODE_DIRECT, (num))
 
 /**
  * @brief IRQ wait - raise IRQ and wait for it to be cleared
  *
  * @param[in] num   IRQ number (0-7)
  */
-#define PIO_IRQ_WAIT(num)     PIO_IRQ(0, 1, PIO_IRQ_IDXMODE_DIRECT, (num))
+#define PIO_IRQ_WAIT(num)       PIO_IRQ(0, 1, PIO_IRQ_IDXMODE_DIRECT, (num))
 
 /**
  * @brief IRQ clear - clear IRQ flag
  *
  * @param[in] num   IRQ number (0-7)
  */
-#define PIO_IRQ_CLEAR(num)    PIO_IRQ(1, 0, PIO_IRQ_IDXMODE_DIRECT, (num))
+#define PIO_IRQ_CLEAR(num)      PIO_IRQ(1, 0, PIO_IRQ_IDXMODE_DIRECT, (num))
 
 /**
  * @brief IRQ set with relative addressing
  *
  * @param[in] num   IRQ number (0-7), low 2 bits added to state machine ID
  */
-#define PIO_IRQ_SET_REL(num)  PIO_IRQ(0, 0, PIO_IRQ_IDXMODE_REL, (num))
+#define PIO_IRQ_SET_REL(num)    PIO_IRQ(0, 0, PIO_IRQ_IDXMODE_REL, (num))
 
 /**
  * @brief IRQ wait with relative addressing
  *
  * @param[in] num   IRQ number (0-7), low 2 bits added to state machine ID
  */
-#define PIO_IRQ_WAIT_REL(num) PIO_IRQ(0, 1, PIO_IRQ_IDXMODE_REL, (num))
+#define PIO_IRQ_WAIT_REL(num)   PIO_IRQ(0, 1, PIO_IRQ_IDXMODE_REL, (num))
 
 /**
  * @brief IRQ set targeting previous PIO block
  *
  * @param[in] num   IRQ number (0-7)
  */
-#define PIO_IRQ_SET_PREV(num) PIO_IRQ(0, 0, PIO_IRQ_IDXMODE_PREV, (num))
+#define PIO_IRQ_SET_PREV(num)   PIO_IRQ(0, 0, PIO_IRQ_IDXMODE_PREV, (num))
 
 /**
  * @brief IRQ set targeting next PIO block
  *
  * @param[in] num   IRQ number (0-7)
  */
-#define PIO_IRQ_SET_NEXT(num) PIO_IRQ(0, 0, PIO_IRQ_IDXMODE_NEXT, (num))
+#define PIO_IRQ_SET_NEXT(num)   PIO_IRQ(0, 0, PIO_IRQ_IDXMODE_NEXT, (num))
 
 /* ========================================================================== */
 /* SET Instruction - Section 11.4.12                                          */
@@ -622,10 +628,10 @@ extern "C" {
  * @name SET instruction destinations
  * @{
  */
-#define PIO_SET_DEST_PINS     (0) /**< PINS */
-#define PIO_SET_DEST_X        (1) /**< Scratch register X */
-#define PIO_SET_DEST_Y        (2) /**< Scratch register Y */
-#define PIO_SET_DEST_PINDIRS  (4) /**< PINDIRS */
+#define PIO_SET_DEST_PINS       (0)     /**< PINS */
+#define PIO_SET_DEST_X          (1)     /**< Scratch register X */
+#define PIO_SET_DEST_Y          (2)     /**< Scratch register Y */
+#define PIO_SET_DEST_PINDIRS    (4)     /**< PINDIRS */
 /** @} */
 
 /**
@@ -636,35 +642,36 @@ extern "C" {
  * @param[in] dest  Destination (PIO_SET_DEST_*)
  * @param[in] data  5-bit immediate value (0-31)
  */
-#define PIO_SET(dest, data)   (0b1110000000000000 | (((dest) & 0b111) << 5) | ((data) & 0b11111))
+#define PIO_SET(dest, data) \
+    (0b1110000000000000 | (((dest) & 0b111) << 5) | ((data) & 0b11111))
 
 /**
  * @brief SET pins - set pin values
  *
  * @param[in] val   Value to set (0-31)
  */
-#define PIO_SET_PINS(val)     PIO_SET(PIO_SET_DEST_PINS, (val))
+#define PIO_SET_PINS(val)       PIO_SET(PIO_SET_DEST_PINS, (val))
 
 /**
  * @brief SET x - set scratch register X
  *
  * @param[in] val   Value to set (0-31)
  */
-#define PIO_SET_X(val)        PIO_SET(PIO_SET_DEST_X, (val))
+#define PIO_SET_X(val)          PIO_SET(PIO_SET_DEST_X, (val))
 
 /**
  * @brief SET y - set scratch register Y
  *
  * @param[in] val   Value to set (0-31)
  */
-#define PIO_SET_Y(val)        PIO_SET(PIO_SET_DEST_Y, (val))
+#define PIO_SET_Y(val)          PIO_SET(PIO_SET_DEST_Y, (val))
 
 /**
  * @brief SET pindirs - set pin directions
  *
  * @param[in] val   Value to set (0-31)
  */
-#define PIO_SET_PINDIRS(val)  PIO_SET(PIO_SET_DEST_PINDIRS, (val))
+#define PIO_SET_PINDIRS(val)    PIO_SET(PIO_SET_DEST_PINDIRS, (val))
 
 #ifdef __cplusplus
 }
