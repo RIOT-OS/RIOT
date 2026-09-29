@@ -67,8 +67,7 @@ BreakAfterJavaFieldAnnotations: false
 # overflowing it (disabling it can produce lines longer than the limit)
 BreakAdjacentStringLiterals: true
 BreakStringLiterals: false
-# "Line length": the absolute maximum of 100 characters per line
-ColumnLimit: 100
+ColumnLimit: 90
 CommentPragmas: '^ IWYU pragma:'
 CompactNamespaces: false
 ConstructorInitializerAllOnOneLineOrOnePerLine: false
@@ -114,7 +113,7 @@ PenaltyBreakBeforeFirstCallParameter: 100
 PenaltyBreakComment: 10
 PenaltyBreakFirstLessLess: 0
 PenaltyBreakString: 10
-PenaltyExcessCharacter: 100
+PenaltyExcessCharacter: 10
 PenaltyReturnTypeOnItsOwnLine: 60
 
 PointerAlignment: Right
