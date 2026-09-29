@@ -96,7 +96,7 @@ if ((res = unicoap_send_request_async(
 The client API provides two ways of customizing timing, reliability, etc.
 Use the flags parameter to toggle boolean switches: At the moment,
 only @ref UNICOAP_REQUEST_FLAG_RELIABLE is supported, which instructs the messaging layer
-to turn its reliable transmission mode while sending the request. If the transport layer is
+to use its reliable transmission mode while sending the request. If the transport layer is
 already inherently reliably, this flag has no effect; but over UDP/DTLS, the RFC 7252 messaging
 implementation will use a confirmable (`CON`) message rather than a non-confirmable (`NON`).
 
