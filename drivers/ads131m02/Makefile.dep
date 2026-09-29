@@ -1,0 +1,16 @@
+FEATURES_REQUIRED += periph_spi
+USEMODULE += xtimer
+
+# it is theoretically possible to use the driver without DMA,
+# but not recommended because higher sampling rates are not achievable without it.
+FEATURES_OPTIONAL += periph_spi_dma
+
+ifneq (,$(filter ads131m02_irq,$(USEMODULE)))
+  FEATURES_REQUIRED += periph_gpio_irq
+  FEATURES_REQUIRED += periph_dma
+endif
+
+ifneq (,$(filter ads131m02_event,$(USEMODULE)))
+  FEATURES_REQUIRED += periph_gpio_event
+  FEATURES_REQUIRED += periph_dma_event
+endif

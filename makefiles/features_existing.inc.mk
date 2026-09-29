@@ -146,6 +146,7 @@ FEATURES_EXISTING := \
     no_idle_thread \
     periph_adc \
     periph_adc_continuous \
+    periph_adc_dma \
     periph_aead_aes_128_ccm \
     periph_can \
     periph_cipher_aes_128_cbc \
@@ -157,11 +158,13 @@ FEATURES_EXISTING := \
     periph_dac \
     periph_dac_play \
     periph_dma \
+    periph_dma_event \
     periph_ecc_ed25519 \
     periph_ecc_p192r1 \
     periph_ecc_p256r1 \
     periph_eeprom \
     periph_eth \
+    periph_event \
     periph_flashpage \
     periph_flashpage_aux \
     periph_flashpage_in_address_space \
@@ -174,6 +177,7 @@ FEATURES_EXISTING := \
     periph_fmc_sdram \
     periph_freqm \
     periph_gpio \
+    periph_gpio_event \
     periph_gpio_fast_read \
     periph_gpio_irq \
     periph_gpio_ll \
@@ -238,6 +242,7 @@ FEATURES_EXISTING := \
     periph_sdmmc_mmc \
     periph_sdmmc_sdhc \
     periph_spi \
+    periph_spi_dma \
     periph_spi_gpio_mode \
     periph_spi_on_qspi \
     periph_spi_reconfigure \
