@@ -172,7 +172,7 @@ if ((res = unicoap_send_request_async(&request, &destination, _on_response, NULL
 
 Finally, we specify a function that is going to handle response. We're going to implement
 `_on_response` next.
-`_on_response` will take three arguments: the response, auxiliary information like the server
+address, and an error argument. Always first check if it is nonzero and bail out if so.
 address, and an error argument. Check if it is nonzero and bail out if so.
 
 ```c
