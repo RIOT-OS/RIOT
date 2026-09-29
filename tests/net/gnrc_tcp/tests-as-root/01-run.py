@@ -148,7 +148,7 @@ def test_gnrc_tcp_garbage_packets_short_payload(child):
 def test_gnrc_tcp_garbage_packets_short_header(child):
     """Verify fix for malformed TCP header.
 
-    See https://github.com/RIOT-OS/RIOT/issues/12086.
+    See https://github.com/RIOT-OS/RIOT/issues/12086
     """
     # Setup RIOT as server
     with RiotTcpServer(child, generate_port_number()) as riot_srv:
@@ -223,7 +223,7 @@ def test_gnrc_tcp_garbage_packets_ack_instead_of_sym(child):
 def test_gnrc_tcp_garbage_packets_option_parsing(child):
     """Verify that malformed options do not break `gnrc_tcp`.
 
-    See https://github.com/RIOT-OS/RIOT/issues/12086.
+    See https://github.com/RIOT-OS/RIOT/issues/12086
     """
     # Setup RIOT as server
     with RiotTcpServer(child, generate_port_number()) as riot_srv:
