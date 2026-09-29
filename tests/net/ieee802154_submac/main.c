@@ -26,6 +26,7 @@
 #include "net/netdev.h"
 #include "shell.h"
 #include "net/ieee802154/submac.h"
+#include "net/ieee802154_timings.h"
 #include "net/ieee802154.h"
 #include "net/netdev/ieee802154_submac.h"
 #include "net/l2util.h"
