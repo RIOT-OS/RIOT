@@ -28,15 +28,15 @@ extern "C" {
 
 /** gpio_mode_t but with the addition of PIO pins */
 typedef enum {
-    GPIO_IN,                /**< configure as input without pull resistor */
-    GPIO_IN_PD,             /**< configure as input with pull-down resistor */
-    GPIO_IN_PU,             /**< configure as input with pull-up resistor */
-    GPIO_OUT,               /**< configure as output in push-pull mode */
-    GPIO_OD,                /**< configure as output in open-drain mode without
+    GPIO_IN,    /**< configure as input without pull resistor */
+    GPIO_IN_PD, /**< configure as input with pull-down resistor */
+    GPIO_IN_PU, /**< configure as input with pull-up resistor */
+    GPIO_OUT,   /**< configure as output in push-pull mode */
+    GPIO_OD,    /**< configure as output in open-drain mode without
                              *   pull resistor */
-    GPIO_OD_PU,              /**< configure as output in open-drain mode with
+    GPIO_OD_PU, /**< configure as output in open-drain mode with
                              *   pull resistor enabled */
-    GPIO_PIO0,               /**< configure pin for PIO usage */
+    GPIO_PIO0,  /**< configure pin for PIO usage */
     GPIO_PIO1
 } gpio_mode_t;
 

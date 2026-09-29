@@ -27,7 +27,7 @@ extern "C" {
 /** TABLE 37, 1 if not full */
 #define SIO_FIFO_SEND_READY_BIT 1
 /** PSM bit for core 1 */
-#define core1_psm_bit 24
+#define core1_psm_bit           24
 
 /**
  * @brief Stack size for core 1

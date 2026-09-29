@@ -5,33 +5,36 @@
  */
 
 #include "compat_layer.h"
-#include "periph_cpu.h"
 #include "multicore.h"
+#include "periph_cpu.h"
 
-extern uint32_t _estack;  /* End of stack based on cortex_m.ld */
+extern uint32_t _estack; /* End of stack based on cortex_m.ld */
 extern uint32_t _sstack; /* Start of stack based on cortex_m.ld */
 
-void core1_reset(void) {
+void core1_reset(void)
+{
     /* We force core1 off via the PSM, this also puts it into reset */
-    atomic_set(&PSM->FRCE_OFF, 1<<core1_psm_bit);
+    atomic_set(&PSM->FRCE_OFF, 1 << core1_psm_bit);
 }
 
-void _core1_trampoline(void) {
+void _core1_trampoline(void)
+{
     rp_arch_init();
 
-    uint32_t* core_1_stack_as_u32 = (uint32_t*) (uintptr_t) core_1_stack;
-    core_1_fn_t function = (core_1_fn_t) core_1_stack_as_u32[0];
-    void *arg = (void *) core_1_stack_as_u32[1];
+    uint32_t *core_1_stack_as_u32 = (uint32_t *)(uintptr_t)core_1_stack;
+    core_1_fn_t function = (core_1_fn_t)core_1_stack_as_u32[0];
+    void *arg = (void *)core_1_stack_as_u32[1];
     (*function)(arg);
 }
 
-void core1_init(core_1_fn_t function, void *arg) {
+void core1_init(core_1_fn_t function, void *arg)
+{
     /* First we need to get core1 online (See 5.3)
      * for that we need to get it out of reset (See 7.4.4)
      * this allows proc1 to power on */
     atomic_set(&PSM->FRCE_ON, (1 << core1_psm_bit));
     /* Check whether PSM Done is set (See Table 533 / 7.4.4) */
-    while (~PSM->DONE & 1<<core1_psm_bit) {
+    while (~PSM->DONE & 1 << core1_psm_bit) {
         /* Wait for the reset to complete */
     }
 
@@ -44,18 +47,18 @@ void core1_init(core_1_fn_t function, void *arg) {
      * we can see that we simply have to pass a data struct
      * I still can't find the exact reason for the first 3 values though?
      */
-   const uint32_t cmd_sequence[] = {
+    const uint32_t cmd_sequence[] = {
         0,
         0,
-        1,        /* Get the vector table pointer, this is needed to set the VTOR register on core1 */
-        (uint32_t) rp_get_vector_poiner(),        /*
+        1, /* Get the vector table pointer, this is needed to set the VTOR register on core1 */
+        (uint32_t)rp_get_vector_poiner(), /*
          * We allocate a stack "locally" instead of in the linker script
          * since that would require changes to the base cortexm script
          * which sound complicated to do on a per-cpu basis
          */
-        (uint32_t) &core_1_stack[0],
+        (uint32_t)&core_1_stack[0],
         /* Pointer to main function for core1 */
-        (uint32_t) _core1_trampoline,
+        (uint32_t)_core1_trampoline,
     };
 
     /*
@@ -63,8 +66,8 @@ void core1_init(core_1_fn_t function, void *arg) {
      * and arguments to the second, so we can later
      * pop them via the core1 trampoline
      */
-    core_1_stack[0] = (uint32_t) function;
-    core_1_stack[1] = (uint32_t) arg;
+    core_1_stack[0] = (uint32_t)function;
+    core_1_stack[1] = (uint32_t)arg;
 
     uint32_t seq = 0;
     /* We iterate through the cmd_sequence till we covered every param
@@ -83,8 +86,8 @@ void core1_init(core_1_fn_t function, void *arg) {
              * fifo_rvalid checks whether the RX FIFO is empty and then the value
              * gets discarded (called multicore_fifo_drain in chapter 5.3)
              */
-            while (SIO->FIFO_ST & 1<<SIO_FIFO_READ_VALID_BIT) {
-                (void) SIO->FIFO_RD; /* Table 39 FIFO_RD */
+            while (SIO->FIFO_ST & 1 << SIO_FIFO_READ_VALID_BIT) {
+                (void)SIO->FIFO_RD; /* Table 39 FIFO_RD */
             };
 
             /* SEV -> Set Event
@@ -93,12 +96,12 @@ void core1_init(core_1_fn_t function, void *arg) {
              * is waiting for FIFO space. Though, as I understand it, this shouldn't technically
              * happen since we don't dynamically re-enable core1 (yet :D)
              */
-             rp_unblock_core();
+            rp_unblock_core();
         }
 
         /* This is eq. to the SDK multicore_fifo_push_blocking_inline */
         /* Check whether queue is full */
-        while (!(SIO->FIFO_ST & 1<<SIO_FIFO_SEND_READY_BIT)) {
+        while (!(SIO->FIFO_ST & 1 << SIO_FIFO_SEND_READY_BIT)) {
             /* Wait for queue space */
         }
         /* Write data since we know we have space */
@@ -108,13 +111,13 @@ void core1_init(core_1_fn_t function, void *arg) {
 
         /* This is eq. to the SDK multicore_fifo_pop_blocking_inline */
         /* We check whether there are events... */
-        while (!(SIO->FIFO_ST & 1<<SIO_FIFO_READ_VALID_BIT)) {
+        while (!(SIO->FIFO_ST & 1 << SIO_FIFO_READ_VALID_BIT)) {
             /* ...if not we simply wait.
              * Fun Fact: it appears like WFE (Wait For Evaint) is not optional
              * in this scenario as not using WFE causes a double fault crash.
              * https://developer.arm.com/documentation/dui0552/a/the-cortex-m3-instruction-set/miscellaneous-instructions/wfe
              */
-             rp_block_core();
+            rp_block_core();
         };
 
         /* Get the event since this is our response */

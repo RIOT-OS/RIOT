@@ -17,85 +17,86 @@
  */
 
 #include <stdint.h>
+
 #include "macros/units.h"
 
 /** 1-15 MHz range
  * @see hardware/regs/xosc.h and chapter 8.2.8
  */
-#define XOSC_CTRL_FREQ_RANGE_VALUE_1_15MHZ 0xaa0u
+#define XOSC_CTRL_FREQ_RANGE_VALUE_1_15MHZ   0xaa0u
 /** 10-30 MHz range */
-#define XOSC_CTRL_FREQ_RANGE_VALUE_10_30MHZ 0xaa1u
+#define XOSC_CTRL_FREQ_RANGE_VALUE_10_30MHZ  0xaa1u
 /** 25-60 MHz range */
-#define XOSC_CTRL_FREQ_RANGE_VALUE_25_60MHZ 0xaa2u
+#define XOSC_CTRL_FREQ_RANGE_VALUE_25_60MHZ  0xaa2u
 /** 40-100 MHz range */
 #define XOSC_CTRL_FREQ_RANGE_VALUE_40_100MHZ 0xaa3u
 /** Disable the XOSC */
-#define XOSC_CTRL_ENABLE_VALUE_DISABLE 0xd1eu
+#define XOSC_CTRL_ENABLE_VALUE_DISABLE       0xd1eu
 /** Enable the XOSC */
-#define XOSC_CTRL_ENABLE_VALUE_ENABLE 0xfabu
+#define XOSC_CTRL_ENABLE_VALUE_ENABLE        0xfabu
 /** LSB of the enable bit */
-#define XOSC_CTRL_ENABLE_LSB 12u
+#define XOSC_CTRL_ENABLE_LSB                 12u
 /** Stable bit in the XOSC status register */
-#define XOSC_STATUS_STABLE_BITS 0x80000000u
+#define XOSC_STATUS_STABLE_BITS              0x80000000u
 /** Default crystal frequency is 12 MHz */
-#define XOSC_HZ MHZ(12u)
+#define XOSC_HZ                              MHZ(12u)
 /** Reference divider for the PLL, set to 2 as per hardware manual */
-#define PLL_REF_DIV 2u
+#define PLL_REF_DIV                          2u
 /** VCO frequency for the PLL, set to 750 MHz as per hardware manual */
-#define PLL_VCO_FREQ 750000000u
+#define PLL_VCO_FREQ                         750000000u
 /** Post divider 1 for the PLL, set to 6 as per hardware manual */
-#define PLL_PD1 6u
+#define PLL_PD1                              6u
 /** Post divider 2 for the PLL, set to 2 as per hardware manual */
-#define PLL_PD2 2u
+#define PLL_PD2                              2u
 /** Power down bits for the PLL */
-#define PLL_PWR_PD_BITS 0x00000001u
+#define PLL_PWR_PD_BITS                      0x00000001u
 /** VCO power down bits for the PLL */
-#define PLL_PWR_VCOPD_BITS 0x00000020u
+#define PLL_PWR_VCOPD_BITS                   0x00000020u
 /** Lock bit in the PLL control status register */
-#define PLL_CS_LOCK_BITS 0x80000000u
+#define PLL_CS_LOCK_BITS                     0x80000000u
 /** LSB of the post divider 1 in the PLL primary register */
-#define PLL_PRIM_POSTDIV1_LSB 16u
+#define PLL_PRIM_POSTDIV1_LSB                16u
 /** LSB of the post divider 2 in the PLL primary register */
-#define PLL_PRIM_POSTDIV2_LSB 12u
+#define PLL_PRIM_POSTDIV2_LSB                12u
 /** Post divider power down bits for the PLL */
-#define PLL_PWR_POSTDIVPD_BITS 0x00000008u
+#define PLL_PWR_POSTDIVPD_BITS               0x00000008u
 /** Enable bit for the peripheral clock control register */
-#define CLK_PERI_CTRL_ENABLE_BIT (1u << 11u)
+#define CLK_PERI_CTRL_ENABLE_BIT             (1u << 11u)
 /** Default CPU frequency in Hz, set to 125 MHz as per hardware manual */
-#define CPUFREQ 125000000u
+#define CPUFREQ                              125000000u
 /** Maximum crystal frequency */
-#define CLOCK_XOSC_MAX MHZ(15u)
+#define CLOCK_XOSC_MAX                       MHZ(15u)
 /** Minimum crystal frequency */
-#define CLOCK_XOSC_MIN MHZ(5u)
+#define CLOCK_XOSC_MIN                       MHZ(5u)
 /** Crystal frequency */
-#define CLOCK_XOSC (XOSC_HZ)
+#define CLOCK_XOSC                           (XOSC_HZ)
 /** Minimum value of the post PLL clock divers */
-#define PLL_POSTDIV_MIN 1u
+#define PLL_POSTDIV_MIN                      1u
 /** Maximum value of the post PLL clock divers */
-#define PLL_POSTDIV_MAX 7u
+#define PLL_POSTDIV_MAX                      7u
 /** Minimum value of the PLL VCO feedback scaler */
-#define PLL_VCO_FEEDBACK_SCALE_MIN 16u
+#define PLL_VCO_FEEDBACK_SCALE_MIN           16u
 /** Maximum value of the PLL VCO feedback scaler */
-#define PLL_VCO_FEEDBACK_SCALE_MAX 320u
+#define PLL_VCO_FEEDBACK_SCALE_MAX           320u
 /** Minimum value of the clock divider applied before
  * feeding in the reference clock into the PLL */
-#define PLL_REF_DIV_MIN 1u
+#define PLL_REF_DIV_MIN                      1u
 /** Minimum value of the clock divider applied before feeding in
  *  the reference clock into the PLL */
-#define PLL_REF_DIV_MAX 1u
+#define PLL_REF_DIV_MAX                      1u
 /** PLL feedback divider value, set to 125 as per hardware manual */
-#define PLL_FEEDBACK_DIVIDER_VALUE 125u
+#define PLL_FEEDBACK_DIVIDER_VALUE           125u
 /** Enable bit for the system clock control register to select the peripheral
  * clock */
-#define CLK_SYS_PERI_CTRL_ENABLE_BIT (1u << 0u)
+#define CLK_SYS_PERI_CTRL_ENABLE_BIT         (1u << 0u)
 /** Selected field value for the system clock control register
  * to select the peripheral clock */
-#define CLK_SYS_SELECTED_PERI_FIELD_VALUE 2u
+#define CLK_SYS_SELECTED_PERI_FIELD_VALUE    2u
 /** RIOT core clock frequency defined as the CPU frequency */
-#define CLOCK_CORECLOCK MHZ(12u)
+#define CLOCK_CORECLOCK                      MHZ(12u)
 
 #if (PLL_VCO_FEEDBACK_SCALE_MIN < PLL_VCO_FEEDBACK_SCALE_MIN) || \
-(PLL_VCO_FEEDBACK_SCALE_MAX > PLL_VCO_FEEDBACK_SCALE_MAX)
+    (PLL_VCO_FEEDBACK_SCALE_MAX > PLL_VCO_FEEDBACK_SCALE_MAX)
 #  error "Value for PLL_VCO_FEEDBACK_SCALE out of range, check config"
 #endif
 #if (PLL_REF_DIV_MIN < PLL_REF_DIV_MIN) || (PLL_REF_DIV_MAX > PLL_REF_DIV_MAX)
@@ -109,7 +110,7 @@
 #endif
 
 /** Post divider for the PLL, calculated based on the post divider values */
-#define PDIV ((PLL_PD1 << PLL_PRIM_POSTDIV1_LSB) | (PLL_PD2 << PLL_PRIM_POSTDIV2_LSB))
+#define PDIV  ((PLL_PD1 << PLL_PRIM_POSTDIV1_LSB) | (PLL_PD2 << PLL_PRIM_POSTDIV2_LSB))
 /** Feedback divider for the PLL, calculated based on the VCO frequency and
 * reference clock frequency */
 #define FBDIV ((PLL_VCO_FREQ / XOSC_HZ) / PLL_REF_DIV)

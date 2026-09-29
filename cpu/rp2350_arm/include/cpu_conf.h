@@ -20,9 +20,9 @@
 #include "cpu_conf_common.h"
 
 #define CPU_DEFAULT_IRQ_PRIO 1u
-#define CPU_IRQ_NUMOF 52u
+#define CPU_IRQ_NUMOF        52u
 /** This tells rp2350_common that we are using the ARM core */
-#define RP2350_USE_ARM 1
+#define RP2350_USE_ARM       1
 
 #ifdef __cplusplus
 extern "C" {
