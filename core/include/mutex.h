@@ -111,28 +111,15 @@ typedef struct {
  * @brief Static initializer for mutex_t.
  * @details This initializer is preferable to mutex_init().
  */
-#  define MUTEX_INIT \
-      { \
-          .queue = {.next = NULL } \
-      }
+#  define MUTEX_INIT { .queue = { .next = NULL } }
 
 /**
  * @brief Static initializer for mutex_t with a locked mutex
  */
-#  define MUTEX_INIT_LOCKED \
-      { \
-          .queue = {.next = MUTEX_LOCKED } \
-      }
+#  define MUTEX_INIT_LOCKED { .queue = { .next = MUTEX_LOCKED } }
 #else
-#  define MUTEX_INIT \
-      { \
-      }
-#  define MUTEX_INIT_LOCKED \
-      { \
-          { \
-              MUTEX_LOCKED \
-          } \
-      }
+#  define MUTEX_INIT {}
+#  define MUTEX_INIT_LOCKED { { MUTEX_LOCKED } }
 #endif /* __cplusplus */
 
 /**
