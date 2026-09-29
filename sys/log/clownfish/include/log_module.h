@@ -112,6 +112,11 @@
 #    define _LOG_THREAD ""
 #  endif
 
+/* Provide experimental fprint, eprint, print, fprintln, eprintln, println
+ * macros that route to fprintf or fputs depending on whether you pass
+ * a format string or not to avoid printf overhead. */
+
+/* Step 1: Define two implementation with same macro signature. */
 #  define _fprint_(stream, fmt, ...)    fprintf(stream, fmt, ##__VA_ARGS__)
 #  define _fprint_noformat(stream, str) fputs(str, stream)
 
@@ -122,14 +127,21 @@
     _31, _32, _33, _34, _35, _36, _37, _38, _39, _3a, _3b, _3c, _3d, _3e, _3f, \
     N, ...) N
 
-#define __fprint_is_noformat(...) __fprint_get_macro( \
-        dummy, ##__VA_ARGS__,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,noformat)
+/* Step 2: Call _fprint_noformat or _fprintf_ depending on whether there's
+ * a single argument or more, which is the format case. */
+#  define _fprint(stream, s, ...) CONCAT(_fprint_, \
+      __fprint_get_macro(dummy,\
+        ##__VA_ARGS__,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,\,,,,,,,,,,,,,,,,,,,,,,,,,,noformat) \
+    )(stream, s, ##__VA_ARGS__)
 
-#  define _fprint(stream, s, ...) CONCAT(_fprint_, __fprint_is_noformat(__VA_ARGS__))(stream, s, ##__VA_ARGS__)
+/* Step 3: Define convenience print functions that route to stdout and stderr */
 #  define _print(s, ...) _fprint(stdout, s, ##__VA_ARGS__)
+#  define _eprint(s, ...) _fprint(stderr, s, ##__VA_ARGS__)
 
+/* Step 3: Define convenience println functions that route to stdout and stderr */
 #  define _fprintln(stream, s, ...) _fprint(stream, s "\n", ##__VA_ARGS__)
 #  define _println(s, ...) _fprintln(stdout, s, ##__VA_ARGS__)
+#  define _eprintln(s, ...) _fprintln(stderr, s, ##__VA_ARGS__)
 
 #  define log_write(level, unit, ...) do { \
     _clownfish_print_prologue( \
