@@ -21,8 +21,9 @@
  *
  * @note This module also initializes bplib's time module. When using the
  *       provided @ref pkg_bplib_fwp, the walltime is expected to be correct
- *       during the whole lifetime of bplib, as soon as the init call is made.
- *       If you can determine when a clock value is invalid and when it is valid,
+ *       during the whole lifetime of bplib, as soon as the init call is made,
+ *       when the `bplib_walltime_available` module is used.
+ *       If the clock is invalid for certain times only,
  *       you can use a custom FWP and change the BPA_TIMEP_GetHostClockState
  *       return value accordingly.
  *

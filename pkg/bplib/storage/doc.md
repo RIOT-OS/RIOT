@@ -21,24 +21,21 @@ The core usage of bplib *requires* the following functions to be implemented:
   Store the given bundle in the storage. Don't forget to call
   `BPLib_MEM_BundleFree()` in here once persistent. Also the AS could be
   incremented if used at all.
-- `BPLib_Status_t BPLib_STOR_EgressForID(BPLib_Instance_t* Inst, uint32_t EgressID, bool LocalDelivery, size_t* NumEgressed)`:
-  Retrieve bundles from the storage for the channel (when LocalDelivery = true)
-  or contact (when LocalDelivery = false) at table index EgressID.
-  NumEgressed should be updated to the number of egressed bundles.
+- `BPLib_Status_t BPLib_STOR_Egress(BPLib_Instance_t* Inst, size_t MaxBundles)`:
+  Retrieve bundles from the storage for all channels and contacts, but at most
+  MaxBundles.
 
 Actual egress has to be done like this. Refer to vfs storage backend for
 an example:
 
-1. Find a bundle matching the EID of the target channel / contact.
-2. Allocate this in bplib's memory using `BPLib_MEM_BlockAlloc()` and fill the
+1. For all the channels and contacts:
+2. Find a bundle matching the EID of the target channel / contact.
+3. Allocate this in bplib's memory using `BPLib_MEM_BlockAlloc()` and fill the
    saved data.
-3. Use `BPLib_QM_WaitQueueTryPush()` to put the bundle in the channel / contact
+4. Use `BPLib_QM_WaitQueueTryPush()` to put the bundle in the channel / contact
    queue. If this fails deallocate with `BPLib_MEM_BundleFree()`.
-4. Delete the bundle from the storage *here already*. As of right now there is
-   no custody transfer and bplib has no option to tell the BPA that the bundle
-   was *actually* sent out. This means this *could* lead to bundle loss in a
-   power off here (graceful shutdown does handle this case though).
-5. Optionally repeat from 1 to egress more than one bundle.
+5. Delete the bundle from the storage here already if it is no custodial bundle.
+6. Optionally repeat from 1 to egress more than one bundle.
 
 Additionally, functions that are also defined in the original bplib SQLite
 storage, but are only called by a user, which *can* be implemented:
@@ -48,10 +45,9 @@ only wrote to SQLite once this function was called, which happened regularly in
 the example implementation. You probably won't need this unless you want such a
 behavior.
 
-`BPLib_STOR_GarbageCollect`: When called by the user, should delete expired as
-well as egressed bundles (if the `BPLib_STOR_EgressForID` only set a egressed
-flag but did not delete the bundle). In the case of unknown absolute time it is
-hard to track when a bundle truly expired.
+`BPLib_STOR_GarbageCollect`: Called periodically, should delete expired bundles.
+In the case of unknown absolute time it is hard to track when a bundle truly
+expired across restarts.
 
 ## Predefined backends
 
@@ -60,10 +56,13 @@ hard to track when a bundle truly expired.
 
 `BPLib_STOR_StoreBundle` does not store anything, and just frees the bundle.
 
-`BPLib_STOR_EgressForID` does never find any bundle and returns.
+`BPLib_STOR_Egress` does never find any bundle and returns.
 
 This means, due to the architecture of bplib's router, if no channel or contact
 is ready to take data directly (is in started state), the bundle will be dropped.
+
+@note Custodial bundles will also never arrive because they will only be sent
+      *after* being in storage, which never happens here.
 
 ### VFS Storage - Unordered Egress
 `bplib_stor_vfs_unordered` module.
