@@ -153,8 +153,8 @@ state object representation. Notifications are sent using @ref unicoap_messaging
 and @ref unicoap_exchange_notify. The notification system serves two purposes.
 
 First, it informs the respective other layer about the allocation and release of owned state
-objects, such that a layer A can decide whether it should also release state given
-that layer B has just release a state object associated with a state object on layer A.
+objects, such that a layer A can decide whether it should also release state when
+layer B has just released a state object associated with a state object on layer A.
 Each layer may keep references to state objects allocated in the
 respective other layer --- this ought to be an opaque reference (`void*`) in most instances.
 Generally, layers are not expected to know the memory layout and interface needed to control
