@@ -32,6 +32,8 @@
 #include "mutex.h"
 #include "vfs.h"
 
+#include "bplib_init.h"
+
 #include "bplib.h"
 
 #include "cache.h"
@@ -40,10 +42,12 @@ static mutex_t caches_lock = MUTEX_INIT;
 static cache_list_t contact_caches[BPLIB_MAX_NUM_CONTACTS];
 static cache_list_t channel_caches[BPLIB_MAX_NUM_CHANNELS];
 
+// TODO: split this file up into store and load at least
+
 /** @brief If the bundle is a custodial bundle */
 #define STORAGE_HEADER_FLAG_CUSTODIAL       0x01
 /**
- * @brief If retransmissions are turned off 
+ * @brief If retransmissions are turned off
  *
  * This can happen if custody at a next hop was rejected. In that case no
  * retransmissions to the same node are done. This only changes when the CLA
@@ -56,7 +60,7 @@ static cache_list_t channel_caches[BPLIB_MAX_NUM_CHANNELS];
  */
 typedef struct {
     /**
-     * @brief Timestamp in monotonic time after which a retransmit can happen 
+     * @brief Timestamp in monotonic time after which a retransmit can happen
      *
      * This currently does not work with restarts.
      */
@@ -79,16 +83,22 @@ typedef struct __attribute__((packed)) {
 
 /* 16 chars each for 64 bit hex numbers, 1 for all / and the last 1 + 8 + 1 is used
  * for the _[bundle-id] suffix and the null terminator */
-#define BPLIB_STOR_PATHLEN_DAT (BPLIB_STOR_DATA_LEN + 1 + 16 + 1 + 16 + 1 + 16 + 1 + 8 + 1)
+#define BPLIB_STOR_PATHLEN_DAT  (BPLIB_STOR_DATA_LEN + 1 + 16 + 1 + 16 + 1 + 16 + 1 + 8 + 1)
 
 /* 1 for the /, 8 for the 32bit ID and the terminator */
-#define BPLIB_STOR_PATHLEN_IDX (BPLIB_STOR_INDEX_LEN + 1 + 8 + 1)
+#define BPLIB_STOR_PATHLEN_IDX  (BPLIB_STOR_INDEX_LEN + 1 + 8 + 1)
+
+/* Longer of the two (which should be the /dat path) */
+#define BPLIB_STOR_PATHLEN_MAX  MAX(BPLIB_STOR_PATHLEN_DAT, BPLIB_STOR_PATHLEN_IDX)
 
 /* Size of the index file. 3 * uint64_t => 24 */
 #define BUNDLE_STORAGE_INDEX_SIZE       24
 /* Size of a whole bundle is storage. This of course still ignores the directories created etc. */
 #define BUNDLE_STORAGE_USAGE(payload)   (payload + (sizeof(bundle_file_structure_t) - 1) + \
                                          BUNDLE_STORAGE_INDEX_SIZE)
+/* Wrapper for BUNDLE_STORAGE_USAGE to subtract the BPLib_BBlocks_t included in the TotalBytes */
+#define BUNDLE_STORAGE_USAGE_FROM_TOTAL_BYTES(total_bytes)  BUNDLE_STORAGE_USAGE(total_bytes \
+                                                                - sizeof(BPLib_BBlocks_t))
 
 BPLib_Status_t BPLib_STOR_Init(BPLib_Instance_t* inst)
 {
@@ -116,7 +126,7 @@ BPLib_Status_t BPLib_STOR_Init(BPLib_Instance_t* inst)
         return BPLIB_OS_ERROR;
     }
 
-    /* TODOs for future efforts: Iterate over all bundles to: 
+    /* TODOs for future efforts: Iterate over all bundles to:
      * - Read the current storage usage of bundles that remained in storage
      *   acrosss restarts
      * - Somehow build this CTDB from storage bundles. Currently, custodial bundles
@@ -140,17 +150,16 @@ void BPLib_STOR_Destroy(BPLib_Instance_t* inst)
  * If this fails, no index file will have been created (or it has been deleted again).
  *
  * @param[in] bundle Bundle to work with
+ * @param expiration_timestamp Timestamp where the bundle expires
  * @retval 0 on success
  * @retval -ERRNO on vfs errors
  */
-static int _create_index_file(BPLib_Bundle_t* bundle)
+static int _create_index_file(BPLib_Bundle_t* bundle, uint64_t expiration_timestamp)
 {
     char path[BPLIB_STOR_PATHLEN_IDX] = BPLIB_STOR_PATH_INDEX;
     int fd;
     ssize_t written = 0;
     bool failed = false;
-    uint64_t deletion_timestamp = bundle->blocks.PrimaryBlock.Timestamp.CreateTime +
-                                  bundle->blocks.PrimaryBlock.Lifetime;
 
     /* First create the index file / check if it exists */
     sprintf(path + BPLIB_STOR_INDEX_LEN, "/%" PRIx32, bundle->blocks.PrimaryBlock.BundleId);
@@ -171,7 +180,7 @@ static int _create_index_file(BPLib_Bundle_t* bundle)
         goto close_file;
     }
 
-    written = vfs_write(fd, &deletion_timestamp, sizeof(uint64_t));
+    written = vfs_write(fd, &expiration_timestamp, sizeof(uint64_t));
     if (written < 0 || written != (ssize_t) sizeof(uint64_t)) {
         failed = true;
         goto close_file;
@@ -190,19 +199,15 @@ close_file:
 }
 
 /**
- * @brief Delete a bundle from storage
+ * @brief Find the path of the bundle data by the ID
  *
- * Will (try to) delete the index file and the bundle data.
- *
- * If the index file is gone, but the blob is still there, this cannot delete the
- * bundle data.
- *
- * @param bundle_id ID of the bundle
+ * @param bundle_id Bundle ID. An index file with this ID should exist.
+ * @param[out] path_dat Pointer to buffer of size >= BPLIB_STOR_PATHLEN_DAT
+ * @return success indicated by bool. Only on true the path is valid.
  */
-static void _delete_bundle(uint32_t bundle_id)
+static bool _bundle_path_from_id(uint32_t bundle_id, char* path_dat)
 {
     char path_idx[BPLIB_STOR_PATHLEN_IDX] = BPLIB_STOR_PATH_INDEX;
-    char path_dat[BPLIB_STOR_PATHLEN_DAT] = BPLIB_STOR_PATH_DATA;
     ssize_t bytes_read;
     int fd;
     uint64_t node, service, time;
@@ -212,7 +217,7 @@ static void _delete_bundle(uint32_t bundle_id)
     fd = vfs_open(path_idx, O_RDONLY, 0777);
     if (fd < 0) {
         /* Index does not exist */
-        return;
+        return false;
     }
 
     bytes_read = vfs_read(fd, &node, sizeof(uint64_t));
@@ -233,19 +238,52 @@ static void _delete_bundle(uint32_t bundle_id)
         goto close_file;
     }
 
-    // TODO decrease counters IFF the bundles fully lived
-
 close_file:
     vfs_close(fd);
 
     if (!failed) {
-        /* The read results are valid, can delete the data file */
-        sprintf(path_dat + BPLIB_STOR_DATA_LEN, "/%" PRIx64 "/%" PRIx64 "/%" PRIx64 "_%" PRIx32, 
+        sprintf(path_dat, BPLIB_STOR_PATH_DATA "/%" PRIx64 "/%" PRIx64 "/%" PRIx64 "_%" PRIx32,
             node, service, time, bundle_id);
-        vfs_unlink(path_dat);
     }
 
-    vfs_unlink(path_idx);
+    return !failed;
+}
+
+/**
+ * @brief Delete a bundle from storage
+ *
+ * Will (try to) delete the index file and the bundle data.
+ *
+ * If the index file is gone, but the blob is still there, this cannot delete the
+ * bundle data.
+ *
+ * @param bundle_id ID of the bundle
+ */
+static void _delete_bundle(uint32_t bundle_id)
+{
+    char path[BPLIB_STOR_PATHLEN_MAX];
+    int rv;
+    bool success = false;
+    struct stat stat;
+    BPLib_Instance_t* inst = &bplib_instance_data.BPLibInst;
+
+    success = _bundle_path_from_id(bundle_id, path);
+
+    if (success) {
+        /* The read results are valid, can delete the data file */
+        rv = vfs_stat(path, &stat);
+
+        /* Only decrement the storage counters if the data file actually exists. This function
+         * is also called when storing fails, so in this case it should not decrease. */
+        if (rv == 0) {
+            inst->BundleStorage.BytesStorageInUse -= stat.st_size + BUNDLE_STORAGE_INDEX_SIZE;
+            inst->BundleStorage.BundleCountStored--;
+        }
+        vfs_unlink(path);
+    }
+
+    sprintf(path, BPLIB_STOR_PATH_INDEX "/%" PRIx32, bundle_id);
+    vfs_unlink(path);
 }
 
 /**
@@ -280,8 +318,19 @@ static BPLib_Status_t _bplib_stor_impl(BPLib_Instance_t* inst, BPLib_Bundle_t* b
     int fd = -1;
     BPLib_MEM_Block_t* curr_mem_block;
     bundle_file_header_t header;
+    uint64_t expiration_timestamp;
 
-    res_idx = _create_index_file(bundle);
+    if (bundle->blocks.PrimaryBlock.Timestamp.CreateTime == 0) {
+        /* Unknown DTN time */
+        expiration_timestamp = bundle->blocks.PrimaryBlock.Lifetime + BPLib_TIME_GetMonotonicTime();
+    }
+    else {
+        /* Known DTN time */
+        expiration_timestamp = bundle->blocks.PrimaryBlock.Timestamp.CreateTime +
+                               bundle->blocks.PrimaryBlock.Lifetime;
+    }
+
+    res_idx = _create_index_file(bundle, expiration_timestamp);
     if (res_idx != 0) {
         goto end_storage;
     }
@@ -304,9 +353,7 @@ static BPLib_Status_t _bplib_stor_impl(BPLib_Instance_t* inst, BPLib_Bundle_t* b
 
     /* Write bundle */
     len += sprintf(path + len, "/%" PRIx64 "_%" PRIx32,
-        (int64_t) bundle->blocks.PrimaryBlock.Timestamp.CreateTime +
-        (int64_t) bundle->blocks.PrimaryBlock.Lifetime,
-        bundle->blocks.PrimaryBlock.BundleId);
+        expiration_timestamp, bundle->blocks.PrimaryBlock.BundleId);
 
     /* Assume now that the ID does not exist, because it did not exist in the index.
      * If it does wrongly exist, just overwrite it. */
@@ -376,7 +423,7 @@ end_storage:
 
     /* The TotalBytes fields already includes the BPLib_BBlocks_t, don't count it twice */
     inst->BundleStorage.BytesStorageInUse +=
-        BUNDLE_STORAGE_USAGE(bundle->Meta.TotalBytes - sizeof(BPLib_BBlocks_t));
+        BUNDLE_STORAGE_USAGE_FROM_TOTAL_BYTES(bundle->Meta.TotalBytes);
     inst->BundleStorage.BundleCountStored++;
 
     return BPLIB_SUCCESS;
@@ -400,7 +447,7 @@ static void _bplib_stor_finalize_custody(BPLib_Instance_t* inst, BPLib_Bundle_t*
     (void) BPLib_CLA_GetContactRunState(bundle->Meta.EgressID, &con_state);
     if (bundle->Meta.EgressID < BPLIB_MAX_NUM_CONTACTS &&
         con_state == BPLIB_CLA_STARTED && disp_code == BPLib_CT_CustodyAccepted) {
-        pushed_bundle = BPLib_QM_WaitQueueTryPush(&(inst->ContactEgressJobs[bundle->Meta.EgressID]), 
+        pushed_bundle = BPLib_QM_WaitQueueTryPush(&(inst->ContactEgressJobs[bundle->Meta.EgressID]),
                                     &bundle, QM_WAIT_FOREVER);
     }
     /* There's no egress path, free memory */
@@ -417,13 +464,20 @@ static void _bplib_stor_finalize_custody(BPLib_Instance_t* inst, BPLib_Bundle_t*
 
 BPLib_Status_t BPLib_STOR_StoreBundle(BPLib_Instance_t* inst, BPLib_Bundle_t* bundle)
 {
-    // TODO add size check (ll 284 in bplib_stor.c) and update the size counter correctly
-    BPLib_Status_t status;
+    if (inst->BundleStorage.BytesStorageInUse
+        + BUNDLE_STORAGE_USAGE_FROM_TOTAL_BYTES(bundle->Meta.TotalBytes)
+        >= BPLIB_MAX_STORED_BUNDLE_BYTES) {
+        BPLib_AS_Increment(BPLIB_EID_INSTANCE, BUNDLE_COUNT_DELETED_NO_STORAGE, 1);
+        BPLib_AS_Increment(BPLIB_EID_INSTANCE, BUNDLE_COUNT_DELETED, 1);
+        BPLib_AS_Increment(BPLIB_EID_INSTANCE, BUNDLE_COUNT_DISCARDED, 1);
 
-    // This should be on the else branch of the above already.
+        BPLib_MEM_BundleFree(&(inst->pool), bundle);
 
-    status = _bplib_stor_impl(inst, bundle);
-    
+        return BPLIB_NO_STOR_ERR;
+    }
+
+    BPLib_Status_t status = _bplib_stor_impl(inst, bundle);
+
     /* Free bundle since it is now persistent. Custodial bundles should not be
      * freed. This is copied from the bplib storage implementation. */
     if (!bundle->Meta.IsCustodial) {
@@ -662,9 +716,6 @@ static int _next_bundle_path(bundle_path_iterator_t* iterator,
         if (iterator->expiry_val <= (uint64_t) BPLib_TIME_GetMonotonicTime()) {
             continue;
         }
-        // TODO test how this behaves with restarts
-        // preliminary answer: not great, but bplib currently cannot handle restarts
-        // + custody anyways.
 
         acc_len = BPLIB_STOR_DATA_LEN + 1 + iterator->node_len + 1 + iterator->service_len;
         snprintf(iterator->path + acc_len,
@@ -727,7 +778,7 @@ static int _should_bundle_be_loaded(bundle_path_iterator_t* iter, bool local_del
         /* Always load local delivery bundles*/
         res = 1;
     }
-    
+
 
 close_file:
     fd = vfs_close(fd);
@@ -776,6 +827,11 @@ static void _fill_bundle_cache(const BPLib_EID_Pattern_t* dest_eids,
                 /* Some bundle is now not in cache anymore */
                 cache->all_bundles_queued = false;
             }
+
+            /* TODO for future efforts: Add early return option so that not all
+             * bundles in storage are searched and ordered, but only N, where N
+             * is the size of the cache. This should speed up egress, while
+             * giving up on the orderedness. */
         }
         else {
             if (res != 1) {
@@ -893,7 +949,7 @@ close_file:
 }
 
 /**
- * @brief Update the retransmission timestamp of the custodial bundle at path 
+ * @brief Update the retransmission timestamp of the custodial bundle at path
  *
  * The next retransmission will happen NOT BEFORE the current time +
  * retrans_interval [ms]. One exception to this is the case where retrans_interval
@@ -908,28 +964,69 @@ close_file:
 static bool _update_retransmission_time(const char* path, uint32_t retrans_interval)
 {
     int fd;
-    ssize_t written;
+    ssize_t status;
     uint64_t next_retransmission;
+    uint8_t flags;
     bool res = true;
+    bool flags_changed = false;
 
     fd = vfs_open(path, O_RDWR, 0777);
     if (fd < 0) {
         return false;
     }
 
-    // TODO case retrans_interval == 0. Also unset flag in non zero case
+    status = vfs_lseek(fd, offsetof(bundle_file_structure_t, header.flags), SEEK_SET);
+    if (status < 0) {
+        res = false;
+        goto close_file;
+    }
+
+    status = vfs_read(fd, &flags, sizeof(uint8_t));
+    if (status < 0 || status != sizeof(uint8_t)) {
+        res = false;
+        goto close_file;
+    }
+
     if (retrans_interval != 0) {
-        written = vfs_lseek(fd, offsetof(bundle_file_structure_t, header.retransmit_timestamp),
+        status = vfs_lseek(fd, offsetof(bundle_file_structure_t, header.retransmit_timestamp),
                             SEEK_SET);
-        if (written < 0) {
+        if (status < 0) {
             res = false;
             goto close_file;
-        }                
+        }
 
         next_retransmission = retrans_interval + BPLib_TIME_GetMonotonicTime();
 
-        written = vfs_write(fd, &next_retransmission, sizeof(uint64_t));
-        if (written < 0 || written != (ssize_t) sizeof(uint64_t)) {
+        status = vfs_write(fd, &next_retransmission, sizeof(uint64_t));
+        if (status < 0 || status != (ssize_t) sizeof(uint64_t)) {
+            res = false;
+            goto close_file;
+        }
+
+        /* Retransmissions are currently off => Turn them on */
+        if (flags & STORAGE_HEADER_FLAG_RETRANS_OFF) {
+            flags &= ~STORAGE_HEADER_FLAG_RETRANS_OFF;
+            flags_changed = true;
+        }
+    }
+    else {
+        /* Retransmissions are currently on => Turn them off */
+        if (!(flags & STORAGE_HEADER_FLAG_RETRANS_OFF)) {
+            flags |= STORAGE_HEADER_FLAG_RETRANS_OFF;
+            flags_changed = true;
+        }
+    }
+
+    /* Write back flags, common for both, but only if the flags changed */
+    if (flags_changed) {
+        status = vfs_lseek(fd, offsetof(bundle_file_structure_t, header.flags), SEEK_SET);
+        if (status < 0) {
+            res = false;
+            goto close_file;
+        }
+
+        status = vfs_write(fd, &flags, sizeof(uint8_t));
+        if (status < 0 || status != (ssize_t) sizeof(uint8_t)) {
             res = false;
             goto close_file;
         }
@@ -1055,7 +1152,13 @@ BPLib_Status_t BPLib_STOR_GarbageCollect(BPLib_Instance_t* inst)
         .MaxService   = 0xFFFFFFFFFFFFFFFF,
     };
 
-    // TODO update GC
+    /* TODO for follow up PR: Update this GC function
+     * It should additionally now
+     * - delete the index files, use _delete_bundle, no direct vfs_unlink here
+     * - integrate other updates to the function from upstream
+     * - check size of files to delete bundles that are less than expected (write failed)
+     * - increment AS on deletion
+     * - handle errors in vfs_read*/
 
     uint64_t time_ref_dtn = BPLib_TIME_GetCurrentDtnTime();
     uint64_t lifetime;
@@ -1081,7 +1184,6 @@ BPLib_Status_t BPLib_STOR_GarbageCollect(BPLib_Instance_t* inst)
             if (fd < 0) {
                 /* Since we just found it by the iterator but it can't seem to open
                  * try to remove it */
-                // TODO delete index file if exists, get id from path
                 vfs_unlink(iterator.path);
                 continue;
             }
@@ -1123,9 +1225,6 @@ BPLib_Status_t BPLib_STOR_GarbageCollect(BPLib_Instance_t* inst)
             break;
         }
     }
-    // TODO add deletion of partial bundles, i.e. bundles where only the metadata
-    // has been written to a file
-    // TODO deletion AS
 
     memset(contact_caches, 0, sizeof(contact_caches));
     memset(channel_caches, 0, sizeof(channel_caches));
@@ -1156,35 +1255,34 @@ BPLib_Status_t BPLib_STOR_StorageTblValidateFunc(void *tbl_data)
     return BPLIB_SUCCESS;
 }
 
-static void _bplib_stor_update_custodial_unlocked(BPLib_Instance_t* inst,
-                                BPLib_STOR_CtUpdateBatch_t* custody_batch)
+static void _bplib_stor_update_custodial_unlocked(BPLib_STOR_CtUpdateBatch_t* custody_batch)
 {
-    BPLib_Status_t status;
+    char path[BPLIB_STOR_PATHLEN_DAT];
 
     for (size_t i = 0; i < custody_batch->Size; i++) {
         if (custody_batch->Ops[i] == BPLIB_CT_MARK_DELETE) {
+            /* This gets called when custody on a next node was accepted */
             _delete_bundle(custody_batch->BundleIDs[i]);
         }
     }
 
     for (size_t i = 0; i < custody_batch->Size; i++) {
-        if (custody_batch->Ops[i] == BPLIB_CT_START_RETRANSMIT) {
-            // TODO Unset STORAGE_HEADER_FLAG_RETRANS_OFF
-            puts("Start retransmit");
+        if (!_bundle_path_from_id(custody_batch->BundleIDs[i], path)) {
+            /* Path could not be loaded, not much we can do. */
+            break;
         }
-        else if (custody_batch->Ops[i] == BPLIB_CT_STOP_RETRANSMIT) {
-            puts("Stop retransmit");
-            // Set STORAGE_HEADER_FLAG_RETRANS_OFF
+
+        if (custody_batch->Ops[i] == BPLIB_CT_STOP_RETRANSMIT) {
+            /* This gets called when custody on a next node was actively rejected,
+             * there is no reason to continue retransmissions to the node.
+             * When a CLA is reconfigured this bundle might be retransmitted again. */
+            _update_retransmission_time(path, 0);
         }
-    }
-
-    (void) status;
-    (void) inst;
-    status = BPLIB_SUCCESS;
-
-    if (status != BPLIB_SUCCESS) {
-        BPLib_EM_SendEvent(BPLIB_STOR_CCS_ERR_EID, BPLib_EM_EventType_ERROR,
-                "Error on CCS storage ops, Status = %d.", status);
+        else if (custody_batch->Ops[i] == BPLIB_CT_START_RETRANSMIT) {
+            /* I am not too sure when this gets called but retransmissen shall
+             * start ASAP again. 1 value to not fall into the 0 case. */
+            _update_retransmission_time(path, 1);
+        }
     }
 
     custody_batch->Size = 0;
@@ -1212,7 +1310,7 @@ void BPLib_STOR_AddToCustodialUpdateBatch(BPLib_Instance_t *inst,
 
     if (custody_batch->Size >= BPLIB_STOR_CT_BATCH_SIZE)
     {
-        _bplib_stor_update_custodial_unlocked(inst, custody_batch);
+        _bplib_stor_update_custodial_unlocked(custody_batch);
     }
 
     mutex_unlock(&(inst->BundleStorage.lock));
@@ -1233,11 +1331,11 @@ void BPLib_STOR_UpdateCustodialBundles(BPLib_Instance_t* inst)
     custody_batch = &(inst->BundleStorage.CustodyUpdateBatch);
 
     if ((custody_batch->Size <= BPLIB_STOR_CT_BATCH_SIZE) && (custody_batch->Size > 0)) {
-        _bplib_stor_update_custodial_unlocked(inst, custody_batch);
+        _bplib_stor_update_custodial_unlocked(custody_batch);
     }
 
     mutex_unlock(&(inst->BundleStorage.lock));
-    
+
     return;
 }
 
@@ -1246,8 +1344,7 @@ BPLib_Status_t BPLib_STOR_SetNewRetransmitTrigger(BPLib_Instance_t *inst,
 {
     /* This function SHOULD update all of the bundles retransmit times and is
      * called when a CLA is setup. In practice this only decreases the time to
-     * the next retransmission, so it is not super important for now. */
-    // TODO
+     * the next retransmission, so it is not super important for now. TODO */
     (void) inst;
     (void) contact_id;
     return BPLIB_SUCCESS;
