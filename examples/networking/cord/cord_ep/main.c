@@ -18,7 +18,6 @@
 #include <stdio.h>
 
 #include "fmt.h"
-#include "shell.h"
 #include "net/ipv6/addr.h"
 #include "net/gcoap.h"
 #include "net/cord/common.h"
@@ -101,9 +100,6 @@ int main(void)
     puts("Client information:");
     printf("  ep: %s\n", cord_common_get_ep());
     printf("  lt: %is\n", (int)CONFIG_CORD_LT);
-
-    char line_buf[SHELL_DEFAULT_BUFSIZE];
-    shell_run(NULL, line_buf, SHELL_DEFAULT_BUFSIZE);
 
     return 0;
 }

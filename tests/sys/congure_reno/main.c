@@ -21,15 +21,10 @@
 
 #include "congure_impl.h"
 
-#define SHELL_BUFSIZE           512U
-
-static char _line_buf[SHELL_BUFSIZE];
-
 static congure_reno_snd_t _congure_state;
 
 int main(void)
 {
-    shell_run(NULL, _line_buf, SHELL_BUFSIZE);
     return 0;
 }
 

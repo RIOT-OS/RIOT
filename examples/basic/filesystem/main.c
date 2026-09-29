@@ -135,8 +135,5 @@ int main(void)
         puts("constfs mounted successfully");
     }
 
-    char line_buf[SHELL_DEFAULT_BUFSIZE];
-    shell_run(NULL, line_buf, SHELL_DEFAULT_BUFSIZE);
-
     return 0;
 }

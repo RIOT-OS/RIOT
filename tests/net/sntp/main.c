@@ -15,14 +15,7 @@
  * @}
  */
 
-#include <stdio.h>
-
-#include "shell.h"
-
-static char line_buf[SHELL_DEFAULT_BUFSIZE];
-
 int main(void)
 {
-    shell_run(NULL, line_buf, SHELL_DEFAULT_BUFSIZE);
     return 0;
 }

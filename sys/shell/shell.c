@@ -1,11 +1,9 @@
 /*
- * Copyright (C) 2009, 2020 Freie Universität Berlin
- * Copyright (C) 2013, INRIA.
- * Copyright (C) 2015 Kaspar Schleiser <kaspar@schleiser.de>
- *
- * This file is subject to the terms and conditions of the GNU Lesser
- * General Public License v2.1. See the file LICENSE in the top level
- * directory for more details.
+ * SPDX-FileCopyrightText: 2009, 2020 Freie Universität Berlin
+ * SPDX-FileCopyrightText: 2013, INRIA
+ * SPDX-FileCopyrightText: 2015 Kaspar Schleiser <kaspar@schleiser.de>
+ * SPDX-FileCopyrightText: 2025 TU Dresden
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
 
 /**
@@ -24,6 +22,7 @@
  * @author      René Kijewski <rene.kijewski@fu-berlin.de>
  * @author      Juan Carrano <j.carrano@fu-berlin.de>
  * @author      Hendrik van Essen <hendrik.ve@fu-berlin.de>
+ * @author      Mikolai Gütschow <mikolai.guetschow@tu-dresden.de>
  *
  * @}
  */
@@ -35,6 +34,8 @@
 #include <stdbool.h>
 #include <assert.h>
 #include <errno.h>
+
+#include "mutex.h"
 
 #include "xfa.h"
 #include "shell.h"
@@ -503,9 +504,29 @@ int shell_readline(char *buf, size_t size)
     }
 }
 
+#ifdef MODULE_AUTO_INIT_SHELL
+/* used to signal whether the shell has already been run in a thread-safe way */
+static mutex_t _run_before = MUTEX_INIT;
+void auto_init_shell(void)
+{
+    /* only run shell if not manually run before */
+    if (!mutex_trylock(&_run_before)) {
+        return;
+    }
+
+    static char line_buf[CONFIG_SHELL_BUFSIZE];
+    shell_run(NULL, line_buf, CONFIG_SHELL_BUFSIZE);
+}
+#endif /* MODULE_AUTO_INIT_SHELL */
+
 void shell_run_once(const shell_command_t *shell_commands,
                     char *line_buf, int len)
 {
+    if (IS_USED(MODULE_AUTO_INIT_SHELL)) {
+        /* signal that the shell has been run to main thread */
+        mutex_trylock(&_run_before);
+    }
+
     if (IS_USED(MODULE_SHELL_LOCK)) {
         shell_lock_checkpoint(line_buf, len);
     }
