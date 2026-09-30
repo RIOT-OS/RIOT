@@ -1,7 +1,6 @@
 # nanoCoAP remote fs example
 
-This allows to mount a remote fs that was exported via e.g. `nanocoap_fileserver`
-or `aiocoap-fileserver`.
+This allows to mount a remote fs that was exported via e.g. `aiocoap-fileserver`.
 
 The test provides a `mount` command to mount a remote fs at a local mount point:
 

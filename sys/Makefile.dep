@@ -449,25 +449,6 @@ ifneq (,$(filter l2filter_%,$(USEMODULE)))
   USEMODULE += l2filter
 endif
 
-ifneq (,$(filter gcoap_fileserver,$(USEMODULE)))
-  USEMODULE += gcoap
-  USEMODULE += nanocoap_fileserver
-endif
-
-ifneq (,$(filter nanocoap_fileserver,$(USEMODULE)))
-  USEMODULE += checksum
-  USEMODULE += vfs
-endif
-
-ifneq (,$(filter nanocoap_fileserver_delete,$(USEMODULE)))
-  USEMODULE += nanocoap_fileserver
-  USEMODULE += vfs_util
-endif
-
-ifneq (,$(filter nanocoap_fileserver_put,$(USEMODULE)))
-  USEMODULE += nanocoap_fileserver
-endif
-
 ifneq (,$(filter gcoap_forward_proxy,$(USEMODULE)))
   USEMODULE += gcoap
   USEMODULE += uri_parser
