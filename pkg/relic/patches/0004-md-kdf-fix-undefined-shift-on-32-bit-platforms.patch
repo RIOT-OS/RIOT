@@ -1,0 +1,32 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: crasbe <crasbe@gmail.com>
+Date: Wed, 30 Sep 2026 12:00:00 +0200
+Subject: [PATCH 4/4] md/kdf: fix undefined shift on 32 bit platforms
+
+Shifting a 32 bit size_t by 32 bits is undefined behavior. Newer compilers
+(e.g. clang 20) exploit this and miscompile nist_kdf() on 32 bit platforms,
+resulting in a segfault. Cast key_len to uint64_t before shifting.
+
+This has to be fixed upstream: https://github.com/relic-toolkit/relic/issues/318
+
+Assisted-by: Claude Code
+---
+ src/md/relic_md_kdf.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/md/relic_md_kdf.c b/src/md/relic_md_kdf.c
+index fc26653..b1aec89 100644
+--- a/src/md/relic_md_kdf.c
++++ b/src/md/relic_md_kdf.c
+@@ -46,7 +46,7 @@ static void nist_kdf(uint8_t *key, size_t key_len, const uint8_t *in,
+ 	uint8_t *buffer = NULL, hash[RLC_MD_LEN];
+ 	size_t out_len = 0;
+ 
+-	if (((key_len >> 32) > RLC_MD_LEN) ||
++	if ((((uint64_t)key_len >> 32) > RLC_MD_LEN) ||
+ 		(in_len + sizeof(uint32_t) < in_len)) {
+ 		RLC_THROW(ERR_NO_VALID);
+ 		return;
+-- 
+2.43.0
+
