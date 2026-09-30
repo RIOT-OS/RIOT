@@ -16,20 +16,20 @@ import sys
 from testrunner import run
 
 
-# Must match RIOT_VERSION_DUMMY_CODE in Makefile.include
-DUMMY_CODE = (2042, 5, 23, 0)
-
-
-def expected_code(version, extra):
+def expected_code(version, extra, dummy):
     """
     Computes the parts of the version code that the build system should
-    generate for the given version string and extra version.
+    generate for the given version string, extra version and comma separated
+    dummy version.
     """
 
     parts = version.split("-", 1)[0].split(".")
 
     if len(parts) < 2 or not all(part.isdigit() for part in parts):
-        return DUMMY_CODE
+        parts = dummy.split("-", 1)[0].split(".")
+
+        if (len(parts) < 2 or not all(part.isdigit() for part in parts)):
+            raise ValueError("RIOT_DUMMY_VERSION is not a valid version.")
 
     major, minor, patch = (int(part) for part in (parts + ["0"])[:3])
 
@@ -39,10 +39,11 @@ def expected_code(version, extra):
 def testfunc(child):
     version = os.environ["RIOT_VERSION"]
     extra = os.environ["RIOT_EXTRAVERSION"]
+    dummy = os.environ["RIOT_DUMMY_VERSION"]
 
     child.expect_exact("RIOT_VERSION: {}".format(version))
     child.expect_exact("RIOT_VERSION_CODE: {}.{}.{}.{}".format(
-        *expected_code(version, extra)))
+        *expected_code(version, extra, dummy)))
 
     child.expect_exact("[SUCCESS]")
 

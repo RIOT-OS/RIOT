@@ -58,7 +58,6 @@ BINDIRBASE                      ?= $(APPDIR)/bin
 PKGDIRBASE                      ?= $(BUILD_DIR)/pkg
 DLCACHE                         ?= $(RIOTTOOLS)/dlcache/dlcache.sh
 DLCACHE_DIR                     ?= $(RIOTBASE)/.dlcache
-RIOT_VERSION_DUMMY_CODE         ?= RIOT_VERSION_NUM\(2042,5,23,0\)
 
 # Resolve potential BOARD alias to canonical name before defining BINDIR
 include $(RIOTMAKE)/board_alias.inc.mk
@@ -469,12 +468,14 @@ include $(RIOTMAKE)/cflags.inc.mk
 
 include $(RIOTMAKE)/git_version.inc.mk
 RIOT_VERSION ?= $(RIOT_VERSION_GIT)
+RIOT_DUMMY_VERSION ?= 2042.5.23
 RIOT_EXTRAVERSION ?= 0
 
-# Generate machine readable RIOT VERSION macro
-RIOT_VERSION_CODE ?= $(shell echo $(RIOT_VERSION) | \
-                      sed -E 's/([0-9]+)\.([0-9]+)\.?([0-9]+)?.*/RIOT_VERSION_NUM\\\(\1,\2,0\3,$(RIOT_EXTRAVERSION)\\\)/' | \
-                      grep RIOT_VERSION_NUM || echo "$(RIOT_VERSION_DUMMY_CODE)")
+# Generate machine readable RIOT_VERSION macro. This will fall-back to
+# RIOT_DUMMY_VERSION if RIOT_VERSION is invalid (e.g. during CI builds).
+RIOT_VERSION_CODE ?= RIOT_VERSION_NUM\($(or \
+  $(call version_tuple,$(RIOT_VERSION)), \
+  $(call version_tuple,$(RIOT_DUMMY_VERSION))),$(RIOT_EXTRAVERSION)\)
 
 # Set module by prepending APPLICATION name with 'application_'.
 # It prevents conflict with application and modules with the same name.

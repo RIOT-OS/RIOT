@@ -18,16 +18,19 @@ make flash test
 Other versions can be tested by overriding the variables:
 
 ```shell
-RIOT_VERSION=2026.10-devel-123-gabcd make flash test
-RIOT_VERSION=2026.10 make flash test
+RIOT_VERSION=2026.04.08 make flash test
 RIOT_VERSION=2026.04.1 RIOT_EXTRAVERSION=3 make flash test
+RIOT_VERSION=2026.08.1 make flash test
+RIOT_VERSION=2026.10 make flash test
+RIOT_VERSION=2026.10-devel-123-gabcd make flash test
 ```
 
 `Makefile.include` will define `RIOT_VERSION` as `buildtest` and define
-`RIOT_VERSION_CODE` as `RIOT_VERSION_DUMMY_CODE` when running in CI:
+`RIOT_VERSION_CODE` from `RIOT_DUMMY_VERSION` when running in CI:
 
 ```shell
 RIOT_CI_BUILD=1 make flash test
+RIOT_CI_BUILD=1 RIOT_EXTRAVERSION=6 make flash test
 ```
 
 ## Expected result
