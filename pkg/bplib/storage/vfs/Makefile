@@ -1,4 +1,4 @@
-MODULE = bplib_stor_vfs_ordered
+MODULE = bplib_stor_vfs
 
 SRC += cache.c
 SRC += storage.c
