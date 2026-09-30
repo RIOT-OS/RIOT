@@ -271,8 +271,7 @@ static int _get(netdev_t *netdev, netopt_t opt, void *val, size_t max_len)
 
     case NETOPT_INTEGRITY_CHECK:
         assert(max_len >= sizeof(netopt_enable_t));
-        *((netopt_enable_t *)val) = sx126x_get_lora_crc(dev) ? NETOPT_ENABLE :
-                                                               NETOPT_DISABLE;
+        *((netopt_enable_t *)val) = sx126x_get_lora_crc(dev) ? NETOPT_ENABLE : NETOPT_DISABLE;
         return sizeof(netopt_enable_t);
 
     case NETOPT_RANDOM:
@@ -282,8 +281,7 @@ static int _get(netdev_t *netdev, netopt_t opt, void *val, size_t max_len)
 
     case NETOPT_IQ_INVERT:
         assert(max_len >= sizeof(uint8_t));
-        *((netopt_enable_t *)val) = sx126x_get_lora_iq_invert(dev) ? NETOPT_ENABLE :
-                                                                     NETOPT_DISABLE;
+        *((netopt_enable_t *)val) = sx126x_get_lora_iq_invert(dev) ? NETOPT_ENABLE : NETOPT_DISABLE;
         return sizeof(netopt_enable_t);
 
     case NETOPT_RSSI:
@@ -428,8 +426,7 @@ static int _set(netdev_t *netdev, netopt_t opt, const void *val, size_t len)
 
     case NETOPT_FIXED_HEADER:
         assert(len <= sizeof(netopt_enable_t));
-        sx126x_set_lora_implicit_header(dev,
-                                        *((const netopt_enable_t *)val) ? true : false);
+        sx126x_set_lora_implicit_header(dev, *((const netopt_enable_t *)val) ? true : false);
         return sizeof(netopt_enable_t);
 
     case NETOPT_PREAMBLE_LENGTH:

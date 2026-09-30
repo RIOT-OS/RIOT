@@ -227,8 +227,7 @@ static void sx126x_init_default_config(sx126x_t *dev)
     /* packet type must be set first */
     sx126x_set_pkt_type(dev, SX126X_PKT_TYPE_LORA);
     sx126x_set_channel(dev, CONFIG_SX126X_CHANNEL_DEFAULT);
-    sx126x_set_tx_power(dev, CONFIG_SX126X_TX_POWER_DEFAULT,
-                        CONFIG_SX126X_RAMP_TIME_DEFAULT);
+    sx126x_set_tx_power(dev, CONFIG_SX126X_TX_POWER_DEFAULT, CONFIG_SX126X_RAMP_TIME_DEFAULT);
 #ifdef CONFIG_SX126X_DEFAULT_SYNC_WORD
     sx126x_set_lora_sync_word(dev, CONFIG_SX126X_DEFAULT_SYNC_WORD);
 #endif
@@ -241,12 +240,10 @@ static void sx126x_init_default_config(sx126x_t *dev)
 
     dev->pkt_params.pld_len_in_bytes = 0;
     dev->pkt_params.crc_is_on = !IS_ACTIVE(CONFIG_LORA_PAYLOAD_CRC_OFF_DEFAULT);
-    dev->pkt_params.header_type = (IS_ACTIVE(CONFIG_LORA_FIXED_HEADER_LEN_MODE_DEFAULT) ?
-                                       true :
-                                       false);
+    dev->pkt_params.header_type = (IS_ACTIVE(CONFIG_LORA_FIXED_HEADER_LEN_MODE_DEFAULT) ? true :
+                                                                                          false);
     dev->pkt_params.preamble_len_in_symb = CONFIG_LORA_PREAMBLE_LENGTH_DEFAULT;
-    dev->pkt_params.invert_iq_is_on = (IS_ACTIVE(CONFIG_LORA_IQ_INVERTED_DEFAULT) ? true :
-                                                                                    false);
+    dev->pkt_params.invert_iq_is_on = (IS_ACTIVE(CONFIG_LORA_IQ_INVERTED_DEFAULT) ? true : false);
     sx126x_set_lora_pkt_params(dev, &dev->pkt_params);
 }
 
@@ -292,8 +289,8 @@ int sx126x_init(sx126x_t *dev)
     int res = spi_init_cs(dev->params->spi, dev->params->nss_pin);
 
     if (res != SPI_OK) {
-        DEBUG("[sx126x] error: failed to initialize SPI_%i device (code %i)\n",
-              dev->params->spi, res);
+        DEBUG("[sx126x] error: failed to initialize SPI_%i device (code %i)\n", dev->params->spi,
+              res);
         return -1;
     }
 
@@ -567,8 +564,7 @@ bool sx126x_get_lora_implicit_header(const sx126x_t *dev)
 void sx126x_set_lora_implicit_header(sx126x_t *dev, bool mode)
 {
     DEBUG("[sx126x]: sx126x_set_lora_implicit_header %d\n", mode);
-    dev->pkt_params.header_type = (mode ? SX126X_LORA_PKT_IMPLICIT :
-                                          SX126X_LORA_PKT_EXPLICIT);
+    dev->pkt_params.header_type = (mode ? SX126X_LORA_PKT_IMPLICIT : SX126X_LORA_PKT_EXPLICIT);
     sx126x_set_lora_pkt_params(dev, &dev->pkt_params);
 }
 
