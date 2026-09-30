@@ -36,8 +36,9 @@ _escape() {
 }
 
 _github_annotate() {
-    MESSAGE="$(_escape "${1}")"
-    LEVEL="${2:-error}"
+    # empty level (workflow command) will become an error
+    LEVEL="${1:-error}"
+    MESSAGE="$(_escape "${2}")"
     OPTS="${3:-}"
     echo "::${LEVEL} ${OPTS}::${MESSAGE}" >> ${OUTFILE}
 }
@@ -54,14 +55,14 @@ github_annotate_error() {
         FILENAME="${1}"
         LINENUM="${2}"
         DETAILS="${3}"
-        _github_annotate "${DETAILS}" error "file=${FILENAME},line=${LINENUM}"
+        _github_annotate error "${DETAILS}" "file=${FILENAME},line=${LINENUM}"
     fi
 }
 
 github_annotate_error_no_file() {
     if [ -n "${GITHUB_RUN_ID}" ]; then
         DETAILS="${1}"
-        _github_annotate "${DETAILS}" error
+        _github_annotate error "${DETAILS}"
     fi
 }
 
@@ -70,14 +71,14 @@ github_annotate_warning() {
         FILENAME="${1}"
         LINENUM="${2}"
         DETAILS="${3}"
-        _github_annotate "${DETAILS}" warning "file=${FILENAME},line=${LINENUM}"
+        _github_annotate warning "${DETAILS}" "file=${FILENAME},line=${LINENUM}"
     fi
 }
 
 github_annotate_warning_no_file() {
     if [ -n "${GITHUB_RUN_ID}" ]; then
         DETAILS="${1}"
-        _github_annotate "${DETAILS}" warning
+        _github_annotate warning "${DETAILS}"
     fi
 }
 
