@@ -111,22 +111,6 @@ static unsigned _count_char(const char *s, char c)
     return count;
 }
 
-static int _resp_init(coap_pkt_t *pdu, uint8_t *buf, size_t len, unsigned code)
-{
-    int header_len = coap_build_reply(pdu, code, buf, len, 0);
-
-    /* request contained no-response option or not enough space for response */
-    if (header_len <= 0) {
-        return -1;
-    }
-
-    pdu->options_len = 0;
-    pdu->payload     = buf + header_len;
-    pdu->payload_len = len - header_len;
-
-    return 0;
-}
-
 /** Build an ETag based on the given file's VFS stat. If the stat fails,
  * returns the error and leaves etag in any state; otherwise there's an etag
  * in the stattag's field */
@@ -166,22 +150,13 @@ static size_t _error_handler(coap_pkt_t *pdu, uint8_t *buf, size_t len, int err)
               code >> 5, code & 0x1f);
     }
 
-    if (_resp_init(pdu, buf, len, code)) {
-        return -1;
+    coap_builder_t resp;
+    int retval = coap_builder_init_reply(&resp, buf, len, pdu, code);
+    if (retval) {
+        return retval;
     }
-    return coap_opt_finish(pdu, COAP_OPT_FINISH_NONE);
-}
 
-static void _calc_szx2(coap_pkt_t *pdu, size_t reserve, coap_block1_t *block2)
-{
-    assert(pdu->payload_len > reserve);
-    size_t remaining_length = pdu->payload_len - reserve;
-    /* > 0: To not wrap around; if that still won't fit that's later caught in
-     * an assertion */
-    while ((coap_szx2size(block2->szx) > remaining_length) && (block2->szx > 0)) {
-        block2->szx--;
-        block2->blknum <<= 1;
-    }
+    return coap_builder_msg_size(&resp);
 }
 
 static inline void _event_file(nanocoap_fileserver_event_t event, struct requestdata *request)
@@ -210,7 +185,6 @@ static ssize_t _get_file(coap_pkt_t *pdu, uint8_t *buf, size_t len,
     int err;
     uint32_t etag, size_total;
 
-    coap_block1_t block2 = { .szx = CONFIG_NANOCOAP_BLOCK_SIZE_MAX };
     {
         struct stat stat;
         if ((err = vfs_stat(request->namebuf, &stat)) < 0) {
@@ -219,20 +193,23 @@ static ssize_t _get_file(coap_pkt_t *pdu, uint8_t *buf, size_t len,
         size_total = stat.st_size;
         stat_etag(&stat, &etag);
     }
-    if (request->options.exists.block2 && !coap_get_block2(pdu, &block2)) {
-        return _error_handler(pdu, buf, len, COAP_CODE_BAD_OPTION);
-    }
+
     if (request->options.exists.if_match &&
-        memcmp(&etag, &request->options.if_match, request->options.if_match_len)) {
+        memcmp(&etag, &request->options.if_match, request->options.if_match_len) != 0)
+    {
         return _error_handler(pdu, buf, len, COAP_CODE_PRECONDITION_FAILED);
     }
+
     if (request->options.exists.etag &&
-        !memcmp(&etag, &request->options.etag, sizeof(etag))) {
-        if (_resp_init(pdu, buf, len, COAP_CODE_VALID)) {
-            return -1;
+        !memcmp(&etag, &request->options.etag, sizeof(etag)))
+    {
+        coap_builder_t resp;
+        int retval = coap_builder_init_reply(&resp, buf, len, pdu, COAP_CODE_VALID);
+        if (retval) {
+            return retval;
         }
-        coap_opt_add_opaque(pdu, COAP_OPT_ETAG, &etag, sizeof(etag));
-        return coap_opt_finish(pdu, COAP_OPT_FINISH_NONE);
+        coap_opt_put_etag(&resp, &etag, sizeof(etag));
+        return coap_builder_msg_size(&resp);
     }
 
     int fd = vfs_open(request->namebuf, O_RDONLY, 0);
@@ -240,71 +217,77 @@ static ssize_t _get_file(coap_pkt_t *pdu, uint8_t *buf, size_t len,
         return _error_handler(pdu, buf, len, fd);
     }
 
-    if (_resp_init(pdu, buf, len, COAP_CODE_CONTENT)) {
-        vfs_close(fd);
-        return -1;
-    }
-    coap_opt_add_opaque(pdu, COAP_OPT_ETAG, &etag, sizeof(etag));
     coap_block_slicer_t slicer;
-    _calc_szx2(pdu,
-               5 + 1 + 1 /* reserve BLOCK2 size + payload marker + more */,
-               &block2);
-    err = coap_block_slicer_init(&slicer, block2.blknum, coap_szx2size(block2.szx));
+    err = coap_block2_init(pdu, &slicer);
     if (err) {
-        return _error_handler(pdu, buf, len, err);
+        return err;
+        goto late_err;
     }
-    coap_opt_add_block2(pdu, &slicer, true);
+
+   coap_builder_t resp;
+    err = coap_builder_init_reply(&resp, buf, len, pdu, COAP_CODE_CONTENT);
+    if (err) {
+        vfs_close(fd);
+        return err;
+    }
+
+    coap_opt_put_etag(&resp, &etag, sizeof(etag));
+    coap_opt_put_block2(&resp, &slicer);
 
     if (request->options.exists.block2) {
-        coap_opt_add_uint(pdu, COAP_OPT_SIZE2, size_total);
+        coap_opt_put_size2(&resp, size_total);
     }
-
-    size_t resp_len = coap_opt_finish(pdu, COAP_OPT_FINISH_PAYLOAD);
 
     err = vfs_lseek(fd, slicer.start, SEEK_SET);
     if (err < 0) {
         goto late_err;
     }
 
-    if (block2.blknum == 0) {
+    if (slicer.start == 0) {
         _event_file(NANOCOAP_FILESERVER_GET_FILE_START, request);
     }
+
+    size_t bytes_to_read = slicer.end - slicer.start;
 
     /* That'd only happen if the buffer is too small for even a 16-byte block,
      * or if the above calculations were wrong.
      *
-     * Not using payload_len here as that's needlessly underestimating the
-     * space by CONFIG_GCOAP_RESP_OPTIONS_BUF
-     * */
-    assert(pdu->payload + slicer.end - slicer.start <= buf + len);
-    bool more = 1;
-    int read = vfs_read(fd, pdu->payload, slicer.end - slicer.start + more);
+     * It is handled "gracefully" in production builds, but in development
+     * builds we can aid debugging of 5.00 Internal Server errors with a blown
+     * assertion here.
+     */
+    assert(bytes_to_read <= coap_builder_buf_remaining(&resp));
+    void *pld_ptr = coap_builder_allocate_payload(&resp, bytes_to_read);
+    if (!pld_ptr) {
+        goto late_err;
+    }
+
+    int read = vfs_read(fd, pld_ptr, bytes_to_read);
     if (read < 0) {
         goto late_err;
     }
-    more = (unsigned)read > slicer.end - slicer.start;
-    read -= more;
 
     vfs_close(fd);
 
-    slicer.cur = slicer.end + more;
-    coap_block2_finish(&slicer);
-
-    if (read == 0) {
-        /* Rewind to clear payload marker */
-        read -= 1;
-    }
+    /* HACK: Normally, we use coap_blockwise_put_bytes(), but here we bypass
+     *       the API to not have to read the whole file to RAM first. We advance
+     *       the state by hand for now until the API is extended to our use case.
+     */
+    slicer.cur = size_total;
+    bool more = coap_block2_finish(&slicer);
 
     if (!more) {
         _event_file(NANOCOAP_FILESERVER_GET_FILE_END, request);
+        /* HACK: Allocated for a full block in resp, but might only have filled
+         *       it partually. */
+        resp.pos -= (bytes_to_read - read);
     }
 
-    return resp_len + read;
+    return coap_builder_msg_size(&resp);
 
 late_err:
     vfs_close(fd);
-    coap_pkt_set_code(pdu, COAP_CODE_INTERNAL_SERVER_ERROR);
-    return coap_get_total_hdr_len(pdu);
+    return _error_handler(pdu, buf, len, -EINVAL);
 }
 
 #if IS_USED(MODULE_NANOCOAP_FILESERVER_PUT)
@@ -386,6 +369,7 @@ static ssize_t _put_file(coap_pkt_t *pdu, uint8_t *buf, size_t len,
         goto close_on_error;
     }
     vfs_close(fd);
+    coap_builder_t resp;
     if (!block1.more) {
         if ((ret = vfs_stat(request->namebuf, &stat)) < 0) {
             goto unlink_on_error;
@@ -403,19 +387,21 @@ static ssize_t _put_file(coap_pkt_t *pdu, uint8_t *buf, size_t len,
         _event_file(NANOCOAP_FILESERVER_PUT_FILE_END, request);
 
         stat_etag(&stat, &etag); /* Etag after write */
-        if (_resp_init(pdu, buf, len, create ? COAP_CODE_CREATED : COAP_CODE_CHANGED)) {
-            return -1;
+        ret = coap_builder_init_reply(&resp, buf, len, pdu, create ? COAP_CODE_CREATED : COAP_CODE_CHANGED);
+        if (ret) {
+            return ret;
         }
-        coap_opt_add_opaque(pdu, COAP_OPT_ETAG, &etag, sizeof(etag));
+        coap_opt_put_etag(&resp, &etag, sizeof(etag));
     }
     else {
-        if (_resp_init(pdu, buf, len, COAP_CODE_CONTINUE)) {
-            return -1;
+        ret = coap_builder_init_reply(&resp, buf, len, pdu, COAP_CODE_CONTINUE);
+        if (ret) {
+            return ret;
         }
         block1.more = true; /* resource is created atomically */
-        coap_opt_add_block1_control(pdu, &block1);
+        coap_opt_put_block1_control(&resp, &block1);
     }
-    return coap_opt_finish(pdu, COAP_OPT_FINISH_NONE);
+    return coap_builder_msg_size(&resp);
 
 close_on_error:
     vfs_close(fd);
@@ -449,10 +435,13 @@ static ssize_t _delete_file(coap_pkt_t *pdu, uint8_t *buf, size_t len,
     if ((ret = vfs_unlink(request->namebuf)) < 0) {
         return _error_handler(pdu, buf, len, ret);
     }
-    if (_resp_init(pdu, buf, len, COAP_CODE_DELETED)) {
-        return -1;
+
+    coap_builder_t resp;
+    ret = coap_builder_init_reply(&resp, buf, len, pdu, COAP_CODE_DELETED);
+    if (ret) {
+        return ret;
     }
-    return coap_opt_finish(pdu, COAP_OPT_FINISH_NONE);
+    return coap_builder_msg_size(&resp);
 }
 #endif
 
@@ -484,7 +473,7 @@ static ssize_t _get_directory(coap_pkt_t *pdu, uint8_t *buf, size_t len,
     coap_block_slicer_t slicer;
     coap_block1_t block2 = { .szx = CONFIG_NANOCOAP_BLOCK_SIZE_MAX };
     if (request->options.exists.block2 && !coap_get_block2(pdu, &block2)) {
-        return _error_handler(pdu, buf, len, COAP_OPT_FINISH_NONE);
+        return _error_handler(pdu, buf, len, COAP_CODE_BAD_OPTION);
     }
     if ((err = vfs_opendir(&dir, request->namebuf)) < 0) {
         return _error_handler(pdu, buf, len, err);
@@ -494,19 +483,18 @@ static ssize_t _get_directory(coap_pkt_t *pdu, uint8_t *buf, size_t len,
     }
     DEBUG("nanocoap_fileserver: Serving directory listing\n");
 
-    if (_resp_init(pdu, buf, len, COAP_CODE_CONTENT)) {
-        vfs_closedir(&dir);
-        return -1;
-    }
-    coap_opt_add_format(pdu, COAP_FORMAT_LINK);
-    _calc_szx2(pdu,
-               5 + 1 /* reserve BLOCK2 size + payload marker */,
-               &block2);
-    err = coap_block_slicer_init(&slicer, block2.blknum, coap_szx2size(block2.szx));
+    err = coap_block2_init(pdu, &slicer);
     if (err) {
         return _error_handler(pdu, buf, len, err);
     }
-    coap_opt_add_block2(pdu, &slicer, true);
+    coap_builder_t resp;
+    err = coap_builder_init_reply(&resp, buf, len, pdu, COAP_CODE_CONTENT);
+    if (err) {
+        vfs_closedir(&dir);
+        return err;
+    }
+    coap_opt_put_ct(&resp, COAP_FORMAT_LINK);
+    coap_opt_put_block2(&resp, &slicer);
 
     size_t root_len = root ? strlen(root) : 0;
     const char *root_dir = &request->namebuf[root_len];
@@ -524,26 +512,26 @@ static ssize_t _get_directory(coap_pkt_t *pdu, uint8_t *buf, size_t len,
         bool is_dir = entry_is_dir(request->namebuf, entry_name);
 
         if (slicer.cur) {
-            coap_blockwise_put_char_pkt(pdu, &slicer, ',');
+            coap_blockwise_put_char(&resp, &slicer, ',');
         } else {
             /* no payload written yet - set payload marker */
-            coap_opt_finish(pdu, COAP_OPT_FINISH_PAYLOAD);
+            coap_builder_add_payload_marker(&resp);
         }
-        coap_blockwise_put_char_pkt(pdu, &slicer, '<');
-        coap_blockwise_put_bytes_pkt(pdu, &slicer, resource_dir, resource_dir_len);
-        coap_blockwise_put_bytes_pkt(pdu, &slicer, root_dir, root_dir_len);
-        coap_blockwise_put_char_pkt(pdu, &slicer, '/');
-        coap_blockwise_put_bytes_pkt(pdu, &slicer, entry_name, entry_len);
+        coap_blockwise_put_char(&resp, &slicer, '<');
+        coap_blockwise_put_bytes(&resp, &slicer, resource_dir, resource_dir_len);
+        coap_blockwise_put_bytes(&resp, &slicer, root_dir, root_dir_len);
+        coap_blockwise_put_char(&resp, &slicer, '/');
+        coap_blockwise_put_bytes(&resp, &slicer, entry_name, entry_len);
         if (is_dir) {
-            coap_blockwise_put_char_pkt(pdu, &slicer, '/');
+            coap_blockwise_put_char(&resp, &slicer, '/');
         }
-        coap_blockwise_put_char_pkt(pdu, &slicer, '>');
+        coap_blockwise_put_char(&resp, &slicer, '>');
     }
 
     vfs_closedir(&dir);
     coap_block2_finish(&slicer);
 
-    return (uintptr_t)pdu->payload - (uintptr_t)pdu->buf;
+    return coap_builder_msg_size(&resp);
 }
 
 #if IS_USED(MODULE_NANOCOAP_FILESERVER_PUT)
@@ -551,13 +539,11 @@ static ssize_t _put_directory(coap_pkt_t *pdu, uint8_t *buf, size_t len,
                               struct requestdata *request)
 {
     vfs_DIR dir;
+    uint8_t code = COAP_CODE_CHANGED;
     if (vfs_opendir(&dir, request->namebuf) == 0) {
         vfs_closedir(&dir);
         if (request->options.exists.if_match && request->options.if_match_len) {
             return _error_handler(pdu, buf, len, COAP_CODE_PRECONDITION_FAILED);
-        }
-        if (_resp_init(pdu, buf, len, COAP_CODE_CHANGED)) {
-            return -1;
         }
     }
     else {
@@ -568,11 +554,15 @@ static ssize_t _put_directory(coap_pkt_t *pdu, uint8_t *buf, size_t len,
         if ((err = vfs_mkdir(request->namebuf, 0777)) < 0) {
             return _error_handler(pdu, buf, len, err);
         }
-        if (_resp_init(pdu, buf, len, COAP_CODE_CREATED)) {
-            return -1;
-        }
+        code = COAP_CODE_CREATED;
     }
-    return coap_opt_finish(pdu, COAP_OPT_FINISH_NONE);
+
+    coap_builder_t resp;
+    int err = coap_builder_init_reply(&resp, buf, len, pdu, code);
+    if (err) {
+        return err;
+    }
+    return coap_builder_msg_size(&resp);
 }
 #endif
 
@@ -596,10 +586,13 @@ static ssize_t _delete_directory(coap_pkt_t *pdu, uint8_t *buf, size_t len,
             return _error_handler(pdu, buf, len, err);
         }
     }
-    if (_resp_init(pdu, buf, len, COAP_CODE_DELETED)) {
-        return -1;
+
+    coap_builder_t resp;
+    err = coap_builder_init_reply(&resp, buf, len, pdu, COAP_CODE_DELETED);
+    if (err) {
+        return err;
     }
-    return coap_opt_finish(pdu, COAP_OPT_FINISH_NONE);
+    return coap_builder_msg_size(&resp);
 }
 #endif
 
@@ -759,11 +752,15 @@ ssize_t nanocoap_fileserver_handler(coap_pkt_t *pdu, uint8_t *buf, size_t len,
         ? nanocoap_fileserver_directory_handler(pdu, buf, len, &request, root, resource)
         : nanocoap_fileserver_file_handler(pdu, buf, len, &request);
 error:
-    if (_resp_init(pdu, buf, len, errorcode)) {
-        return -1;
+    {
+        coap_builder_t resp;
+        int err = coap_builder_init_reply(&resp, buf, len, pdu, errorcode);
+        if (err) {
+            return err;
+        }
+
+        return coap_builder_msg_size(&resp);
     }
-    coap_opt_finish(pdu, COAP_OPT_FINISH_NONE);
-    return 0;
 }
 
 #ifdef MODULE_NANOCOAP_FILESERVER_CALLBACK
