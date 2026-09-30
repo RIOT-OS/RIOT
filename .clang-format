@@ -67,7 +67,11 @@ BreakAfterJavaFieldAnnotations: false
 # overflowing it (disabling it can produce lines longer than the limit)
 BreakAdjacentStringLiterals: true
 BreakStringLiterals: false
-ColumnLimit: 90
+# "Line length": the coding conventions aim for 80 characters per line with an
+# absolute maximum of 100. clang-format can only enforce the hard maximum, so
+# set the limit to 100 and leave lines up to 100 characters untouched (the
+# 80 character target is a soft guideline for humans, not the formatter)
+ColumnLimit: 100
 CommentPragmas: '^ IWYU pragma:'
 CompactNamespaces: false
 ConstructorInitializerAllOnOneLineOrOnePerLine: false
@@ -113,11 +117,18 @@ PenaltyBreakBeforeFirstCallParameter: 100
 PenaltyBreakComment: 10
 PenaltyBreakFirstLessLess: 0
 PenaltyBreakString: 10
-PenaltyExcessCharacter: 10
+# penalty for exceeding the column limit; a low value lets clang-format
+# overflow ColumnLimit instead of wrapping, so keep it high enough that the
+# 100 character hard maximum is actually enforced (lines up to 100 characters
+# are left untouched)
+PenaltyExcessCharacter: 100
 PenaltyReturnTypeOnItsOwnLine: 60
 
 PointerAlignment: Right
-ReflowComments: false
+# re-wrap/indent comments so that multi-line trailing comments (e.g. enum
+# members with `/**< ... */`) stay aligned when the code next to them is
+# re-formatted; clang-format still does not add leading `*` or fix `*/`
+ReflowComments: true
 # remove superfluous semicolons (e.g. after an empty brace block)
 RemoveSemicolon: true
 # do not format macro definition bodies: clang-format would expand brace
