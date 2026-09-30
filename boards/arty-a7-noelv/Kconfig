@@ -1,0 +1,10 @@
+# SPDX-FileCopyrightText: 2026 Matvii Ivashchenko
+# SPDX-License-Identifier: LGPL-2.1-only
+
+config BOARD
+    default "arty-a7-noelv" if BOARD_ARTY_A7_NOELV
+
+config BOARD_ARTY_A7_NOELV
+    bool
+    default y
+    select CPU_MODEL_NOELV_RV32IMAC
