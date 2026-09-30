@@ -152,6 +152,50 @@ CoAP over DTLS drivers that share the RFC 7252 messaging implementation:
 Both the CoAP over UDP and CoAP over DTLS driver support sending vectored data, hence the `sendv`
 suffixes in the function names depicted in the figure above.
 
+To manage state, the exchange and messaging layer(s) exchange notifications composed of a
+notification type and an opaque state object pointer that may point to the layer-internal
+state object representation. Notifications are sent using @ref unicoap_messaging_notify
+and @ref unicoap_exchange_notify. The notification system serves two purposes.
+
+First, it informs the respective other layer about the allocation and release of owned state
+objects, such that a layer A can decide whether it should also release state when
+layer B has just released a state object associated with a state object on layer A.
+Each layer may keep references to state objects allocated in the
+respective other layer --- this ought to be an opaque reference (`void*`) in most instances.
+Generally, layers are not expected to know the memory layout and interface needed to control
+state objects of other layers.
+Layer A gets to know of opaque references to state owned by B through an allocation notification
+from B.
+For example, the exchange layer stores state objects called _memos_ that track an _exchange_ which
+may, in turn, encompass multiple _transmissions_ on the messaging layer in the case of a block-wise
+transfer. Once the messaging layer has sent a state release notification to the exchange layer,
+the exchange layer may also release its memo if the block-wise transfer is done or keeps the memo
+otherwise. Each time a new CoAP message is sent, the messaging layer informs the exchange layer
+of any new state object allocations such that the current messaging state reference in the memo
+can be set.
+
+Second, it allows one layer to propagate errors that occurred asynchronously.
+This case is called _asynchronous failure_ as synchronous failures,
+i.e., those originating from a function call from the other layer, must be propagated by returning
+an error instead. This is usually done by returning a negative error number, but you should check
+each function's documentation.
+For example, one layer may have set a timeout that once expired
+leads to an asynchronous error condition that must be propagated to the other layer so it can
+handle the error, i.e., by retrying or by releasing a state object it owns if it cannot recover.
+Triggers for these asynchronous scenarios may be the reception of an inbound PDU on the messaging
+layer, or the invocation of an API above the exchange layer. Crucially, should an error leading
+to state release occur on one layer, it may decide between a regular state release notification
+to the other or an error notification, depending on the implications. For example, if the failure
+condition is the user calling _cancel_ on a pending request, the exchange layer may determine
+it is better to release state in an orderly fashion, i.e., to communicate a regular state release
+notification to the messaging layer instead of an async failure notification as the messaging
+layer may tear down transport connections in the latter instance. In general, you should
+question if an error on layer A is really relevant to layer B or if communicating the mere
+consequence of the error on A
+(regular state release notification instead of async failure notification)
+suffices to cause an associated state object on B to be discarded.
+
+
 ## Adding a New Driver
 
 In the `unicoap` codebase you will encounter several marks (`MARK: ...`)
