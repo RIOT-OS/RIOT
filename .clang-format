@@ -136,3 +136,6 @@ Standard: Cpp03
 TabWidth: 4
 UseTab: Never
 QualifierAlignment: Left
+# As of clang-format-22, clang-format often does such a poor job at formatting
+# macro definition bodies, that we rather keep formatting them by hand.
+SkipMacroDefinitionBody: true
