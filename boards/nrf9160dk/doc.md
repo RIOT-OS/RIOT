@@ -31,6 +31,10 @@ aliases, so that the application can run as the *non-secure* image.
 USEMODULE += trustzone_m_nonsecure
 ```
 
+@warning The module on its own does not produce a working image. Without a
+         secure image in flash that hands the peripherals over, the
+         application faults at its first peripheral access.
+
 A secure image has to be present in flash; the non-secure application does not
 boot on its own. The secure image configures which flash, RAM and
 peripherals are handed over to the non-secure world.
