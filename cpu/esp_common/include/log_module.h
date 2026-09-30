@@ -19,35 +19,11 @@
 extern "C" {
 #endif
 
-#include <stdio.h>
 #include "esp_common_log.h"
+#include "fmt.h"
 
-#ifdef MODULE_LOG_PRINTFNOFORMAT
-
-static inline void log_write(unsigned level, const char *format, ...) {
-    (void)level;
-    puts(format);
-}
-
-#else /* MODULE_LOG_PRINTFNOFORMAT */
-
-#define log_write(level, ...) \
-                do { \
-                    if (level == LOG_ERROR) { \
-                        LOG_TAG(LOG_ERROR, E, __func__, ##__VA_ARGS__); \
-                    } \
-                    else if (level == LOG_WARNING) { \
-                        LOG_TAG(LOG_WARNING, W, __func__, ##__VA_ARGS__); \
-                    } \
-                    else if (level == LOG_INFO) { \
-                        LOG_TAG(LOG_INFO, D, __func__, ##__VA_ARGS__); \
-                    } \
-                    else if (level == LOG_DEBUG) { \
-                        LOG_TAG(LOG_DEBUG, E, __func__, ##__VA_ARGS__); \
-                    } \
-                } while (0U)
-
-#endif /* MODULE_LOG_PRINTFNOFORMAT */
+#define log_write(level, unit, ...) fmt_print(__VA_ARGS__)
+#define LOG_FORMAT(...) ESP_LOG_FORMAT_DEFAULT(__VA_ARGS__)
 
 #ifdef __cplusplus
 }

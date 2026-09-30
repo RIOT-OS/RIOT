@@ -101,14 +101,14 @@ typedef enum {
 #  endif
 #endif
 
-#define LOG_WITH_UNIT_WRITER(write, level, unit, ...) \
-    do { __LOG_PROLOGUE \
+#define LOG_IMPL(write, level, unit, ...) \
+    do { _LOG_PROLOGUE \
         if (_CAN_LOG_H(level, unit)) { \
             write(level, (unit), __VA_ARGS__); \
         } \
-    } while (0U) __LOG_EPILOGUE
+    } while (0U) _LOG_EPILOGUE
 
-#define LOG_WITH_UNIT(level, unit, ...) LOG_WITH_UNIT_WRITER(log_write, level, unit, __VA_ARGS__)
+#define LOG_WITH_UNIT(level, unit, ...) LOG_IMPL(log_write_formatted, level, unit, __VA_ARGS__)
 #define LOG(level, ...) LOG_WITH_UNIT(level, LOG_UNIT, __VA_ARGS__)
 
 #define LOG_ERROR(...)   LOG(LOG_ERROR,   __VA_ARGS__)
@@ -116,25 +116,40 @@ typedef enum {
 #define LOG_INFO(...)    LOG(LOG_INFO,    __VA_ARGS__)
 #define LOG_DEBUG(...)   LOG(LOG_DEBUG,   __VA_ARGS__)
 
-#define LOG_CONT_WITH_UNIT_WRITER(write, level, unit, ...) \
-    do { __LOG_PROLOGUE \
-        if (_CAN_LOG_H(level, unit)) { \
-            write(level, (unit), __VA_ARGS__); \
-        } \
-    } while (0U) __LOG_EPILOGUE
+#define LOG_BEGIN_WITH_UNIT(level, unit, ...) \
+    LOG_IMPL(log_begin_formatted,    level, unit,     __VA_ARGS__)
 
-#define LOG_CONT_(level, unit, ...) LOG_CONT_WITH_UNIT_WRITER(log_write_continue, unit, __VA_ARGS__)
-#define LOG_CONT(level, ...) LOG_CONT_(level, LOG_UNIT, __VA_ARGS__)
+#define LOG_BEGIN(level, ...) \
+    LOG_BEGIN_WITH_UNIT(             level, LOG_UNIT, __VA_ARGS__)
+
+#define LOG_CONT_WITH_UNIT(level, unit, ...) \
+    LOG_IMPL(log_continue_formatted, level, unit,     __VA_ARGS__)
+
+#define LOG_CONT(level, ...) \
+    LOG_CONT_WITH_UNIT(              level, LOG_UNIT, __VA_ARGS__)
+
+#define LOG_END_WITH_UNIT(level, unit, ...) \
+    LOG_IMPL(log_end_formatted,      level, unit,     __VA_ARGS__)
+
+#define LOG_END(level, ...) \
+    LOG_END_WITH_UNIT(               level, LOG_UNIT, __VA_ARGS__)
 
 /** @} */ /* section */
 
 /** @cond */ /* hide */
 
+#if defined(MODULE_LOG_DYNAMIC_CONTROL)
+#  include "log_dynamic.h"
+#else
+#  define log_unit_is_enabled(unit, level) 0
+#endif
+
+#if defined(LOG_SELECTIVE)
+#include <stdbool.h>
 /* If LOG is present in make, switch to new logic: LOG invocations used to always have an effect
  * if the level matched, now they only do if contained in LOG. DEBUG invocations used to only
- * have an effect when ENABLE_DEBUG was turned on, now they do too if contained in LOG */
-#if defined(LOG_SELECTIVE)
-/*   New behavior:
+ * have an effect when ENABLE_DEBUG was turned on, now they do too if contained in LOG 
+ * New behavior:
  *   - LOG() iff level and unit matches
  *   - DEBUG() iff (ENABLE_DEBUG or [level and unit matches, just like LOG])
  */
@@ -144,10 +159,10 @@ typedef enum {
 /*   There are three tiers of selective logging: */
 #  if defined(LOG_SELECTIVE_ALL)
 /*   1. LOG="ALL", i.e., enable all log units */
-#    define _LOG_UNIT_ENABLED(unit, level) true
+#    define _LOG_UNIT_ENABLED(unit, level) 1
 #  elif defined(LOG_SELECTIVE_PATTERNS) && defined(LOG_SELECTIVE_LEVELS)
 /*   2. LOG="core.irq ztimer", i.e., enable log units by prefix pattern */
-#    define _LOG_UNIT_ENABLED(unit, level) ((strlen(unit) > 0) && ({                                \
+#    define _LOG_UNIT_ENABLED(unit, level) (log_unit_is_enabled(unit, level) || ((strlen(unit) > 0) && ({                                \
         bool forced = false;                                                                   \
         for (unsigned int i = 0; i < ARRAY_SIZE((const char*[]){ LOG_SELECTIVE_PATTERNS }); i += 1) {    \
             forced |= strncmp(((const char*[]){ LOG_SELECTIVE_PATTERNS })[i], (unit),                      \
@@ -155,10 +170,10 @@ typedef enum {
                        && (log_level_t)(level) <= ((log_level_t[]){ LOG_SELECTIVE_LEVELS })[i];                     \
         }                                                                                      \
         forced;                                                                                \
-      }))
+      })))
 #  else
 /*   3. LOG="", i.e., disable all log units */
-#    define _LOG_UNIT_ENABLED(unit, level) false
+#    define _LOG_UNIT_ENABLED(unit, level) 0
 #  endif
 
 #else /* defined(LOG_SELECTIVE) */
@@ -170,45 +185,64 @@ typedef enum {
 #endif /* defined(LOG_SELECTIVE) */
 
 #if defined(__clang__)
-#  define __LOG_PROLOGUE \
+#  define _LOG_PROLOGUE \
  _Pragma("clang diagnostic push") \
  _Pragma("clang diagnostic ignored \"-Wtautological-compare\"")
-#  define __LOG_EPILOGUE \
+#  define _LOG_EPILOGUE \
  _Pragma("clang diagnostic pop")
 #else /* defined(__clang__) */
-#  define __LOG_PROLOGUE
-#  define __LOG_EPILOGUE
+#  define _LOG_PROLOGUE
+#  define _LOG_EPILOGUE
 #endif /* defined(__clang__) */
 
 #if defined(MODULE_LOG)
 #  include "log_module.h"
+/* Provide default for log backend defining macro.
+ * For fallback for log backend providing function, see sys/log/log.c */
+#  if defined(log_write) && !defined(log_begin)
+#    define log_begin log_write
+#  endif
+#  if defined(log_write) && !defined(log_continue)
+#    define log_continue log_write
+#  endif
+#  if defined(log_write) && !defined(log_end)
+#    define log_end log_write
+#  endif
+#else /* defined(MODULE_LOG) */
+#  include "fmt.h"
+#  define log_write(level, unit, ...) fmt_print(__VA_ARGS__)
+#  define log_begin(level, unit, ...) fmt_print(__VA_ARGS__)
+#  define log_continue(level, unit, ...) fmt_print(__VA_ARGS__)
+#  define log_end(level, unit, ...) fmt_print(__VA_ARGS__)
+#endif /* defined(MODULE_LOG) */
+
+#if !defined(LOG_FORMAT)
+#  define LOG_FORMAT(write, level, unit, ...) write(level, unit, __VA_ARGS__)
 #endif
 
-#if defined(LOG_FORMAT)
-#  include "macros/print.h"
-#  define log_write(level, unit, ...) do { \
-        LOG_FORMAT(print, level, unit, ""); \
-        print(__VA_ARGS__); \
-    } while (0)
-#  define log_write_continue(level, unit, ...) \
-        print(LOG_STREAM, __VA_ARGS__)
-#elif !defined(MODULE_LOG)
-#  if !defined(CONFIG_LOG_SHOW_UNIT)
-#    define CONFIG_LOG_SHOW_UNIT 1
-#  endif
-#  include "macros/print.h"
-#  define log_write(level, unit, ...) \
-    do { \
-        if (IS_ACTIVE(CONFIG_LOG_SHOW_UNIT) && (unit) && (unit)[0]) { \
-            print("%s: ", (unit)); \
-        } \
-        print(__VA_ARGS__); \
-    } while (0)
-#  define log_write_continue(level, unit, ...) \
-    do { \
-        print(__VA_ARGS__); \
-    } while (0)
+#if !defined(LOG_FORMAT_BEGIN)
+#  define LOG_FORMAT_BEGIN(write, level, unit, ...) LOG_FORMAT(write, level, unit, __VA_ARGS__)
 #endif
+
+#if !defined(LOG_FORMAT_CONTINUE)
+#  define LOG_FORMAT_CONTINUE(write, level, unit, ...) write(level, unit, __VA_ARGS__)
+#endif
+
+#if !defined(LOG_FORMAT_END)
+#  define LOG_FORMAT_END(write, level, unit, ...) write(level, unit, __VA_ARGS__)
+#endif
+
+#define log_write_formatted(level, unit, ...) \
+    LOG_FORMAT(log_write,             level, unit, __VA_ARGS__)
+
+#define log_begin_formatted(level, unit, ...) \
+    LOG_FORMAT_BEGIN(log_begin,       level, unit, __VA_ARGS__)
+
+#define log_continue_formatted(level, unit, ...) \
+    LOG_FORMAT_CONTINUE(log_continue, level, unit, __VA_ARGS__)
+    
+#define log_end_formatted(level, unit, ...) \
+    LOG_FORMAT_END(log_end,           level, unit, __VA_ARGS__)
 
 /** @endcond */ /* hide */
 

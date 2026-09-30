@@ -178,51 +178,71 @@ static inline const char* _debug_thread_name_or_isr(void)
 
 /** @} */ /* end of section */
 
-/** @cond */ /* hide */
-#if CONFIG_DEBUG_AS_LOG
-#  define debug_write_fmt(unit, ...)          log_write(LOG_DEBUG, unit, __VA_ARGS__)
-#  define debug_write_fmt_continue(unit, ...) log_write(LOG_DEBUG, unit, __VA_ARGS__)
-#  define debug_write_str(unit, str)          log_write(LOG_DEBUG, unit, str)
-#else /* CONFIG_DEBUG_AS_LOG */
-#  define debug_write_fmt(unit, ...)          printf(__VA_ARGS__)
-#  define debug_write_fmt_continue(unit, ...) printf(__VA_ARGS__)
-#  define debug_write_str(unit, str)          puts(str)
-#endif /* CONFIG_DEBUG_AS_LOG */
-/** @endcond */ /* show */
-
+#if CONFIG_DEBUG_AS_LOG || defined(DOXYGEN)
 /**
  * @name User-facing debug message API
  * @{
  */
 
-#define DEBUG(...) do { __LOG_PROLOGUE                                              \
+/**
+ * @brief ...
+ */
+#  define DEBUG(...) do { _LOG_PROLOGUE                                              \
         if (_CAN_DEBUG_H(LOG_DEBUG, LOG_UNIT) && _debug_sufficient_stack(false)) {  \
-            debug_write_fmt(LOG_UNIT, __VA_ARGS__);                                 \
+            LOG_WITH_UNIT(LOG_DEBUG, LOG_UNIT, __VA_ARGS__);                                 \
         }                                                                           \
-    } while (0) __LOG_EPILOGUE
+    } while (0) _LOG_EPILOGUE
+
+/**
+ * @brief Begin printing debug information to stdout
+ *
+ * Use this macro if you need to debug-log multiple items using @ref DEBUG_CONT
+ */
+#  define DEBUG_BEGIN(...) do { _LOG_PROLOGUE                                         \
+        if (_CAN_DEBUG_H(LOG_DEBUG, LOG_UNIT) && _debug_sufficient_stack(false)) {  \
+            LOG_BEGIN_WITH_UNIT(LOG_DEBUG, LOG_UNIT, __VA_ARGS__);                        \
+        }                                                                           \
+    } while (0) _LOG_EPILOGUE
 
 /**
  * @brief Continue printing debug information to stdout, without repeating the prefix
  *
  * Use this macro the same way as `printf` if you want to continue printing to the
- * same line that has been started with @ref DEBUG previously.
- *
- * Experimentally, you may define your own version of this macro to provide a custom debug printing
- * backend, in which case this function will not be defined by `debug.h`. This must be done
- * in conjunction with defining @ref DEBUG_.
+ * same line that has been started with @ref DEBUG_BEGIN previously.
  */
-#define DEBUG_CONT(...) do { __LOG_PROLOGUE                                         \
+#  define DEBUG_CONT(...) do { _LOG_PROLOGUE                                         \
         if (_CAN_DEBUG_H(LOG_DEBUG, LOG_UNIT) && _debug_sufficient_stack(false)) {  \
-            debug_write_fmt_continue(LOG_UNIT, __VA_ARGS__);                        \
+            LOG_CONT_WITH_UNIT(LOG_DEBUG, LOG_UNIT, __VA_ARGS__);                        \
         }                                                                           \
-    } while (0) __LOG_EPILOGUE
+    } while (0) _LOG_EPILOGUE
 
-
-#define DEBUG_PUTS(str) do { __LOG_PROLOGUE                                         \
+/**
+ * @brief End printing debug information to stdout
+ *
+ * Use this macro if have debug-logged multiple items before using @ref DEBUG_CONT
+ */
+#  define DEBUG_END(...) do { _LOG_PROLOGUE                                         \
         if (_CAN_DEBUG_H(LOG_DEBUG, LOG_UNIT) && _debug_sufficient_stack(false)) {  \
-            debug_write_str(LOG_UNIT, str "\n");                                    \
+            LOG_END_WITH_UNIT(LOG_DEBUG, LOG_UNIT, __VA_ARGS__);                        \
         }                                                                           \
-    } while (0) __LOG_EPILOGUE
+    } while (0) _LOG_EPILOGUE
+
+#  define DEBUG_PUTS(str) DEBUG(str)
+#else
+#  define DEBUG(str) do { _LOG_PROLOGUE                                         \
+        if (ENABLE_DEBUG && _debug_sufficient_stack(false)) {  \
+            printf(str);                                    \
+        }                                                                           \
+    } while (0) _LOG_EPILOGUE
+#  define DEBUG_BEGIN(...) DEBUG(__VA_ARGS__)
+#  define DEBUG_CONT(...) DEBUG(__VA_ARGS__)
+#  define DEBUG_END(...) DEBUG(__VA_ARGS__)
+#  define DEBUG_PUTS(str) do { _LOG_PROLOGUE                                         \
+        if (ENABLE_DEBUG && _debug_sufficient_stack(false)) {  \
+            puts(str);                                    \
+        }                                                                           \
+    } while (0) _LOG_EPILOGUE
+#endif
 
 /**
  * @deprecated use @ref DEBUG instead. Will be removed after release 2027.04.

@@ -66,13 +66,8 @@ void IRAM_ATTR esp_log_write(esp_log_level_t level,
     va_end(list);
 }
 
-/*
- * provided by: /path/to/esp-idf/components/log/log.c
- */
-void IRAM_ATTR esp_log_writev(esp_log_level_t level,
-                              const char *tag,
-                              const char *format,
-                              va_list args)
+void IRAM_ATTR log_unit_is_enabled(esp_log_level_t level,
+                                   const char *tag)
 {
     /*
      * We use the log level set for the given tag instead of using
@@ -92,11 +87,22 @@ void IRAM_ATTR esp_log_writev(esp_log_level_t level,
         act_level = _log_levels[ARRAY_SIZE(_log_levels)-1].level;
     }
 
-    /* Return if the log output has not the required level */
-    if ((unsigned)act_level > CONFIG_LOG_DEFAULT_LEVEL) {
+    /* Return false if the log output has not the required level */
+    return (unsigned)act_level <= CONFIG_LOG_DEFAULT_LEVEL;
+}
+
+/*
+ * provided by: /path/to/esp-idf/components/log/log.c
+ */
+void IRAM_ATTR esp_log_writev(esp_log_level_t level,
+                              const char *tag,
+                              const char *format,
+                              va_list args)
+{
+    
+    if (!log_unit_is_enabled(level, tag)) {
         return;
     }
-
     vprintf(format, args);
 }
 
