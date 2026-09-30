@@ -22,7 +22,13 @@ _missing-picolibc:
 
 ifeq (1,$(USE_PICOLIBC))
   LINKFLAGS += -specs=picolibc.specs
-  CFLAGS += -specs=picolibc.specs
+  ifeq (llvm,$(TOOLCHAIN))
+    # clang does not support spec files, the include directories of picolibc
+    # are added via GCC_C_INCLUDES instead (see makefiles/toolchain/llvm.inc.mk)
+    GCC_SPECS += -specs=picolibc.specs
+  else
+    CFLAGS += -specs=picolibc.specs
+  endif
   ifeq (,$(filter printf_float scanf_float,$(USEMODULE)))
     CFLAGS += -DPICOLIBC_INTEGER_PRINTF_SCANF
     LINKFLAGS += -DPICOLIBC_INTEGER_PRINTF_SCANF
