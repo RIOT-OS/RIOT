@@ -26,7 +26,7 @@ The core usage of bplib *requires* the following functions to be implemented:
   or contact (when LocalDelivery = false) at table index EgressID.
   NumEgressed should be updated to the number of egressed bundles.
 
-Actual egress has to be done like this. Refer to unordered storage backend for
+Actual egress has to be done like this. Refer to vfs storage backend for
 an example:
 
 1. Find a bundle matching the EID of the target channel / contact.
@@ -65,28 +65,7 @@ hard to track when a bundle truly expired.
 This means, due to the architecture of bplib's router, if no channel or contact
 is ready to take data directly (is in started state), the bundle will be dropped.
 
-### VFS Storage - Unordered Egress
-`bplib_stor_vfs_unordered` module.
-
-All data is stored in the `CONFIG_BPLIB_STOR_BASE` directory
-as up to 4 character hexadecimal number.
-
-Bundles are discovered into a queue of length `CONFIG_BPLIB_EGRESS_CACHE_LEN`
-for each channel and contact, breaking when the queue is full. Bundle data is
-not read yet, only the EID check is made.
-The order in which they are found by `vfs_readdir` is the order in which they
-will be egressed, which is usually *not* ordered by anything.
-
-Then the bundles are read from storage from the queue until it is empty.
-
-`bplib_stor_vfs_contact_changed` and `bplib_stor_vfs_channel_changed` are used
-to notify the implementation that the cache is not valid anymore, since the
-reachable EIDs might have changed. This is automatically done in the default FWP
-implementation.
-
-@see pkg_bplib_fwp
-
-### VFS Storage - Ordered Egress
+### VFS Storage
 
 `bplib_stor_vfs_ordered` module.
 
