@@ -290,11 +290,12 @@ void gnrc_ndp_nbr_sol_send(const ipv6_addr_t *tgt, gnrc_netif_t *netif,
     gnrc_netif_acquire(netif);
     do {    /* XXX hidden goto */
         /* check if there is a fitting source address to target */
-        if (!src) {
+        if (src == NULL) {
             src = gnrc_netif_ipv6_addr_best_src(netif, tgt, false);
         }
+
         /* add SL2AO based on interface and source address */
-        if (src && !ipv6_addr_is_unspecified(src)) {
+        if ((src != NULL) && !ipv6_addr_is_unspecified(src)) {
             l2src_len = _get_l2src(netif, l2src);
 
             if (l2src_len > 0) {
@@ -361,7 +362,7 @@ void gnrc_ndp_nbr_adv_send(const ipv6_addr_t *tgt, gnrc_netif_t *netif,
             DEBUG("ndp: tgt not assigned to interface. Abort sending\n");
             break;
         }
-        if (!(src = gnrc_netif_ipv6_addr_best_src(netif, dst, true))) {
+        if ((src = gnrc_netif_ipv6_addr_best_src(netif, dst, true)) == NULL) {
             DEBUG("ndp: no VALID link-local source address found for NA\n");
             break;
         }
@@ -524,7 +525,8 @@ void gnrc_ndp_rtr_adv_send(gnrc_netif_t *netif, const ipv6_addr_t *src,
         }
         /* get address from source selection algorithm.
          * Only link local addresses may be used (RFC 4861 section 4.1) */
-        if (!src && !(src = gnrc_netif_ipv6_addr_best_src(netif, dst, true))) {
+        if ((src == NULL) &&
+            (src = gnrc_netif_ipv6_addr_best_src(netif, dst, true)) == NULL) {
             DEBUG("ndp rtr: no VALID source address found for RA\n");
             break;
         }
