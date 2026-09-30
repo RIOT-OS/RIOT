@@ -91,8 +91,13 @@ static void _resp_handler(const gcoap_request_memo_t *memo, coap_pkt_t* pdu,
         return;
     }
 
-    coap_block1_t block;
-    if (coap_get_block2(pdu, &block) && block.blknum == 0) {
+    coap_block2_t block;
+    int blockwise = coap_get_block2(pdu, &block);
+    if (blockwise < 0) {
+        puts("ERROR: Invalid Block2 Option");
+        return;
+    }
+    if (blockwise && block.blknum == 0) {
         puts("--- blockwise start ---");
     }
 
@@ -121,7 +126,7 @@ static void _resp_handler(const gcoap_request_memo_t *memo, coap_pkt_t* pdu,
     }
 
     /* ask for next block if present */
-    if (coap_get_block2(pdu, &block)) {
+    if (blockwise) {
         if (block.more) {
             unsigned msg_type = coap_get_type(pdu);
             if (block.blknum == 0 && !strlen(_last_req_uri)) {

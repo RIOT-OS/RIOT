@@ -19,6 +19,11 @@ ssize_t _flashwrite_handler(coap_pkt_t* pkt, uint8_t *buf, size_t len, coap_requ
 
     coap_block1_t block1;
     int blockwise = coap_get_block1(pkt, &block1);
+    if (blockwise < 0) {
+        const char *errmsg = "Block1";
+        return coap_reply_simple(pkt, COAP_CODE_BAD_OPTION, buf, len,
+                                 COAP_FORMAT_TEXT, errmsg, strlen(errmsg));
+    }
 
     printf("_flashwrite_handler(): received data: offset=%" PRIuSIZE
            " len=%u blockwise=%i more=%i\n",
