@@ -5,10 +5,9 @@ RAM_LEN ?= 0x40000
 PSEUDOMODULES += trustzone_m_nonsecure
 
 ifneq (,$(filter trustzone_m_nonsecure,$(USEMODULE)))
-
-# Shared nRF/Cortex-M code has to select the non-secure peripheral aliases.
-CFLAGS += -DNRF_TRUSTZONE_NONSECURE
-
+  # Shared nRF/Cortex-M code has to select the non-secure peripheral aliases.
+  # This define is also evaluated by `nrfx`.
+  CFLAGS += -DNRF_TRUSTZONE_NONSECURE
 endif
 
 FLASHFILE ?= $(BINFILE)
