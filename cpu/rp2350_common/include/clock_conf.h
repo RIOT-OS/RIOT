@@ -112,7 +112,7 @@
 /** Post divider for the PLL, calculated based on the post divider values */
 #define PDIV ((PLL_PD1 << PLL_PRIM_POSTDIV1_LSB) | (PLL_PD2 << PLL_PRIM_POSTDIV2_LSB))
 /** Feedback divider for the PLL, calculated based on the VCO frequency and
-* reference clock frequency */
+ * reference clock frequency */
 #define FBDIV ((PLL_VCO_FREQ / XOSC_HZ) / PLL_REF_DIV)
 
 #ifdef __cplusplus

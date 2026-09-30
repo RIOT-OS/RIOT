@@ -52,10 +52,11 @@ void core1_init(core_1_fn_t function, void *arg)
         0,
         1, /* Get the vector table pointer, this is needed to set the VTOR register on core1 */
         (uint32_t)rp_get_vector_poiner(), /*
-         * We allocate a stack "locally" instead of in the linker script
-         * since that would require changes to the base cortexm script
-         * which sound complicated to do on a per-cpu basis
-         */
+                                           * We allocate a stack "locally" instead of in the linker
+                                           * script since that would require changes to the base
+                                           * cortexm script which sound complicated to do on a
+                                           * per-cpu basis
+                                           */
         (uint32_t)&core_1_stack[0],
         /* Pointer to main function for core1 */
         (uint32_t)_core1_trampoline,
@@ -91,10 +92,11 @@ void core1_init(core_1_fn_t function, void *arg)
             };
 
             /* SEV -> Set Event
-             * See also: https://developer.arm.com/documentation/dui0473/m/arm-and-thumb-instructions/sev
-             * The Doc (p376) says that this is done to cover cases where core 1
-             * is waiting for FIFO space. Though, as I understand it, this shouldn't technically
-             * happen since we don't dynamically re-enable core1 (yet :D)
+             * See also:
+             * https://developer.arm.com/documentation/dui0473/m/arm-and-thumb-instructions/sev The
+             * Doc (p376) says that this is done to cover cases where core 1 is waiting for FIFO
+             * space. Though, as I understand it, this shouldn't technically happen since we don't
+             * dynamically re-enable core1 (yet :D)
              */
             rp_unblock_core();
         }
