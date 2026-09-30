@@ -24,17 +24,9 @@ extern "C" {
 /**
  * @brief   Compatibility wrapper for nRF9160
  */
-#ifdef NRF_FICR_S
-#  ifdef NRF_TRUSTZONE_NONSECURE
-#    if !defined(NRF_FICR_NS)
-#      define NRF_FICR_NS_BASE 0x2003E000
-#      define NRF_FICR_NS ((NRF_FICR_Type *)NRF_FICR_NS_BASE)
-#    endif
-#    define NRF_FICR NRF_FICR_NS
-#  else
-#    define NRF_FICR NRF_FICR_S
-#  endif
-#endif /* NRF_FICR_S */
+#if defined(NRF_FICR_S) && !defined(NRF_TRUSTZONE_NONSECURE)
+#  define NRF_FICR NRF_FICR_S
+#endif
 
 /**
  * @brief   Enable the workaround for the SPI single byte transmit errata (No.

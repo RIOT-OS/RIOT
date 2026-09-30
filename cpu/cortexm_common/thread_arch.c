@@ -130,8 +130,8 @@ extern uint32_t _sstack;
  * @brief   ARM Cortex-M specific exception return value, that triggers the
  *          return to the task mode stack pointer
  *
- *          If RIOT runs in non-secure mode, this return value must point
- *          to non-secure mode and and the non-secure exception stack.
+ * If RIOT runs in non-secure mode, this return value must point
+ * to non-secure mode and the non-secure exception stack.
  */
 #ifdef NRF_TRUSTZONE_NONSECURE
 #  define EXCEPT_RET_TASK_MODE      (0xffffffbc)
