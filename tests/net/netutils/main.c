@@ -235,7 +235,7 @@ static void test_sock_tl_name2ep__name_only(void)
 Test *tests_netutils_ipv6_tests(void)
 {
     for (unsigned i = 0; i < ARRAY_SIZE(dummy_netif); ++i) {
-        netif_register(&dummy_netif[i].netif);
+        netif_register(&dummy_netif[i].netif, NETIF_ANY, 0);
         dummy_netif[i].pid = i;
     }
 

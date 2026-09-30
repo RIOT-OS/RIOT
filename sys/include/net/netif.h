@@ -61,12 +61,69 @@ extern "C" {
 /** @} */
 
 /**
+ * @brief   Driver types for network interfaces.
+ *
+ * @warning New entries must be added at the bottom of the list
+ *          because the values need to remain constant to
+ *          generate stable L2 addresses.
+ * @{
+ */
+typedef enum {
+    NETIF_ANY = 0,         /**< Will match any interface type */
+    NETIF_AT86RF215,
+    NETIF_AT86RF2XX,
+    NETIF_CC2538,
+    NETIF_DOSE,
+    NETIF_ENC28J60,
+    NETIF_KW41ZRF,
+    NETIF_MRF24J40,
+    NETIF_NRF802154,
+    NETIF_STM32_ETH,
+    NETIF_CC110X,
+    NETIF_SX127X,
+    NETIF_SAM0_ETH,
+    NETIF_ESP_NOW,
+    NETIF_NRF24L01P_NG,
+    NETIF_SOCKET_ZEP,
+    NETIF_SX126X,
+    NETIF_SX1280,
+    NETIF_CC2420,
+    NETIF_ETHOS,
+    NETIF_SLIPDEV,
+    NETIF_TAP,
+    NETIF_W5100,
+    NETIF_ENCX24J600,
+    NETIF_ATWINC15X0,
+    NETIF_KW2XRF,
+    NETIF_ESP_ETH,
+    NETIF_ESP_WIFI,
+    NETIF_CDC_ECM,
+    NETIF_TINYUSB,
+    NETIF_W5500,
+    NETIF_ESP_IEEE802154,
+    NETIF_LPC1768_ETH,
+    NETIF_GRETH,
+    NETIF_EFM32_ETH,
+    /* add more if needed */
+} netif_type_t;
+/** @} */
+
+/**
+ * @brief   Will match any interface index
+ */
+#define NETIF_INDEX_ANY    (0xFF)
+
+/**
  * @brief Network interface descriptor.
  *
  * @note All network interfaces should inherit from this structure.
  */
 typedef struct {
     list_node_t node;               /**< Pointer to the next interface */
+#ifdef MODULE_NETIF_REGISTER
+    netif_type_t type;              /**< driver type used for the netif */
+    uint8_t index;                  /**< instance number of the netif */
+#endif
 #ifdef MODULE_NETSTATS_NEIGHBOR
     netstats_nb_table_t neighbors;  /**< Structure containing all L2 neighbors */
 #endif
@@ -193,11 +250,16 @@ int netif_set_opt(const netif_t *netif, netopt_t opt, uint16_t context,
  * @note    This functions should be called when initializing an interface.
  *
  * @param[in] netif     Interface to be registered
+ * @param[in] type      driver type of the interface, can be @ref NETIF_ANY
+ *                      if unknown or if the `netif_register` module is not
+ *                      used
+ * @param[in] index     index of the interface of the given type, can be
+ *                      @ref NETIF_INDEX_ANY
  *
  * @return  0 on success
  * @return  -EINVAL if @p netif is NULL.
  */
-int netif_register(netif_t *netif);
+int netif_register(netif_t *netif, netif_type_t type, uint8_t index);
 
 /**
  * @brief   Get IPv6 address(es) of the given interface
