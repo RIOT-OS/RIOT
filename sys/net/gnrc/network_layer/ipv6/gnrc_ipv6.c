@@ -500,11 +500,11 @@ static int _fill_ipv6_hdr(gnrc_netif_t *netif, gnrc_pktsnip_t *ipv6)
         if (ipv6_addr_is_loopback(&hdr->dst)) {
             ipv6_addr_set_loopback(&hdr->src);
         }
-        else if (!icmpv6_hdr ||
-                 (icmpv6_hdr->type != ICMPV6_RTR_SOL &&
-                  icmpv6_hdr->type != ICMPV6_NBR_SOL)) {
+        else if ((icmpv6_hdr == NULL) ||
+                 ((icmpv6_hdr->type != ICMPV6_RTR_SOL) &&
+                  (icmpv6_hdr->type != ICMPV6_NBR_SOL))) {
             ipv6_addr_t *src = gnrc_netif_ipv6_addr_best_src(netif, &hdr->dst, false);
-            if (!src) {
+            if (src == NULL) {
                 /*
                  * Unspecified source is intended for some NDP message types.
                  * If the source address for those type is set to unspecified,
@@ -530,7 +530,7 @@ static int _fill_ipv6_hdr(gnrc_netif_t *netif, gnrc_pktsnip_t *ipv6)
         gnrc_netif_release(netif);
         if (invalid_src) {
 #if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_6LN)
-            if (!icmpv6_hdr ||
+            if ((icmpv6_hdr == NULL) ||
                 ((icmpv6_hdr->type != ICMPV6_RTR_SOL) &&
                  (icmpv6_hdr->type != ICMPV6_NBR_SOL))) {
                 DEBUG("ipv6: preset packet source address %s is invalid\n",
