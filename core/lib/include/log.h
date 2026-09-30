@@ -85,123 +85,132 @@ typedef enum {
 } log_level_t;
 
 
-#if !defined(LOG_LEVEL) || defined(DOXYGEN)
+#if !defined(LOG_LEVEL)
 /**
  * @brief Default log level define
  */
 #  define LOG_LEVEL LOG_INFO
 #endif
 
-#if !defined(DOXYGEN)
-
 /* If the log unit is not provided, we assume the default created by the build system. */
-#  if !defined(LOG_UNIT)
-#    if defined(LOG_UNIT_DEFAULT)
-#      define LOG_UNIT LOG_UNIT_DEFAULT
-#    else
-#      define LOG_UNIT ""
-#    endif
+#if !defined(LOG_UNIT)
+#  if defined(LOG_UNIT_DEFAULT)
+#    define LOG_UNIT LOG_UNIT_DEFAULT
+#  else
+#    define LOG_UNIT ""
 #  endif
+#endif
 
-#  define _LOG_LEVEL_MATCHES(level) ((log_level_t)(level) <= (log_level_t)(LOG_LEVEL))
-
-/* If LOG is present in make, switch to new logic: LOG invocations used to always have an effect
- * if the level matched, now they only do if contained in LOG. DEBUG invocations used to only
- * have an effect when ENABLE_DEBUG was turned on, now they do too if contained in LOG */
-#  if defined(LOG_UNITS_SELECTIVE)
-/*   New behavior:
- *   - LOG() iff level and unit matches
- *   - DEBUG() iff (ENABLE_DEBUG or [level and unit matches, just like LOG])
- */
-#    define _CAN_LOG_H(level, unit) (_LOG_LEVEL_MATCHES(level) && _LOG_UNIT_ENABLED(unit))
-#    define _CAN_DEBUG_H(level, unit) (ENABLE_DEBUG || _CAN_LOG_H(level, unit))
-
-/*   There are three tiers of selective logging: */
-#    if defined(LOG_UNITS_SELECTIVE_ALL)
-/*     1. LOG="ALL", i.e., enable all log units */
-#      define _LOG_UNIT_ENABLED(unit) true
-#    elif defined(LOG_UNITS_SELECTIVE_PATTERNS)
-/*     2. LOG="core.irq ztimer", i.e., enable log units by prefix pattern */
-#      define _LOG_UNIT_ENABLED(unit) ((strlen(unit) > 0) && ({                                \
-            bool forced = false;                                                                   \
-            for (unsigned int i = 0; i < ARRAY_SIZE((const char*[]){ LOG_UNITS_SELECTIVE_PATTERNS }); i += 1) {    \
-                forced |= strncmp(((const char*[]){ LOG_UNITS_SELECTIVE_PATTERNS })[i], unit,                      \
-                           strlen(((const char*[]){ LOG_UNITS_SELECTIVE_PATTERNS })[i])) == 0;                     \
-            }                                                                                      \
-            forced;                                                                                \
-        }))
-#    else
-/*     3. LOG="", i.e., disable all log units */
-#      define _LOG_UNIT_ENABLED(unit) false
-#    endif
-
-#  else /* defined(LOG_UNITS_SELECTIVE) */
-/*   Old behavior:
- *   - LOG() iff level matches
- *   - DEBUG() iff ENABLE_DEBUG is on. */
-#    define _CAN_LOG_H(level, unit) _LOG_LEVEL_MATCHES(level)
-#    define _CAN_DEBUG_H(level, unit) ENABLE_DEBUG
-#  endif /* defined(LOG_UNITS_SELECTIVE) */
-
-#  if defined(__clang__)
-#    define __LOG_PROLOGUE \
-      _Pragma("clang diagnostic push") \
-      _Pragma("clang diagnostic ignored \"-Wtautological-compare\"")
-#    define __LOG_EPILOGUE \
-      _Pragma("clang diagnostic pop")
-#  else /* defined(__clang__) */
-#    define __LOG_PROLOGUE
-#    define __LOG_EPILOGUE
-#  endif /* defined(__clang__) */
-
-#endif /* !defined(DOXYGEN) */
-
-#define LOG_WRITE(level, unit, ...) \
+#define LOG_WITH_UNIT_WRITER(write, level, unit, ...) \
     do { __LOG_PROLOGUE \
         if (_CAN_LOG_H(level, unit)) { \
-            log_write(level, (unit), __VA_ARGS__); \
+            write(level, (unit), __VA_ARGS__); \
         } \
     } while (0U) __LOG_EPILOGUE
 
-#define LOG_WRITE_CONT(level, unit, ...) \
-    do { __LOG_PROLOGUE \
-        if (_CAN_LOG_H(level, unit)) { \
-            log_write_continue(level, (unit), __VA_ARGS__); \
-        } \
-    } while (0U) __LOG_EPILOGUE
-
-#define LOG(level, ...)      LOG_WRITE(level, LOG_UNIT, __VA_ARGS__)
-#define LOG_CONT(level, ...) LOG_WRITE_CONT(level, LOG_UNIT, __VA_ARGS__)
+#define LOG_WITH_UNIT(level, unit, ...) LOG_WITH_UNIT_WRITER(log_write, level, unit, __VA_ARGS__)
+#define LOG(level, ...) LOG_WITH_UNIT(level, LOG_UNIT, __VA_ARGS__)
 
 #define LOG_ERROR(...)   LOG(LOG_ERROR,   __VA_ARGS__)
 #define LOG_WARNING(...) LOG(LOG_WARNING, __VA_ARGS__)
 #define LOG_INFO(...)    LOG(LOG_INFO,    __VA_ARGS__)
 #define LOG_DEBUG(...)   LOG(LOG_DEBUG,   __VA_ARGS__)
-/** @} */
 
+#define LOG_CONT_WITH_UNIT_WRITER(write, level, unit, ...) \
+    do { __LOG_PROLOGUE \
+        if (_CAN_LOG_H(level, unit)) { \
+            write(level, (unit), __VA_ARGS__); \
+        } \
+    } while (0U) __LOG_EPILOGUE
 
-#ifdef MODULE_LOG
-#  include "log_module.h"
-#else
-#  include <stdio.h>
+#define LOG_CONT_(level, unit, ...) LOG_CONT_WITH_UNIT_WRITER(log_write_continue, unit, __VA_ARGS__)
+#define LOG_CONT(level, ...) LOG_CONT_(level, LOG_UNIT, __VA_ARGS__)
 
-/**
- * @brief Default log_write function, just maps to printf
+/** @} */ /* section */
+
+/** @cond */ /* hide */
+
+/* If LOG is present in make, switch to new logic: LOG invocations used to always have an effect
+ * if the level matched, now they only do if contained in LOG. DEBUG invocations used to only
+ * have an effect when ENABLE_DEBUG was turned on, now they do too if contained in LOG */
+#if defined(LOG_SELECTIVE)
+/*   New behavior:
+ *   - LOG() iff level and unit matches
+ *   - DEBUG() iff (ENABLE_DEBUG or [level and unit matches, just like LOG])
  */
+#  define _CAN_LOG_H(level, unit) _LOG_UNIT_ENABLED(unit, level)
+#  define _CAN_DEBUG_H(level, unit) (ENABLE_DEBUG || _CAN_LOG_H(level, unit))
+
+/*   There are three tiers of selective logging: */
+#  if defined(LOG_SELECTIVE_ALL)
+/*   1. LOG="ALL", i.e., enable all log units */
+#    define _LOG_UNIT_ENABLED(unit, level) true
+#  elif defined(LOG_SELECTIVE_PATTERNS) && defined(LOG_SELECTIVE_LEVELS)
+/*   2. LOG="core.irq ztimer", i.e., enable log units by prefix pattern */
+#    define _LOG_UNIT_ENABLED(unit, level) ((strlen(unit) > 0) && ({                                \
+        bool forced = false;                                                                   \
+        for (unsigned int i = 0; i < ARRAY_SIZE((const char*[]){ LOG_SELECTIVE_PATTERNS }); i += 1) {    \
+            forced |= strncmp(((const char*[]){ LOG_SELECTIVE_PATTERNS })[i], (unit),                      \
+                       strlen(((const char*[]){ LOG_SELECTIVE_PATTERNS })[i])) == 0 \
+                       && (log_level_t)(level) <= ((log_level_t[]){ LOG_SELECTIVE_LEVELS })[i];                     \
+        }                                                                                      \
+        forced;                                                                                \
+      }))
+#  else
+/*   3. LOG="", i.e., disable all log units */
+#    define _LOG_UNIT_ENABLED(unit, level) false
+#  endif
+
+#else /* defined(LOG_SELECTIVE) */
+/* Old behavior:
+ * - LOG() iff level matches
+ * - DEBUG() iff ENABLE_DEBUG is on. */
+#  define _CAN_LOG_H(level, unit) ((log_level_t)(level) <= (log_level_t)(LOG_LEVEL))
+#  define _CAN_DEBUG_H(level, unit) ENABLE_DEBUG
+#endif /* defined(LOG_SELECTIVE) */
+
+#if defined(__clang__)
+#  define __LOG_PROLOGUE \
+ _Pragma("clang diagnostic push") \
+ _Pragma("clang diagnostic ignored \"-Wtautological-compare\"")
+#  define __LOG_EPILOGUE \
+ _Pragma("clang diagnostic pop")
+#else /* defined(__clang__) */
+#  define __LOG_PROLOGUE
+#  define __LOG_EPILOGUE
+#endif /* defined(__clang__) */
+
+#if defined(MODULE_LOG)
+#  include "log_module.h"
+#endif
+
+#if defined(LOG_FORMAT)
+#  include "macros/print.h"
+#  define log_write(level, unit, ...) do { \
+        LOG_FORMAT(print, level, unit, ""); \
+        print(__VA_ARGS__); \
+    } while (0)
+#  define log_write_continue(level, unit, ...) \
+        print(LOG_STREAM, __VA_ARGS__)
+#elif !defined(MODULE_LOG)
+#  if !defined(CONFIG_LOG_SHOW_UNIT)
+#    define CONFIG_LOG_SHOW_UNIT 1
+#  endif
+#  include "macros/print.h"
 #  define log_write(level, unit, ...) \
     do { \
         if (IS_ACTIVE(CONFIG_LOG_SHOW_UNIT) && (unit) && (unit)[0]) { \
-            printf("%s: ", (unit)); \
+            print("%s: ", (unit)); \
         } \
-        printf(__VA_ARGS__); \
+        print(__VA_ARGS__); \
     } while (0)
-
 #  define log_write_continue(level, unit, ...) \
     do { \
-        printf(__VA_ARGS__); \
+        print(__VA_ARGS__); \
     } while (0)
-
 #endif
+
+/** @endcond */ /* hide */
 
 #ifdef __cplusplus
 }

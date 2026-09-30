@@ -33,7 +33,6 @@
 #include "irq.h"
 #include "sched.h"
 #include "thread.h"
-#include "log.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -90,22 +89,24 @@ extern "C" {
 #endif
 
 /**
- * @brief Use `printf` and `puts` for @ref DEBUG, @ref DEBUG_CONT,
- *        @ref DEBUG_PUTS instead of @ref LOG_DEBUG
+ * @brief Treat  @ref DEBUG, @ref DEBUG_CONT, @ref DEBUG_PUTS like @ref LOG_DEBUG
  *
  * **Default**: Enabled (1)
  *
- * If turned on, `DEBUG` invocations route directly to `printf` and `puts`.
- * If turned off, `DEBUG` is treated like @ref LOG_DEBUG.
+ * If turned off, `DEBUG` invocations route directly to `printf` and `puts`.
+ * If turned on, `DEBUG` is treated like @ref LOG_DEBUG.
  *
  * Some deployments may rely on a custom log backend that does not expect
  * to handle all DEBUG messages additionally. To help the transition,
- * turn on CONFIG_DEBUG_COMPAT for the old separate behavior of DEBUG and LOG.
+ * turn off CONFIG_DEBUG_AS_LOG for the old, separate behavior of DEBUG and LOG.
  */
-#if !defined(CONFIG_DEBUG_COMPAT) || defined(DOXYGEN)
-#  define CONFIG_DEBUG_COMPAT 0
+#if !defined(CONFIG_DEBUG_AS_LOG) || defined(DOXYGEN)
+#  define CONFIG_DEBUG_AS_LOG 1
 #endif
 
+#if CONFIG_DEBUG_AS_LOG
+#  include "log.h"
+#endif
 
 /**
  * @brief   Contains the function name if compiler supports it.
@@ -119,37 +120,6 @@ extern "C" {
 #  define DEBUG_FUNC __FUNCTION__
 #else
 #  define DEBUG_FUNC ""
-#endif
-
-/**
- * @brief   Contains the file path if compiler supports it.
- *          Otherwise it is an empty string.
- */
-#if defined(__FILE__) || defined(DOXYGEN)
-#  define DEBUG_FILE_PATH __FILE__
-#else
-#  define DEBUG_FILE_PATH ""
-#endif
-
-/**
- * @brief   Contains the file name if compiler supports it.
- *          Otherwise it is an empty string.
- */
-#if defined(__FILE_NAME__) || defined(DOXYGEN)
-#  define DEBUG_FILE_NAME __FILE_NAME__
-#else
-#  define DEBUG_FILE_NAME ""
-#endif
-
-
-/**
- * @brief   Contains the file line number if compiler supports it.
- *          Otherwise it is an empty string.
- */
-#if defined(__LINE__) || defined(DOXYGEN)
-#  define DEBUG_LINE __LINE__
-#else
-#  define DEBUG_LINE ""
 #endif
 
 /** @} */ /* end of section */
@@ -171,7 +141,7 @@ extern "C" {
  * @retval   true               Stack is sufficiently big, or `DEVELHELP` is disabled
  * @retval   false              Stack is too small
  */
-static inline bool __debug_sufficient_stack(bool print)
+static inline bool _debug_sufficient_stack(bool print)
 {
     /* DO NOT call any function here that invokes DEBUG OR LOG in here. */
 #if IS_ACTIVE(DEVELHELP)
@@ -200,7 +170,7 @@ static inline bool __debug_sufficient_stack(bool print)
  *
  * @return   the thread name, or "<isr>"
  */
-static inline const char *__debug_thread_name_or_isr(void)
+static inline const char* _debug_thread_name_or_isr(void)
 {
     const thread_t *thread = thread_get_active();
     return (irq_is_in() || thread == NULL) ? "<isr>" : thread_get_name(thread);
@@ -208,25 +178,25 @@ static inline const char *__debug_thread_name_or_isr(void)
 
 /** @} */ /* end of section */
 
-#ifndef DOXYGEN
-#  if CONFIG_DEBUG_COMPAT
-#    define debug_write_fmt(unit, ...) printf(__VA_ARGS__)
-#    define debug_write_fmt_continue(unit, ...) printf(__VA_ARGS__)
-#    define debug_write_str(unit, str) puts(str)
-#  else /* CONFIG_DEBUG_AS_LOG */
-#    define debug_write_fmt(unit, ...) log_write(LOG_DEBUG, unit, __VA_ARGS__)
-#    define debug_write_fmt_continue(unit, ...) log_write(LOG_DEBUG, unit, __VA_ARGS__)
-#    define debug_write_str(unit, str) log_write(LOG_DEBUG, unit, str)
-#  endif /* CONFIG_DEBUG_AS_LOG */
-#endif /* !defined(DOXYGEN) */
+/** @cond */ /* hide */
+#if CONFIG_DEBUG_AS_LOG
+#  define debug_write_fmt(unit, ...)          log_write(LOG_DEBUG, unit, __VA_ARGS__)
+#  define debug_write_fmt_continue(unit, ...) log_write(LOG_DEBUG, unit, __VA_ARGS__)
+#  define debug_write_str(unit, str)          log_write(LOG_DEBUG, unit, str)
+#else /* CONFIG_DEBUG_AS_LOG */
+#  define debug_write_fmt(unit, ...)          printf(__VA_ARGS__)
+#  define debug_write_fmt_continue(unit, ...) printf(__VA_ARGS__)
+#  define debug_write_str(unit, str)          puts(str)
+#endif /* CONFIG_DEBUG_AS_LOG */
+/** @endcond */ /* show */
 
 /**
- * @name User-facing debug print API
+ * @name User-facing debug message API
  * @{
  */
 
 #define DEBUG(...) do { __LOG_PROLOGUE                                              \
-        if (_CAN_DEBUG_H(LOG_DEBUG, LOG_UNIT) && __debug_sufficient_stack(false)) { \
+        if (_CAN_DEBUG_H(LOG_DEBUG, LOG_UNIT) && _debug_sufficient_stack(false)) {  \
             debug_write_fmt(LOG_UNIT, __VA_ARGS__);                                 \
         }                                                                           \
     } while (0) __LOG_EPILOGUE
@@ -242,14 +212,14 @@ static inline const char *__debug_thread_name_or_isr(void)
  * in conjunction with defining @ref DEBUG_.
  */
 #define DEBUG_CONT(...) do { __LOG_PROLOGUE                                         \
-        if (_CAN_DEBUG_H(LOG_DEBUG, LOG_UNIT) && __debug_sufficient_stack(false)) { \
+        if (_CAN_DEBUG_H(LOG_DEBUG, LOG_UNIT) && _debug_sufficient_stack(false)) {  \
             debug_write_fmt_continue(LOG_UNIT, __VA_ARGS__);                        \
         }                                                                           \
     } while (0) __LOG_EPILOGUE
 
 
 #define DEBUG_PUTS(str) do { __LOG_PROLOGUE                                         \
-        if (_CAN_DEBUG_H(LOG_DEBUG, LOG_UNIT) && __debug_sufficient_stack(false)) { \
+        if (_CAN_DEBUG_H(LOG_DEBUG, LOG_UNIT) && _debug_sufficient_stack(false)) {  \
             debug_write_str(LOG_UNIT, str "\n");                                    \
         }                                                                           \
     } while (0) __LOG_EPILOGUE

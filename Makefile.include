@@ -291,27 +291,41 @@ endif
 
 # Override LOG_LEVEL if variable is set and if CFLAGS doesn't already contain
 # a LOG_LEVEL config
+VALID_LOG_LEVELS = NONE ERROR WARNING INFO DEBUG ALL
 ifdef LOG_LEVEL
   ifeq (,$(filter -DLOG_LEVEL=%,$(CFLAGS)))
     ifneq (,$(filter 0 1 2 3 4 5 6 7 8 9 10,$(strip $(LOG_LEVEL))))
       CFLAGS += -DLOG_LEVEL=$(LOG_LEVEL)
-    else ifneq (,$(filter NONE ALL ERROR WARNING INFO DEBUG,$(patsubst LOG_%,%,$(LOG_LEVEL))))
+    else ifneq (,$(filter $(VALID_LOG_LEVELS),$(patsubst LOG_%,%,$(LOG_LEVEL))))
       CFLAGS += -DLOG_LEVEL=LOG_$(patsubst LOG_%,%,$(LOG_LEVEL))
     else
-      $(info Value '$(strip $(LOG_LEVEL))' is not a valid log level.)
-      $(info +++ FIXIT: Pass DEBUG, INFO, WARNING, ERROR, ALL, or NONE as LOG_LEVEL.)
+      $(error Invalid log level: $(strip $(LOG_LEVEL)))
     endif
+  else
+    $(warning LOG_LEVEL overruled by $(filter -DLOG_LEVEL=%,$(CFLAGS)))
   endif
 endif
 
 # Set log unit prefixes from "core.sched ztimer" to "core.sched", "ztimer"s
 ifneq ($(origin LOG), undefined)
   # Turn on new selective logging system only if LOG is present
-  CFLAGS += -DLOG_UNITS_SELECTIVE=1
+  CFLAGS += -DLOG_SELECTIVE=1
   ifeq (ALL,$(strip $(LOG)))
-    CFLAGS += -DLOG_UNITS_SELECTIVE_ALL=1
+    CFLAGS += -DLOG_SELECTIVE_ALL=1
   else ifneq (,$(strip $(LOG)))
-    CFLAGS_WITH_MACROS += -DLOG_UNITS_SELECTIVE_PATTERNS=\"$(shell echo '$(sort $(LOG))' | sed 's/ /\\",\\"/g')\"
+    LOG_LEVELS_INVALID = $(filter-out $(LOG), \
+      $(filter-out $(VALID_LOG_LEVELS), \
+        $(notdir $(subst =,/,$(LOG))) \
+      ))
+    ifneq ($(LOG_LEVELS_INVALID),)
+      $(error Invalid log levels: $(LOG_LEVELS_INVALID))
+    endif
+    # e.g., "unit1", "unit2", "unit3"
+    CFLAGS_WITH_MACROS += \
+      -DLOG_SELECTIVE_PATTERNS="$(foreach c,$(LOG),\"$(word 1,$(subst =, ,$(c)))\",)"
+    # e.g., LOG_DEBUG, LOG_WARNING, LOG_LEVEL
+    CFLAGS_WITH_MACROS += \
+      -DLOG_SELECTIVE_LEVELS="$(foreach c,$(LOG),LOG_$(or $(word 2,$(subst =, ,$(c))),LEVEL),)"
   endif
 endif
 
