@@ -22,6 +22,7 @@
 
 #include "net/af.h"
 #include "net/gnrc/netif/raw.h"
+#include "net/gnrc/ipv6/nib.h"
 #include "net/ipv6/addr.h"
 #include "net/netdev_test.h"
 #include "net/sock/udp.h"
@@ -210,6 +211,7 @@ int main(void)
     netdev_test_set_get_cb(&netdev_test, NETOPT_SRC_LEN, netdev_get_src_len);
     gnrc_netif_raw_create(&netif, netif_stack, sizeof(netif_stack), NETIF_PRIO,
                           "netdev_test", netdev);
+    gnrc_ipv6_nib_iface_up(&netif);
 
     sock_udp_t sock;
     sock_udp_ep_t local = SOCK_IPV6_EP_ANY;
