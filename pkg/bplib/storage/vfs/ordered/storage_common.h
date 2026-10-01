@@ -34,6 +34,7 @@ extern "C" {
 
 /** @brief If the bundle is a custodial bundle */
 #define STORAGE_HEADER_FLAG_CUSTODIAL       0x01
+
 /**
  * @brief If retransmissions are turned off
  *
@@ -64,7 +65,7 @@ extern "C" {
 /**
  * @brief Size of the index file
  *
- * It contains 3 * uint64_t => 24
+ * It contains 3 * uint64_t => 24 bytes
  */
 #define BUNDLE_STORAGE_INDEX_SIZE       (3 * sizeof(uint64_t))
 
@@ -102,7 +103,7 @@ typedef struct {
  * @brief Helper to mirror the layout of bundles in a file (hence packed)
  *
  * This packed struct should only be used for offset calculation and not for
- * storing data
+ * storing data.
  */
 typedef struct __attribute__((packed)) {
     /** @brief First: Storage specific header */
@@ -135,9 +136,10 @@ extern bplib_stor_common_data_t bplib_stor_common_data;
 /**
  * @brief Find the path of the bundle data by the ID
  *
- * @param bundle_id Bundle ID. An index file with this ID should exist.
+ * @param[in] bundle_id Bundle ID. An index file with this ID should exist.
  * @param[out] path_dat Pointer to buffer of size >= BPLIB_STOR_PATHLEN_DAT
- * @return success indicated by bool. Only on true the path is valid.
+ *
+ * @return true on success, when the path was filled, false otherwise
  */
 bool bplib_stor_vfs_bundle_path_from_id(uint32_t bundle_id, char* path_dat);
 
@@ -156,18 +158,18 @@ void bplib_stor_vfs_delete_bundle(uint32_t bundle_id);
 /**
  * @brief Update the retransmission timestamp of the custodial bundle at path
  *
- * The next retransmission will happen NOT BEFORE the current time +
- * retrans_interval [ms]. One exception to this is the case where retrans_interval
- * == 0. Then retransmissions will be turned off, until this function is called
- * again with non zero value.
+ * The next retransmission will happen NOT BEFORE
+ * `current time + retrans_interval` [ms]. One exception to this is the case
+ * where `retrans_interval == 0`. Then retransmissions will be turned off, until
+ * this function is called again with a non-zero value.
  *
- * @param path Path of the bundle
- * @param retrans_interval Time [ms] in which to do the next retransmission
+ * @param[in] path Path of the bundle
+ * @param[in] retrans_interval Time [ms] in which to do the next retransmission
  *
- * @return bool success of operation
+ * @return true if the operation succeeded, false otherwise
  */
 bool bplib_stor_vfs_update_retransmission_time(const char* path,
-                                                      uint32_t retrans_interval);
+                                               uint32_t retrans_interval);
 
 #ifdef __cplusplus
 }

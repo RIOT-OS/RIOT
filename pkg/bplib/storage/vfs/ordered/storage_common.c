@@ -23,13 +23,6 @@
 
 bplib_stor_common_data_t bplib_stor_common_data;
 
-/**
- * @brief Find the path of the bundle data by the ID
- *
- * @param bundle_id Bundle ID. An index file with this ID should exist.
- * @param[out] path_dat Pointer to buffer of size >= BPLIB_STOR_PATHLEN_DAT
- * @return success indicated by bool. Only on true the path is valid.
- */
 bool bplib_stor_vfs_bundle_path_from_id(uint32_t bundle_id, char* path_dat)
 {
     char path_idx[BPLIB_STOR_PATHLEN_IDX] = BPLIB_STOR_PATH_INDEX;
