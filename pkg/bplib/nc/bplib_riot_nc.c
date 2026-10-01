@@ -325,15 +325,15 @@ BPLib_Status_t bplib_channel_set_state(uint32_t channel, BPLib_NC_ApplicationSta
     BPLib_NC_ApplicationState_t curr_state = BPLib_NC_GetAppState(channel);
 
     /* For fast forward, try to call this function recursively once to change this state */
-    if (curr_state == BPLIB_NC_APP_STATE_REMOVED && state == BPLIB_NC_APP_STATE_STARTED) {
+    if ((curr_state == BPLIB_NC_APP_STATE_REMOVED) && (state == BPLIB_NC_APP_STATE_STARTED)) {
         status = bplib_channel_set_state(channel, BPLIB_NC_APP_STATE_ADDED);
     }
-    else if (curr_state == BPLIB_NC_APP_STATE_STARTED && state == BPLIB_NC_APP_STATE_REMOVED) {
+    else if ((curr_state == BPLIB_NC_APP_STATE_STARTED) && (state == BPLIB_NC_APP_STATE_REMOVED)) {
         status = bplib_channel_set_state(channel, BPLIB_NC_APP_STATE_STOPPED);
     }
 
     if (status != BPLIB_SUCCESS) {
-        /* Fast forward failed */
+        /* This was a fast forward transition and the first transition failed */
         return status;
     }
 
@@ -370,15 +370,15 @@ BPLib_Status_t bplib_contact_set_state(uint32_t contact, BPLib_CLA_ContactRunSta
     }
 
     /* For fast forward, try to call this function recursively once to change this state */
-    if (curr_state == BPLIB_CLA_TORNDOWN && state == BPLIB_CLA_STARTED) {
+    if ((curr_state == BPLIB_CLA_TORNDOWN) && (state == BPLIB_CLA_STARTED)) {
         status = bplib_contact_set_state(contact, BPLIB_CLA_SETUP);
     }
-    else if (curr_state == BPLIB_CLA_STARTED && state == BPLIB_CLA_TORNDOWN) {
+    else if ((curr_state == BPLIB_CLA_STARTED) && (state == BPLIB_CLA_TORNDOWN)) {
         status = bplib_contact_set_state(contact, BPLIB_CLA_STOPPED);
     }
 
     if (status != BPLIB_SUCCESS) {
-        /* Fast forward failed */
+        /* This was a fast forward transition and the first transition failed */
         return status;
     }
 
