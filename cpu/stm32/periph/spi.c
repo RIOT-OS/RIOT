@@ -398,6 +398,11 @@ static inline void _wait_for_end(spi_t bus)
 }
 
 #ifdef MODULE_PERIPH_DMA
+static void _unlock(void *ctx)
+{
+    mutex_unlock(ctx);
+}
+
 static void _transfer_dma(spi_t bus, const void *out, void *in, size_t len)
 {
     uint8_t tmp = 0;
@@ -446,6 +451,12 @@ static void _transfer_dma(spi_t bus, const void *out, void *in, size_t len)
         dma_prepare(spi_config[bus].rx_dma, &tmp, len, 0);
     }
 #endif
+
+    mutex_t rx_lock = MUTEX_INIT_LOCKED;
+    mutex_t tx_lock = MUTEX_INIT_LOCKED;
+    dma_set_cb(spi_config[bus].rx_dma, _unlock, &rx_lock);
+    dma_set_cb(spi_config[bus].tx_dma, _unlock, &tx_lock);
+
     /* Start RX first to ensure it is active before the SPI transfers are
      * triggered by the TX dma activity */
     dma_start(spi_config[bus].rx_dma);
@@ -456,8 +467,8 @@ static void _transfer_dma(spi_t bus, const void *out, void *in, size_t len)
     dev(bus)->CR1 |= SPI_CR1_CSTART;
 #endif
 
-    dma_wait(spi_config[bus].rx_dma);
-    dma_wait(spi_config[bus].tx_dma);
+    mutex_lock(&rx_lock);
+    mutex_lock(&tx_lock);
 
 #if defined(DMA_CCR_EN) || defined(CPU_FAM_STM32H7)
     dma_stop(spi_config[bus].rx_dma);

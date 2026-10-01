@@ -88,7 +88,8 @@
 struct dma_ctx {
     STM32_DMA_Stream_Type *stream;
     mutex_t conf_lock;
-    mutex_t sync_lock;
+    dma_cb_t cb;
+    void *ctx;
     uint16_t len;
 };
 
@@ -320,13 +321,16 @@ void dma_init(void)
 {
     for (unsigned i = 0; i < DMA_NUMOF; i++) {
         mutex_init(&dma_ctx[i].conf_lock);
-        mutex_init(&dma_ctx[i].sync_lock);
-        mutex_lock(&dma_ctx[i].sync_lock);
         int stream_n = dma_config[i].stream;
         dma_poweron(stream_n);
         dma_isr_enable(stream_n);
         dma_ctx[i].stream = dma_stream(stream_n);
     }
+}
+
+static void _unlock(void *arg)
+{
+    mutex_unlock(arg);
 }
 
 int dma_transfer(dma_t dma, int chan, const volatile void *src, volatile void *dst, size_t len,
@@ -336,9 +340,13 @@ int dma_transfer(dma_t dma, int chan, const volatile void *src, volatile void *d
     if (ret != 0) {
         return ret;
     }
+
+    mutex_t lock = MUTEX_INIT_LOCKED;
+    dma_set_cb(dma, _unlock, &lock);
     dma_start(dma);
-    dma_wait(dma);
+    mutex_lock(&lock);
     dma_stop(dma);
+    dma_set_cb(dma, NULL, NULL);
 
     return len;
 }
@@ -370,7 +378,16 @@ void dma_release(dma_t dma)
     /* unblock STOP mode */
     pm_unblock(STM32_PM_STOP);
 #endif
+    dma_set_cb(dma, NULL, NULL);
     mutex_unlock(&dma_ctx[dma].conf_lock);
+}
+
+void dma_set_cb(dma_t dma, dma_cb_t cb, void *ctx)
+{
+    assert(dma < DMA_NUMOF);
+
+    dma_ctx[dma].cb = cb;
+    dma_ctx[dma].ctx = ctx;
 }
 
 void dma_setup(dma_t dma, int chan, void *periph_addr, dma_mode_t mode,
@@ -617,16 +634,13 @@ void dma_stop(dma_t dma)
     stream->CONTROL_REG &= ~(uint32_t)DMA_EN;
 }
 
-void dma_wait(dma_t dma)
-{
-    mutex_lock(&dma_ctx[dma].sync_lock);
-}
-
 void dma_isr_handler(dma_t dma)
 {
     dma_clear_all_flags(dma);
 
-    mutex_unlock(&dma_ctx[dma].sync_lock);
+    if (dma_ctx[dma].cb) {
+        dma_ctx[dma].cb(dma_ctx[dma].ctx);
+    }
 
     cortexm_isr_end();
 }
@@ -739,7 +753,9 @@ static void shared_isr(uint8_t *streams, size_t nb)
         dma_t dma = streams[i];
         if (dma_is_isr(dma)) {
             dma_clear_all_flags(dma);
-            mutex_unlock(&dma_ctx[dma].sync_lock);
+            if (dma_ctx[dma].cb) {
+                dma_ctx[dma].cb(dma_ctx[dma].ctx);
+            }
         }
     }
 

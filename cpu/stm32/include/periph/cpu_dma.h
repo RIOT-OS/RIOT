@@ -86,6 +86,13 @@ typedef enum {
 } dma_fifo_thresh_t;
 
 /**
+ * @brief   Signature of event callback functions triggered from interrupts
+ *
+ * @param[in] arg       optional context for the callback
+ */
+typedef void (*dma_cb_t)(void *arg);
+
+/**
  * @brief   DMA channel/trigger configuration for DMA peripherals without
  *          channel/trigger filtering such as the stm32f1 and stm32f3.
  */
@@ -188,13 +195,6 @@ void dma_resume(dma_t dma, uint16_t remaining);
 void dma_stop(dma_t dma);
 
 /**
- * @brief   Wait for the end of a transfer
- *
- * @param[in] dma     logical DMA stream
- */
-void dma_wait(dma_t dma);
-
-/**
  * @brief   Configure a DMA stream for a new transfer
  *
  * @param[in]  dma     logical DMA stream
@@ -259,6 +259,21 @@ void dma_setup_ext(dma_t dma, dma_burst_t pburst, dma_burst_t mburst,
  * @param[in]   incr_mem    Increment the memory address (by the transfer width) after read/write
  */
 void dma_prepare(dma_t dma, void *mem, size_t len, bool incr_mem);
+
+/**
+ * @brief   Set DMA callback
+ *
+ * The callback is called from interrupt context when a transfer is complete.
+ * It must be set before @ref dma_start and stays set until it is changed or
+ * the stream is released with @ref dma_release.
+ *
+ * @note @ref dma_transfer sets its own callback and clears it afterwards.
+ *
+ * @param[in]   dma         Logical DMA stream
+ * @param[in]   cb          Callback function, NULL to disable
+ * @param[in]   ctx         Context passed to the callback (optional)
+ */
+void dma_set_cb(dma_t dma, dma_cb_t cb, void *ctx);
 
 #endif /* MODULE_PERIPH_DMA */
 
