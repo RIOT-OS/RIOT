@@ -39,7 +39,7 @@
  * If this fails, no index file will have been created (or it has been deleted again).
  *
  * @param[in] bundle Bundle to work with
- * @param expiration_timestamp Timestamp where the bundle expires
+ * @param[in] expiration_timestamp Timestamp where the bundle expires
  * @retval 0 on success
  * @retval -ERRNO on vfs errors
  */
@@ -58,19 +58,19 @@ static int _create_index_file(BPLib_Bundle_t* bundle, uint64_t expiration_timest
     }
 
     written = vfs_write(fd, &bundle->blocks.PrimaryBlock.DestEID.Node, sizeof(uint64_t));
-    if (written < 0 || written != (ssize_t) sizeof(uint64_t)) {
+    if (written != (ssize_t)sizeof(uint64_t)) {
         failed = true;
         goto close_file;
     }
 
     written = vfs_write(fd, &bundle->blocks.PrimaryBlock.DestEID.Service, sizeof(uint64_t));
-    if (written < 0 || written != (ssize_t) sizeof(uint64_t)) {
+    if (written != (ssize_t)sizeof(uint64_t)) {
         failed = true;
         goto close_file;
     }
 
     written = vfs_write(fd, &expiration_timestamp, sizeof(uint64_t));
-    if (written < 0 || written != (ssize_t) sizeof(uint64_t)) {
+    if (written != (ssize_t)sizeof(uint64_t)) {
         failed = true;
         goto close_file;
     }
@@ -102,8 +102,8 @@ close_file:
  *
  * This function will increment the counters regarding storage space.
  *
- * @param inst bplib instance
- * @param bundle The bundle to store
+ * @param[inout] inst bplib instance
+ * @param[in] bundle The bundle to store
  *
  * @retval BPLIB_SUCCESS on success
  * @retval other on error
@@ -138,17 +138,17 @@ static BPLib_Status_t _bplib_stor_impl(BPLib_Instance_t* inst, BPLib_Bundle_t* b
     }
 
     /* Create node directory */
-    len += sprintf(path + len, "/%" PRIx64, (int64_t) bundle->blocks.PrimaryBlock.DestEID.Node);
+    len += sprintf(path + len, "/%" PRIx64, (int64_t)bundle->blocks.PrimaryBlock.DestEID.Node);
     res = vfs_mkdir(path, 0777);
-    if (res < 0 && res != -EEXIST) {
+    if ((res < 0) && (res != -EEXIST)) {
         failed = true;
         goto end_storage;
     }
 
     /* Create service directory */
-    len += sprintf(path + len, "/%" PRIx64, (int64_t) bundle->blocks.PrimaryBlock.DestEID.Service);
+    len += sprintf(path + len, "/%" PRIx64, (int64_t)bundle->blocks.PrimaryBlock.DestEID.Service);
     res = vfs_mkdir(path, 0777);
-    if (res < 0 && res != -EEXIST) {
+    if ((res < 0) && (res != -EEXIST)) {
         failed = true;
         goto end_storage;
     }
@@ -169,25 +169,25 @@ static BPLib_Status_t _bplib_stor_impl(BPLib_Instance_t* inst, BPLib_Bundle_t* b
     header.flags |= bundle->Meta.IsCustodial ? STORAGE_HEADER_FLAG_CUSTODIAL : 0;
 
     header.retransmit_timestamp = (int64_t)BPLib_TIME_GetMonotonicTime()
-                                + bundle->Meta.RetransmitTime;
+                                  + bundle->Meta.RetransmitTime;
 
     /* Write header specific to this storage implementation */
     written = vfs_write(fd, &header, sizeof(bundle_file_header_t));
-    if (written < 0 || written != (ssize_t) sizeof(bundle_file_header_t)) {
+    if (written != (ssize_t)sizeof(bundle_file_header_t)) {
         failed = true;
         goto close_file;
     }
 
     /* Write bundle metadata */
     written = vfs_write(fd, &bundle->Meta, sizeof(BPLib_BundleMetaData_t));
-    if (written < 0 || written != (ssize_t) sizeof(BPLib_BundleMetaData_t)) {
+    if (written != (ssize_t)sizeof(BPLib_BundleMetaData_t)) {
         failed = true;
         goto close_file;
     }
 
     /* Write bundle blocks */
     written = vfs_write(fd, &bundle->blocks, sizeof(BPLib_BBlocks_t));
-    if (written < 0 || written != (ssize_t) sizeof(BPLib_BBlocks_t)) {
+    if (written != (ssize_t)sizeof(BPLib_BBlocks_t)) {
         failed = true;
         goto close_file;
     }
@@ -196,7 +196,7 @@ static BPLib_Status_t _bplib_stor_impl(BPLib_Instance_t* inst, BPLib_Bundle_t* b
     curr_mem_block = bundle->blob;
     while (curr_mem_block != NULL) {
         written = vfs_write(fd, curr_mem_block->user_data.BigData, curr_mem_block->used_len);
-        if (written < 0 || written != (ssize_t) curr_mem_block->used_len) {
+        if (written != (ssize_t)curr_mem_block->used_len) {
             failed = true;
             goto close_file;
         }
@@ -243,10 +243,10 @@ static void _bplib_stor_finalize_custody(BPLib_Instance_t* inst, BPLib_Bundle_t*
     }
 
     /* Finalize custodial transfer for custodial bundles */
-    (void) BPLib_CT_SignalCustody(inst, bundle, disp_code, bundle_stored);
+    BPLib_CT_SignalCustody(inst, bundle, disp_code, bundle_stored);
 
     /* Custodial bundles with an egress path should get sent out instead of freed */
-    (void) BPLib_CLA_GetContactRunState(bundle->Meta.EgressID, &con_state);
+    BPLib_CLA_GetContactRunState(bundle->Meta.EgressID, &con_state);
     if (bundle->Meta.EgressID < BPLIB_MAX_NUM_CONTACTS &&
         con_state == BPLIB_CLA_STARTED && disp_code == BPLib_CT_CustodyAccepted) {
         pushed_bundle = BPLib_QM_WaitQueueTryPush(&(inst->ContactEgressJobs[bundle->Meta.EgressID]),
