@@ -33,16 +33,16 @@
 static char _generic_worker_stack[CONFIG_BPLIB_GENERIC_STACK_SIZE];
 static char _maintenance_stack[CONFIG_BPLIB_MAINTENANCE_STACK_SIZE];
 
-static char _mem_pool[CONFIG_BPLIB_MEMPOOL_LEN] __attribute__ ((aligned (8)));
+static char _mem_pool[CONFIG_BPLIB_MEMPOOL_LEN] __attribute__((aligned (8)));
 
 bplib_instance_data_t bplib_instance_data;
 
 #define ENABLE_DEBUG 0
 #include "debug.h"
 
-static void* _generic_worker(void *arg)
+static void* _generic_worker(void* arg)
 {
-    (void) arg;
+    (void)arg;
     int32_t worker_id;
     BPLib_Status_t rv = BPLib_QM_RegisterWorker(&bplib_instance_data.BPLibInst, &worker_id);
     if (rv != BPLIB_SUCCESS) {
@@ -57,13 +57,12 @@ static void* _generic_worker(void *arg)
     return NULL;
 }
 
-static void* _maintenance_worker(void *arg)
+static void* _maintenance_worker(void* arg)
 {
-    (void) arg;
+    (void)arg;
     BPLib_Status_t status;
 
-    while (bplib_instance_data.running)
-    {
+    while (bplib_instance_data.running) {
         ztimer_sleep(ZTIMER_MSEC, CONFIG_BPLIB_MAINTENANCE_INTERVAL);
 
         status = BPLib_STOR_Egress(&bplib_instance_data.BPLibInst,

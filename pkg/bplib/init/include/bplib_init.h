@@ -133,8 +133,8 @@ extern bplib_instance_data_t bplib_instance_data;
  * started.
  *
  * @retval BPLIB_SUCCESS on success
- * @retval other error values from BPLib_NC_Init
  * @retval BPLIB_ERROR if the thread creation failed
+ * @return other error values from BPLib_NC_Init
  */
 BPLib_Status_t bplib_init(void);
 
