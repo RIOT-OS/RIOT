@@ -76,7 +76,7 @@ int bplib_cache_add(cache_list_t* cache,
             elem = container_of(old, cache_list_node_t, list);
         }
         else {
-            return 1;
+            return BPLIB_CACHE_ADD_IGNORED;
         }
     }
 
@@ -88,10 +88,10 @@ int bplib_cache_add(cache_list_t* cache,
     _bplib_cache_insert(&cache->list, elem);
 
     if (elem == NULL) {
-        return 2;
+        return BPLIB_CACHE_ADD_REPLACED;
     }
     else {
-        return 0;
+        return BPLIB_CACHE_ADD_ADDED;
     }
 }
 

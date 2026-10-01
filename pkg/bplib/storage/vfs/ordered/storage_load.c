@@ -34,6 +34,11 @@
 
 #include "vfs.h"
 
+/** @brief A bundle has been read and is in the iterator */
+#define NEXT_BUNDLE_PATH_BUNDLE_READ            0
+/** @brief Iteration completed without errors, no bundle is in the iterator */
+#define NEXT_BUNDLE_PATH_ITERATION_COMPLETED    1
+
 typedef struct {
     char path[BPLIB_STOR_PATHLEN_DAT];
     unsigned node_len;
@@ -99,16 +104,16 @@ static BPLib_Status_t _destroy_iterator(bundle_path_iterator_t* iterator)
  *
  * These bundles will already be filtered by the dest_eids, but will not yet be
  * filtered by the other conditions of the original SQL query, like the custodial
- * retransmit times. This has to happen outside of this function
+ * retransmit times. This has to happen outside of this function.
  *
  * @param[inout] iterator Iterator over the whole storage
  * @param[in] dest_eids Destination EID patterns to filter by
- * @param num_eids Number of EID entries in dest_eids
- * @retval 0 when one bundle has been read
+ * @param[in] num_eids Number of EID entries in dest_eids
+ * @retval NEXT_BUNDLE_PATH_BUNDLE_READ when one bundle has been read
  * @retval -EAGAIN when one subdirectory is fully traversed but no bundle has been read
  * @retval -EINVAL when the state is invalid or null pointers are passed
  * @retval -ERRNO respective negative errors from vfs_opendir if this fails
- * @retval 1 when traversal of the whole path is completed
+ * @retval NEXT_BUNDLE_PATH_ITERATION_COMPLETED when traversal of the whole path is completed
  */
 static int _next_bundle_path(bundle_path_iterator_t* iterator,
     const BPLib_EID_Pattern_t* dest_eids, size_t num_eids)
@@ -116,7 +121,6 @@ static int _next_bundle_path(bundle_path_iterator_t* iterator,
     int res;
     vfs_dirent_t entry;
     unsigned acc_len;
-    size_t i;
     bool match;
     uint64_t decoded;
 
@@ -150,7 +154,7 @@ static int _next_bundle_path(bundle_path_iterator_t* iterator,
         }
         if (res == 0) {
             /* All node_id directories have been read */
-            return 1;
+            return NEXT_BUNDLE_PATH_ITERATION_COMPLETED;
         }
         if (entry.d_name[0] == '.') {
             continue;
@@ -158,8 +162,8 @@ static int _next_bundle_path(bundle_path_iterator_t* iterator,
 
         decoded = strtoull(entry.d_name, NULL, 16);
         match = false;
-        for (i = 0; i < num_eids; i++) {
-            if (decoded >= dest_eids[i].MinNode && decoded <= dest_eids[i].MaxNode) {
+        for (size_t i = 0; i < num_eids; i++) {
+            if ((decoded >= dest_eids[i].MinNode) && (decoded <= dest_eids[i].MaxNode)) {
                 match = true;
                 break;
             }
@@ -204,8 +208,8 @@ static int _next_bundle_path(bundle_path_iterator_t* iterator,
 
         decoded = strtoull(entry.d_name, NULL, 16);
         match = false;
-        for (i = 0; i < num_eids; i++) {
-            if (decoded >= dest_eids[i].MinService && decoded <= dest_eids[i].MaxService) {
+        for (size_t i = 0; i < num_eids; i++) {
+            if ((decoded >= dest_eids[i].MinService) && (decoded <= dest_eids[i].MaxService)) {
                 match = true;
                 break;
             }
@@ -251,7 +255,7 @@ static int _next_bundle_path(bundle_path_iterator_t* iterator,
 
         /* Also ignore all bundles that have already expired */
         iterator->expiry_val = strtoull(entry.d_name, NULL, 16);
-        if (iterator->expiry_val <= (uint64_t) BPLib_TIME_GetMonotonicTime()) {
+        if (iterator->expiry_val <= (uint64_t)BPLib_TIME_GetMonotonicTime()) {
             continue;
         }
 
@@ -261,7 +265,7 @@ static int _next_bundle_path(bundle_path_iterator_t* iterator,
             "/%s", entry.d_name);
         iterator->id_val = strtol(strchr(entry.d_name, '_') + 1, NULL, 16);
 
-        return 0;
+        return NEXT_BUNDLE_PATH_BUNDLE_READ;
     }
 }
 
@@ -272,7 +276,7 @@ static int _next_bundle_path(bundle_path_iterator_t* iterator,
  * locally delivered (channels vs contacts).
  *
  * @param[in] iter Valid iterator result from _next_bundle_path()
- * @param local_delivery true if this bundle is local (this is a channel not a contact)
+ * @param[in] local_delivery true if this bundle is local (this is a channel not a contact)
  *
  * @retval 0  If the bundle SHOULD NOT be loaded
  * @retval >0 If the bundle SHOULD be loaded
@@ -300,8 +304,7 @@ static int _should_bundle_be_loaded(bundle_path_iterator_t* iter, bool local_del
 
         if (header.flags & STORAGE_HEADER_FLAG_CUSTODIAL) {
             if (!(header.flags & STORAGE_HEADER_FLAG_RETRANS_OFF) &&
-                (header.retransmit_timestamp <= (uint64_t)BPLib_TIME_GetMonotonicTime()))
-            {
+                (header.retransmit_timestamp <= (uint64_t)BPLib_TIME_GetMonotonicTime())) {
                 /* Load custodial bundles only if retransmissions are not turned off
                  * and the time for a retransmission is reached */
                 res = 1;
@@ -333,9 +336,9 @@ close_file:
  * bundles in storage, filtered by the EID patterns.
  *
  * @param[in] dest_eids The patterns by which to filter
- * @param num_eids Number of pattern provided
+ * @param[in] num_eids Number of pattern provided
  * @param[out] cache The cache to fill
- * @param local_delivery true if this egresses for a channel, false for a contact
+ * @param[in] local_delivery true if this egresses for a channel, false for a contact
  */
 static void _fill_bundle_cache(const BPLib_EID_Pattern_t* dest_eids,
     size_t num_eids, cache_list_t* cache, bool local_delivery)
@@ -348,35 +351,36 @@ static void _fill_bundle_cache(const BPLib_EID_Pattern_t* dest_eids,
         do {
             res = _next_bundle_path(&iterator, dest_eids, num_eids);
         } while (res == -EAGAIN);
-        /* bundle was found, is in the iterator or nothing was found */
-        if (res == 0) {
-            res = _should_bundle_be_loaded(&iterator, local_delivery);
-            if (res <= 0) {
-                /* A custodial bundle should not yet be retransmitted. */
-                cache->all_bundles_queued = false;
-                continue;
-            }
 
-            res = bplib_cache_add(cache, iterator.node_val, iterator.service_val,
-                iterator.expiry_val, iterator.id_val);
-
-            if (res > 0) {
-                /* Some bundle is now not in cache anymore */
-                cache->all_bundles_queued = false;
-            }
-
-            /* TODO for future efforts: Add early return option so that not all
-             * bundles in storage are searched and ordered, but only N, where N
-             * is the size of the cache. This should speed up egress, while
-             * giving up on the orderedness. */
-        }
-        else {
-            if (res != 1) {
-                /* Some other error but not full traversal */
+        /* Error or full traversal */
+        if (res != NEXT_BUNDLE_PATH_BUNDLE_READ) {
+            if (res != NEXT_BUNDLE_PATH_ITERATION_COMPLETED) {
+                /* On any error some bundles probably remain */
                 cache->all_bundles_queued = false;
             }
             break;
         }
+
+        /* A bundle was found and is in the iterator */
+        res = _should_bundle_be_loaded(&iterator, local_delivery);
+        if (res <= 0) {
+            /* A custodial bundle should not yet be retransmitted. */
+            cache->all_bundles_queued = false;
+            continue;
+        }
+
+        res = bplib_cache_add(cache, iterator.node_val, iterator.service_val,
+            iterator.expiry_val, iterator.id_val);
+
+        if ((res == BPLIB_CACHE_ADD_IGNORED) || (res == BPLIB_CACHE_ADD_REPLACED)) {
+            /* Some bundle is now not in cache anymore */
+            cache->all_bundles_queued = false;
+        }
+
+        /* TODO for future efforts: Add early return option so that not all
+            * bundles in storage are searched and ordered, but only N, where N
+            * is the size of the cache. This should speed up egress, while
+            * giving up on the orderedness. */
     }
 
     _destroy_iterator(&iterator);
@@ -399,6 +403,7 @@ static BPLib_Status_t _load_next_bundle(BPLib_Instance_t* inst, BPLib_Bundle_t**
     int fd;
     int res;
     ssize_t bytes_read;
+    ssize_t status;
     BPLib_MEM_Block_t* bundle_head = NULL;
     BPLib_MEM_Block_t* curr_block = NULL;
     BPLib_MEM_Block_t* next_block = NULL;
@@ -423,7 +428,11 @@ static BPLib_Status_t _load_next_bundle(BPLib_Instance_t* inst, BPLib_Bundle_t**
     }
 
     /* Skip over the header. It is not needed here where the actual bundle is read */
-    vfs_lseek(fd, offsetof(bundle_file_structure_t, meta), SEEK_SET);
+    status = vfs_lseek(fd, offsetof(bundle_file_structure_t, meta), SEEK_SET);
+    if (status < 0) {
+        ret = BPLIB_OS_ERROR;
+        goto close_file;
+    }
 
     /* Read bundle metadata */
     bytes_read = vfs_read(fd, &bundle_head->user_data.Bundle.Meta, sizeof(BPLib_BundleMetaData_t));
@@ -460,7 +469,7 @@ static BPLib_Status_t _load_next_bundle(BPLib_Instance_t* inst, BPLib_Bundle_t**
         curr_block = next_block;
         curr_block->used_len = bytes_read;
 
-        if (bytes_read < (ssize_t) sizeof(next_block->user_data.BigData)) {
+        if (bytes_read < (ssize_t)sizeof(next_block->user_data.BigData)) {
             break;
         }
     }
@@ -476,7 +485,8 @@ close_file:
         if (bundle_head != NULL) {
             BPLib_MEM_BlockListFree(pool, bundle_head);
         }
-    } else {
+    }
+    else {
         ret_bundle = (BPLib_Bundle_t*)(&bundle_head->user_data.Bundle);
         ret_bundle->blob = bundle_head->next;
         *bundle = ret_bundle;
@@ -529,7 +539,8 @@ BPLib_Status_t BPLib_STOR_EgressForID(BPLib_Instance_t* inst, uint32_t egress_id
         num_eids = 1;
         egress_queue = &(inst->ChannelEgressJobs[egress_id]);
         cache = &bplib_stor_common_data.channel_caches[egress_id];
-    } else {
+    }
+    else {
         dest_eids = BPLib_NC_ConfigPtrs.ContactsConfigPtr->ContactSet[egress_id].DestEIDs;
         num_eids = BPLIB_MAX_CONTACT_DEST_EIDS;
         egress_queue = &(inst->ContactEgressJobs[egress_id]);
@@ -546,8 +557,7 @@ BPLib_Status_t BPLib_STOR_EgressForID(BPLib_Instance_t* inst, uint32_t egress_id
 
     while (_load_next_bundle(inst, &curr_bundle, cache, path) == BPLIB_SUCCESS) {
         curr_bundle->Meta.EgressID = egress_id;
-        if (BPLib_QM_WaitQueueTryPush(egress_queue, &curr_bundle, QM_NO_WAIT) == false)
-        {
+        if (!BPLib_QM_WaitQueueTryPush(egress_queue, &curr_bundle, QM_NO_WAIT)) {
             /* If QM couldn't accept the bundle, free it. It will be reloaded next time. */
             BPLib_MEM_BundleFree(&inst->pool, curr_bundle);
             break;
@@ -603,7 +613,7 @@ BPLib_Status_t BPLib_STOR_GarbageCollect(BPLib_Instance_t* inst)
      * - integrate other updates to the function from upstream
      * - check size of files to delete bundles that are less than expected (write failed)
      * - increment AS on deletion
-     * - handle errors in vfs_read
+     * - handle errors in vfs_read and vfs_lseek
      * - call BPLib_CT_DeleteBundleFromCtdb for custodial bundles */
 
     uint64_t time_ref_dtn = BPLib_TIME_GetCurrentDtnTime();
@@ -643,22 +653,20 @@ BPLib_Status_t BPLib_STOR_GarbageCollect(BPLib_Instance_t* inst)
                           sizeof(BPLib_BundleMetaData_t), SEEK_SET);
             bytes_read += vfs_read(fd, &bundle_creation_time, sizeof(BPLib_TIME_MonotonicTime_t));
 
-            if (vfs_close(fd) < 0 ||
-                bytes_read != sizeof(BPLib_TIME_MonotonicTime_t) + sizeof(uint64_t)) {
+            if ((vfs_close(fd) < 0) ||
+                (bytes_read != (sizeof(BPLib_TIME_MonotonicTime_t) + sizeof(uint64_t)))) {
                 continue;
             }
 
             bplib_status = BPLib_TIME_GetTimeDelta(curr_time, bundle_creation_time, &delta);
 
-            if (bplib_status == BPLIB_SUCCESS &&
-                delta > (int64_t) lifetime) {
+            if ((bplib_status == BPLIB_SUCCESS) && (delta > (int64_t)lifetime)) {
                 delete = true;
             }
 
             /* Generally, if the DTN time is available all bundles should be deleted
              * that expired previously */
-            if (time_ref_dtn != 0 &&
-                time_ref_dtn >= iterator.expiry_val) {
+            if ((time_ref_dtn != 0) && (time_ref_dtn >= iterator.expiry_val)) {
                 delete = true;
             }
 
