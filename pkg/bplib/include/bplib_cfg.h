@@ -6,8 +6,6 @@
  * SPDX-FileCopyrightText: National Aeronautics and Space Administration.
  * SPDX-FileCopyrightText: 2026 Technische Universität Hamburg
  * SPDX-License-Identifier: Apache-2.0
- *
- * Modified version of [bplib]/inc/bplib_cfg.c
  */
 
 #pragma once
@@ -18,7 +16,7 @@
  * @brief Configuration options
  *
  * ## About
- * Configuration options of the `bplib_cfg.h` file
+ * Configuration options of the `[bplib]/inc/bplib_cfg.h` file
  *
  * All defines in this module can be overwritten by CFLAGS definitions.
  *
@@ -140,7 +138,7 @@ extern "C" {
  * @brief Maximum number of canonical blocks per bundle
  *
  * This is one more than BPLIB_MAX_NUM_EXTENSION_BLOCKS
- * because it includes all extension blocks plus the payload block
+ * because it includes all extension blocks plus the payload block.
  */
 #define BPLIB_MAX_NUM_CANONICAL_BLOCKS          (BPLIB_MAX_NUM_EXTENSION_BLOCKS + 1)
 
@@ -156,7 +154,7 @@ extern "C" {
 /**
  * @brief This is the EID IPN/SSP format for this instance of a DTN node.
  *
- * Currently only BPLIB_EID_IPN_SSP_FORMAT_TWO_DIGIT is supported
+ * Currently only BPLIB_EID_IPN_SSP_FORMAT_TWO_DIGIT is supported.
  */
 #ifndef BPLIB_LOCAL_EID_IPN_SSP_FORMAT
 #  define BPLIB_LOCAL_EID_IPN_SSP_FORMAT        BPLIB_EID_IPN_SSP_FORMAT_TWO_DIGIT
@@ -165,15 +163,13 @@ extern "C" {
 /**
  * @brief This is the EID allocator for this instance of a DTN node
  *
- * Since only BPLIB_EID_IPN_SSP_FORMAT_TWO_DIGIT is supported, this has to be 0
+ * Since only BPLIB_EID_IPN_SSP_FORMAT_TWO_DIGIT is supported, this has to be 0.
  */
 #ifndef BPLIB_LOCAL_EID_ALLOCATOR
 #  define BPLIB_LOCAL_EID_ALLOCATOR             0
 #endif
 
-/**
- * @brief This is the EID node number for this instance of a DTN node
- */
+/** @brief This is the EID node number for this instance of a DTN node */
 #ifndef BPLIB_LOCAL_EID_NODE_NUM
 #  define BPLIB_LOCAL_EID_NODE_NUM              100
 #endif
@@ -206,7 +202,7 @@ extern "C" {
 /**
  * @brief This is the absolute maximum size a bundle payload is allowed to be.
  *
- * Must be < @ref BPLIB_MAX_BUNDLE_LEN.
+ * Must be smaller than @ref BPLIB_MAX_BUNDLE_LEN.
  *
  * This option controls the size of the CBOR encoding buffer. In order to reduce
  * the memory footprint, this can be reduced.
@@ -250,7 +246,7 @@ extern "C" {
  * @brief This is the maximum CS size trigger allowed in the contacts configuration [bytes]
  *
  * By default, we can only have a maximum of two bundle sequence collections per CCS and
- * the length of their sequence range arrays is the upper limit on how big a CCS can get
+ * the length of their sequence range arrays is the upper limit on how big a CCS can get.
  */
 #ifndef BPLIB_MAX_CS_SIZE_TRIGGER_ALLOWED
 #  define BPLIB_MAX_CS_SIZE_TRIGGER_ALLOWED     (BPLIB_MINIMUM_ENCODED_CCS_LEN + \
@@ -305,7 +301,7 @@ extern "C" {
  * @brief Maximum number of bundle bytes allowed in storage at any given time
  */
 #ifndef BPLIB_MAX_STORED_BUNDLE_BYTES
-#  define BPLIB_MAX_STORED_BUNDLE_BYTES         ((size_t) 100000)  /* 100 KB */
+#  define BPLIB_MAX_STORED_BUNDLE_BYTES         ((size_t) 100000UL)  /* 100 KB */
 #endif
 
 /**
@@ -319,33 +315,33 @@ extern "C" {
 
 /** @brief Maximum number of entries allowed in the Custody Transfer Database (CTDB) */
 #ifndef BPLIB_CT_DB_MAX_ENTRIES
-#  define BPLIB_CT_DB_MAX_ENTRIES                   (10u)
+#  define BPLIB_CT_DB_MAX_ENTRIES               (10u)
 #endif
 
 /** @brief CRC type to use for generated admin records */
 #ifndef BPLIB_ADMIN_RECORD_CRC_TYPE
-#  define BPLIB_ADMIN_RECORD_CRC_TYPE               BPLib_CRC_Type_CRC16
+#  define BPLIB_ADMIN_RECORD_CRC_TYPE           BPLib_CRC_Type_CRC16
 #endif
 
 /** @brief Lifetime [ms] to use for generated admin records */
 #ifndef BPLIB_ADMIN_RECORD_LIFETIME
-#  define BPLIB_ADMIN_RECORD_LIFETIME               (3600000u)
+#  define BPLIB_ADMIN_RECORD_LIFETIME           (3600000u)
 #endif
 
-/** @brief Block number of the 'Age Block' use for generated admin records */
+/** @brief Block number of the 'Age Block' used for generated admin records */
 #ifndef BPLIB_ADMIN_RECORD_AGE_BLOCK_NUM
-#  define BPLIB_ADMIN_RECORD_AGE_BLOCK_NUM          (2u)
+#  define BPLIB_ADMIN_RECORD_AGE_BLOCK_NUM      (2u)
 #endif
 
-/** @brief Additional bundle flags to use for generated admin records */
+/** @brief Additional bundle flags to used for generated admin records */
 #ifndef BPLIB_ADMIN_RECORD_BLOCK_FLAGS
-#  define BPLIB_ADMIN_RECORD_BLOCK_FLAGS            (0u)
+#  define BPLIB_ADMIN_RECORD_BLOCK_FLAGS        (0u)
 #endif
 
 /**
  * @brief Egress queue depth
  *
- * Number of elements in the egress queues per channel and per contacts. In RIOT,
+ * Number of elements in the egress queues per channel and per contact. In RIOT,
  * this is likely bottlenecked by the size of the memory pool anyways.
  */
 #ifndef BPLIB_QM_TX_QUEUE_DEPTH
