@@ -118,7 +118,7 @@ a bundle in the `dat` folder.
     68bf4c6a ──────┘            [bundle_id] as hex
 ```
 
-The above for example may appear when a bundle with the destination ipn:200.123
+The above example may appear when a bundle with the destination ipn:200.123
 is stored. bplib computes the ID 68bf4c6a for this bundle. The index file then
 uniquely identifies the real data file.
 
