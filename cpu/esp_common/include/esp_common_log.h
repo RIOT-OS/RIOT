@@ -61,29 +61,29 @@ extern "C" {
 #define ESP_LOG_LETTER_LOG_VERBOSE "V"
 
 #if defined(MODULE_ESP_LOG_TAGGED)
-#    define ESP_LOG_FORMAT_DEFAULT(write, level, unit, format, ...) \
-      write(level, unit, ESP_LOG_COLOR_ ## level \
-            ESP_LOG_LETTER_ ## level \
-            " (%" PRIu32 ") [%s] " format ESP_LOG_RESET_COLOR, \
-            system_get_time_ms(), unit, ##__VA_ARGS__)
+#    define ESP_LOG_FORMAT_DEFAULT(level, unit, format, ...) \
+        ESP_LOG_COLOR_ ## level \
+        ESP_LOG_LETTER_ ## level \
+        " (%" PRIu32 ") [%s] " format ESP_LOG_RESET_COLOR, \
+        system_get_time_ms(), unit, ##__VA_ARGS__
 #else
-#    define ESP_LOG_FORMAT_DEFAULT(write, level, unit, format, ...) \
-      write(level, unit, ESP_LOG_COLOR_ ## level \
-            format ESP_LOG_RESET_COLOR, \
-            ##__VA_ARGS__)
+#    define ESP_LOG_FORMAT_DEFAULT(level, unit, format, ...) \
+        ESP_LOG_COLOR_ ## level \
+        format ESP_LOG_RESET_COLOR, \
+        ##__VA_ARGS__
 #endif
 
-#if defined(MODULE_LOG_FORMAT)
+#if defined(LOG_FORMAT)
 #  define ESP_LOG_FORMAT LOG_FORMAT
 #else 
 #  define ESP_LOG_FORMAT ESP_LOG_FORMAT_DEFAULT
 #endif
 
-#define esp_log_write_formatted_early(level, unit, ...) \
-    ESP_LOG_FORMAT(ets_printf, level, unit, __VA_ARGS__)
+#define esp_log_write_early(level, unit, ...) \
+    ets_printf(ESP_LOG_FORMAT(level, unit, __VA_ARGS__))
 
 #define LOG_TAG_EARLY(level, _letter, unit, ...) \
-    LOG_IMPL(esp_log_write_formatted_early, level, unit, __VA_ARGS__)
+    LOG_IMPL(esp_log_write_early, level, unit, __VA_ARGS__)
 
 #define LOG_TAG(level, _letter, tag, format, ...) \
     LOG_WITH_UNIT(level, tag, format, ##__VA_ARGS__)

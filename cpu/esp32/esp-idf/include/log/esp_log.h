@@ -45,11 +45,17 @@ extern "C" {
 #  define ESP_LOG_LEVEL_LOCAL(level, unit, format, ...) \
     LOG_WITH_UNIT(level, unit, format, ##__VA_ARGS__)
 
-#  define esp_log_write_rom(format, ...) esp_rom_printf(DRAM_STR(format), ##__VA_ARGS__)
-#  define esp_log_write_formatted_rom(level, unit, ...) \
-    ESP_LOG_FORMAT(esp_log_write_rom, level, unit, __VA_ARGS__)
+#  define esp_rom_printf_dram_format(format, ...) \
+    esp_rom_printf(DRAM_STR(format), ##__VA_ARGS__)
+
+#   define esp_rom_printf_dram_format_(...) \
+    esp_rom_printf_dram_format(__VA_ARGS__)
+
+#  define esp_log_write_dram(level, unit, ...) \
+    esp_rom_printf_dram_format_(ESP_LOG_FORMAT(level, unit, __VA_ARGS__))
+
 #  define ESP_DRAM_LOG_LEVEL(level, unit, ...) \
-    LOG_IMPL(esp_log_write_formatted_rom, level, unit, __VA_ARGS__)
+    LOG_IMPL(esp_log_write_dram, level, unit, __VA_ARGS__)
 
 #  define ESP_DRAM_LOGE(tag, format, ...) ESP_DRAM_LOG_LEVEL(LOG_ERROR  , tag, format "\n", ##__VA_ARGS__)
 #  define ESP_DRAM_LOGW(tag, format, ...) ESP_DRAM_LOG_LEVEL(LOG_WARNING, tag, format "\n", ##__VA_ARGS__)

@@ -13,8 +13,6 @@
 #include "macros/utils.h"
 #include "fmt.h"
 
-#define log_write(level, unit, ...) fmt_print(__VA_ARGS__)
-
 /**
  * @name Configuring contextual information
  * @{
@@ -214,8 +212,8 @@
 #  define _CLOWNFISH_FMT_EXTRAS_ARGS
 #endif
 
-#define LOG_FORMAT(write, level, unit, fmt, ...) \
-    write(level, unit,                                       \
+#define LOG_FORMAT_PRINT_PREFIX
+#define LOG_FORMAT(level, unit, fmt, ...) \
         _CLOWNFISH_FMT_FILE_FSTR                 \
         _CLOWNFISH_FMT_LEVEL_FSTR(level)         \
         ANSI_STYLE_RESET " # "                   \
@@ -227,7 +225,6 @@
         _CLOWNFISH_FMT_LEVEL_ARGS(level)         \
         _CLOWNFISH_FMT_UNIT_ARGS(unit)           \
         _CLOWNFISH_FMT_EXTRAS_ARGS               \
-        , ##__VA_ARGS__                              \
-    )
+        , ##__VA_ARGS__                           
 
 /** @endcond */ /* visible */

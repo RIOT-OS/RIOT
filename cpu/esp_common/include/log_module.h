@@ -20,9 +20,8 @@ extern "C" {
 #endif
 
 #include "esp_common_log.h"
-#include "fmt.h"
 
-#define log_write(level, unit, ...) fmt_print(__VA_ARGS__)
+#define LOG_FORMAT_PRINT_PREFIX
 #define LOG_FORMAT(...) ESP_LOG_FORMAT_DEFAULT(__VA_ARGS__)
 
 #ifdef __cplusplus

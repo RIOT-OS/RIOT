@@ -7,6 +7,7 @@ USEMODULE += esp_common_periph
 USEMODULE += esp_freertos
 USEMODULE += esp_idf
 USEMODULE += log # Use log module, so log.h includes ESP log_module.h
+USEMODULE += log_dynamic_control
 USEMODULE += periph
 USEMODULE += periph_hwrng
 USEMODULE += periph_uart
@@ -63,11 +64,7 @@ ifneq (,$(filter esp_gdbstub,$(USEMODULE)))
   USEMODULE += esp_gdb
 endif
 
-ifneq (,$(filter log_color,$(USEMODULE)))
-  USEMODULE += esp_log_colored
-endif
-
-ifneq (,$(filter 4 5,$(LOG_LEVEL)))
+ifneq (,$(filter 4 5 DEBUG ALL LOG_DEBUG LOG_ALL,$(LOG_LEVEL)))
   USEMODULE += esp_log_startup
 endif
 

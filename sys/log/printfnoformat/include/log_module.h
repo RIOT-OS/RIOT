@@ -28,9 +28,8 @@
 extern "C" {
 #endif
 
-#define log_write(level, unit, ...) fmt_print(__VA_ARGS__)
-
-#define LOG_FORMAT(write, level, unit, format, ...) write(format)
+#define LOG_FORMAT_PRINT_PREFIX
+#define LOG_FORMAT(level, unit, format, ...) format
 
 #ifdef __cplusplus
 }

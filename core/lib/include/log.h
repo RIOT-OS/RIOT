@@ -108,31 +108,20 @@ typedef enum {
         } \
     } while (0U) _LOG_EPILOGUE
 
-#define LOG_WITH_UNIT(level, unit, ...) LOG_IMPL(log_write_formatted, level, unit, __VA_ARGS__)
-#define LOG(level, ...) LOG_WITH_UNIT(level, LOG_UNIT, __VA_ARGS__)
+#define LOG_WITH_UNIT(level, unit, ...)       LOG_IMPL(log_write,    level, unit,     __VA_ARGS__)
+#define LOG_BEGIN_WITH_UNIT(level, unit, ...) LOG_IMPL(log_begin,    level, unit,     __VA_ARGS__)
+#define LOG_CONT_WITH_UNIT(level, unit, ...)  LOG_IMPL(log_continue, level, unit,     __VA_ARGS__)
+#define LOG_END_WITH_UNIT(level, unit, ...)   LOG_IMPL(log_end,      level, unit,     __VA_ARGS__)
+
+#define LOG(level, ...)                       LOG_WITH_UNIT(         level, LOG_UNIT, __VA_ARGS__)
+#define LOG_BEGIN(level, ...)                 LOG_BEGIN_WITH_UNIT(   level, LOG_UNIT, __VA_ARGS__)
+#define LOG_CONT(level, ...)                  LOG_CONT_WITH_UNIT(    level, LOG_UNIT, __VA_ARGS__)
+#define LOG_END(level, ...)                   LOG_END_WITH_UNIT(     level, LOG_UNIT, __VA_ARGS__)
 
 #define LOG_ERROR(...)   LOG(LOG_ERROR,   __VA_ARGS__)
 #define LOG_WARNING(...) LOG(LOG_WARNING, __VA_ARGS__)
 #define LOG_INFO(...)    LOG(LOG_INFO,    __VA_ARGS__)
 #define LOG_DEBUG(...)   LOG(LOG_DEBUG,   __VA_ARGS__)
-
-#define LOG_BEGIN_WITH_UNIT(level, unit, ...) \
-    LOG_IMPL(log_begin_formatted,    level, unit,     __VA_ARGS__)
-
-#define LOG_BEGIN(level, ...) \
-    LOG_BEGIN_WITH_UNIT(             level, LOG_UNIT, __VA_ARGS__)
-
-#define LOG_CONT_WITH_UNIT(level, unit, ...) \
-    LOG_IMPL(log_continue_formatted, level, unit,     __VA_ARGS__)
-
-#define LOG_CONT(level, ...) \
-    LOG_CONT_WITH_UNIT(              level, LOG_UNIT, __VA_ARGS__)
-
-#define LOG_END_WITH_UNIT(level, unit, ...) \
-    LOG_IMPL(log_end_formatted,      level, unit,     __VA_ARGS__)
-
-#define LOG_END(level, ...) \
-    LOG_END_WITH_UNIT(               level, LOG_UNIT, __VA_ARGS__)
 
 /** @} */ /* section */
 
@@ -199,50 +188,28 @@ typedef enum {
 #  include "log_module.h"
 /* Provide default for log backend defining macro.
  * For fallback for log backend providing function, see sys/log/log.c */
-#  if defined(log_write) && !defined(log_begin)
-#    define log_begin log_write
+#  if defined(LOG_FORMAT_PRINT_PREFIX)
+#    if !defined(LOG_FORMAT_PRINT)
+#      define LOG_FORMAT_PRINT fmt_print
+#    endif
+#    include "fmt.h"
+#    define log_write(   level, unit, ...) LOG_FORMAT_PRINT(LOG_FORMAT(level, unit, __VA_ARGS__))
+#    define log_begin(   level, unit, ...) LOG_FORMAT_PRINT(LOG_FORMAT(level, unit, __VA_ARGS__))
+#    define log_continue(level, unit, ...) LOG_FORMAT_PRINT(__VA_ARGS__)
+#    define log_end(     level, unit, ...) LOG_FORMAT_PRINT(__VA_ARGS__)
 #  endif
-#  if defined(log_write) && !defined(log_continue)
+#  if defined(log_write) && !defined(log_begin) && !defined(log_continue) && !defined(log_end)
+#    define log_begin    log_write
 #    define log_continue log_write
-#  endif
-#  if defined(log_write) && !defined(log_end)
-#    define log_end log_write
+#    define log_end      log_write
 #  endif
 #else /* defined(MODULE_LOG) */
 #  include "fmt.h"
-#  define log_write(level, unit, ...) fmt_print(__VA_ARGS__)
-#  define log_begin(level, unit, ...) fmt_print(__VA_ARGS__)
+#  define log_write(   level, unit, ...) fmt_print(__VA_ARGS__)
+#  define log_begin(   level, unit, ...) fmt_print(__VA_ARGS__)
 #  define log_continue(level, unit, ...) fmt_print(__VA_ARGS__)
-#  define log_end(level, unit, ...) fmt_print(__VA_ARGS__)
+#  define log_end(     level, unit, ...) fmt_print(__VA_ARGS__)
 #endif /* defined(MODULE_LOG) */
-
-#if !defined(LOG_FORMAT)
-#  define LOG_FORMAT(write, level, unit, ...) write(level, unit, __VA_ARGS__)
-#endif
-
-#if !defined(LOG_FORMAT_BEGIN)
-#  define LOG_FORMAT_BEGIN(write, level, unit, ...) LOG_FORMAT(write, level, unit, __VA_ARGS__)
-#endif
-
-#if !defined(LOG_FORMAT_CONTINUE)
-#  define LOG_FORMAT_CONTINUE(write, level, unit, ...) write(level, unit, __VA_ARGS__)
-#endif
-
-#if !defined(LOG_FORMAT_END)
-#  define LOG_FORMAT_END(write, level, unit, ...) write(level, unit, __VA_ARGS__)
-#endif
-
-#define log_write_formatted(level, unit, ...) \
-    LOG_FORMAT(log_write,             level, unit, __VA_ARGS__)
-
-#define log_begin_formatted(level, unit, ...) \
-    LOG_FORMAT_BEGIN(log_begin,       level, unit, __VA_ARGS__)
-
-#define log_continue_formatted(level, unit, ...) \
-    LOG_FORMAT_CONTINUE(log_continue, level, unit, __VA_ARGS__)
-    
-#define log_end_formatted(level, unit, ...) \
-    LOG_FORMAT_END(log_end,           level, unit, __VA_ARGS__)
 
 /** @endcond */ /* hide */
 
