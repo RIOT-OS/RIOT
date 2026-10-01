@@ -143,12 +143,12 @@ static uint32_t _set_best_pdm_rate(uint32_t rate)
     /* Calculate the divisor for ratio 80 given the desired sample rate. */
     uint8_t divisor_80 = _rate_to_divisor(rate, PDM_RATIO_HIGH);
     uint32_t real_rate_80 = PDM_SRC_CLOCK_HZ / (divisor_80 * PDM_RATIO_HIGH);
-    uint32_t abs_diff_80 = MAX(real_rate_80, rate) - MIN(real_rate_80, rate);
+    uint32_t abs_diff_80 = ABS((int32_t)real_rate_80 - (int32_t)rate);
 
     /* Do the same for ratio 64. */
     uint8_t divisor_64 = _rate_to_divisor(rate, PDM_RATIO_LOW);
     uint32_t real_rate_64 = PDM_SRC_CLOCK_HZ / (divisor_64 * PDM_RATIO_LOW);
-    uint32_t abs_diff_64 = MAX(real_rate_64, rate) - MIN(real_rate_64, rate);
+    uint32_t abs_diff_64 = ABS((int32_t)real_rate_64 - (int32_t)rate);
 
     /* Choose the ratio which gets closest to the desired sample rate. */
     if (abs_diff_80 <= abs_diff_64) {
