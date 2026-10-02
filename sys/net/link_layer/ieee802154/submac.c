@@ -240,20 +240,20 @@ static ieee802154_fsm_state_t _fsm_state_rx(ieee802154_submac_t *submac, ieee802
     case IEEE802154_FSM_EV_RX_DONE:
         while (ieee802154_radio_set_idle(dev, false) < 0) {}
 #if IS_USED(MODULE_IEEE802154_SUBMAC_SOFT_ACK)
-        submac->rx_len = ieee802154_radio_len(dev);
-        assert(submac->rx_len <= IEEE802154_FRAME_LEN_MAX);
-        res = ieee802154_radio_read(dev, submac->rx_buf, submac->rx_len, &submac->rx_info);
-        assert(res == (int)submac->rx_len);
+        size_t rx_len = ieee802154_radio_len(dev);
+        assert(rx_len <= IEEE802154_FRAME_LEN_MAX);
+        uint8_t header_snip[3];
         /* Make sure it's not an ACK frame */
-        if (submac->rx_len > (int)IEEE802154_MIN_FRAME_LEN) {
+        if (rx_len > (int)IEEE802154_MIN_FRAME_LEN) {
+            ieee802154_radio_peek(dev, header_snip, 0, sizeof(header_snip));
             /* sending ACK if radio does not support auto-ACK */
             if (!_does_send_ack(dev)) {
                 ieee802154_filter_mode_t mode;
-                if ((submac->rx_buf[0] & IEEE802154_FCF_ACK_REQ) &&
+                if ((header_snip[0] & IEEE802154_FCF_ACK_REQ) &&
                     (ieee802154_radio_get_frame_filter_mode(dev, &mode) < 0 ||
                     mode == IEEE802154_FILTER_ACCEPT)) {
                     if ((res = _handle_fsm_ev_tx_ack(submac,
-                        ieee802154_get_seq(submac->rx_buf))) < 0) {
+                        ieee802154_get_seq(header_snip))) < 0) {
                         DEBUG("IEEE802154 submac: Sending ACK failed with status: %d\n", res);
                     }
                     else {
@@ -801,13 +801,6 @@ int ieee802154_submac_init(ieee802154_submac_t *submac, const network_uint16_t *
     ieee802154_dev_t *dev = &submac->dev;
 
     submac->fsm_state = IEEE802154_FSM_STATE_RX;
-
-#if IS_USED(MODULE_IEEE802154_SUBMAC_SOFT_ACK)
-    submac->rx_len = 0;
-    submac->rx_info.rssi = 0;
-    submac->rx_info.lqi = 0;
-    memset(submac->rx_buf, 0, sizeof(submac->rx_buf));
-#endif
 
     int res;
 
