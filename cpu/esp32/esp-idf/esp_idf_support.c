@@ -55,7 +55,7 @@ static esp_log_level_entry_t _log_levels[] = {
     { .tag = "*", .level = LOG_DEBUG },
 };
 
-bool IRAM_ATTR log_unit_is_enabled(const char* tag, log_level_t level)
+bool IRAM_ATTR log_dynamic_allows(const char* tag, log_level_t level)
 {
     esp_log_level_t max_level = (esp_log_level_t)level;
     size_t i;
@@ -79,6 +79,7 @@ bool IRAM_ATTR log_unit_is_enabled(const char* tag, log_level_t level)
 void IRAM_ATTR esp_log_write(esp_log_level_t level,
                              const char* tag, const char* format, ...)
 {
+    /* TODO: reroute to RIOT logging */
     va_list list;
     va_start(list, format);
     esp_log_writev(level, tag, format, list);
@@ -94,10 +95,11 @@ void IRAM_ATTR esp_log_writev(esp_log_level_t level,
                               va_list args)
 {
     
-    if (!log_unit_is_enabled(tag, (log_level_t)level)) {
+    if (!log_dynamic_allows(tag, (log_level_t)level)) {
         return;
     }
-    printf("esp_log_writev |")
+    printf("esp_log_writev |");
+    /* TODO: reroute to RIOT logging */
     vprintf(format, args);
 }
 

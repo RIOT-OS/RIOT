@@ -320,12 +320,18 @@ ifneq ($(origin LOG), undefined)
     ifneq ($(LOG_LEVELS_INVALID),)
       $(error Invalid log levels: $(LOG_LEVELS_INVALID))
     endif
-    # e.g., "unit1", "unit2", "unit3"
+    # e.g., LOG="ztimer=DEBUG coap=WARNING wifi" turns into
+    # R(u,l,"ztimer",LOG_DEBUG) R(u,l,"coap",LOG_WARNING) P(u,l,"wifi",L)
+    # where R is the rule macro for checking the requested u(nit) and l(evel)
+    # against the list of selected log units and levels from LOG, and L
+    # the default log level when you don't add `=LOG_SOME_LEVEL` in LOG.
+    _log_rule = R\(u,l,\"$(firstword $(1))\",$(if $(word 2,$(1)),LOG_$(word 2,$(1)),L)\)
+    # log.h uses _LOG_SELECTIVE_RULES(R,u,l,L) to build a predicate (OR clause)
+    # to check if a message can be logged from the given unit u at the requested
+    # level l, e.g., u=LOG_UNIT, l=LOG_INFO when you do `LOG(LOG_INFO, "..")`.
+    # L is set to LOG_LEVEL at the expansion site of the LOG macro.
     CFLAGS_WITH_MACROS += \
-      -DLOG_SELECTIVE_PATTERNS="$(foreach c,$(LOG),\"$(word 1,$(subst =, ,$(c)))\",)"
-    # e.g., LOG_DEBUG, LOG_WARNING, LOG_LEVEL
-    CFLAGS_WITH_MACROS += \
-      -DLOG_SELECTIVE_LEVELS="$(foreach c,$(LOG),LOG_$(or $(word 2,$(subst =, ,$(c))),LEVEL),)"
+      -D_LOG_SELECTIVE_RULES\(R,u,l,L\)="$(foreach c,$(LOG),$(call _log_rule,$(subst =, ,$(c))))"
   endif
 endif
 
