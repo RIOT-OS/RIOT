@@ -34,10 +34,10 @@ function _bools {
     _describe 'bool' _bool_vals
 }
 
-function _ports {
-    local -a _ports_vals=($(ls /dev/tty*))
+function _serials {
+    local -a _serial_vals=($(ls /dev/tty*))
 
-    _describe 'port' _ports_vals
+    _describe 'serial' _serial_vals
 }
 
 function _programmers {
@@ -113,6 +113,28 @@ function _riot_terminals {
     _describe 'terminal' _riot_terminal_vals
 }
 
+function _riot_emulators {
+    local -a _riot_emulator_vals=(
+        "renode:embedded system emulator framework modelling MCUs, on-chip peripherals, and external devices"
+        "qemu:generic and open source machine emulator and virtualizer"
+        "mgba:Game Boy Advance emulator"
+    )
+
+    _describe 'emulator' _riot_emulator_vals
+}
+
+function _renode_log_levels {
+    local -a _levels=(
+        "-1:Noisy"
+        "0:Debug"
+        "1:Info"
+        "2:Warning"
+        "3:Error"
+    )
+
+    _describe 'log_level' _levels
+}
+
 function _riot {
     local -a _std_targets=(
         "all:build the application"
@@ -156,21 +178,29 @@ function _riot {
     local -a vars
     vars=(
         'BOARD[Select the board to build for]:board:_boards'
-        'TOOLCHAIN[Select the toolchain to use]:toolcahin:_toolchains'
         'BUILD_IN_DOCKER[Build inside docker container]:bool:_bools'
         'DOCKER_IMAGE[The docker image to use with BUILD_IN_DOCKER=1]:docker_image:_docker_image'
+        'EMULATE[Run firmware in emulator selected by RIOT_EMULATOR]:bool:_bools'
+        'GDB_PORT[Port for the GDB server to use in "make debug" or "make debug-sever"]:port'
         'LTO[Enable link time optimization]:bool:_bools'
-        'VERBOSE_ASSERT[Print source file and line on blown assertion]:bool:_bools'
-        'QUIET[Reduce verbosity of build output]:bool:_bools'
-        'WERROR[Enable/disable -Werror flag]:bool:_bools'
-        'RIOT_CI_BUILD[Behave as in the CI: Less verbose output, reproducible builds, ...]:bool:_bools'
-        'PORT[Serial port connected to the board]:port:_ports'
-        'PROGRAMMER[Select the programmer software to flash (debug) with]:programmer:_programmers'
         'OPENOCD_DEBUG_ADAPTER[Select the programmer hardware to use with OpenOCD]:hw_programmer:_hw_programmers'
         'OPENOCD_FTDI_ADAPTER[Select the FTDI adapter config to use with OpenOCD]:ftdi_adapter:_ftdi_adapter'
         'OPENOCD_RESET_USE_CONNECT_ASSERT_SRST[Let OpenOCD attach while reset signal is asserted]:bool:_bools'
-        'STATIC_ANALYSIS[Enable static analysis for modules that claim support]:bool:_bools'
+        'PORT[Serial port connected to the board]:serial:_serials'
+        'PROGRAMMER[Select the programmer software to flash (debug) with]:programmer:_programmers'
+        'QUIET[Reduce verbosity of build output]:bool:_bools'
+        'RENODE[Renode executable to run, defaults to "renode"]:renode'
+        'RENODE_LOG_LEVEL[The log verbosity of renode]:log_level:_renode_log_levels'
+        'RENODE_SHOW_GUI[Whether to show the renode GUI]:bool:_bools'
+        'RENODE_SHOW_LOG[Whether to show the renode log]:bool:_bools'
+        'RENODE_TELNET_PORT[The port on which renode will accept telnet sessions]:port'
+        'RIOT_CI_BUILD[Behave as in the CI: Less verbose output, reproducible builds, ...]:bool:_bools'
+        'RIOT_EMULATOR[Emulator run the generated firmware, renode by default]:emulator:_riot_emulators'
         'RIOT_TERMINAL[Select the terminal program to use]:terminal:_riot_terminals'
+        'STATIC_ANALYSIS[Enable static analysis for modules that claim support]:bool:_bools'
+        'TOOLCHAIN[Select the toolchain to use]:toolchain:_toolchains'
+        'VERBOSE_ASSERT[Print source file and line on blown assertion]:bool:_bools'
+        'WERROR[Enable/disable -Werror flag]:bool:_bools'
     )
 
     _values -w 'variables' $vars
