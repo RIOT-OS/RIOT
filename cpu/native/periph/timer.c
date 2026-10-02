@@ -47,7 +47,13 @@ static unsigned long time_null;
 static timer_cb_t _callback;
 static void *_cb_arg;
 
-static struct itimerspec its;
+static struct {
+    struct itimerspec its;
+    uint64_t asan_guard; /* ASAN expects itimerspec on native32 to be 24 B in
+                          * size, but it may be only 16 B in size when
+                          * time_t still is 32 bit. We allocate a bit more to
+                          * work around the false positive. */
+} its;
 
 static timer_t itimer_monotonic;
 
@@ -134,14 +140,14 @@ static void do_timer_set(unsigned int offset, bool periodic)
     }
 
     memset(&its, 0, sizeof(its));
-    its.it_value.tv_sec = offset / NATIVE_TIMER_SPEED;
-    its.it_value.tv_nsec = (offset % NATIVE_TIMER_SPEED) * (NS_PER_SEC / NATIVE_TIMER_SPEED);
+    its.its.it_value.tv_sec = offset / NATIVE_TIMER_SPEED;
+    its.its.it_value.tv_nsec = (offset % NATIVE_TIMER_SPEED) * (NS_PER_SEC / NATIVE_TIMER_SPEED);
     if (periodic) {
-        its.it_interval = its.it_value;
+        its.its.it_interval = its.its.it_value;
     }
 
-    DEBUG("timer_set(): setting %lu.%09lu\n", (unsigned long)its.it_value.tv_sec,
-          (unsigned long)its.it_value.tv_nsec);
+    DEBUG("timer_set(): setting %lu.%09lu\n", (unsigned long)its.its.it_value.tv_sec,
+          (unsigned long)its.its.it_value.tv_nsec);
 }
 
 int timer_set(tim_t dev, int channel, unsigned int offset)
@@ -199,7 +205,7 @@ void timer_start(tim_t dev)
     DEBUG("%s\n", __func__);
 
     _native_syscall_enter();
-    if (timer_settime(itimer_monotonic, 0, &its, NULL) == -1) {
+    if (timer_settime(itimer_monotonic, 0, &its.its, NULL) == -1) {
         core_panic(PANIC_GENERAL_ERROR, "Failed to set monotonic timer");
     }
     _native_syscall_leave();
@@ -212,12 +218,12 @@ void timer_stop(tim_t dev)
 
     _native_syscall_enter();
     struct itimerspec zero = {0};
-    if (timer_settime(itimer_monotonic, 0, &zero, &its) == -1) {
+    if (timer_settime(itimer_monotonic, 0, &zero, &its.its) == -1) {
         core_panic(PANIC_GENERAL_ERROR, "Failed to set monotonic timer");
     }
     _native_syscall_leave();
 
-    DEBUG("time left: %lu.%09lu\n", (unsigned long)its.it_value.tv_sec, its.it_value.tv_nsec);
+    DEBUG("time left: %lu.%09lu\n", (unsigned long)its.its.it_value.tv_sec, its.its.it_value.tv_nsec);
 }
 
 unsigned int timer_read(tim_t dev)
