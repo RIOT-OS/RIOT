@@ -20,9 +20,6 @@
 #define ENABLE_DEBUG 0
 #include "debug.h"
 
-/* symbol time is always 120 µs for MR-OFDM */
-#define OFDM_SYMBOL_TIME_US 120
-
 /* IEEE Std 802.15.4g™-2012 Amendment 3
  * Table 68d—Total number of channels and first channel center frequencies for SUN PHYs */
 static uint32_t _channel_spacing_kHz(uint8_t option)
@@ -191,36 +188,10 @@ static void _set_option(at86rf215_t *dev, uint8_t option)
     }
 
     at86rf215_reg_write(dev, dev->BBC->RG_OFDMC, option - 1);
-
     /* make sure channel config is still valid */
     dev->num_chans = _get_max_chan(dev, option);
-    dev->netdev.chan = at86rf215_chan_valid(dev, dev->netdev.chan);
-    at86rf215_reg_write16(dev, dev->RF->RG_CNL, dev->netdev.chan);
-}
-
-static unsigned _get_frame_duration(uint8_t option, uint8_t scheme,
-                                    uint8_t bytes)
-{
-    /* Table 150 - phySymbolsPerOctet values for MR-OFDM PHY, IEEE 802.15.4g-2012 */
-    static const uint8_t quot[] = { 3, 3, 6, 12, 18, 24, 36 };
-
-    --option;
-    /* phyMaxFrameDuration = phySHRDuration + phyPHRDuration + ceiling [(aMaxPHYPacketSize + 1) x phySymbolsPerOctet] */
-    const unsigned phySHRDuration = 6;
-    const unsigned phyPHRDuration = option ? 6 : 3;
-    const unsigned phyPDUDuration = ((bytes + 1) * (1 << option) + quot[scheme] - 1)
-                                  / quot[scheme];
-
-    return (phySHRDuration + phyPHRDuration + phyPDUDuration) * OFDM_SYMBOL_TIME_US;
-}
-
-static void _set_ack_timeout(at86rf215_t *dev, uint8_t option, uint8_t scheme)
-{
-    dev->ack_timeout_usec = dev->csma_backoff_period
-                          + IEEE802154G_ATURNAROUNDTIME_US
-                          + _get_frame_duration(option, scheme,
-                                                AT86RF215_ACK_PSDU_BYTES);
-    DEBUG("[%s] ACK timeout: %" PRIu32 " µs\n", "OFDM", dev->ack_timeout_usec);
+    dev->channel = at86rf215_chan_valid(dev, dev->channel);
+    at86rf215_reg_write16(dev, dev->RF->RG_CNL, dev->channel);
 }
 
 static bool _option_mcs_valid(uint8_t option, uint8_t mcs)
@@ -265,16 +236,8 @@ int at86rf215_configure_OFDM(at86rf215_t *dev, uint8_t option, uint8_t scheme)
 
     at86rf215_reg_write(dev, dev->BBC->RG_OFDMPHRTX, scheme);
 
-    dev->csma_backoff_period = IEEE802154G_ATURNAROUNDTIME_US
-                             + IEEE802154_CCA_DURATION_IN_SYMBOLS
-                             * OFDM_SYMBOL_TIME_US;
-    DEBUG("[%s] CSMA BACKOFF: %" PRIu32 " µs\n", "OFDM",
-          dev->csma_backoff_period);
-
-    _set_ack_timeout(dev, option, scheme);
-
     /* disable FSK preamble switching */
-#ifdef MODULE_NETDEV_IEEE802154_MR_FSK
+#ifdef MODULE_IEEE802154_PHY_MR_FSK
     dev->fsk_pl = 0;
 #endif
 
@@ -295,7 +258,6 @@ int at86rf215_OFDM_set_scheme(at86rf215_t *dev, uint8_t scheme)
     at86rf215_await_state_end(dev, RF_STATE_TX);
 
     at86rf215_reg_write(dev, dev->BBC->RG_OFDMPHRTX, scheme);
-    _set_ack_timeout(dev, at86rf215_OFDM_get_option(dev), scheme);
 
     return 0;
 }
@@ -317,7 +279,6 @@ int at86rf215_OFDM_set_option(at86rf215_t *dev, uint8_t option)
     at86rf215_await_state_end(dev, RF_STATE_TX);
 
     _set_option(dev, option);
-    _set_ack_timeout(dev, option, mcs);
 
     return 0;
 }

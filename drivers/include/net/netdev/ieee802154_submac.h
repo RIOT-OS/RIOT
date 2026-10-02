@@ -51,6 +51,18 @@ typedef struct {
     int8_t retrans;                     /**< number of frame retransmissions of the last TX */
     bool dispatch;                      /**< whether an event should be dispatched or not */
     netdev_event_t ev;                  /**< event to be dispatched */
+    union {
+        ieee802154_phy_conf_t super;
+#ifdef MODULE_IEEE802154_PHY_MR_OQPSK
+        ieee802154_mr_oqpsk_conf_t mr_oqpsk;
+#endif
+#ifdef MODULE_IEEE802154_PHY_MR_OFDM
+        ieee802154_mr_ofdm_conf_t mr_ofdm;
+#endif
+#ifdef MODULE_IEEE802154_PHY_MR_FSK
+        ieee802154_mr_fsk_conf_t mr_fsk;
+#endif
+    } phy_conf;                         /**< PHY configuration */
 } netdev_ieee802154_submac_t;
 
 /**
