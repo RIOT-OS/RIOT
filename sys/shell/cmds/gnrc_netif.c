@@ -214,7 +214,6 @@ static void _set_usage(char *cmd_name)
          "       * \"key\" - set the encryption key in hexadecimal format\n"
          "       * \"mtu\" - IPv6 maximum transmission unit\n"
          "       * \"nid\" - sets the network identifier (or the PAN ID)\n"
-         "       * \"page\" - set the channel page (IEEE 802.15.4)\n"
          "       * \"pan\" - alias for \"nid\"\n"
          "       * \"pan_id\" - alias for \"nid\"\n"
          "       * \"phy_busy\" - set busy mode on-off\n"
@@ -354,10 +353,6 @@ static void _print_netopt(netopt_t opt)
 
     case NETOPT_CHANNEL_FREQUENCY:
         printf("frequency [in Hz]");
-        break;
-
-    case NETOPT_CHANNEL_PAGE:
-        printf("page");
         break;
 
     case NETOPT_HOP_LIMIT:
@@ -672,10 +667,6 @@ static void _netif_list(netif_t *iface)
     res = netif_get_opt(iface, NETOPT_CHANNEL_FREQUENCY, 0, &u32, sizeof(u32));
     if (res >= 0) {
         printf(" Frequency: %" PRIu32 "Hz ", u32);
-    }
-    res = netif_get_opt(iface, NETOPT_CHANNEL_PAGE, 0, &u16, sizeof(u16));
-    if (res >= 0) {
-        printf(" Page: %" PRIu16 " ", u16);
     }
     res = netif_get_opt(iface, NETOPT_NID, 0, &u16, sizeof(u16));
     if (res >= 0) {
@@ -1639,9 +1630,6 @@ static int _netif_set(char *cmd_name, netif_t *iface, char *key, char *value)
     else if ((strcmp("nid", key) == 0) || (strcmp("pan", key) == 0) ||
              (strcmp("pan_id", key) == 0)) {
         return _netif_set_u16(iface, NETOPT_NID, 0, value);
-    }
-    else if (strcmp("page", key) == 0) {
-        return _netif_set_u16(iface, NETOPT_CHANNEL_PAGE, 0, value);
     }
     else if (strcmp("power", key) == 0) {
         return _netif_set_i16(iface, NETOPT_TX_POWER, value);

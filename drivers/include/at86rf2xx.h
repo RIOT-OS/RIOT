@@ -60,14 +60,10 @@ extern "C" {
 #  define AT86RF2XX_MIN_CHANNEL           (IEEE802154_CHANNEL_MIN_SUBGHZ)
 #  define AT86RF2XX_MAX_CHANNEL           (IEEE802154_CHANNEL_MAX_SUBGHZ)
 #  define AT86RF2XX_DEFAULT_CHANNEL       (CONFIG_IEEE802154_DEFAULT_SUBGHZ_CHANNEL)
-/* Page 2 is O-QPSK 100 kbit/s (channel 0), or 250 kbit/s (channels 1-10) */
-#  define AT86RF2XX_DEFAULT_PAGE          (CONFIG_IEEE802154_DEFAULT_SUBGHZ_PAGE)
 #else
 #  define AT86RF2XX_MIN_CHANNEL           (IEEE802154_CHANNEL_MIN)
 #  define AT86RF2XX_MAX_CHANNEL           (IEEE802154_CHANNEL_MAX)
 #  define AT86RF2XX_DEFAULT_CHANNEL       (CONFIG_IEEE802154_DEFAULT_CHANNEL)
-#  define AT86RF2XX_DEFAULT_PAGE          (0)
-/* Only page 0 is supported in the 2.4 GHz band */
 #endif
 /** @} */
 

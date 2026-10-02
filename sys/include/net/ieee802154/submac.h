@@ -196,7 +196,6 @@ struct ieee802154_submac {
     uint16_t csma_backoff_us;           /**< CSMA sender backoff period in µs */
     uint16_t panid;                     /**< IEEE 802.15.4 PAN ID */
     uint16_t channel_num;               /**< IEEE 802.15.4 channel number */
-    uint8_t channel_page;               /**< IEEE 802.15.4 channel page */
     uint8_t retrans;                    /**< current number of retransmissions */
     uint8_t csma_retries_nb;            /**< current number of CSMA-CA retries */
     uint8_t backoff_mask;               /**< internal value used for random backoff calculation */
@@ -341,35 +340,6 @@ static inline int ieee802154_set_channel_number(ieee802154_submac_t *submac,
     const ieee802154_phy_conf_t conf = {
         .phy_mode = IEEE802154_PHY_NO_OP,
         .channel = channel_num,
-        .page = submac->channel_page,
-        .pow = submac->tx_pow,
-    };
-
-    return ieee802154_set_phy_conf(submac, &conf);
-}
-
-/**
- * @brief Set IEEE 802.15.4 channel page
- *
- * This is a shortcut to @ref ieee802154_set_phy_conf
- *
- * @param[in] submac pointer the SubMAC descriptor
- * @param[in] channel_page channel page
- *
- * @return 0 on success
- * @return -ENOTSUP if the channel page is not supported
- * @return -EBUSY if the SubMAC is not in RX or IDLE state or if called inside
- *         @ref ieee802154_submac_cb_t::rx_done or
- *         @ref ieee802154_submac_cb_t::tx_done
- * @return negative errno on error
- */
-static inline int ieee802154_set_channel_page(ieee802154_submac_t *submac,
-                                              uint16_t channel_page)
-{
-    const ieee802154_phy_conf_t conf = {
-        .phy_mode = IEEE802154_PHY_NO_OP,
-        .channel = submac->channel_num,
-        .page = channel_page,
         .pow = submac->tx_pow,
     };
 
@@ -397,7 +367,6 @@ static inline int ieee802154_set_tx_power(ieee802154_submac_t *submac,
     const ieee802154_phy_conf_t conf = {
         .phy_mode = IEEE802154_PHY_NO_OP,
         .channel = submac->channel_num,
-        .page = submac->channel_page,
         .pow = tx_pow,
     };
 

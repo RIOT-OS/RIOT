@@ -137,7 +137,7 @@ Using `ifconfig` on the shell of your mote shows you the addresses of your
 mote, for instance:
 
 ```
-Iface  7   HWaddr: 59:72  Channel: 26  Page: 0  NID: 0x23
+Iface  7   HWaddr: 59:72  Channel: 26  NID: 0x23
             Long HWaddr: 5a:46:10:6e:f2:f5:d9:72
             TX-Power: 0dBm  State: IDLE  max. Retrans.: 3  CSMA Retries: 4
             AUTOACK  CSMA  MTU:1280  HL:64  6LO  RTR  RTR_ADV  IPHC
