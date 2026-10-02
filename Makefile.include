@@ -830,7 +830,7 @@ debug-client:
 	' not possible.'
 	@false
 else
-debug-client:
+debug-client: $(DEBUGDEPS)
 	$(call check_cmd,$(DEBUGCLIENT),Debug client program)
 	$(DEBUGCLIENT) $(DEBUGCLIENT_FLAGS)
 endif
@@ -843,7 +843,7 @@ debug-server:
 	' not possible.'
 	@false
 else
-debug-server:
+debug-server: $(DEBUGDEPS)
 	$(call check_cmd,$(DEBUGSERVER),Debug server program)
 	$(DEBUGSERVER) $(DEBUGSERVER_FLAGS)
 endif
