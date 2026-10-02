@@ -24,9 +24,19 @@
 #include "debug.h"
 
 /**
+ * @brief   Extra stack for resolving the local and remote address
+ *
+ * The MAC layer thread calls getaddrinfo() of the host's libc when the radio
+ * is turned on, which can use a lot of stack when resolving host names
+ * (e.g. "localhost" with glibc 2.43).
+ */
+#define SOCKET_ZEP_EXTRA_STACKSIZE  (4096)
+
+/**
  * @brief   Define stack parameters for the MAC layer thread
  */
-#define SOCKET_ZEP_MAC_STACKSIZE    (IEEE802154_STACKSIZE_DEFAULT + DEBUG_EXTRA_STACKSIZE)
+#define SOCKET_ZEP_MAC_STACKSIZE    (IEEE802154_STACKSIZE_DEFAULT + DEBUG_EXTRA_STACKSIZE + \
+                                     SOCKET_ZEP_EXTRA_STACKSIZE)
 #ifndef SOCKET_ZEP_MAC_PRIO
 #define SOCKET_ZEP_MAC_PRIO         (GNRC_NETIF_PRIO)
 #endif

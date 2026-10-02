@@ -15,13 +15,16 @@ REGEX_INCLUDES = r"^#include <\.\.\.> search starts here:$((?:\n|\r|.)*?)^End of
 REGEX_INCLUDES = re.compile(REGEX_INCLUDES, re.MULTILINE)
 
 
-def detect_includes_and_version_gcc(compiler):
+def detect_includes_and_version_gcc(compiler, flags):
     """
     Runs the given compiler with -v -E on an no-op compilation unit and parses
     the built-in include search directories and the GCC version from the output
 
     :param compiler: name / path of the compiler to run
     :type compiler: str
+    :param flags: additional flags affecting the include search directories
+                  (e.g. -specs=picolibc.specs)
+    :type flags: list of str
 
     :return: (list_of_include_paths, version)
     :rtype: tuple
@@ -29,7 +32,7 @@ def detect_includes_and_version_gcc(compiler):
     try:
         process_env = dict(os.environ)
         process_env["LC_MESSAGES"] = "C"
-        with subprocess.Popen([compiler, "-v", "-E", "-"],
+        with subprocess.Popen([compiler, *flags, "-v", "-E", "-"],
                               stdin=subprocess.PIPE, stdout=subprocess.PIPE,
                               stderr=subprocess.PIPE, env=process_env) as proc:
             inputdata = b"typedef int dont_be_pedantic;"
@@ -83,7 +86,7 @@ def detect_libstdcxx_includes(compiler, includes, version):
             break
 
 
-def detect_built_in_includes(compiler, args):
+def detect_built_in_includes(compiler, args, flags):
     """
     Tries to detect the built-in include search directories of the given
     compiler
@@ -91,14 +94,16 @@ def detect_built_in_includes(compiler, args):
     :param compiler: Name or path of the compiler
     :type compiler: str
     :param args: Command line arguments
+    :param flags: additional flags affecting the include search directories
+    :type flags: list of str
 
     :return: List of built-in include directories
     :rtype: list of str
     """
     if compiler.endswith('-gcc'):
-        includes, version = detect_includes_and_version_gcc(compiler)
+        includes, version = detect_includes_and_version_gcc(compiler, flags)
     elif compiler.endswith('-g++'):
-        includes, version = detect_includes_and_version_gcc(compiler)
+        includes, version = detect_includes_and_version_gcc(compiler, flags)
         if args.add_libstdcxx_includes:
             detect_libstdcxx_includes(compiler, includes, version)
     elif compiler in ('clang', 'clang++', 'gcc', 'g++'):
@@ -161,7 +166,7 @@ class State:  # pylint: disable=too-few-public-methods
         self.is_first = True
 
 
-def get_built_in_include_flags(compiler, state, args):
+def get_built_in_include_flags(compiler, state, args, flags):
     """
     Get built-in include search directories as parameter list.
 
@@ -170,6 +175,8 @@ def get_built_in_include_flags(compiler, state, args):
     :type compiler: str
     :param state: state of the program
     :param args: command line arguments
+    :param flags: additional flags affecting the include search directories
+    :type flags: list of str
 
     :return: The -isystem <...> compiler flags for the built-in include search
              dirs as list
@@ -177,10 +184,11 @@ def get_built_in_include_flags(compiler, state, args):
     """
 
     result = []
-    if compiler not in state.def_includes:
-        state.def_includes[compiler] = detect_built_in_includes(compiler, args)
+    key = (compiler, tuple(flags))
+    if key not in state.def_includes:
+        state.def_includes[key] = detect_built_in_includes(compiler, args, flags)
 
-    for include in state.def_includes[compiler]:
+    for include in state.def_includes[key]:
         result.append('-isystem')
         result.append(include)
 
@@ -240,6 +248,9 @@ def generate_module_compile_commands(path, state, args):
     """
     cdetails = CompilationDetails(path)
 
+    # GCC spec files (e.g. picolibc.specs) add include search directories
+    specs = [flag for flag in cdetails.cflags if flag.startswith('-specs=')]
+
     for flag in args.filter_out:
         try:
             cdetails.cflags.remove(flag)
@@ -251,6 +262,10 @@ def generate_module_compile_commands(path, state, args):
             pass
 
     if args.clangd:
+        # clang does not support GCC spec files, the include search directories
+        # added by them are passed via -isystem instead
+        cdetails.cflags = [f for f in cdetails.cflags if not f.startswith('-specs=')]
+        cdetails.cxxflags = [f for f in cdetails.cxxflags if not f.startswith('-specs=')]
         # Inject flags for better user experience if compile commands are
         # intended to be consumed by clangd: We do not care if those are
         # matching 100% what the compiler uses, but rather about best linting
@@ -265,8 +280,8 @@ def generate_module_compile_commands(path, state, args):
     cxx_extra_includes = []
 
     if args.add_built_in_includes:
-        c_extra_includes = get_built_in_include_flags(cdetails.cc, state, args)
-        cxx_extra_includes = get_built_in_include_flags(cdetails.cxx, state, args)
+        c_extra_includes = get_built_in_include_flags(cdetails.cc, state, args, specs)
+        cxx_extra_includes = get_built_in_include_flags(cdetails.cxx, state, args, specs)
 
     if args.clangd:
         if cdetails.target_arch_llvm:

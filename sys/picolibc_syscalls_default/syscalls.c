@@ -541,10 +541,10 @@ int fstat(int fd, struct stat *buf)
 /**
  * @brief Status of a file (by name)
  *
- * This is a wrapper around @c vfs_fstat
+ * This is a wrapper around @c vfs_stat
  *
  * @param[in]  name     path to file
- * @param[out] buf      pointer to stat struct to fill
+ * @param[out] st       pointer to stat struct to fill
  *
  * @return 0 on success
  * @return -1 on error, @c errno set to a constant from errno.h to indicate the error

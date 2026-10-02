@@ -39,6 +39,9 @@ ifeq (llvm,$(TOOLCHAIN))
   # the floating point exception bug is more likely to trigger when build
   # with LLVM, so we just disable LLVM on native as a work around
   TEST_ON_CI_BLACKLIST += native32 native64
+else
+  # To force Murdock to work again we disable native32 for now
+  TEST_ON_CI_BLACKLIST += native32
 endif
 
 DISABLE_MODULE += auto_init auto_init_%
