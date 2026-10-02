@@ -13,6 +13,13 @@
  *
  * Helpers for using emulated MTDs.
  *
+ * The emulated MTD reproduces the programming behavior of a NOR flash.
+ * Programming a location can only clear bits, it can never set a bit from 0
+ * back to 1. The sector a location belongs to has to be erased for that.
+ *
+ * Modern NOR flash devices may even prohibit writing to a location that has
+ * not been erased before. This behavior is not emulated by this driver.
+ *
  * @author      Gunar Schorcht <gunar@schorcht.net>
  */
 

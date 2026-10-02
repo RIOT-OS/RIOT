@@ -60,20 +60,20 @@ ifeq ($(DEFAULT_GIT_CACHE_RS),$(wildcard $(DEFAULT_GIT_CACHE_RS)))
   GIT_CACHE_RS ?= $(DEFAULT_GIT_CACHE_RS)
 endif
 
-# The PKG_SOURCE_LOCAL and PKG_SOURCE_LOCAL_pkgname variables can be used to
+# The PKG_SOURCE_LOCAL and PKG_SOURCE_LOCAL_$(PKG_NAME) variables can be used to
 # override the package source with a local folder, which is useful during
 # development.
 ifeq ("environment", "$(origin PKG_SOURCE_LOCAL)")
-  $(info $(COLOR_YELLOW)Warning: You set a global PKG_SOURCE_LOCAL in the\
-	 environment. This can have effects on all packages! Consider using\
-	 PKG_SOURCE_LOCAL_$(PKG_NAME) instead!$(COLOR_RESET))
+  $(call echowarn,("Warning: You set a global PKG_SOURCE_LOCAL in the"\
+         "environment. This can have effects on all packages! Consider using"\
+         "PKG_SOURCE_LOCAL_$(call uppercase_and_underscore,$(PKG_NAME)) instead!"))
 endif
 
 PKG_SOURCE_LOCAL ?= $(PKG_SOURCE_LOCAL_$(call uppercase_and_underscore,$(PKG_NAME)))
 
 ifneq (,$(PKG_SOURCE_LOCAL))
-  $(info $(COLOR_YELLOW)Warning: PKG_SOURCE_LOCAL in use! Remember to remove it\
-	 before committing!$(COLOR_RESET))
+  $(call echowarn,("Warning: PKG_SOURCE_LOCAL in use! Remember to remove it"\
+         "before committing!"))
 
   include $(RIOTBASE)/pkg/local.mk
 else
@@ -181,10 +181,9 @@ else
 # redirect stderr so git sees a pipe and not a terminal see https://github.com/git/git/blob/master/progress.c#L138
 $(PKG_SOURCE_DIR)/.git: $(PKG_SPARSE_TAG) | $(PKG_CUSTOM_PREPARED)
 	$(if $(QUIETER),,$(info [INFO] cloning $(PKG_NAME) without cache))
-	@echo "$(COLOR_YELLOW)[INFO] Consider using git-cache-rs to speed up your build" \
+	@$(call sh_echowarn,("[INFO] Consider using git-cache-rs to speed up your build"\
 	  "and reduce network traffic! See:" \
-	  "https://guides.riot-os.org/build-system/advanced_build_system_tricks/#speed-up-builds-with-git-cache-rs" \
-	  "$(COLOR_RESET)"
+	  "https://guides.riot-os.org/build-system/advanced_build_system_tricks/#speed-up-builds-with-git-cache-rs"))
 	$(Q)rm -Rf $(PKG_SOURCE_DIR)
 	$(Q)mkdir -p $(PKG_SOURCE_DIR)
 	$(Q)git init $(GIT_QUIET) $(PKG_SOURCE_DIR)

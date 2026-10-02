@@ -253,6 +253,12 @@ extern "C" {
  */
 #define AUTO_INIT_PRIO_MOD_LORAMAC                      1330
 #endif
+#ifndef AUTO_INIT_PRIO_MOD_RADIOLIB
+/**
+ * @brief   RadioLib priority
+ */
+#define AUTO_INIT_PRIO_MOD_RADIOLIB                     1335
+#endif
 #ifndef AUTO_INIT_PRIO_MOD_DSM
 /**
  * @brief   DSM priority

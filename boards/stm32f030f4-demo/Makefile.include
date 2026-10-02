@@ -2,3 +2,8 @@ INCLUDES += -I$(RIOTBOARD)/common/stm32/include
 
 # Setup of programmer and serial is shared between STM32 based boards
 include $(RIOTMAKE)/boards/stm32.inc.mk
+
+include $(RIOTBASE)/makefiles/color.inc.mk
+$(call echowarn,("The stm32f030f4-demo board is deprecated and will be removed"\
+                 "after the 2027.04 Release! If you are still using it"\
+                 "actively, please notify the maintainers."))

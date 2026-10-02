@@ -8,12 +8,12 @@ import Contact from '@components/contact.astro';
 import WorkingVideo from './img/gpio/05_working_video.mp4';
 import ButtonVideo from './img/gpio/08_buttons.mp4';
 
-So far we have been running all our code using the `arduino-feather-nrf52840-sense` board.
+So far we have been running all our code using the `adafruit-feather-nrf52840-sense` board.
 
 In this tutorial, we will learn how to use the GPIO pins on a real board
 to control LEDs or read button presses.
 
-For this tutorial we will be using a the `arduino-feather-nrf52840-sense` board
+For this tutorial we will be using a the `adafruit-feather-nrf52840-sense` board
 with the [Teamagochi PCB](https://github.com/smartuni/teamagochi),
 but you can use any board that has GPIO pins.
 
@@ -26,7 +26,7 @@ First, we need to inform RIOT about the board we are using.
 To do this we adapt the `BOARD` variable in our `Makefile` to the board we are using.
 
 ```make
-BOARD ?= arduino-feather-nrf52840-sense
+BOARD ?= adafruit-feather-nrf52840-sense
 ```
 
 ```makefile title="Makefile" {5}
@@ -34,7 +34,7 @@ BOARD ?= arduino-feather-nrf52840-sense
 APPLICATION = gpio_example
 
 # Change this to your board if you want to build for a different board
-BOARD ?= arduino-feather-nrf52840-sense
+BOARD ?= adafruit-feather-nrf52840-sense
 
 # This has to be the absolute path to the RIOT base directory:
 # If you are following the tutorial, your RIOT base directory will
@@ -58,7 +58,7 @@ If you ever want to just quickly test something
 on a board without having to change the `Makefile`,
 you can also set the `BOARD` variable in the terminal before running `make`.
 ```bash
-BOARD=arduino-feather-nrf52840-sense make all
+BOARD=adafruit-feather-nrf52840-sense make all
 ```
 
 First we want to make sure that we can build the code for the board.
@@ -111,7 +111,7 @@ sudo usermod -a -G uucp $USER
 Now that we have the board working, let's try to control the LEDs on the board.
 
 The exact pins that control the LEDs might vary depending on the board you are using,
-but in the case of the `arduino-feather-nrf52840-sense` board,
+but in the case of the `adafruit-feather-nrf52840-sense` board,
 the LED would be connected on Port 1 Pin 9.
 
 You can often find these defines either in the board schematics or in the board
@@ -134,7 +134,7 @@ USEMODULE += ztimer_msec
 APPLICATION = gpio_example
 
 # Change this to your board if you want to build for a different board
-BOARD ?= arduino-feather-nrf52840-sense
+BOARD ?= adafruit-feather-nrf52840-sense
 
 # This has to be the absolute path to the RIOT base directory:
 # If you are following the tutorial, your RIOT base directory will
@@ -341,7 +341,7 @@ If we now `make flash` and then `make term` we should see the LED turn on
 when the button is pressed.
 
 :::tip
-If you are using the `arduino-feather-nrf52840-sense` board,
+If you are using the `adafruit-feather-nrf52840-sense` board,
 the button is on the back of the board.
 
 Be careful to not press the reset button by mistake 😉
@@ -356,7 +356,7 @@ Be careful to not press the reset button by mistake 😉
 
 Most boards (if they have LEDs or buttons) will have
 specific defines for the GPIO pins that are used.
-For example, the `arduino-feather-nrf52840-sense` board has the `LED0_TOGGLE`
+For example, the `adafruit-feather-nrf52840-sense` board has the `LED0_TOGGLE`
 define that allows you to toggle the LED without having to define the pin yourself.
 
 In most cases using gpio like we did in this tutorial is the best way to go,

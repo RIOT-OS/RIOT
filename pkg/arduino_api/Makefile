@@ -7,5 +7,10 @@ GITAMFLAGS = --3way
 
 include $(RIOTBASE)/pkg/pkg.mk
 
+# Disable the LLVM20 warning about the (weak) main function in extern "C" {}
+ifeq (llvm,$(TOOLCHAIN))
+  CFLAGS += -Wno-main
+endif
+
 all:
 	$(QQ)"$(MAKE)" -C $(PKG_SOURCE_DIR)/api -f $(RIOTBASE)/Makefile.base MODULE=$(PKG_NAME)

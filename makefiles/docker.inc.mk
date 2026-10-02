@@ -6,7 +6,7 @@
 # dist/tools/buildsystem_sanity_check/check.sh start complaining in CI, and
 # provide the latest values to verify and fill in.
 
-DOCKER_TESTED_IMAGE_REPO_DIGEST := 5db178a4ad8d2755a94c0e521b9e544995d10eeb5bf801f8d4fb3e3e19e5f84d
+DOCKER_TESTED_IMAGE_REPO_DIGEST := 089b88290d1ad9ba2d960239f683a97d080bdf661ecd321b82ecc4b9adf30e70
 
 DOCKER_PULL_IDENTIFIER := docker.io/riot/riotbuild@sha256:$(DOCKER_TESTED_IMAGE_REPO_DIGEST)
 export DOCKER_IMAGE ?= $(DOCKER_PULL_IDENTIFIER)

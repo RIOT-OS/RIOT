@@ -22,7 +22,8 @@
 
 /* define a local dummy handler as it needs to be in the same compilation unit
  * as the alias definition */
-void dummy_handler(void) {
+void dummy_handler(void)
+{
     dummy_handler_default();
 }
 
@@ -74,12 +75,23 @@ WEAK_DEFAULT void isr_cryptocell(void);
 WEAK_DEFAULT void isr_spi3(void);
 WEAK_DEFAULT void isr_pwm3(void);
 
+/* The ISR for UARTE0 is shared with UART0, which is why it is called isr_uart0
+ * instead of isr_uarte0. As there is no UARTE1, the ISR is called isr_uarte1.
+ * Defining the false friends causes a linker error and avoids nasty footguns
+ * that will lead to a Hard Fault. */
+void isr_uarte0(void)
+{
+}
+void isr_uart1(void)
+{
+}
+
 /* CPU specific interrupt vector table */
 ISR_VECTOR(1)
 const isr_t vector_cpu[CPU_IRQ_NUMOF] = {
     isr_power_clock,       /* power_clock */
     isr_radio,             /* radio */
-    isr_uart0,             /* uart0 */
+    isr_uart0,             /* uart0 and uarte0 */
     isr_spi0_twi0,         /* spi0_twi0 */
     isr_spi1_twi1,         /* spi1_twi1 */
     isr_nfct,              /* nfct */

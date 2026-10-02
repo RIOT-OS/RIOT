@@ -320,9 +320,19 @@ void gnrc_sixlowpan_frag_recv(gnrc_pktsnip_t *pkt, void *ctx, unsigned page)
     (void)ctx;
     switch (frag->disp_size.u8[0] & SIXLOWPAN_FRAG_DISP_MASK) {
         case SIXLOWPAN_FRAG_1_DISP:
+            if (pkt->size < sizeof(sixlowpan_frag_t)) {
+                DEBUG("6lo rbuf: Invalid (too short) fragment header.\n");
+                gnrc_pktbuf_release(pkt);
+                return;
+            }
             break;
 
         case SIXLOWPAN_FRAG_N_DISP:
+            if (pkt->size < sizeof(sixlowpan_frag_n_t)) {
+                DEBUG("6lo rbuf: Invalid (too short) fragment header.\n");
+                gnrc_pktbuf_release(pkt);
+                return;
+            }
             offset = (((sixlowpan_frag_n_t *)frag)->offset * 8);
             break;
 
