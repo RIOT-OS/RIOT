@@ -110,6 +110,26 @@ $(BUILD_DIR)/CACHEDIR.TAG:
 	$(Q)echo "Signature: 8a477f597d28d172789f06886806bc55" > "$@"
 	$(Q)echo "# This folder contains RIOT's build cache" >> "$@"
 
+# Ensure that packages that have dynamic sparse paths (e.g., pkg/cmsis) or
+# packages that can be built sparse and non-sparse (e.g. nrfx) are rebuilt
+# when the (sparse) paths of the time of checkout are not the same as needed now.
+# Example 1: Build a) only needs CMSIS/Core. Build b) also needs CMSIS/DSP.
+#   If b) is built after a), the sources need to be checked out again.
+# Example 2: Build a) only needs nRF vendor headers. Build b) needs the full nrfx
+#   package. If b) is built after a), the package is incomplete and the sources
+#   need to be checked out again.
+#
+# This snippet is doing an ad-hoc (but faster) "|$(LAZYSPONGE)". The sparse
+# paths (also the empty list!) of a compilation run are saved in
+# `$(PKG_SOURCE_DIR).sparse` as `$(PKG_SPARSE_TAG)` and compared to the current
+# sparse paths in `$(PKG_SPARSE_PATHS)`. A mismatch triggers a rebuild.
+PKG_SPARSE_TAG = $(PKG_SOURCE_DIR).sparse
+$(PKG_SPARSE_TAG): FORCE
+	$(Q)if test -f $@; then \
+	  test "$$(cat $@)" = "$(PKG_SPARSE_PATHS)" && exit 0; \
+	fi; \
+	mkdir -p $$(dirname $@) && echo "$(PKG_SPARSE_PATHS)" > $@
+
 # Add noop builtin to avoid "Nothing to be done for prepare" message
 prepare: $(PKG_PREPARED) | $(BUILD_DIR)/CACHEDIR.TAG
 	@:
@@ -125,8 +145,9 @@ GIT_IN_PKG = git -C $(PKG_SOURCE_DIR) --git-dir=.git --work-tree=.
 
 # When $(PKG_PATCHED).d is included $(PKG_PATCHED) prerequisites will include
 # the old prerequisites forcing a rebuild on prerequisite removal, but we do
-# not want to generate $(PKG_PATCHED).d with the old prerequisites
-PKG_PATCHED_PREREQUISITES = $(PKG_PATCHES) $(PKG_DOWNLOADED) $(MAKEFILE_LIST)
+# not want to generate $(PKG_PATCHED).d with the old prerequisites.
+# If the git repo changes, the files have to be patched again.
+PKG_PATCHED_PREREQUISITES = $(PKG_PATCHES) $(PKG_DOWNLOADED) $(PKG_SOURCE_DIR)/.git $(MAKEFILE_LIST)
 
 # Generate dependency file. Force rebuilding on dependency deletion
 # Warning: It will be evaluated before target execution, so use as first step
@@ -139,7 +160,7 @@ gen_dependency_files = $(file >$1,$@: $2)$(foreach f,$2,$(file >>$1,$(f):))
 # * checkout the wanted base commit
 # * apply patches if there are any. (If none, it does nothing)
 $(PKG_PATCHED): $(PKG_PATCHED_PREREQUISITES)
-	$(if $(QUIETER),,$(info [INFO] patch $(PKG_NAME)))
+	$(if $(QUIETER),,@echo "[INFO] patching $(PKG_NAME)")
 	$(call gen_dependency_files,$@.d,$(PKG_PATCHED_PREREQUISITES))
 	$(Q)$(GIT_IN_PKG) clean $(GIT_QUIET) -xdff '**' -e $(PKG_STATE:$(PKG_SOURCE_DIR)/%='%*')
 	$(Q)$(GIT_IN_PKG) checkout $(GIT_QUIET) -f $(PKG_VERSION)
@@ -148,39 +169,23 @@ $(PKG_PATCHED): $(PKG_PATCHED_PREREQUISITES)
 	     fi
 	$(Q)touch $@
 
-$(PKG_DOWNLOADED): $(MAKEFILE_LIST) | $(PKG_SOURCE_DIR)/.git
-	$(if $(QUIETER),,$(info [INFO] updating $(PKG_NAME) $(PKG_DOWNLOADED)))
+$(PKG_DOWNLOADED): $(MAKEFILE_LIST) $(PKG_SPARSE_TAG) | $(PKG_SOURCE_DIR)/.git
+	$(if $(QUIETER),,@echo "[INFO] updating $(PKG_NAME) $(PKG_DOWNLOADED)")
 	$(Q)if ! $(GIT_IN_PKG) cat-file -e $(PKG_VERSION); then \
 		$(if $(QUIETER),,printf "[INFO] fetching new $(PKG_NAME) version "$(PKG_VERSION)"\n";) \
 		$(GIT_IN_PKG) fetch $(GIT_QUIET) "$(PKG_URL)" "$(PKG_VERSION)"; \
 	fi
 	$(Q)echo $(PKG_VERSION) > $@
 
-# This snippet ensures that for packages that have dynamic sparse paths (e.g.,
-# pkg/cmsis), the sparse paths of the time of checkout are the same as needed
-# now.
-# E.g., build a) only needs CMSIS/Core. Build b) also needs CMSIS/DSP.
-# If b) is built after a) and the cmsis checkout does not contain CMSIS/DSP,
-# the sources need to be checked out again.
-# (Inside, this is doing an ad-hoc "|$(LAZYSPONGE)", but using the python version turned out
-# to be significantly slower).
-ifneq (, $(PKG_SPARSE_PATHS))
-PKG_SPARSE_TAG = $(PKG_SOURCE_DIR).sparse
-$(PKG_SPARSE_TAG): FORCE
-	$(Q)if test -f $@; then \
-		test "$$(cat $@)" = "$(PKG_SPARSE_PATHS)" && exit 0; \
-	fi ; mkdir -p $$(dirname $@) && echo "$(PKG_SPARSE_PATHS)" > $@
-endif
-
 ifneq (,$(GIT_CACHE_RS))
 $(PKG_SOURCE_DIR)/.git: $(PKG_SPARSE_TAG) | $(PKG_CUSTOM_PREPARED)
-	$(if $(QUIETER),,$(info [INFO] cloning $(PKG_NAME) with git-cache-rs))
+	$(if $(QUIETER),,@echo "[INFO] cloning $(PKG_NAME) with git-cache-rs")
 	$(Q)rm -Rf $(PKG_SOURCE_DIR)
 	$(Q)$(GIT_CACHE_RS) clone --commit $(PKG_VERSION) $(addprefix --sparse-add ,$(PKG_SPARSE_PATHS)) -- $(PKG_URL) $(PKG_SOURCE_DIR)
 else
 # redirect stderr so git sees a pipe and not a terminal see https://github.com/git/git/blob/master/progress.c#L138
 $(PKG_SOURCE_DIR)/.git: $(PKG_SPARSE_TAG) | $(PKG_CUSTOM_PREPARED)
-	$(if $(QUIETER),,$(info [INFO] cloning $(PKG_NAME) without cache))
+	$(if $(QUIETER),,@echo "[INFO] cloning $(PKG_NAME) without cache")
 	@$(call sh_echowarn,("[INFO] Consider using git-cache-rs to speed up your build"\
 	  "and reduce network traffic! See:" \
 	  "https://guides.riot-os.org/build-system/advanced_build_system_tricks/#speed-up-builds-with-git-cache-rs"))
