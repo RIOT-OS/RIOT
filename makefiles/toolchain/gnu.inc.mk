@@ -29,6 +29,7 @@ GCC_VERSION := $(firstword $(subst ., ,$(shell command -v $(CC) > /dev/null && $
 # -fmacro-prefix-map requires GCC 8
 ifneq (1,$(call version_is_greater_or_equal,$(GCC_VERSION),8))
   OPTIONAL_CFLAGS_BLACKLIST += -fmacro-prefix-map=$(RIOTBASE)/=
+  OPTIONAL_CFLAGS_BLACKLIST += -fdebug-prefix-map=$(RIOTBASE)/=
 endif
 
 # GCC does not warn about documentation (yet)
