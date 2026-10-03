@@ -40,8 +40,12 @@ ifeq (llvm,$(TOOLCHAIN))
   # with LLVM, so we just disable LLVM on native as a work around
   TEST_ON_CI_BLACKLIST += native32 native64
 else
-  # To force Murdock to work again we disable native32 for now
-  TEST_ON_CI_BLACKLIST += native32
+  ifeq (native32,$(BOARD))
+    # ASAN produces a false positive for timer initialization on native32 since it assumes
+    # 32-bit values but then writes 64 bits. These CFLAGS set the width of the timer values
+    # to 64 bits. See also https://github.com/RIOT-OS/RIOT/issues/22822
+    CFLAGS += -D_TIME_BITS=64 -D_FILE_OFFSET_BITS=64
+  endif
 endif
 
 DISABLE_MODULE += auto_init auto_init_%
