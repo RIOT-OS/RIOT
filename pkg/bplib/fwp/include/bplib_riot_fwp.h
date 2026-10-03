@@ -41,10 +41,8 @@
  *
  * ### Overriding the default FWP
  *
- * bplib_riot_fwp_init() is called in @ref pkg_bplib_init, so if this module
- * is not enabled with `bplib_default_fwp`, a function with the signature of
- * bplib_riot_fwp_init() has to be provided by other means. The header will
- * always be in the include path of the bplib package.
+ * Provide a different bplib_fwp_callbacks and don't select the bplib_default_fwp
+ * module. This header will always be included.
  *
  *
  * @{
@@ -62,18 +60,9 @@ extern "C" {
 #endif
 
 /**
- * @brief Initializes the FWP callbacks for bplib.
- *
- * Notably provides callbacks for time, using ztimer64 and,
- * if enabled with the `bplib_walltime_available` module,
- * walltime. Also notified the VFS Storage when a contact
- * ends or a channel is closed, to flush the bundle in the
- * cache, so they won't get egressed on a possibly different
- * channel / contact.
- *
- * @return return value of BPLib_FWP_Init()
+ * @brief Callback functions used by bplib
  */
-BPLib_Status_t bplib_riot_fwp_init(void);
+extern BPLib_FWP_ProxyCallbacks_t bplib_fwp_callbacks;
 
 #ifdef __cplusplus
 }
