@@ -44,6 +44,8 @@
 #include <time.h>
 #include <unistd.h>
 
+#include "macros/utils.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -689,6 +691,71 @@ void print_str(const char* str);
  * @returns         max(in_len, pad_len)
  */
 size_t fmt_lpad(char *str, size_t in_len, size_t pad_len, char pad_char);
+
+/** @cond */ /* hide */
+
+/* Provide experimental fprint, eprint, print, fprintln, eprintln, println
+ * macros that route to fprintf or fputs depending on whether you pass
+ * a format string or not to avoid printf overhead. */
+
+/* Step 1: Define two implementation with same macro signature. */
+#  define __fprint_(stream, fmt, ...)    fprintf(stream, fmt, ##__VA_ARGS__)
+#  define __fprint_noformat(stream, str) fputs(str, stream)
+
+#  define __fprint_get_macro(\
+    _01, _02, _03, _04, _05, _06, _07, _08, _09, _0a, _0b, _0c, _0d, _0e, _0f, \
+    _11, _12, _13, _14, _15, _16, _17, _18, _19, _1a, _1b, _1c, _1d, _1e, _1f, \
+    _21, _22, _23, _24, _25, _26, _27, _28, _29, _2a, _2b, _2c, _2d, _2e, _2f, \
+    _31, _32, _33, _34, _35, _36, _37, _38, _39, _3a, _3b, _3c, _3d, _3e, _3f, \
+    N, ...) N
+
+#  define __fprint_impl(stream, s, ...) CONCAT(__fprint_, \
+      __fprint_get_macro(dummy,\
+        ##__VA_ARGS__,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,noformat) \
+    )(stream, s, ##__VA_ARGS__)
+
+/** @endcond */
+
+/**
+ * @name Printing
+ * @{
+ */
+
+/**
+ * @brief Print into @p stream
+ *
+ * @param stream Stream or file to print to, e.g., `stdout` or `stderr`
+ * @param s String, can be format string
+ * @param ... Variadic format arguments if @p s was a format string
+ *
+ * This macro will call `fputs`, if no format string is given, and `fprintf``
+ * otherwise to avoid the overhead of `printf`.
+ */
+#define fmt_fprint(stream, s, ...) __fprint_impl(stream, s, ##__VA_ARGS__)
+
+/**
+ * @brief Print to standard output
+ *
+ * @param s String, can be format string
+ * @param ... Variadic format arguments if @p s was a format string
+ *
+ * This macro will call `fputs`, if no format string is given, and `fprintf``
+ * otherwise to avoid the overhead of `printf`.
+ */
+#define fmt_print(s, ...) fmt_fprint(stdout, s, ##__VA_ARGS__)
+
+/**
+ * @brief Print to standard error
+ *
+ * @param s String, can be format string
+ * @param ... Variadic format arguments if @p s was a format string
+ *
+ * This macro will call `fputs`, if no format string is given, and `fprintf``
+ * otherwise to avoid the overhead of `printf`.
+ */
+#define fmt_eprint(s, ...) fmt_fprint(stderr, s, ##__VA_ARGS__)
+
+/** @} */ /* section */
 
 #ifdef __cplusplus
 }

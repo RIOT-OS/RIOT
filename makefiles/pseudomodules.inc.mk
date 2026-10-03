@@ -317,7 +317,7 @@ PSEUDOMODULES += l2filter_whitelist
 PSEUDOMODULES += libc_gettimeofday
 
 PSEUDOMODULES += libstdcpp
-PSEUDOMODULES += log
+PSEUDOMODULES += log_dynamic_control
 PSEUDOMODULES += lora
 PSEUDOMODULES += lpc1768_eth_auto
 PSEUDOMODULES += lpc1768_eth_link_up
