@@ -18,6 +18,7 @@
  */
 
 #include <assert.h>
+
 #include "sx126x.h"
 
 #ifdef __cplusplus

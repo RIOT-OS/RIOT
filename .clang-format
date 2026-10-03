@@ -1,6 +1,6 @@
 # SPDX-License-Identifier: GPL-2.0
 #
-# clang-format configuration file. Intended for clang-format >= 17.
+# clang-format configuration file. Intended for clang-format >= 18.
 #
 # For more information, see:
 #
@@ -37,6 +37,8 @@ AlwaysBreakBeforeMultilineStrings: false
 AlwaysBreakTemplateDeclarations: false
 BinPackArguments: true
 BinPackParameters: true
+# "Bit fields": space before and after the colon (e.g. `uint8_t a : 1`)
+BitFieldColonSpacing: Both
 BraceWrapping:
   AfterClass: false
   AfterControlStatement: false
@@ -60,8 +62,15 @@ BreakBeforeTernaryOperators: false
 BreakConstructorInitializersBeforeComma: false
 BreakConstructorInitializers: BeforeComma
 BreakAfterJavaFieldAnnotations: false
+# adjacent string literals can only be wrapped between literals; keep this
+# enabled so concatenations are split at the 100 character limit instead of
+# overflowing it (disabling it can produce lines longer than the limit)
+BreakAdjacentStringLiterals: true
 BreakStringLiterals: false
-# "Line length": the absolute maximum of 100 characters per line
+# "Line length": the coding conventions aim for 80 characters per line with an
+# absolute maximum of 100. clang-format can only enforce the hard maximum, so
+# set the limit to 100 and leave lines up to 100 characters untouched (the
+# 80 character target is a soft guideline for humans, not the formatter)
 ColumnLimit: 100
 CommentPragmas: '^ IWYU pragma:'
 CompactNamespaces: false
@@ -95,6 +104,8 @@ InsertNewlineAtEOF: true
 JavaScriptQuotes: Leave
 JavaScriptWrapImports: true
 KeepEmptyLinesAtTheStartOfBlocks: false
+# "Line endings": all line endings shall be LF
+LineEnding: LF
 MacroBlockBegin: ''
 MacroBlockEnd: ''
 MaxEmptyLinesToKeep: 1
@@ -106,13 +117,25 @@ PenaltyBreakBeforeFirstCallParameter: 100
 PenaltyBreakComment: 10
 PenaltyBreakFirstLessLess: 0
 PenaltyBreakString: 10
+# penalty for exceeding the column limit; a low value lets clang-format
+# overflow ColumnLimit instead of wrapping, so keep it high enough that the
+# 100 character hard maximum is actually enforced (lines up to 100 characters
+# are left untouched)
 PenaltyExcessCharacter: 100
 PenaltyReturnTypeOnItsOwnLine: 60
 
 PointerAlignment: Right
-ReflowComments: false
+# re-wrap/indent comments so that multi-line trailing comments (e.g. enum
+# members with `/**< ... */`) stay aligned when the code next to them is
+# re-formatted; clang-format still does not add leading `*` or fix `*/`
+ReflowComments: true
 # remove superfluous semicolons (e.g. after an empty brace block)
 RemoveSemicolon: true
+# do not format macro definition bodies: clang-format would expand brace
+# initializer macros (e.g. `#define FOO { 1, 2 }`) into multi-line backslash
+# continuations and would also split `do { ... } while (0)` bodies, which
+# destroys the intended one-line form
+SkipMacroDefinitionBody: true
 SortIncludes: true
 SortUsingDeclarations: false
 SpaceAfterCStyleCast: false
@@ -135,4 +158,5 @@ SpacesInSquareBrackets: false
 Standard: Cpp03
 TabWidth: 4
 UseTab: Never
-QualifierAlignment: Left
+QualifierAlignment: Custom
+QualifierOrder: ['static', 'inline', 'const', 'volatile', 'type']
