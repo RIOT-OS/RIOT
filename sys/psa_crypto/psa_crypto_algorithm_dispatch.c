@@ -283,8 +283,6 @@ psa_status_t psa_algorithm_dispatch_sign_hash(  const psa_key_attributes_t *attr
     psa_asym_key_t asym_key = PSA_INVALID_OPERATION;
     uint8_t *key_data = NULL;
     size_t *key_bytes = NULL;
-    uint8_t *pub_key_data = NULL;
-    size_t *pub_key_bytes = NULL;
 
     if (PSA_KEY_TYPE_IS_ECC_KEY_PAIR(attributes->type)) {
         asym_key =
@@ -298,15 +296,19 @@ psa_status_t psa_algorithm_dispatch_sign_hash(  const psa_key_attributes_t *attr
 
     psa_get_key_data_from_key_slot(slot, &key_data, &key_bytes);
 
+    /* A sealed key is stored as an opaque blob, so the slot reports no plaintext
+     * key length. Pass zero instead of dereferencing a NULL pointer. */
+    size_t key_data_len = key_bytes ? *key_bytes : 0;
+
     switch (asym_key) {
 #if IS_USED(MODULE_PSA_ASYMMETRIC_ECC_P192R1)
     case PSA_ECC_P192_R1:
-        return psa_ecc_p192r1_sign_hash(attributes, alg, key_data, *key_bytes, hash, hash_length,
+        return psa_ecc_p192r1_sign_hash(attributes, alg, key_data, key_data_len, hash, hash_length,
                                         signature, signature_size, signature_length);
 #endif
 #if IS_USED(MODULE_PSA_ASYMMETRIC_ECC_P256R1)
     case PSA_ECC_P256_R1:
-        return psa_ecc_p256r1_sign_hash(attributes, alg, key_data, *key_bytes, hash, hash_length,
+        return psa_ecc_p256r1_sign_hash(attributes, alg, key_data, key_data_len, hash, hash_length,
                                         signature, signature_size, signature_length);
 #endif
     default:
@@ -317,8 +319,7 @@ psa_status_t psa_algorithm_dispatch_sign_hash(  const psa_key_attributes_t *attr
         (void)signature;
         (void)signature_size;
         (void)signature_length;
-        (void)pub_key_data;
-        (void)pub_key_bytes;
+        (void)key_data_len;
         return PSA_ERROR_NOT_SUPPORTED;
     }
 }
@@ -589,7 +590,16 @@ psa_status_t psa_algorithm_dispatch_import_key(const psa_key_attributes_t *attri
 #endif
 #if IS_USED(MODULE_PSA_ASYMMETRIC_ECC_P256R1)
         case PSA_ECC_P256_R1:
-            ret = psa_derive_ecc_p256r1_public_key(data, pubkey_data, data_length, pubkey_data_len);
+#if IS_USED(MODULE_PSA_CRYPTOSERVICE_ECC_P256)
+            /* The secure world seals the key on import; it rejects any key that
+             * is not destined for PSA_KEY_LOCATION_LOCAL_SEALED itself. */
+            ret = psa_import_ecc_p256r1_key_pair(attributes, data, data_length,
+                                                 key_data, key_data_size, key_bytes,
+                                                 pubkey_data, pubkey_data_len);
+#else
+            ret = psa_derive_ecc_p256r1_public_key(data, pubkey_data, data_length,
+                                                   pubkey_data_len);
+#endif
             break;
 #endif
 #if IS_USED(MODULE_PSA_ASYMMETRIC_ECC_ED25519)
@@ -606,8 +616,12 @@ psa_status_t psa_algorithm_dispatch_import_key(const psa_key_attributes_t *attri
             ret = PSA_ERROR_NOT_SUPPORTED;
             break;
         }
-        if (ret == PSA_SUCCESS) {
-            /* save private key data */
+        /* For a sealed key the backend has already stored it as an opaque sealed
+         * blob and key_bytes is NULL, so only the plaintext private key of a
+         * non-sealed local key pair is saved here. */
+        if (ret == PSA_SUCCESS &&
+            PSA_KEY_LIFETIME_GET_LOCATION(attributes->lifetime) !=
+            PSA_KEY_LOCATION_LOCAL_SEALED) {
             memcpy(key_data, data, data_length);
             *key_bytes = data_length;
         }
@@ -655,6 +669,11 @@ psa_status_t psa_algorithm_dispatch_cipher_encrypt( const psa_key_attributes_t *
     }
 
     switch (op) {
+    #if IS_USED(MODULE_PSA_CIPHER_AES_128_ECB)
+        case PSA_ECB_NO_PAD_AES_128:
+            return psa_cipher_ecb_aes_128_encrypt(attributes, key_data, *key_bytes, alg, input,
+                                              input_length, output, output_size, output_length);
+    #endif
     #if IS_USED(MODULE_PSA_CIPHER_AES_128_CBC)
         case PSA_CBC_NO_PAD_AES_128:
             return psa_cipher_cbc_aes_128_encrypt(attributes, key_data, *key_bytes, alg, input,
@@ -709,6 +728,11 @@ psa_status_t psa_algorithm_dispatch_cipher_decrypt( const psa_key_attributes_t *
     }
 
     switch (op) {
+    #if IS_USED(MODULE_PSA_CIPHER_AES_128_ECB)
+        case PSA_ECB_NO_PAD_AES_128:
+            return psa_cipher_ecb_aes_128_decrypt(attributes, key_data, *key_bytes, alg, input,
+                                              input_length, output, output_size, output_length);
+    #endif
     #if IS_USED(MODULE_PSA_CIPHER_AES_128_CBC)
         case PSA_CBC_NO_PAD_AES_128:
             return psa_cipher_cbc_aes_128_decrypt(attributes, key_data, *key_bytes, alg, input,

@@ -25,7 +25,11 @@
 /* get the IRQ configuration */
 #ifdef NRF_RTC0_S
 #if (RTT_DEV == 0)
+#ifdef NRF_TRUSTZONE_NONSECURE
+#define DEV             NRF_RTC0_NS
+#else
 #define DEV             NRF_RTC0_S
+#endif
 #define ISR             isr_rtc0
 #define IRQn            RTC0_IRQn
 #elif (RTT_DEV == 1)

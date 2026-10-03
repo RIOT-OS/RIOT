@@ -2,6 +2,23 @@
 ROM_LEN ?= 0x100000
 RAM_LEN ?= 0x40000
 
+PSEUDOMODULES += trustzone_m_nonsecure
+
+ifneq (,$(filter trustzone_m_nonsecure,$(USEMODULE)))
+
+# Shared nRF/Cortex-M code has to select the non-secure peripheral aliases.
+CFLAGS += -DNRF_TRUSTZONE_NONSECURE
+
+# The secure image owns the lower part of flash and RAM.
+include $(RIOTPKG)/riot-tee/riot-tee-layout.mk
+
+export SECURE_FLASH_SIZE
+ROM_LEN = $(NS_FLASH_SIZE)
+RAM_LEN = $(NS_RAM_SIZE)
+RAM_START_ADDR ?= $(NS_RAM_START)
+ROM_OFFSET = $(SECURE_FLASH_SIZE)
+endif
+
 FLASHFILE ?= $(BINFILE)
 
 PROGRAMMER ?= jlink

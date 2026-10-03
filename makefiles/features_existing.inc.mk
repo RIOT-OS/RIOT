@@ -275,6 +275,7 @@ FEATURES_EXISTING := \
     sdcard_spi \
     ssp \
     tinyusb_device \
+    trustzone_m \
     vdd_lc_filter_reg0 \
     vdd_lc_filter_reg1 \
     xiao_shield \

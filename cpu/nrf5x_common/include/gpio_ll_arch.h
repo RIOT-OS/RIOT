@@ -43,7 +43,11 @@ extern "C" {
 
 /* Compatibility wrapper defines for nRF9160 */
 #ifdef NRF_P0_S
-#define NRF_P0 NRF_P0_S
+#  ifdef NRF_TRUSTZONE_NONSECURE
+#    define NRF_P0 NRF_P0_NS
+#  else
+#    define NRF_P0 NRF_P0_S
+#  endif
 #endif
 
 #if defined(CPU_FAM_NRF51)
