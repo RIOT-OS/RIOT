@@ -24,8 +24,8 @@ extern "C" {
 /**
  * @brief   Compatibility wrapper for nRF9160
  */
-#ifdef NRF_FICR_S
-#define NRF_FICR NRF_FICR_S
+#if defined(NRF_FICR_S) && !defined(NRF_TRUSTZONE_NONSECURE)
+#  define NRF_FICR NRF_FICR_S
 #endif
 
 /**
