@@ -1,4 +1,4 @@
-""" RIOT customization of Kconfig """
+"""RIOT customization of Kconfig."""
 import argparse
 import sys
 
@@ -6,9 +6,10 @@ from kconfiglib import Kconfig, KconfigError
 
 
 class RiotKconfig(Kconfig):
-    """ RIOT adaption of Kconfig class """
+    """RIOT adaption of `Kconfig` class."""
+
     def _parse_help(self, node):
-        """ Parses the help section of a node, removing Doxygen markers """
+        """Parse the help section of a node, removing Doxygen markers."""
         doxygen_markers = ["@ref ", "@see "]
 
         # call default parsing
@@ -19,7 +20,7 @@ class RiotKconfig(Kconfig):
             node.help = node.help.replace(marker, "")
 
     def write_autoconf(self, filename=None, header="/* RIOT Configuration File */\n"):
-        """ Override to convert - to _ when writing autoconf.h """
+        """Override to convert `-` to `_` when writing `autoconf.h`."""
         tmp_unique_defined_syms = self.unique_defined_syms.copy()
         for sym in self.unique_defined_syms:
             if not sym._write_to_conf:
@@ -39,6 +40,8 @@ class RiotKconfig(Kconfig):
 
 def standard_riot_kconfig(description=None):
     """
+    Parse the arguments of tools that take a single optional Kconfig file.
+
     Argument parsing helper for tools that take a single optional Kconfig file
     argument (default: Kconfig). Returns the RiotKconfig instance for the parsed
     configuration. Uses argparse internally.

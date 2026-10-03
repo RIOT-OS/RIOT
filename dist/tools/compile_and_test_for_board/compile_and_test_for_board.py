@@ -1,7 +1,8 @@
 #! /usr/bin/env python3
 
 # pylint: disable=line-too-long
-"""
+"""Handle compilation and tests for one board.
+
 This script handles building all applications and tests for one board and also
 execute tests if they are available.
 
@@ -345,7 +346,7 @@ class RIOTApplication:
             )
 
     def run_compilation_and_test(self, **test_kwargs):
-        """Same as `compilation_and_test` but handles exception.
+        """Do the same as `compilation_and_test` but handle exceptions.
 
         :returns: 0 on success and 1 on error.
         """
@@ -403,7 +404,6 @@ class RIOTApplication:
         :param jobs: Number of parallel jobs allowed
         :raises ErrorInTest: on execution failed during one step
         """
-
         # Ignore incompatible APPS
         if not self.board_is_supported(jobs):
             create_directory(self.resultdir, clean=True)
@@ -576,7 +576,6 @@ class RIOTApplication:
 
         It also deletes other `name.*` files before.
         """
-
         # Delete previous status files
         resultfiles = glob.glob(self._outfile(f"{name}.*"))
         for resultfile in resultfiles:
@@ -658,7 +657,7 @@ def save_failure_summary(resultdir, summary):
 
 
 def list_from_string(list_str=None):
-    """Get list of items from `list_str`
+    """Get list of items from `list_str`.
 
     >>> list_from_string(None)
     []

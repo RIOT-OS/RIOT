@@ -65,6 +65,8 @@ class TestCongUREBase(unittest.TestCase):
         # pylint: disable=invalid-name
         # trying to be in line with `unittest`
         """
+        Assert that the state is in slow start.
+
         > The slow start algorithm is used when cwnd < ssthresh, while the
         > congestion avoidance algorithm is used when cwnd > ssthresh.  When
         > cwnd and ssthresh are equal, the sender may use either slow start or
@@ -76,6 +78,8 @@ class TestCongUREBase(unittest.TestCase):
         # pylint: disable=invalid-name
         # trying to be in line with `unittest`
         """
+        Assert that the state is in congestion avoidance.
+
         > The slow start algorithm is used when cwnd < ssthresh, while the
         > congestion avoidance algorithm is used when cwnd > ssthresh.  When
         > cwnd and ssthresh are equal, the sender may use either slow start or
@@ -87,6 +91,8 @@ class TestCongUREBase(unittest.TestCase):
         # pylint: disable=invalid-name
         # trying to be in line with `unittest`
         """
+        Assert that the state is in fast retransmit.
+
         > The TCP sender SHOULD use the "fast retransmit" algorithm to detect
         > and repair loss, based on incoming duplicate ACKs.  The fast
         > retransmit algorithm uses the arrival of 3 duplicate ACKs [...] as
@@ -97,7 +103,7 @@ class TestCongUREBase(unittest.TestCase):
     def assertNotInFastRetransmit(self, state):
         # pylint: disable=invalid-name
         # trying to be in line with `unittest`
-        """Reverse of self.assertInFastRetransmit()"""
+        """Reverse of `self.assertInFastRetransmit()`."""
         self.assertLess(state['dup_acks'], state['consts']['frthresh'])
 
     def get_ff_calls(self):
@@ -211,6 +217,8 @@ class TestCongURERenoDefaultInitTests(TestCongUREBase):
 
     def test_init(self):
         """
+        Test the initial congestion window.
+
         https://tools.ietf.org/html/rfc5681#section-3.1
 
         > IW, the initial value of cwnd, MUST be set using the following
@@ -248,6 +256,8 @@ class TestCongURERenoDefault(TestCongUREBase):
 
     def test_mss_2200(self):
         """
+        Test the initial congestion window with an SMSS of 2200 bytes.
+
         https://tools.ietf.org/html/rfc5681#section-3.1
 
         > IW, the initial value of cwnd, MUST be set using the following
@@ -275,6 +285,8 @@ class TestCongURERenoDefault(TestCongUREBase):
 
     def test_mss_1095(self):
         """
+        Test the initial congestion window with an SMSS of 1095 bytes.
+
         https://tools.ietf.org/html/rfc5681#section-3.1
 
         > IW, the initial value of cwnd, MUST be set using the following
@@ -304,6 +316,8 @@ class TestCongURERenoDefault(TestCongUREBase):
         # pylint: disable=invalid-name
         # name chosen to be in line with RFC
         """
+        Test the cwnd increase during slow start with N smaller than SMSS.
+
         https://tools.ietf.org/html/rfc5681#section-3.1
 
         > During slow start, a TCP increments cwnd by at most SMSS bytes for
@@ -336,9 +350,7 @@ class TestCongURERenoDefault(TestCongUREBase):
     def test_slow_start_increase_large_N(self):
         # pylint: disable=invalid-name
         # name chosen to be in line with RFC
-        """
-        Same as test_slow_start_increase_small_N(), but with N larger than SMSS
-        """
+        """Same as `test_slow_start_increase_small_N()`, but with N larger than SMSS."""
         state = self.cong_state()
         init_cwnd = state['cwnd']
         init_mss = state['mss']
@@ -359,6 +371,8 @@ class TestCongURERenoDefault(TestCongUREBase):
 
     def test_congestion_avoidance_increase(self):
         """
+        Test the cwnd increase during congestion avoidance.
+
         During congestion avoidance, cwnd is incremented by roughly 1 full-
         sized segment per round-trip time (RTT).  Congestion avoidance
         continues until congestion is detected.  The basic guidelines for
@@ -402,6 +416,8 @@ class TestCongURERenoDefault(TestCongUREBase):
 
     def test_reduce_ssthresh_small_flight_size(self):
         """
+        Test the ssthresh reduction on timeout with a small flight size.
+
         https://tools.ietf.org/html/rfc5681#section-3.1
 
         > When a TCP sender detects segment loss using the retransmission timer
@@ -443,10 +459,7 @@ class TestCongURERenoDefault(TestCongUREBase):
         self.assertNotInFastRetransmit(state)
 
     def test_reduce_ssthresh_large_flight_size(self):
-        """
-        Same as test_reduce_ssthresh_small_flight_size, but with flight size
-        larger than 4 * SMSS
-        """
+        """Same as `test_reduce_ssthresh_small_flight_size`, but with flight size larger than 4 * SMSS."""
         state = self.cong_state()
         init_cwnd = state['cwnd']
         init_mss = state['mss']
@@ -480,8 +493,10 @@ class TestCongURERenoDefault(TestCongUREBase):
 
     def test_enter_fast_retransmit_check_a_not_true(self):
         """
-        Fast retransmit according to RFC 5681 when receiving a duplicate
-        ACK is received (see RFC 5681, section 3.2).
+        Test fast retransmit when a duplicate ACK is received.
+
+        Fast retransmit according to RFC 5681 when a duplicate ACK is received
+        (see RFC 5681, section 3.2).
 
         > The TCP sender SHOULD use the "fast retransmit" algorithm to detect
         >    and repair loss, based on incoming duplicate ACKs.  The fast
@@ -527,9 +542,9 @@ class TestCongURERenoDefault(TestCongUREBase):
 
     def test_enter_fast_retransmit_check_b_not_true(self):
         """
-        See self.test_enter_fast_retransmit_check_a_not_true()
-        This test checks if fast retransmit is NOT entered when condition (b)
-        is not true but all others are
+        Check that fast retransmit is NOT entered if only condition (b) is not true.
+
+        See `test_enter_fast_retransmit_check_a_not_true()`.
         """
         state = self.cong_state()
         self.assertEqual(0, self.get_ff_calls())
@@ -556,9 +571,9 @@ class TestCongURERenoDefault(TestCongUREBase):
 
     def test_enter_fast_retransmit_check_c_not_true(self):
         """
-        See self.test_enter_fast_retransmit_check_a_not_true()
-        This test checks if fast retransmit is NOT entered when condition (c)
-        is not true but all others are
+        Check that fast retransmit is NOT entered if only condition (c) is not true.
+
+        See `test_enter_fast_retransmit_check_a_not_true()`.
         """
         state = self.cong_state()
         self.assertEqual(0, self.get_ff_calls())
@@ -585,9 +600,9 @@ class TestCongURERenoDefault(TestCongUREBase):
 
     def test_enter_fast_retransmit_check_d_not_true(self):
         """
-        See self.test_enter_fast_retransmit_check_a_not_true()
-        This test checks if fast retransmit is NOT entered when condition (d)
-        is not true but all others are
+        Check that fast retransmit is NOT entered if only condition (d) is not true.
+
+        See `test_enter_fast_retransmit_check_a_not_true()`.
         """
         state = self.cong_state()
         self.assertEqual(0, self.get_ff_calls())
@@ -614,9 +629,9 @@ class TestCongURERenoDefault(TestCongUREBase):
 
     def test_enter_fast_retransmit_check_e_not_true(self):
         """
-        See self.test_enter_fast_retransmit_check_a_not_true()
-        This test checks if fast retransmit is NOT entered when condition (e)
-        is not true but all others are
+        Check that fast retransmit is NOT entered if only condition (e) is not true.
+
+        See `test_enter_fast_retransmit_check_a_not_true()`.
         """
         state = self.cong_state()
         self.assertEqual(0, self.get_ff_calls())
@@ -643,10 +658,11 @@ class TestCongURERenoDefault(TestCongUREBase):
 
     def test_enter_fast_retransmit_all_check_true_1(self):
         """
-        See self.test_enter_fast_retransmit_check_a_not_true()
-        This test checks if fast retransmit is entered all conditions are true
-        (in the sense that a window is advertised and the current send window
-        is the same)
+        Check that fast retransmit is entered if all conditions are true.
+
+        All conditions are true in the sense that a window is advertised and
+        the current send window is the same. See
+        `test_enter_fast_retransmit_check_a_not_true()`.
         """
         state = self.cong_state()
         self.assertEqual(0, self.get_ff_calls())
@@ -673,10 +689,11 @@ class TestCongURERenoDefault(TestCongUREBase):
 
     def test_enter_fast_retransmit_all_check_true_2(self):
         """
-        See self.test_enter_fast_retransmit_check_a_not_true()
-        This test checks if fast retransmit is entered all conditions are true
-        (in the sense that a window is not advertised and thus it is not
-        comparable to the send window)
+        Check that fast retransmit is entered if all conditions are true.
+
+        All conditions are true in the sense that a window is not advertised
+        and thus it is not comparable to the send window. See
+        `test_enter_fast_retransmit_check_a_not_true()`.
         """
         state = self.cong_state()
         self.assertEqual(0, self.get_ff_calls())
@@ -704,6 +721,8 @@ class TestCongURERenoDefault(TestCongUREBase):
 
     def test_ecn_ce(self):
         """
+        Test the reaction to a reported ECN congestion experienced (CE) event.
+
         https://tools.ietf.org/html/rfc5681#section-3
 
         > Also, note that the algorithms specified in this document work in
@@ -740,6 +759,8 @@ class TestCongURERenoDefault(TestCongUREBase):
 
     def test_msg_discarded(self):
         """
+        Test reporting of discarded messages.
+
         RFC 5681 does not say anything about discarding messages. It's a
         feature of CongURE. Calling it, should reduce the `in_flight_size`.
         """
@@ -754,6 +775,8 @@ class TestCongURERenoDefault(TestCongUREBase):
 
     def test_msgs_lost(self):
         """
+        Test reporting of explicitly lost messages.
+
         RFC 5681 does not say anything about explicitly lost messages.
         It's a feature of CongURE. Calling it, should enforce fast retransmit,
         as implicit loss (3 duplicate ACKs) does the same.

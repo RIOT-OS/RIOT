@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 """Generate a binary file from a sample image of the MNIST dataset.
+
 Pixel of the sample are stored as float32, images have size 8x8.
 """
 

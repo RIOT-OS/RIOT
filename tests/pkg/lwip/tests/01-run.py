@@ -276,7 +276,7 @@ def test_tcpv6_send(board_group, application, env=None):
 
 
 def test_tcpv6_large_send(board_group, application, env=None):
-    """Test that the TCP server can receive a large packet in multiple reads"""
+    """Test that the TCP server can receive a large packet in multiple reads."""
     if any(b.name not in ["native", "native64"] for b in board_group.boards):
         # run test only with native
         print("SKIP_TEST INFO found non-native board")

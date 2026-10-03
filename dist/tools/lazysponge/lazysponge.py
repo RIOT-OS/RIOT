@@ -9,7 +9,7 @@
 #
 
 """
-lazysponge
+lazysponge: write standard input to a file only if its content changed.
 
 Adaptation of moreutils `sponge` with added functionality that it does not
 modify the output file if the content would be unchanged.
@@ -25,7 +25,6 @@ unchanged.
 
 Note
 ----
-
 It only works with input provided by a `pipe` and not interactive input.
 The reason is that `ctrl+c` would not be handled properly in that case.
 

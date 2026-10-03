@@ -19,7 +19,8 @@ def get_cbor(data):
 
 
 def args(*params):
-    """Constructs a dict from a list of arguments for sending a CBOR command.
+    """Construct a dict from a list of arguments for sending a CBOR command.
+
     None elements will be omitted.
     """
     return dict((i, v) for i, v in enumerate(params, 1) if v is not None)

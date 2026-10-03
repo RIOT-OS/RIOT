@@ -50,18 +50,14 @@ MUD_TEST_URL = b"https://example.org"
 
 
 class StatelessDHCPv6Test(Automaton):
-    """
-        Scapy Automaton used for performing stateless DHCPv6 tests.
-    """
+    """Scapy Automaton used for performing stateless DHCPv6 tests."""
 
     def parse_args(self, child, **kwargs):
         """
-            Initializes the Automaton.
+        Initialize the Automaton.
 
-            Receives the TAP interface that is being
-            used as a keyword argument (`iface`).
-            Also generates a randomized prefix for
-            SLAAC testing.
+        Receives the TAP interface that is being used as a keyword argument
+        (`iface`). Also generates a randomized prefix for SLAAC testing.
         """
         super().parse_args(**kwargs)
         self.child = child
@@ -73,20 +69,20 @@ class StatelessDHCPv6Test(Automaton):
     @ATMT.state(initial=1)
     def WAITING_FOR_NDP_RS(self):
         """
-            The initial state.
+        Represent the initial state.
 
-            The Automaton waits for an NDP Router Solicitation.
+        The Automaton waits for an NDP Router Solicitation.
         """
         pass
 
     @ATMT.receive_condition(WAITING_FOR_NDP_RS, prio=1)
     def received_ICMP(self, pkt):
         """
-            Checks if an incoming packet contains an NDP Router Solicitaion (RS).
+        Check if an incoming packet contains an NDP Router Solicitation (RS).
 
-            If an RS has been received, `on_NDP_RS` will be called with the packet
-            as an argument and the Automaton's state will change to
-            `WAITING_FOR_DHCP_IR`.
+        If an RS has been received, `on_NDP_RS` will be called with the packet
+        as an argument and the Automaton's state will change to
+        `WAITING_FOR_DHCP_IR`.
         """
         if ICMPv6ND_RS in pkt:
             raise self.WAITING_FOR_DHCP_IR().action_parameters(pkt)
@@ -94,26 +90,24 @@ class StatelessDHCPv6Test(Automaton):
     @ATMT.action(received_ICMP)
     def on_NDP_RS(self, pkt):
         """
-            Called when an NDP Router Solicitation has been received.
+        Handle a received NDP Router Solicitation.
 
-            Calls `send_RA` to send an NDP Router Advertisement to all IPv6 nodes.
+        Calls `send_RA` to send an NDP Router Advertisement to all IPv6 nodes.
         """
         self.send_RA()
 
     @staticmethod
     def build_router_advertise_header():
-        """
-            Builds Ethernet and IPv6 headers for sending a packet to all IPv6 nodes.
-        """
+        """Build Ethernet and IPv6 headers for sending a packet to all IPv6 nodes."""
         return Ether() / IPv6(dst="ff02::1")
 
     def send_RA(self):
         """
-            Composes and sends an NDP Router Advertisement (RA).
+        Composes and send an NDP Router Advertisement (RA).
 
-            The RA contains a prefix which will be used by the RIOT
-            application for configuring a global IPv6 addresses using
-            Stateless Address Autoconfiguration (SLAAC).
+        The RA contains a prefix which will be used by the RIOT application for
+        configuring a global IPv6 addresses using Stateless Address
+        Autoconfiguration (SLAAC).
         """
         header = self.build_router_advertise_header()
         ra = ICMPv6ND_RA(M=0, O=1)
@@ -129,20 +123,20 @@ class StatelessDHCPv6Test(Automaton):
     @ATMT.state()
     def WAITING_FOR_DHCP_IR(self):
         """
-            The second state.
+        Represent the second state.
 
-            The Automaton waits for a DHCPv6 Information Request.
+        The Automaton waits for a DHCPv6 Information Request.
         """
         pass
 
     @ATMT.receive_condition(WAITING_FOR_DHCP_IR, prio=1)
     def received_DHCPv6(self, pkt):
         """
-            Checks if an expected DHCPv6 Information Request (IR) was received.
+        Check if an expected DHCPv6 Information Request (IR) was received.
 
-            The method asserts that the expected options are contained in the IR,
-            triggers `on_DHCPv6_IR` if this is the case, and lets the Automaton
-            switch to the final state `END`.
+        The method asserts that the expected options are contained in the IR,
+        triggers `on_DHCPv6_IR` if this is the case, and lets the Automaton
+        switch to the final state `END`.
         """
         if DHCP6_InfoRequest in pkt:
             hwaddrs = get_hwaddrs(self.child)
@@ -165,17 +159,15 @@ class StatelessDHCPv6Test(Automaton):
 
     @ATMT.action(received_DHCPv6)
     def on_DHCPv6_IR(self, pkt):
-        """
-            Calls `send_DHCPv6_Reply` for sending a DHCPv6 Reply message.
-        """
+        """Call `send_DHCPv6_Reply` for sending a DHCPv6 Reply message."""
         self.send_DHCPv6_Reply(pkt)
 
     @staticmethod
     def build_reply_headers(pkt):
         """
-            Constructs the Ethernet, IPv6, and UDP headers for the DHCPv6 Reply.
+        Construct the Ethernet, IPv6, and UDP headers for the DHCPv6 Reply.
 
-            Uses the received packet for inserting the correct addresses and ports.
+        Uses the received packet for inserting the correct addresses and ports.
         """
         src_ether = pkt[Ether].src
         src_ip = pkt[IPv6].src
@@ -184,9 +176,7 @@ class StatelessDHCPv6Test(Automaton):
         return Ether(dst=src_ether) / IPv6(dst=src_ip) / UDP(sport=dport, dport=sport)
 
     def send_DHCPv6_Reply(self, pkt):
-        """
-            Sends out the DHCPv6 Reply message.
-        """
+        """Send out the DHCPv6 Reply message."""
         header = self.build_reply_headers(pkt)
         trid = pkt[DHCP6_InfoRequest].trid
         srv_duid = header[Ether].src
@@ -201,18 +191,16 @@ class StatelessDHCPv6Test(Automaton):
     @ATMT.timeout(WAITING_FOR_NDP_RS, 10.0)
     @ATMT.timeout(WAITING_FOR_DHCP_IR, 10.0)
     def waiting_timeout(self):
-        """
-            Defines a timeout of 10 seconds for both the first and second state.
-        """
+        """Define a timeout of 10 seconds for both the first and second state."""
         raise self.ERROR_TIMEOUT()
 
     @ATMT.state(final=1)
     def END(self):
         """
-            The final state.
+        Represent the final state.
 
-            Checks if the global IPv6 address has been configured correctly and
-            terminates the test.
+        Checks if the global IPv6 address has been configured correctly and
+        terminates the test.
         """
         time.sleep(1)
 
@@ -224,9 +212,7 @@ class StatelessDHCPv6Test(Automaton):
 
 
 def get_hwaddrs(child):
-    """
-        Extracts the RIOT device's MAC Address from the command line for assertions.
-    """
+    """Extract the RIOT device's MAC Address from the command line for assertions."""
     hwaddrs = []
     child.sendline("ifconfig")
     child.expect(r"HWaddr:\s+(([A-Fa-f0-9]{2}:?)+)\s")
@@ -239,9 +225,7 @@ def get_hwaddrs(child):
 
 
 def testfunc(child):
-    """
-        The test function that is called by the test runner.
-    """
+    """The test function that is called by the test runner."""
     iface = os.environ["TAP"]
     StatelessDHCPv6Test(child, iface=iface).run()
 

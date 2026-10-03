@@ -118,7 +118,7 @@ class SerCmd(cmd.Cmd):
                  set_dtr=None, serprompt=None,
                  repeat_command_on_empty_line=defaultrepeat_cmd_empty_line,
                  reconnect=defaultreconnect):
-        """Constructor.
+        """Initialize the Pyterm instance.
 
         Args:
             port (str):         serial port
@@ -132,7 +132,6 @@ class SerCmd(cmd.Cmd):
             run_name (str):     identifier for log files subdirectory
 
         """
-
         # initialize class members
         cmd.Cmd.__init__(self)
         self.port = port
@@ -216,9 +215,7 @@ class SerCmd(cmd.Cmd):
         self.logger.addHandler(ch)
 
     def preloop(self):
-        """Executed bat program start.
-        """
-
+        """Execute at program start."""
         if self.process and (self.port != defaultport or self.tcp_serial):
             self.logger.error("Specified a process instance AND a serial "
                               "port or TCP connection. You probably want "
@@ -312,8 +309,10 @@ class SerCmd(cmd.Cmd):
         receiver_thread.start()
 
     def precmd(self, line):
-        """Check for command prefixes to distinguish between Pyterm
-        interal commands and commands that should be send to the node.
+        """Check for command prefixes.
+
+        This distinguishes between Pyterm internal commands and commands that
+        should be sent to the node.
         """
         self.logger.debug("processing line #%s#" % line)
         if (line.startswith("/")):
@@ -331,8 +330,10 @@ class SerCmd(cmd.Cmd):
             self.default('')
 
     def default(self, line):
-        """In case of no Pyterm specific prefix is detected, split
-        string by colons and send it to the node.
+        """Send a line without a Pyterm specific prefix to the node.
+
+        In case no Pyterm specific prefix is detected, split the string by
+        semicolons and send it to the node.
         """
         self.logger.debug("%s is no pyterm command, sending to default "
                           "out" % line)
@@ -344,8 +345,9 @@ class SerCmd(cmd.Cmd):
                 self._write_char((tok.strip() + "\n").encode("utf-8"))
 
     def do_help(self, line):
-        """Do not use Cmd's internal help function, but redirect to the
-        node.
+        """Redirect help to the node.
+
+        Do not use `Cmd`'s internal help function, but redirect to the node.
         """
         self._write_char("help\n".encode("utf-8"))
 
@@ -356,28 +358,24 @@ class SerCmd(cmd.Cmd):
         sys.exit(0)
 
     def complete_date(self, text, line, begidx, endidm):
-        """Auto completion for date string.
-        """
+        """Auto completion for date string."""
         date = time.strftime("%Y-%m-%d %H:%M:%S")
         return ["%s" % (date)]
 
     def do_PYTERM_sleep(self, line):
-        """Pyterm command: Sleep for n seconds.
-        """
+        """Pyterm command: Sleep for n seconds."""
         if line:
             time.sleep(float(line))
         else:
             self.logger.error("sleep: missing operand")
 
     def do_PYTERM_reset(self, line):
-        """Pyterm command: Send a reset to the node.
-        """
+        """Pyterm command: Send a reset to the node."""
         self.ser.setDTR(1)
         self.ser.setDTR(0)
 
     def do_PYTERM_exit(self, line, unused=None):
-        """Pyterm command: Exit Pyterm.
-        """
+        """Pyterm command: Exit Pyterm."""
         self.logger.info("Exiting Pyterm")
         # save history file
         readline.write_history_file()
@@ -401,8 +399,7 @@ class SerCmd(cmd.Cmd):
         return True
 
     def do_PYTERM_save(self, line):
-        """Pyterm command: Save Pyterm configuration to file.
-        """
+        """Pyterm command: Save Pyterm configuration to file."""
         if not self.config.has_section("general"):
             self.config.add_section("general")
         self.config.set("general", "port", self.port)
@@ -451,14 +448,14 @@ class SerCmd(cmd.Cmd):
             self.logger.info("Config saved")
 
     def do_PYTERM_show_config(self, line):
-        """Pyterm command: Show current configuration.
-        """
+        """Pyterm command: Show current configuration."""
         for key in self.__dict__:
             print(str(key) + ": " + str(self.__dict__[key]))
 
     def do_PYTERM_alias(self, line):
-        """Pyterm command: Register an alias or show an list of all
-        registered aliases.
+        """Pyterm command: Register an alias or show a list of all aliases.
+
+        When called with `list`, all registered aliases are shown.
         """
         if line.endswith("list"):
             for alias in self.aliases:
@@ -474,22 +471,19 @@ class SerCmd(cmd.Cmd):
         self.aliases[alias] = command
 
     def do_PYTERM_rmalias(self, line):
-        """Pyterm command: Unregister an alias.
-        """
+        """Pyterm command: Unregister an alias."""
         if not self.aliases.pop(line, None):
             sys.stderr.write("Alias not found")
 
     def get_alias(self, tok):
-        """Internal function to check for aliases.
-        """
+        """Check for aliases."""
         for alias in self.aliases:
             if tok.split()[0] == alias:
                 return self.aliases[alias] + tok[len(alias):]
         return tok
 
     def do_PYTERM_trigger(self, line):
-        """Pyterm command: Register an trigger Regex.
-        """
+        """Pyterm command: Register a trigger Regex."""
         if not line.count("="):
             sys.stderr.write("Usage: /trigger <regex> = <CMD>\n")
             return
@@ -500,19 +494,16 @@ class SerCmd(cmd.Cmd):
         self.triggers[re.compile(trigger)] = action
 
     def do_PYTERM_rmtrigger(self, line):
-        """Pyterm command: Unregister an trigger.
-        """
+        """Pyterm command: Unregister a trigger."""
         if not self.triggers.pop(line, None):
             sys.stderr.write("Trigger not found")
 
     def do_PYTERM_ignore(self, line):
-        """Pyterm command: Ignore lines with these Regexes matching.
-        """
+        """Pyterm command: Ignore lines with these Regexes matching."""
         self.ignores.append(re.compile(line.strip()))
 
     def do_PYTERM_unignore(self, line):
-        """Pyterm command: Remote an ignore Regex.
-        """
+        """Pyterm command: Remove an ignore Regex."""
         for r in self.ignores:
             if (r.pattern == line.strip()):
                 self.logger.info("Remove ignore for %s" % r.pattern)
@@ -521,13 +512,11 @@ class SerCmd(cmd.Cmd):
         sys.stderr.write("Ignore for %s not found\n" % line.strip())
 
     def do_PYTERM_filter(self, line):
-        """Pyterm command: Show only lines matching this Regex.
-        """
+        """Pyterm command: Show only lines matching this Regex."""
         self.filters.append(re.compile(line.strip()))
 
     def do_PYTERM_unfilter(self, line):
-        """Pyterm command: Remove a filter.
-        """
+        """Pyterm command: Remove a filter."""
         for r in self.filters:
             if (r.pattern == line.strip()):
                 self.logger.info("Remove filter for %s" % r.pattern)
@@ -536,21 +525,19 @@ class SerCmd(cmd.Cmd):
         sys.stderr.write("Filter for %s not found\n" % line.strip())
 
     def do_PYTERM_json(self, line):
-        """Pyterm command: Transfer lines matching this Regex as JSON
-        object.
-        """
+        """Pyterm command: Transfer lines matching this Regex as JSON object."""
         self.json_regs[line.split(' ')[0].strip()] =\
             re.compile(line.partition(' ')[2].strip())
 
     def do_PYTERM_unjson(self, line):
-        """Pyterm command: Remove a JSON filter.
-        """
+        """Pyterm command: Remove a JSON filter."""
         if not self.aliases.pop(line, None):
             sys.stderr.write("JSON regex with ID %s not found" % line)
 
     def do_PYTERM_init(self, line):
-        """Pyterm command: Add a startup command. (Only useful in
-        addition with /save).
+        """Pyterm command: Add a startup command.
+
+        This is only useful in addition with `/save`.
         """
         self.init_cmd.append(line.strip())
 
@@ -570,8 +557,7 @@ class SerCmd(cmd.Cmd):
         t.start()
 
     def load_config(self):
-        """Internal function to laod configuration from file.
-        """
+        """Load the configuration from file."""
         self.config = configparser.ConfigParser()
         cf = os.path.join(self.configdir, self.configfile)
         self.config.read(cf)
@@ -607,7 +593,7 @@ class SerCmd(cmd.Cmd):
                         setattr(self, opt, self.config.get(sec, opt))
 
     def timer_handler(self, line):
-        """Handles a scheduled timer event.
+        """Handle a scheduled timer event.
 
         Args:
             line (str): the command line to be executed, when the timer
@@ -617,8 +603,9 @@ class SerCmd(cmd.Cmd):
         self.onecmd(self.precmd(line + '\n'))
 
     def process_line(self, line):
-        """Processes a valid line from node that should be printed and
-        possibly forwarded.
+        """Process a valid line from node.
+
+        The line should be printed and possibly forwarded.
 
         Args:
             line (str): input from node.
@@ -660,8 +647,9 @@ class SerCmd(cmd.Cmd):
                     self.factory.myproto.sendMessage(json_obj)
 
     def handle_line(self, line):
-        """Handle line from node and check for further processing
-        requirements.
+        """Handle line from node.
+
+        Check for further processing requirements.
 
         Args:
             line (str): input line from node.
@@ -730,8 +718,7 @@ class SerCmd(cmd.Cmd):
                 pass
 
     def reader(self):
-        """Serial or TCP reader.
-        """
+        """Read from the serial or TCP connection."""
         output = ""
         crreceived = False
         nlreceived = False
