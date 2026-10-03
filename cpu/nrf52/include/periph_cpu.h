@@ -85,6 +85,18 @@ typedef enum {
 #endif
 
 /**
+ * @brief   Structure for PDM configuration data
+ *
+ * @note    A board providing periph_pdm must also define PDM_MIC_CLK_MIN_HZ and
+ *          PDM_MIC_CLK_MAX_HZ, matching the normal operating clock range of the
+ *          used microphone (in Hz), as given by the microphone's datasheet.
+ */
+typedef struct {
+    gpio_t din_pin;            /**< DIN pin */
+    gpio_t clk_pin;            /**< CLK pin */
+} pdm_conf_t;
+
+/**
  * @brief Common SPI/I2C interrupt callback
  *
  * @param   arg     Opaque context pointer
