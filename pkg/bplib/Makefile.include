@@ -43,6 +43,10 @@ ifneq (,$(filter bplib_cla_udp,$(USEMODULE)))
   INCLUDES += -I$(RIOTPKG)/bplib/cla/udp/include
 endif
 
+ifneq (,$(filter bplib_cla_uwb,$(USEMODULE)))
+  INCLUDES += -I$(RIOTPKG)/bplib/cla/uwb/include
+endif
+
 ifneq (,$(filter bplib_stor_vfs_%,$(USEMODULE)))
   INCLUDES += -I$(RIOTPKG)/bplib/storage/vfs/include
 endif
