@@ -61,7 +61,6 @@
 #define FLASH_CR_PNB_Pos       (FLASH_CR_SNB_Pos)
 #define CNTRL_REG              (FLASH->CR)
 #else
-/* L4, WB, G4, G0, WL, C0, STM32U3, …: FLASH->CR; bit macros are FLASH_CR_* in CMSIS*/
 #define CNTRL_REG              (FLASH->CR)
 #define CNTRL_REG_LOCK         (FLASH_CR_LOCK)
 #endif
@@ -152,9 +151,7 @@ static void _erase_page(void *page_addr)
     DEBUG("[flashpage] erase: the page address is set and started\n");
 #else /* CPU_FAM_STM32F0 || CPU_FAM_STM32F1 || CPU_FAM_STM32F3 */
     DEBUG("[flashpage] erase: setting the page address\n");
-#if !defined(CPU_FAM_STM32U3)
     FLASH->AR = (uint32_t)page_addr;
-#endif
     /* trigger the page erase and wait for it to be finished */
     DEBUG("[flashpage] erase: trigger the page erase\n");
     CNTRL_REG |= FLASH_CR_STRT;

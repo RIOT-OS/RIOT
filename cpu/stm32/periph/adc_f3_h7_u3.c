@@ -165,28 +165,25 @@ int adc_init(adc_t line)
 #if defined(CPU_FAM_STM32U3)
     /* U3 has no CKMODE divider; prescale the kernel clock (HCLK/8) to keep
      * enough sample time on high-impedance channels at high HCLK */
-    ADC_INSTANCE->CCR = (ADC_INSTANCE->CCR & ~ADC_CCR_PRESC)
-                      | ADC_CCR_PRESC_2;
-#endif
-
-#if !defined(CPU_FAM_STM32U3)
+    ADC_INSTANCE->CCR = (ADC_INSTANCE->CCR & ~ADC_CCR_PRESC) | ADC_CCR_PRESC_2;
+#else
     /* Setting ADC clock to HCLK/1 is only allowed if AHB clock
      * prescaler is 1 */
-#ifdef RCC_D1CFGR_HPRE
+#  ifdef RCC_D1CFGR_HPRE
     if (!(RCC->D1CFGR & RCC_D1CFGR_HPRE_3)) {
-#else
+#  else
     if (!(RCC->CFGR & RCC_CFGR_HPRE_3)) {
-#endif
+#  endif
         /* set ADC clock to HCLK/1 */
         if (adc_config[line].dev <= 1) {
             ADC_INSTANCE->CCR |= ADC_CCR_CKMODE_0;
         }
         if (adc_config[line].dev >= 2) {
-#if defined(ADC3_COMMON)
+#  if defined(ADC3_COMMON)
             ADC3_COMMON->CCR |= ADC_CCR_CKMODE_0;
-#elif defined(ADC34_COMMON)
+#  elif defined(ADC34_COMMON)
             ADC34_COMMON->CCR |= ADC_CCR_CKMODE_0;
-#endif
+#  endif
         }
     }
     else {
@@ -195,14 +192,14 @@ int adc_init(adc_t line)
             ADC_INSTANCE->CCR |= ADC_CCR_CKMODE_1;
         }
         if (adc_config[line].dev >= 2) {
-#if defined(ADC3_COMMON)
+#  if defined(ADC3_COMMON)
             ADC3_COMMON->CCR  |= ADC_CCR_CKMODE_1;
-#elif defined(ADC34_COMMON)
+#  elif defined(ADC34_COMMON)
             ADC34_COMMON->CCR |= ADC_CCR_CKMODE_1;
-#endif
+#  endif
         }
     }
-#endif /* !CPU_FAM_STM32U3 (U3 has no CKMODE field in ADC_CCR) */
+#endif /* CPU_FAM_STM32U3 */
 
     /* Configure the pin */
     if (adc_config[line].pin != GPIO_UNDEF) {
@@ -211,27 +208,22 @@ int adc_init(adc_t line)
     /* Init ADC line only if it wasn't already initialized */
     if (!(dev(line)->CR & ADC_CR_ADEN)) {
 
-#if CPU_FAM_STM32H7
-        /* take ADC out of deep sleep */
-        dev(line)->CR &= ~(ADC_CR_DEEPPWD);
-#endif
-#if defined(CPU_FAM_STM32U3)
+#if defined(CPU_FAM_STM32H7) || defined(CPU_FAM_STM32U3)
         /* Exit ADC deep-power-down mode */
         dev(line)->CR &= ~(ADC_CR_DEEPPWD);
 #endif
-        /* Enable ADC internal voltage regulator and wait for startup period */
 #if defined(CPU_FAM_STM32U3)
         /* Clear LDO-ready flag before enabling the regulator */
         dev(line)->ISR |= ADC_ISR_LDORDY;
 #endif
+        /* Enable ADC internal voltage regulator and wait for startup period */
         dev(line)->CR |= ADC_CR_ADVREGEN;
 #if defined(CPU_FAM_STM32U3)
         while (!(dev(line)->ISR & ADC_ISR_LDORDY)) {}
-#else
-        busy_wait_us(ADC_T_ADCVREG_STUP_US * 2);
 #endif
+        busy_wait_us(ADC_T_ADCVREG_STUP_US * 2);
 
-#if defined(ADC_CR_ADCALDIF) && !defined(CPU_FAM_STM32U3)
+#if defined(ADC_CR_ADCALDIF)
         if (dev(line)->DIFSEL & (1 << adc_config[line].chan)) {
             /* Configure calibration for differential inputs */
             dev(line)->CR |= ADC_CR_ADCALDIF;
@@ -350,8 +342,8 @@ int32_t adc_sample(adc_t line, adc_res_t res)
 
     /* Set resolution */
 #if defined(CPU_FAM_STM32U3)
-    dev(line)->CFGR1 &= ~(uint32_t)ADC_CFGR_RES;
-    dev(line)->CFGR1 |= (uint32_t)res;
+    dev(line)->CFGR1 &= ~ADC_CFGR_RES;
+    dev(line)->CFGR1 |= res;
 #else
     dev(line)->CFGR &= ~ADC_CFGR_RES;
     dev(line)->CFGR |= res;
@@ -359,16 +351,6 @@ int32_t adc_sample(adc_t line, adc_res_t res)
 
     /* Specify channel for regular conversion */
     dev(line)->SQR1 = adc_config[line].chan << ADC_SQR1_SQ1_Pos;
-
-#if defined(CPU_FAM_STM32U3)
-    if (IS_USED(MODULE_PERIPH_VBAT) && line == VBAT_ADC) {
-        /* Dummy conversion to flush residual charge after enabling VBAT */
-        dev(line)->ISR |= ADC_ISR_EOC;
-        dev(line)->CR |= ADC_CR_ADSTART;
-        while (!(dev(line)->ISR & ADC_ISR_EOC)) {}
-        (void)dev(line)->DR;
-    }
-#endif
 
     /* Start conversion and wait for it to complete */
     dev(line)->ISR |= ADC_ISR_EOC;

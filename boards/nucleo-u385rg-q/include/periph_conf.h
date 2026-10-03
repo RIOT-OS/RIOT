@@ -222,8 +222,8 @@ static const stm32_usbdev_fs_config_t stm32_usbdev_fs_config[] = {
     },
 };
 
-#define USBDEV_ISR          isr_usb_fs                        /**< USB FS interrupt service routine */
-#define USBDEV_NUMOF        ARRAY_SIZE(stm32_usbdev_fs_config) /**< Number of configured USB devices */
+#define USBDEV_ISR      isr_usb_fs                         /**< USB FS interrupt service routine */
+#define USBDEV_NUMOF    ARRAY_SIZE(stm32_usbdev_fs_config) /**< Number of configured USB devices */
 /** @} */
 
 #ifdef __cplusplus

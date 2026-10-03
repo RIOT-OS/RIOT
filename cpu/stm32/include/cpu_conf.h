@@ -77,7 +77,7 @@ extern "C" {
  */
 #if defined(CPU_FAM_STM32U5)
 #define FLASHPAGE_SIZE                  (8192U)
-#elif defined(CPU_FAM_STM32WB) || defined(CPU_FAM_STM32U3)
+#elif defined(CPU_FAM_STM32U3) || defined(CPU_FAM_STM32WB)
 #define FLASHPAGE_SIZE                  (4096U)
 #elif defined(CPU_LINE_STM32F091xC) || defined(CPU_LINE_STM32F072xB) \
    || defined(CPU_LINE_STM32F030xC) || defined(CPU_LINE_STM32F103xE) \

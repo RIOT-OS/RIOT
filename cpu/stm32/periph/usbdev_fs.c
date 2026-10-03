@@ -42,12 +42,12 @@
 
 /* STM32U3 CMSIS exposes PMA base as USB_DRD_PMAADDR, not legacy USB_PMAADDR */
 #if defined(CPU_FAM_STM32U3)
-#ifndef USB_PMAADDR
-#define USB_PMAADDR             USB_DRD_PMAADDR
-#endif
-#ifndef USB1_PMAADDR
-#define USB1_PMAADDR            USB_DRD_PMAADDR
-#endif
+#  ifndef USB_PMAADDR
+#    define USB_PMAADDR         USB_DRD_PMAADDR
+#  endif
+#  ifndef USB1_PMAADDR
+#    define USB1_PMAADDR        USB_DRD_PMAADDR
+#  endif
 #endif
 
 #ifndef USB1_PMAADDR
@@ -60,9 +60,9 @@
  * @{
  */
 #if defined(CPU_FAM_STM32U3)
-#ifndef USB_CNTR_FRES
-#  define USB_CNTR_FRES             USB_CNTR_USBRST
-#endif
+#  ifndef USB_CNTR_FRES
+#    define USB_CNTR_FRES           USB_CNTR_USBRST
+#  endif
 #  ifndef USB_EPTX_DTOG1
 #    define USB_EPTX_DTOG1          USB_CHEP_TX_DTOG1
 #    define USB_EPTX_DTOG2          USB_CHEP_TX_DTOG2
@@ -122,10 +122,10 @@
                                          * accessing the PMA SRAM from CPU */
 #elif defined(CPU_FAM_STM32U3)
 
-#define _ENDPOINT_NUMOF         (8)
-#define _PMA_SRAM_SIZE          (2048)  /* see USB_DRD_PMA_SIZE in device header */
-#define _PMA_ACCESS_SCHEME      (2)     /* 2 x 16-bit/word (USB DRD FS PMA) */
-#define _PMA_ACCESS_STEP_SIZE   (1)     /* Step in 16-bit half-words when
+#  define _ENDPOINT_NUMOF       (8)
+#  define _PMA_SRAM_SIZE        (2048)  /* see USB_DRD_PMA_SIZE in device header */
+#  define _PMA_ACCESS_SCHEME    (2)     /* 2 x 16-bit/word (USB DRD FS PMA) */
+#  define _PMA_ACCESS_STEP_SIZE (1)     /* Step in 16-bit half-words when
                                          * accessing the PMA from CPU */
 #else
 #error "STM32 line is not supported"
@@ -214,9 +214,9 @@ static inline void _pma_write16(volatile uint16_t *addr, uint16_t val)
         *word = (*word & 0xffff0000UL) | val;
     }
 }
-#define _pma_set(dst, val)  _pma_write16((volatile uint16_t *)&(dst), (val))
+#  define _pma_set(dst, val) _pma_write16((volatile uint16_t *)&(dst), (val))
 #else
-#define _pma_set(dst, val)  ((dst) = (val))
+#  define _pma_set(dst, val) ((dst) = (val))
 #endif
 
 usbdev_t *usbdev_get_ctx(unsigned num)
@@ -373,10 +373,10 @@ static inline void _usb_attach(stm32_usbdev_fs_t *usbdev)
 #ifdef USB_BCDR_DPPU
     /* Enable DP pullup to signal connection */
     _global_regs(conf)->BCDR |= USB_BCDR_DPPU;
-#if defined(CRS) && defined(CRS_ISR_ESYNCF) && !defined(CPU_FAM_STM32U3)
+#  if defined(CRS_ISR_ESYNCF) && !defined(CPU_FAM_STM32U3)
     /* Synchronize 48MHz clock: not all families use CRS the same for USB */
     while (!(CRS->ISR & CRS_ISR_ESYNCF)) {}
-#endif
+#  endif
 #else
     /* If configuration uses a GPIO for USB connect/disconnect */
     if (conf->disconn != GPIO_UNDEF) {
@@ -507,12 +507,7 @@ static void _usbdev_init(usbdev_t *dev)
     /* Enable USB IRQ */
     NVIC_EnableIRQ(conf->irqn);
     /* fill USB SRAM with zeroes */
-#if defined(CPU_FAM_STM32U3)
-    /* U3 USB DRD PMA is 2 KiB; other lines keep the historical clear size */
     memset((uint8_t *)USB1_PMAADDR, 0, _PMA_SRAM_SIZE);
-#else
-    memset((uint8_t *)USB1_PMAADDR, 0, 1024);
-#endif
 }
 
 static usbdev_ep_t *_get_ep(stm32_usbdev_fs_t *usbdev, unsigned num,

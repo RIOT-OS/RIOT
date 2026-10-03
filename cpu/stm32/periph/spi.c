@@ -36,15 +36,6 @@
 #include "debug.h"
 
 /**
- * @brief SPI variants with CFG1/CFG2/TXDR/RXDR (not legacy DR + BR in CR1)
- *
- * Same programming model as STM32H7; STM32U3 uses this SPI IP as well.
- */
-#if defined(CPU_FAM_STM32H7) || defined(CPU_FAM_STM32U3)
-#define STM32_SPI_USE_MODERN_REGS   1
-#endif
-
-/**
  * @brief   Number of bits to shift the BR value in the CR1 register
  */
 #define BR_SHIFT            (3U)

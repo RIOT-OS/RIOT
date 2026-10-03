@@ -46,8 +46,8 @@
 #  define EXTI_REG_FTSR     (EXTI->FTSR1)
 #  define EXTI_REG_PR       (EXTI->PR1)
 #  define EXTI_REG_IMR      (EXTI->IMR1)
-#elif defined(CPU_FAM_STM32G0) || defined(CPU_FAM_STM32U3) ||  \
-      defined(CPU_FAM_STM32WL) || defined(CPU_FAM_STM32U5)
+#elif defined(CPU_FAM_STM32G0) || defined(CPU_FAM_STM32U3) || \
+      defined(CPU_FAM_STM32U5) || defined(CPU_FAM_STM32WL)
 #  define EXTI_REG_RTSR     (EXTI->RTSR1)
 #  define EXTI_REG_FTSR     (EXTI->FTSR1)
 #  define EXTI_REG_PR       (EXTI->RPR1)
@@ -80,7 +80,7 @@
 #  define RTC_ISR_INIT      RTC_ICSR_INIT
 #  define RTC_ISR_INITF     RTC_ICSR_INITF
 #  define RTC_ISR_INITS     RTC_ICSR_INITS
-#elif defined(CPU_FAM_STM32U5) || defined(CPU_FAM_STM32U3)
+#elif defined(CPU_FAM_STM32U3) || defined(CPU_FAM_STM32U5)
 #  define RTC_REG_ISR       RTC->ICSR
 #  define RTC_REG_SR        RTC->SR
 #  define RTC_REG_SCR       RTC->SCR
@@ -95,8 +95,8 @@
 
 /* interrupt line name mapping */
 #if defined(CPU_FAM_STM32F0) || defined(CPU_FAM_STM32L0) || \
-    defined(CPU_FAM_STM32L5) || defined(CPU_FAM_STM32U5) || \
-    defined(CPU_FAM_STM32U3)
+    defined(CPU_FAM_STM32L5) || defined(CPU_FAM_STM32U3) || \
+    defined(CPU_FAM_STM32U5)
 #  define IRQN              (RTC_IRQn)
 #  define ISR_NAME          isr_rtc
 #elif defined(CPU_FAM_STM32G0)
@@ -298,10 +298,10 @@ void rtc_init(void)
     periph_clk_en(APB1, RCC_APB1ENR1_RTCAPBEN);
 #elif defined(CPU_FAM_STM32G0)
     periph_clk_en(APB1, RCC_APBENR1_RTCAPBEN);
-#elif defined(CPU_FAM_STM32U5)
-    periph_clk_en(APB3, RCC_APB3ENR_RTCAPBEN);
 #elif defined(CPU_FAM_STM32U3)
     periph_clk_en(APB1, RCC_APB1ENR1_RTCAPBEN);
+#elif defined(CPU_FAM_STM32U5)
+    periph_clk_en(APB3, RCC_APB3ENR_RTCAPBEN);
 #elif defined(CPU_FAM_STM32H7)
     periph_clk_en(APB4, RCC_APB4ENR_RTCAPBEN);
 #endif
@@ -438,7 +438,7 @@ void rtc_clear_alarm(void)
     RTC->CR &= ~(RTC_CR_ALRAE | RTC_CR_ALRAIE);
 
 #if !(defined(CPU_FAM_STM32L5) || defined(CPU_FAM_STM32U3) || \
-      defined(CPU_FAM_STM32WL) || defined(CPU_FAM_STM32U5))
+      defined(CPU_FAM_STM32U5) || defined(CPU_FAM_STM32WL))
     while (!(RTC_REG_ISR & RTC_ISR_ALRAWF)) {}
 #else
     RTC_REG_SCR = RTC_SCR_CALRAF;
