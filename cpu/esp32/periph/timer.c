@@ -290,9 +290,6 @@ int IRAM_ATTR timer_set(tim_t dev, int chn, unsigned int delta)
     timer_ll_clear_intr_status(_timers[dev].group, _timers[dev].int_mask);
     timer_ll_enable_intr(_timers[dev].group, _timers[dev].int_mask, true);
 
-    /* enable the counter */
-    timer_ll_enable_counter(_timers[dev].group, _timers[dev].index, true);
-
     /* restore interrupts enabled state */
     irq_restore (state);
 
