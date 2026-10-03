@@ -78,7 +78,7 @@ static int _comp_uncomp(const uint8_t *buf, size_t len)
                 n -= n_sunk;
             }
             size_t written = 0;
-            heatshrink_decoder_poll(&_decoder, outpos, (_buf + sizeof(_buf) - outpos), &written);
+            heatshrink_decoder_poll(&_decoder, outpos, (_buf_res + sizeof(_buf_res) - outpos), &written);
             outpos += written;
         }
         else {

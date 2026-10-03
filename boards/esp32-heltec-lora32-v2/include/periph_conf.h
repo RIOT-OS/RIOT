@@ -100,7 +100,7 @@
 #define PWM0_GPIOS  { GPIO25, GPIO17, GPIO2 }
 #endif
 
-/** PWM_DEV(1) is not used */
+/** PWM channels for device PWM_DEV(1) */
 #ifndef PWM1_GPIOS
 #define PWM1_GPIOS  { GPIO22, GPIO23 }
 #endif

@@ -166,7 +166,7 @@ static void test_sock_udp_create__only_local_reuse_ep(void)
                   sizeof(ipv6_addr_t)) == 0);
     expect(SOCK_ADDR_ANY_NETIF == ep2.netif);
     expect(_TEST_PORT_LOCAL == ep2.port);
-    expect(-ENOTCONN == sock_udp_get_remote(&_sock, &ep2));
+    expect(-ENOTCONN == sock_udp_get_remote(&_sock2, &ep2));
     sock_udp_close(&_sock2);
 }
 

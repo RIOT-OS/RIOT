@@ -168,11 +168,12 @@ static void test_repetition_message_decode_fail(void)
 {
     unsigned char result[sizeof(data_in)];
 
-    /* adding a second error to the first symbol leads to an
-     * uncorrectable sequence */
-    msg_enc_rep_1_err_per_symbol[0] ^= (1L << 6);
+    /* add an additional bit error to the second repetition of the first
+     * symbol, so that the majority vote fails (sizeof(data_in) is the first
+     * byte of the second repetition, clearing bit 3 turns 201 into 193) */
+    msg_enc_rep_1_err_per_symbol[sizeof(data_in)] ^= (1L << 3);
 
-    golay2412_decode(sizeof(result), &msg_enc_rep_1_err_per_symbol[0], &result[0]);
+    repetition_decode(sizeof(result), &msg_enc_rep_1_err_per_symbol[0], &result[0]);
 
     TEST_ASSERT(memcmp(&data_in, &result, sizeof(data_in)));
 }

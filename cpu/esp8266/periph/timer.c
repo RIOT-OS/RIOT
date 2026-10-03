@@ -82,7 +82,7 @@ void IRAM hw_timer_handler(void* arg)
     uint32_t dev = (uint32_t)arg >> 4;
     uint32_t chn = (uint32_t)arg & 0xf;
 
-    if (dev >= HW_TIMER_NUMOF && chn >= HW_TIMER_CHANNELS) {
+    if (dev >= HW_TIMER_NUMOF || chn >= HW_TIMER_CHANNELS) {
         return;
     }
 

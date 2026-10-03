@@ -644,12 +644,12 @@ void i2c_print_config(void)
 
 static void _i2c_configure_gpios(i2c_t dev)
 {
-    gpio_init(i2c_config[dev].scl, i2c_config[dev].scl_pullup ? GPIO_IN_OD_PU : GPIO_IN_OD_PU);
+    gpio_init(i2c_config[dev].scl, i2c_config[dev].scl_pullup ? GPIO_IN_OD_PU : GPIO_IN_OD);
     gpio_set(i2c_config[dev].scl);
     esp_rom_gpio_connect_out_signal(i2c_config[dev].scl, i2c_periph_signal[dev].scl_out_sig, 0, 0);
     esp_rom_gpio_connect_in_signal(i2c_config[dev].scl, i2c_periph_signal[dev].scl_in_sig, 0);
 
-    gpio_init(i2c_config[dev].sda, i2c_config[dev].sda_pullup ? GPIO_IN_OD_PU : GPIO_IN_OD_PU);
+    gpio_init(i2c_config[dev].sda, i2c_config[dev].sda_pullup ? GPIO_IN_OD_PU : GPIO_IN_OD);
     gpio_set(i2c_config[dev].sda);
     esp_rom_gpio_connect_out_signal(i2c_config[dev].sda, i2c_periph_signal[dev].sda_out_sig, 0, 0);
     esp_rom_gpio_connect_in_signal(i2c_config[dev].sda, i2c_periph_signal[dev].sda_in_sig, 0);
@@ -720,8 +720,8 @@ static void _i2c_clear_bus(i2c_t dev)
     gpio_set_pin_usage(i2c_config[dev].scl, _GPIO);
     gpio_set_pin_usage(i2c_config[dev].sda, _GPIO);
 
-    gpio_init(i2c_config[dev].scl, i2c_config[dev].scl_pullup ? GPIO_IN_OD_PU : GPIO_IN_OD_PU);
-    gpio_init(i2c_config[dev].sda, i2c_config[dev].sda_pullup ? GPIO_IN_OD_PU : GPIO_IN_OD_PU);
+    gpio_init(i2c_config[dev].scl, i2c_config[dev].scl_pullup ? GPIO_IN_OD_PU : GPIO_IN_OD);
+    gpio_init(i2c_config[dev].sda, i2c_config[dev].sda_pullup ? GPIO_IN_OD_PU : GPIO_IN_OD);
 
     gpio_set(i2c_config[dev].scl);
     gpio_set(i2c_config[dev].sda);
