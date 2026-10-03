@@ -17,6 +17,7 @@
  */
 
 #include "cpu.h"
+#include "periph_cpu.h"
 
 #define ENABLE_DEBUG           0
 #include "debug.h"
@@ -41,6 +42,12 @@
 #define KEY_REG                (FLASH->NSKEYR)
 #define FLASH_SR_EOP           (FLASH_NSSR_NSEOP)
 #endif
+#elif defined(CPU_FAM_STM32U3)
+#define FLASH_KEY1             ((uint32_t)0x45670123)
+#define FLASH_KEY2             ((uint32_t)0xCDEF89AB)
+#define CNTRL_REG              (FLASH->CR)
+#define CNTRL_REG_LOCK         (FLASH_CR_LOCK)
+#define KEY_REG                (FLASH->KEYR)
 #else
 #if defined(CPU_FAM_STM32L4) || defined(CPU_FAM_STM32WB) || \
     defined(CPU_FAM_STM32G4) || defined(CPU_FAM_STM32G0) || \
