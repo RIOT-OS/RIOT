@@ -98,6 +98,8 @@ OPTIONAL_CFLAGS += -Wformat-truncation
 
 # Don't include absolute path in __FILE__ macro
 OPTIONAL_CFLAGS += -fmacro-prefix-map=$(RIOTBASE)/=
+# Same with debug info
+OPTIONAL_CFLAGS += -fdebug-prefix-map=$(RIOTBASE)/=
 
 # Warn about casts that increase alignment requirements
 OPTIONAL_CFLAGS += -Wcast-align
