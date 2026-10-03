@@ -91,6 +91,11 @@ static void BPA_PERFLOGP_Exit(uint32_t PerfLogID)
     return;
 }
 
+BPLib_Status_t BPA_TABLEP_TableInit(void)
+{
+    return BPLIB_SUCCESS;
+}
+
 static BPLib_Status_t BPA_TABLEP_TableUpdate(uint8_t TableType, void** TblPtr)
 {
     (void) TableType;
@@ -186,10 +191,9 @@ static BPLib_Status_t BPA_ADUP_RemoveApplication(uint32_t ChanId)
     return BPLIB_SUCCESS;
 }
 
-static BPLib_Status_t BPA_CLAP_ContactSetup(uint32_t ContactId, BPLib_CLA_ContactsSet_t ContactInfo)
+static BPLib_Status_t BPA_CLAP_ContactSetup(uint32_t ContactId)
 {
     (void) ContactId;
-    (void) ContactInfo;
     return BPLIB_SUCCESS;
 }
 
@@ -214,7 +218,7 @@ static void BPA_CLAP_ContactTeardown(uint32_t ContactId)
     return;
 }
 
-static BPLib_FWP_ProxyCallbacks_t Callbacks = {
+BPLib_FWP_ProxyCallbacks_t bplib_fwp_callbacks = {
     /* Time Proxy */
     .BPA_TIMEP_GetMonotonicTime = BPA_TIMEP_GetMonotonicTime,
     .BPA_TIMEP_GetHostEpoch = BPA_TIMEP_GetHostEpoch,
@@ -226,6 +230,7 @@ static BPLib_FWP_ProxyCallbacks_t Callbacks = {
     .BPA_PERFLOGP_Exit = BPA_PERFLOGP_Exit,
 
     /* Table Proxy */
+    .BPA_TABLEP_TableInit = BPA_TABLEP_TableInit,
     .BPA_TABLEP_TableUpdate = BPA_TABLEP_TableUpdate,
 
     /* Event Proxy */
@@ -253,8 +258,3 @@ static BPLib_FWP_ProxyCallbacks_t Callbacks = {
     .BPA_CLAP_ContactStop = BPA_CLAP_ContactStop,
     .BPA_CLAP_ContactTeardown = BPA_CLAP_ContactTeardown,
 };
-
-BPLib_Status_t bplib_riot_fwp_init(void)
-{
-    return BPLib_FWP_Init(&Callbacks);
-}

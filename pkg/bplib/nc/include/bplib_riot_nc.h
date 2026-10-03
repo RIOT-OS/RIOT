@@ -21,19 +21,23 @@
  * This means the usual lifecycle of a channel / contact is as follows:
  *
  * 1. Configure the channel / contact with the functions in this module.
- * 2. Call BPLib_PI_AddApplication() or BPLib_CLA_ContactSetup() for a channel /
- *    contact. It can only be configured again (using functions in this module)
+ * 2. Call bplib_channel_set_state(i,BPLIB_NC_APP_STATE_ADDED) or
+ *    bplib_contact_set_state(i,BPLIB_CLA_SETUP)
+ *    It can only be configured again (using functions in this module)
  *    once it has been completely torn down (step 5). Tear down from this state
  *    is possible as well.
- * 3. Call BPLib_PI_StartApplication() or BPLib_CLA_ContactStart() respectively.
+ * 3. Call bplib_channel_set_state(i,BPLIB_NC_APP_STATE_STARTED) or
+ *    bplib_contact_set_state(i,BPLIB_CLA_STARTED) respectively.
  *    This makes the channel / contact active and bundles can flow through them.
- * 4. With BPLib_PI_StopApplication() or BPLib_CLA_ContactStop() respectively,
+ * 4. With bplib_channel_set_state(i,BPLIB_NC_APP_STATE_STOPPED) or
+ *    bplib_contact_set_state(i,BPLIB_CLA_STOPPED) respectively,
  *    the channel / contact can be stopped. This retains its configuration and
  *    it can be started again by step 3 if necessary. Bundles will not flow
  *    anymore. This is useful for
  *    contacts, when the configuration should stay the same (e.g. same network
  *    address to connect to), but the contact is currently disconnected.
- * 5. Call BPLib_PI_RemoveApplication() or BPLib_CLA_ContactTeardown(). This
+ * 5. Call bplib_channel_set_state(i,BPLIB_NC_APP_STATE_REMOVED) or
+ *    bplib_contact_set_state(i,BPLIB_CLA_TORNDOWN). This
  *    will tear down the channel / contact.
  *    Now goto 1 if the channel / contact  should be changed, for example when a
  *    new neighbor has been discovered.
@@ -58,6 +62,7 @@
  */
 
 #include "bplib.h"
+#include "bplib_init.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -71,25 +76,32 @@ extern "C" {
 #endif
 
 /**
+ * @brief Whether this node should support taking custody [bool].
+ */
+#ifndef CONFIG_BPLIB_SUPPORT_CUSTODY
+#  define CONFIG_BPLIB_SUPPORT_CUSTODY 1
+#endif
+
+/**
  * @brief block type indicator for bplib_channel_set_block_*() functions
  */
 typedef enum {
     BPLIB_PREVIOUS_NODE_BLOCK = 0,
     BPLIB_BUNDLE_AGE_BLOCK = 1,
     BPLIB_HOP_COUNT_BLOCK = 2,
-    BPLIB_PAYLOAD_BLOCK = 3
+    BPLIB_PAYLOAD_BLOCK = 3,
+    BPLIB_CUSTODY_TRANSFER_BLOCK = 4
 } bplib_nc_canonical_block_t;
 
 /**
  * @brief Initializes bplib's NC.
  *
  * NC means "Node Config" and contains pointers to the configuration tables.
- * This function sets the config pointers, calls BPLib_NC_Init and returns.
+ * This function sets the config pointers.
  *
  * @param[out] ConfigPtrs pointers in this will be set to the config
- * @return BPLIB_SUCCESS on success, forwarded from BPLib_NC_Init call.
  */
-BPLib_Status_t bplib_riot_nc_init(BPLib_NC_ConfigPtrs_t* ConfigPtrs);
+void bplib_riot_nc_init(BPLib_NC_ConfigPtrs_t* ConfigPtrs);
 
 /**
  * @brief Set the hop limit of the channel.
@@ -313,6 +325,118 @@ BPLib_Status_t bplib_contact_set_out_addr(uint32_t contact,
  */
 BPLib_Status_t bplib_contact_set_in_addr(uint32_t contact,
             const char* addr, uint16_t port);
+
+/**
+ * @brief Set the time after which a custody acknowledgement signal will be sent
+ *
+ * The idea of this is to aggregate multiple custody acknowledgements into one transmit,
+ * but at least after this time.
+ *
+ * This has to be in the bound of the BPLIB_MIN_CS_TIME_TRIGGER_ALLOWED and
+ * BPLIB_MAX_CS_TIME_TRIGGER_ALLOWED config values.
+ *
+ * @param contact Index of the contact
+ * @param millis Custody signal trigger time [ms]
+ * @retval BPLIB_SUCCESS on success
+ * @retval BPLIB_INVALID_CONT_ID_ERR if contact >= BPLIB_MAX_NUM_CONTACTS
+ * @retval BPLIB_INVALID_CONFIG_ERR if value is outside of the valid bounds
+ */
+BPLib_Status_t bplib_contact_set_cs_time_trigger(uint32_t contact, uint32_t millis);
+
+/**
+ * @brief Set the bytes received after which a custody acknowledgement signal will be sent
+ *
+ * The idea of this is to aggregate multiple custody acknowledgements into one transmit,
+ * but at least if the custody report reaches this size
+ *
+ * This has to be in the bound of the BPLIB_MIN_CS_SIZE_TRIGGER_ALLOWED and
+ * BPLIB_MAX_CS_SIZE_TRIGGER_ALLOWED config values.
+ *
+ * @param contact Index of the contact
+ * @param size Custody signal size trigger [bytes]
+ * @retval BPLIB_SUCCESS on success
+ * @retval BPLIB_INVALID_CONT_ID_ERR if contact >= BPLIB_MAX_NUM_CONTACTS
+ * @retval BPLIB_INVALID_CONFIG_ERR if value is outside of the valid bounds
+ */
+BPLib_Status_t bplib_contact_set_cs_size_trigger(uint32_t contact, uint32_t size);
+
+/**
+ * @brief Set the time after which custody will attempt a retransmission
+ *
+ * This has to be in the bound of the BPLIB_MIN_RETRANSMIT_ALLOWED and
+ * BPLIB_MAX_RETRANSMIT_ALLOWED config values.
+ *
+ * @param contact Index of the contact
+ * @param millis Time [ms] after which a retransmission happens
+ * @retval BPLIB_SUCCESS on success
+ * @retval BPLIB_INVALID_CONT_ID_ERR if contact >= BPLIB_MAX_NUM_CONTACTS
+ * @retval BPLIB_INVALID_CONFIG_ERR if value is outside of the valid bounds
+ */
+BPLib_Status_t bplib_contact_set_cs_retransmit_time(uint32_t contact, uint32_t millis);
+
+/**
+ * @brief Request a channel to transition to the given next state
+ *
+ * The state can be one of BPLib_NC_ApplicationState_t, i.e.
+ * - BPLIB_NC_APP_STATE_REMOVED
+ * - BPLIB_NC_APP_STATE_ADDED
+ * - BPLIB_NC_APP_STATE_STARTED
+ * - BPLIB_NC_APP_STATE_STOPPED
+ *
+ * The function allows two convenient fast-forward state transitions.
+ * 1. From state REMOVED --> STARTED (ADDED skipped)
+ * 2. From state STARTED --> REMOVED (STOPPED skipped)
+ *
+ * These are here to make switches easier, since in many situations the configuration
+ * has been done and the channel should just start, and not sit in ADDED. In the
+ * error case the error code of the first failing transition is returned. Only if
+ * BPLIB_SUCCESS is returned, one can be sure the channel reached the final state.
+ *
+ * @param channel Index of the channel
+ * @param state The requested next state, one of BPLib_NC_ApplicationState_t.
+ * @retval BPLIB_SUCCESS on success. The new state is the requested state.
+ * @retval BPLIB_INVALID_CHAN_ID_ERR if channel >= BPLIB_MAX_NUM_CHANNELS
+ * @retval BPLIB_INVALID_CONFIG_ERR if state is outside of the valid bounds
+ * @retval BPLIB_APP_STATE_ERR if the transition is not possible
+ * @retval other bplib errors of the PI functions
+ */
+BPLib_Status_t bplib_channel_set_state(uint32_t channel, BPLib_NC_ApplicationState_t state);
+
+/**
+ * @brief Request a contact to transition to the given next state
+ *
+ * The state can be one of BPLib_CLA_ContactRunState_t, i.e.
+ * - BPLIB_CLA_TORNDOWN
+ * - BPLIB_CLA_SETUP
+ * - BPLIB_CLA_STARTED
+ * - BPLIB_CLA_STOPPED
+ *
+ * The function allows two convenient fast-forward state transitions.
+ * 1. From state TORNDOWN --> STARTED (SETUP skipped)
+ * 2. From state STARTED --> TORNDOWN (STOPPED skipped)
+ *
+ * See bplib_channel_set_state() for the reasoning.
+ *
+ * @param contact Index of the contact
+ * @param state The requested next state, one of BPLib_CLA_ContactRunState_t.
+ * @retval BPLIB_SUCCESS on success. The new state is the requested state.
+ * @retval BPLIB_INVALID_CONT_ID_ERR if contact >= BPLIB_MAX_NUM_CONTACTS
+ * @retval BPLIB_INVALID_CONFIG_ERR if state is outside of the valid bounds
+ * @retval BPLIB_CLA_INCORRECT_STATE if the transition is not possible
+ * @retval other bplib errors of the CLA state functions
+ */
+BPLib_Status_t bplib_contact_set_state(uint32_t contact, BPLib_CLA_ContactRunState_t state);
+
+/**
+ * @brief Updates the local EID 
+ *
+ * Note that DTN format EIDs are NOT supported, only IPN.
+ *
+ * @param eid_new The new local EID of the executing node
+ * @retval BPLIB_SUCCESS on success
+ * @retval BPLIB_INVALID_CONFIG_ERR if the EID is invalid. This includes DTN format EIDs.
+ */
+BPLib_Status_t bplib_config_set_local_eid(BPLib_EID_t* eid_new);
 
 #ifdef __cplusplus
 }

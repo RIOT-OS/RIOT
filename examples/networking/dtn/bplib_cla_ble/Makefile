@@ -7,6 +7,8 @@ BOARD ?= nrf52840dk
 # This has to be the absolute path to the RIOT base directory:
 RIOTBASE ?= $(CURDIR)/../../../..
 
+DEVELHELP ?= 1
+
 # Include bplib and the configuration modules
 USEPKG += bplib
 USEMODULE += bplib_stor_void    # No storage, void bundles that can't be used directly

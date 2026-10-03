@@ -5,14 +5,25 @@
 This package includes the RIOT port of NASA's bplib, a delay tolerant network
 stack implementing the bundle protocol (BPv7).
 
-In the ported version (7.0.2) of bplib the following features of the bundle
+In the ported version (7.0.5) of bplib the following features of the bundle
 protocol are NOT possible:
 - Fragmentation
 - Status report generation
 - BIBE extension
-  - This means also no custody transfer
 - BPSec extension
-- dtn EID Scheme. Only ipn is supported.
+- dtn EID Scheme. Only ipn is supported. Also the three digit ipn format is
+  supported in structs already, but bplib itself, as well as the storage don't
+  handle it nicely.
+
+Since 7.0.5 Custody Transfer is supported using
+[CCSDS Cusotdy Transfer](https://ccsds.org/publications/orangebooks/entry/4868/).
+Bundles are sent repeatedly until an Administrative Bundle arrives containing
+either an ACK or NACK. This ACK can also ACK multiple bundles at once.
+
+@note Be sure to have a memory pool of sufficient size. If the pool is full and
+      bplib waits for an ACK, no incoming bundle can be allocated in the pool,
+      meaning the ACK will never arrive. This will only stop when the bundles
+      time out.
 
 ## Usage
 
@@ -30,16 +41,6 @@ This can be disabled with the `bplib_no_vfs` module.
 Also a CLA implementation (see below) should be used as well, otherwise only
 local message deliveries are possible.
 
-### Non automated things
-To ensure the bundle storage does not fill up infinitely, you want to also call
-`BPLib_STOR_GarbageCollect()` more or less regularly, or when the storage
-becomes filled to a certain level.
-
-In order to maintain information about monotonic times across boot cycles
-`BPLib_TIME_MaintenanceActivities()` has to be called.
-This should thus be called at least when a reboot is scheduled or bplib is
-terminated, or, to handle unforeseen power-offs, regularly.
-
 ## Lists of sub-modules
 ### List of generic modules
 Module name   | Description   | Requirements
@@ -53,8 +54,8 @@ Module name   | Description   | Requirements
 ### List of storage implementations
 Module name   | Description   | Requirements
 ------------- | ------------- | -----------
-`bplib_stor_vfs_ordered` | Stores bundles on the filesystem, in folders `node_id/service_id/`.<br> This path will be prefixed by `CONFIG_BPLIB_STOR_BASE`, which defaults to `/nvm0/bp`.<br> Bundles will be egressed ordered by urgency, which does not work when DTN time is not known.  | `vfs` and a filesystem
-`bplib_stor_vfs_unordered` | Stores bundles on the filesystem in `CONFIG_BPLIB_STOR_BASE`, which defaults to defaults to `/nvm0/bp`.<br> Bundles will be retrieved in the order they are discovered by `vfs_readdir`.<br> This should be faster than the ordered option, unless **many** contacts / channels are used. | `vfs` and a filesystem
+`bplib_stor_vfs_ordered` | Stores bundles on the filesystem, in folders `node_id/service_id/`.<br> This path will be prefixed by `CONFIG_BPLIB_STOR_BASE/dat`, which defaults to `/nvm0/bp`.<br> Bundles will be egressed ordered by urgency, which does not work when DTN time is not known.  | `vfs` and a filesystem
+`bplib_stor_vfs_unordered` | Stores bundles on the filesystem in `CONFIG_BPLIB_STOR_BASE`, which defaults to defaults to `/nvm0/bp`.<br> Bundles will be retrieved in the order they are discovered by `vfs_readdir`.<br> **This is likely broken and will be removed in the future**. | `vfs` and a filesystem
 `bplib_stor_void` | Voids all bundles which cannot be delivered to a contact / channel immediately.<br> This kind of destroys the purpose of the bundle protocol but might be useful for leaf nodes and testing. | -
 
 ### List of CLA implementations
@@ -82,12 +83,16 @@ CONFIG_BPLIB_CLA_UDP_TIMEOUT | Timeout [ms] after which the UDP CLA will termina
 CONFIG_BPLIB_MEMPOOL_LEN | Mempool size available for bplib bundles in send / delivery queues. Increasing this means more bundles can be queued, since bundles ingressed when to mempool is full, are dropped. Note: Each bundle is at least `sizeof BPLib_BBlocks_t` (around 700) + the blocks allocated for the actual payload. | `bplib_init`
 CONFIG_BPLIB_GEN_WORKER_TIMEOUT | Timeout [ms] after which the generic worker times out after bplib termination | `bplib_init`
 CONFIG_BPLIB_GENERIC_STACK_SIZE | Stack size of the generic worker. | `bplib_init`
+CONFIG_BPLIB_MAINTENANCE_STACK_SIZE | Stack size of the maintenance worker. | `bplib_init`
+CONFIG_BPLIB_MAINTENANCE_INTERVAL | Interval [ms] of maintenance task. Since this task also egresses bundles from storage, this should not be too high if bundles should be forwarded in reasonable times. | `bplib_init`
+CONFIG_BPLIB_MAINTENANCE_MAX_BUNDLES | Maximum number of bundles to egress per contact and channel per maintenance call. Might be used to prevent spending long times egressing from storage. | `bplib_init`
 CONFIG_BPLIB_MAX_SEQ_NUM | Maximum sequence number, after which it will wrap back to 0 | `bplib_nc`
+CONFIG_BPLIB_SUPPORT_CUSTODY | Whether this node shall allow custody bundles or not [bool] | `bplib_nc`
 CONFIG_BPLIB_STOR_BASE | File path prefix of the folder where the bundles will be stored. | `bplib_stor_vfs_*`
 CONFIG_BPLIB_EGRESS_CACHE_LEN | Number of bundle references stored in the caches / queues per channel and contact. Larger means the storage is searched less, at the price of more used memory. | `bplib_stor_vfs_*`
 CONFIG_BPLIB_STOR_MAX_DUPLICATE_CHECKS | Used to upper bound the linear search for a filename which is not yet used. This applies only for the ordered storage, so when DTN time is known there should not be many bundles with the same expiration timestamp. Max 255. | `bplib_stor_vfs_ordered`
 
-Also the generic bplib config options from [bplib]/inc/bplib_cfg.h. These are currently not prefixed by CONFIG_.
+Also the generic bplib config options from the `bplib_cfg.h`, see @ref pkg_bplib_configopts. These are not prefixed by CONFIG_.
 
 The defaults, i.e. not using `bplib_include_nc_telemetry` and
 `bplib_include_as` save more than 20KB of application size.

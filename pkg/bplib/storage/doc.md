@@ -21,24 +21,21 @@ The core usage of bplib *requires* the following functions to be implemented:
   Store the given bundle in the storage. Don't forget to call
   `BPLib_MEM_BundleFree()` in here once persistent. Also the AS could be
   incremented if used at all.
-- `BPLib_Status_t BPLib_STOR_EgressForID(BPLib_Instance_t* Inst, uint32_t EgressID, bool LocalDelivery, size_t* NumEgressed)`:
-  Retrieve bundles from the storage for the channel (when LocalDelivery = true)
-  or contact (when LocalDelivery = false) at table index EgressID.
-  NumEgressed should be updated to the number of egressed bundles.
+- `BPLib_Status_t BPLib_STOR_Egress(BPLib_Instance_t* Inst, size_t MaxBundles)`:
+  Retrieve bundles from the storage for all channels and contacts, but at most
+  MaxBundles.
 
-Actual egress has to be done like this. Refer to unordered storage backend for
+Actual egress has to be done like this. Refer to vfs storage backend for
 an example:
 
-1. Find a bundle matching the EID of the target channel / contact.
-2. Allocate this in bplib's memory using `BPLib_MEM_BlockAlloc()` and fill the
+1. For all the channels and contacts:
+2. Find a bundle matching the EID of the target channel / contact.
+3. Allocate this in bplib's memory using `BPLib_MEM_BlockAlloc()` and fill the
    saved data.
-3. Use `BPLib_QM_WaitQueueTryPush()` to put the bundle in the channel / contact
+4. Use `BPLib_QM_WaitQueueTryPush()` to put the bundle in the channel / contact
    queue. If this fails deallocate with `BPLib_MEM_BundleFree()`.
-4. Delete the bundle from the storage *here already*. As of right now there is
-   no custody transfer and bplib has no option to tell the BPA that the bundle
-   was *actually* sent out. This means this *could* lead to bundle loss in a
-   power off here (graceful shutdown does handle this case though).
-5. Optionally repeat from 1 to egress more than one bundle.
+5. Delete the bundle from the storage here already if it is no custodial bundle.
+6. Optionally repeat from 1 to egress more than one bundle.
 
 Additionally, functions that are also defined in the original bplib SQLite
 storage, but are only called by a user, which *can* be implemented:
@@ -48,10 +45,9 @@ only wrote to SQLite once this function was called, which happened regularly in
 the example implementation. You probably won't need this unless you want such a
 behavior.
 
-`BPLib_STOR_GarbageCollect`: When called by the user, should delete expired as
-well as egressed bundles (if the `BPLib_STOR_EgressForID` only set a egressed
-flag but did not delete the bundle). In the case of unknown absolute time it is
-hard to track when a bundle truly expired.
+`BPLib_STOR_GarbageCollect`: Called periodically, should delete expired bundles.
+In the case of unknown absolute time it is hard to track when a bundle truly
+expired across restarts.
 
 ## Predefined backends
 
@@ -60,13 +56,20 @@ hard to track when a bundle truly expired.
 
 `BPLib_STOR_StoreBundle` does not store anything, and just frees the bundle.
 
-`BPLib_STOR_EgressForID` does never find any bundle and returns.
+`BPLib_STOR_Egress` does never find any bundle and returns.
 
 This means, due to the architecture of bplib's router, if no channel or contact
 is ready to take data directly (is in started state), the bundle will be dropped.
 
+@note Custodial bundles will also never arrive because they will only be sent
+      *after* being in storage, which never happens here.
+
 ### VFS Storage - Unordered Egress
 `bplib_stor_vfs_unordered` module.
+
+@warning Since the update to bplib 7.0.5 this storage backend was not updated and
+         will either not compile at all and certainly not support custody transfer.
+         It will be removed in the future.
 
 All data is stored in the `CONFIG_BPLIB_STOR_BASE` directory
 as up to 4 character hexadecimal number.
@@ -91,25 +94,49 @@ implementation.
 `bplib_stor_vfs_ordered` module.
 
 All data is stored in the `CONFIG_BPLIB_STOR_BASE` directory.
-In here, subdirectories as `node_no/service_no` are located. Each bundle is
-saved by its expiration time (creation time + lifetime).
+Bundle data is saved in the `dat` subdirectory.
+In there, subdirectories as `node_no/service_no` are located, by the destination
+EID. Each bundle is saved by its expiration time (creation time + lifetime). All
+of these values are represented in hexadecimal form, without leading zeros. A
+service number of 100 (decimal), would create the directory '64'.
 
-@attention Ordering provides no benefit when running with unknown absolute DTN
-           time. The ordered implementation has been shown to still be faster
-           due to its directory structure.
-           However, due to the way bundles are saved in this implementation, the
-           unordered implementation should be preferred for the case of unknown
-           time.
-           Consider this implementation experimental, it may be changed in the
-           future.
+Since bplib currently does not support 3 digit IPN values, this storage also
+currently assumes there is no allocator or rather that the node number is a FQNN.
+
+Since bplib version 7.0.5, a bundle_id was added, which can uniquely identify a
+bundle. For this, in the `CONFIG_BPLIB_STOR_BASE`, another subdirectoy `idx` was
+added. This contains files where the filename is such a bundle ID and references
+a bundle in the `dat` folder.
+
+```
+/nvm0/bp/                       Whatever CONFIG_BPLIB_STOR_BASE is
+  dat/
+    c8/                         Node No    200 as hex
+      7b/                       Service No 123 as hex
+        3795d4_68bf4c6a         [expiration_time]_[bundle_id]
+  idx/             ↑
+    68bf4c6a ──────┘            [bundle_id] as hex
+```
+
+The above for example may appear when a bundle with the destination ipn:200.123
+is stored. bplib computes the ID 68bf4c6a for this bundle. The index file then
+uniquely identifies the real data file.
 
 @note The subdirectories are currently not cleaned up when they are empty. When
       destination EID change a lot, many empty directories could be left.
+      At the same time, when they don't change, this might be better than to
+      recreate and delete the same directory many times.
 
 Bundles are discovered into a cache of length `CONFIG_BPLIB_EGRESS_CACHE_LEN`
-for each channel and contact, but iterating over ALL reachable bundles. Bundle
-data is not read yet, only the EID check is made. After this cache filling, the
-cache contains the bundle references ordered by urgency.
+for each channel and contact, but iterating over ALL reachable bundles. Due to
+the directory structure these can be filtered out early, e.g. if a contact only
+has a route to ipn:400.*, it will not iterate through the `c8/` node directory
+in the example above.
+
+The Bundle data is not read yet, only the EID check is made. After this cache
+filling, the cache contains the bundle references ordered by urgency. A larger
+cache will speed up egress when there are many bundles, because this full
+iteration and ordering happens less often.
 
 The order in which they are found by `vfs_readdir` is usually NOT the order in
 which they will be egressed.

@@ -1,3 +1,3 @@
-MODULE = bplib_stor_vfs_ordered
+MODULE = bplib_util
 
 include $(RIOTBASE)/Makefile.base
