@@ -54,7 +54,9 @@ static ssize_t _riot_block2_handler(coap_pkt_t *pkt, uint8_t *buf, size_t len,
     coap_builder_t state;
     int err = coap_block2_init(pkt, &slicer);
     if (err) {
-        return err;
+        const char *errmsg = "Block2";
+        return coap_reply_simple(pkt, COAP_CODE_BAD_OPTION, buf, len,
+                                 COAP_FORMAT_TEXT, errmsg, strlen(errmsg));
     }
     err = coap_builder_init_reply(&state, buf, len, pkt, COAP_CODE_CONTENT);
     if (err) {
@@ -138,8 +140,13 @@ ssize_t _sha256_handler(coap_pkt_t* pkt, uint8_t *buf, size_t len, coap_request_
 
     uint32_t result = COAP_CODE_204;
 
-    coap_block1_t block1;
+    coap_block1_t block1 = { 0 };
     int blockwise = coap_get_block1(pkt, &block1);
+    if (blockwise < 0) {
+        const char *errmsg = "Block1";
+        return coap_reply_simple(pkt, COAP_CODE_BAD_OPTION, buf, len,
+                                 COAP_FORMAT_TEXT, errmsg, strlen(errmsg));
+    }
 
     printf("_sha256_handler(): received data: offset=%" PRIuSIZE " len=%u blockwise=%i more=%i\n",
             block1.offset, pkt->payload_len, blockwise, block1.more);

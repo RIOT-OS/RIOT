@@ -219,7 +219,7 @@ static ssize_t _get_file(coap_pkt_t *pdu, uint8_t *buf, size_t len,
         size_total = stat.st_size;
         stat_etag(&stat, &etag);
     }
-    if (request->options.exists.block2 && !coap_get_block2(pdu, &block2)) {
+    if (request->options.exists.block2 && (coap_get_block2(pdu, &block2) < 0)) {
         return _error_handler(pdu, buf, len, COAP_CODE_BAD_OPTION);
     }
     if (request->options.exists.if_match &&
@@ -327,7 +327,7 @@ static ssize_t _put_file(coap_pkt_t *pdu, uint8_t *buf, size_t len,
         memmove(file + 2, file + 1, strlen(file + 1));
         *(file + 1) = '.';
     }
-    if (request->options.exists.block1 && !coap_get_block1(pdu, &block1)) {
+    if (request->options.exists.block1 && (coap_get_block1(pdu, &block1) < 0)) {
         ret = COAP_CODE_BAD_OPTION;
         goto unlink_on_error;
     }
@@ -483,8 +483,8 @@ static ssize_t _get_directory(coap_pkt_t *pdu, uint8_t *buf, size_t len,
     vfs_DIR dir;
     coap_block_slicer_t slicer;
     coap_block1_t block2 = { .szx = CONFIG_NANOCOAP_BLOCK_SIZE_MAX };
-    if (request->options.exists.block2 && !coap_get_block2(pdu, &block2)) {
-        return _error_handler(pdu, buf, len, COAP_OPT_FINISH_NONE);
+    if (request->options.exists.block2 && (coap_get_block2(pdu, &block2) < 0)) {
+        return _error_handler(pdu, buf, len, COAP_CODE_BAD_OPTION);
     }
     if ((err = vfs_opendir(&dir, request->namebuf)) < 0) {
         return _error_handler(pdu, buf, len, err);

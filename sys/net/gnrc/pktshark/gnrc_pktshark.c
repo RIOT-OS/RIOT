@@ -306,19 +306,25 @@ static void _dump_icmpv6(const icmpv6_hdr_t *hdr, size_t payload_len)
 static void _print_coap_block(coap_pkt_t *pkt, uint16_t option)
 {
     coap_block1_t block;
-    coap_get_block(pkt, &block, option);
+    int err = coap_get_block(pkt, &block, option);
 
     if (option == COAP_OPT_BLOCK1) {
         print_str(" B1[");
     } else {
         print_str(" B2[");
     }
-    print_u32_dec(block.blknum);
-    print_str(".");
-    print_u32_dec(coap_szx2size(block.szx));
 
-    if (block.more) {
-        print_str(" M");
+    if (err < 0) {
+        print_str("ERR!");
+    }
+    else {
+        print_u32_dec(block.blknum);
+        print_str(".");
+        print_u32_dec(coap_szx2size(block.szx));
+
+        if (block.more) {
+            print_str(" M");
+        }
     }
 
     print_str("]");
