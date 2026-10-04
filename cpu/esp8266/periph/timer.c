@@ -196,7 +196,7 @@ unsigned int IRAM timer_read(tim_t dev)
 
 void IRAM timer_start(tim_t dev)
 {
-    DEBUG("%s dev=%u @%u\n", __func__, dev, phy_get_mactime());
+    DEBUG("%s dev=%u @%" PRIu32 "\n", __func__, dev, phy_get_mactime());
 
     CHECK_PARAM (dev < HW_TIMER_NUMOF);
     CHECK_PARAM (!timers[dev].started);
@@ -247,7 +247,7 @@ static void IRAM __timer_channel_start (struct hw_timer_t* timer, struct hw_chan
     channel->cycles     = channel->delta_time >> HW_TIMER_DELTA_RSHIFT;
     channel->remainder  = channel->delta_time &  HW_TIMER_DELTA_MASK;
 
-    DEBUG("%s cycles=%u remainder=%u @%u\n",
+    DEBUG("%s cycles=%" PRIu32 " remainder=%" PRIu32 " @%" PRIu32 "\n",
           __func__, channel->cycles, channel->remainder, phy_get_mactime());
 
     /* start timer either with full cycles, remaining or minimum time */
@@ -512,7 +512,7 @@ static void IRAM __timer_channel_start (struct phy_timer_t* timer, struct phy_ch
     channel->cycles     = channel->delta_time >> OS_TIMER_DELTA_RSHIFT;
     channel->remainder  = channel->delta_time &  OS_TIMER_DELTA_MASK;
 
-    DEBUG("%s cycles=%u remainder=%u @%u\n",
+    DEBUG("%s cycles=%" PRIu32 " remainder=%" PRIu32 " @%" PRIu32 "\n",
           __func__, channel->cycles, channel->remainder, phy_get_mactime());
 
     /* start timer either with full cycles, remainder or minimum time */
