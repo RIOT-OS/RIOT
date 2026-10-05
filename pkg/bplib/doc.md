@@ -53,8 +53,7 @@ Module name   | Description   | Requirements
 ### List of storage implementations
 Module name   | Description   | Requirements
 ------------- | ------------- | -----------
-`bplib_stor_vfs_ordered` | Stores bundles on the filesystem, in folders `node_id/service_id/`.<br> This path will be prefixed by `CONFIG_BPLIB_STOR_BASE`, which defaults to `/nvm0/bp`.<br> Bundles will be egressed ordered by urgency, which does not work when DTN time is not known.  | `vfs` and a filesystem
-`bplib_stor_vfs_unordered` | Stores bundles on the filesystem in `CONFIG_BPLIB_STOR_BASE`, which defaults to defaults to `/nvm0/bp`.<br> Bundles will be retrieved in the order they are discovered by `vfs_readdir`.<br> This should be faster than the ordered option, unless **many** contacts / channels are used. | `vfs` and a filesystem
+`bplib_stor_vfs` | Stores bundles on the filesystem, in folders `node_id/service_id/`.<br> This path will be prefixed by `CONFIG_BPLIB_STOR_BASE`, which defaults to `/nvm0/bp`.<br> Bundles will be egressed ordered by urgency, which does not work when DTN time is not known.  | `vfs` and a filesystem
 `bplib_stor_void` | Voids all bundles which cannot be delivered to a contact / channel immediately.<br> This kind of destroys the purpose of the bundle protocol but might be useful for leaf nodes and testing. | -
 
 ### List of CLA implementations
@@ -83,9 +82,9 @@ CONFIG_BPLIB_MEMPOOL_LEN | Mempool size available for bplib bundles in send / de
 CONFIG_BPLIB_GEN_WORKER_TIMEOUT | Timeout [ms] after which the generic worker times out after bplib termination | `bplib_init`
 CONFIG_BPLIB_GENERIC_STACK_SIZE | Stack size of the generic worker. | `bplib_init`
 CONFIG_BPLIB_MAX_SEQ_NUM | Maximum sequence number, after which it will wrap back to 0 | `bplib_nc`
-CONFIG_BPLIB_STOR_BASE | File path prefix of the folder where the bundles will be stored. | `bplib_stor_vfs_*`
-CONFIG_BPLIB_EGRESS_CACHE_LEN | Number of bundle references stored in the caches / queues per channel and contact. Larger means the storage is searched less, at the price of more used memory. | `bplib_stor_vfs_*`
-CONFIG_BPLIB_STOR_MAX_DUPLICATE_CHECKS | Used to upper bound the linear search for a filename which is not yet used. This applies only for the ordered storage, so when DTN time is known there should not be many bundles with the same expiration timestamp. Max 255. | `bplib_stor_vfs_ordered`
+CONFIG_BPLIB_STOR_BASE | File path prefix of the folder where the bundles will be stored. | `bplib_stor_vfs`
+CONFIG_BPLIB_EGRESS_CACHE_LEN | Number of bundle references stored in the caches / queues per channel and contact. Larger means the storage is searched less, at the price of more used memory. | `bplib_stor_vfs`
+CONFIG_BPLIB_STOR_MAX_DUPLICATE_CHECKS | Used to upper bound the linear search for a filename which is not yet used. This applies only for the ordered storage, so when DTN time is known there should not be many bundles with the same expiration timestamp. Max 255. | `bplib_stor_vfs`
 
 Also the generic bplib config options from [bplib]/inc/bplib_cfg.h. These are currently not prefixed by CONFIG_.
 

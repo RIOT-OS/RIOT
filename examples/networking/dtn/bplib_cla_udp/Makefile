@@ -9,7 +9,7 @@ RIOTBASE ?= $(CURDIR)/../../../..
 
 # Include bplib and the configuration modules
 USEPKG += bplib
-USEMODULE += bplib_stor_vfs_ordered     # Ordered/Hierarchical storage
+USEMODULE += bplib_stor_vfs             # VFS based storage
 USEMODULE += bplib_cla_udp              # UDPCL
 
 # The number of contacts that bplib uses / the number of tables reserved.

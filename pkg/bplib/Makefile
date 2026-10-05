@@ -26,14 +26,11 @@ bplib_init:
 	+"$(MAKE)" -C $(RIOTPKG)/bplib/init
 
 # ----------------------------- Storage modules --------------------------------
-bplib_stor_vfs_ordered:
-	+"$(MAKE)" -C $(RIOTPKG)/bplib/storage/vfs/ordered
-
-bplib_stor_vfs_unordered:
-	+"$(MAKE)" -C $(RIOTPKG)/bplib/storage/vfs/unordered
+bplib_stor_vfs:
+	+"$(MAKE)" -C $(RIOTPKG)/bplib/storage/vfs
 
 bplib_stor_void:
-	+"$(MAKE)" -C $(RIOTPKG)/bplib/storage/mem/void
+	+"$(MAKE)" -C $(RIOTPKG)/bplib/storage/void
 
 # -------------------------------- CLA modules ---------------------------------
 bplib_cla_ble:
