@@ -62,10 +62,11 @@ BreakBeforeTernaryOperators: false
 BreakConstructorInitializersBeforeComma: false
 BreakConstructorInitializers: BeforeComma
 BreakAfterJavaFieldAnnotations: false
-# adjacent string literals can only be wrapped between literals; keep this
-# enabled so concatenations are split at the 100 character limit instead of
-# overflowing it (disabling it can produce lines longer than the limit)
-BreakAdjacentStringLiterals: true
+# do not break between adjacent string literals: an intra-argument break makes
+# clang-format force every following argument onto its own line;
+# the trade-off is that a concatenation that
+# does not fit is kept on one line and may exceed the column limit
+BreakAdjacentStringLiterals: false
 BreakStringLiterals: false
 # "Line length": the coding conventions aim for 80 characters per line with an
 # absolute maximum of 100. clang-format can only enforce the hard maximum, so
