@@ -502,6 +502,25 @@ typedef struct {
 } ieee802154_mr_fsk_conf_t;
 
 /**
+ * @brief Union of all supported PHY configurations
+ *
+ * All members start with @ref ieee802154_phy_conf_t, so @p super.phy_mode
+ * can always be read to determine which member is valid.
+ */
+typedef union {
+    ieee802154_phy_conf_t super;            /**< common settings */
+#if IS_USED(MODULE_NETDEV_IEEE802154_MR_OQPSK)
+    ieee802154_mr_oqpsk_conf_t mr_oqpsk;    /**< valid if phy_mode == MR_OQPSK */
+#endif
+#if IS_USED(MODULE_NETDEV_IEEE802154_MR_OFDM)
+    ieee802154_mr_ofdm_conf_t mr_ofdm;      /**< valid if phy_mode == MR_OFDM */
+#endif
+#if IS_USED(MODULE_NETDEV_IEEE802154_MR_FSK)
+    ieee802154_mr_fsk_conf_t mr_fsk;        /**< valid if phy_mode == MR_FSK */
+#endif
+} ieee802154_phy_pib_t;
+
+/**
  * @brief IEEE 802.15.4 radio operations
  */
 typedef enum {

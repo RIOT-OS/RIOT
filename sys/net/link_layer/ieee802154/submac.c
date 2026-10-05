@@ -724,13 +724,13 @@ int ieee802154_submac_init(ieee802154_submac_t *submac, const network_uint16_t *
     submac->csma_retries = CONFIG_IEEE802154_DEFAULT_CSMA_CA_RETRIES;
     submac->be.max = CONFIG_IEEE802154_DEFAULT_CSMA_CA_MAX_BE;
 
-    submac->tx_pow = CONFIG_IEEE802154_DEFAULT_TXPOWER;
+    submac->phy_conf.super.pow = CONFIG_IEEE802154_DEFAULT_TXPOWER;
 
     if (ieee802154_radio_has_24_ghz(dev)) {
-        submac->channel_num = CONFIG_IEEE802154_DEFAULT_CHANNEL;
+        submac->phy_conf.super.channel = CONFIG_IEEE802154_DEFAULT_CHANNEL;
     }
     else {
-        submac->channel_num = CONFIG_IEEE802154_DEFAULT_SUBGHZ_CHANNEL;
+        submac->phy_conf.super.channel = CONFIG_IEEE802154_DEFAULT_SUBGHZ_CHANNEL;
     }
 
     /* Get supported PHY modes */
@@ -744,7 +744,7 @@ int ieee802154_submac_init(ieee802154_submac_t *submac, const network_uint16_t *
     if (CONFIG_IEEE802154_DEFAULT_PHY_MODE != IEEE802154_PHY_DISABLED &&
         (supported_phy_modes & default_phy_cap)) {
         /* Check if default PHY is supported */
-        submac->phy_mode = CONFIG_IEEE802154_DEFAULT_PHY_MODE;
+        submac->phy_conf.super.phy_mode = CONFIG_IEEE802154_DEFAULT_PHY_MODE;
     }
     else {
         /* Get first set bit, and use it as the default,
@@ -754,7 +754,7 @@ int ieee802154_submac_init(ieee802154_submac_t *submac, const network_uint16_t *
          * IEEE 802.15.4g-2012 PHY modes. */
         unsigned bit = bitarithm_lsb(supported_phy_modes);
 
-        submac->phy_mode = ieee802154_cap_to_phy_mode(1 << bit);
+        submac->phy_conf.super.phy_mode = ieee802154_cap_to_phy_mode(1 << bit);
     }
 
     /* If the radio is still not in TRX_OFF state, spin */
@@ -765,46 +765,28 @@ int ieee802154_submac_init(ieee802154_submac_t *submac, const network_uint16_t *
     ieee802154_radio_config_addr_filter(dev, IEEE802154_AF_EXT_ADDR, &submac->ext_addr);
     ieee802154_radio_config_addr_filter(dev, IEEE802154_AF_PANID, &submac->panid);
 
-    /* Configure PHY settings (mode, channel, TX power) */
-    union {
-        ieee802154_phy_conf_t super;
 #ifdef MODULE_NETDEV_IEEE802154_MR_OQPSK
-        ieee802154_mr_oqpsk_conf_t mr_oqpsk;
-#endif
-#ifdef MODULE_NETDEV_IEEE802154_MR_OFDM
-        ieee802154_mr_ofdm_conf_t mr_ofdm;
-#endif
-#ifdef MODULE_NETDEV_IEEE802154_MR_FSK
-        ieee802154_mr_fsk_conf_t mr_fsk;
-#endif
-    } conf;
-
-#ifdef MODULE_NETDEV_IEEE802154_MR_OQPSK
-    if (submac->phy_mode == IEEE802154_PHY_MR_OQPSK) {
-        conf.mr_oqpsk.chips = CONFIG_IEEE802154_MR_OQPSK_DEFAULT_CHIPS;
-        conf.mr_oqpsk.rate_mode = CONFIG_IEEE802154_MR_OQPSK_DEFAULT_RATE;
+    if (submac->phy_conf.super.phy_mode == IEEE802154_PHY_MR_OQPSK) {
+        submac->phy_conf.mr_oqpsk.chips = CONFIG_IEEE802154_MR_OQPSK_DEFAULT_CHIPS;
+        submac->phy_conf.mr_oqpsk.rate_mode = CONFIG_IEEE802154_MR_OQPSK_DEFAULT_RATE;
     }
 #endif
 #ifdef MODULE_NETDEV_IEEE802154_MR_OFDM
-    if (submac->phy_mode == IEEE802154_PHY_MR_OFDM) {
-        conf.mr_ofdm.option = CONFIG_IEEE802154_MR_OFDM_DEFAULT_OPTION;
-        conf.mr_ofdm.scheme = CONFIG_IEEE802154_MR_OFDM_DEFAULT_SCHEME;
+    if (submac->phy_conf.super.phy_mode == IEEE802154_PHY_MR_OFDM) {
+        submac->phy_conf.mr_ofdm.option = CONFIG_IEEE802154_MR_OFDM_DEFAULT_OPTION;
+        submac->phy_conf.mr_ofdm.scheme = CONFIG_IEEE802154_MR_OFDM_DEFAULT_SCHEME;
     }
 #endif
 #ifdef MODULE_NETDEV_IEEE802154_MR_FSK
-    if (submac->phy_mode == IEEE802154_PHY_MR_FSK) {
-        conf.mr_fsk.srate = CONFIG_IEEE802154_MR_FSK_DEFAULT_SRATE;
-        conf.mr_fsk.mod_ord = CONFIG_IEEE802154_MR_FSK_DEFAULT_MOD_ORD;
-        conf.mr_fsk.mod_idx = CONFIG_IEEE802154_MR_FSK_DEFAULT_MOD_IDX;
-        conf.mr_fsk.fec = CONFIG_IEEE802154_MR_FSK_DEFAULT_FEC;
+    if (submac->phy_conf.super.phy_mode == IEEE802154_PHY_MR_FSK) {
+        submac->phy_conf.mr_fsk.srate = CONFIG_IEEE802154_MR_FSK_DEFAULT_SRATE;
+        submac->phy_conf.mr_fsk.mod_ord = CONFIG_IEEE802154_MR_FSK_DEFAULT_MOD_ORD;
+        submac->phy_conf.mr_fsk.mod_idx = CONFIG_IEEE802154_MR_FSK_DEFAULT_MOD_IDX;
+        submac->phy_conf.mr_fsk.fec = CONFIG_IEEE802154_MR_FSK_DEFAULT_FEC;
     }
 #endif
 
-    conf.super.phy_mode = submac->phy_mode;
-    conf.super.channel = submac->channel_num;
-    conf.super.pow = submac->tx_pow;
-
-    ieee802154_submac_config_phy(submac, &conf.super);
+    ieee802154_submac_config_phy(submac, &submac->phy_conf.super);
     ieee802154_radio_set_cca_threshold(dev,
                                        CONFIG_IEEE802154_CCA_THRESH_DEFAULT);
 
@@ -845,12 +827,44 @@ int ieee802154_set_phy_conf(ieee802154_submac_t *submac, const ieee802154_phy_co
     res = ieee802154_submac_config_phy(submac, conf);
 
     if (res >= 0) {
-        submac->channel_num = conf->channel;
-        submac->tx_pow = conf->pow;
-        if (conf->phy_mode != IEEE802154_PHY_NO_OP) {
-            submac->phy_mode = conf->phy_mode;
+        /* keep current mode on NO_OP */
+        ieee802154_phy_mode_t mode = conf->phy_mode == IEEE802154_PHY_NO_OP ?
+                                     submac->phy_conf.super.phy_mode : conf->phy_mode;
+
+        size_t conf_size = sizeof(ieee802154_phy_conf_t);
+
+        switch (conf->phy_mode) {
+#if IS_USED(MODULE_NETDEV_IEEE802154_MR_OQPSK)
+        case IEEE802154_PHY_MR_OQPSK:
+            conf_size = sizeof(ieee802154_mr_oqpsk_conf_t);
+            break;
+#endif
+#if IS_USED(MODULE_NETDEV_IEEE802154_MR_OFDM)
+        case IEEE802154_PHY_MR_OFDM:
+            conf_size = sizeof(ieee802154_mr_ofdm_conf_t);
+            break;
+#endif
+#if IS_USED(MODULE_NETDEV_IEEE802154_MR_FSK)
+        case IEEE802154_PHY_MR_FSK:
+            conf_size = sizeof(ieee802154_mr_fsk_conf_t);
+            break;
+#endif
+        case IEEE802154_PHY_OQPSK:
+        case IEEE802154_PHY_BPSK:
+        case IEEE802154_PHY_NO_OP:
+        case IEEE802154_PHY_DISABLED:
+            break;
+        default:
+            res = -EINVAL;
+            break;
+        }
+
+        if (res >= 0) {
+            memcpy(&submac->phy_conf, conf, conf_size);
+            submac->phy_conf.super.phy_mode = mode;
         }
     }
+
     while (ieee802154_radio_confirm_set_idle(dev) == -EAGAIN) {}
 
     /* Go back to RX if needed */
