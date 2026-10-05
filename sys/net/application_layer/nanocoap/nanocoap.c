@@ -1165,7 +1165,7 @@ int coap_get_block(coap_pkt_t *pkt, struct _coap_block *block, uint16_t option)
 
     /* as blkopt is at most 24 bits, `blknum = blkopt >> 4` is at most 0xfffff
      * as `szx = `blkopt & 7`, `szx + 4` is at most 11. Since
-     * 0xfffff << 11 == 0x7ffff800 < UINT32_MAX, the following is defined
+     * `0xfffff << 11 == 0x7ffff800 < UINT32_MAX`, the following is defined
      * behavior and never overflows on 32-bit arithmetic: */
     uint32_t offset = block->blknum << (block->szx + 4);
 
