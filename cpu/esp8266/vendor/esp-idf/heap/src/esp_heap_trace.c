@@ -122,7 +122,7 @@ void heap_trace_dump(void)
                 if (!line) {
                     ESP_EARLY_LOGI(TAG, HEAP_INFO " caller func %p", HEAP_INFO_PARAM(p), mem2_blk->file);
                 } else {
-                    const char *file = rindex(mem2_blk->file, '/');
+                    const char *file = strrchr(mem2_blk->file, '/');
                     if (file)
                         file++;
                     else

@@ -535,7 +535,7 @@ static esp_err_t IRAM_ATTR _esp_system_event_handler(void *ctx, system_event_t *
             result = esp_wifi_connect();
             if (result != ESP_OK) {
                 ESP_WIFI_LOG_ERROR("esp_wifi_connect failed with return "
-                                   "value %d", result);
+                                   "value %d", (int)result);
             }
             break;
 
@@ -584,14 +584,14 @@ static esp_err_t IRAM_ATTR _esp_system_event_handler(void *ctx, system_event_t *
                 result = esp_wifi_disconnect();
                 if (result != ESP_OK) {
                     ESP_WIFI_LOG_ERROR("esp_wifi_disconnect failed with "
-                                       "return value %d", result);
+                                       "return value %d", (int)result);
                     return result;
                 }
 
                 /* try to reconnect */
                 if (_esp_wifi_started && ((result = esp_wifi_connect()) != ESP_OK)) {
                    ESP_WIFI_LOG_ERROR("esp_wifi_connect failed with "
-                                      "return value %d", result);
+                                      "return value %d", (int)result);
                 }
             }
 
@@ -928,7 +928,7 @@ void esp_wifi_setup (esp_wifi_netdev_t* dev)
 #if CONFIG_ESP_WIFI_NVS_ENABLED
     result = nvs_flash_init();
     if (result != ESP_OK) {
-        ESP_WIFI_LOG_ERROR("nfs_flash_init failed with return value %d", result);
+        ESP_WIFI_LOG_ERROR("nfs_flash_init failed with return value %d", (int)result);
         return;
     }
 #endif /* CONFIG_ESP_WIFI_NVS_ENABLED */
@@ -936,7 +936,7 @@ void esp_wifi_setup (esp_wifi_netdev_t* dev)
     wifi_init_config_t cfg = WIFI_INIT_CONFIG_DEFAULT();
     result = esp_wifi_init(&cfg);
     if (result != ESP_OK) {
-        ESP_WIFI_LOG_ERROR("esp_wifi_init failed with return value %d", result);
+        ESP_WIFI_LOG_ERROR("esp_wifi_init failed with return value %d", (int)result);
         return;
     }
 
@@ -962,7 +962,7 @@ void esp_wifi_setup (esp_wifi_netdev_t* dev)
     result = esp_wifi_set_mode(WIFI_MODE_STA);
 #endif /* defined(CPU_ESP8266) */
     if (result != ESP_OK) {
-        ESP_WIFI_LOG_ERROR("esp_wifi_set_mode failed with return value %d", result);
+        ESP_WIFI_LOG_ERROR("esp_wifi_set_mode failed with return value %d", (int)result);
         return;
     }
 
@@ -977,7 +977,7 @@ void esp_wifi_setup (esp_wifi_netdev_t* dev)
     /* set the SoftAP configuration */
     result = esp_wifi_set_config(WIFI_IF_AP, &wifi_config_ap);
     if (result != ESP_OK) {
-        ESP_WIFI_LOG_ERROR("esp_wifi_set_config softap failed with return value %d", result);
+        ESP_WIFI_LOG_ERROR("esp_wifi_set_config softap failed with return value %d", (int)result);
         return;
     }
 #endif /* defined(CPU_ESP8266) || defined(MODULE_ESP_WIFI_AP) */
@@ -988,7 +988,7 @@ void esp_wifi_setup (esp_wifi_netdev_t* dev)
     /* set the Station configuration */
     result = esp_wifi_set_config(WIFI_IF_STA, &wifi_config_sta);
     if (result != ESP_OK) {
-        ESP_WIFI_LOG_ERROR("esp_wifi_set_config station failed with return value %d", result);
+        ESP_WIFI_LOG_ERROR("esp_wifi_set_config station failed with return value %d", (int)result);
         return;
     }
 #endif /* MODULE_ESP_WIFI_AP */
@@ -1027,7 +1027,7 @@ void esp_wifi_setup (esp_wifi_netdev_t* dev)
     /* start the WiFi driver */
     result = esp_wifi_start();
     if (result != ESP_OK) {
-        ESP_WIFI_LOG_ERROR("esp_wifi_start failed with return value %d", result);
+        ESP_WIFI_LOG_ERROR("esp_wifi_start failed with return value %d", (int)result);
         return;
     }
 
