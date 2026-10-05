@@ -275,6 +275,42 @@ void dma_prepare(dma_t dma, void *mem, size_t len, bool incr_mem);
  */
 void dma_set_cb(dma_t dma, dma_cb_t cb, void *ctx);
 
+/**
+ * @brief   Enable circular DMA mode
+ *
+ * In circular mode the transfer restarts automatically at the end of the buffer
+ * and the callback triggers twice per buffer cycle, once when the first half of
+ * the buffer is full and once when the whole buffer is full.
+ *
+ * @note The stream must be stopped before enabling circular mode and it cannot
+ *       be used with memory-to-memory transfers. Call this after @ref dma_setup
+ *       or @ref dma_configure, as both disable circular mode again.
+ *
+ * @param[in] dma     Logical DMA stream
+ */
+void dma_enable_loop(dma_t dma);
+
+/**
+ * @brief   Disable circular DMA mode
+ *
+ * @note The stream must be stopped before disabling circular mode.
+ *
+ * @param[in] dma     Logical DMA stream
+ */
+void dma_disable_loop(dma_t dma);
+
+/**
+ * @brief   Get the remaining number of data items to transfer
+ *
+ * @note In circular mode, a value greater than half the buffer length means
+ *       the second half is complete, otherwise the first half is complete.
+ *
+ * @param[in] dma     Logical DMA stream
+ *
+ * @return  remaining number of data items in the current buffer cycle
+ */
+uint16_t dma_get_remaining(dma_t dma);
+
 #endif /* MODULE_PERIPH_DMA */
 
 #ifdef __cplusplus
