@@ -1414,8 +1414,8 @@ int coap_get_block(coap_pkt_t *pkt, struct _coap_block *block, uint16_t option);
  *
  * If no block option is present in @p pkt, the values in @p block will
  * be initialized with defaults. That implies both `block->offset` and
- * `block->more` are also valid in that case, as packet with `offset==0` and
- * more==0 means it contains all the payload for the corresponding request.
+ * `block->more` are also valid in that case, as a packet with `offset==0` and
+ * `more==0` means it contains all the payload for the corresponding request.
  * `block-szx` will be set to `CONFIG_NANOCOAP_BLOCKSIZE_DEFAULT` when no
  * option is present.
  *
