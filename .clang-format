@@ -158,5 +158,3 @@ SpacesInSquareBrackets: false
 Standard: Cpp03
 TabWidth: 4
 UseTab: Never
-QualifierAlignment: Custom
-QualifierOrder: ['static', 'inline', 'const', 'volatile', 'type']
