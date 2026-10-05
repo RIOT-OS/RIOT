@@ -36,9 +36,6 @@
 #define ENABLE_DEBUG (0)
 #include "debug.h"
 
-#define IEEE802154_PAGE_24GHZ_OQPSK        2 /**< page value for 2.4 GHz O-QPSK PHY */
-#define IEEE802154_PAGE_SUB_GHZ_OQPSK_BPSK 0 /**< page value for Sub GHz O-QPSK or BPSK PHY */
-
 static const ieee802154_radio_ops_t at86rf2xx_ops;
 static ieee802154_dev_t *at86rf2xx_periph;
 
