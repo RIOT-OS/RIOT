@@ -112,6 +112,15 @@ int _gnrc_tcp_rcvbuf_get_buffer(gnrc_tcp_tcb_t *tcb)
     return 0;
 }
 
+void _gnrc_tcp_rcvbuf_clear_buffer(gnrc_tcp_tcb_t *tcb)
+{
+    TCP_DEBUG_ENTER;
+    if (tcb->rcv_buf_raw != NULL) {
+        ringbuffer_init(&tcb->rcv_buf, (char *) tcb->rcv_buf_raw, GNRC_TCP_RCV_BUF_SIZE);
+    }
+    TCP_DEBUG_LEAVE;
+}
+
 void _gnrc_tcp_rcvbuf_release_buffer(gnrc_tcp_tcb_t *tcb)
 {
     TCP_DEBUG_ENTER;
