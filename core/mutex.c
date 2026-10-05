@@ -59,8 +59,7 @@ static inline __attribute__((always_inline)) void _block(mutex_t *mutex, unsigne
     /* Fail visibly even if a blocking action is called from somewhere where
      * it's subtly not allowed, eg. board_init */
     assert(me != NULL);
-    DEBUG("PID[%" PRIkernel_pid "] mutex_lock() Adding node to mutex queue: "
-          "prio: %" PRIu32 "\n",
+    DEBUG("PID[%" PRIkernel_pid "] mutex_lock() Adding node to mutex queue: " "prio: %" PRIu32 "\n",
           thread_getpid(), (uint32_t)me->priority);
     sched_set_status(me, STATUS_MUTEX_BLOCKED);
     if (mutex->queue.next == MUTEX_LOCKED) {
@@ -137,8 +136,7 @@ int mutex_lock_cancelable(mutex_cancel_t *mc)
     DEBUG("PID[%" PRIkernel_pid "] mutex_lock_cancelable()\n", thread_getpid());
 
     if (mc->cancelled) {
-        DEBUG("PID[%" PRIkernel_pid "] mutex_lock_cancelable cancelled "
-              "early.\n",
+        DEBUG("PID[%" PRIkernel_pid "] mutex_lock_cancelable cancelled " "early.\n",
               thread_getpid());
         irq_restore(irq_state);
         return -ECANCELED;
@@ -166,8 +164,7 @@ int mutex_lock_cancelable(mutex_cancel_t *mc)
     else {
         _block(mutex, irq_state, pc);
         if (mc->cancelled) {
-            DEBUG("PID[%" PRIkernel_pid "] mutex_lock_cancelable() "
-                  "cancelled.\n",
+            DEBUG("PID[%" PRIkernel_pid "] mutex_lock_cancelable() " "cancelled.\n",
                   thread_getpid());
         }
         return (mc->cancelled) ? -ECANCELED : 0;
@@ -235,8 +232,7 @@ void mutex_unlock_and_sleep(mutex_t *mutex)
         else {
             list_node_t *next = list_remove_head(&mutex->queue);
             thread_t *process = container_of((clist_node_t *)next, thread_t, rq_entry);
-            DEBUG("PID[%" PRIkernel_pid "] mutex_unlock_and_sleep(): waking up "
-                  "waiter.\n",
+            DEBUG("PID[%" PRIkernel_pid "] mutex_unlock_and_sleep(): waking up " "waiter.\n",
                   process->pid);
             sched_set_status(process, STATUS_PENDING);
             if (!mutex->queue.next) {
