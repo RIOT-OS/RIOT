@@ -310,6 +310,7 @@ static inline ieee802154_phy_mode_t ieee802154_get_phy_mode(
  *
  * @return 0 on success
  * @return -ENOTSUP if the PHY settings are not supported
+ * @return -EINVAL if the PHY mode is unknown to the SubMAC
  * @return -EBUSY if the SubMAC is not in RX or IDLE state or if called inside
  *         @ref ieee802154_submac_cb_t::rx_done or
  *         @ref ieee802154_submac_cb_t::tx_done
@@ -363,6 +364,278 @@ static inline int ieee802154_set_tx_power(ieee802154_submac_t *submac,
     conf.super.phy_mode = IEEE802154_PHY_NO_OP;
     conf.super.pow = tx_pow;
     return ieee802154_set_phy_conf(submac, &conf.super);
+}
+
+/**
+ * @brief Set the MR-FSK modulation index
+ *
+ * This is a shortcut to @ref ieee802154_set_phy_conf
+ *
+ * @pre The current PHY mode is @ref IEEE802154_PHY_MR_FSK
+ *
+ * @param[in] submac    pointer to the SubMAC descriptor
+ * @param[in] mod_idx   modulation index
+ *
+ * @return 0 on success
+ * @return -ENOTSUP if the value is not supported or the current phy is not MR-FSK
+ * @return -EBUSY if the SubMAC is not in RX or IDLE state or if called inside
+ *         @ref ieee802154_submac_cb_t::rx_done or
+ *         @ref ieee802154_submac_cb_t::tx_done
+ * @return negative errno on error
+ */
+static inline int ieee802154_set_mr_fsk_mod_idx(ieee802154_submac_t *submac,
+                                                uint8_t mod_idx)
+{
+#if IS_USED(MODULE_IEEE802154_PHY_MR_FSK)
+    if (ieee802154_get_phy_mode(submac) != IEEE802154_PHY_MR_FSK) {
+        return -ENOTSUP;
+    }
+    ieee802154_phy_pib_t conf = submac->phy_conf;
+    conf.mr_fsk.mod_idx = mod_idx;
+    return ieee802154_set_phy_conf(submac, &conf.super);
+#else
+    (void)submac;
+    (void)mod_idx;
+    return -ENOTSUP;
+#endif
+}
+
+/**
+ * @brief Set the MR-FSK modulation order
+ *
+ * This is a shortcut to @ref ieee802154_set_phy_conf
+ *
+ * @pre The current PHY mode is @ref IEEE802154_PHY_MR_FSK
+ *
+ * @param[in] submac    pointer to the SubMAC descriptor
+ * @param[in] mod_ord   modulation order (2-FSK or 4-FSK)
+ *
+ * @return 0 on success
+ * @return -ENOTSUP if the current PHY mode is not MR-FSK or the value is not supported
+ * @return -EBUSY if the SubMAC is not in RX or IDLE state or if called inside
+ *         @ref ieee802154_submac_cb_t::rx_done or
+ *         @ref ieee802154_submac_cb_t::tx_done
+ * @return negative errno on error
+ */
+static inline int ieee802154_set_mr_fsk_mod_ord(ieee802154_submac_t *submac,
+                                                uint8_t mod_ord)
+{
+#if IS_USED(MODULE_IEEE802154_PHY_MR_FSK)
+    if (ieee802154_get_phy_mode(submac) != IEEE802154_PHY_MR_FSK) {
+        return -ENOTSUP;
+    }
+    ieee802154_phy_pib_t conf = submac->phy_conf;
+    conf.mr_fsk.mod_ord = mod_ord;
+    return ieee802154_set_phy_conf(submac, &conf.super);
+#else
+    (void)submac;
+    (void)mod_ord;
+    return -ENOTSUP;
+#endif
+}
+
+/**
+ * @brief Set the MR-FSK symbol rate
+ *
+ * This is a shortcut to @ref ieee802154_set_phy_conf
+ *
+ * @pre The current PHY mode is @ref IEEE802154_PHY_MR_FSK
+ *
+ * @param[in] submac    pointer to the SubMAC descriptor
+ * @param[in] srate     symbol rate
+ *
+ * @return 0 on success
+ * @return -ENOTSUP if the current PHY mode is not MR-FSK or the value is not supported
+ * @return -EBUSY if the SubMAC is not in RX or IDLE state or if called inside
+ *         @ref ieee802154_submac_cb_t::rx_done or
+ *         @ref ieee802154_submac_cb_t::tx_done
+ * @return negative errno on error
+ */
+static inline int ieee802154_set_mr_fsk_srate(ieee802154_submac_t *submac,
+                                              ieee802154_mr_fsk_srate_t srate)
+{
+#if IS_USED(MODULE_IEEE802154_PHY_MR_FSK)
+    if (ieee802154_get_phy_mode(submac) != IEEE802154_PHY_MR_FSK) {
+        return -ENOTSUP;
+    }
+    ieee802154_phy_pib_t conf = submac->phy_conf;
+    conf.mr_fsk.srate = srate;
+    return ieee802154_set_phy_conf(submac, &conf.super);
+#else
+    (void)submac;
+    (void)srate;
+    return -ENOTSUP;
+#endif
+}
+
+/**
+ * @brief Set the MR-FSK forward error correction
+ *
+ * This is a shortcut to @ref ieee802154_set_phy_conf
+ *
+ * @pre The current PHY mode is @ref IEEE802154_PHY_MR_FSK
+ *
+ * @param[in] submac    pointer to the SubMAC descriptor
+ * @param[in] fec       forward error correction scheme
+ *
+ * @return 0 on success
+ * @return -ENOTSUP if the current PHY mode is not MR-FSK or the value is not supported
+ * @return -EBUSY if the SubMAC is not in RX or IDLE state or if called inside
+ *         @ref ieee802154_submac_cb_t::rx_done or
+ *         @ref ieee802154_submac_cb_t::tx_done
+ * @return negative errno on error
+ */
+static inline int ieee802154_set_mr_fsk_fec(ieee802154_submac_t *submac,
+                                            ieee802154_mr_fsk_fec_t fec)
+{
+#if IS_USED(MODULE_IEEE802154_PHY_MR_FSK)
+    if (ieee802154_get_phy_mode(submac) != IEEE802154_PHY_MR_FSK) {
+        return -ENOTSUP;
+    }
+    ieee802154_phy_pib_t conf = submac->phy_conf;
+    conf.mr_fsk.fec = fec;
+    return ieee802154_set_phy_conf(submac, &conf.super);
+#else
+    (void)submac;
+    (void)fec;
+    return -ENOTSUP;
+#endif
+}
+
+/**
+ * @brief Set the MR-OFDM option
+ *
+ * This is a shortcut to @ref ieee802154_set_phy_conf
+ *
+ * @pre The current PHY mode is @ref IEEE802154_PHY_MR_OFDM
+ *
+ * @param[in] submac    pointer to the SubMAC descriptor
+ * @param[in] option    MR-OFDM option
+ *
+ * @return 0 on success
+ * @return -ENOTSUP if the current PHY mode is not MR-OFDM or the value is not supported
+ * @return -EBUSY if the SubMAC is not in RX or IDLE state or if called inside
+ *         @ref ieee802154_submac_cb_t::rx_done or
+ *         @ref ieee802154_submac_cb_t::tx_done
+ * @return negative errno on error
+ */
+static inline int ieee802154_set_mr_ofdm_option(ieee802154_submac_t *submac,
+                                                uint8_t option)
+{
+#if IS_USED(MODULE_IEEE802154_PHY_MR_OFDM)
+    if (ieee802154_get_phy_mode(submac) != IEEE802154_PHY_MR_OFDM) {
+        return -ENOTSUP;
+    }
+    ieee802154_phy_pib_t conf = submac->phy_conf;
+    conf.mr_ofdm.option = option;
+    return ieee802154_set_phy_conf(submac, &conf.super);
+#else
+    (void)submac;
+    (void)option;
+    return -ENOTSUP;
+#endif
+}
+
+/**
+ * @brief Set the MR-OFDM modulation and coding scheme
+ *
+ * This is a shortcut to @ref ieee802154_set_phy_conf
+ *
+ * @pre The current PHY mode is @ref IEEE802154_PHY_MR_OFDM
+ *
+ * @param[in] submac    pointer to the SubMAC descriptor
+ * @param[in] scheme    modulation and coding scheme (MCS)
+ *
+ * @return 0 on success
+ * @return -ENOTSUP if the current PHY mode is not MR-OFDM or the value is not supported
+ * @return -EBUSY if the SubMAC is not in RX or IDLE state or if called inside
+ *         @ref ieee802154_submac_cb_t::rx_done or
+ *         @ref ieee802154_submac_cb_t::tx_done
+ * @return negative errno on error
+ */
+static inline int ieee802154_set_mr_ofdm_scheme(ieee802154_submac_t *submac,
+                                                uint8_t scheme)
+{
+#if IS_USED(MODULE_IEEE802154_PHY_MR_OFDM)
+    if (ieee802154_get_phy_mode(submac) != IEEE802154_PHY_MR_OFDM) {
+        return -ENOTSUP;
+    }
+    ieee802154_phy_pib_t conf = submac->phy_conf;
+    conf.mr_ofdm.scheme = scheme;
+    return ieee802154_set_phy_conf(submac, &conf.super);
+#else
+    (void)submac;
+    (void)scheme;
+    return -ENOTSUP;
+#endif
+}
+
+/**
+ * @brief Set the MR-O-QPSK chip rate
+ *
+ * This is a shortcut to @ref ieee802154_set_phy_conf
+ *
+ * @pre The current PHY mode is @ref IEEE802154_PHY_MR_OQPSK
+ *
+ * @param[in] submac    pointer to the SubMAC descriptor
+ * @param[in] chips     chip rate
+ *
+ * @return 0 on success
+ * @return -ENOTSUP if the current PHY mode is not MR-O-QPSK or the value is not supported
+ * @return -EBUSY if the SubMAC is not in RX or IDLE state or if called inside
+ *         @ref ieee802154_submac_cb_t::rx_done or
+ *         @ref ieee802154_submac_cb_t::tx_done
+ * @return negative errno on error
+ */
+static inline int ieee802154_set_mr_oqpsk_chips(ieee802154_submac_t *submac,
+                                                ieee802154_mr_oqpsk_chips_t chips)
+{
+#if IS_USED(MODULE_IEEE802154_PHY_MR_OQPSK)
+    if (ieee802154_get_phy_mode(submac) != IEEE802154_PHY_MR_OQPSK) {
+        return -ENOTSUP;
+    }
+    ieee802154_phy_pib_t conf = submac->phy_conf;
+    conf.mr_oqpsk.chips = chips;
+    return ieee802154_set_phy_conf(submac, &conf.super);
+#else
+    (void)submac;
+    (void)chips;
+    return -ENOTSUP;
+#endif
+}
+
+/**
+ * @brief Set the MR-O-QPSK rate mode
+ *
+ * This is a shortcut to @ref ieee802154_set_phy_conf
+ *
+ * @pre The current PHY mode is @ref IEEE802154_PHY_MR_OQPSK
+ *
+ * @param[in] submac    pointer to the SubMAC descriptor
+ * @param[in] rate_mode rate mode
+ *
+ * @return 0 on success
+ * @return -ENOTSUP if the current PHY mode is not MR-O-QPSK or the value is not supported
+ * @return -EBUSY if the SubMAC is not in RX or IDLE state or if called inside
+ *         @ref ieee802154_submac_cb_t::rx_done or
+ *         @ref ieee802154_submac_cb_t::tx_done
+ * @return negative errno on error
+ */
+static inline int ieee802154_set_mr_oqpsk_rate_mode(ieee802154_submac_t *submac,
+                                                    uint8_t rate_mode)
+{
+#if IS_USED(MODULE_IEEE802154_PHY_MR_OQPSK)
+    if (ieee802154_get_phy_mode(submac) != IEEE802154_PHY_MR_OQPSK) {
+        return -ENOTSUP;
+    }
+    ieee802154_phy_pib_t conf = submac->phy_conf;
+    conf.mr_oqpsk.rate_mode = rate_mode;
+    return ieee802154_set_phy_conf(submac, &conf.super);
+#else
+    (void)submac;
+    (void)rate_mode;
+    return -ENOTSUP;
+#endif
 }
 
 /**

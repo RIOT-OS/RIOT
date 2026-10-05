@@ -442,6 +442,8 @@ static int _config_phy(ieee802154_dev_t *hal, const ieee802154_phy_conf_t *conf)
         break;
     }
 #endif
+    case IEEE802154_PHY_NO_OP:
+        break;
     default:
         return -EINVAL;
     }
