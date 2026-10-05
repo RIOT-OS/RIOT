@@ -195,15 +195,13 @@ struct ieee802154_submac {
     uint16_t ack_timeout_us;            /**< ACK timeout in µs */
     uint16_t csma_backoff_us;           /**< CSMA sender backoff period in µs */
     uint16_t panid;                     /**< IEEE 802.15.4 PAN ID */
-    uint16_t channel_num;               /**< IEEE 802.15.4 channel number */
     uint8_t retrans;                    /**< current number of retransmissions */
     uint8_t csma_retries_nb;            /**< current number of CSMA-CA retries */
     uint8_t backoff_mask;               /**< internal value used for random backoff calculation */
     uint8_t csma_retries;               /**< maximum number of CSMA-CA retries */
-    int8_t tx_pow;                      /**< Transmission power (in dBm) */
-    ieee802154_fsm_state_t fsm_state;    /**< State of the SubMAC */
-    ieee802154_phy_mode_t phy_mode;     /**< IEEE 802.15.4 PHY mode */
+    ieee802154_fsm_state_t fsm_state;   /**< State of the SubMAC */
     const iolist_t *psdu;               /**< stores the current PSDU */
+    ieee802154_phy_pib_t phy_conf;      /**< Current PHY Configuration */
 };
 
 /**
@@ -301,7 +299,7 @@ static inline int ieee802154_set_panid(ieee802154_submac_t *submac,
 static inline ieee802154_phy_mode_t ieee802154_get_phy_mode(
     ieee802154_submac_t *submac)
 {
-    return submac->phy_mode;
+    return ((ieee802154_phy_conf_t *)&submac->phy_conf)->phy_mode;
 }
 
 /**
@@ -337,12 +335,9 @@ int ieee802154_set_phy_conf(ieee802154_submac_t *submac, const ieee802154_phy_co
 static inline int ieee802154_set_channel_number(ieee802154_submac_t *submac,
                                                 uint16_t channel_num)
 {
-    const ieee802154_phy_conf_t conf = {
-        .phy_mode = IEEE802154_PHY_NO_OP,
-        .channel = channel_num,
-        .pow = submac->tx_pow,
-    };
-
+    ieee802154_phy_conf_t conf = *(ieee802154_phy_conf_t *)&submac->phy_conf;
+    conf.phy_mode = IEEE802154_PHY_NO_OP;
+    conf.channel = channel_num;
     return ieee802154_set_phy_conf(submac, &conf);
 }
 
@@ -364,12 +359,9 @@ static inline int ieee802154_set_channel_number(ieee802154_submac_t *submac,
 static inline int ieee802154_set_tx_power(ieee802154_submac_t *submac,
                                           int8_t tx_pow)
 {
-    const ieee802154_phy_conf_t conf = {
-        .phy_mode = IEEE802154_PHY_NO_OP,
-        .channel = submac->channel_num,
-        .pow = tx_pow,
-    };
-
+    ieee802154_phy_conf_t conf = *(ieee802154_phy_conf_t *)&submac->phy_conf;
+    conf.phy_mode = IEEE802154_PHY_NO_OP;
+    conf.pow = tx_pow;
     return ieee802154_set_phy_conf(submac, &conf);
 }
 
