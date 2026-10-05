@@ -48,6 +48,9 @@
 #  define CONFIG_TEST_ADC_SLEEP_SEC    3
 #endif
 
+#ifndef CONFIG_TEST_ADC_FREQ_HZ
+#  define CONFIG_TEST_ADC_FREQ_HZ      KHZ(100)
+#endif
 typedef struct adc_process_event {
     event_t ev;
     adc_t adc;
@@ -118,7 +121,7 @@ int main(void)
         .avg_samples_numof = CONFIG_TEST_ADC_BUF_SAMPLES,
     };
 
-    adc_dma_setup(adc_arg.adc, _adc_dma_cb, &adc_arg, ADC_RES_12BIT);
+    adc_dma_setup(adc_arg.adc, ADC_RES_12BIT, CONFIG_TEST_ADC_FREQ_HZ, _adc_dma_cb, &adc_arg);
 
     printf("Sampling ADC%d %u bits with %u samples at %" PRIu32 " sps from %" PRIu32 " Hz ADC clock\n",
            adc_arg.adc, adc_arg.bits, adc_arg.avg_samples_numof,
