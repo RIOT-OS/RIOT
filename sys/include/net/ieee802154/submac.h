@@ -299,7 +299,7 @@ static inline int ieee802154_set_panid(ieee802154_submac_t *submac,
 static inline ieee802154_phy_mode_t ieee802154_get_phy_mode(
     ieee802154_submac_t *submac)
 {
-    return submac->phy_conf.super.phy_mode;
+    return submac->phy_conf.common.phy_mode;
 }
 
 /**
@@ -336,9 +336,9 @@ static inline int ieee802154_set_channel_number(ieee802154_submac_t *submac,
                                                 uint16_t channel_num)
 {
     ieee802154_phy_pib_t conf = submac->phy_conf;
-    conf.super.phy_mode = IEEE802154_PHY_NO_OP;
-    conf.super.channel = channel_num;
-    return ieee802154_set_phy_conf(submac, &conf.super);
+    conf.common.phy_mode = IEEE802154_PHY_NO_OP;
+    conf.common.channel = channel_num;
+    return ieee802154_set_phy_conf(submac, &conf.common);
 }
 
 /**
@@ -360,9 +360,9 @@ static inline int ieee802154_set_tx_power(ieee802154_submac_t *submac,
                                           int8_t tx_pow)
 {
     ieee802154_phy_pib_t conf = submac->phy_conf;
-    conf.super.phy_mode = IEEE802154_PHY_NO_OP;
-    conf.super.pow = tx_pow;
-    return ieee802154_set_phy_conf(submac, &conf.super);
+    conf.common.phy_mode = IEEE802154_PHY_NO_OP;
+    conf.common.pow = tx_pow;
+    return ieee802154_set_phy_conf(submac, &conf.common);
 }
 
 /**
