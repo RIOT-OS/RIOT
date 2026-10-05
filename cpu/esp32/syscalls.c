@@ -398,7 +398,7 @@ void __retarget_lock_release_recursive(_LOCK_T lock)
         /* use the shared rmutex if lock is NULL */
         lock = (_lock_t)&s_shared_rmutex;
     }
-    _lock_release(&lock);
+    _lock_release_recursive(&lock);
 }
 
 #endif /* _RETARGETABLE_LOCKING */
