@@ -4,6 +4,20 @@ PKG_URL=https://github.com/espressif/ESP8266_RTOS_SDK
 PKG_VERSION=913a06a9ac3b2f18009e8fee8f092ca9ffeccd38
 PKG_LICENSE=Apache-2.0
 
+# Only check out the components that are actually used by RIOT. The full
+# ESP8266_RTOS_SDK checkout is ~60 MB, mostly examples, docs, tools and unused
+# components, which slows down every build that has to clone the package.
+PKG_SPARSE_PATHS += components/bootloader
+PKG_SPARSE_PATHS += components/bootloader_support
+PKG_SPARSE_PATHS += components/esp8266
+PKG_SPARSE_PATHS += components/heap
+PKG_SPARSE_PATHS += components/log
+PKG_SPARSE_PATHS += components/lwip
+PKG_SPARSE_PATHS += components/nvs_flash
+PKG_SPARSE_PATHS += components/spi_flash
+PKG_SPARSE_PATHS += components/util
+PKG_SPARSE_PATHS += components/wpa_supplicant
+
 include $(RIOTBASE)/pkg/pkg.mk
 
 # This directory is shared across all apps since there's no need to replicate
