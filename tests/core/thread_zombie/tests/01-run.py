@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-# SPDX-FileCopyrightText: 2019 Freie Universität Berlin,
+# SPDX-FileCopyrightText: 2019 Freie Universität Berlin
 # SPDX-License-Identifier: LGPL-2.1-only
 
 import sys

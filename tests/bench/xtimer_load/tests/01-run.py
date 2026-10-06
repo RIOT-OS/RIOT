@@ -3,6 +3,7 @@
 # vim:fenc=utf-8
 
 # SPDX-FileCopyrightText: 2019 Kaspar Schleiser <kaspar@schleiser.de>
+# SPDX-FileCopyrightText: 2019 Freie Universität Berlin
 # SPDX-License-Identifier: LGPL-2.1-only
 
 import sys

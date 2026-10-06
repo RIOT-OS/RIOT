@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-# SPDX-FileCopyrightText: 2024 HAW Hamburg.
+# SPDX-FileCopyrightText: 2024 HAW Hamburg
 # SPDX-License-Identifier: LGPL-2.1-only
 
 import sys

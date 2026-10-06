@@ -1,5 +1,4 @@
 #! /bin/sh
-
 #
 # SPDX-FileCopyrightText: 2018 Martine Lenders <m.lenders@fu-berlin.de>
 # SPDX-License-Identifier: MIT
