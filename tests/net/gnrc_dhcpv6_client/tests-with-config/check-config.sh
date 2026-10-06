@@ -1,9 +1,8 @@
 #! /bin/sh
+
 #
-# check_config.sh
-# Copyright (C) 2021 Martine Lenders <mail@martine-lenders.eu>
-#
-# Distributed under terms of the MIT license.
+# SPDX-FileCopyrightText: 2018 Martine Lenders <m.lenders@fu-berlin.de>
+# SPDX-License-Identifier: MIT
 #
 
 ip link show dev "${IFACE}" > /dev/null
