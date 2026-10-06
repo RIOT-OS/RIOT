@@ -716,7 +716,7 @@ def gnrc_netif_parser(data_dict):
 
 
 def ipv6_hdr_parser(data_dict):
-    """Sub-parser for IPv6 headers."""
+    """Parse IPv6 headers."""
     data_dict["nh"] = PROTNUMS.get(data_dict["nh"], data_dict["nh"])
     data_dict["version"] = data_dict["v_tc_fl"] >> 28
     data_dict["tc"] = {"ecn": (data_dict["v_tc_fl"] & 0x0c000000) >> 26,
