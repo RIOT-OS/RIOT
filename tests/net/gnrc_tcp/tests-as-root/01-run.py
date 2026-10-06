@@ -183,7 +183,11 @@ def test_gnrc_tcp_garbage_packets_short_header(child):
 
 @Runner(timeout=5)
 def test_gnrc_tcp_garbage_packets_ack_instead_of_sym(child):
-    """Verify that sending an ACK instead of a SYN does not break `gnrc_tcp`."""
+    """
+    Verify that `gnrc_tcp` handles an unexpected ACK.
+
+    Sending an ACK instead of a SYN must not break `gnrc_tcp`.
+    """
     # Setup RIOT as server
     with RiotTcpServer(child, generate_port_number()) as riot_srv:
         # Construct HostTcpClient to lookup node properties
@@ -293,7 +297,11 @@ def test_gnrc_tcp_recv_behavior_on_closed_connection(child):
 
 @Runner(timeout=5)
 def test_gnrc_tcp_recv_behavior_on_zero_length_buffer_size(child):
-    """Verify that `gnrc_tcp_recv` accepts zero as buffer size and returns 0."""
+    """
+    Verify that `gnrc_tcp_recv` accepts a buffer size of zero.
+
+    The call returns 0 in this case.
+    """
     with HostTcpServer(generate_port_number()) as host_srv:
         riot_cli = RiotTcpClient(child, host_srv)
 
@@ -315,7 +323,11 @@ def test_gnrc_tcp_recv_behavior_on_zero_length_buffer_size(child):
 
 @Runner(timeout=5)
 def test_gnrc_tcp_send_behavior_on_zero_length_buffer_size(child):
-    """Verify that `gnrc_tcp_send` accepts zero length payload and returns 0."""
+    """
+    Verify that `gnrc_tcp_send` accepts a zero length payload.
+
+    The call returns 0 in this case.
+    """
     with HostTcpServer(generate_port_number()) as host_srv:
         riot_cli = RiotTcpClient(child, host_srv)
 
@@ -441,7 +453,11 @@ def test_gnrc_tcp_ep_from_str_returns_EINVAL(child):
 
 @Runner(timeout=0.5)
 def test_gnrc_tcp_accept_returns_EAGAIN(child):
-    """`gnrc_tcp_accept` must return with `-EAGAIN` if no connection is ready and timeout is 0."""
+    """
+    Verify that `gnrc_tcp_accept` returns `-EAGAIN`.
+
+    This happens if no connection is ready and the timeout is 0.
+    """
     riot_srv = RiotTcpServer(child, generate_port_number())
     riot_srv.listen()
 
@@ -451,7 +467,11 @@ def test_gnrc_tcp_accept_returns_EAGAIN(child):
 
 @Runner(timeout=1.5)
 def test_gnrc_tcp_accept_returns_ETIMEDOUT(child):
-    """`gnrc_tcp_accept` must return with `-ETIMEDOUT` if no connection is ready and timeout is not 0."""
+    """
+    Verify that `gnrc_tcp_accept` returns `-ETIMEDOUT`.
+
+    This happens if no connection is ready and the timeout is not 0.
+    """
     riot_srv = RiotTcpServer(child, generate_port_number())
     riot_srv.listen()
 
@@ -461,7 +481,11 @@ def test_gnrc_tcp_accept_returns_ETIMEDOUT(child):
 
 @Runner(timeout=1)
 def test_gnrc_tcp_accept_returns_ENOMEM(child):
-    """`gnrc_tcp_accept` must return with `-ENOMEM` if all TCBs already handle a connection."""
+    """
+    Verify that `gnrc_tcp_accept` returns `-ENOMEM`.
+
+    This happens if all TCBs already handle a connection.
+    """
     with RiotTcpServer(child, generate_port_number()) as riot_srv:
         # Establish connection to ensure that all TCBs are in use
         with HostTcpClient(riot_srv):
@@ -474,7 +498,11 @@ def test_gnrc_tcp_accept_returns_ENOMEM(child):
 
 @Runner(timeout=0.5)
 def test_gnrc_tcp_accept_returns_EINVAL(child):
-    """`gnrc_tcp_accept` must return with `-EINVAL` if `listen` was not called before."""
+    """
+    Verify that `gnrc_tcp_accept` returns `-EINVAL`.
+
+    This happens if `listen` was not called before.
+    """
     child.sendline('gnrc_tcp_accept 0')
     child.expect_exact('gnrc_tcp_accept: returns -EINVAL')
 
@@ -508,7 +536,11 @@ def test_gnrc_tcp_get_local_returns_0(child):
 
 @Runner(timeout=1)
 def test_gnrc_tcp_get_local_returns_EADDRNOTAVAIL(child):
-    """Verify that `get_local` returns `-EADDRNOTAVAIL` when not connected."""
+    """
+    Verify that `get_local` returns `-EADDRNOTAVAIL`.
+
+    This happens if there is no connection.
+    """
     child.sendline('gnrc_tcp_get_local')
     child.expect_exact('gnrc_tcp_get_local: returns -EADDRNOTAVAIL')
 
@@ -540,7 +572,11 @@ def test_gnrc_tcp_get_remote_returns_0(child):
 
 @Runner(timeout=1)
 def test_gnrc_tcp_get_remote_returns_ENOTCONN(child):
-    """Verify that `get_remote` returns `-ENOTCONN` when not connected."""
+    """
+    Verify that `get_remote` returns `-ENOTCONN`.
+
+    This happens if there is no connection.
+    """
     child.sendline('gnrc_tcp_get_remote')
     child.expect_exact('gnrc_tcp_get_remote: returns -ENOTCONN')
 
@@ -577,7 +613,11 @@ def test_gnrc_tcp_queue_get_local_returns_0(child):
 
 @Runner(timeout=1)
 def test_gnrc_tcp_queue_get_local_returns_EADDRNOTAVAIL(child):
-    """Verify that `queue_get_local` returns `-EADDRNOTAVAIL` when not listening."""
+    """
+    Verify that `queue_get_local` returns `-EADDRNOTAVAIL`.
+
+    This happens if `listen` was not called before.
+    """
     child.sendline('gnrc_tcp_queue_get_local')
     child.expect_exact('gnrc_tcp_queue_get_local: returns -EADDRNOTAVAIL')
 

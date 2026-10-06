@@ -238,7 +238,9 @@ class TestCongUREABE(TestCongUREBase):
     def test_slow_start_increase(self):
         # pylint: disable=invalid-name
         # name chosen to be in line with RFC
-        """See `test_slow_start_increase_large_N()` from `tests/congure_reno`."""
+        """
+        Test the slow start increase with N larger than SMSS.
+        """
         state = self.cong_state()
         init_cwnd = state['cwnd']
         init_mss = state['mss']
@@ -258,7 +260,9 @@ class TestCongUREABE(TestCongUREBase):
         self.assertNotInFastRetransmit(state)
 
     def test_enter_fast_retransmit(self):
-        """See `self.test_enter_fast_retransmit_all_check_true()` from `tests/congure_reno`."""
+        """
+        Check that fast retransmit is entered if all conditions are true.
+        """
         state = self.cong_state()
         self.assertEqual(0, self.get_ff_calls())
         self.assertNotInFastRetransmit(state)
