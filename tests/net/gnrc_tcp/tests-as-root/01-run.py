@@ -46,11 +46,12 @@ def test_connection_lifecycle_as_server(child):
 @Runner(timeout=10)
 def test_gnrc_tcp_listen_tcb_discards_unread_data_on_reuse(child):
     """
-    Test for ensuring that a listening TCB is cleared between connections.
-        This happens when a client (host) connects, sends data that is not
-        (yet) read by the RIOT application, and then disconnects. The TCB may
-        then be reused for a new connection, which should not see unread data
-        from the previous connection.
+    Ensure that a listening TCB is cleared between connections.
+
+    This happens when a client (host) connects, sends data that is not (yet)
+    read by the RIOT application, and then disconnects. The TCB may then be
+    reused for a new connection, which should not see unread data from the
+    previous connection.
     """
     with RiotTcpServer(child, generate_port_number()) as riot_srv:
         # First client connects, sends data to the application, never reads and
