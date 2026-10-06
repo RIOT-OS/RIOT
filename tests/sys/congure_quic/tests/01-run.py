@@ -195,7 +195,7 @@ class TestCongUREQUICDefaultInitTests(TestCongUREBase):
 
     The implementation is based on
 
-    https://www.rfc-editor.org/info/rfc9002/#section-b
+    https://www.rfc-editor.org/info/rfc9002/#section-appendix.b
 
     so we can check the viability based on that.
     """
@@ -280,7 +280,7 @@ class TestCongUREQUICDefault(TestCongUREBase):
 
     The implementation is based on
 
-    https://www.rfc-editor.org/info/rfc9002/#section-b
+    https://www.rfc-editor.org/info/rfc9002/#section-appendix.b
 
     so we can check the viability based on that.
     """
