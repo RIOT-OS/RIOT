@@ -164,7 +164,7 @@ static int test_timer(unsigned num, uint32_t timer_freq)
                    num);
             return 0;
         }
-        printf("    - channel %i fired at SW count %8" PRIu32, i, (unsigned)timeouts[i]);
+        printf("    - channel %i fired at SW count %8" PRIu32, i, timeouts[i]);
         if (i == 0) {
             printf("      - init: %8" PRIu32 "\n", atomic_load_u32(&timeouts[i]));
         }
