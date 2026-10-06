@@ -30,7 +30,8 @@ class RiotKconfig(Kconfig):
         self.unique_defined_syms = tmp_unique_defined_syms
 
     def evaluate_config(self):
-        """Evaluate the current configuration.
+        """
+        Evaluate the current configuration.
 
         Useful to catch warnings (such as out-of-range integers) before writing
         the configuration to a file.

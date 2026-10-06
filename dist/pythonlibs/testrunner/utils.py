@@ -23,7 +23,8 @@ def _test_utils_interactive_sync(child, retries, delay, ready_cmd='r',
 
 
 def test_utils_interactive_sync(child, retries, delay):
-    """Synchronize with the `test_utils_interactive_sync` function.
+    """
+    Synchronize with the `test_utils_interactive_sync` function.
 
     Interacts through input to wait for node being ready.
     """
@@ -33,7 +34,8 @@ def test_utils_interactive_sync(child, retries, delay):
 
 
 def test_utils_interactive_sync_shell(child, retries, delay):
-    """Synchronize with the `shell` and `test_utils_interactive_sync` modules.
+    """
+    Synchronize with the `shell` and `test_utils_interactive_sync` modules.
 
     This is used when the `shell` and `test_utils_interactive_sync` modules are
     used (`test_utils_interactive_sync` function is not).

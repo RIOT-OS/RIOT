@@ -56,7 +56,8 @@ def _relpath_p(path, start):
 
 
 def mkconstfs(files, root_path, mount_point, constfs_name):
-    """Generate a C file containing a constant file system.
+    """
+    Generate a C file containing a constant file system.
 
     Return
     ------
@@ -89,7 +90,8 @@ def _mkident(k):
 
 
 def print_file_data(local_fname, varname, target_fname=""):
-    """Convert a file into a static C array.
+    """
+    Convert a file into a static C array.
 
     Parameters
     ----------
