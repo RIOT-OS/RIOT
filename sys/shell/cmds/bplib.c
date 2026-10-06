@@ -19,17 +19,19 @@
 #include "bplib_eid_util.h"
 #include "bplib_riot_nc.h"
 
+#include "fmt.h"
 #include "shell.h"
 
 #include <ctype.h>
+#include <errno.h>
 #include <inttypes.h>
 #include <stdint.h>
 #include <stdlib.h>
 
 /* Strings used for contact and channel config */
-#define STR_INVALID_CHANNEL_CONTACT "Invalid channel/contact: %s\n"
-#define STR_INVALID_STATE_KW        "Invalid state keyword '%s'\n"
-#define STR_INVALID_CRC_KW          "Invalid CRC keyword '%s'\n"
+#define STR_INVALID_CHANNEL_CONTACT "Invalid channel/contact '%s'\n"
+#define STR_INVALID_STATE           "Invalid state '%s'\n"
+#define STR_INVALID_VALUE           "Invalid value '%s'\n"
 #define STR_CURRENT_STATE           "Current state: %s\n"
 #define STR_ONLY_IN_OFF_STATE       "Only possible in 'torndown'/'removed'\n"
 #define STR_OTHER_ERROR             "Other error: %" PRIi32 "\n"
@@ -61,7 +63,7 @@ static void __print_help_bp_channel(void)
          "   crc <none / CRC16 / CRC32>\n"
          "   num <block_num>\n"
          "   flags <block_flags_hex>\n"
-         " max_hops <hop_limit>\n"
+         " max_hops <uint8_t>\n"
          " flags <bundle_flags_hex>\n"
          " crc <CRC16 / CRC32C>\n"
          " lifetime <lifetime_ms>\n"
@@ -81,7 +83,7 @@ static void __print_help_bp_send(void)
 
 static bool __validate_channel(char* chan_str, int* chan)
 {
-    if (isdigit(*chan_str)) {
+    if (isdigit((int)*chan_str)) {
         *chan = atoi(chan_str);
         if ((*chan >= 0) && (*chan < BPLIB_MAX_NUM_CHANNELS)) {
             return true;
@@ -94,7 +96,7 @@ static bool __validate_channel(char* chan_str, int* chan)
 
 static bool __validate_contact(char* cont_str, int* cont)
 {
-    if (isdigit(*cont_str)) {
+    if (isdigit((int)*cont_str)) {
         *cont = atoi(cont_str);
         if ((*cont >= 0) && (*cont < BPLIB_MAX_NUM_CONTACTS)) {
             return true;
@@ -135,7 +137,7 @@ static void __set_contact(int c, char* arg)
         status = BPLib_CLA_ContactTeardown(&bplib_instance_data.BPLibInst, c);
     }
     else {
-        printf(STR_INVALID_STATE_KW, arg);
+        printf(STR_INVALID_STATE, arg);
         return;
     }
 
@@ -159,7 +161,7 @@ static void __set_channel(int c, char* arg)
         status = BPLib_PI_RemoveApplication(&bplib_instance_data.BPLibInst, c);
     }
     else {
-        printf(STR_INVALID_STATE_KW, arg);
+        printf(STR_INVALID_STATE, arg);
         return;
     }
 
@@ -297,6 +299,22 @@ static int _bp_contact(int argc, char **argv)
     return 0;
 }
 
+/* Print feedback for channel, config commands */
+static void __print_feedback(BPLib_Status_t rv)
+{
+    if (rv == BPLIB_APP_STATE_ERR) {
+        printf(STR_ONLY_IN_OFF_STATE);
+    }
+    else if (rv == BPLIB_INVALID_CRC_ERROR) {
+        /* This is returned only when no CRC is trying to be set for the primary
+         * block, which is not possible. */
+        printf(STR_INVALID_VALUE, "none");
+    }
+    else if (rv != BPLIB_SUCCESS) {
+        printf(STR_OTHER_ERROR, rv);
+    }
+}
+
 static int _bp_channel_block(int argc, char **argv, int c)
 {
     /* The calling function has already checked: channel validity
@@ -320,7 +338,12 @@ static int _bp_channel_block(int argc, char **argv, int c)
 
     if (strcmp(argv[5], "include") == 0) {
         if (set) {
-            rv = bplib_channel_set_block_include(c, block, atoi(argv[6]));
+            int res = scn_bool_str(argv[6]);
+            if (res == -EINVAL) {
+                printf(STR_INVALID_VALUE, argv[6]);
+                return 1;
+            }
+            rv = bplib_channel_set_block_include(c, block, res);
         }
         else {
             printf("Current value: %s\n", block_cfg->IncludeBlock ? "true" : "false");
@@ -330,7 +353,7 @@ static int _bp_channel_block(int argc, char **argv, int c)
         if (set) {
             BPLib_CRC_Type_t crc;
             if (!__resolve_crc_str(argv[6], &crc)) {
-                printf(STR_INVALID_CRC_KW, argv[6]);
+                printf(STR_INVALID_VALUE, argv[6]);
                 return 1;
             }
                 
@@ -342,7 +365,7 @@ static int _bp_channel_block(int argc, char **argv, int c)
     }
     else if (strcmp(argv[5], "num") == 0) {
         if (set) {
-            rv = bplib_channel_set_block_num(c, block, atoi(argv[6]));
+            rv = bplib_channel_set_block_num(c, block, strtoul(argv[6], NULL, 10));
         }
         else {
             printf("Current value: %" PRIi32 "\n", block_cfg->BlockNum);
@@ -362,12 +385,7 @@ static int _bp_channel_block(int argc, char **argv, int c)
     }
 
     /* A valid command was executed, but it might have failed */
-    if (rv == BPLIB_APP_STATE_ERR) {
-        printf(STR_ONLY_IN_OFF_STATE);
-    }
-    else if (rv != BPLIB_SUCCESS) {
-        printf(STR_OTHER_ERROR, rv);
-    }
+    __print_feedback(rv);
 
     return 0;
 }
@@ -385,6 +403,10 @@ static int _bp_channel(int argc, char **argv)
         return 1;
     }
 
+    BPLib_PI_Config_t* chan_cfg = &bplib_instance_data.ConfigPtrs.
+                                  ChanConfigPtr->Configs[c];
+    BPLib_Status_t rv = BPLIB_SUCCESS;
+
     if (strcmp(argv[3], "state") == 0) {
         /* Return current state */
         if (argc == 4) {
@@ -398,6 +420,93 @@ static int _bp_channel(int argc, char **argv)
     }
     else if (strcmp(argv[3], "block") == 0) {
         return _bp_channel_block(argc, argv, c);
+    }
+    else if (strcmp(argv[3], "service") == 0) {
+        if (argc == 4) {
+            printf("Current value: %" PRIu64 "\n", chan_cfg->LocalServiceNumber);
+        }
+        else {
+            rv = bplib_channel_set_service_no(c, strtoull(argv[4], NULL, 10));
+            __print_feedback(rv);
+        }
+    }
+    else if (strcmp(argv[3], "max_hops") == 0) {
+        if (argc == 4) {
+            printf("Current value: %" PRIu8 "\n", chan_cfg->HopLimit);
+        }
+        else {
+            int val = atoi(argv[4]);
+            if ((val < 1) || (val > 255)) {
+                printf(STR_INVALID_VALUE, argv[4]);
+                return 1;
+            }
+            rv = bplib_channel_set_hop_limit(c, val);
+            __print_feedback(rv);
+        }
+    }
+    else if (strcmp(argv[3], "flags") == 0) {
+        if (argc == 4) {
+            printf("Current value: 0x%" PRIx64 "\n", chan_cfg->BundleProcFlags);
+        }
+        else {
+            rv = bplib_channel_set_bundle_flags(c, strtoull(argv[4], NULL, 16));
+            __print_feedback(rv);
+        }
+    }
+    else if (strcmp(argv[3], "crc") == 0) {
+        if (argc == 4) {
+            printf("Current value: %s\n", __resolve_crc_type(chan_cfg->CrcType));
+        }
+        else {
+            BPLib_CRC_Type_t crc;
+            if (!__resolve_crc_str(argv[4], &crc)) {
+                printf(STR_INVALID_VALUE, argv[4]);
+                return 1;
+            }
+            rv = bplib_channel_set_crc_type(c, crc);
+            __print_feedback(rv);
+        }
+    }
+    else if (strcmp(argv[3], "lifetime") == 0) {
+        if (argc == 4) {
+            printf("Current value: %" PRIu64 "\n", chan_cfg->Lifetime);
+        }
+        else {
+            rv = bplib_channel_set_lifetime(c, strtoull(argv[4], NULL, 10));
+            __print_feedback(rv);
+        }
+    }
+    else if (strcmp(argv[3], "dest") == 0) {
+        if (argc == 4) {
+            char buf[DTN_EID_IPN_MAX_SIZE];
+            bplib_util_eid2str(&chan_cfg->DestEID, buf);
+            printf("Current value: %s\n", buf);
+        }
+        else {
+            BPLib_EID_t eid;
+            if (!bplib_util_str2eid(argv[4], &eid)) {
+                printf(STR_INVALID_VALUE, argv[4]);
+                return 1;
+            }
+            rv = bplib_channel_set_dest_eid(c, eid);
+            __print_feedback(rv);
+        }
+    }
+    else if (strcmp(argv[3], "report_to") == 0) {
+        if (argc == 4) {
+            char buf[DTN_EID_IPN_MAX_SIZE];
+            bplib_util_eid2str(&chan_cfg->ReportToEID, buf);
+            printf("Current value: %s\n", buf);
+        }
+        else {
+            BPLib_EID_t eid;
+            if (!bplib_util_str2eid(argv[4], &eid)) {
+                printf(STR_INVALID_VALUE, argv[4]);
+                return 1;
+            }
+            rv = bplib_channel_set_report_to_eid(c, eid);
+            __print_feedback(rv);
+        }
     }
     else {
        __print_help_bp_channel();
@@ -451,7 +560,7 @@ static int _bp_info(void)
         }
     }
 
-    // TODO include me when rebased bplib 7.0.5
+    // TODO include me when rebased bplib 7.0.5 
 #if 0
     size_t used, free;
     used = BPLib_MEM_GetBytesInUse(&bplib_instance_data.BPLibInst.pool);
@@ -477,9 +586,26 @@ static int _bp_config(int argc, char **argv)
         return 1;
     }
 
+    BPLib_Status_t rv = BPLIB_SUCCESS;
+
     if (strcmp(argv[2], "node") == 0) {
-        // TODO parse dtn:...
-        // bplib_config_set_local_eid
+        if (argc == 3) {
+            char buf[DTN_EID_IPN_MAX_SIZE];
+            bplib_util_eid2str(&BPLIB_EID_INSTANCE, buf);
+            printf("Current value: %s\n", buf);
+        }
+        else {
+            BPLib_EID_t eid;
+            if (!bplib_util_str2eid(argv[3], &eid) ||
+                (eid.Allocator == 0 && eid.Node == 0) || (eid.Service != 0)) {
+                /* The local node cannot be a null EID, but the local service
+                 * number should be 0 */
+                printf(STR_INVALID_VALUE, argv[3]);
+                return 1;
+            }
+            rv = bplib_config_set_local_eid(&eid);
+            __print_feedback(rv);
+        }
     }
     else {
         __print_help_bp_config();
