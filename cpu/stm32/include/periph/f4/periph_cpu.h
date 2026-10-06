@@ -22,16 +22,19 @@ extern "C" {
 /**
  * @brief   Available number of ADC devices
  */
-#if defined(CPU_LINE_STM32F401xE) || defined(CPU_LINE_STM32F410Rx) \
-    || defined(CPU_LINE_STM32F411xE) || defined(CPU_LINE_STM32F412Zx) \
-    || defined(CPU_LINE_STM32F413xx) || defined(CPU_LINE_STM32F423xx)
-#define ADC_DEVS            (1U)
-#elif defined(CPU_LINE_STM32F405xx)  || defined(CPU_LINE_STM32F407xx) \
-    || defined(CPU_LINE_STM32F415xx) || defined(CPU_LINE_STM32F429xx) \
-    || defined(CPU_LINE_STM32F439xx) || defined(CPU_LINE_STM32F437xx) \
-    || defined(CPU_LINE_STM32F446xx) || defined(CPU_LINE_STM32F469xx)
-#define ADC_DEVS            (3U)
+#if defined(CPU_LINE_STM32F401xE) || defined(CPU_LINE_STM32F410Rx) || \
+    defined(CPU_LINE_STM32F411xE) || defined(CPU_LINE_STM32F412Zx) || \
+    defined(CPU_LINE_STM32F413xx) || defined(CPU_LINE_STM32F423xx)
+#  define ADC_DEVS          (1U)
+#elif defined(CPU_LINE_STM32F405xx) || defined(CPU_LINE_STM32F407xx) || \
+      defined(CPU_LINE_STM32F415xx) || defined(CPU_LINE_STM32F429xx) || \
+      defined(CPU_LINE_STM32F439xx) || defined(CPU_LINE_STM32F437xx) || \
+      defined(CPU_LINE_STM32F446xx) || defined(CPU_LINE_STM32F469xx)
+#  define ADC_DEVS          (3U)
 #endif
+
+/* determined with tests/periph/rtt_min */
+#define RTT_MIN_OFFSET (4U)
 
 #ifndef DOXYGEN
 
@@ -39,23 +42,23 @@ extern "C" {
  * @brief   Starting address of the ROM bootloader
  *          see application note AN2606
  */
-#if defined(CPU_LINE_STM32F423xx)
-#define STM32_BOOTLOADER_ADDR   (0x1FF00000)
-#else
-#define STM32_BOOTLOADER_ADDR   (0x1FFF0000)
-#endif
+#  if defined(CPU_LINE_STM32F423xx)
+#    define STM32_BOOTLOADER_ADDR   (0x1FF00000)
+#  else
+#    define STM32_BOOTLOADER_ADDR   (0x1FFF0000)
+#  endif
 
 /**
  * @brief   Readout Protection (RDP) option bytes
  */
-#define STM32_OPTION_BYTES   ((uint32_t*) 0x1FFFC000)
-#define GET_RDP(x) ((x & 0xFF00) >> 8)
+#  define STM32_OPTION_BYTES ((uint32_t*) 0x1FFFC000)
+#  define GET_RDP(x) ((x & 0xFF00) >> 8)
 
 /**
  * @brief   Override ADC resolution values
  * @{
  */
-#define HAVE_ADC_RES_T
+#  define HAVE_ADC_RES_T
 typedef enum {
     ADC_RES_6BIT  = (ADC_CR1_RES),      /**< ADC resolution: 6 bit */
     ADC_RES_8BIT  = (ADC_CR1_RES_1),    /**< ADC resolution: 8 bit */
@@ -70,8 +73,8 @@ typedef enum {
  * @name   Constants for internal VBAT ADC line
  * @{
  */
-#define VBAT_ADC_RES        ADC_RES_12BIT
-#define VBAT_ADC_MAX        4095
+#  define VBAT_ADC_RES      ADC_RES_12BIT
+#  define VBAT_ADC_MAX      4095
 /** @} */
 
 #endif /* ndef DOXYGEN */
