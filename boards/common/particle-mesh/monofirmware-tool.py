@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
-"""Verify and populate the module info of a Particle monofirmware.
+"""
+Verify and populate the module info of a Particle monofirmware.
 
 Verify that a pair of `.bin`/`.elf` has the `particle_monofirmware_module_info` at
 the right place. If there is a particle_monofirmware_checksum symbol, verify
