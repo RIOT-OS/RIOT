@@ -439,7 +439,7 @@ Note: Violations of our [code of conduct][code-of-conduct] should be reported
 [extractive-contributions]: #extractive-contributions
 
 Please be aware that we may close issues and pull requests
-that we consider as [extractive contribution][guide-extracitve-contributions].
+that we consider as [extractive contribution][guide-extractive-contributions].
 
 [guide-extractive-contributions]: https://guides.riot-os.org/general/ai_policy/#extractive-contributions
 
