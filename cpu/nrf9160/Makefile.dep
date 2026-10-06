@@ -1,4 +1,11 @@
 USEMODULE += nrf9160_vectors
+
+# Building as the TrustZone-M non-secure image: the secure image owns the lower
+# part of flash and RAM, and the shared nRF/Cortex-M code has to select the
+# non-secure peripheral aliases.
+ifneq (,$(filter trustzone_m_nonsecure,$(USEMODULE)))
+  FEATURES_REQUIRED += trustzone_m
+endif
 USEMODULE += nrf_shared_serial_irq
 
 ifneq (,$(filter periph_spi,$(USEMODULE)))

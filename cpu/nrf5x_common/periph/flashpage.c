@@ -20,8 +20,12 @@
 #include "assert.h"
 #include "periph/flashpage.h"
 
-#ifndef NRF_NVMC
-#define NRF_NVMC NRF_NVMC_S
+#if defined(CPU_FAM_NRF53) || defined(CPU_FAM_NRF9160)
+#  ifdef NRF_TRUSTZONE_NONSECURE
+#    define NRF_NVMC NRF_NVMC_NS
+#  else
+#    define NRF_NVMC NRF_NVMC_S
+#  endif
 #endif
 
 void flashpage_erase(unsigned page)

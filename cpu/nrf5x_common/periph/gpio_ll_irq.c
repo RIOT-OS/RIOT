@@ -36,8 +36,12 @@
 #include "periph_conf.h"
 #include "periph_cpu.h"
 
-#ifdef NRF_GPIOTE0_S
-#define NRF_GPIOTE NRF_GPIOTE0_S
+#if defined(CPU_FAM_NRF53) || defined(CPU_FAM_NRF9160)
+#  ifdef NRF_TRUSTZONE_NONSECURE
+#    define NRF_GPIOTE NRF_GPIOTE1_NS
+#  else
+#    define NRF_GPIOTE NRF_GPIOTE0_S
+#  endif
 #define GPIOTE_IRQn GPIOTE0_IRQn
 #endif
 
