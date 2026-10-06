@@ -67,7 +67,7 @@ class TestCongUREBase(unittest.TestCase):
         """
         Assert that the congestion state is in slow start.
 
-        https://tools.ietf.org/html/rfc9002#section-7.3.1
+        https://www.rfc-editor.org/info/rfc9002/#section-7.3.1
 
         > A NewReno sender is in slow start any time the congestion window is
         > below the slow start threshold. A sender begins in slow start because
@@ -81,7 +81,7 @@ class TestCongUREBase(unittest.TestCase):
         """
         Assert that the congestion state is in congestion avoidance.
 
-        https://tools.ietf.org/html/rfc9002#section-7.3.3
+        https://www.rfc-editor.org/info/rfc9002/#section-7.3.3
 
         > A NewReno sender is in congestion avoidance any time the congestion
         > window is at or above the slow start threshold and not in a recovery
@@ -195,7 +195,7 @@ class TestCongUREQUICDefaultInitTests(TestCongUREBase):
 
     The implementation is based on
 
-    https://tools.ietf.org/html/rfc9002#appendix-B
+    https://www.rfc-editor.org/info/rfc9002/#section-b
 
     so we can check the viability based on that.
     """
@@ -237,7 +237,7 @@ class TestCongUREQUICDefaultInitTests(TestCongUREBase):
         implemented
 
         Some recovery variables also apply for congestion, thus we also need to
-        check if https://tools.ietf.org/html/rfc9002#appendix-A.4
+        check if https://www.rfc-editor.org/info/rfc9002/#section-a.4
         upholds:
 
         > A.4.  Initialization
@@ -280,7 +280,7 @@ class TestCongUREQUICDefault(TestCongUREBase):
 
     The implementation is based on
 
-    https://tools.ietf.org/html/rfc9002#appendix-B
+    https://www.rfc-editor.org/info/rfc9002/#section-b
 
     so we can check the viability based on that.
     """
@@ -295,7 +295,7 @@ class TestCongUREQUICDefault(TestCongUREBase):
         self.ack_delay = 10
 
     def test_on_packet_sent(self):
-        """See https://tools.ietf.org/html/rfc9002#appendix-B.4"""
+        """Test https://www.rfc-editor.org/info/rfc9002/#section-b.4 compliance."""
         state = self.cong_state()
         init_in_flight_size = state['in_flight_size']
         self.cong_report_msg_sent(self.sent_bytes)
@@ -317,7 +317,7 @@ class TestCongUREQUICDefault(TestCongUREBase):
         return msg, ack
 
     def test_on_packet_ack_no_rtt_sample(self, state=None):
-        """See https://tools.ietf.org/html/rfc9002#appendix-A.7"""
+        """Test https://www.rfc-editor.org/info/rfc9002/#section-a.7 compliance."""
         if state is None:
             state = self.cong_state()
         # From A.7, UpdateRtt
@@ -354,7 +354,7 @@ class TestCongUREQUICDefault(TestCongUREBase):
         self.assertGreater(state['first_rtt_sample'], 0)
 
     def test_on_packet_ack_rtt_sample_greater_rtt(self):
-        """See https://tools.ietf.org/html/rfc9002#appendix-A.7"""
+        """Test https://www.rfc-editor.org/info/rfc9002/#section-a.7 compliance."""
         # set first RTT sample
         self.test_on_packet_ack_no_rtt_sample()
         state = self.cong_state()
@@ -378,7 +378,7 @@ class TestCongUREQUICDefault(TestCongUREBase):
                                     init_rtt_var, adjusted_rtt)
 
     def test_on_packet_ack_rtt_sample_less_rtt(self):
-        """See https://tools.ietf.org/html/rfc9002#appendix-A.7"""
+        """Test https://www.rfc-editor.org/info/rfc9002/#section-a.7 compliance."""
         # set first RTT sample
         self.test_on_packet_ack_no_rtt_sample()
         state = self.cong_state()
@@ -402,7 +402,7 @@ class TestCongUREQUICDefault(TestCongUREBase):
                                     init_rtt_var, adjusted_rtt)
 
     def test_on_packet_ack_not_limited_slow_start(self):
-        """See https://tools.ietf.org/html/rfc9002#appendix-B.5"""
+        """Test https://www.rfc-editor.org/info/rfc9002/#section-b.5 compliance."""
         state = self.cong_state()
         self.assertSlowStart(state)
         self.assertNotInRecovery(state)
@@ -420,7 +420,7 @@ class TestCongUREQUICDefault(TestCongUREBase):
         self.assertEqual(state['cwnd'], init_cwnd + msg['size'])
 
     def test_on_packet_ack_not_limited_congestion_avoidance(self):
-        """See https://tools.ietf.org/html/rfc9002#appendix-B.5"""
+        """Test https://www.rfc-editor.org/info/rfc9002/#section-b.5 compliance."""
         state = self.cong_state()
         # enforce congestion avoidance
         self.set_ssthresh(state['cwnd'] - 100)
@@ -447,7 +447,7 @@ class TestCongUREQUICDefault(TestCongUREBase):
         )
 
     def test_on_packet_ack_not_limited_recovery(self):
-        """See https://tools.ietf.org/html/rfc9002#appendix-B.5"""
+        """Test https://www.rfc-editor.org/info/rfc9002/#section-b.5 compliance."""
         # enforce recovery mode for given send time 1000 and ack recv time 1120
         self.set_recovery_start(1130)
         state = self.cong_state()
@@ -467,7 +467,7 @@ class TestCongUREQUICDefault(TestCongUREBase):
         self.assertEqual(state['cwnd'], init_cwnd)
 
     def test_on_packet_ack_limited(self):
-        """See https://tools.ietf.org/html/rfc9002#appendix-B.5"""
+        """Test https://www.rfc-editor.org/info/rfc9002/#section-b.5 compliance."""
         # set to limited by application or flow control
         self.set_limited(True)
         state = self.cong_state()
@@ -500,18 +500,18 @@ class TestCongUREQUICDefault(TestCongUREBase):
     def assertOnNewCongestionEvent(self, state, init_cwnd, init_ssthresh,
                                    in_recovery=False,
                                    persistent_congestion=False):
-        """See https://tools.ietf.org/html/rfc9002#appendix-B.6"""
+        """Test https://www.rfc-editor.org/info/rfc9002/#section-b.6 compliance."""
         if persistent_congestion:
             # persistent congestion triggers return to slow start; see
-            # https://tools.ietf.org/html/rfc9002#section-7.3
+            # https://www.rfc-editor.org/info/rfc9002/#section-7.3
             self.assertNotInRecovery(state)
-            # See https://tools.ietf.org/html/rfc9002#appendix-B.8
+            # See https://www.rfc-editor.org/info/rfc9002/#section-b.8
             # if (InPersistentCongestion(pc_lost)):
             #   congestion_window = kMinimumWindow
             #   congestion_recovery_start_time = 0
             self.assertEqual(state['cwnd'], state['consts']['min_wnd'])
             # persistent congestion triggers return to slow start; see
-            # https://tools.ietf.org/html/rfc9002#section-7.3
+            # https://www.rfc-editor.org/info/rfc9002/#section-7.3
             # or at least congestion avoidance with ssthresh being at least
             # kMinimumWindow
             # see https://github.com/quicwg/base-drafts/issues/4826#issuecomment-776316765
@@ -526,7 +526,7 @@ class TestCongUREQUICDefault(TestCongUREBase):
             self.assertEqual(state['cwnd'], init_cwnd)
         else:
             # persistent congestion triggers return to slow start; see
-            # https://tools.ietf.org/html/rfc9002#section-7.3
+            # https://www.rfc-editor.org/info/rfc9002/#section-7.3
             # Enter recovery period.
             # congestion_recovery_start_time = now()
             self.assertInRecovery(state)
@@ -543,7 +543,7 @@ class TestCongUREQUICDefault(TestCongUREBase):
             self.assertMaybeSendOnePacket(state)
 
     def test_on_ecn_information_not_recovery(self):
-        """See https://tools.ietf.org/html/rfc9002#appendix-B.7"""
+        """Test https://www.rfc-editor.org/info/rfc9002/#section-b.7 compliance."""
         state = self.cong_state()
         init_cwnd = state['cwnd']
         init_ssthresh = state['ssthresh']
@@ -554,7 +554,7 @@ class TestCongUREQUICDefault(TestCongUREBase):
         self.assertNotEqual(state['cwnd'], state['consts']['min_wnd'])
 
     def test_on_ecn_information_not_recovery_low_ssthresh(self):
-        """See https://tools.ietf.org/html/rfc9002#appendix-B.7"""
+        """Test https://www.rfc-editor.org/info/rfc9002/#section-b.7 compliance."""
         state = self.cong_state()
         # enforce new cwnd to be smaller than `min_wnd`
         init_cwnd = state['consts']['min_wnd']
@@ -567,7 +567,7 @@ class TestCongUREQUICDefault(TestCongUREBase):
         self.assertEqual(state['cwnd'], state['consts']['min_wnd'])
 
     def test_on_ecn_information_recovery(self):
-        """See https://tools.ietf.org/html/rfc9002#appendix-B.7"""
+        """Test https://www.rfc-editor.org/info/rfc9002/#section-b.7 compliance."""
         # enforce recovery mode for given send time = 1000
         self.set_recovery_start(2000)
         state = self.cong_state()
@@ -592,7 +592,7 @@ class TestCongUREQUICDefault(TestCongUREBase):
         self.cong_report_msgs_lost(msgs)
 
     def test_on_packets_lost_not_recovery_no_pc(self):
-        """See https://tools.ietf.org/html/rfc9002#appendix-B.8"""
+        """Test https://www.rfc-editor.org/info/rfc9002/#section-b.8 compliance."""
         msgs = [{'send_time': 1000, 'size': 124, 'resends': 1},
                 {'send_time': 1050, 'size': 643, 'resends': 0},
                 {'send_time': 1100, 'size': 134, 'resends': 0}]
@@ -613,7 +613,7 @@ class TestCongUREQUICDefault(TestCongUREBase):
         self.assertOnNewCongestionEvent(state, init_cwnd, init_ssthresh)
 
     def test_on_packets_lost_not_recovery_no_pc_low_cwnd(self):
-        """See https://tools.ietf.org/html/rfc9002#appendix-B.8"""
+        """Test https://www.rfc-editor.org/info/rfc9002/#section-b.8 compliance."""
         msgs = [{'send_time': 1000, 'size': 124, 'resends': 1},
                 {'send_time': 1050, 'size': 643, 'resends': 0},
                 {'send_time': 1100, 'size': 134, 'resends': 0}]
@@ -638,7 +638,7 @@ class TestCongUREQUICDefault(TestCongUREBase):
         self.assertOnNewCongestionEvent(state, init_cwnd, init_ssthresh)
 
     def test_on_packets_lost_recovery_no_pc(self):
-        """See https://tools.ietf.org/html/rfc9002#appendix-B.8"""
+        """Test https://www.rfc-editor.org/info/rfc9002/#section-b.8 compliance."""
         msgs = [{'send_time': 1000, 'size': 124, 'resends': 1},
                 {'send_time': 1050, 'size': 643, 'resends': 0},
                 {'send_time': 1100, 'size': 134, 'resends': 0}]
@@ -662,7 +662,7 @@ class TestCongUREQUICDefault(TestCongUREBase):
                                         in_recovery=True)
 
     def test_on_packets_lost_not_recovery_pc(self):
-        """See https://tools.ietf.org/html/rfc9002#appendix-B.8"""
+        """Test https://www.rfc-editor.org/info/rfc9002/#section-b.8 compliance."""
         # trigger message + ACK and check if UpdateRTT (see A.7) was called
         # correctly to have an RTT sample
         msg, ack = self.test_on_packet_ack_no_rtt_sample(self.cong_state())
@@ -672,7 +672,7 @@ class TestCongUREQUICDefault(TestCongUREBase):
         # only messages sent after the first RTT sample are considered for
         # persistent congestion, so add that time to the message's send_time
         offset = state['first_rtt_sample']
-        # See https://tools.ietf.org/html/rfc9002#section-7.6.1
+        # See https://www.rfc-editor.org/info/rfc9002/#section-7.6.1
         #    (smoothed_rtt + max(4*rttvar, kGranularity) + max_ack_delay) *
         #           kPersistentCongestionThreshold
         pc_duration = (
@@ -701,7 +701,7 @@ class TestCongUREQUICDefault(TestCongUREBase):
                                         persistent_congestion=True)
 
     def test_on_packets_lost_not_recovery_pc_low_cwnd(self):
-        """See https://tools.ietf.org/html/rfc9002#appendix-B.8"""
+        """Test https://www.rfc-editor.org/info/rfc9002/#section-b.8 compliance."""
         # trigger message + ACK and check if UpdateRTT (see A.7) was called
         # correctly to have an RTT sample
         msg, ack = self.test_on_packet_ack_no_rtt_sample(self.cong_state())
@@ -716,7 +716,7 @@ class TestCongUREQUICDefault(TestCongUREBase):
         # only messages sent after the first RTT sample are considered for
         # persistent congestion, so add that time to the message's send_time
         offset = state['first_rtt_sample']
-        # See https://tools.ietf.org/html/rfc9002#section-7.6.1
+        # See https://www.rfc-editor.org/info/rfc9002/#section-7.6.1
         #    (smoothed_rtt + max(4*rttvar, kGranularity) + max_ack_delay) *
         #           kPersistentCongestionThreshold
         pc_duration = (
@@ -746,7 +746,7 @@ class TestCongUREQUICDefault(TestCongUREBase):
                                         persistent_congestion=True)
 
     def test_on_packets_lost_recovery_pc(self):
-        """See https://tools.ietf.org/html/rfc9002#appendix-B.8"""
+        """Test https://www.rfc-editor.org/info/rfc9002/#section-b.8 compliance."""
         # trigger message + ACK and check if UpdateRTT (see A.7) was called
         # correctly to have an RTT sample
         msg, ack = self.test_on_packet_ack_no_rtt_sample(self.cong_state())
@@ -759,7 +759,7 @@ class TestCongUREQUICDefault(TestCongUREBase):
         # only messages sent after the first RTT sample are considered for
         # persistent congestion, so add that time to the message's send_time
         offset = state['first_rtt_sample']
-        # See https://tools.ietf.org/html/rfc9002#section-7.6.1
+        # See https://www.rfc-editor.org/info/rfc9002/#section-7.6.1
         #    (smoothed_rtt + max(4*rttvar, kGranularity) + max_ack_delay) *
         #           kPersistentCongestionThreshold
         pc_duration = (
@@ -789,12 +789,12 @@ class TestCongUREQUICDefault(TestCongUREBase):
                                         in_recovery=True,
                                         persistent_congestion=True)
         # persistent congestion triggers return to slow start; see
-        # https://tools.ietf.org/html/rfc9002#section-7.3
+        # https://www.rfc-editor.org/info/rfc9002/#section-7.3
         self.assertSlowStart(state)
         self.assertNotInRecovery(state)
 
     def test_removing_discarded_packets_from_bytes_in_flight(self):
-        """See https://tools.ietf.org/html/rfc9002#appendix-B.9"""
+        """Test https://www.rfc-editor.org/info/rfc9002/#section-b.9 compliance."""
         state = self.cong_state()
         init_in_flight_size = state['in_flight_size']
         self.cong_report_msg_sent(1337)
@@ -803,7 +803,7 @@ class TestCongUREQUICDefault(TestCongUREBase):
         self.assertEqual(state['in_flight_size'], init_in_flight_size)
 
     def test_pacing(self):
-        """See https://tools.ietf.org/html/rfc9002#section-7.7"""
+        """Test https://www.rfc-editor.org/info/rfc9002/#section-7.7 compliance."""
         state = self.cong_state()
         self.assertGreater(state["smoothed_rtt"], 0)
         self.assertGreater(state["cwnd"], 0)
