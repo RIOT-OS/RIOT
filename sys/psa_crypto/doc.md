@@ -44,7 +44,7 @@ by PSA as *active* and can not be used for a new operation.
 The example function and macro shown below result in the same thing: A new, inactive structure.
 
 ```c
-// Choose one of these options
+/* Choose one of these options */
 psa_hash_operation_t hash_op = psa_hash_operation_init();
 psa_hash_operation_t hash_op = PSA_HASH_OPERATION_INIT;
 ```
@@ -75,10 +75,10 @@ That information needs to be specified in a set of
 The example below defines attributes for an AES-128 key, which can be used for CBC encryption
 and decryption and will be stored in local volatile memory.
 ```c
-// Initializes empty attributes structure
+/* Initializes empty attributes structure */
 psa_key_attributes_t attributes = psa_key_attributes_init();
 
-// Set all necessary attributes
+/* Set all necessary attributes */
 psa_set_key_lifetime(&attributes, PSA_KEY_LIFETIME_VOLATILE);
 psa_set_key_type(&attributes, PSA_KEY_TYPE_AES);
 psa_set_key_bits(&attributes, 128);
@@ -89,7 +89,7 @@ psa_set_key_usage_flags(&attributes, (PSA_KEY_USAGE_ENCRYPT | PSA_KEY_USAGE_DECR
 After setting the attributes, an exiting key can be imported:
 ```c
 uint8_t aes_key[] = { ... };
-psa_key_id_t key_id = 0;     // Will be set by PSA Crypto
+psa_key_id_t key_id = 0;     /* Will be set by PSA Crypto */
 psa_status_t status = psa_import_key(&attributes, aes_key, sizeof(aes_key), &key_id);
 ```
 The PSA Crypto implementation will assign an identifier to the key and return it
@@ -97,8 +97,9 @@ via the `key_id` parameter. This identifier can then be used for operations with
 specific key.
 ```c
 uint8_t PLAINTEXT[] = { ... };
-// Buffer sizes can be calculated with macros
-size_t output_buf_size = PSA_CIPHER_ENCRYPT_OUTPUT_SIZE(PSA_KEY_TYPE_AES, PSA_ALG_CBC_NO_PADDING,sizeof(PLAINTEXT));
+/* Buffer sizes can be calculated with macros */
+size_t output_buf_size = PSA_CIPHER_ENCRYPT_OUTPUT_SIZE(PSA_KEY_TYPE_AES,
+                             PSA_ALG_CBC_NO_PADDING, sizeof(PLAINTEXT));
 uint8_t output_buffer[output_buf_size];
 
 status = psa_cipher_encrypt(key_id, PSA_ALG_CBC_NO_PADDING, PLAINTEXT, sizeof(PLAINTEXT), output_buffer, sizeof(output_buffer), &output_length);
@@ -115,8 +116,7 @@ Persistent keys will also be written into flash memory for later access. To dest
 them they must be explicitly deleted with the `psa_destroy_key()` function.
 
 @note    Persistent key storage can be optionally enabled on `native` and on the `nRF52840dk`.
-         For this, add `USEMODULE += psa_persistent_storage` to your application makefile
-         or `CONFIG_MODULE_PSA_PERSISTENT_STORAGE=y` to your `app.config.test` file.
+         For this, add `USEMODULE += psa_persistent_storage` to your application makefile.
          Example: `tests/sys/psa_crypto_persistent_storage`
 
 @warning Be aware that the current implementation writes keys in plain text to flash memory.
@@ -143,46 +143,14 @@ supports values for [Secure Elements](#secure-elements).
 
 Configuration {#configuration}
 ===
-Currently there are two ways to configure PSA Crypto: Kconfig and Makefiles. An example for both
-can be found in `RIOT/examples/advanced/psa_crypto`.
+Modules are selected in your application Makefile. Configuration values, like the number of
+key slots, can be set with Kconfig or via `CFLAGS`. An example can be found in
+`RIOT/examples/advanced/psa_crypto`.
 
-## Kconfig
-We recommend using Kconfig and choosing your features in `menuconfig`.
-You can access the GUI by calling
-
-```sh
-TEST_KCONFIG=1 BOARD=<your board> make menuconfig
-```
-
-from your application directory.
-There you can find the available PSA features and options under `System->PSA Crypto`.
-If you only select the operations you want to use (e.g. `PSA Ciphers->AES-128 CBC`), Kconfig
-will automatically select the best backend for you depending on the board (e.g. a hardware
-accelerator if it is available). Optionally you can force a custom backend.
-
-Further you can specify the exact number of keys you need to store (section `PSA Key Management
-Configuration` in `menuconfig`), or choose your [Secure Element](#secure-elements)
-configurations.
-
-Alternatively you can create an `app.config.test` file in your application folder
-and choose your symbols there (see `examples/advanced/psa_crypto`).
-
-In the `app.config.test` file, modules can be chosen with the following syntax:
-`CONFIG_MODULE_<MODULENAME>=y`, as shown below.
-```kconfig
-CONFIG_MODULE_PSA_CRYPTO=y
-CONFIG_MODULE_PSA_CIPHER=y
-CONFIG_MODULE_PSA_CIPHER_AES_128_CBC=y
-```
-
-## Makefiles
-If you don't want to use Kconfig, you can use the traditional way in RIOT of selecting
-modules in your application Makefile.
-
-Here you need to set the base module and individual modules for each operation you need.
+Set the base module and individual modules for each operation you need.
 The example below also chooses a default backend depending on your board.
 ```makefile
-// Base module: this is required!
+# Base module: this is required!
 USEMODULE += psa_crypto
 
 USEMODULE += psa_cipher
@@ -196,7 +164,7 @@ USEMODULE += psa_cipher_aes_128_cbc_custom_backend
 USEMODULE += psa_cipher_aes_128_cbc_backend_riot
 ```
 
-The currently available modules, are listed [below](#available-modules).
+The currently available modules are listed [below](#available-modules).
 
 ## Key Slot Types {#configuration-keys}
 The key management of PSA keeps track of keys by storing them in virtual key slot
@@ -213,14 +181,15 @@ the user depending on their requirements.
 | Single keys or unstructured data,<br>e.g. AES keys or asymmetric<br>public keys in local memory | Asymmetric key pairs<br>(private and public parts) <br>in local memory | Any keys stored on a secure<br>element or on-chip in<br>hardware protected memory |
 
 If you want to change the default number of allocated key slots you can do so by
-updating the number in `menuconfig`, or adding them to the `app.config.test` file like so:
+updating the number in `menuconfig` (`System->PSA Crypto->PSA Key Management Configuration`),
+or adding them to an `app.config` file like so:
 ```kconfig
 CONFIG_PSA_SINGLE_KEY_COUNT=3
 CONFIG_PSA_ASYMMETRIC_KEYPAIR_COUNT=1
 CONFIG_PSA_PROTECTED_KEY_COUNT=2
 ```
 
-When using Makefiles, you can pass CFLAGS as shown below.
+Without Kconfig, you can pass CFLAGS as shown below.
 ```makefile
 CFLAGS += -DCONFIG_PSA_SINGLE_KEY_COUNT=3
 CFLAGS += -DCONFIG_PSA_ASYMMETRIC_KEYPAIR_COUNT=1
@@ -238,12 +207,7 @@ No matter which operation you need, you always have to choose the base module.
 If you want to specify a backend other than the default, you need to select
 `psa_<operation>_custom_backend` in addition to the actual backend module.
 
-The names listed are are the version used in makefiles with the
-`USEMODULE += <modulename>` syntax.
-In Kconfig you don't need to know the exact names, you can simply choose the features in
-`menuconfig`.
-When using `app.config.test` files in your application directory, you need to write the
-names in uppercase and add the prefix `CONFIG_MODULE_` to all of them.
+The names listed are used with the `USEMODULE += <modulename>` syntax.
 
 ### Key Storage
 - Persistent Key Storage: psa_persistent_storage
@@ -426,8 +390,8 @@ a device's location value.
 
 ```c
 psa_key_lifetime_t lifetime =
-     PSA_KEY_LIFETIME_FROM_PERSISTENCE_AND_LOCATION (PSA_KEY_LIFETIME_VOLATILE,
-                                                        PSA_KEY_LOCATION_PRIMARY_SECURE_ELEMENT);
+     PSA_KEY_LIFETIME_FROM_PERSISTENCE_AND_LOCATION(PSA_KEY_LIFETIME_VOLATILE,
+                                                    PSA_KEY_LOCATION_PRIMARY_SECURE_ELEMENT);
 ```
 
 Some secure elements come with their own key management and device configurations. In this case
@@ -448,33 +412,27 @@ the example.
 - ATECCX08A: [Microchip Cryptoauthlib as a PSA backend](#psa-cryptoauthlib)
 
 ## Main SE Configuration
-To use SEs, the appropriate modules must be chosen in Kconfig:
-```kconfig
-CONFIG_PSA_SECURE_ELEMENT=y
-CONFIG_PSA_SECURE_ELEMENT_ATECCX08A=y        // device example
-CONFIG_PSA_SECURE_ELEMENT_ATECCX08A_ECC_P256=y
-```
-
-or added to the Makefile:
+To use SEs, add the appropriate modules to the Makefile:
 ```makefile
 USEMODULE += psa_secure_element
-USEMODULE += psa_secure_element_ateccx08a        // device example
+USEMODULE += psa_secure_element_ateccx08a        # device example
 USEMODULE += psa_secure_element_ateccx08a_ecc_p256
 ```
 
 This implementation supports the use of one or more secure elements (SE) as backends. In this
 case the number of used secure elements must be specified (must be at least 2 and at most 255).
-When using more than one SE, add
-```kconfig
-CONFIG_PSA_SECURE_ELEMENT_MULTIPLE=y
-CONFIG_PSA_MAX_SE_COUNT=2                    // or any other number between 2 and 255
-```
-
-or, respectively,
-
+When using more than one SE, add the module to the Makefile
 ```makefile
 USEMODULE += psa_secure_element_multiple
-CFLAGS += -DCONFIG_PSA_MAX_SE_COUNT=2        // or any other number between 2 and 255
+```
+and set the number of SEs with Kconfig
+```kconfig
+CONFIG_PSA_MAX_SE_COUNT=2        # or any other number between 2 and 255
+```
+
+or, respectively, with CFLAGS
+```makefile
+CFLAGS += -DCONFIG_PSA_MAX_SE_COUNT=2
 ```
 
 Porting Guide {#porting-guide}
@@ -507,13 +465,9 @@ example `CRYS_to_psa_error()` in
 `pkg/driver_cryptocell_310/psa_cryptocell_310/error_conversion.c`).
 
 ### The Build System
-As mentioned before, there are two ways of selecting build time configurations in RIOT: Kconfig
-and Makefiles.
-Kconfig dependency resolution is currently an experimental feature and will at some point
-replace Makefiles. Until then, our implementation needs to support both, which means we need
-to define features and symbols in multiple places.
-Luckily, the modules have the exact same names in both systems, which makes the transfer easier.
-The examples below show both ways.
+### The Build System
+Our implementation defines features and symbols in the Makefiles (`Makefile.dep` and
+`Makefile.include`). The examples below show how to do this.
 
 ### Modules {#module-names}
 In RIOT, module names are generated from path names, so if you create a directory for
@@ -561,8 +515,7 @@ another sourcefile in the same folder, we need to select it explicitly. For exam
 files that all the others use (e.g. for hashes there is a `hashes_common.c` file).
 
 If that is the case for your driver, you need to make sure the modules are selected in
-the Kconfig file as well as the `Makefile.dep` file (see `psa_cryptocell_310/Makefile.dep` or
-`psa_cryptocell_310/Kconfig`).
+the `Makefile.dep` file (see `psa_cryptocell_310/Makefile.dep`).
 
 ### Adding Glue Code {#glue-code}
 We define a number of wrapper APIs, which are called by PSA to invoke crypto backends.
@@ -616,7 +569,7 @@ When defining the contexts for a software library, the headerfile should be call
 shown below:
 ```c
 #if IS_USED(MODULE_PSA_<LIBRARY>_<ALGORITHM>)
-#include "<library>/<library>_<algorithm>.h"
+#  include "<library>/<library>_<algorithm>.h"
 #endif
 ```
 
@@ -624,7 +577,7 @@ When defining the context types, those must always depend on the specific algori
 for example
 ```c
 #if IS_USED(MODULE_PSA_<LIBRARY>_HASHES_SHA_256)
-#include "path/to/headerfile_containing_the_driver_context_definition"
+#  include "path/to/headerfile_containing_the_driver_context_definition"
 
 typedef <library_context_type_t> psa_hashes_sha256_ctx_t;
 #endif
@@ -675,7 +628,7 @@ In these files we need to implement the methods that are called by PSA as descri
 
 #### Adding Makefiles
 We add a Makefile to the `psa_fancycrypt` folder with the following content:
-```c
+```makefile
 BASE_MODULE := psa_fancycrypt
 SUBMODULES := 1
 
@@ -692,10 +645,10 @@ These should be dependent on the PSA Crypto module as shown below.
 
 ```makefile
 ifneq (,$(filter psa_fancycrypt_%, $(USEMODULE)))
-    PSEUDOMODULES += psa_fancycrypt_hashes_sha_256
-    PSEUDOMODULES += psa_fancycrypt_p256
-    DIRS += $(RIOTPKG)/fancycrypt/psa_fancycrypt
-    INCLUDES += -I$(RIOTBASE)/sys/psa_crypto/include
+  PSEUDOMODULES += psa_fancycrypt_hashes_sha_256
+  PSEUDOMODULES += psa_fancycrypt_p256
+  DIRS += $(RIOTPKG)/fancycrypt/psa_fancycrypt
+  INCLUDES += -I$(RIOTBASE)/sys/psa_crypto/include
 endif
 ```
 
@@ -709,59 +662,11 @@ ifneq (,$(filter psa_fancycrypt_hashes_sha1,$(USEMODULE)))
 endif
 ```
 
-#### Adding a Kconfig file
-We add a file called `Kconfig` to the `psa_fancycrypt` folder. Here we declare
-the modules for Kconfig like so:
-```kconfig
-config MODULE_PSA_FANCYCRYPT_HASHES_SHA_256
-    bool
-    depends on MODULE_PSA_CRYPTO
-    select MODULE_PSA_FANCYCRYPT
-
-config MODULE_PSA_FANCYCRYPT_P256
-    bool
-    depends on MODULE_PSA_CRYPTO
-    select MODULE_PSA_FANCYCRYPT
-
-config MODULE_PSA_FANCYCRYPT
-    bool
-```
-
-If the implementation has any dependencies, we can select them in this Kconfig file:
-```kconfig
-config MODULE_PSA_FANCYCRYPT_HASHES_SHA_256
-    bool
-    depends on MODULE_PSA_CRYPTO
-    select MODULE_PSA_FANCYCRYPT
-    select MODULE_PSA_FANCYCRYPT_HASHES_COMMON
-    select MODULE_PSA_FANCYCRYPT_ERROR_CONVERSION
-```
-
-In `pkg/fancycrypt/Kconfig` we need to add the line
-```kconfig
-rsource "psa_fancycrypt/Kconfig"
-```
-at the bottom.
-
 #### Telling PSA Crypto about it
-To be able to choose `fancycrypt` as a PSA backend, we need to add the option to the Kconfig
-and Makefiles of the PSA Crypto Module.
+To be able to choose `fancycrypt` as a PSA backend, we need to add the option to the
+Makefiles of the PSA Crypto Module: `sys/psa_crypto/Makefile.dep` and
+`sys/psa_crypto/Makefile.include`.
 
-In `sys/psa_crypto/` we need to modify `Kconfig.asymmetric`, `sys/psa_crypto/Kconfig.hashes`,
-`Makefile.dep` and `Makefile.include`.
-
-To `Kconfig.asymmetric` we need to add
-```kconfig
-config MODULE_PSA_ASYMMETRIC_ECC_P256R1_BACKEND_FANCYCRYPT
-    bool "FancyCrypt Package"
-    select PACKAGE_FANCYCRYPT
-    select MODULE_PSA_FANCYCRYPT_P256
-```
-This will expose FancyCrypt as a backend option in PSA and then enable all the necessary
-features, when users select it.
-You need to do the same thing for the hash operation in `Kconfig.hashes`.
-
-To achieve the same thing with Makefiles we need to do this in two places:
 In `Makefile.include` there are some existing pseudomodules for asymmetric crypto and hashes.
 There we need to create the backend modules for FancyCrypt by adding
 
@@ -780,9 +685,9 @@ and hashes are selected we add cases for our backend modules:
 
 ```makefile
 ifneq (,$(filter psa_asymmetric_ecc_p256r1_backend_fancycrypt,$(USEMODULE)))
-    USEPKG += fancycrypt
-    USEMODULE += psa_fancycrypt
-    USEMODULE += psa_fancycrypt_p256
+  USEPKG += fancycrypt
+  USEMODULE += psa_fancycrypt
+  USEMODULE += psa_fancycrypt_p256
 endif
 ```
 
@@ -791,7 +696,7 @@ operations.
 
 ### Case Example – A Hardware Driver {#porting-hardware}
 The first steps of porting a hardware driver are the same as for the software library.
-Only we skip the last part where we add the modules to the PSA Crypto Kconfig and Makefiles
+Only we skip the last part where we add the modules to the PSA Crypto Makefiles
 and do something else instead.
 
 Hardware drivers are treated a little differently, mostly because they are tied to a specific
@@ -807,7 +712,6 @@ Now, let's say we have a CPU called `myCPU` with an on-chip accelerator called
 The vendor provides a driver, which we already have included in RIOT as a package.
 Also we've followed the steps in the [glue code section](#glue-code) and provide a folder called
 `pkg/driver_speedycrypt/psa_speedycrypt` with the required wrapper files.
-We have also added the module names in a Kconfig file and in the Makefiles.
 
 #### Telling PSA Crypto about it
 This is where we diverge from the software library example. If you take a look at the available
@@ -818,64 +722,34 @@ module for all crypto hardware accelerators and will automatically resolve to th
 associated with the available accelerator.
 
 Before we're able to use it we need to tell RIOT that those hardware features exist for
-our `myCPU` (see `cpu/nrf52/Kconfig` and `cpu/nrf52/Makefile.features` as an example).
+our `myCPU` (see `cpu/nrf52/Makefile.features` as an example).
 In `cpu/myCPU` we add all the provided features as shown below.
 
 Files we need to touch:
 - `cpu/myCPU/Makefile.features`
-- `cpu/myCPU/Kconfig`
 - `cpu/myCPU/periph/Makefile.dep`
-- `cpu/myCPU/periph/Kconfig`
-- When defining new features: `RIOT/kconfigs/Kconfig.features`
 
 **cpu/myCPU/Makefile.features:**
 ```makefile
-FEATURES_PROVIDED += periph_speedycrypt      // General feature for the accelerator
+FEATURES_PROVIDED += periph_speedycrypt      # General feature for the accelerator
 FEATURES_PROVIDED += periph_hash_sha_256
 FEATURES_PROVIDED += periph_ecc_p256r1
 ```
 
-**cpu/myCPU/Kconfig:**
-```kconfig
-config CPU_FAM_MYCPU
-    bool
-    select CPU_SOME_FEATURES
-     ...
-    select HAS_PERIPH_HASH_SHA_256
-    select HAS_PERIPH_ECC_P256R1
-    select HAS_PERIPH_SPEEDYCRYPT
-```
-The `HAS_PERIPH_*` symbols are defined in. If your device
-provides capabilities that are not yet defined, you can add them to that file.
-
 Next we need to define selectable modules for this in the `cpu/myCPU/periph` folder, which
 then automatically enable the driver. An example for this is `cpu/nrf52/periph`.
-We add the following to the `cpu/myCPU/periph/Kconfig` file and `cpu/myCPU/periph/Makefile.dep`:
+We add the following to `cpu/myCPU/periph/Makefile.dep`:
 
 **cpu/myCPU/periph/Makefile.dep:**
 ```makefile
 ifneq (,$(filter periph_hash_sha_256,$(USEMODULE)))
-    USEPKG += driver_speedycrypt
-    USEMODULE += psa_speedycrypt_hashes_sha256
+  USEPKG += driver_speedycrypt
+  USEMODULE += psa_speedycrypt_hashes_sha256
 endif
 ```
 
-**cpu/myCPU/periph/Kconfig:**
-```kconfig
-config MODULE_PERIPH_FANCYCRYPT
-    bool
-    depends on HAS_PERIPH_FANCYCRYPT
-    select PACKAGE_DRIVER_FANCYCRYPT
-
-config MODULE_PERIPH_HASH_SHA_256
-    bool
-    depends on HAS_PERIPH_HASH_SHA_256
-    select MODULE_PERIPH_SPEEDYCRYPT
-    select MODULE_PSA_SPEEDYCRYPT_HASHES_SHA256
-```
-
-Here we basically say "If the user chooses the `periph_hash_sha_256 module`, also select the
-`periph_speedycrypt` feature, which will then enable the speedycrypt driver". Of course you need
+Here we basically say "If the user chooses the `periph_hash_sha_256` module, also enable the
+speedycrypt driver". Of course you need
 to do this for all your available features.
 
 Now, if you build PSA Crypto with default configurations, it should automatically detect that
@@ -932,12 +806,12 @@ context unions as shown in the example below:
 typedef struct {
     union driver_context {
         unsigned dummy;
-    #if IS_USED(MODULE_PSA_SECURE_ELEMENT_ATECCX08A) || defined(DOXYGEN)
+#if IS_USED(MODULE_PSA_SECURE_ELEMENT_ATECCX08A) || defined(DOXYGEN)
         atca_aes_cbc_ctx_t atca_aes_cbc;
-    #endif
-    #if IS_USED(MODULE_PSA_SECURE_ELEMENT_SUPERSE) || defined(DOXYGEN)
+#endif
+#if IS_USED(MODULE_PSA_SECURE_ELEMENT_SUPERSE) || defined(DOXYGEN)
         superse_cipher_ctx_t superse_aes_cbc;
-    #endif
+#endif
     } drv_ctx;
 } psa_se_cipher_context_t;
 ```
@@ -1013,30 +887,7 @@ An example implementation of this can be seen in `sys/auto_init/security/auto_in
 
 #### Telling PSA Crypto about it
 To be able to choose our `superSE` during configuration, we need to define the corresponding
-modules in the Kconfig files and Makefiles.
-
-To `pkg/super_se_lib/Kconfig` we add something like
-```kconfig
-config MODULE_PSA_SUPERSE_DRIVER
-    bool
-    depends on PACKAGE_SUPERSE_LIB
-    default y if MODULE_PSA_CRYPTO
-    select PSA_KEY_MANAGEMENT
-```
-This tells the build system that whenever this driver and PSA Crypto are used at the same time,
-the wrapper and the PSA key management module are needed, too.
-
-To `sys/psa_crypto/psa_se_mgmt/Kconfig` we add a menu for the SE like so:
-```kconfig
-menuconfig MODULE_PSA_SECURE_ELEMENT_SUPERSE
-    bool "Our Vendor's SuperSE"
-    select PACKAGE_SUPERSE_LIB
-    depends on <whatever protocol is needed for communication, e.g. HAS_PERIPH_I2C>
-    help
-        <Some helpful information about this module>
-```
-This makes our driver selectable whenever an application configuration selects the PSA secure
-element module.
+modules in the Makefiles.
 
 As described in the [Configuration Section](#configuration-keys), references to keys on secure
 elements are stored by PSA in a different type of key slot than other keys.
@@ -1052,25 +903,14 @@ key.
 Secure Element operations also depend on the PSA modules. E.g. when you want to use an ECC
 operation, you need to make sure that you also build the asymmetric PSA functions.
 
-For this we need to add the following to the `superSE` menu:
-```kconfig
-config MODULE_PSA_SECURE_ELEMENT_SUPERSE_ECC_P256
-    bool "Our Vendor's Elliptic Curve P256"
-    select PSA_KEY_SIZE_256
-    select MODULE_PSA_ASYMMETRIC
-    depends on MODULE_PSA_SECURE_ELEMENT_SUPERSE
-```
-This tells us, what size a key slot should have to store the public key. If your SE supports
-other curves, you need to modify this accordingly or add more of them.
-
-Now we need to add the same to the Makefiles. In `Makefile.include` we add the source file path
+In `Makefile.include` we add the source file path
 and the PSA include folders and define the new available pseudomodules:
 ```makefile
 ifneq (,$(filter psa_crypto,$(USEMODULE)))
-    DIRS += $(RIOTPKG)/superse_lib/psa_superse_driver
-    INCLUDES += -I$(RIOTBASE)/sys/psa_crypto/include
-    PSEUDOMODULES += psa_secure_element_superse
-    PSEUDOMODULES += psa_secure_element_superse_ecc_p256
+  DIRS += $(RIOTPKG)/superse_lib/psa_superse_driver
+  INCLUDES += -I$(RIOTBASE)/sys/psa_crypto/include
+  PSEUDOMODULES += psa_secure_element_superse
+  PSEUDOMODULES += psa_secure_element_superse_ecc_p256
 endif
 ```
 
@@ -1081,11 +921,10 @@ ifneq (,$(filter psa_crypto,$(USEMODULE)))
   USEMODULE += psa_superse_driver
 endif
 
-ifneq (,$(filter psa_secure_element_superse_ecc_p256, $(USEMODULE)))
+ifneq (,$(filter psa_secure_element_superse_ecc_p256,$(USEMODULE)))
   USEMODULE += psa_asymmetric
 endif
 ```
 This needs to be done for all other supported operations (e.g. ATECCX08 operations in
-`pkg/cryptoauthlib/Makefile.include`, `pkg/cryptoauthlib/Makefile.dep` and
-`sys/psa_crypto/psa_se_mgmt/Kconfig`). Now the secure element should be available for use
-with PSA Crypto.
+`pkg/cryptoauthlib/Makefile.include` and `pkg/cryptoauthlib/Makefile.dep`). Now the secure
+element should be available for use with PSA Crypto.
