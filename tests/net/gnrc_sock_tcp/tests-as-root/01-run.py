@@ -106,7 +106,8 @@ def test_send_data_from_host_to_riot(child):
 
 @Runner(timeout=10)
 def test_connection_listen_accept_cycle(child, iterations=10):
-    """Verify `sock_tcp` in a typical server role.
+    """
+    Verify `sock_tcp` in a typical server role.
 
     Accept a connection, exchange data, teardown connection, handle the next one.
     """

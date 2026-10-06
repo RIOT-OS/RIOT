@@ -92,7 +92,8 @@ class TestCongUREBase(unittest.TestCase):
     def assertInRecovery(self, state):
         # pylint: disable=invalid-name
         # trying to be in line with `unittest`
-        """Assert that the congestion state is in a recovery period.
+        """
+        Assert that the congestion state is in a recovery period.
 
         `recovery_start` is set to current system time when entering recovery
         period.
@@ -102,7 +103,8 @@ class TestCongUREBase(unittest.TestCase):
     def assertNotInRecovery(self, state):
         # pylint: disable=invalid-name
         # trying to be in line with `unittest`
-        """Assert that the congestion state is not in a recovery period.
+        """
+        Assert that the congestion state is not in a recovery period.
 
         `recovery_start` is reset to 0 when leaving recovery period.
         """

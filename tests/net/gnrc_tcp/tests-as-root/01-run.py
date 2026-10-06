@@ -45,7 +45,8 @@ def test_connection_lifecycle_as_server(child):
 
 @Runner(timeout=10)
 def test_gnrc_tcp_listen_tcb_discards_unread_data_on_reuse(child):
-    """ Test for ensuring that a listening TCB is cleared between connections.
+    """
+    Test for ensuring that a listening TCB is cleared between connections.
         This happens when a client (host) connects, sends data that is not
         (yet) read by the RIOT application, and then disconnects. The TCB may
         then be reused for a new connection, which should not see unread data
@@ -117,7 +118,8 @@ def test_send_data_from_host_to_riot(child):
 
 @Runner(timeout=5)
 def test_gnrc_tcp_garbage_packets_short_payload(child):
-    """Receive unusually short payload with timeout.
+    """
+    Receive unusually short payload with timeout.
 
     Verifies fix for https://github.com/RIOT-OS/RIOT/issues/11999
     """
@@ -146,7 +148,8 @@ def test_gnrc_tcp_garbage_packets_short_payload(child):
 
 @Runner(timeout=5)
 def test_gnrc_tcp_garbage_packets_short_header(child):
-    """Verify fix for malformed TCP header.
+    """
+    Verify fix for malformed TCP header.
 
     See https://github.com/RIOT-OS/RIOT/issues/12086
     """
@@ -221,7 +224,8 @@ def test_gnrc_tcp_garbage_packets_ack_instead_of_sym(child):
 
 @Runner(timeout=5)
 def test_gnrc_tcp_garbage_packets_option_parsing(child):
-    """Verify that malformed options do not break `gnrc_tcp`.
+    """
+    Verify that malformed options do not break `gnrc_tcp`.
 
     See https://github.com/RIOT-OS/RIOT/issues/12086
     """
@@ -476,7 +480,8 @@ def test_gnrc_tcp_accept_returns_EINVAL(child):
 
 @Runner(timeout=5)
 def test_gnrc_tcp_get_local_returns_0(child):
-    """Verify that `get_local` returns 0 in a connected state.
+    """
+    Verify that `get_local` returns 0 in a connected state.
 
     The used endpoint contains the expected connection parameters.
     """
@@ -509,7 +514,8 @@ def test_gnrc_tcp_get_local_returns_EADDRNOTAVAIL(child):
 
 @Runner(timeout=5)
 def test_gnrc_tcp_get_remote_returns_0(child):
-    """Verify that `get_remote` returns 0 in a connected state.
+    """
+    Verify that `get_remote` returns 0 in a connected state.
 
     The used endpoint contains the expected connection parameters.
     """
@@ -540,7 +546,8 @@ def test_gnrc_tcp_get_remote_returns_ENOTCONN(child):
 
 @Runner(timeout=1)
 def test_gnrc_tcp_queue_get_local_returns_0(child):
-    """Verify that `queue_get_local` returns 0 when called after `listen`.
+    """
+    Verify that `queue_get_local` returns 0 when called after `listen`.
 
     The endpoint content is as expected.
     """
@@ -576,7 +583,8 @@ def test_gnrc_tcp_queue_get_local_returns_EADDRNOTAVAIL(child):
 
 @Runner(timeout=5)
 def test_gnrc_tcp_accept_respects_GNRC_TCP_NO_TIMEOUT(child):
-    """Verify that `gnrc_tcp_accept` respects `GNRC_TCP_NO_TIMEOUT`.
+    """
+    Verify that `gnrc_tcp_accept` respects `GNRC_TCP_NO_TIMEOUT`.
 
     `gnrc_tcp_accept` timeout mechanism must be disabled if
     `GNRC_TCP_NO_TIMEOUT` is set as timeout value.
@@ -607,7 +615,8 @@ def test_gnrc_tcp_accept_respects_GNRC_TCP_NO_TIMEOUT(child):
 
 @Runner(timeout=5)
 def test_gnrc_tcp_recv_respects_GNRC_TCP_NO_TIMEOUT(child):
-    """Verify that `gnrc_tcp_recv` respects `GNRC_TCP_NO_TIMEOUT`.
+    """
+    Verify that `gnrc_tcp_recv` respects `GNRC_TCP_NO_TIMEOUT`.
 
     `gnrc_tcp_recv` timeout mechanism must be disabled if
     `GNRC_TCP_NO_TIMEOUT` is set as timeout value.
@@ -643,7 +652,8 @@ def test_gnrc_tcp_recv_respects_GNRC_TCP_NO_TIMEOUT(child):
 
 @Runner(timeout=10)
 def test_connection_listen_accept_cycle(child, iterations=10):
-    """Verify `gnrc_tcp` in a typical server role.
+    """
+    Verify `gnrc_tcp` in a typical server role.
 
     Accept a connection, exchange data, teardown connection, handle the next one.
     """
