@@ -87,7 +87,7 @@ static unsigned milliseconds_to_ticks(uint32_t timer_freq, unsigned millisecs)
 
 static int test_timer(unsigned num, uint32_t timer_freq)
 {
-    int set = 0;
+    unsigned set = 0;
 
     /* reset state */
     atomic_store_u32(&sw_count, 0);
@@ -121,8 +121,7 @@ static int test_timer(unsigned num, uint32_t timer_freq)
         if (timer_set(TIMER_DEV(num), i, timeout) < 0) {
             printf("ERROR: Couldn't set timeout %u for channel %u\n", timeout, i);
             /* If the timer supports the periph_timer_query_freqs feature, we
-             * expect it to correctly report the number of supported channels
-             */
+             * expect it to correctly report the number of supported channels */
             if (IS_USED(MODULE_PERIPH_TIMER_QUERY_FREQS)) {
                 return 0;
             }
@@ -159,13 +158,13 @@ static int test_timer(unsigned num, uint32_t timer_freq)
 
     /* collect results */
     printf("  - Results:\n");
-    for (int i = 0; i < set; i++) {
+    for (unsigned i = 0; i < set; i++) {
         if (args[i] != ((COOKIE * num) + i)) {
             printf("    ERROR: Callback for channel %u on timer %u has incorrect argument\n", i,
                    num);
             return 0;
         }
-        printf("    - channel %i fired at SW count %8u", i, (unsigned)timeouts[i]);
+        printf("    - channel %i fired at SW count %8" PRIu32, i, (unsigned)timeouts[i]);
         if (i == 0) {
             printf("      - init: %8" PRIu32 "\n", atomic_load_u32(&timeouts[i]));
         }
@@ -328,9 +327,7 @@ int main(void)
     int failed = 0;
     /* test all configured timers */
     for (unsigned i = 0; i < TIMER_NUMOF; i++) {
-        printf("\nTIMER %u\n"
-               "=======\n\n",
-               i);
+        printf("\nTIMER %u\n=======\n\n", i);
         print_supported_frequencies(TIMER_DEV(i));
 
         /* test querying of frequencies, but only if supported by the driver */
