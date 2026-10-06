@@ -1,17 +1,27 @@
 OPENOCD_SCRIPTS_PATH=${OPENOCD_SCRIPTS_PATH:-/usr/share/openocd/scripts/}
 DOCKER=${DOCKER:-docker}
 
+# Assume that boards are only in the `boards` folder of the current git repo,
+# or in any gitsubmodule under the current repo. This works both in RIOT and
+# in external projects that do use RIOT as git submodule.
 function _boards {
     local -a _boards_available
     local -a _board_dirs
     _board_dirs=( ${(s[ ])EXTERNAL_BOARD_DIRS} )
-    local _repo_root
     if git rev-parse --is-inside-work-tree &> /dev/null; then
         local _repo_root="$(git rev-parse --show-toplevel)"
-        _board_dirs+=("$_repo_root/boards")
+        if [ -d "$_repo_root/boards" ]; then
+            _board_dirs+=("$_repo_root/boards")
+        fi
+
+        for submodule in $(git submodule status --recursive | cut -d ' ' -f 3); do
+            if [ -d "$submodule/boards" ]; then
+                _board_dirs+=("$submodule/boards")
+            fi
+        done
     fi
     for dir ("$_board_dirs[@]") \
-        _boards_available+=($(ls $dir | grep -v common))
+        _boards_available+=($(ls "$dir" | grep -v common))
 
     _describe 'board' _boards_available
 }
@@ -35,7 +45,13 @@ function _bools {
 }
 
 function _serials {
-    local -a _serial_vals=($(ls /dev/tty*))
+    local -a _serial_vals
+
+    if [[ $OSTYPE == darwin* ]]; then
+        _serial_vals=(/dev/cu.*(N))
+    else
+        _serial_vals=(/dev/ttyUSB*(N) /dev/ttyACM*(N))
+    fi
 
     _describe 'serial' _serial_vals
 }
@@ -150,7 +166,7 @@ function _riot {
         "info-build:show details to debug the build"
         "info-build-json:show details of the build as JSON"
         "info-buildsize:print the size of the firmware for the given board"
-	"info-buildsizes-diff:compare the size of two firmware builds for two given directories"
+        "info-buildsizes-diff:compare the size of two firmware builds for two given directories"
         "info-cpu:print the CPU family for the given board"
         "info-features-missing:list features missing by the given board in regard to the given app"
         "info-features-provided:list features provided by the given board"
@@ -160,7 +176,7 @@ function _riot {
         "info-objsize:list the size of the individual modules (prior garbage collection)"
         "info-packages:list packages used by the given app when build for the given board"
         "info-programmers-supported:list programmers supported by the given board"
-        "info-rust:list versions of the used rust toolcahin"
+        "info-rust:list versions of the used rust toolchain"
         "info-toolchains-supported:list toolchains supported by the given board"
         "list-ttys:list TTYs connected to the machine"
         "lstfile:dump lots of details of the build firmware in a lstfile"
@@ -172,8 +188,7 @@ function _riot {
 
     _describe 'target' _std_targets
     _arguments -A '*' \
-        '(-C --directory=)'{-C,--directory}'[dir of the app to build]:dir:_directories' \
-        #
+        '(-C --directory=)'{-C,--directory}'[dir of the app to build]:dir:_directories'
 
     local -a vars
     vars=(
@@ -205,3 +220,27 @@ function _riot {
 
     _values -w 'variables' $vars
 }
+
+_is_riot() {
+    if ! git rev-parse --is-inside-work-tree &> /dev/null; then
+        return 1
+    fi
+    local _repo_root="$(git rev-parse --show-toplevel)"
+    if [ -f "$_repo_root/.murdock" ]; then
+        return 0
+    fi
+    for submodule in $(git submodule status --recursive | cut -d ' ' -f 3); do
+        if [ -f "$submodule/.murdock" ]; then
+            return 0
+        fi
+    done
+    return 1
+}
+
+compdef '
+if _is_riot; then
+    _riot
+else
+    _make
+fi
+' make
