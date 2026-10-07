@@ -234,7 +234,7 @@ bool _native_host_internal(void);
  * @private
  *
  * Hands the CPU over to the host thread of the thread returned by
- * @ref thread_get_active and blocks until the calling thread is scheduled
+ * @ref thread_get_active() and blocks until the calling thread is scheduled
  * again. Returns immediately if the calling thread is still the active thread.
  */
 void _native_switch_to_active(void);
