@@ -10,6 +10,7 @@ endif
 
 ifneq (,$(filter ieee802154_submac,$(USEMODULE)))
 	SRC += submac.c
+	SRC += ieee802154_timings.c
 endif
 
 include $(RIOTBASE)/Makefile.base
