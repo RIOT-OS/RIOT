@@ -501,35 +501,9 @@ int ieee802154_send(ieee802154_submac_t *submac, const iolist_t *iolist)
 static int ieee802154_submac_config_phy(ieee802154_submac_t *submac,
                                         const ieee802154_phy_conf_t *conf)
 {
-    switch (conf->phy_mode) {
-    case IEEE802154_PHY_OQPSK:
-    case IEEE802154_PHY_BPSK:
+    if (conf->phy_mode != IEEE802154_PHY_DISABLED && conf->phy_mode != IEEE802154_PHY_NO_OP) {
         submac->csma_backoff_us = ieee802154_calculate_unit_backoff_period(conf);
         submac->ack_timeout_us = ieee802154_calculate_ack_wait_duration(conf);
-        break;
-#ifdef MODULE_NETDEV_IEEE802154_MR_OQPSK
-    case IEEE802154_PHY_MR_OQPSK:
-        submac->ack_timeout_us = _mr_oqpsk_ack_timeout_us((void *)conf);
-        submac->csma_backoff_us = _mr_oqpsk_csma_backoff_period_us((void *)conf);
-        break;
-#endif
-#ifdef MODULE_NETDEV_IEEE802154_MR_OFDM
-    case IEEE802154_PHY_MR_OFDM:
-        submac->ack_timeout_us = _mr_ofdm_ack_timeout_us((void *)conf);
-        submac->csma_backoff_us = _mr_ofdm_csma_backoff_period_us((void *)conf);
-        break;
-#endif
-#ifdef MODULE_NETDEV_IEEE802154_MR_FSK
-    case IEEE802154_PHY_MR_FSK:
-        submac->ack_timeout_us = _mr_fsk_ack_timeout_us((void *)conf);
-        submac->csma_backoff_us = _mr_fsk_csma_backoff_period_us((void *)conf);
-        break;
-#endif
-    case IEEE802154_PHY_NO_OP:
-    case IEEE802154_PHY_DISABLED:
-        break;
-    default:
-        return -EINVAL;
     }
 
     return ieee802154_radio_config_phy(&submac->dev, conf);
