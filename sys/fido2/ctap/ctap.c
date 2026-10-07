@@ -32,7 +32,7 @@
 #include "fido2/ctap/transport/hid/ctap_hid.h"
 #endif
 
-#define ENABLE_DEBUG    (0)
+#define ENABLE_DEBUG 0
 #include "debug.h"
 
 /**

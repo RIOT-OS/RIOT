@@ -20,7 +20,7 @@
 #include "objects/humidity.h"
 #include "objects/ipso_sensor_base.h"
 
-#define ENABLE_DEBUG 1
+#define ENABLE_DEBUG 0
 #include "debug.h"
 
 /**
