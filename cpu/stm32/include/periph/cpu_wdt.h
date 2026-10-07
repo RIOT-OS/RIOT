@@ -37,12 +37,7 @@ extern "C" {
 #define NWDT_TIME_UPPER_LIMIT          (4U * US_PER_MS * 4096U * (1 << 6U) \
                                         / CLOCK_LSI)
 #define WDT_HAS_STOP                   (0U)     /**<  Watchdog can't be stopped once enabled */
-/** Whether Watchdog has an init function (only on STM32L4) */
-#if defined(CPU_FAM_STM32L4)
-#define WDT_HAS_INIT                   (1U)
-#else
-#define WDT_HAS_INIT                   (0U)
-#endif
+#define WDT_HAS_INIT                   (0U)     /**<  Watchdog has no init function */
 /** @} */
 
 #ifdef __cplusplus

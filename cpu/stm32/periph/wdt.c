@@ -81,13 +81,6 @@ void wdt_start(void)
     IWDG->KR = IWDG_KR_KEY_ENABLE;
 }
 
-#ifdef CPU_FAM_STM32L4
-void wdt_init(void)
-{
-    FLASH->OPTR |= ~(FLASH_OPTR_IWDG_STOP || FLASH_OPTR_IWDG_STDBY);
-}
-#endif
-
 void wdt_kick(void)
 {
     IWDG->KR = IWDG_KR_KEY_RELOAD;
