@@ -351,16 +351,20 @@ psa_status_t psa_algorithm_dispatch_sign_message(const psa_key_attributes_t *att
 
     psa_get_key_data_from_key_slot(slot, &key_data, &key_bytes);
 
+    /* A sealed key is stored as an opaque blob, so the slot reports no plaintext
+     * key length. Pass zero instead of dereferencing a NULL pointer. */
+    size_t key_data_len = key_bytes ? *key_bytes : 0;
+
     switch (asym_key) {
 #if IS_USED(MODULE_PSA_ASYMMETRIC_ECC_P192R1)
     case PSA_ECC_P192_R1:
-        return psa_ecc_p192r1_sign_message(attributes, alg, key_data, *key_bytes, input,
+        return psa_ecc_p192r1_sign_message(attributes, alg, key_data, key_data_len, input,
                                            input_length,
                                            signature, signature_size, signature_length);
 #endif
 #if IS_USED(MODULE_PSA_ASYMMETRIC_ECC_P256R1)
     case PSA_ECC_P256_R1:
-        return psa_ecc_p256r1_sign_message(attributes, alg, key_data, *key_bytes, input,
+        return psa_ecc_p256r1_sign_message(attributes, alg, key_data, key_data_len, input,
                                            input_length,
                                            signature, signature_size, signature_length);
 #endif
@@ -386,6 +390,7 @@ psa_status_t psa_algorithm_dispatch_sign_message(const psa_key_attributes_t *att
         (void)signature_length;
         (void)pub_key_data;
         (void)pub_key_bytes;
+        (void)key_data_len;
         return PSA_ERROR_NOT_SUPPORTED;
     }
 }
