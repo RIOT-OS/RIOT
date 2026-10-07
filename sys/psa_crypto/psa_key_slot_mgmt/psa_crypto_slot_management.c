@@ -206,17 +206,17 @@ static void psa_wipe_real_slot_type(psa_key_slot_t *slot)
         if (!PSA_KEY_TYPE_IS_KEY_PAIR(attr.type)) {
             memset(slot, 0, sizeof(psa_key_slot_t));
         }
+#if PSA_SEALED_KEY_COUNT
+        else if (PSA_KEY_LIFETIME_GET_LOCATION(attr.lifetime) == PSA_KEY_LOCATION_LOCAL_SEALED) {
+            memset((psa_sealed_key_slot_t *)slot, 0, sizeof(psa_sealed_key_slot_t));
+        }
+#endif
 #if PSA_ASYMMETRIC_KEYPAIR_COUNT
         else {
             memset((psa_key_pair_slot_t *)slot, 0, sizeof(psa_key_pair_slot_t));
         }
 #endif
     }
-#if PSA_SEALED_KEY_COUNT
-    else if (PSA_KEY_LIFETIME_GET_LOCATION(attr.lifetime) == PSA_KEY_LOCATION_LOCAL_SEALED) {
-        memset((psa_sealed_key_slot_t *)slot, 0, sizeof(psa_sealed_key_slot_t));
-    }
-#endif
 #if PSA_PROTECTED_KEY_COUNT
     else {
         memset((psa_prot_key_slot_t *)slot, 0, sizeof(psa_prot_key_slot_t));
