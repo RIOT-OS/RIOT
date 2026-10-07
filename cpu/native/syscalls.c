@@ -109,7 +109,7 @@ void *malloc(size_t size)
     _native_syscall_enter();
     r = real_malloc(size);
     _native_syscall_leave();
-    if (IS_USED(MODULE_MALLOC_MONITOR)) {
+    if (IS_USED(MODULE_MALLOC_MONITOR) && !_native_host_internal()) {
         malloc_monitor_add(r, size, cpu_get_caller_pc(), "m");
     }
     return r;
@@ -120,7 +120,7 @@ void free(void *ptr)
     _native_syscall_enter();
     real_free(ptr);
     _native_syscall_leave();
-    if (IS_USED(MODULE_MALLOC_MONITOR)) {
+    if (IS_USED(MODULE_MALLOC_MONITOR) && !_native_host_internal()) {
         malloc_monitor_rm(ptr, cpu_get_caller_pc());
     }
 }
@@ -147,7 +147,7 @@ void *calloc(size_t nmemb, size_t size)
     _native_syscall_enter();
     r = real_calloc(nmemb, size);
     _native_syscall_leave();
-    if (IS_USED(MODULE_MALLOC_MONITOR)) {
+    if (IS_USED(MODULE_MALLOC_MONITOR) && !_native_host_internal()) {
         malloc_monitor_add(r, nmemb*size, cpu_get_caller_pc(), "c");
     }
     return r;
@@ -159,7 +159,7 @@ void *realloc(void *ptr, size_t size)
     _native_syscall_enter();
     r = real_realloc(ptr, size);
     _native_syscall_leave();
-    if (IS_USED(MODULE_MALLOC_MONITOR)) {
+    if (IS_USED(MODULE_MALLOC_MONITOR) && !_native_host_internal()) {
         malloc_monitor_mv(ptr, r, size, cpu_get_caller_pc());
     }
     return r;

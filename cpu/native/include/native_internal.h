@@ -220,6 +220,15 @@ extern volatile int _native_in_isr;
 bool _native_is_cpu_owner(void);
 
 /**
+ * @brief   Check if the caller is host internal code running outside of a
+ *          RIOT thread context (e.g. the host libc managing host threads)
+ *
+ * Memory allocated by such code must not be tracked by malloc_monitor, as
+ * the monitor requires a RIOT thread context.
+ */
+bool _native_host_internal(void);
+
+/**
  * @brief Switches to the active thread as selected by the scheduler
  * @pre All signals are blocked and the calling host thread was the CPU owner
  * @private

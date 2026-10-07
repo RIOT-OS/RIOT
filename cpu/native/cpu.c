@@ -115,6 +115,18 @@ static __thread jmp_buf *_exit_buf;
 static pthread_t _zombie;
 static bool _have_zombie;
 
+/**
+ * @brief   Number of host thread management calls in progress, they allocate
+ *          memory on behalf of the host libc
+ */
+static unsigned _host_calls;
+
+/**
+ * @brief   The calling host thread has left its RIOT thread and is only
+ *          running host libc exit code
+ */
+static __thread bool _exited;
+
 static inline native_thread_t *_native_thread(thread_t *thread)
 {
     /* Use intermediate cast to uintptr_t to silence -Wcast-align.
@@ -140,7 +152,9 @@ static void _reap_zombie(void)
     if (_have_zombie) {
         _have_zombie = false;
         _native_pending_syscalls_up();
+        _host_calls++;
         real_pthread_join(_zombie, NULL);
+        _host_calls--;
         _native_pending_syscalls_down();
     }
 }
@@ -164,6 +178,7 @@ static void _start(native_thread_t *next)
     next->started = true;
 
     _native_pending_syscalls_up();
+    _host_calls++;
     real_pthread_attr_init(&attr);
     /* the host libc may reject the RIOT stack if it is too small for it,
      * fall back to a stack allocated by the host libc in that case */
@@ -176,6 +191,7 @@ static void _start(native_thread_t *next)
         res = real_pthread_create(&pthread, NULL, _thread_entry, next);
     }
     real_pthread_attr_destroy(&attr);
+    _host_calls--;
     _native_pending_syscalls_down();
 
     if (res != 0) {
@@ -214,6 +230,11 @@ static void _wait_for_cpu(native_thread_t *self)
     }
 
     _reap_zombie();
+}
+
+bool _native_host_internal(void)
+{
+    return _host_calls || _exited;
 }
 
 bool _native_is_cpu_owner(void)
@@ -294,6 +315,7 @@ void cpu_switch_context_exit(void)
     real_close(_self->pipe_fd[1]);
     _zombie = _self->pthread;
     _have_zombie = true;
+    _exited = true;
     _schedule(next);
 
     /* the new CPU owner joins this host thread before touching anything,
