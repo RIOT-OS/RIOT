@@ -1,5 +1,5 @@
 ---
-title: Installing WSL (Windows-only)
+title: Setting up WSL on Windows
 description: Install Ubuntu LTS and Windows Subsystem for Linux (WSL)
 ---
 
@@ -13,23 +13,23 @@ If you are using a different operating system, please refer to [the general guid
 
 ## Install Ubuntu LTS
 
-![Searching Ubuntu LTS in the Windows Store](img/00-Install_Ubuntu-00.png)
+![Searching Ubuntu LTS in the Windows Store](../img/00-Install_Ubuntu-00.png)
 
 1. Open the Windows Store
 2. Type "Ubuntu LTS" in the search bar
 3. Click on the most recent version (highest number) of Ubuntu LTS found.
    As of February 2024, this is version Ubuntu 22.04.3 LTS.
 
-![The Ubuntu LTS page in the Windows Store](img/00-Install_Ubuntu-01.png)
+![The Ubuntu LTS page in the Windows Store](../img/00-Install_Ubuntu-01.png)
 
 1. Click on the button labeled "Get"
 
 
-![The Windows Store App is installing Ubuntu LTS](img/00-Install_Ubuntu-02.png)
+![The Windows Store App is installing Ubuntu LTS](../img/00-Install_Ubuntu-02.png)
 
 It will take a while for Ubuntu LTS to be installed.
 
-![The Windows Store App has completed installing Ubuntu LTS](img/00-Install_Ubuntu-03.png)
+![The Windows Store App has completed installing Ubuntu LTS](../img/00-Install_Ubuntu-03.png)
 
 Eventually, the installation completes.
 
@@ -40,7 +40,7 @@ If the Windows Subsystem for Linux (WSL) has not yet been enabled, an error
 such as below will show. Not to worry, the next section got you covered.
 :::
 
-![Error message because WSL is not enabled](img/00-Install_Ubuntu-04.png)
+![Error message because WSL is not enabled](../img/00-Install_Ubuntu-04.png)
 
 ## Enabling WSL
 
@@ -49,26 +49,26 @@ If an Ubuntu terminal opened just fine, proceed directly to the next section.
 This section will show how to enable WSL for those who hit the error.
 :::
 
-![Opening the PowerShell as administrator](img/01-Install_WSL-00.png)
+![Opening the PowerShell as administrator](../img/01-Install_WSL-00.png)
 
 1. Search for "powershell" in the search field of the task bar
 2. ***Right***-click on the hit "Windows PowerShell"
 3. Click "Run as administrator"
 
-![Prompt asking for confirmation to run PowerShell as admin](img/01-Install_WSL-01.png)
+![Prompt asking for confirmation to run PowerShell as admin](../img/01-Install_WSL-01.png)
 
 1. Click "Yes" to confirm running the PowerShell as administrator
 
-![PowerShell terminal opened as administrator](img/01-Install_WSL-02.png)
+![PowerShell terminal opened as administrator](../img/01-Install_WSL-02.png)
 
 - Type `wsl --install` and confirm with the return-key.
 - After a while, the following message should appear:
 
-![PowerShell after WSL has been enabled](img/01-Install_WSL-03.png)
+![PowerShell after WSL has been enabled](../img/01-Install_WSL-03.png)
 
 - Now reboot Windows to complete the installation
 
-![Windows installing WSL during reboot](img/01-Install_WSL-04.png)
+![Windows installing WSL during reboot](../img/01-Install_WSL-04.png)
 
 The reboot will take longer than usual due to the installation of WSL. You
 may see a screen like above for some time. Once the reboot is completed,
@@ -78,14 +78,14 @@ an Ubuntu terminal should open automatically.
 
 You should now see an Ubuntu terminal such as:
 
-![An Ubuntu terminal when first started](img/02-Setup_Ubuntu-00.png)
+![An Ubuntu terminal when first started](../img/02-Setup_Ubuntu-00.png)
 
 <details>
 <summary>
     If no Ubuntu terminal has opened, click here to see how to open it
 </summary>
 
-![Open Ubuntu in the start menu](img/02-Setup_Ubuntu-01.png)
+![Open Ubuntu in the start menu](../img/02-Setup_Ubuntu-01.png)
 
 1. Click on the Start / Windows button in the task bar
 2. Click on the "Ubuntu" entry
@@ -110,7 +110,7 @@ no need to worry.
 - Once you successfully have entered user name and password, you should see
   something like this:
 
-![Ubuntu terminal after username and password are configured](img/02-Setup_Ubuntu-02.png)
+![Ubuntu terminal after username and password are configured](../img/02-Setup_Ubuntu-02.png)
 
 - now type (without quotation signs) "sudo apt update" and confirm with the return-key
 - you will be asked for you password. Enter it and confirm with the return key
@@ -122,7 +122,7 @@ typed password or `*` chars. This is an intentional security feature.
 
 - Once you successfully entered the password, something like this will show up:
 
-![Ubuntu terminal after running apt update](img/02-Setup_Ubuntu-03.png)
+![Ubuntu terminal after running apt update](../img/02-Setup_Ubuntu-03.png)
 
 :::note
 The command `sudo apt update` only updates the list of available software
@@ -145,7 +145,7 @@ password.
 - Eventually after all software packages in Ubuntu have been updated, you will
   see something like this:
 
-![Ubuntu terminal after updating software](img/02-Setup_Ubuntu-05.png)
+![Ubuntu terminal after updating software](../img/02-Setup_Ubuntu-05.png)
 
 
 :::note
@@ -155,7 +155,7 @@ using `sudo apt update` followed by `sudo apt upgrade`
 
 ## Installing VS Code
 
-![Windows Store page of VS Code](img/04-Install_VS_Code-00.png)
+![Windows Store page of VS Code](../img/04-Install_VS_Code-00.png)
 
 1. Click on the Windows Store icon to open the Windows store
 2. Type `vs code` in the search bar
@@ -164,22 +164,22 @@ using `sudo apt update` followed by `sudo apt upgrade`
 4. In the Windows Store page of VS Code (as shown in the screenshot above),
    click on the button labeled "Install"
 
-![Windows Store installing VS Code](img/04-Install_VS_Code-01.png)
+![Windows Store installing VS Code](../img/04-Install_VS_Code-01.png)
 
 - Downloading and installing VS Code by the Store App may take some time
 - Eventually, it should show something like this:
 
-![Windows Store completed installing VS Code](img/04-Install_VS_Code-02.png)
+![Windows Store completed installing VS Code](../img/04-Install_VS_Code-02.png)
 
 - Now, launch VS Code via the start menu
 - On the first launch, VS code will look similar to this:
 
-![First Launch page of VS Code](img/04-Install_VS_Code-03.png)
+![First Launch page of VS Code](../img/04-Install_VS_Code-03.png)
 
 - You can select a theme of you liking
 - You might want to dial back the data collection by Microsoft by clicking on "opt out"
 
-![Installation of the WSL extension for VS Code](img/04-Install_VS_Code-04.png)
+![Installation of the WSL extension for VS Code](../img/04-Install_VS_Code-04.png)
 
 1. Open the extension marketplace by clicking on the extensions icon in the
    left menu bar
@@ -194,34 +194,34 @@ Ubuntu terminal. If the Ubuntu terminal was still open, close it using the
 
 ## Installing `usbipd-win`
 
-![Release Page of usbipd-win](img/07-Install_USBIPd-01.png)
+![Release Page of usbipd-win](../img/07-Install_USBIPd-01.png)
 
 0. Open the [release page of `usbipd-win`][usbipd-win-releases]
 1. Download the installer (file extension `.msi`) of the most recent release
 
 [usbipd-win-releases]: https://github.com/dorssel/usbipd-win/releases
 
-![Download of usbipd-win completed](img/07-Install_USBIPd-02.png)
+![Download of usbipd-win completed](../img/07-Install_USBIPd-02.png)
 
 Once the download is completed:
 
 1. Open the downloaded installer
 
-![Confirmation to open the installer](img/07-Install_USBIPd-03.png)
+![Confirmation to open the installer](../img/07-Install_USBIPd-03.png)
 
 1. Confirm that you indeed want to execute the installer by clicking "OK".
 
-![Setup of usbipd-win](img/07-Install_USBIPd-04.png)
+![Setup of usbipd-win](../img/07-Install_USBIPd-04.png)
 
 The setup of `usbipd-win` opens.
 
 1. Click on the "Install" button to proceed with the installation.
 
-![Confirmation of installation](img/07-Install_USBIPd-05.png)
+![Confirmation of installation](../img/07-Install_USBIPd-05.png)
 
 1. Confirm the installation by clicking on "Yes".
 
-![Completion of the usbipd-win setup](img/07-Install_USBIPd-06.png)
+![Completion of the usbipd-win setup](../img/07-Install_USBIPd-06.png)
 
 Eventually, the setup will inform you of the completion of the installation.
 
@@ -244,17 +244,17 @@ anyway. All supported board run on Linux out of the box without the need of
 drivers to be installed.
 :::
 
-![Running PowerShell as admin](img/08-Flash_Real_Hardware-00.png)
+![Running PowerShell as admin](../img/08-Flash_Real_Hardware-00.png)
 
 1. Search for `powershell` in search field in the task bar
 2. ***Right***-click on the search result "Windows PowerShell"
 3. Select "Run as administrator"
 
-![Confirmation to run PowerShell as admin](img/08-Flash_Real_Hardware-01.png)
+![Confirmation to run PowerShell as admin](../img/08-Flash_Real_Hardware-01.png)
 
 1. Click on "Yes" to confirm running the PowerShell as admin
 
-![PowerShell terminal](img/08-Flash_Real_Hardware-02.png)
+![PowerShell terminal](../img/08-Flash_Real_Hardware-02.png)
 
 1. Type the command `usbipd list` and confirm with the return-key
 2. Identify the USB device to share. In this guide we use an ESP32 development
