@@ -282,6 +282,20 @@ void rtc_init(void)
         RTC->BKP0R = MAGIC_CLCK_NUMBER; /* Store the new magic number */
     }
 #endif
+#if defined(CPU_FAM_STM32F4) || defined(CPU_FAM_STM32F7)
+    /* The RTC clock source can only be changed by resetting the backup domain.
+     * If a different clock domain was set previously without a power cycle,
+     * it has to be reset as otherwise the initialization will hang.
+     * This also clears LSEON, so it must happen before the LF clock is enabled.
+     * Potentially affects more families than the F4 and F7. */
+    uint32_t clksel = EN_REG & CLKSEL_MASK;
+    if ((clksel != 0) && ((IS_ACTIVE(CONFIG_BOARD_HAS_LSE) && (clksel != CLKSEL_LSE)) ||
+                          (!IS_ACTIVE(CONFIG_BOARD_HAS_LSE) && (clksel != CLKSEL_LSI)))) {
+        EN_REG |= RCC_BDCR_BDRST;
+        EN_REG &= ~RCC_BDCR_BDRST;
+    }
+#endif
+
     /* enable low frequency clock */
     stmclk_enable_lfclk();
 
@@ -309,8 +323,7 @@ void rtc_init(void)
     }
 #endif
 
-    if (!(RTC_REG_ISR & RTC_ISR_INITS))
-    {
+    if (!(RTC_REG_ISR & RTC_ISR_INITS)) {
         rtc_enter_init_mode();
         /* reset configuration */
         RTC->CR = 0;
@@ -321,11 +334,11 @@ void rtc_init(void)
 
     /* configure the EXTI channel, as RTC interrupts are routed through it.
      * Needs to be configured to trigger on rising edges. */
-    EXTI_REG_IMR  |= EXTI_IMR_BIT;
+    EXTI_REG_IMR |= EXTI_IMR_BIT;
 #if !(defined(CPU_FAM_STM32L5) || defined(CPU_FAM_STM32WL))
     EXTI_REG_FTSR &= ~(EXTI_FTSR_BIT);
     EXTI_REG_RTSR |= EXTI_RTSR_BIT;
-    EXTI_REG_PR   = EXTI_PR_BIT;
+    EXTI_REG_PR = EXTI_PR_BIT;
 #endif
     /* enable global RTC interrupt */
     NVIC_EnableIRQ(IRQN);
