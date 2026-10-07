@@ -14,11 +14,12 @@
 #include "uri_parser.h"
 #include "modules.h"
 
+#include "net/sock.h"
+#include "net/sock/udp.h"
+
 #if IS_USED(MODULE_UNICOAP_SOCK_SUPPORT) || defined(DOXYGEN)
-#  include "net/sock.h"
 #  include "net/sock/async/event.h"
 #  include "net/sock/util.h"
-#  include "net/sock/udp.h"
 #  include "net/sock/tcp.h"
 #endif
 
@@ -226,7 +227,6 @@ typedef struct {
     };
 } unicoap_endpoint_t;
 
-#if IS_USED(MODULE_UNICOAP_SOCK_SUPPORT) || defined(DOXYGEN)
 /**
  * @brief Retrieves UDP endpoint from CoAP endpoint
  * @pre @p endpoint is a CoAP over UDP endpoint (proto == @ref UNICOAP_PROTO_UDP)
@@ -239,7 +239,12 @@ typedef struct {
  */
 static inline sock_udp_ep_t* unicoap_endpoint_get_udp(unicoap_endpoint_t* endpoint)
 {
+    (void)endpoint;
+#if IS_USED(MODULE_UNICOAP_SOCK_SUPPORT)
     return &endpoint->udp_ep;
+#else
+    return NULL;
+#endif
 }
 
 /**
@@ -254,10 +259,15 @@ static inline sock_udp_ep_t* unicoap_endpoint_get_udp(unicoap_endpoint_t* endpoi
  */
 static inline sock_udp_ep_t* unicoap_endpoint_get_dtls(unicoap_endpoint_t* endpoint)
 {
+    (void)endpoint;
+#if IS_USED(MODULE_UNICOAP_SOCK_SUPPORT)
     return &endpoint->dtls_ep;
+#else
+    return NULL;
+#endif
 }
 
-#  ifndef DOXYGEN
+#ifndef DOXYGEN
 /**
  * @brief Private API. Retrieves transport layer endpoint from CoAP endpoint
  *
@@ -269,10 +279,14 @@ static inline sock_udp_ep_t* unicoap_endpoint_get_dtls(unicoap_endpoint_t* endpo
  */
 static inline struct _sock_tl_ep* _unicoap_endpoint_get_tl(unicoap_endpoint_t* endpoint)
 {
+    (void)endpoint;
+#  if IS_USED(MODULE_UNICOAP_SOCK_SUPPORT)
     return &endpoint->_tl_ep;
+#  else
+    return NULL;
+#  endif
 }
-#  endif /* !defined(DOXYGEN) */
-#endif /* IS_USED(MODULE_UNICOAP_SOCK_SUPPORT) || defined(DOXYGEN) */
+#endif /* !defined(DOXYGEN) */
 /** @} */
 
 /* MARK: - Conversions and Tools */
@@ -438,6 +452,8 @@ void* unicoap_transport_dtls_get_socket(void)
  *
  * You can call this function at any time after `unicoap` has been initialized.
  *
+ * @warning Not fully supported yet.
+ *
  * @returns `0` on success or negative error value otherwise. The error value depends on the
  * DTLS implementation.
  */
@@ -460,6 +476,8 @@ int unicoap_transport_dtls_add_socket(void* socket, void* base_socket, void* loc
  *
  * @param[in,out] socket The socket pointer you have previously passed to
  *                       @ref unicoap_transport_dtls_add_socket
+ *
+ * @warning Not fully supported yet.
  *
  * @returns `0`, indicating a success. Future versions of this API may return a negative error.
  *

@@ -11,13 +11,14 @@
  * @author  Carl Seifert <carl.seifert@tu-dresden.de>
  */
 
-#include <stdint.h>
 #include <errno.h>
+#include <stdint.h>
+
 #include "architecture.h"
-#include "net/unicoap/transport.h"
 #include "net/sock.h"
-#include "net/sock/async/types.h"
 #include "net/sock/async/event.h"
+#include "net/sock/async/types.h"
+#include "net/unicoap/transport.h"
 
 #define ENABLE_DEBUG CONFIG_UNICOAP_DEBUG_LOGGING
 #include "debug.h"
@@ -28,9 +29,6 @@
 UNICOAP_DECL_RECEIVER_STORAGE_EXTERN;
 
 static sock_udp_t _udp_socket;
-
-extern int unicoap_messaging_process_rfc7252(const uint8_t* pdu, size_t size, bool truncated,
-                                             unicoap_packet_t* packet);
 
 static void _udp_on_event(sock_udp_t* sock, sock_async_flags_t type, void* arg)
 {
@@ -98,7 +96,9 @@ static void _udp_on_event(sock_udp_t* sock, sock_async_flags_t type, void* arg)
         }
 #endif
 
-        unicoap_messaging_process_rfc7252(pdu, (size_t)received, truncated, &packet);
+        unicoap_messaging_process_rfc7252(pdu, (size_t)received,
+                                          UNICOAP_MESSAGING_RFC7252_EVENT_RX | (truncated ? UNICOAP_MESSAGING_RFC7252_EVENT_TRUNCATED : 0),
+                                          &packet);
 
         if (IS_ACTIVE(CONFIG_UNICOAP_SOCK_ZERO_COPY_GUARANTEES)) {
             received = sock_udp_recv_buf_aux(sock, &stackbuf, &buffer_ctx, 0,
@@ -137,9 +137,9 @@ int unicoap_transport_sendv_udp(iolist_t* iolist, const sock_udp_ep_t* remote,
 static int _add_socket(event_queue_t* queue, sock_udp_t* socket, sock_udp_ep_t* local)
 {
     _UDP_DEBUG("zero_copy_guarantees=%u creating UDP sock, port=%" PRIu16 " if=%" PRIu16
-              " family=%s\n",
-              CONFIG_UNICOAP_SOCK_ZERO_COPY_GUARANTEES, local->port, local->netif,
-              local->family == AF_INET6 ? "inet6" : (local->family == AF_INET ? "inet" : "?"));
+               " family=%s\n",
+               CONFIG_UNICOAP_SOCK_ZERO_COPY_GUARANTEES, local->port, local->netif,
+               local->family == AF_INET6 ? "inet6" : (local->family == AF_INET ? "inet" : "?"));
 
     int res = sock_udp_create(socket, local, NULL, 0);
     if (res < 0) {
@@ -174,11 +174,13 @@ sock_udp_t* unicoap_transport_udp_get_socket(void)
     return &_udp_socket;
 }
 
-int unicoap_transport_udp_add_socket(sock_udp_t* socket, sock_udp_ep_t* local) {
+int unicoap_transport_udp_add_socket(sock_udp_t* socket, sock_udp_ep_t* local)
+{
     return _add_socket(sock_udp_get_async_ctx(&_udp_socket)->queue, socket, local);
 }
 
-int unicoap_transport_udp_remove_socket(sock_udp_t* socket) {
+int unicoap_transport_udp_remove_socket(sock_udp_t* socket)
+{
     sock_udp_close(socket);
     return 0;
 }
