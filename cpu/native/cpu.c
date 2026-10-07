@@ -113,7 +113,7 @@ static __thread jmp_buf *_exit_buf;
  * @brief   Host thread of the last RIOT thread that exited, still to be joined
  */
 static pthread_t _zombie;
-static bool _have_zombie;
+static bool _have_zombie; /**< True if _zombie currently points to a zombie thread */
 
 /**
  * @brief   Number of host thread management calls in progress, they allocate
