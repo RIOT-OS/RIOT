@@ -51,7 +51,6 @@ BOARD_INSUFFICIENT_MEMORY := \
     stm32mp157c-dk2 \
     telosb \
     weact-g030f6 \
-    yunjia-nrf51822 \
     z1 \
     zigduino \
     #
