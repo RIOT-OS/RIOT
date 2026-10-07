@@ -26,8 +26,8 @@ all: $(PKG_BUILD_DIR)/Makefile
 LAYOUT_MK := $(RIOTBASE)/pkg/riot-tee/riot-tee-layout.mk
 
 # tf-m must be prepared before cmake configures: riot-tee's CMakeLists lists the
-# cc3xx driver sources (under build/pkg/tf-m) as add_library sources, so they
-# have to exist in build/pkg/tf-m before this configure step runs.
+# cc3xx driver sources (under $(PKGDIRBASE)/tf-m) as add_library sources, so
+# they have to exist before this configure step runs.
 $(PKG_BUILD_DIR)/Makefile: $(TOOLCHAIN_FILE) $(LAYOUT_MK)
 	"$(MAKE)" -C $(RIOTBASE)/pkg/tf-m/
 	@rm -rf $(PKG_BUILD_DIR)/CMakeCache.txt
@@ -36,7 +36,7 @@ $(PKG_BUILD_DIR)/Makefile: $(TOOLCHAIN_FILE) $(LAYOUT_MK)
 		-DCMAKE_BUILD_TYPE=Debug \
 		-DCMAKE_C_FLAGS="$(TEE_CFLAGS)" \
 		-DTOOLCHAINPATH=/usr/bin \
-		-DRIOT_CRYPTOSERVICE=$(RIOTBASE)/build/pkg/cryptoservice \
+		-DRIOT_CRYPTOSERVICE=$(PKGDIRBASE)/cryptoservice \
 		-DCMAKE_TOOLCHAIN_FILE=$(TOOLCHAIN_FILE) \
 		-DTEE_FLASH_START=$(TEE_FLASH_START) \
 		-DTEE_FLASH_SIZE=$(TEE_FLASH_SIZE) \
@@ -44,7 +44,7 @@ $(PKG_BUILD_DIR)/Makefile: $(TOOLCHAIN_FILE) $(LAYOUT_MK)
 		-DFIRST_NS_FLASH_REGION=$(FIRST_NS_FLASH_REGION) \
 		-DFIRST_NS_RAM_REGION=$(FIRST_NS_RAM_REGION) \
 		-DNSC_FLASH_REGION=$(NSC_FLASH_REGION) \
-		-DTFM_PATH=$(RIOTBASE)/build/pkg/tf-m \
+		-DTFM_PATH=$(PKGDIRBASE)/tf-m \
 		-B$(PKG_BUILD_DIR) \
 		-H$(PKG_SOURCE_DIR)
 
@@ -57,7 +57,3 @@ $(TOOLCHAIN_FILE): | ..cmake_version_supported
 	$(Q)\
 	CMAKE_VERSION=$$(cmake --version | sed -n '1 {s/cmake version //;s/-rc.*//;p;}'); \
 	$(RIOTTOOLS)/has_minimal_version/has_minimal_version.sh "$${CMAKE_VERSION}" "$(CMAKE_MINIMAL_VERSION)" cmake
-
-clean::
-	@rm -rf $(RIOTBASE)/build/pkg/riot-tee
-	@rm -rf $(BINDIR)
