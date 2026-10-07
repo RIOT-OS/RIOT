@@ -613,17 +613,23 @@ PSEUDOMODULES += test_utils_main_exit_cb
 PSEUDOMODULES += tiny_strerror_as_strerror
 PSEUDOMODULES += tiny_strerror_minimal
 
+# Request cancellation support
+PSEUDOMODULES += unicoap_client_cancellation
+
+# URI support in unicoap client API
+PSEUDOMODULES += unicoap_client_uri
+
 # An umbrella module for the unicoap_driver_rfc7252_common_pdu
 # and unicoap_driver_rfc7252_common_messaging modules
 PSEUDOMODULES += unicoap_driver_rfc7252_common
 # Alias for unicoap_driver_rfc7252_common_pdu, and is hence a pseudomodule
 PSEUDOMODULES += unicoap_driver_rfc7252_pdu
 
-# Common sock dependencies of sock-based CoAP drivers in unicoap
-PSEUDOMODULES += unicoap_sock_support
-
 # XFA support for CoAP resource definitions in unicoap server
 PSEUDOMODULES += unicoap_server_resource_declarations
+
+# Common sock dependencies of sock-based CoAP drivers in unicoap
+PSEUDOMODULES += unicoap_sock_support
 
 PSEUDOMODULES += usbus_urb
 

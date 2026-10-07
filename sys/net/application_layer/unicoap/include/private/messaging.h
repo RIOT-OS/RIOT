@@ -310,10 +310,16 @@ int unicoap_messaging_process_rfc7252(const uint8_t* pdu, size_t size,
  *.                        messaging-layer transmission
  * @returns Zero on success or negative error value. See @ref unicoap_messaging_send_rfc7252.
  */
-int unicoap_messaging_send(unicoap_packet_t* packet, unicoap_messaging_flags_t flags, void* exchange);
+int unicoap_messaging_send(
+    unicoap_packet_t* packet,
+    unicoap_messaging_flags_t flags,
+    void* exchange);
 
 /** @brief Sends CoAP over UDP or DTLS packet, see @ref unicoap_messaging_send */
-int unicoap_messaging_send_rfc7252(unicoap_packet_t* packet, unicoap_messaging_flags_t flags, void* exchange);
+int unicoap_messaging_send_rfc7252(
+    unicoap_packet_t* packet,
+    unicoap_messaging_flags_t flags,
+    void* exchange);
 
 /**
  * @brief Generates new token
@@ -345,7 +351,9 @@ _messaging_flags_resource(unicoap_resource_flags_t resource_flags)
  * @param request_flags Request flags
  * @return Messaging flags extracted from the given bitfield
  */
-static inline unicoap_messaging_flags_t _messaging_flags_client(unicoap_request_flags_t request_flags) {
+static inline unicoap_messaging_flags_t _messaging_flags_client(
+    unicoap_request_flags_t request_flags)
+{
     /* We documented other flags are RFU, hence downcasting to the messaging
      flags bitfield width is fine here */
     return (unicoap_messaging_flags_t)request_flags;
@@ -413,10 +421,10 @@ int unicoap_client_send_request_part(unicoap_packet_t* packet, unicoap_client_me
 /**
  * @brief Sends entire request body, may be split into parts and then sent
  *
- * @param request Request body to send
- * @param endpoint Remote endpoint (server)
- * @param callback Optional application callback
- * @param parameters Optional parameters (nullable)
+ * @param[in] request Request body to send
+ * @param[in] endpoint Remote endpoint (server)
+ * @param[in] callback Optional application callback
+ * @param[in] parameters Optional parameters (nullable)
  * @param flags Request flags
  *
  * @returns Zero on success, negative integer otherwise

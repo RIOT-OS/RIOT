@@ -113,8 +113,8 @@ typedef struct {
     uint8_t carbon_copies[CONFIG_UNICOAP_CARBON_COPIES_MAX][CONFIG_UNICOAP_PDU_SIZE_MAX];
 #endif
 
-#if CONFIG_UNICOAP_RFC7252_TRANSMISSIONS_MAX > 0
-    _transmission_t transmissions[CONFIG_UNICOAP_RFC7252_TRANSMISSIONS_MAX];
+#if CONFIG_UNICOAP_RFC7252_TRANSMISSIONS_CAPACITY > 0
+    _transmission_t transmissions[CONFIG_UNICOAP_RFC7252_TRANSMISSIONS_CAPACITY];
 #endif
 } _state_t;
 
@@ -231,7 +231,7 @@ static inline void _carbon_copy_free(uint8_t* carbon_copy)
 
 static inline _transmission_t* _transmission_alloc_unsafe(void)
 {
-#if CONFIG_UNICOAP_RFC7252_TRANSMISSIONS_MAX > 0
+#if CONFIG_UNICOAP_RFC7252_TRANSMISSIONS_CAPACITY > 0
     /* Find empty slot in list of open requests. */
     for (int i = 0; i < (int)ARRAY_SIZE(_state.transmissions); i += 1) {
         if (!_state.transmissions[i].is_used) {
@@ -290,7 +290,7 @@ static _transmission_t* _transmission_find(const unicoap_endpoint_t* endpoint, u
 {
     (void)endpoint;
     (void)id;
-#if CONFIG_UNICOAP_RFC7252_TRANSMISSIONS_MAX > 0
+#if CONFIG_UNICOAP_RFC7252_TRANSMISSIONS_CAPACITY > 0
     for (int i = 0; i < (int)ARRAY_SIZE(_state.transmissions); i += 1) {
         _transmission_t* transmission = &_state.transmissions[i];
         if (transmission->is_used &&
@@ -678,7 +678,7 @@ static inline int _reset(unicoap_packet_t* packet)
 static int _resume(const unicoap_endpoint_t* endpoint, unicoap_sock_dtls_session_t* session)
 {
     (void)endpoint;
-#if CONFIG_UNICOAP_RFC7252_TRANSMISSIONS_MAX > 0
+#if CONFIG_UNICOAP_RFC7252_TRANSMISSIONS_CAPACITY > 0
     for (int i = 0; i < (int)ARRAY_SIZE(_state.transmissions); i += 1) {
         _transmission_t* transmission = &_state.transmissions[i];
         if (transmission->is_used &&
@@ -1026,9 +1026,9 @@ void unicoap_messaging_print_rfc7252_state(void)
 {
 #if ENABLE_DEBUG
     printf("\n\t- RFC 7252 transmissions (%" PRIuSIZE " total):\n",
-           (size_t)CONFIG_UNICOAP_RFC7252_TRANSMISSIONS_MAX);
+           (size_t)CONFIG_UNICOAP_RFC7252_TRANSMISSIONS_CAPACITY);
 
-#  if CONFIG_UNICOAP_RFC7252_TRANSMISSIONS_MAX > 0
+#  if CONFIG_UNICOAP_RFC7252_TRANSMISSIONS_CAPACITY > 0
     for (size_t i = 0; i < ARRAY_SIZE(_state.transmissions); i += 1) {
         _transmission_t* transmission = &_state.transmissions[i];
         printf("\t\t- transmission #%" PRIuSIZE "\n", i);
@@ -1043,7 +1043,7 @@ void unicoap_messaging_print_rfc7252_state(void)
         printf("\t\t\t- pdu_size=%" PRIuSIZE "\n", transmission->pdu_size);
         printf("\t\t\t- exchange=%p\n", transmission->exchange);
     }
-#  endif /* CONFIG_UNICOAP_RFC7252_TRANSMISSIONS_MAX > 0 */
+#  endif /* CONFIG_UNICOAP_RFC7252_TRANSMISSIONS_CAPACITY > 0 */
 
     printf("\n\t- RFC 7252 carbon copies (%" PRIuSIZE " total):\n",
            (size_t)CONFIG_UNICOAP_CARBON_COPIES_MAX);
