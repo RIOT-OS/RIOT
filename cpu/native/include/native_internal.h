@@ -139,7 +139,7 @@ int native_unregister_interrupt(int sig);
  * is performed, this function only returns once the calling thread is scheduled
  * again. Interrupts are enabled again when this function returns.
  *
- * @param in_signal_handler `true` if called from within the native signal handler
+ * @param[in] in_signal_handler `true` if called from within the native signal handler
  */
 void _native_isr_run(bool in_signal_handler);
 /** @} */
