@@ -12,13 +12,13 @@
  */
 
 #include <errno.h>
-#include "container.h"
-#include "thread.h"
-#include "sched.h"
-#include "random.h"
-#include "event.h"
 
+#include "container.h"
+#include "event.h"
 #include "net/unicoap/config.h"
+#include "random.h"
+#include "sched.h"
+#include "thread.h"
 
 #define ENABLE_DEBUG CONFIG_UNICOAP_DEBUG_LOGGING
 #include "debug.h"
@@ -78,6 +78,262 @@ void unicoap_state_lock(void)
 void unicoap_state_unlock(void)
 {
     _unlock();
+}
+
+static unicoap_client_memo_t* _alloc_client(void)
+{
+#if UNICOAP_HAVE_CLIENT_STATE
+    /* Find empty slot in list of transactions */
+    for (int i = 0; i < (int)ARRAY_SIZE(_state.client_memos); i += 1) {
+        if (_state.client_memos[i].super.endpoint.proto == UNICOAP_PROTO_UNSPECIFIED) {
+            return &_state.client_memos[i];
+        }
+    }
+#endif
+    _STATE_DEBUG("[client] no space to alloc\n");
+    return NULL;
+}
+
+static inline bool _is_client(const unicoap_memo_t* memo)
+{
+    (void)memo;
+#if UNICOAP_HAVE_CLIENT_STATE
+    return (uintptr_t)memo >= (uintptr_t)&_state.client_memos[0] &&
+           (uintptr_t)memo <= (uintptr_t)&_state.client_memos[ARRAY_SIZE(_state.client_memos) - 1];
+#else
+    return false;
+#endif
+}
+
+static inline size_t _client_index(unicoap_client_memo_t* memo)
+{
+    /* debugging-only */
+#if UNICOAP_HAVE_CLIENT_STATE
+    return ((uintptr_t)memo - (uintptr_t)_state.client_memos) / sizeof(*_state.client_memos);
+#else
+    (void)memo;
+    assert(false);
+    return 0;
+#endif
+}
+
+static void _deinit_client(unicoap_client_memo_t* memo)
+{
+    if (!UNICOAP_HAVE_CLIENT_STATE) {
+        return;
+    }
+    _STATE_DEBUG("[client #%" PRIuSIZE "] release\n", _client_index(memo));
+    memo->callback._any = NULL;
+    memo->callback_arg = NULL;
+    memo->flags = 0;
+#if IS_USED(MODULE_UNICOAP_CLIENT_CANCELLATION)
+    memo->reference_id = 0;
+#endif
+}
+
+unicoap_client_memo_t* unicoap_client_memo_create(const unicoap_endpoint_t* endpoint)
+{
+    if (!UNICOAP_HAVE_CLIENT_STATE) {
+        return NULL;
+    }
+    assert(endpoint);
+    assert(endpoint->proto != UNICOAP_PROTO_UNSPECIFIED);
+    _lock();
+    unicoap_client_memo_t* memo = _alloc_client();
+    if (memo) {
+        _STATE_DEBUG("[client #%" PRIuSIZE "] alloc\n", _client_index(memo));
+        memo->super.endpoint = *endpoint;
+    }
+    _unlock();
+    return memo;
+}
+
+static void _free(unicoap_memo_t* memo)
+{
+    unicoap_event_cancel(&memo->exchange.timeout);
+    memset(memo, 0, sizeof(*memo));
+}
+
+void unicoap_client_memo_free(unicoap_client_memo_t* memo, int error)
+{
+    if (!UNICOAP_HAVE_CLIENT_STATE) {
+        return;
+    }
+    _lock();
+    /* Mark as unused, such that all the logic below can run without a lock.
+      * The messaging layer may need the lock too. */
+    unicoap_proto_t proto = memo->super.endpoint.proto;
+    (void)proto;
+    memo->super.endpoint.proto = UNICOAP_PROTO_UNSPECIFIED;
+    _unlock();
+    _deinit_client(memo);
+    (void)error;
+#if UNICOAP_HAVE_MESSAGING_STATE
+    /* On the exchange layer, we're hiding the actual reason from the driver. It should
+     * not matter to the messaging layer whether we release state because of an error or because
+     * the state object is released as usual. Should the messaging layer rely on this
+     * information, the exchange-messaging abstraction has a design flaw. */
+    if (unicoap_memo_messaging_state(&memo->super)) {
+        unicoap_messaging_notify(
+            unicoap_memo_messaging_state(&memo->super),
+            error ? unicoap_layer_notification_async_failure_from_errno(error) : UNICOAP_LAYER_NOTIFICATION_STATE_RELEASE,
+            NULL, proto);
+    }
+#endif
+    _free(&memo->super);
+}
+
+unicoap_client_memo_t* unicoap_client_memo_find_token(const unicoap_endpoint_t* endpoint,
+                                                      const uint8_t* token, size_t token_length)
+{
+    (void)endpoint;
+    (void)token;
+    (void)token_length;
+    assert(token);
+
+#if UNICOAP_HAVE_CLIENT_STATE
+    for (size_t i = 0; i < (size_t)ARRAY_SIZE(_state.client_memos); i += 1) {
+        unicoap_client_memo_t* memo = &_state.client_memos[i];
+
+        if ((!endpoint || unicoap_endpoint_is_equal(&memo->super.endpoint, endpoint)) &&
+            token_length == sizeof(memo->token) &&
+            memcmp(memo->token, token, token_length) == 0) {
+            return memo;
+        }
+    }
+#endif
+    return NULL;
+}
+
+#define UNICOAP_REFNO_MASK_MIN_INDEX (0x7000)
+#define UNICOAP_REFNO_MASK_ID        (0xfff)
+
+unicoap_client_memo_t* unicoap_client_memo_find_refno(int refno)
+{
+    assert(refno > 0);
+    (void)refno;
+#if IS_USED(MODULE_UNICOAP_CLIENT_CANCELLATION)
+    /* First bit is sign bit, then 3 bits for min index and then 12 bits of randomness.
+     * For 16 or fewer memos, we thus don't have to search at all. */
+    size_t index_min = (refno & UNICOAP_REFNO_MASK_MIN_INDEX) >> 12;
+    uint16_t reference_id = refno & UNICOAP_REFNO_MASK_ID;
+    _STATE_DEBUG("find refno=%i (min_client_ix=#%" PRIuSIZE ", refid=%u)\n", refno, index_min, reference_id);
+#  if UNICOAP_HAVE_CLIENT_STATE
+    for (size_t i = index_min; i < (size_t)ARRAY_SIZE(_state.client_memos); i += 1) {
+        unicoap_client_memo_t* memo = &_state.client_memos[i];
+        if (memo->reference_id == reference_id) {
+            return memo;
+        }
+    }
+#  endif
+#endif
+    return NULL;
+}
+
+int unicoap_client_memo_assign_refno(unicoap_client_memo_t* memo)
+{
+    (void)memo;
+    assert(memo);
+#if IS_USED(MODULE_UNICOAP_CLIENT_CANCELLATION)
+    /* Memos require a unique reference ID and array index for fast lookup. Because functions return
+     * the refno as an int where negative values represent errors, we assume a minimum 16-bit int
+     * and use the 15 positive bits.
+     * 15 available bits  =  12 bits (reference ID) + 3 bits (minimum index)
+     * Since 3 bits represent a maximum value of 7, we store the minimum index instead of the full
+     * size_t. This provides O(1) lookup for up to 7 memos and narrows the search space for larger
+     * arrays. */
+    memo->reference_id = random_uint32_range(1, 0xfff);                     /* 12 bits for reference ID */
+    int refno = memo->reference_id | (MIN(_client_index(memo), 0x7) << 12); /* 3 bits min index */
+    _STATE_DEBUG("assign refno=%i (min_client_ix=#%" PRIuSIZE ", refid=%u)\n",
+                 refno, MIN(_client_index(memo), 0x7), memo->reference_id);
+    return refno;
+#else
+    return 0;
+#endif
+}
+
+void unicoap_exchange_notify(void* state, unicoap_layer_notification_t type, void* arg)
+{
+    (void)arg;
+    if (!state) {
+        return;
+    }
+    unicoap_memo_t* memo = (unicoap_memo_t*)state;
+    if (memo->endpoint.proto == UNICOAP_PROTO_UNSPECIFIED) {
+        _STATE_NOTIF_DEBUG("use of released state obj\n");
+        return;
+    }
+    _lock();
+    if (type & UNICOAP_LAYER_NOTIFICATION_ASYNC_FAILURE) {
+        _STATE_NOTIF_DEBUG("messaging layer encountered error %i (type %i)\n",
+                           unicoap_layer_notification_async_failure_to_errno(type), type);
+#if UNICOAP_HAVE_MESSAGING_STATE
+        memo->messaging.state = NULL;
+#endif
+    }
+    else if (type == UNICOAP_LAYER_NOTIFICATION_STATE_RELEASE) {
+        _STATE_NOTIF_DEBUG("messaging layer released state (type %i)\n", type);
+#if UNICOAP_HAVE_MESSAGING_STATE
+        memo->messaging.state = NULL;
+#endif
+    }
+    else if (type == UNICOAP_LAYER_NOTIFICATION_STATE_ALLOC) {
+        _STATE_NOTIF_DEBUG("messaging layer allocated state (type %i)\n", type);
+        assert(arg);
+#if UNICOAP_HAVE_MESSAGING_STATE
+        memo->messaging.state = arg;
+#endif
+    }
+    _unlock();
+
+    if (IS_USED(MODULE_UNICOAP_CLIENT) && _is_client(memo)) {
+        if (type & UNICOAP_LAYER_NOTIFICATION_ASYNC_FAILURE) {
+            unicoap_client_callback_failure(unicoap_client_memo_of_super(memo),
+                                            unicoap_layer_notification_async_failure_to_errno(type));
+
+            /* Messaging layer failed, our signal to release state. Error occurred on messaging
+             * layer and not on exchange layer, so use 0 instead of error number here. */
+            unicoap_client_memo_free(unicoap_client_memo_of_super(memo), 0);
+        }
+    }
+}
+
+void unicoap_exchange_notify_all(const unicoap_endpoint_t* endpoint, unicoap_layer_notification_t type, void* arg)
+{
+    unicoap_memo_t* memo = NULL;
+    (void)memo;
+    (void)endpoint;
+    (void)type;
+    (void)arg;
+#if UNICOAP_HAVE_CLIENT_STATE
+    for (int i = 0; i < CONFIG_UNICOAP_CLIENT_MEMOS_CAPACITY; i += 1) {
+        memo = &_state.client_memos[i].super;
+        if (unicoap_endpoint_is_equal(endpoint, &memo->endpoint)) {
+            unicoap_exchange_notify(memo, type, arg);
+        }
+    }
+#endif
+}
+
+void unicoap_messaging_notify(void* state, unicoap_layer_notification_t type, void* arg, unicoap_proto_t proto)
+{
+    assert(proto != UNICOAP_PROTO_UNSPECIFIED);
+    if (!state) {
+        return;
+    }
+    (void)arg;
+    (void)type;
+    switch (proto) {
+#if IS_USED(MODULE_UNICOAP_DRIVER_RFC7252_COMMON)
+    case UNICOAP_PROTO_UDP:
+    case UNICOAP_PROTO_DTLS: {
+        extern void unicoap_messaging_notify_rfc7252(void* state, unicoap_layer_notification_t type);
+        return unicoap_messaging_notify_rfc7252(state, type);
+    }
+#endif
+    default:
+        break;
+    }
 }
 
 /* MARK: - Event Scheduling on Internal Queue */
@@ -411,9 +667,43 @@ unicoap_preprocessing_result_t unicoap_exchange_preprocess(unicoap_packet_t* pac
 
     case UNICOAP_CODE_CLASS_RESPONSE_SUCCESS:
     case UNICOAP_CODE_CLASS_RESPONSE_CLIENT_FAILURE:
-    case UNICOAP_CODE_CLASS_RESPONSE_SERVER_FAILURE:
-        /* TODO: Client: Process response */
-        return UNICOAP_PREPROCESSING_ERROR_RESPONSE_UNEXPECTED;
+    case UNICOAP_CODE_CLASS_RESPONSE_SERVER_FAILURE: {
+        if (IS_USED(MODULE_UNICOAP_CLIENT)) {
+            const unicoap_endpoint_t* remote = packet->remote;
+            if (packet->local && unicoap_endpoint_is_multicast(packet->local)) {
+                _CLIENT_DEBUG("(weird) multicast response\n");
+                remote = NULL;
+            }
+            unicoap_client_memo_t* memo = unicoap_client_memo_find_token(remote,
+                                                                         packet->properties.token, packet->properties.token_length);
+
+            if (!memo) {
+                if (unicoap_options_contains(packet->message->options, UNICOAP_OPTION_OBSERVE)) {
+                    /* We are no longer interested in notifications */
+                    _CLIENT_DEBUG("received unknown NON notification\n");
+                    return UNICOAP_PREPROCESSING_ERROR_NOTIFICATION_UNEXPECTED;
+                }
+                else {
+                    _CLIENT_DEBUG("received unknown response\n");
+                    return UNICOAP_PREPROCESSING_ERROR_RESPONSE_UNEXPECTED;
+                }
+            }
+
+            if (truncated) {
+                _CLIENT_DEBUG("truncated, not processing\n");
+                unicoap_client_callback_failure(memo, -ENOBUFS);
+                unicoap_client_memo_free(memo, 0);
+                return UNICOAP_PREPROCESSING_ERROR_TRUNCATED;
+            }
+            unicoap_event_cancel(&memo->super.exchange.timeout);
+            arg->client = memo;
+            *flags = _messaging_flags_client(memo->flags);
+            return UNICOAP_PREPROCESSING_SUCCESS_RESPONSE;
+        }
+        else {
+            return UNICOAP_PREPROCESSING_ERROR_UNSUPPORTED;
+        }
+    }
 
     case UNICOAP_CODE_CLASS_SIGNAL:
         /* TODO: Signaling */
@@ -436,8 +726,9 @@ int unicoap_exchange_process(unicoap_packet_t* packet, unicoap_exchange_arg_t ar
     case UNICOAP_CODE_CLASS_RESPONSE_SUCCESS:
     case UNICOAP_CODE_CLASS_RESPONSE_CLIENT_FAILURE:
     case UNICOAP_CODE_CLASS_RESPONSE_SERVER_FAILURE:
-        /* TODO: Client: Process response */
-        return -1;
+        return IS_USED(MODULE_UNICOAP_CLIENT) ?
+                   unicoap_client_process_response(packet, arg.client) :
+                   -ENOTSUP;
 
     case UNICOAP_CODE_CLASS_SIGNAL:
         /* TODO: Signaling */
