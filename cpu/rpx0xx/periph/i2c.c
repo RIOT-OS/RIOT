@@ -78,14 +78,20 @@ int i2c_read_bytes(i2c_t dev, uint16_t addr, void *data,
                    size_t len, uint8_t flags)
 {
     pio_i2c_bus_t *i2c = pio_i2c_get(dev);
-    return i2c ? pio_i2c_read_bytes(i2c->pio, i2c->sm, addr, data, len, flags) : -EINVAL;
+    if (!i2c || (i2c->sm < 0)) {
+        return -EINVAL;
+    }
+    return pio_i2c_read_bytes(i2c->pio, i2c->sm, addr, data, len, flags);
 }
 
 int i2c_read_regs(i2c_t dev, uint16_t addr, uint16_t reg,
                   void *data, size_t len, uint8_t flags)
 {
     pio_i2c_bus_t *i2c = pio_i2c_get(dev);
-    return i2c ? pio_i2c_read_regs(i2c->pio, i2c->sm, addr, reg, data, len, flags) : -EINVAL;
+    if (!i2c || (i2c->sm < 0)) {
+        return -EINVAL;
+    }
+    return pio_i2c_read_regs(i2c->pio, i2c->sm, addr, reg, data, len, flags);
 }
 
 int i2c_read_reg(i2c_t dev, uint16_t addr, uint16_t reg,
@@ -98,14 +104,20 @@ int i2c_write_bytes(i2c_t dev, uint16_t addr, const void *data,
                     size_t len, uint8_t flags)
 {
     pio_i2c_bus_t *i2c = pio_i2c_get(dev);
-    return i2c ? pio_i2c_write_bytes(i2c->pio, i2c->sm, addr, data, len, flags) : -EINVAL;
+    if (!i2c || (i2c->sm < 0)) {
+        return -EINVAL;
+    }
+    return pio_i2c_write_bytes(i2c->pio, i2c->sm, addr, data, len, flags);
 }
 
 int i2c_write_regs(i2c_t dev, uint16_t addr, uint16_t reg,
                    const void *data, size_t len, uint8_t flags)
 {
     pio_i2c_bus_t *i2c = pio_i2c_get(dev);
-    return i2c ? pio_i2c_write_regs(i2c->pio, i2c->sm, addr, reg, data, len, flags) : -EINVAL;
+    if (!i2c || (i2c->sm < 0)) {
+        return -EINVAL;
+    }
+    return pio_i2c_write_regs(i2c->pio, i2c->sm, addr, reg, data, len, flags);
 }
 
 int i2c_write_reg(i2c_t dev, uint16_t addr, uint16_t reg,
