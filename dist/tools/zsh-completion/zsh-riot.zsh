@@ -151,6 +151,14 @@ function _renode_log_levels {
     _describe 'log_level' _levels
 }
 
+# Complete to either an executable in $PATH (including shell builtins), or
+# to a file that is executable
+_executables() {
+    _alternative \
+        'commands:command:_command_names' \
+        'files:executable:_path_files -g "*(x)"'
+}
+
 function _riot {
     local -a _std_targets=(
         "all:build the application"
@@ -204,7 +212,7 @@ function _riot {
         'PORT[Serial port connected to the board]:serial:_serials'
         'PROGRAMMER[Select the programmer software to flash (debug) with]:programmer:_programmers'
         'QUIET[Reduce verbosity of build output]:bool:_bools'
-        'RENODE[Renode executable to run, defaults to "renode"]:renode'
+        'RENODE[Renode executable to run, defaults to "renode"]:renode:_executables'
         'RENODE_LOG_LEVEL[The log verbosity of renode]:log_level:_renode_log_levels'
         'RENODE_SHOW_GUI[Whether to show the renode GUI]:bool:_bools'
         'RENODE_SHOW_LOG[Whether to show the renode log]:bool:_bools'
