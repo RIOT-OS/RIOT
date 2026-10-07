@@ -11,19 +11,18 @@
  * @author  Carl Seifert <carl.seifert@tu-dresden.de>
  */
 
-#include <stddef.h>
-#include <stdio.h>
-#include <stdint.h>
-#include <errno.h>
 #include <assert.h>
+#include <errno.h>
+#include <stddef.h>
+#include <stdint.h>
+#include <stdio.h>
 
 #include "byteorder.h"
 #include "compiler_hints.h"
 #include "modules.h"
-#include "ztimer.h" /* needed for generating observe value */
-
 #include "net/unicoap/message.h"
 #include "net/unicoap/options.h"
+#include "ztimer.h" /* needed for generating observe value */
 
 #define ENABLE_DEBUG CONFIG_UNICOAP_DEBUG_LOGGING
 #include "debug.h"
@@ -83,8 +82,8 @@
 #define DECODE_DELTA_NIBBLE(head)    (head >> 4)
 #define ENCODE_DELTA_NIBBLE(nibble)  (nibble << 4)
 
-#define DECODE_LENGTH_NIBBLE(head)    (head & 0xf)
-#define ENCODE_LENGTH_NIBBLE(nibble)  (nibble)
+#define DECODE_LENGTH_NIBBLE(head)   (head & 0xf)
+#define ENCODE_LENGTH_NIBBLE(nibble) (nibble)
 
 /* MARK: - Unsigned Integer Parsing */
 
@@ -235,7 +234,7 @@ static inline ssize_t _option_size(uint16_t delta, size_t value_size)
  * @return `-EBADOPT` if reading this option fails
  */
 static inline ssize_t _read_option_in_range(const uint8_t** cursor, const uint8_t* end,
-                                                   uint16_t* delta, const uint8_t** value)
+                                            uint16_t* delta, const uint8_t** value)
 {
     uint8_t head = **cursor;
     *cursor += 1;
@@ -339,8 +338,7 @@ static inline void _write_head_partial(uint8_t** cursor, uint16_t delta, uint8_t
  *
  * @warning You must perform runtime bounds checks at the call site.
  */
-static inline
-void _move_options_in_storage_buffer(unicoap_options_t* options, uint8_t* dest, uint8_t* src)
+static inline void _move_options_in_storage_buffer(unicoap_options_t* options, uint8_t* dest, uint8_t* src)
 {
     uint8_t* start = unicoap_options_data(options);
     uint8_t* end = start + options->storage_capacity;
@@ -417,7 +415,7 @@ static int _shift_options(unicoap_options_t* options, size_t i, ssize_t data_dif
     size_t new_size = options->storage_size + data_diff;
     if (new_size > options->storage_capacity) {
         _OPTIONS_DEBUG("buf too small, " _UNICOAP_NEED_HAVE "\n", new_size,
-                      options->storage_capacity);
+                       options->storage_capacity);
         return -ENOBUFS;
     }
 
@@ -425,7 +423,8 @@ static int _shift_options(unicoap_options_t* options, size_t i, ssize_t data_dif
         uint8_t* data = options->entries[i].data;
         _move_options_in_storage_buffer(options, data + data_diff, data);
         _update_option_entries_with_storage_diff(options, i, data_diff);
-    } else {
+    }
+    else {
         /* Nothing to shift, see @remark above */
     }
 
@@ -483,7 +482,7 @@ ssize_t unicoap_pdu_parse_options_and_payload(uint8_t* cursor, const uint8_t* en
         uint16_t delta = 0;
 
         /* Casting from non-const to const is safe. */
-        ssize_t option_size = _read_option_in_range((const uint8_t **)&cursor, end, &delta, NULL);
+        ssize_t option_size = _read_option_in_range((const uint8_t**)&cursor, end, &delta, NULL);
 
         if (option_size == -EPAYLD) {
             /* we hit the payload marker */
@@ -491,7 +490,7 @@ ssize_t unicoap_pdu_parse_options_and_payload(uint8_t* cursor, const uint8_t* en
             message->payload = message->payload_size > 0 ? cursor : NULL;
             message->options->storage_capacity = (uintptr_t)cursor - (uintptr_t)start; /* (<-) */
             _OPTIONS_DEBUG("payload size = %" PRIuSIZE " opts capacity = %" PRIuSIZE "\n",
-                          message->payload_size, message->options->storage_capacity);
+                           message->payload_size, message->options->storage_capacity);
             return 0;
         }
         else if (option_size >= 0) {
@@ -529,7 +528,7 @@ bool unicoap_options_contains(const unicoap_options_t* options, unicoap_option_n
 }
 
 ssize_t unicoap_options_get(const unicoap_options_t* options, unicoap_option_number_t number,
-                           const uint8_t** value)
+                            const uint8_t** value)
 {
     int option_index = _find_option_index(options, number);
     if (option_index < 0) {
@@ -613,14 +612,14 @@ int unicoap_options_add(unicoap_options_t* options, unicoap_option_number_t numb
             i += 1;
         }
     }
-    else if (count == 0 || opts[count-1].number <= number) {
+    else if (count == 0 || opts[count - 1].number <= number) {
         /* allowed in-order addition */
         i = count;
     }
     else {
         unicoap_assist(API_ERROR("Adding option out of order not supported.")
-                        FIXIT("Enable CONFIG_UNICOAP_OPTIONS_FULL_SUPPORT")
-                        FIXIT("Reorder option additions to ascending CoAP option numbers"));
+                           FIXIT("Enable CONFIG_UNICOAP_OPTIONS_FULL_SUPPORT")
+                               FIXIT("Reorder option additions to ascending CoAP option numbers"));
         return -ENOTSUP;
     }
 
@@ -633,7 +632,7 @@ int unicoap_options_add(unicoap_options_t* options, unicoap_option_number_t numb
         /* Option to be inserted is trailing option, can just add after last option */
         if (storage_size > options->storage_capacity) {
             _OPTIONS_DEBUG("buf too small to insert opt " _UNICOAP_NEED_HAVE "\n",
-                          storage_size, options->storage_capacity);
+                           storage_size, options->storage_capacity);
             return -ENOBUFS;
         }
 
@@ -704,7 +703,7 @@ int unicoap_options_add(unicoap_options_t* options, unicoap_option_number_t numb
 }
 
 int unicoap_options_add_values_joined(unicoap_options_t* options, unicoap_option_number_t number,
-                               const uint8_t* buffer, size_t size, uint8_t separator)
+                                      const uint8_t* buffer, size_t size, uint8_t separator)
 {
     int res = 0;
     const uint8_t* end = buffer + size;
@@ -757,8 +756,8 @@ int unicoap_options_set(unicoap_options_t* options, unicoap_option_number_t numb
     }
     else {
         unicoap_assist(API_ERROR("Changing existing option not supported.")
-                       FIXIT("Enable CONFIG_UNICOAP_OPTIONS_FULL_SUPPORT")
-                       FIXIT("Only set options once."));
+                           FIXIT("Enable CONFIG_UNICOAP_OPTIONS_FULL_SUPPORT")
+                               FIXIT("Only set options once."));
         return -ENOTSUP;
     }
     return 0;
@@ -768,13 +767,13 @@ int unicoap_options_remove_all(unicoap_options_t* options, unicoap_option_number
 {
     if (!IS_ACTIVE(CONFIG_UNICOAP_OPTIONS_FULL_SUPPORT)) {
         unicoap_assist(API_ERROR("Removing options not supported.")
-                       FIXIT("Enable CONFIG_UNICOAP_OPTIONS_FULL_SUPPORT")
-                       FIXIT("Do not remove options."));
+                           FIXIT("Enable CONFIG_UNICOAP_OPTIONS_FULL_SUPPORT")
+                               FIXIT("Do not remove options."));
         return -ENOTSUP;
     }
 
     _OPTIONS_DEBUG("attempting to remove %s (nr=%u)\n", unicoap_string_from_option_number(number),
-                  number);
+                   number);
     int option_index = _find_option_index(options, number);
     if (unlikely(option_index < 0)) {
         return 0;
@@ -938,24 +937,24 @@ ssize_t unicoap_options_get_next_query_by_name(unicoap_options_iterator_t* itera
 static inline uint32_t _ntoh_variable(const uint8_t* variable_network_uint, size_t size)
 {
     switch (size) {
-        case sizeof(uint8_t):
-            return (uint32_t)*variable_network_uint;
-        case sizeof(uint16_t):
-            return (uint32_t)byteorder_bebuftohs(variable_network_uint);
-        case UNICOAP_UINT24_SIZE:
-            return ((uint32_t)byteorder_bebuftohs(variable_network_uint) << 8) |
-                ((uint32_t)variable_network_uint[2]);
-        case sizeof(uint32_t):
-            return byteorder_bebuftohl(variable_network_uint);
-        default:
-            UNREACHABLE();
-            return 0;
+    case sizeof(uint8_t):
+        return (uint32_t)*variable_network_uint;
+    case sizeof(uint16_t):
+        return (uint32_t)byteorder_bebuftohs(variable_network_uint);
+    case UNICOAP_UINT24_SIZE:
+        return ((uint32_t)byteorder_bebuftohs(variable_network_uint) << 8) |
+               ((uint32_t)variable_network_uint[2]);
+    case sizeof(uint32_t):
+        return byteorder_bebuftohl(variable_network_uint);
+    default:
+        UNREACHABLE();
+        return 0;
     }
 }
 
 ssize_t _unicoap_options_get_variable_uint(const unicoap_options_t* options,
-                                          unicoap_option_number_t number, uint32_t* uint,
-                                          size_t max_size)
+                                           unicoap_option_number_t number, uint32_t* uint,
+                                           size_t max_size)
 {
     assert(max_size <= sizeof(uint32_t));
     const uint8_t* src = NULL;
