@@ -8,11 +8,6 @@ PKG_LICENSE = unknown
 
 include $(RIOTBASE)/pkg/pkg.mk
 
-# all:
-.PHONY: all..cmake_version_supported
-
-CMAKE_MINIMAL_VERSION = 3.30.0
-
 FLAGS += -Wno-cast-align
 
 ifneq (,$(filter trustzone_m_nonsecure,$(USEMODULE)))
@@ -29,7 +24,3 @@ $(PKG_BUILD_DIR)/Makefile:
     -DCMAKE_C_FLAGS=$(FLAGS) \
 		-B$(PKG_BUILD_DIR) \
 		-H$(PKG_SOURCE_DIR)
-
-clean::
-	@rm -rf $(RIOTBASE)/build/pkg/riot-tee
-	@rm -rf $(BINDIR)

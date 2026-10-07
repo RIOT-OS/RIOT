@@ -414,7 +414,7 @@ extern "C" {
 /**
  * @brief   Cryptoservice priority
  */
-#define AUTO_INIT_PRIO_MOD_CRYPTOSERVICE               1580
+#define AUTO_INIT_PRIO_MOD_CRYPTOSERVICE                1580
 #endif
 
 #ifdef __cplusplus

@@ -72,7 +72,6 @@ psa_status_t psa_import_ecc_p256r1_key_pair(const psa_key_attributes_t *attribut
 
     *pub_key_buffer_length = CYS_ECC_P256_PUB_SIZE;
 
-    (void) attributes;
     (void) priv_key_size;
     (void) priv_key_buffer_length;
     return PSA_SUCCESS;
