@@ -6,13 +6,10 @@
 /**
  * @ingroup     cpu_stm32
  * @ingroup     drivers_periph_wdt
- *
- * @brief
- *
  * @{
  *
  * @file        wdt.c
- * @brief       Independent Watchdog timer for STM32L platforms
+ * @brief       Independent Watchdog timer for STM32 platforms
  *
  * @author      Francisco Molina <francois-xavier.molina@inria.fr>
  */
@@ -30,8 +27,9 @@
 #define ENABLE_DEBUG 0
 #include "debug.h"
 
-#ifdef __cplusplus
-extern "C" {
+#ifdef CPU_FAM_STM32H7
+/* use watchdog 1 for the H7 */
+#  define IWDG IWDG1
 #endif
 
 #define MAX_RELOAD                (4096U)
@@ -47,52 +45,18 @@ extern "C" {
 static inline uint32_t _wdt_time(uint8_t pre, uint16_t rel)
 {
     /* wdt_time (us) = LSI(us) x 4 x 2^PRE x RELOAD */
-    return (uint32_t)(((uint64_t) US_PER_SEC * 4 * (1 << pre) * rel ) / CLOCK_LSI);
+    return (uint32_t)(((uint64_t)US_PER_SEC * 4 * (1 << pre) * rel ) / CLOCK_LSI);
 }
 
-static inline void _iwdt_unlock(void)
-{
-#ifdef CPU_FAM_STM32H7
-    IWDG1->KR = IWDG_UNLOCK;
-#else
-    IWDG->KR = IWDG_UNLOCK;
-#endif
-}
-
-static inline void _iwdt_lock(void)
-{
-
-#ifdef CPU_FAM_STM32H7
-    IWDG1->KR = IWDG_LOCK;
-#else
-    IWDG->KR = IWDG_LOCK;
-#endif
-}
-
-static void _set_prescaler(uint8_t prescaler)
+static void _set_config(uint8_t prescaler, uint16_t reload)
 {
     assert(prescaler <= MAX_PRESCALER);
-
-    _iwdt_unlock();
-#ifdef CPU_FAM_STM32H7
-    IWDG1->PR = prescaler;
-#else
-    IWDG->PR = prescaler;
-#endif
-    _iwdt_lock();
-}
-
-static void _set_reload(uint16_t reload)
-{
     assert(reload <= IWDG_RLR_RL);
 
-    _iwdt_unlock();
-#ifdef CPU_FAM_STM32H7
-    IWDG1->RLR = reload;
-#else
+    IWDG->KR = IWDG_UNLOCK;
+    IWDG->PR = prescaler;
     IWDG->RLR = reload;
-#endif
-    _iwdt_lock();
+    IWDG->KR = IWDG_LOCK;
 }
 
 static uint8_t _find_prescaler(uint32_t rst_time)
@@ -114,11 +78,7 @@ static uint16_t _find_reload_value(uint8_t pre, uint32_t rst_time)
 
 void wdt_start(void)
 {
-#ifdef CPU_FAM_STM32H7
-    IWDG1->KR = IWDG_KR_KEY_ENABLE;
-#else
     IWDG->KR = IWDG_KR_KEY_ENABLE;
-#endif
 }
 
 #ifdef CPU_FAM_STM32L4
@@ -130,16 +90,12 @@ void wdt_init(void)
 
 void wdt_kick(void)
 {
-#ifdef CPU_FAM_STM32H7
-    IWDG1->KR = IWDG_KR_KEY_RELOAD;
-#else
     IWDG->KR = IWDG_KR_KEY_RELOAD;
-#endif
 }
 
 void wdt_setup_reboot(uint32_t min_time, uint32_t max_time)
 {
-    (void) min_time;
+    (void)min_time;
     /* Windowed wdt not supported */
     assert(min_time == 0);
 
@@ -151,15 +107,10 @@ void wdt_setup_reboot(uint32_t min_time, uint32_t max_time)
     uint16_t rel = _find_reload_value(pre, max_time);
 
     /* Set watchdog prescaler and reload value */
-    _set_prescaler(pre);
-    _set_reload(rel);
+    _set_config(pre, rel);
 
     DEBUG("[wdt]: reset time %" PRIu32 " [us]\n", _wdt_time(pre, rel));
 
     /* Refresh wdt counter */
     wdt_kick();
 }
-
-#ifdef __cplusplus
-}
-#endif
