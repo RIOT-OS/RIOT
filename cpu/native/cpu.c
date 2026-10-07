@@ -327,8 +327,7 @@ void thread_yield_higher(void)
 {
     sched_context_switch_request = 1;
 
-    if (_native_in_isr == 0 && _native_interrupts_enabled
-        && _native_is_cpu_owner()) {
+    if ((_native_in_isr == 0) && _native_interrupts_enabled && _native_is_cpu_owner()) {
         DEBUG_CPU("yielding higher priority thread\n");
         _native_isr_run(false);
     }
