@@ -29,6 +29,9 @@
 #include <errno.h>
 #include <fcntl.h>
 #include <pthread.h>
+#if defined(__FreeBSD__)
+#  include <pthread_np.h>
+#endif
 #include <setjmp.h>
 #include <signal.h>
 #include <stdbool.h>
@@ -270,6 +273,28 @@ void native_cpu_init(void)
     DEBUG_CPU("RIOT native cpu initialized.\n");
 }
 
+/* Name the host thread after the RIOT thread, so it shows up in debuggers */
+static void _set_host_thread_name(native_thread_t *self, const char *name)
+{
+#if defined(__linux__) || defined(__FreeBSD__)
+    /* Linux limits thread names to 16 bytes including the terminator */
+    char buf[16];
+
+    if (name == NULL) {
+        return;
+    }
+
+    strncpy(buf, name, sizeof(buf) - 1);
+    buf[sizeof(buf) - 1] = '\0';
+    _native_pending_syscalls_up();
+    pthread_setname_np(self->pthread, buf);
+    _native_pending_syscalls_down();
+#else
+    (void)self;
+    (void)name;
+#endif
+}
+
 static void *_thread_entry(void *arg)
 {
     jmp_buf exit_buf;
@@ -282,6 +307,9 @@ static void *_thread_entry(void *arg)
     /* only now the control block on the RIOT stack is guaranteed to be valid */
     native_thread_t *self = _native_thread(thread_get_active());
     _self = self;
+
+    /* the name is only assigned after thread_stack_init() returned */
+    _set_host_thread_name(self, thread_getname(thread_getpid()));
 
     if (setjmp(exit_buf) == 0) {
         /* RIOT threads start with interrupts enabled */
