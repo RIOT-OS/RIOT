@@ -32,7 +32,7 @@
  * @author carl-tud
  */
 
-#include "util/ucontext.h"
+#include <signal.h>
 #include <stdio.h>
 #include <stdint.h>
 #include <poll.h>
@@ -131,22 +131,17 @@ int native_register_interrupt(int sig, _native_callback_t handler);
 int native_unregister_interrupt(int sig);
 
 /**
- * @brief Calls signal handlers for pending signal, then exits ISR context and performs context switch
- * @pre Intended to be called from **ISR context**
+ * @brief Calls signal handlers for pending signals and performs a context switch if requested
+ * @pre Interrupts are enabled, not in ISR context and the calling host thread is the CPU owner
  * @private
  *
- * The context switch back to userspace is performed using @ref `cpu_switch_context_exit`.
+ * Interrupts are disabled while the handlers are executed. If a context switch
+ * is performed, this function only returns once the calling thread is scheduled
+ * again. Interrupts are enabled again when this function returns.
  *
- * @note While it would have been possible to separate this method's functionality into two functions, `setcontext` requires us to have a single function.
+ * @param in_signal_handler `true` if called from within the native signal handler
  */
-void _native_call_sig_handlers_and_switch(void);
-
-/**
- * @brief Switches to ISR context, then enables IRQ and returns to userspace
- *
- * @note This function is implemented in assembly.
- */
-extern void _native_sig_leave_tramp(void);
+void _native_isr_run(bool in_signal_handler);
 /** @} */
 
 /* MARK: - System Calls */
@@ -157,10 +152,10 @@ extern void _native_sig_leave_tramp(void);
  * @{
  */
 /**
- * @brief Number of currently pending system calls
+ * @brief Number of currently pending system calls of the calling host thread
  * @private
  */
-extern volatile int _native_pending_syscalls;
+extern __thread volatile int _native_pending_syscalls;
 
 /**
  * @brief Increment spending system call counter
@@ -211,57 +206,29 @@ void _native_init_syscalls(void);
  */
 
 /**
- * @brief Points to instruction in userspace where RIOT left off and switched to ISR context
- */
-extern volatile uintptr_t _native_user_fptr;
-
-/**
  * @brief A boolean variable indicating whether program execution currently takes place in an ISR context
  */
 extern volatile int _native_in_isr;
 
 /**
- * @brief Stack used in ISR context
- */
-extern char _isr_stack[THREAD_STACKSIZE_DEFAULT];
-
-/**
- * @brief ISR context
- */
-extern ucontext_t *_native_isr_context;
-
-/**
- * @brief Resets internal `in_ISR` barrier switch and resumes execution on the currently scheduled thread
- * @pre Intended to be executed in userspace
+ * @brief Checks whether the calling host thread backs the active RIOT thread
  * @private
  *
- * @note This function is implemented in assembly to preserve registers. See `native.S`
+ * Each RIOT thread is backed by a host thread, but only the host thread of the
+ * active RIOT thread (the CPU owner) is allowed to run.
  */
-extern void _native_isr_leave(void);
+bool _native_is_cpu_owner(void);
 
 /**
- * @brief Makes ISR context so that execution continues at `func` when the context is applied
+ * @brief Switches to the active thread as selected by the scheduler
+ * @pre All signals are blocked and the calling host thread was the CPU owner
+ * @private
  *
- * @param func Function executed when `_native_isr_context` is applied
+ * Hands the CPU over to the host thread of the thread returned by
+ * @ref thread_get_active and blocks until the calling thread is scheduled
+ * again. Returns immediately if the calling thread is still the active thread.
  */
-static inline void _native_isr_context_make(void (*func)(void)) {
-    _native_isr_context->uc_stack.ss_sp = _isr_stack;
-    _native_isr_context->uc_stack.ss_size = sizeof(_isr_stack);
-    _native_isr_context->uc_stack.ss_flags = 0;
-
-    /* Create the ISR context, will execute _isr_schedule_and_switch */
-    makecontext(_native_isr_context, func, 0);
-}
-
-/**
- * @brief Retrieves user context
- * @returns `ucontext_t`
- */
-static inline ucontext_t* _native_user_context(void) {
-    /* Use intermediate cast to uintptr_t to silence -Wcast-align.
-     * stacks are manually word aligned in thread_static_init() */
-    return (ucontext_t *)(uintptr_t)thread_get_active()->sp;
-}
+void _native_switch_to_active(void);
 /** @} */
 
 /* MARK: - Native Process State */

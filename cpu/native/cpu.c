@@ -10,18 +10,33 @@
  * @author Ludwig Knüpfer <ludwig.knuepfer@fu-berlin.de>
  * @author Kaspar Schleiser <kaspar@schleiser.de>
  *
- * In-process preemptive context switching utilizes POSIX ucontexts.
- * (ucontext provides for architecture independent stack handling)
+ * Every RIOT thread is backed by a host POSIX thread. Only the host thread
+ * that currently owns the (emulated) CPU is allowed to run, all other host
+ * threads are blocked reading from a pipe with all signals masked.
+ *
+ * Interrupts are emulated with POSIX signals. As only the CPU owner has
+ * signals unmasked, process directed signals are always delivered to the
+ * host thread of the active RIOT thread. If an interrupt handler (or a
+ * voluntary yield) results in a different thread being scheduled, the CPU is
+ * handed over to the host thread of that thread and the current host thread
+ * blocks until it is scheduled again - if this happened inside a signal
+ * handler, the interrupted thread will simply return from the signal handler
+ * once resumed. This avoids any architecture specific context switching code.
  */
 
+#include <dlfcn.h>
 #include <err.h>
-#include <stdio.h>
-#include <unistd.h>
-#include <stdlib.h>
+#include <errno.h>
+#include <fcntl.h>
+#include <pthread.h>
+#include <setjmp.h>
 #include <signal.h>
+#include <stdbool.h>
+#include <stddef.h>
+#include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
-
-#include "util/valgrind.h"
+#include <unistd.h>
 
 #include "cpu.h"
 #include "cpu_conf.h"
@@ -40,7 +55,133 @@ extern netdev_tap_t netdev_tap;
 #include "debug.h"
 #define DEBUG_CPU(...) DEBUG("[native] CPU: " __VA_ARGS__)
 
-static ucontext_t _end_context;
+/**
+ * @brief   Host thread backing a RIOT thread
+ *
+ * This is stored at the top of the RIOT thread stack, `thread_t::sp` points
+ * to it.
+ */
+typedef struct {
+    pthread_t pthread;              /**< host thread */
+    int pipe_fd[2];                 /**< a byte is written to it to schedule the thread */
+    thread_task_func_t task_func;   /**< RIOT thread function */
+    void *arg;                      /**< argument to @ref task_func */
+} native_thread_t;
+
+/**
+ * @name    Host pthread functions
+ *
+ * The `posix_pthread` module provides RIOT implementations of these functions,
+ * so the host ones have to be looked up explicitly.
+ * @{
+ */
+static int (*real_pthread_create)(pthread_t *thread, const pthread_attr_t *attr,
+                                  void *(*start_routine)(void *), void *arg);
+static int (*real_pthread_join)(pthread_t thread, void **retval);
+/** @} */
+
+/**
+ * @brief   Host thread of the calling host thread, NULL for the main host thread
+ */
+static __thread native_thread_t *_self;
+
+/**
+ * @brief   Read end of the pipe of the calling host thread
+ *
+ * This is kept separately from @ref _self, as the control block may only be
+ * accessed once the thread got scheduled: until then the RIOT stack holding
+ * it may be reused (e.g. by tests/core/thread_flood).
+ */
+static __thread int _cpu_fd = -1;
+
+/**
+ * @brief   Used by an exiting thread to return from its host thread function
+ */
+static __thread jmp_buf *_exit_buf;
+
+/**
+ * @brief   Host thread of the last RIOT thread that exited, still to be joined
+ */
+static pthread_t _zombie;
+static bool _have_zombie;
+
+static inline native_thread_t *_native_thread(thread_t *thread)
+{
+    /* Use intermediate cast to uintptr_t to silence -Wcast-align.
+     * The control block is aligned in thread_stack_init() */
+    return (native_thread_t *)(uintptr_t)thread->sp;
+}
+
+static void _block_all_signals(sigset_t *old)
+{
+    sigset_t all;
+
+    sigfillset(&all);
+    if (pthread_sigmask(SIG_SETMASK, &all, old) != 0) {
+        errx(EXIT_FAILURE, "native: pthread_sigmask() failed");
+    }
+}
+
+/* Reap the host thread of an exited RIOT thread. Must be called by the new
+ * CPU owner before doing anything else, so that the memory of the exited
+ * thread (which might hold its host thread's state) can safely be reused. */
+static void _reap_zombie(void)
+{
+    if (_have_zombie) {
+        _have_zombie = false;
+        _native_pending_syscalls_up();
+        real_pthread_join(_zombie, NULL);
+        _native_pending_syscalls_down();
+    }
+}
+
+/* Hand the CPU over to @p next. Must be called with all signals masked. */
+static void _schedule(native_thread_t *next)
+{
+    char token = 0;
+
+    if (real_write(next->pipe_fd[1], &token, 1) != 1) {
+        err(EXIT_FAILURE, "native: failed to schedule host thread");
+    }
+}
+
+/* Block until the calling host thread is the CPU owner again. Must be called
+ * with all signals masked. */
+static void _wait_for_cpu(void)
+{
+    char token;
+    ssize_t res;
+
+    do {
+        res = real_read(_cpu_fd, &token, 1);
+    } while ((res == -1) && (errno == EINTR));
+
+    if (res != 1) {
+        err(EXIT_FAILURE, "native: failed to wait for CPU");
+    }
+
+    _reap_zombie();
+}
+
+bool _native_is_cpu_owner(void)
+{
+    thread_t *active = thread_get_active();
+    return _self && active && (_native_thread(active) == _self);
+}
+
+void _native_switch_to_active(void)
+{
+    native_thread_t *next = _native_thread(thread_get_active());
+
+    if (next == _self) {
+        return;
+    }
+
+    DEBUG_CPU("switching to PID %" PRIkernel_pid "\n", thread_getpid());
+
+    _schedule(next);
+    _wait_for_cpu();
+}
 
 /**
  * TODO: implement
@@ -63,61 +204,6 @@ void native_breakpoint(void)
     raise(SIGTRAP);
 }
 
-/* ========================================= */
-/* ISR -> user  switch function */
-
-void _isr_switch_to_user(void) {
-    DEBUG_CPU("... ISR: switching to user thread, calling setcontext(PID %" PRIkernel_pid ")\n\n", thread_getpid());
-
-    ucontext_t *context = _native_user_context();
-    _native_interrupts_enabled = true;
-
-    /* Get PC/LR. This is where we will resume execution on the userspace thread. */
-    _native_user_fptr = (uintptr_t)_context_get_fptr(context);
-
-    /* Now we want to go to _native_isr_leave before resuming execution at _native_user_fptr. */
-    _context_set_fptr(context, (uintptr_t)_native_isr_leave);
-
-    /* libucontext does not restore signal mask on setcontext() [1], so we
-     * need to enable signals again to not get locked up
-     *
-     * [1]: https://man.archlinux.org/man/libucontext.3.en#CAVEATS
-     */
-    if (IS_ACTIVE(USE_LIBUCONTEXT)) {
-        if (sigprocmask(SIG_SETMASK, &_native_sig_set, NULL) == -1) {
-            err(EXIT_FAILURE, "irq_enable: sigprocmask");
-        }
-    }
-
-    if (setcontext(context) == -1) {
-        err(EXIT_FAILURE, "_isr_schedule_and_switch: setcontext");
-    }
-    errx(EXIT_FAILURE, "2 this should have never been reached!!");
-}
-
-/* ========================================= */
-
-void _isr_context_switch_exit(void)
-{
-    DEBUG_CPU("_isr_schedule_and_switch\n");
-    /* Schedule thread job if no active thread */
-    if (((sched_context_switch_request == 1) || (thread_get_active() == NULL))
-        && IS_USED(MODULE_CORE_THREAD)) {
-        /* Schedule active thread */
-        sched_run();
-    }
-
-    /* Switch to active userspace thread */
-    _isr_switch_to_user();
-}
-
-/*               ^
- *               |
- *               |
- * cpu_switch_context_exit continues
- * in ISR context in _isr_context_switch_exit
- */
-
 void cpu_switch_context_exit(void)
 {
 # ifdef NATIVE_AUTO_EXIT
@@ -128,151 +214,126 @@ void cpu_switch_context_exit(void)
     }
 # endif
 
-    if (_native_in_isr == 0) {
-        /* Disable interrupts while switching */
-        irq_disable();
-        _native_in_isr = 1;
+    _block_all_signals(NULL);
+    _native_interrupts_enabled = false;
+    _native_in_isr = 1;
 
-        _native_isr_context_make(_isr_context_switch_exit);
-        if (setcontext(_native_isr_context) == -1) {
-            err(EXIT_FAILURE, "cpu_switch_context_exit: setcontext");
+    if (IS_USED(MODULE_CORE_THREAD)) {
+        sched_run();
+    }
+
+    native_thread_t *next = _native_thread(thread_get_active());
+
+    if (_self == NULL) {
+        /* called by kernel_init() on the main host thread: start the first
+         * RIOT thread and let the main host thread sleep forever */
+        DEBUG_CPU("cpu_switch_context_exit: starting first thread\n");
+        _schedule(next);
+        while (1) {
+            pause();
         }
-        errx(EXIT_FAILURE, "1 this should have never been reached!!");
     }
-    else {
-        _isr_context_switch_exit();
-    }
-    errx(EXIT_FAILURE, "3 this should have never been reached!!");
+
+    /* called by sched_task_exit(): the active RIOT thread has ended */
+    DEBUG_CPU("cpu_switch_context_exit: thread exited\n");
+    _reap_zombie();
+    real_close(_self->pipe_fd[0]);
+    real_close(_self->pipe_fd[1]);
+    _zombie = _self->pthread;
+    _have_zombie = true;
+    _schedule(next);
+
+    /* the new CPU owner joins this host thread before touching anything,
+     * so it is still safe to access our own thread local storage */
+    longjmp(*_exit_buf, 1);
 }
-
-/* ========================================= */
-
-void _isr_thread_yield(void)
-{
-    DEBUG_CPU("... ISR: switched to ISR context, scheduling\n");
-
-    if (_native_pending_signals > 0) {
-        DEBUG_CPU("... ISR: pending signals, handling signals\n\n");
-        _native_call_sig_handlers_and_switch();
-    }
-
-    if (!IS_USED(MODULE_CORE_THREAD)) {
-        return;
-    }
-
-    /* Set active thread */
-    sched_run();
-
-    /* Switch to active userspace thread */
-    _isr_switch_to_user();
-}
-
-/*               ^
- *               |
- *               |
- * thread_yield_higher continues
- * in ISR context in _isr_thread_yield
- */
 
 void thread_yield_higher(void)
 {
     sched_context_switch_request = 1;
 
-    if (_native_in_isr == 0 && _native_interrupts_enabled) {
-        DEBUG_CPU("yielding higher priority thread, switching to ISR context ...\n");
-
-        _native_in_isr = 1;
-        irq_disable();
-
-        /* Create the ISR context, will execute isr_thread_yield */
-        _native_isr_context_make(_isr_thread_yield);
-        if (swapcontext(_native_user_context(), _native_isr_context) == -1) {
-            err(EXIT_FAILURE, "thread_yield_higher: swapcontext");
-        }
-        irq_enable();
+    if (_native_in_isr == 0 && _native_interrupts_enabled
+        && _native_is_cpu_owner()) {
+        DEBUG_CPU("yielding higher priority thread\n");
+        _native_isr_run(false);
     }
 }
 
-/* ========================================= */
-
 void native_cpu_init(void)
 {
-    if (getcontext(&_end_context) == -1) {
-        err(EXIT_FAILURE, "native_cpu_init: getcontext");
+    *(void **)&real_pthread_create = dlsym(RTLD_NEXT, "pthread_create");
+    *(void **)&real_pthread_join = dlsym(RTLD_NEXT, "pthread_join");
+    if (!real_pthread_create || !real_pthread_join) {
+        errx(EXIT_FAILURE, "native_cpu_init: failed to look up host pthread functions");
     }
-
-    /* The _end_context allows RIOT to execute code after a thread task func returns.
-     * This works as follows (explanation based on libplatform)
-     *  - In thread_stack_init, we call makecontext with the thread task func
-     *    and uc_link = _end_context.
-     *  - makecontext modifies the ucontext so that _ctx_start (in the libc/libplatform impl)
-     *    is called when setcontext is executed. The thread task func resides in a register.
-     *  - When the thread is started using setcontext, _ctx_start branches and links to the
-     *    the task func. After the task func returns, _ctx_start would normally call exit.
-     *    However, if _end_context is set, it calls setcontext on th bespoke _end_context.
-     */
-    _end_context.uc_stack.ss_sp = malloc(SIGSTKSZ);
-    expect(_end_context.uc_stack.ss_sp != NULL);
-    _end_context.uc_stack.ss_size = SIGSTKSZ;
-    _end_context.uc_stack.ss_flags = 0;
-    makecontext(&_end_context, sched_task_exit, 0);
-
-    (void)VALGRIND_STACK_REGISTER(_end_context.uc_stack.ss_sp,
-                                  (char *)_end_context.uc_stack.ss_sp + _end_context.uc_stack.ss_size);
-    VALGRIND_DEBUG("VALGRIND_STACK_REGISTER(%p, %p)\n",
-                   (void*)_end_context.uc_stack.ss_sp,
-                   (void*)((char *)_end_context.uc_stack.ss_sp + _end_context.uc_stack.ss_size));
 
     DEBUG_CPU("RIOT native cpu initialized.\n");
 }
 
-/* ========================================= */
-
-static inline void *align_stack(uintptr_t start, int *stacksize)
+static void *_thread_entry(void *arg)
 {
-    const size_t alignment = sizeof(uintptr_t);
-    const uintptr_t align_mask = alignment - 1;
-    size_t unalignment = (start & align_mask)
-                         ? (alignment - (start & align_mask)) : 0;
-    start += unalignment;
-    *stacksize -= unalignment;
-    *stacksize &= ~align_mask;
-    return (void *)start;
+    jmp_buf exit_buf;
+
+    _cpu_fd = (intptr_t)arg;
+    _exit_buf = &exit_buf;
+
+    _wait_for_cpu();
+
+    /* only now the control block on the RIOT stack is guaranteed to be valid */
+    native_thread_t *self = _native_thread(thread_get_active());
+    _self = self;
+
+    if (setjmp(exit_buf) == 0) {
+        /* RIOT threads start with interrupts enabled */
+        _native_in_isr = 0;
+        irq_enable();
+
+        self->task_func(self->arg);
+        sched_task_exit();
+    }
+
+    return NULL;
 }
 
 char *thread_stack_init(thread_task_func_t task_func, void *arg, void *stack_start, int stacksize)
 {
-    ucontext_t *p;
-
-    stack_start = align_stack((uintptr_t)stack_start, &stacksize);
-
-    (void) VALGRIND_STACK_REGISTER(stack_start, (char *)stack_start + stacksize);
-    VALGRIND_DEBUG("VALGRIND_STACK_REGISTER(%p, %p)\n",
-                   stack_start, (void*)((char *)stack_start + stacksize));
+    native_thread_t *ctx;
+    sigset_t old;
+    int res;
 
     DEBUG_CPU("thread_stack_init\n");
 
-    /* Use intermediate cast to uintptr_t to silence -Wcast-align. The stack
-     * is aligned to word size above. */
-    p = (ucontext_t *)(uintptr_t)((uint8_t *)stack_start + (stacksize - sizeof(ucontext_t)));
-    /* Stack guards might be in the way. */
-    memset(p, 0, sizeof(ucontext_t));
-    stacksize -= sizeof(ucontext_t);
+    /* Place the host thread control block at the top of the RIOT stack.
+     * The host thread uses a stack allocated by the host libc, as RIOT
+     * stacks are typically too small for host code (and pthreads). */
+    uintptr_t top = (uintptr_t)stack_start + stacksize - sizeof(native_thread_t);
+    top &= ~(uintptr_t)(_Alignof(max_align_t) - 1);
+    expect(top >= (uintptr_t)stack_start);
+    ctx = (native_thread_t *)top;
 
-    if (getcontext(p) == -1) {
-        err(EXIT_FAILURE, "thread_stack_init: getcontext");
+    memset(ctx, 0, sizeof(*ctx));
+    ctx->task_func = task_func;
+    ctx->arg = arg;
+    if (real_pipe(ctx->pipe_fd) == -1) {
+        err(EXIT_FAILURE, "thread_stack_init: pipe");
+    }
+    /* don't leak the pipes on reboot (execve()) */
+    real_fcntl(ctx->pipe_fd[0], F_SETFD, FD_CLOEXEC);
+    real_fcntl(ctx->pipe_fd[1], F_SETFD, FD_CLOEXEC);
+
+    /* The new host thread inherits our signal mask, it must not receive any
+     * signals until it becomes the CPU owner. */
+    _block_all_signals(&old);
+    _native_pending_syscalls_up();
+    res = real_pthread_create(&ctx->pthread, NULL, _thread_entry,
+                              (void *)(intptr_t)ctx->pipe_fd[0]);
+    _native_pending_syscalls_down();
+    pthread_sigmask(SIG_SETMASK, &old, NULL);
+
+    if (res != 0) {
+        errx(EXIT_FAILURE, "thread_stack_init: pthread_create() failed: %s",
+             strerror(res));
     }
 
-    p->uc_stack.ss_sp = stack_start;
-    p->uc_stack.ss_size = stacksize;
-    p->uc_stack.ss_flags = 0;
-    p->uc_link = &_end_context;
-
-    if (sigemptyset(&(p->uc_sigmask)) == -1) {
-        err(EXIT_FAILURE, "thread_stack_init: sigemptyset");
-    }
-
-    makecontext64(p, (void (*)(void))task_func, arg);
-
-    return (char *) p;
+    return (char *)ctx;
 }
