@@ -195,8 +195,13 @@ To emulate this board you need an updated version of
 [renode](https://github.com/renode/renode) installed, at least version 1.11.
 
 ```shell
-EMULATE=1 BOARD=stm32f4discovery make all term
+USEMODULE=stdio_uart EMULATE=1 BOARD=stm32f4discovery make all term
 ```
+
+Note that `stdio_cdc_acm` is the default, as the integrated ST-Link does not
+expose the UART interface unlike modern discovery or Nucleo boards do. Since
+renode as of October 2026 (1.17.0) does not have a USB model, a firmware built
+without selecting `stdio_uart` will not have an stdio available in renode.
 
 ### Known Issues / Problems
 
