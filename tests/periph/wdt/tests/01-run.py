@@ -58,11 +58,23 @@ def testfunc(child):
     wdt_lower_bound = int(child.match.group(1))
     wdt_upper_bound = int(child.match.group(2))
 
+    # The advertised bounds must be accepted, values outside must be rejected
+    for rst_time in [wdt_lower_bound, wdt_upper_bound]:
+        child.expect_exact(">")
+        child.sendline("setup 0 {}".format(rst_time))
+        child.expect_exact("valid configuration", timeout=1)
+    for rst_time in [wdt_lower_bound - 1, wdt_upper_bound + 1]:
+        if rst_time < 0:
+            continue
+        child.expect_exact(">")
+        child.sendline("setup 0 {}".format(rst_time))
+        child.expect_exact("invalid times, see \"range\"", timeout=1)
+
     for rst_time in reset_times_ms:
         child.expect_exact(">")
         child.sendline("setup 0 {}".format(rst_time))
         if rst_time < wdt_lower_bound or rst_time > wdt_upper_bound:
-            child.expect_exact("invalid time, see \"range\"", timeout=1)
+            child.expect_exact("invalid times, see \"range\"", timeout=1)
         else:
             child.expect_exact(">")
             child.sendline("startloop")
