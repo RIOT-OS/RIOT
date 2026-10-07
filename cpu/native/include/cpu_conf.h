@@ -31,12 +31,12 @@ extern "C" {
 #if !defined(THREAD_STACKSIZE_DEFAULT) || defined(DOXYGEN)
 /**
  * @brief Default size of a thread stack
+ *
+ * The host thread backing a RIOT thread runs on the RIOT thread stack, which
+ * must be at least `PTHREAD_STACK_MIN` and also holds the host thread's TLS,
+ * libc internal state and signal frames.
  */
-#  if (__SIZEOF_POINTER__ == 8)
-#    define THREAD_STACKSIZE_DEFAULT            (16384)
-#  else
-#    define THREAD_STACKSIZE_DEFAULT            (8192)
-#  endif
+#  define THREAD_STACKSIZE_DEFAULT            (32768)
 #endif
 /**
  * @brief Default size of idle thread stack

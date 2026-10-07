@@ -42,6 +42,7 @@
 #include <unistd.h>
 
 #include "cpu.h"
+#include "container.h"
 #include "cpu_conf.h"
 #include "irq.h"
 #include "sched.h"
@@ -62,13 +63,23 @@ extern netdev_tap_t netdev_tap;
  * @brief   Host thread backing a RIOT thread
  *
  * This is stored at the top of the RIOT thread stack, `thread_t::sp` points
- * to it.
+ * to it. The remainder of the RIOT stack is used as stack of the host thread
+ * if it is large enough, so that stack usage reported by e.g. `ps` is
+ * meaningful.
+ *
+ * The host thread is only created when the RIOT thread is scheduled for the
+ * first time. Until then the RIOT stack may legitimately be reused (e.g. by
+ * tests/core/thread_flood), and resources are only spent on threads that
+ * actually run.
  */
 typedef struct {
-    pthread_t pthread;              /**< host thread */
+    pthread_t pthread;              /**< host thread, valid if @ref started */
     int pipe_fd[2];                 /**< a byte is written to it to schedule the thread */
     thread_task_func_t task_func;   /**< RIOT thread function */
     void *arg;                      /**< argument to @ref task_func */
+    void *stack;                    /**< stack for the host thread */
+    size_t stack_size;              /**< size of @ref stack */
+    bool started;                   /**< host thread has been created */
 } native_thread_t;
 
 /**
@@ -81,21 +92,17 @@ typedef struct {
 static int (*real_pthread_create)(pthread_t *thread, const pthread_attr_t *attr,
                                   void *(*start_routine)(void *), void *arg);
 static int (*real_pthread_join)(pthread_t thread, void **retval);
+static pthread_t (*real_pthread_self)(void);
+static int (*real_pthread_attr_init)(pthread_attr_t *attr);
+static int (*real_pthread_attr_setstack)(pthread_attr_t *attr, void *stackaddr,
+                                         size_t stacksize);
+static int (*real_pthread_attr_destroy)(pthread_attr_t *attr);
 /** @} */
 
 /**
  * @brief   Host thread of the calling host thread, NULL for the main host thread
  */
 static __thread native_thread_t *_self;
-
-/**
- * @brief   Read end of the pipe of the calling host thread
- *
- * This is kept separately from @ref _self, as the control block may only be
- * accessed once the thread got scheduled: until then the RIOT stack holding
- * it may be reused (e.g. by tests/core/thread_flood).
- */
-static __thread int _cpu_fd = -1;
 
 /**
  * @brief   Used by an exiting thread to return from its host thread function
@@ -138,10 +145,53 @@ static void _reap_zombie(void)
     }
 }
 
+static void *_thread_entry(void *arg);
+
+/* Create the host thread for @p next, which starts out as CPU owner.
+ * Must be called with all signals masked, which the new thread inherits. */
+static void _start(native_thread_t *next)
+{
+    pthread_attr_t attr;
+    pthread_t pthread;
+    int res;
+
+    if (real_pipe(next->pipe_fd) == -1) {
+        err(EXIT_FAILURE, "native: pipe");
+    }
+    /* don't leak the pipes on reboot (execve()) */
+    real_fcntl(next->pipe_fd[0], F_SETFD, FD_CLOEXEC);
+    real_fcntl(next->pipe_fd[1], F_SETFD, FD_CLOEXEC);
+    next->started = true;
+
+    _native_pending_syscalls_up();
+    real_pthread_attr_init(&attr);
+    /* the host libc may reject the RIOT stack if it is too small for it,
+     * fall back to a stack allocated by the host libc in that case */
+    res = EINVAL;
+    if (next->stack
+        && real_pthread_attr_setstack(&attr, next->stack, next->stack_size) == 0) {
+        res = real_pthread_create(&pthread, &attr, _thread_entry, next);
+    }
+    if (res == EINVAL) {
+        res = real_pthread_create(&pthread, NULL, _thread_entry, next);
+    }
+    real_pthread_attr_destroy(&attr);
+    _native_pending_syscalls_down();
+
+    if (res != 0) {
+        errx(EXIT_FAILURE, "native: pthread_create() failed: %s", strerror(res));
+    }
+}
+
 /* Hand the CPU over to @p next. Must be called with all signals masked. */
 static void _schedule(native_thread_t *next)
 {
     char token = 0;
+
+    if (!next->started) {
+        _start(next);
+        return;
+    }
 
     if (real_write(next->pipe_fd[1], &token, 1) != 1) {
         err(EXIT_FAILURE, "native: failed to schedule host thread");
@@ -150,13 +200,13 @@ static void _schedule(native_thread_t *next)
 
 /* Block until the calling host thread is the CPU owner again. Must be called
  * with all signals masked. */
-static void _wait_for_cpu(void)
+static void _wait_for_cpu(native_thread_t *self)
 {
     char token;
     ssize_t res;
 
     do {
-        res = real_read(_cpu_fd, &token, 1);
+        res = real_read(self->pipe_fd[0], &token, 1);
     } while ((res == -1) && (errno == EINTR));
 
     if (res != 1) {
@@ -183,7 +233,7 @@ void _native_switch_to_active(void)
     DEBUG_CPU("switching to PID %" PRIkernel_pid "\n", thread_getpid());
 
     _schedule(next);
-    _wait_for_cpu();
+    _wait_for_cpu(_self);
 }
 
 /**
@@ -264,10 +314,24 @@ void thread_yield_higher(void)
 
 void native_cpu_init(void)
 {
-    *(void **)&real_pthread_create = dlsym(RTLD_NEXT, "pthread_create");
-    *(void **)&real_pthread_join = dlsym(RTLD_NEXT, "pthread_join");
-    if (!real_pthread_create || !real_pthread_join) {
-        errx(EXIT_FAILURE, "native_cpu_init: failed to look up host pthread functions");
+    static const struct {
+        void **fn;
+        const char *name;
+    } lookups[] = {
+        { (void **)&real_pthread_create, "pthread_create" },
+        { (void **)&real_pthread_join, "pthread_join" },
+        { (void **)&real_pthread_self, "pthread_self" },
+        { (void **)&real_pthread_attr_init, "pthread_attr_init" },
+        { (void **)&real_pthread_attr_setstack, "pthread_attr_setstack" },
+        { (void **)&real_pthread_attr_destroy, "pthread_attr_destroy" },
+    };
+
+    for (unsigned i = 0; i < ARRAY_SIZE(lookups); i++) {
+        *lookups[i].fn = dlsym(RTLD_NEXT, lookups[i].name);
+        if (*lookups[i].fn == NULL) {
+            errx(EXIT_FAILURE, "native_cpu_init: failed to look up %s()",
+                 lookups[i].name);
+        }
     }
 
     DEBUG_CPU("RIOT native cpu initialized.\n");
@@ -297,16 +361,15 @@ static void _set_host_thread_name(native_thread_t *self, const char *name)
 
 static void *_thread_entry(void *arg)
 {
+    native_thread_t *self = arg;
     jmp_buf exit_buf;
 
-    _cpu_fd = (intptr_t)arg;
+    /* the host thread starts out as CPU owner */
+    self->pthread = real_pthread_self();
+    _self = self;
     _exit_buf = &exit_buf;
 
-    _wait_for_cpu();
-
-    /* only now the control block on the RIOT stack is guaranteed to be valid */
-    native_thread_t *self = _native_thread(thread_get_active());
-    _self = self;
+    _reap_zombie();
 
     /* the name is only assigned after thread_stack_init() returned */
     _set_host_thread_name(self, thread_getname(thread_getpid()));
@@ -326,14 +389,11 @@ static void *_thread_entry(void *arg)
 char *thread_stack_init(thread_task_func_t task_func, void *arg, void *stack_start, int stacksize)
 {
     native_thread_t *ctx;
-    sigset_t old;
-    int res;
 
     DEBUG_CPU("thread_stack_init\n");
 
-    /* Place the host thread control block at the top of the RIOT stack.
-     * The host thread uses a stack allocated by the host libc, as RIOT
-     * stacks are typically too small for host code (and pthreads). */
+    /* Place the host thread control block at the top of the RIOT stack,
+     * the remainder is used as stack of the host thread. */
     uintptr_t top = (uintptr_t)stack_start + stacksize - sizeof(native_thread_t);
     top &= ~(uintptr_t)(_Alignof(max_align_t) - 1);
     expect(top >= (uintptr_t)stack_start);
@@ -342,25 +402,12 @@ char *thread_stack_init(thread_task_func_t task_func, void *arg, void *stack_sta
     memset(ctx, 0, sizeof(*ctx));
     ctx->task_func = task_func;
     ctx->arg = arg;
-    if (real_pipe(ctx->pipe_fd) == -1) {
-        err(EXIT_FAILURE, "thread_stack_init: pipe");
-    }
-    /* don't leak the pipes on reboot (execve()) */
-    real_fcntl(ctx->pipe_fd[0], F_SETFD, FD_CLOEXEC);
-    real_fcntl(ctx->pipe_fd[1], F_SETFD, FD_CLOEXEC);
 
-    /* The new host thread inherits our signal mask, it must not receive any
-     * signals until it becomes the CPU owner. */
-    _block_all_signals(&old);
-    _native_pending_syscalls_up();
-    res = real_pthread_create(&ctx->pthread, NULL, _thread_entry,
-                              (void *)(intptr_t)ctx->pipe_fd[0]);
-    _native_pending_syscalls_down();
-    pthread_sigmask(SIG_SETMASK, &old, NULL);
-
-    if (res != 0) {
-        errx(EXIT_FAILURE, "thread_stack_init: pthread_create() failed: %s",
-             strerror(res));
+    uintptr_t bottom = ((uintptr_t)stack_start + _Alignof(max_align_t) - 1)
+                       & ~(uintptr_t)(_Alignof(max_align_t) - 1);
+    if (top > bottom) {
+        ctx->stack = (void *)bottom;
+        ctx->stack_size = top - bottom;
     }
 
     return (char *)ctx;
