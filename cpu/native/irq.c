@@ -134,8 +134,7 @@ unsigned irq_enable(void)
     DEBUG_IRQ("irq_enable()\n");
 
     /* Mark the IRQ as enabled first since pthread_sigmask could call the handler
-     * before returning to userspace.
-     */
+    * before returning to userspace. */
 
     prev_state = _native_interrupts_enabled;
     _native_interrupts_enabled = true;
