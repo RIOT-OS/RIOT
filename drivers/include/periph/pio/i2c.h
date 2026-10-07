@@ -37,7 +37,7 @@ typedef i2c_t pio_i2c_t;
  */
 typedef struct pio_program_i2c {
     pio_program_t base; /**< PIO base program */
-    unsigned ref_mask;  /**< Mask of referencing PIO state machines */
+    unsigned ref_mask;  /**< Mask of referencing PIO state machines (unused!) */
 } pio_program_i2c_t;
 
 /**
