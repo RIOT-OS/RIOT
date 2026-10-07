@@ -3,6 +3,18 @@
  * SPDX-License-Identifier: LGPL-2.1-only
  */
 
+/**
+ * @ingroup     tests
+ * @{
+ *
+ * @file
+ * @brief       AES-128 CBC and ECB encryption and decryption in the secure image
+ *
+ * @author      Lena Boeckmann <lena.boeckmann@haw-hamburg.de>
+ *
+ * @}
+ */
+
 #include <stdint.h>
 
 #include "test_utils.h"

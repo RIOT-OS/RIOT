@@ -3,7 +3,18 @@
  * SPDX-License-Identifier: LGPL-2.1-only
  */
 
-#include <stdio.h>
+/**
+ * @ingroup     tests
+ * @{
+ *
+ * @file
+ * @brief       SHA-256 hash computation in the secure image
+ *
+ * @author      Lena Boeckmann <lena.boeckmann@haw-hamburg.de>
+ *
+ * @}
+ */
+
 #include <stdint.h>
 
 #include "test_utils.h"
@@ -19,7 +30,7 @@ static const uint8_t msg[] = {
     0xa4, 0xb8, 0xc0, 0xcf,
     0x5e, 0xf0, 0x2b, 0x95
 };
-static const size_t msg_len = sizeof(msg); // exclude NULL-byte
+static const size_t msg_len = sizeof(msg);
 
 static const uint8_t hash_sha256[] = {
     0x4f, 0x44, 0xc1, 0xc7,

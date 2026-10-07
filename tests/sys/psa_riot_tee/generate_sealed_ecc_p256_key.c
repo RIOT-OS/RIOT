@@ -3,6 +3,18 @@
  * SPDX-License-Identifier: LGPL-2.1-only
  */
 
+/**
+ * @ingroup     tests
+ * @{
+ *
+ * @file
+ * @brief       Generate a sealed ECC P-256 key pair, then sign and verify
+ *
+ * @author      Lena Boeckmann <lena.boeckmann@haw-hamburg.de>
+ *
+ * @}
+ */
+
 #include "test_utils.h"
 
 static void test_psa_generate_sign_verify_ecc_p256_key(void)

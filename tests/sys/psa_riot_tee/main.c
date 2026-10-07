@@ -3,6 +3,18 @@
  * SPDX-License-Identifier: LGPL-2.1-only
  */
 
+/**
+ * @ingroup     tests
+ * @{
+ *
+ * @file
+ * @brief       Tests for the PSA Crypto API with the riot-tee (TrustZone-M) backend
+ *
+ * @author      Lena Boeckmann <lena.boeckmann@haw-hamburg.de>
+ *
+ * @}
+ */
+
 #include "test_utils.h"
 
 int main(void)
