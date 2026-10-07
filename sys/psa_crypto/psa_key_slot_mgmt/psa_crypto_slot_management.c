@@ -560,21 +560,20 @@ psa_status_t psa_validate_key_location(psa_key_lifetime_t lifetime, psa_se_drv_d
             }
             return PSA_SUCCESS;
         }
-#endif
+#else
         (void)p_drv;
+#endif /* MODULE_PSA_SECURE_ELEMENT */
         return PSA_ERROR_INVALID_ARGUMENT;
     }
-
-    if (PSA_KEY_LIFETIME_GET_LOCATION(lifetime) == PSA_KEY_LOCATION_LOCAL_SEALED) {
+    else if (PSA_KEY_LIFETIME_GET_LOCATION(lifetime) == PSA_KEY_LOCATION_LOCAL_SEALED) {
         (void)p_drv;
-#if PSA_SEALED_KEY_COUNT
+        /* a sealed key can only be stored if there are sealed key slots */
+        return PSA_SEALED_KEY_COUNT ? PSA_SUCCESS : PSA_ERROR_INVALID_ARGUMENT;
+    }
+    else {
+        (void)p_drv;
         return PSA_SUCCESS;
-#endif /* PSA_SEALED_KEY_COUNT */
-        return PSA_ERROR_INVALID_ARGUMENT;
     }
-
-    (void)p_drv;
-    return PSA_SUCCESS;
 }
 
 psa_status_t psa_validate_key_persistence(psa_key_lifetime_t lifetime)
@@ -678,7 +677,7 @@ void psa_get_public_key_data_from_key_slot(const psa_key_slot_t *slot, uint8_t *
             *pubkey_data_len = &((psa_sealed_key_slot_t *)slot)->key.pubkey_data_len;
             return;
         }
-#endif /* PSA_SEALED_KEY_SLOT */
+#endif /* PSA_SEALED_KEY_COUNT */
 
         else {
 #if PSA_ASYMMETRIC_KEYPAIR_COUNT
