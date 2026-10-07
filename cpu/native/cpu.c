@@ -149,13 +149,21 @@ static void _block_all_signals(sigset_t *old)
  * thread (which might hold its host thread's state) can safely be reused. */
 static void _reap_zombie(void)
 {
-    if (_have_zombie) {
-        _have_zombie = false;
-        _native_pending_syscalls_up();
-        _host_calls++;
-        real_pthread_join(_zombie, NULL);
-        _host_calls--;
-        _native_pending_syscalls_down();
+    int res;
+
+    if (!_have_zombie) {
+        return;
+    }
+
+    _have_zombie = false;
+    _native_pending_syscalls_up();
+    _host_calls++;
+    res = real_pthread_join(_zombie, NULL);
+    _host_calls--;
+    _native_pending_syscalls_down();
+
+    if (res) {
+        DEBUG_CPU("_reap_zombie: pthread_join() failed with %d\n", res);
     }
 }
 
