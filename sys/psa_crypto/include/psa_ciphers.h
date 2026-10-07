@@ -26,20 +26,20 @@ extern "C" {
 #include "psa/crypto.h"
 #include "psa/crypto_contexts.h"
 
-#if IS_USED(MODULE_PSA_CIPHER_AES_128_CBC) || defined(DOXYGEN)
+#if IS_USED(MODULE_PSA_CIPHER_AES_128_ECB) || defined(DOXYGEN)
 /**
  * @brief   Low level wrapper function to call a driver for an AES 128 ECB encryption.
  *          See @ref psa_cipher_encrypt()
  *
- * @param   attributes          Attributes of the key to be used
- * @param   key_buffer          Buffer containing the key
- * @param   key_buffer_size     Size of @p key_buffer in bytes
- * @param   alg                 Algorithm to be used
- * @param   input               Input to be encrypted
- * @param   input_length        Size of @p input in bytes
- * @param   output              Buffer to write the ciphertext
- * @param   output_size         Size of @p output in bytes
- * @param   output_length       Actual size of the ciphertext
+ * @param[in]   attributes          Attributes of the key to be used
+ * @param[in]   key_buffer          Buffer containing the key
+ * @param[in]   key_buffer_size     Size of @p key_buffer in bytes
+ * @param[in]   alg                 Algorithm to be used
+ * @param[in]   input               Input to be encrypted
+ * @param[in]   input_length        Size of @p input in bytes
+ * @param[out]  output              Buffer to write the ciphertext
+ * @param[in]   output_size         Size of @p output in bytes
+ * @param[out]  output_length       Actual size of the ciphertext
  * @return  @ref psa_status_t
  */
 psa_status_t psa_cipher_ecb_aes_128_encrypt(const psa_key_attributes_t *attributes,
@@ -56,15 +56,15 @@ psa_status_t psa_cipher_ecb_aes_128_encrypt(const psa_key_attributes_t *attribut
  * @brief   Low level wrapper function to call a driver for an AES 128 ECB decryption.
  *          See @ref psa_cipher_decrypt()
  *
- * @param   attributes          Attributes of the key to be used
- * @param   key_buffer          Buffer containing the key
- * @param   key_buffer_size     Size of @p key_buffer in bytes
- * @param   alg                 Algorithm to be used
- * @param   input               Input to be decrypted
- * @param   input_length        Size of @p input in bytes
- * @param   output              Buffer to write the plaintext
- * @param   output_size         Size of @p output in bytes
- * @param   output_length       Actual size of the plaintext
+ * @param[in]   attributes          Attributes of the key to be used
+ * @param[in]   key_buffer          Buffer containing the key
+ * @param[in]   key_buffer_size     Size of @p key_buffer in bytes
+ * @param[in]   alg                 Algorithm to be used
+ * @param[in]   input               Input to be decrypted
+ * @param[in]   input_length        Size of @p input in bytes
+ * @param[out]  output              Buffer to write the plaintext
+ * @param[in]   output_size         Size of @p output in bytes
+ * @param[out]  output_length       Actual size of the plaintext
  * @return  @ref psa_status_t
  */
 psa_status_t psa_cipher_ecb_aes_128_decrypt(const psa_key_attributes_t *attributes,
@@ -76,7 +76,9 @@ psa_status_t psa_cipher_ecb_aes_128_decrypt(const psa_key_attributes_t *attribut
                                             uint8_t *output,
                                             size_t output_size,
                                             size_t *output_length);
+#endif /* MODULE_PSA_CIPHER_AES_128_ECB */
 
+#if IS_USED(MODULE_PSA_CIPHER_AES_128_CBC) || defined(DOXYGEN)
 /**
  * @brief   Low level wrapper function to call a driver for an AES 128 CBC encryption.
  *          See @ref psa_cipher_encrypt()

@@ -97,8 +97,9 @@ typedef struct {
 /**
  * @brief   Structure for a sealed key slot.
  *
- *          These slots hold Slot Numbers for keys in protected storage and, if the key type is an
- *          asymmetric key pair, the public key.
+ * These slots hold a sealed private key, i.e. the encrypted key as returned by the
+ * TEE, and the public key of the key pair. The plaintext private key is never
+ * stored here.
  */
 typedef struct {
     clist_node_t node;

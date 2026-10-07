@@ -27,7 +27,7 @@ extern "C" {
  * @brief   Generate random bytes using a custom (backend-specific) RNG.
  *
  * @param[out]  output       Buffer to write the generated random bytes to
- * @param       output_size  Number of random bytes to generate
+ * @param[in]   output_size  Number of random bytes to generate
  *
  * @return  @ref psa_status_t
  */

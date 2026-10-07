@@ -1,11 +1,11 @@
 ifneq (,$(filter psa_crypto,$(USEMODULE)))
-ifneq (,$(filter psa_cryptoservice,$(USEMODULE)))
-  USEMODULE += psa_cryptoservice_random
-  USEMODULE += psa_custom_random
-else
-  USEMODULE += random
-  USEMODULE += prng_sha256prng
-endif
+  ifneq (,$(filter psa_cryptoservice,$(USEMODULE)))
+    USEMODULE += psa_cryptoservice_random
+    USEMODULE += psa_custom_random
+  else
+    USEMODULE += random
+    USEMODULE += prng_sha256prng
+  endif
 endif
 
 ifneq (,$(filter psa_persistent_storage, $(USEMODULE)))
