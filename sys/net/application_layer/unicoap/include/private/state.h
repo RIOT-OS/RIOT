@@ -16,6 +16,10 @@
 
 #include "private/packet.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /**
  * @defgroup net_unicoap_private_state State Management
  * @ingroup  net_unicoap_private
@@ -28,9 +32,11 @@
  * @author Carl Seifert <carl.seifert@tu-dresden.de>
  */
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+/* MARK: - Event Scheduling */
+/**
+ * @name Event Scheduling
+ * @{
+ */
 
 /**
  * @brief An event scheduled for a specified point in time
@@ -114,11 +120,6 @@ static inline unicoap_scheduled_event_t* unicoap_scheduled_event_of_event(event_
     return container_of(event, unicoap_scheduled_event_t, super);
 }
 
-/* MARK: - Event Scheduling */
-/**
- * @name Event Scheduling
- * @{
- */
 /** @brief The ztimer clock used for event scheduling */
 #define UNICOAP_CLOCK ZTIMER_MSEC
 
@@ -264,7 +265,13 @@ static inline unicoap_memo_t* unicoap_memo_of_timeout(unicoap_scheduled_event_t*
 static inline unicoap_memo_t* unicoap_memo_of_event(event_t* event) {
     return unicoap_memo_of_timeout(unicoap_scheduled_event_of_event(event));
 }
+/** @} */
 
+/* MARK: - Layered notification system */
+/**
+ * @name Layered notification system
+ * @{
+ */
 /**
  * @brief A signal sent from one layer to another indicating a change to a state object
  *
@@ -423,7 +430,7 @@ typedef struct {
 #endif
 
     /**
-     * @brief Request flags from application, from the original call to `unicoap_send_request_*
+     * @brief Request flags from application, from the original call to `unicoap_send_request_*`
      */
     unicoap_request_flags_t flags;
 } unicoap_client_memo_t;
@@ -540,8 +547,6 @@ int unicoap_client_memo_assign_refno(unicoap_client_memo_t* memo);
  */
 void unicoap_client_memo_free(unicoap_client_memo_t* memo, int error);
 /** @} */
-
-/* TODO: Client and advanced server features: Elaborate state management */
 
 #ifdef __cplusplus
 }

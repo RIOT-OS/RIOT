@@ -7,6 +7,7 @@
 #pragma once
 
 #include <stdint.h>
+#include <alloca.h>
 
 #include "mutex.h"
 #include "bitfield.h"
@@ -260,6 +261,37 @@ int unicoap_resource_match_request_default(const unicoap_listener_t* listener,
  */
 int unicoap_resource_handle_well_known_core(unicoap_message_t* message, const unicoap_aux_t* aux,
                                             unicoap_request_context_t* ctx, void* arg);
+/** @} */
+
+/* MARK: - Private message and option helpers */
+/**
+ * @name Private message and option helpers
+ * @{
+ */
+#ifndef DOXYGEN
+#  define _UNICOAP_OPTIONS_ALLOCA(_buf, _name, capacity, _static) \
+    uint8_t* _buf = alloca(capacity);                             \
+    unicoap_options_t* _name = alloca(sizeof(unicoap_options_t)); \
+    memset(_name, 0, sizeof(unicoap_options_t));                  \
+    (_name)->entries->data = _buf;                                \
+    (_name)->storage_capacity = capacity;
+#endif
+
+/**
+ * @brief Dynamically allocates options with buffer capacity on stack at runtime
+ *
+ * @param name Name of the variable storing the options structure as identifier token
+ * @param capacity Storage buffer capacity in bytes
+ *
+ * Allocates a new @ref unicoap_options_t container and a storage buffer with
+ * the given capacity, and initializes it. No need to call
+ * @ref unicoap_options_t::unicoap_options_init afterwards.
+ *
+ * See @ref UNICOAP_OPTIONS_ALLOC for stack allocation at compile-time
+ * See @ref UNICOAP_OPTIONS_ALLOC_STATIC for static allocation
+ */
+#define UNICOAP_OPTIONS_ALLOCA(name, capacity) \
+    _UNICOAP_OPTIONS_ALLOCA(_CONCAT3(name, _storage, __LINE__), name, capacity,)
 /** @} */
 
 /* MARK: - Other Utils */

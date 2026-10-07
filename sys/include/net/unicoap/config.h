@@ -169,6 +169,16 @@
 #endif
 
 /**
+ * @brief Maximum length of host part in client URIs, used for DNS resolution
+ *
+ * **Default**: 32 bytes
+ */
+#if !defined(CONFIG_UNICOAP_URI_HOST_PART_LENGTH_MAX) || defined(DOXYGEN)
+#  define CONFIG_UNICOAP_URI_HOST_PART_LENGTH_MAX (32)
+#endif
+
+
+/**
  * @brief Size of buffer unicoap allocates for a CoAP message header,
  * including token length.
  */
@@ -259,6 +269,16 @@ static_assert(CONFIG_UNICOAP_GENERATED_TOKEN_LENGTH > 0,
  * @brief `DEFAULT_LEISURE` constant for multicast delay calculation
  */
 #define UNICOAP_DEFAULT_LEISURE (5)
+
+/**
+ * @brief Default time to wait for a response
+ *
+ * **Unit**: milliseconds
+ * **Default**: 7000
+ */
+#if !defined(CONFIG_UNICOAP_TIMEOUT_CLIENT_RESPONSE_MS) || defined(DOXYGEN)
+#  define CONFIG_UNICOAP_TIMEOUT_CLIENT_RESPONSE_MS (7000)
+#endif
 /** @} */
 
 /* MARK: - Resource observation */
@@ -375,8 +395,8 @@ static_assert(CONFIG_UNICOAP_RETRANSMISSIONS_MAX < 32,
  *
  * **Default**: 2 transmissions
  */
-#if !defined(CONFIG_UNICOAP_RFC7252_TRANSMISSIONS_MAX) || defined(DOXYGEN)
-#  define CONFIG_UNICOAP_RFC7252_TRANSMISSIONS_MAX 2
+#if !defined(CONFIG_UNICOAP_RFC7252_TRANSMISSIONS_CAPACITY) || defined(DOXYGEN)
+#  define CONFIG_UNICOAP_RFC7252_TRANSMISSIONS_CAPACITY 2
 #endif
 
 /* TODO: Client and advanced server features: Limit to exchange-layer state objects */
@@ -392,7 +412,7 @@ static_assert(CONFIG_UNICOAP_RETRANSMISSIONS_MAX < 32,
  * the same resource at a time. `CON` responses will need to cached, i.e., a carbon copy will be
  * created. If the client acknowledges the response directly and no retransmission is needed,
  * the copy will be deleted. Otherwise, the copy is kept until an `ACK` arrives or the
- * retransmission counter exceeds @ref CONFIG_UNICOAP_RFC7252_TRANSMISSIONS_MAX.
+ * retransmission counter exceeds @ref CONFIG_UNICOAP_RFC7252_TRANSMISSIONS_CAPACITY.
  *
  */
 #if !defined(CONFIG_UNICOAP_CARBON_COPIES_MAX) || defined(DOXYGEN)
