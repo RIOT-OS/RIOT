@@ -17,6 +17,7 @@
 #include <stdlib.h>
 #include <assert.h>
 #include <inttypes.h>
+#include <stdbool.h>
 
 #include "cpu.h"
 #include "timex.h"
@@ -41,21 +42,37 @@
 #define IWDG_UNLOCK               ((uint16_t)0x5555)
 #define IWDG_LOCK                 ((uint16_t)0x0000)
 
+/* The prescaler and reload values are calculated by wdt_setup_reboot()
+ * and have to be applied by wdt_start(), so they have to be stored.
+ * Initialized with safe default values. */
+static uint8_t _prescaler = 0;
+static uint16_t _reload = IWDG_RLR_RL;
+static bool _started;
+
 static inline uint32_t _wdt_time(uint8_t pre, uint16_t rel)
 {
     /* wdt_time (us) = LSI(us) x 4 x 2^PRE x RELOAD */
     return (uint32_t)(((uint64_t)US_PER_SEC * 4 * (1 << pre) * rel ) / CLOCK_LSI);
 }
 
-static void _set_config(uint8_t prescaler, uint16_t reload)
+static void _set_config(void)
 {
-    assert(prescaler <= MAX_PRESCALER);
-    assert(reload <= IWDG_RLR_RL);
+    assert(_prescaler <= MAX_PRESCALER);
+    assert(_reload <= IWDG_RLR_RL);
+
+    /* PR and RLR can't be written while an update is ongoing. Updates only
+     * complete while the watchdog is running, so this must not be called
+     * before starting it. */
+    while (IWDG->SR & (IWDG_SR_PVU | IWDG_SR_RVU)) {}
 
     IWDG->KR = IWDG_UNLOCK;
-    IWDG->PR = prescaler;
-    IWDG->RLR = reload;
+    IWDG->PR = _prescaler;
+    IWDG->RLR = _reload;
     IWDG->KR = IWDG_LOCK;
+
+    /* Wait for the update before reloading the counter with the new value */
+    while (IWDG->SR & (IWDG_SR_PVU | IWDG_SR_RVU)) {}
+    wdt_kick();
 }
 
 static inline uint32_t _wdt_ticks(uint8_t pre, uint32_t rst_time)
@@ -86,6 +103,8 @@ static uint16_t _find_reload_value(uint8_t pre, uint32_t rst_time)
 void wdt_start(void)
 {
     IWDG->KR = IWDG_KR_KEY_ENABLE;
+    _started = true;
+    _set_config();
 }
 
 void wdt_kick(void)
@@ -102,14 +121,14 @@ void wdt_setup_reboot(uint32_t min_time, uint32_t max_time)
     /* Check reset time limit */
     assert((max_time >= NWDT_TIME_LOWER_LIMIT) && (max_time <= NWDT_TIME_UPPER_LIMIT));
 
-    uint8_t pre = _find_prescaler(max_time);
-    uint16_t rel = _find_reload_value(pre, max_time);
+    _prescaler = _find_prescaler(max_time);
+    _reload = _find_reload_value(_prescaler, max_time);
 
-    /* Set watchdog prescaler and reload value */
-    _set_config(pre, rel);
+    DEBUG("[wdt]: reset time %" PRIu32 " [us]\n", _wdt_time(_prescaler, _reload + 1));
 
-    DEBUG("[wdt]: reset time %" PRIu32 " [us]\n", _wdt_time(pre, rel + 1));
-
-    /* Refresh wdt counter */
-    wdt_kick();
+    /* If the WDT is not already running, the configuration will be applied
+     * when starting the watchdog. */
+    if (_started) {
+        _set_config();
+    }
 }
