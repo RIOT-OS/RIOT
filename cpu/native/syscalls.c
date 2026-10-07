@@ -75,16 +75,10 @@ void _native_syscall_leave(void)
             && (_native_in_isr == 0)
             && (_native_pending_syscalls == 0)
             && (_native_interrupts_enabled)
-            && (thread_get_active() != NULL)
+            && _native_is_cpu_owner()
        )
     {
-        _native_in_isr = 1;
-        _native_interrupts_enabled = false;
-
-        _native_isr_context_make(_native_call_sig_handlers_and_switch);
-        if (swapcontext(_native_user_context(), _native_isr_context) == -1) {
-            err(EXIT_FAILURE, "_native_syscall_leave: swapcontext");
-        }
+        _native_isr_run(false);
     }
 }
 
