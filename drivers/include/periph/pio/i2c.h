@@ -45,7 +45,7 @@ typedef struct pio_program_i2c {
  */
 typedef struct pio_i2c_bus {
     pio_t pio;              /**< PIO index */
-    pio_sm_t sm;            /**< State machine index */
+    pio_sm_t sm;            /**< State machine index, default value -1 if unlocked */
     mutex_t mtx;            /**< Mutex to protect the bus from concurrent accesses */
 } pio_i2c_bus_t;
 
@@ -89,6 +89,9 @@ int pio_i2c_init_program(pio_t pio);
 
 /**
  * @brief   Free a PIO I2C program
+ *
+ * The program is only freed if no state machine of PIO @p pio
+ * is using it anymore.
  *
  * @param[in]       pio         PIO index
  */
