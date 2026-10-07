@@ -22,6 +22,10 @@
 #include "kernel_defines.h"
 #include "periph_cpu.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /**
  * @name    Clock configuration
  *
@@ -29,12 +33,10 @@
  * the actual AHB frequency). The ACLINT mtime counter runs at half of it.
  * @{
  */
+#ifndef CLOCK_CORECLOCK
 #define CLOCK_CORECLOCK     (40000000UL)    /**< CPU core clock, 40 MHz */
-/** @} */
-
-#ifdef __cplusplus
-extern "C" {
 #endif
+/** @} */
 
 /**
  * @name    Timer configuration
