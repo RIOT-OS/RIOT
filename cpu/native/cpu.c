@@ -262,7 +262,7 @@ void _native_switch_to_active(void)
  */
 void thread_print_stack(void)
 {
-    DEBUG_CPU("thread_print_stack\n");
+    DEBUG_CPU("thread_print_stack: not implemented yet!\n");
     return;
 }
 
