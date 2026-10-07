@@ -13,10 +13,9 @@
 
 #include <string.h>
 
-#include "thread.h"
 #include "compiler_hints.h"
-
 #include "net/unicoap/server.h"
+#include "thread.h"
 
 #define ENABLE_DEBUG CONFIG_UNICOAP_DEBUG_LOGGING
 #include "debug.h"
@@ -134,15 +133,15 @@ int unicoap_server_process_request(unicoap_packet_t* packet, const unicoap_resou
 
     if (res > 0) {
         _SERVER_DEBUG("sending response " UNICOAP_CODE_CLASS_DETAIL_FORMAT
-                     " from return value\n",
-                     unicoap_code_class((uint8_t)res), unicoap_code_detail((uint8_t)res));
+                      " from return value\n",
+                      unicoap_code_class((uint8_t)res), unicoap_code_detail((uint8_t)res));
 
         if (IS_ACTIVE(CONFIG_UNICOAP_PREVENT_OPTIONAL_RESPONSES)) {
             if (unicoap_response_is_optional(packet->message->options, (unicoap_status_t)res)) {
                 _SERVER_DEBUG("response " UNICOAP_CODE_CLASS_DETAIL_FORMAT
-                             " is optional, not responding\n",
-                             unicoap_code_class((uint8_t)res),
-                             unicoap_code_detail((uint8_t)res));
+                              " is optional, not responding\n",
+                              unicoap_code_class((uint8_t)res),
+                              unicoap_code_detail((uint8_t)res));
                 return 0;
             }
         }
@@ -190,7 +189,7 @@ int unicoap_server_send_response_body(unicoap_packet_t* packet,
                                       const unicoap_resource_t* resource)
 {
     int res = 0;
-    if ((res = unicoap_messaging_send(packet, _messaging_flags_resource(resource->flags))) < 0) {
+    if ((res = unicoap_messaging_send(packet, _messaging_flags_resource(resource->flags), NULL)) < 0) {
         _SERVER_DEBUG("error: could not send response\n");
         goto error;
     }
