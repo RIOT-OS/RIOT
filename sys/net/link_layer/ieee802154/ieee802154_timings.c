@@ -32,9 +32,15 @@ uint16_t ieee802154_get_symbol_duration(const ieee802154_phy_conf_t *conf)
              * 915 MHz (channels 1-10): 40 ksymbol/s */
             return (conf->channel == 0) ? 50 : 25;
         case IEEE802154_PHY_MR_FSK:
-            return IEEE802154_MR_FSK_SYMBOL_TIME_US;
+            if (IS_USED(MODULE_IEEE802154_PHY_MR_FSK)) {
+                return IEEE802154_MR_FSK_SYMBOL_TIME_US;
+            }
+            goto unsupported;
         case IEEE802154_PHY_MR_OFDM:
-            return IEEE802154_MR_OFDM_SYMBOL_TIME_US;
+            if (IS_USED(MODULE_IEEE802154_PHY_MR_OFDM)) {
+                return IEEE802154_MR_OFDM_SYMBOL_TIME_US;
+            }
+            goto unsupported;
         case IEEE802154_PHY_MR_OQPSK:
             if (IS_USED(MODULE_IEEE802154_PHY_MR_OQPSK)) {
                 const ieee802154_mr_oqpsk_conf_t *oqpsk = (const ieee802154_mr_oqpsk_conf_t *)conf;
@@ -48,9 +54,7 @@ uint16_t ieee802154_get_symbol_duration(const ieee802154_phy_conf_t *conf)
                 /* 1000 and 2000 kchip/s */
                 return 64;
             }
-            else {
-                goto unsupported;
-            }
+            goto unsupported;
         default:
 unsupported:
             /* other PHYs not supported yet */
@@ -84,17 +88,13 @@ static uint32_t _get_shr_duration(const ieee802154_phy_conf_t *conf)
                 shr_len = ieee802154_mr_fsk_plen(fsk->srate) * 8 * 8 + 16;
                 break;
             }
-            else {
-                goto unsupported;
-            }
+            goto unsupported;
         case IEEE802154_PHY_MR_OFDM:
             if (IS_USED(MODULE_IEEE802154_PHY_MR_OFDM)) {
                 shr_len = 6;
                 break;
             }
-            else {
-                goto unsupported;
-            }
+            goto unsupported;
         case IEEE802154_PHY_MR_OQPSK:
             if (IS_USED(MODULE_IEEE802154_PHY_MR_OQPSK)) {
                 const ieee802154_mr_oqpsk_conf_t *oqpsk = (const ieee802154_mr_oqpsk_conf_t *)conf;
@@ -102,9 +102,7 @@ static uint32_t _get_shr_duration(const ieee802154_phy_conf_t *conf)
                 shr_len = (oqpsk->chips < IEEE802154_MR_OQPSK_CHIPS_1000) ? 48 : 72;
                 break;
             }
-            else {
-                goto unsupported;
-            }
+            goto unsupported;
         default:
 unsupported:
             /* other PHYs not supported yet */
@@ -166,9 +164,7 @@ static uint32_t _get_psdu_duration(const ieee802154_phy_conf_t *conf, uint16_t l
                 }
                 break;
             }
-            else {
-                goto unsupported;
-            }
+            goto unsupported;
         case IEEE802154_PHY_MR_OFDM:
             if (IS_USED(MODULE_IEEE802154_PHY_MR_OFDM)) {
                 const ieee802154_mr_ofdm_conf_t *ofdm = (const ieee802154_mr_ofdm_conf_t *)conf;
@@ -179,12 +175,10 @@ static uint32_t _get_psdu_duration(const ieee802154_phy_conf_t *conf, uint16_t l
                 /* PHR: 3 or 6 symbols */
                 symbols = option ? 6 : 3;
                 symbols += ((length + 1) * (1 << option) + quot[ofdm->scheme] - 1) /
-                            quot[ofdm->scheme];
+                           quot[ofdm->scheme];
                 break;
             }
-            else {
-                goto unsupported;
-            }
+            goto unsupported;
         case IEEE802154_PHY_MR_OQPSK:
             if (IS_USED(MODULE_IEEE802154_PHY_MR_OQPSK)) {
                 /* only valid for ACK frames Nd fixed to 63 */
@@ -202,9 +196,7 @@ static uint32_t _get_psdu_duration(const ieee802154_phy_conf_t *conf, uint16_t l
                 symbols += (Npsdu + Ns / 2) / Ns + (Npsdu + 8 * Ns) / (16 * Ns);
                 break;
             }
-            else {
-                goto unsupported;
-            }
+            goto unsupported;
         default:
 unsupported:
             /* other PHYs not supported yet */
@@ -223,10 +215,22 @@ uint32_t ieee802154_get_turnaround_time(const ieee802154_phy_conf_t *conf)
             /* Table 12-1: 12 symbol periods */
             return IEEE802154_ATURNAROUNDTIME_IN_SYMBOLS * ieee802154_get_symbol_duration(conf);
         case IEEE802154_PHY_MR_FSK:
+            if (IS_USED(MODULE_IEEE802154_PHY_MR_FSK)) {
+                return IEEE802154G_ATURNAROUNDTIME_US;
+            }
+            goto unsupported;
         case IEEE802154_PHY_MR_OFDM:
+            if (IS_USED(MODULE_IEEE802154_PHY_MR_OFDM)) {
+                return IEEE802154G_ATURNAROUNDTIME_US;
+            }
+            goto unsupported;
         case IEEE802154_PHY_MR_OQPSK:
-            return IEEE802154G_ATURNAROUNDTIME_US;
+            if (IS_USED(MODULE_IEEE802154_PHY_MR_OQPSK)) {
+                return IEEE802154G_ATURNAROUNDTIME_US;
+            }
+            goto unsupported;
         default:
+unsupported:
             /* other PHYs not supported yet */
             assert(0);
             return IEEE802154G_ATURNAROUNDTIME_US;
@@ -240,11 +244,23 @@ uint32_t ieee802154_get_cca_time(const ieee802154_phy_conf_t *conf)
     switch (conf->phy_mode) {
         case IEEE802154_PHY_BPSK:
         case IEEE802154_PHY_OQPSK:
-        case IEEE802154_PHY_MR_FSK:
-        case IEEE802154_PHY_MR_OFDM:
             /* Table 12-2: 8 symbol periods if not specified by the PHY clause */
             cca_duration_symbol = IEEE802154_CCA_DURATION_IN_SYMBOLS;
             break;
+        case IEEE802154_PHY_MR_FSK:
+            if (IS_USED(MODULE_IEEE802154_PHY_MR_FSK)) {
+                /* Table 12-2: 8 symbol periods if not specified by the PHY clause */
+                cca_duration_symbol = IEEE802154_CCA_DURATION_IN_SYMBOLS;
+                break;
+            }
+            goto unsupported;
+        case IEEE802154_PHY_MR_OFDM:
+            if (IS_USED(MODULE_IEEE802154_PHY_MR_OFDM)) {
+                /* Table 12-2: 8 symbol periods if not specified by the PHY clause */
+                cca_duration_symbol = IEEE802154_CCA_DURATION_IN_SYMBOLS;
+                break;
+            }
+            goto unsupported;
         case IEEE802154_PHY_MR_OQPSK:
             if (IS_USED(MODULE_IEEE802154_PHY_MR_OQPSK)) {
                 const ieee802154_mr_oqpsk_conf_t *oqpsk = (const ieee802154_mr_oqpsk_conf_t *)conf;
@@ -252,9 +268,7 @@ uint32_t ieee802154_get_cca_time(const ieee802154_phy_conf_t *conf)
                 cca_duration_symbol = (oqpsk->chips < IEEE802154_MR_OQPSK_CHIPS_1000) ? 4 : 8;
                 break;
             }
-            else {
-                goto unsupported;
-            }
+            goto unsupported;
         default:
 unsupported:
             /* other PHYs not supported yet */
@@ -276,23 +290,17 @@ static uint32_t _get_phr_len(const ieee802154_phy_conf_t *conf)
             if (IS_USED(MODULE_IEEE802154_PHY_MR_FSK)) {
                 return 2;
             }
-            else {
-                goto unsupported;
-            }
+            goto unsupported;
         case IEEE802154_PHY_MR_OFDM:
             if (IS_USED(MODULE_IEEE802154_PHY_MR_OFDM)) {
                 return 0;
             }
-            else {
-                goto unsupported;
-            }
+            goto unsupported;
         case IEEE802154_PHY_MR_OQPSK:
             if (IS_USED(MODULE_IEEE802154_PHY_MR_OQPSK)) {
                 return 0;
             }
-            else {
-                goto unsupported;
-            }
+            goto unsupported;
         default:
 unsupported:
             /* other PHYs not supported yet */
