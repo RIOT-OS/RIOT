@@ -113,6 +113,18 @@ static __thread native_thread_t *_self;
 static pthread_t _zombie;
 static bool _have_zombie; /**< True if _zombie currently points to a zombie thread */
 
+/**
+ * @brief   Number of host thread management calls in progress, they allocate
+ *          memory on behalf of the host libc
+ */
+static unsigned _host_calls;
+
+/**
+ * @brief   The calling host thread has left its RIOT thread and is only
+ *          running host libc exit code
+ */
+static __thread bool _exited;
+
 static inline native_thread_t *_native_thread(thread_t *thread)
 {
     /* Use intermediate cast to uintptr_t to silence -Wcast-align.
@@ -135,11 +147,21 @@ static void _block_all_signals(sigset_t *old)
  * thread (which might hold its host thread's state) can safely be reused. */
 static void _reap_zombie(void)
 {
-    if (_have_zombie) {
-        _have_zombie = false;
-        _native_pending_syscalls_up();
-        real_pthread_join(_zombie, NULL);
-        _native_pending_syscalls_down();
+    int res;
+
+    if (!_have_zombie) {
+        return;
+    }
+
+    _have_zombie = false;
+    _native_pending_syscalls_up();
+    _host_calls++;
+    res = real_pthread_join(_zombie, NULL);
+    _host_calls--;
+    _native_pending_syscalls_down();
+
+    if (res) {
+        DEBUG_CPU("_reap_zombie: pthread_join() failed with %d\n", res);
     }
 }
 
@@ -162,12 +184,14 @@ static void _start(native_thread_t *next)
     next->started = true;
 
     _native_pending_syscalls_up();
+    _host_calls++;
     real_pthread_attr_init(&attr);
     res = real_pthread_attr_setstack(&attr, next->stack, next->stack_size);
     if (res == 0) {
         res = real_pthread_create(&pthread, &attr, _thread_entry, next);
     }
     real_pthread_attr_destroy(&attr);
+    _host_calls--;
     _native_pending_syscalls_down();
 
     if (res != 0) {
@@ -206,6 +230,11 @@ static void _wait_for_cpu(native_thread_t *self)
     }
 
     _reap_zombie();
+}
+
+bool _native_host_internal(void)
+{
+    return _host_calls || _exited;
 }
 
 bool _native_is_cpu_owner(void)
@@ -285,6 +314,7 @@ void cpu_switch_context_exit(void)
     real_close(_self->pipe_fd[1]);
     _zombie = _self->pthread;
     _have_zombie = true;
+    _exited = true;
     _schedule(next);
 
     real_pthread_exit(NULL);
