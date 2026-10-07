@@ -228,6 +228,17 @@ static_assert(CONFIG_UNICOAP_GENERATED_TOKEN_LENGTH > 0,
 #if !defined(CONFIG_UNICOAP_WELL_KNOWN_CORE_SIZE_MAX) || defined(DOXYGEN)
 #  define CONFIG_UNICOAP_WELL_KNOWN_CORE_SIZE_MAX (120)
 #endif
+
+/**
+ * @brief Maximum number of pending requests that can be started using the client API
+ *
+ ***Default**: 2
+ *
+ */
+#if !defined(CONFIG_UNICOAP_CLIENT_MEMOS_CAPACITY) || defined(DOXYGEN)
+#  define CONFIG_UNICOAP_CLIENT_MEMOS_CAPACITY (2)
+#endif
+
 /** @} */
 
 /* MARK: - Timing */

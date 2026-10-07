@@ -74,7 +74,7 @@ extern "C" {
  *
  * ### Relationship with Exchange-Layer Flags
  * Messaging flags are provided as part of client and resource flags. The
- * (TODO: ref) unicoap_client_flags_t and @ref unicoap_resource_flags_t are separated into
+ * @ref unicoap_request_flags_t and @ref unicoap_resource_flags_t are separated into
  * - exchange flags needed for features building on top the request/response level and
  * - messaging flags.
  *
@@ -146,7 +146,8 @@ typedef enum {
 typedef union {
     /** @brief Resource */
     const unicoap_resource_t* resource;
-
+    /** @brief Client memo */
+    unicoap_client_memo_t* client;
 } unicoap_exchange_arg_t;
 
 /**
@@ -337,6 +338,18 @@ _messaging_flags_resource(unicoap_resource_flags_t resource_flags)
      flags bitfield width is fine here */
     return (unicoap_messaging_flags_t)resource_flags;
 }
+
+/**
+ * @brief Retrieves the part of a request flags bitfield relevant for the messaging driver.
+ *
+ * @param request_flags Request flags
+ * @return Messaging flags extracted from the given bitfield
+ */
+static inline unicoap_messaging_flags_t _messaging_flags_client(unicoap_request_flags_t request_flags) {
+    /* We documented other flags are RFU, hence downcasting to the messaging
+     flags bitfield width is fine here */
+    return (unicoap_messaging_flags_t)request_flags;
+}
 /** @}  */
 
 /* MARK: - Private Exchange-Layer Server API */
@@ -367,6 +380,52 @@ int unicoap_server_process_request(unicoap_packet_t* packet, const unicoap_resou
  */
 int unicoap_server_send_response_body(unicoap_packet_t* packet,
                                       const unicoap_resource_t* resource);
+/** @} */
+
+/* MARK: - Private exchange-layer client API */
+/**
+ * @name Client
+ * @{
+ */
+/**
+ * @brief Informs the unicoap client a new packet has been preprocessed and can be handled.
+ *
+ * @param[in,out] packet Packet that will be processed by the client
+ * @param[in,out] memo Mandatory pointer to memo variable, memo itself can be `NULL`
+ *
+ * @return `0` on success
+ * @returns Negative errno on failure
+ */
+int unicoap_client_process_response(unicoap_packet_t* packet, unicoap_client_memo_t* memo);
+
+/**
+ * @brief Sends part of request body, such as single request in a block-wise transfer
+ *
+ * @param packet Packet to send
+ * @param memo Optional memo
+ * @param request_flags Request flags
+ *
+ * @returns Zero on success or negative integer on error
+ */
+int unicoap_client_send_request_part(unicoap_packet_t* packet, unicoap_client_memo_t* memo,
+                                     unicoap_request_flags_t request_flags);
+
+/**
+ * @brief Sends entire request body, may be split into parts and then sent
+ *
+ * @param request Request body to send
+ * @param endpoint Remote endpoint (server)
+ * @param callback Optional application callback
+ * @param parameters Optional parameters (nullable)
+ * @param flags Request flags
+ *
+ * @returns Zero on success, negative integer otherwise
+ */
+int unicoap_client_send_request_body(unicoap_message_t* request,
+                                     unicoap_endpoint_t* endpoint,
+                                     unicoap_callback_t callback,
+                                     unicoap_request_parameters_t* parameters,
+                                     unicoap_request_flags_t flags);
 /** @} */
 
 #ifdef __cplusplus

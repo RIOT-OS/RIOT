@@ -130,6 +130,9 @@ void unicoap_state_lock(void);
 
 /** @brief Unlocks internal state lock */
 void unicoap_state_unlock(void);
+
+/** @brief PID of `unicoap` thread */
+extern kernel_pid_t _unicoap_pid;
 /** @} */
 
 /* MARK: - State and initialization */
@@ -149,6 +152,11 @@ typedef struct {
 #if IS_USED(MODULE_UNICOAP_SERVER) || defined(DOXYGEN)
     /** @brief Groups of resources */
     unicoap_listener_t* listeners;
+#endif
+
+#if UNICOAP_HAVE_CLIENT_STATE
+    /** @ref unicoap_memo_t */
+    unicoap_client_memo_t client_memos[CONFIG_UNICOAP_CLIENT_MEMOS_CAPACITY];
 #endif
 
     /* TODO: Client and advanced server features: Exchange-layer state objects */

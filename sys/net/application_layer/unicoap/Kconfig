@@ -14,6 +14,13 @@ menu "CoAP Unified Suite (unicoap)"
                 some implementation cost and can therefore be disabled. In that case,
                 altering or adding an option out-of-order results in a runtime error.
 
+        config UNICOAP_CLIENT_MEMOS_MAX
+            int "Maximum parallel exchanges"
+            range 0 9999999
+            default 2
+            help
+                Maximum number of pending requests started using the client API.
+
         config UNICOAP_OPTIONS_MAX
             int "Maximum number of options in a message"
             range 0 9999999
