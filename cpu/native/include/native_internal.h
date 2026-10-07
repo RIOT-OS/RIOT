@@ -230,7 +230,8 @@ bool _native_host_internal(void);
 
 /**
  * @brief Switches to the active thread as selected by the scheduler
- * @pre All signals are blocked and the calling host thread was the CPU owner
+ *
+ * @pre All signals are blocked and the calling host thread was the CPU owner.
  * @private
  *
  * Hands the CPU over to the host thread of the thread returned by
