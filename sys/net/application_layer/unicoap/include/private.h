@@ -68,6 +68,8 @@ extern "C" {
 #  define _STATE_NOTIF_DEBUG(...)               _UNICOAP_PREFIX_DEBUG(".state.notif", __VA_ARGS__)
 #  define _TRANSPORT_DEBUG(...)                 _UNICOAP_PREFIX_DEBUG(".transport", __VA_ARGS__)
 #  define _SERVER_DEBUG(...)                    _UNICOAP_PREFIX_DEBUG(".server", __VA_ARGS__)
+#  define _CLIENT_DEBUG(...)                    _UNICOAP_PREFIX_DEBUG(".client", __VA_ARGS__)
+#  define _URI_DEBUG(...)                       _UNICOAP_PREFIX_DEBUG(".uri", __VA_ARGS__)
 #  define API_WARNING(message)                 "WARNING: " message "\n"
 #  define API_ERROR(message)                   "ERROR: " message "\n"
 #  define API_MISUSE(message)                  "API MISUSE: " message "\n"
