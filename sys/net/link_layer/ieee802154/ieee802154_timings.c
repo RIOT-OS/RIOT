@@ -172,10 +172,8 @@ static uint32_t _get_psdu_duration(const ieee802154_phy_conf_t *conf, uint16_t l
                 static const uint8_t quot[] = { 3, 3, 6, 12, 18, 24, 36 };
                 const uint8_t option = ofdm->option - 1;
 
-                /* PHR: 3 or 6 symbols */
-                symbols = option ? 6 : 3;
-                symbols += ((length + 1) * (1 << option) + quot[ofdm->scheme] - 1) /
-                           quot[ofdm->scheme];
+                symbols = ((length + 1) * (1 << option) + quot[ofdm->scheme] - 1) /
+                          quot[ofdm->scheme];
                 break;
             }
             goto unsupported;
@@ -191,9 +189,7 @@ static uint32_t _get_psdu_duration(const ieee802154_phy_conf_t *conf, uint16_t l
                 /* Nd == 63, since ACK length is 5 or 7 octets only */
                 const uint16_t Npsdu = Rspread * 2 * 63;
 
-                /* PHR: 15 symbols */
-                symbols = 15;
-                symbols += (Npsdu + Ns / 2) / Ns + (Npsdu + 8 * Ns) / (16 * Ns);
+                symbols = (Npsdu + Ns / 2) / Ns + (Npsdu + 8 * Ns) / (16 * Ns);
                 break;
             }
             goto unsupported;
@@ -205,6 +201,39 @@ unsupported:
     }
 
     return symbols * symbol_duration_us;
+}
+
+/* phyPHRDuration in microseconds */
+static uint32_t _get_phr_duration(const ieee802154_phy_conf_t *conf)
+{
+    switch (conf->phy_mode) {
+        case IEEE802154_PHY_BPSK:
+        case IEEE802154_PHY_OQPSK:
+            /* PHR: 1 octet transmitted at the PSDU data rate */
+            return _get_psdu_duration(conf, 1);
+        case IEEE802154_PHY_MR_FSK:
+            if (IS_USED(MODULE_IEEE802154_PHY_MR_FSK)) {
+                /* PHR: 2 octets transmitted at the PSDU data rate (incl. FEC) */
+                return _get_psdu_duration(conf, 2);
+            }
+            goto unsupported;
+        case IEEE802154_PHY_MR_OFDM:
+            if (IS_USED(MODULE_IEEE802154_PHY_MR_OFDM)) {
+                const ieee802154_mr_ofdm_conf_t *ofdm = (const ieee802154_mr_ofdm_conf_t *)conf;
+                return ((ofdm->option == 1) ? 3 : 6) * ieee802154_get_symbol_duration(conf);
+            }
+            goto unsupported;
+        case IEEE802154_PHY_MR_OQPSK:
+            if (IS_USED(MODULE_IEEE802154_PHY_MR_OQPSK)) {
+                return 15 * ieee802154_get_symbol_duration(conf);
+            }
+            goto unsupported;
+        default:
+unsupported:
+            /* other PHYs not supported yet */
+            assert(0);
+            return 0;
+    }
 }
 
 uint32_t ieee802154_get_turnaround_time(const ieee802154_phy_conf_t *conf)
@@ -279,36 +308,6 @@ unsupported:
     return cca_duration_symbol * ieee802154_get_symbol_duration(conf);
 }
 
-/* PHR length in octets transmitted at the PSDU data rate */
-static uint32_t _get_phr_len(const ieee802154_phy_conf_t *conf)
-{
-    switch (conf->phy_mode) {
-        case IEEE802154_PHY_OQPSK:
-        case IEEE802154_PHY_BPSK:
-            return 1;
-        case IEEE802154_PHY_MR_FSK:
-            if (IS_USED(MODULE_IEEE802154_PHY_MR_FSK)) {
-                return 2;
-            }
-            goto unsupported;
-        case IEEE802154_PHY_MR_OFDM:
-            if (IS_USED(MODULE_IEEE802154_PHY_MR_OFDM)) {
-                return 0;
-            }
-            goto unsupported;
-        case IEEE802154_PHY_MR_OQPSK:
-            if (IS_USED(MODULE_IEEE802154_PHY_MR_OQPSK)) {
-                return 0;
-            }
-            goto unsupported;
-        default:
-unsupported:
-            /* other PHYs not supported yet */
-            assert(0);
-            return 0;
-    }
-}
-
 uint32_t ieee802154_calculate_unit_backoff_period(const ieee802154_phy_conf_t *conf)
 {
     return ieee802154_get_turnaround_time(conf)
@@ -320,6 +319,6 @@ uint32_t ieee802154_calculate_ack_wait_duration(const ieee802154_phy_conf_t *con
     return ieee802154_calculate_unit_backoff_period(conf)
          + ieee802154_get_turnaround_time(conf)
          + _get_shr_duration(conf)
-         /* ack psdu with phr included */
-         + _get_psdu_duration(conf, _get_phr_len(conf) + IEEE802154_ACK_FRAME_LEN);
+         + _get_phr_duration(conf)
+         + _get_psdu_duration(conf, IEEE802154_ACK_FRAME_LEN);
 }
