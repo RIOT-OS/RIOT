@@ -263,7 +263,7 @@ static int _next_bundle_path(bundle_path_iterator_t* iterator,
         snprintf(iterator->path + acc_len,
             BPLIB_STOR_PATHLEN_DAT - acc_len,
             "/%s", entry.d_name);
-        iterator->id_val = strtol(strchr(entry.d_name, '_') + 1, NULL, 16);
+        iterator->id_val = strtoul(strchr(entry.d_name, '_') + 1, NULL, 16);
 
         return NEXT_BUNDLE_PATH_BUNDLE_READ;
     }
