@@ -12,7 +12,6 @@ ifneq (,$(filter trustzone_m_nonsecure,$(USEMODULE)))
   # The secure image owns the lower part of flash and RAM.
   include $(RIOTPKG)/riot-tee/riot-tee-layout.mk
 
-  ROM_LEN = $(NS_FLASH_SIZE)
   RAM_LEN = $(NS_RAM_SIZE)
   RAM_START_ADDR ?= $(NS_RAM_START)
   ROM_OFFSET = $(SECURE_FLASH_SIZE)
