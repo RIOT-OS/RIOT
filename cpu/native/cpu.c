@@ -28,6 +28,7 @@
 #include <err.h>
 #include <errno.h>
 #include <fcntl.h>
+#include <limits.h>
 #include <pthread.h>
 #if defined(__FreeBSD__)
 #  include <pthread_np.h>
@@ -63,9 +64,9 @@ extern netdev_tap_t netdev_tap;
  * @brief   Host thread backing a RIOT thread
  *
  * This is stored at the top of the RIOT thread stack, `thread_t::sp` points
- * to it. The remainder of the RIOT stack is used as stack of the host thread
- * if it is large enough, so that stack usage reported by e.g. `ps` is
- * meaningful.
+ * to it. The remainder of the RIOT stack is used as stack of the host thread,
+ * so that stack usage reported by e.g. `ps` is meaningful. It must be at least
+ * `PTHREAD_STACK_MIN` large.
  *
  * The host thread is only created when the RIOT thread is scheduled for the
  * first time. Until then the RIOT stack may legitimately be reused (e.g. by
@@ -188,15 +189,9 @@ static void _start(native_thread_t *next)
     _native_pending_syscalls_up();
     _host_calls++;
     real_pthread_attr_init(&attr);
-    /* the host libc may reject the RIOT stack if it is too small for it,
-     * fall back to a stack allocated by the host libc in that case */
-    res = EINVAL;
-    if (next->stack
-        && real_pthread_attr_setstack(&attr, next->stack, next->stack_size) == 0) {
+    res = real_pthread_attr_setstack(&attr, next->stack, next->stack_size);
+    if (res == 0) {
         res = real_pthread_create(&pthread, &attr, _thread_entry, next);
-    }
-    if (res == EINVAL) {
-        res = real_pthread_create(&pthread, NULL, _thread_entry, next);
     }
     real_pthread_attr_destroy(&attr);
     _host_calls--;
@@ -434,9 +429,13 @@ char *thread_stack_init(thread_task_func_t task_func, void *arg, void *stack_sta
 
     uintptr_t bottom = ((uintptr_t)stack_start + _Alignof(max_align_t) - 1)
                        & ~(uintptr_t)(_Alignof(max_align_t) - 1);
-    if (top > bottom) {
-        ctx->stack = (void *)bottom;
-        ctx->stack_size = top - bottom;
+    ctx->stack = (void *)bottom;
+    ctx->stack_size = top - bottom;
+
+    /* the host libc refuses to run a thread on a smaller stack */
+    if (top < bottom || ctx->stack_size < (size_t)PTHREAD_STACK_MIN) {
+        errx(EXIT_FAILURE, "thread_stack_init: stack too small, need at least "
+             "%ld bytes (+ overhead), got %d", (long)PTHREAD_STACK_MIN, stacksize);
     }
 
     return (char *)ctx;

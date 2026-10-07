@@ -39,6 +39,20 @@ extern "C" {
 #  define THREAD_STACKSIZE_DEFAULT            (32768)
 #endif
 /**
+ * @brief Small and tiny stack sizes
+ *
+ * Don't derive these from @ref THREAD_STACKSIZE_DEFAULT: every thread stack
+ * must be larger than `PTHREAD_STACK_MIN` (16 KiB) plus the control block.
+ * @{
+ */
+#if !defined(THREAD_STACKSIZE_SMALL) || defined(DOXYGEN)
+#  define THREAD_STACKSIZE_SMALL              (24576)
+#endif
+#if !defined(THREAD_STACKSIZE_TINY) || defined(DOXYGEN)
+#  define THREAD_STACKSIZE_TINY               (20480)
+#endif
+/** @} */
+/**
  * @brief Default size of idle thread stack
  */
 #if !defined(THREAD_STACKSIZE_IDLE) || defined(DOXYGEN)
