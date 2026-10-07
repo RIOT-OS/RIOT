@@ -1,9 +1,9 @@
 # SPDX-FileCopyrightText: 2024 HAW Hamburg
 # SPDX-License-Identifier: LGPL-2.1-only
 
-# The secure image is written for the nRF9160, and the application has to run
-# as its non-secure image.
-FEATURES_REQUIRED += cpu_nrf9160
+# riot-tee is a secure firmware for Armv8-M devices with TrustZone-M, and the
+# application runs as its non-secure image.
+FEATURES_REQUIRED += trustzone_m
 USEMODULE += trustzone_m_nonsecure
 
 USEMODULE += cortexm_svc
