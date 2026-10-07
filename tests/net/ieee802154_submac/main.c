@@ -489,16 +489,16 @@ static int constants(int argc, char **argv)
     (void)argc;
     (void)argv;
 
-    printf("Symbol duration: %"PRIu16" us\n",
-           ieee802154_get_symbol_duration(&submac));
-    printf("Turn-around time: %"PRIu32" us\n",
-           ieee802154_get_turnaround_time(&submac));
-    printf("CCA time: %"PRIu32" us\n",
-           ieee802154_get_cca_time(&submac));
-    printf("Unit backoff period: %"PRIu32" us\n",
-           ieee802154_get_unit_backoff_period(&submac));
-    printf("ACK wait duration: %"PRIu32" us\n",
-           ieee802154_get_ack_wait_duration(&submac));
+    ieee802154_phy_conf_t conf = {
+        .phy_mode = submac.phy_mode,
+        .channel = submac.channel_num,
+    };
+
+    printf("Symbol duration: %"PRIu16" us\n", ieee802154_get_symbol_duration(&conf));
+    printf("Turn-around time: %"PRIu32" us\n", ieee802154_get_turnaround_time(&conf));
+    printf("CCA time: %"PRIu32" us\n", ieee802154_get_cca_time(&conf));
+    printf("Unit backoff period: %"PRIu32" us\n", ieee802154_get_unit_backoff_period(&submac));
+    printf("ACK wait duration: %"PRIu32" us\n", ieee802154_get_ack_wait_duration(&submac));
 
     return 0;
 }

@@ -26,6 +26,13 @@ extern "C" {
  */
 void tests_ieee802154(void);
 
+/**
+ * @brief   Generates tests for ieee802154_timings.h
+ *
+ * @return  embUnit tests if successful, NULL if not.
+ */
+Test *tests_ieee802154_timings_tests(void);
+
 #ifdef __cplusplus
 }
 #endif
