@@ -1,4 +1,9 @@
 # SPDX-FileCopyrightText: 2024 HAW Hamburg
 # SPDX-License-Identifier: LGPL-2.1-only
 
+# The secure image is written for the nRF9160, and the application has to run
+# as its non-secure image.
+FEATURES_REQUIRED += cpu_nrf9160
+USEMODULE += trustzone_m_nonsecure
+
 USEMODULE += cortexm_svc
