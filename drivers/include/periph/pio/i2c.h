@@ -37,7 +37,7 @@ typedef i2c_t pio_i2c_t;
  */
 typedef struct pio_program_i2c {
     pio_program_t base; /**< PIO base program */
-    unsigned ref_mask;  /**< Mask of referencing PIO state machines (unused!) */
+    unsigned ref_mask;  /**< Mask of referencing PIO state machines */
 } pio_program_i2c_t;
 
 /**
@@ -89,6 +89,9 @@ int pio_i2c_init_program(pio_t pio);
 
 /**
  * @brief   Free a PIO I2C program
+ *
+ * The program is only freed if no state machine of PIO @p pio
+ * is using it anymore.
  *
  * @param[in]       pio         PIO index
  */

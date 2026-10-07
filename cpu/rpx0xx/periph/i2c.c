@@ -46,6 +46,7 @@ void i2c_init(i2c_t dev)
     pio_sm_t sm = pio_i2c_sm_lock(pio, i2c);
     if (sm < 0) {
         DEBUG("[i2c] init: PIO state machine allocation failed\n");
+        pio_i2c_deinit_program(pio);
         return;
     }
     if (pio_i2c_init(i2c, pio_i2c_get_program(pio),
@@ -54,6 +55,7 @@ void i2c_init(i2c_t dev)
                      pio_i2c_config[dev].irq)) {
         DEBUG("[i2c] init: PIO I2C initialization failed\n");
         pio_i2c_sm_unlock(i2c);
+        pio_i2c_deinit_program(pio);
         return;
     }
 }

@@ -209,6 +209,10 @@ int pio_i2c_init_program(pio_t pio)
 
 void pio_i2c_deinit_program(pio_t pio)
 {
+    /* the program is shared between all buses on this PIO */
+    if (_prog[pio].ref_mask) {
+        return;
+    }
     pio_free_program(pio, &_prog[pio].base);
 }
 
