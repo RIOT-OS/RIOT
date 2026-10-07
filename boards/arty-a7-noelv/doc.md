@@ -40,7 +40,7 @@ SW0..SW3 are additionally exposed as BTN4..BTN7.
 Download the FPGA configuration files from [NOEL-ARTYA7][noel-artya7] and
 program the board with the Vivado script shipped in that archive:
 
-```
+```shell
 vivado -mode tcl -notrace -source doprog.tcl
 doprog GP32L-SC
 ```
@@ -48,7 +48,7 @@ doprog GP32L-SC
 Afterwards the application is loaded via JTAG using
 [GRMON](https://www.gaisler.com/grmon):
 
-```
+```shell
 grmon -digilent
 grmon4> forward disable uart0
 grmon4> load <application>.elf
@@ -60,7 +60,7 @@ reaches the USB serial console (see below).
 
 The RIOT build system uses GRMON as the default programmer for this board:
 
-```
+```shell
 make BOARD=arty-a7-noelv flash
 ```
 
