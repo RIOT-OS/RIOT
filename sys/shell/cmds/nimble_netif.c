@@ -302,7 +302,7 @@ static int _cmd_adv(int argc, char **argv, bool legacy)
 
     uint32_t timeout = 0;
     if (argc >= 4) {
-        timeout = (uint32_t)atoi(argv[3]);
+        timeout = atoi(argv[3]);
     }
 
     uint8_t phy_sec = BLE_GAP_LE_PHY_1M;
@@ -410,7 +410,7 @@ static void _cmd_connect(int argc, char **argv)
     /* populate connection parameters */
     _connect_params.timeout_ms = DEFAULT_CONN_TIMEOUT_MS;
     if (argc >= 4) {
-        _connect_params.timeout_ms = (uint32_t)atoi(argv[3]);
+        _connect_params.timeout_ms = atoi(argv[3]);
     }
     _connect_params.phy_mode = NIMBLE_PHY_1M;
     if (argc >= 5) {

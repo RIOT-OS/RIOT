@@ -13,7 +13,7 @@
  * @author      Nils Ollrogge <nils.ollrogge@mailbox.tu-dresden.de>
  * @}
  */
-#define ENABLE_DEBUG    (0)
+#define ENABLE_DEBUG 0
 #include "debug.h"
 
 #include "ztimer.h"

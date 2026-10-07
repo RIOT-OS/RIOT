@@ -23,7 +23,7 @@
 #include "fido2/ctap/transport/hid/ctap_hid.h"
 #include "fido2/ctap/ctap_utils.h"
 
-#define ENABLE_DEBUG    (0)
+#define ENABLE_DEBUG 0
 #include "debug.h"
 
 /**
