@@ -1,4 +1,5 @@
 BOARD ?= native64
+BOARDS_SUPPORTED := native64
 
 include ../Makefile.drivers_common
 
