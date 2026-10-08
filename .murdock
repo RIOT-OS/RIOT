@@ -7,16 +7,19 @@
 
 QUICKBUILD_BOARDS="
 adafruit-itsybitsy-m4
+arduino-uno
 atmega256rfr2-xpro
 esp32-wroom-32
+esp32c3-devkit
 esp32s3-devkit
-frdm-k64f
 hifive1b
+iotlab-m3
 msb-430
 msba2
 native32
 native64
 nrf52840dk
+nrf9160dk
 qn9080dk
 samr21-xpro
 stk3200
@@ -41,7 +44,8 @@ esac
 # factor 2, but still have a decent regression test coverage.
 # TODO: Consider reusing QUICKBUILD_BOARDS once all those boards are supported
 # on LLVM.
-: ${TEST_BOARDS_LLVM_COMPILE:="iotlab-m3 native32 native64 nrf52dk mulle nucleo-f401re samr21-xpro slstk3402a"}
+#: ${TEST_BOARDS_LLVM_COMPILE:="iotlab-m3 native32 native64 nrf52dk mulle nucleo-f401re samr21-xpro slstk3402a"}
+: ${TEST_BOARDS_LLVM_COMPILE:=${QUICKBUILD_BOARDS}}
 
 : ${TEST_WITH_CONFIG_SUPPORTED:="examples/advanced/suit_update tests/drivers/at86rf2xx_aes"}
 
