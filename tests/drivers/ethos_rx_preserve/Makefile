@@ -9,6 +9,4 @@ INCLUDES += -I$(APPDIR)
 
 TEST_DEPS += $(ELFFILE)
 
-export ELFFILE
-
 include $(RIOTBASE)/Makefile.include
