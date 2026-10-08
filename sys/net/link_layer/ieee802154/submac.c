@@ -834,23 +834,36 @@ int ieee802154_set_phy_conf(ieee802154_submac_t *submac, const ieee802154_phy_co
         size_t conf_size = sizeof(ieee802154_phy_conf_t);
 
         switch (conf->phy_mode) {
-#if IS_USED(MODULE_IEEE802154_PHY_MR_OQPSK)
         case IEEE802154_PHY_MR_OQPSK:
-            conf_size = sizeof(ieee802154_mr_oqpsk_conf_t);
+            if (IS_USED(MODULE_IEEE802154_PHY_MR_OQPSK)) {
+                conf_size = sizeof(ieee802154_mr_oqpsk_conf_t);
+            }
+            else {
+                res = -EINVAL;
+            }
             break;
-#endif
-#if IS_USED(MODULE_IEEE802154_PHY_MR_OFDM)
         case IEEE802154_PHY_MR_OFDM:
-            conf_size = sizeof(ieee802154_mr_ofdm_conf_t);
+            if (IS_USED(MODULE_IEEE802154_PHY_MR_OFDM)) {
+                conf_size = sizeof(ieee802154_mr_ofdm_conf_t);
+            }
+            else {
+                res = -EINVAL;
+            }
             break;
-#endif
-#if IS_USED(MODULE_IEEE802154_PHY_MR_FSK)
         case IEEE802154_PHY_MR_FSK:
-            conf_size = sizeof(ieee802154_mr_fsk_conf_t);
+            if (IS_USED(MODULE_IEEE802154_PHY_MR_FSK)) {
+                conf_size = sizeof(ieee802154_mr_fsk_conf_t);
+            }
+            else {
+                res = -EINVAL;
+            }
             break;
-#endif
         case IEEE802154_PHY_OQPSK:
+            conf_size = sizeof(ieee802154_oqpsk_conf_t);
+            break;
         case IEEE802154_PHY_BPSK:
+            conf_size = sizeof(ieee802154_bpsk_conf_t);
+            break;
         case IEEE802154_PHY_NO_OP:
         case IEEE802154_PHY_DISABLED:
             break;
