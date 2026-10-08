@@ -15,158 +15,174 @@
  * @author      Vitor Batista <vitor.batista@ml-pa.com>
  */
 
-#include "board.h"
+#include "board.h" /* IWYU pragma: keep */
 #include "lm75.h"
 #include "lm75_regs.h"
-#include "kernel_defines.h"
+#include "modules.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
 #ifndef LM75_PARAM_I2C
-#define LM75_PARAM_I2C               I2C_DEV(0) /**< I2C BUS used */
+#  define LM75_PARAM_I2C I2C_DEV(0) /**< I2C BUS used */
 #endif
 
-/** 7-bit I2C slave address: 1-0-0-1-A2-A1-A0, where
-   the last three bits A2, A1, A0 are defined
-   by the voltage level on the ADDR pin */
+/**
+ * @brief   Default I2C address
+ *
+ * 7-bit I2C slave address: 1-0-0-1-A2-A1-A0, where the last three bits A2, A1,
+ * A0 are defined by the voltage level on the ADDR pin
+ */
 #ifndef CONFIG_LM75_I2C_ADDR
-#define CONFIG_LM75_I2C_ADDR         (0x48) /**< Default I2C address */
+#  define CONFIG_LM75_I2C_ADDR (0x48)
 #endif
 
 /* Device operation mode configuration - normal or shutdown */
 #if IS_ACTIVE(CONFIG_NORMAL_MODE)
-#define CONFIG_OPERATION_MODE     NORMAL_MODE
+#  define CONFIG_OPERATION_MODE NORMAL_MODE
 #elif IS_ACTIVE(CONFIG_SHUTDOWN_MODE)
-#define CONFIG_OPERATION_MODE     SHUTDOWN_MODE
+#  define CONFIG_OPERATION_MODE SHUTDOWN_MODE
 #endif
 
 #ifndef CONFIG_OPERATION_MODE
-#define CONFIG_OPERATION_MODE     NORMAL_MODE /**< Normal Mode is the default */
-
+#  define CONFIG_OPERATION_MODE NORMAL_MODE /**< Normal Mode is the default */
 #endif
 
 /* Device Overtemperature Shutdown operation mode configuration - comparator or interrupt */
 #if IS_ACTIVE(CONFIG_COMPARATOR_MODE)
-#define CONFIG_THERMOSTAT_MODE      COMPARATOR_MODE
+#  define CONFIG_THERMOSTAT_MODE COMPARATOR_MODE
 #elif IS_ACTIVE(CONFIG_INTERRUPT_MODE)
-#define CONFIG_THERMOSTAT_MODE      INTERRUPT_MODE
+#  define CONFIG_THERMOSTAT_MODE INTERRUPT_MODE
 #endif
 
 #ifndef CONFIG_THERMOSTAT_MODE
-#define CONFIG_THERMOSTAT_MODE      COMPARATOR_MODE /**< Comparator Mode is the default */
+#  define CONFIG_THERMOSTAT_MODE COMPARATOR_MODE /**< Comparator Mode is the default */
 
 #endif
 
 /* Device Overtemperature Shutdown polarity configuration - OS active low or high */
 #if IS_ACTIVE(CONFIG_OS_ACTIVE_LOW)
-#define CONFIG_OS_POLARITY     OS_ACTIVE_LOW
+#  define CONFIG_OS_POLARITY OS_ACTIVE_LOW
 #elif IS_ACTIVE(CONFIG_OS_ACTIVE_HIGH)
-#define CONFIG_OS_POLARITY     OS_ACTIVE_HIGH
+#  define CONFIG_OS_POLARITY OS_ACTIVE_HIGH
 #endif
 
 #ifndef CONFIG_OS_POLARITY
-#define CONFIG_OS_POLARITY     OS_ACTIVE_LOW  /**< OS pin active on low is the default */
+#  define CONFIG_OS_POLARITY OS_ACTIVE_LOW /**< OS pin active on low is the default */
 
 #endif
 
-/* Device Overtemperatue Shutdown fault queue configuration -
- * number of faults that must occur consecutively until OS goes active */
 #if IS_ACTIVE(CONFIG_FAULT_1)
-#define CONFIG_FAULT_QUEUE     FAULT_1
+#  define CONFIG_FAULT_QUEUE FAULT_1
 #elif IS_ACTIVE(CONFIG_FAULT_2)
-#define CONFIG_FAULT_QUEUE     FAULT_2
+#  define CONFIG_FAULT_QUEUE FAULT_2
 #elif (IS_ACTIVE(CONFIG_FAULT_3) && IS_USED(MODULE_TMP1075))
-#define CONFIG_FAULT_QUEUE     FAULT_3
+#  define CONFIG_FAULT_QUEUE FAULT_3
 #elif (IS_ACTIVE(CONFIG_FAULT_4) && IS_USED(MODULE_LM75A))
-#define CONFIG_FAULT_QUEUE     FAULT_4
+#  define CONFIG_FAULT_QUEUE FAULT_4
 #elif (IS_ACTIVE(CONFIG_FAULT_4) && IS_USED(MODULE_TMP1075))
-#define CONFIG_FAULT_QUEUE     FAULT_4_TMP1075
+#  define CONFIG_FAULT_QUEUE FAULT_4_TMP1075
 #elif (IS_ACTIVE(CONFIG_FAULT_6) && IS_USED(MODULE_LM75A))
-#define CONFIG_FAULT_QUEUE     FAULT_6
+#  define CONFIG_FAULT_QUEUE FAULT_6
 #endif
 
+/**
+ * @brief   Device Overtemperatue Shutdown fault queue configuration
+ *
+ * Number of faults that must occur consecutively until OS goes active
+ *
+ * Default: One
+ */
 #ifndef CONFIG_FAULT_QUEUE
-#define CONFIG_FAULT_QUEUE     FAULT_1     /**< One Fault is the default */
-
+#  define CONFIG_FAULT_QUEUE FAULT_1
 #endif
 
 #ifndef LM75_PARAM_INT
-#define LM75_PARAM_INT GPIO_UNDEF          /**< Pin used for Interrupts defined by the board */
+#  define LM75_PARAM_INT GPIO_UNDEF /**< Pin used for Interrupts defined by the board */
 #endif
 
-#define LM75A_CONV_RATE           (100)    /**< temperature register updated every 100ms */
+#define LM75A_CONV_RATE    (100)  /**< Temperature register updated every 100ms */
 
-#define LM75A_OS_RES              (5)      /**< resolution in 0.5ºC */
-#define LM75A_OS_MULT             (10)     /**< Must multiply by 10 to get temp in ºC */
-#define LM75A_OS_SHIFT            (7)      /**< Only the 9 most significant bits are needed */
-#define LM75A_TEMP_RES            (125)    /**< resolution in 0.125ºC */
-#define LM75A_TEMP_MULT           (1000)   /**< Must multiply by 1000 to get temp in ºC */
-#define LM75A_TEMP_SHIFT          (5)      /**< Only the 11 most significant bits are needed */
+#define LM75A_OS_RES       (5)    /**< Resolution in 0.5ºC */
+#define LM75A_OS_MULT      (10)   /**< Must multiply by 10 to get temp in ºC */
+#define LM75A_OS_SHIFT     (7)    /**< Only the 9 most significant bits are needed */
+#define LM75A_TEMP_RES     (125)  /**< Resolution in 0.125ºC */
+#define LM75A_TEMP_MULT    (1000) /**< Must multiply by 1000 to get temp in ºC */
+#define LM75A_TEMP_SHIFT   (5)    /**< Only the 11 most significant bits are needed */
 
-#define TMP1075_OS_RES            (625)    /**< resolution in 0.0625ºC */
-#define TMP1075_OS_MULT           (10000)  /**< Must multiply by 10000 to get temp in ºC */
-#define TMP1075_OS_SHIFT          (4)      /**< Only the 12 most significant bits are needed */
-#define TMP1075_TEMP_RES          (625)    /**< resolution in 0.0625ºC */
-#define TMP1075_TEMP_MULT         (10000)  /**< Must multiply by 10000 to get temp in ºC */
-#define TMP1075_TEMP_SHIFT        (4)      /**< Only the 12 most significant bits are needed */
+#define TMP1075_OS_RES     (625)   /**< Resolution in 0.0625ºC */
+#define TMP1075_OS_MULT    (10000) /**< Must multiply by 10000 to get temp in ºC */
+#define TMP1075_OS_SHIFT   (4)     /**< Only the 12 most significant bits are needed */
+#define TMP1075_TEMP_RES   (625)   /**< Resolution in 0.0625ºC */
+#define TMP1075_TEMP_MULT  (10000) /**< Must multiply by 10000 to get temp in ºC */
+#define TMP1075_TEMP_SHIFT (4)     /**< Only the 12 most significant bits are needed */
 
-/* Device conversion rate configuration - only available in the TMP1075 sensor */
 #if IS_ACTIVE(CONFIG_TMP1075_CONV_RATE_REG_27H)
-#define CONFIG_TMP1075_CONV_RATE_REG     TMP1075_CONV_RATE_REG_27H
-#define TMP1075_CONV_RATE                (28)
+#  define CONFIG_TMP1075_CONV_RATE_REG TMP1075_CONV_RATE_REG_27H
+#  define TMP1075_CONV_RATE            (28)
 #elif IS_ACTIVE(CONFIG_TMP1075_CONV_RATE_REG_55)
-#define CONFIG_TMP1075_CONV_RATE_REG     TMP1075_CONV_RATE_REG_55
-#define TMP1075_CONV_RATE                (55)
+#  define CONFIG_TMP1075_CONV_RATE_REG TMP1075_CONV_RATE_REG_55
+#  define TMP1075_CONV_RATE            (55)
 #elif IS_ACTIVE(CONFIG_TMP1075_CONV_RATE_REG_110)
-#define CONFIG_TMP1075_CONV_RATE_REG     TMP1075_CONV_RATE_REG_110
-#define TMP1075_CONV_RATE                (110)
+#  define CONFIG_TMP1075_CONV_RATE_REG TMP1075_CONV_RATE_REG_110
+#  define TMP1075_CONV_RATE            (110)
 #elif IS_ACTIVE(CONFIG_TMP1075_CONV_RATE_REG_220)
-#define CONFIG_TMP1075_CONV_RATE_REG     TMP1075_CONV_RATE_REG_220
-#define TMP1075_CONV_RATE                (220)
+#  define CONFIG_TMP1075_CONV_RATE_REG TMP1075_CONV_RATE_REG_220
+#  define TMP1075_CONV_RATE            (220)
 #endif
 
 #ifndef CONFIG_TMP1075_CONV_RATE_REG
-#define CONFIG_TMP1075_CONV_RATE_REG     TMP1075_CONV_RATE_REG_27H /**< Default conv rate is 27.5ms */
-#define TMP1075_CONV_RATE                (28) /**< Default conversion rate is 27.5 ms */
-/* this was rounded up to 28ms to retain usage of integers and to keep all times in ms */
+/**
+ * @brief   Device conversion rate register value
+ *
+ * Only available in TMP1075 devices!
+ *
+ * Default: 27.5ms
+ */
+#  define CONFIG_TMP1075_CONV_RATE_REG TMP1075_CONV_RATE_REG_27H
+/**
+ * @brief   Device conversion rate in milliseconds
+ *
+ * Default is 27.5ms or about 28 ms. This is rounded up to 28ms to retain usage
+of integers and to keep all times in ms
+ */
+#  define TMP1075_CONV_RATE            (28)
 #endif
 
 #ifndef LM75_PARAMS
-#if IS_USED(MODULE_LM75A)
-#define LM75_PARAMS        {     .res             = &lm75a_properties, \
-                                 .gpio_alarm      = LM75_PARAM_INT, \
-                                 .conv_rate       = LM75A_CONV_RATE, \
-                                 .i2c_bus         = LM75_PARAM_I2C, \
-                                 .i2c_addr        = CONFIG_LM75_I2C_ADDR, \
-                                 .shutdown_mode   = CONFIG_OPERATION_MODE, \
-                                 .tm_mode         = CONFIG_THERMOSTAT_MODE, \
-                                 .polarity        = CONFIG_OS_POLARITY, \
-                                 .fault_q         = CONFIG_FAULT_QUEUE }
+#  if IS_USED(MODULE_LM75A)
+#    define LM75_PARAMS { .res = &lm75a_properties,               \
+                          .gpio_alarm = LM75_PARAM_INT,           \
+                          .conv_rate = LM75A_CONV_RATE,           \
+                          .i2c_bus = LM75_PARAM_I2C,              \
+                          .i2c_addr = CONFIG_LM75_I2C_ADDR,       \
+                          .shutdown_mode = CONFIG_OPERATION_MODE, \
+                          .tm_mode = CONFIG_THERMOSTAT_MODE,      \
+                          .polarity = CONFIG_OS_POLARITY,         \
+                          .fault_q = CONFIG_FAULT_QUEUE }
 
-#endif
+#  endif
 
-#if IS_USED(MODULE_TMP1075)
-#define LM75_PARAMS        {    .res                 = &tmp1075_properties, \
-                                .gpio_alarm          = LM75_PARAM_INT, \
-                                .conv_rate           = TMP1075_CONV_RATE, \
-                                .i2c_bus             = LM75_PARAM_I2C, \
-                                .i2c_addr            = CONFIG_LM75_I2C_ADDR, \
-                                .shutdown_mode       = CONFIG_OPERATION_MODE, \
-                                .tm_mode             = CONFIG_THERMOSTAT_MODE, \
-                                .polarity            = CONFIG_OS_POLARITY, \
-                                .fault_q             = CONFIG_FAULT_QUEUE, \
-                                .conv_rate_reg       = CONFIG_TMP1075_CONV_RATE_REG }
-#endif
+#  if IS_USED(MODULE_TMP1075)
+#    define LM75_PARAMS { .res = &tmp1075_properties,             \
+                          .gpio_alarm = LM75_PARAM_INT,           \
+                          .conv_rate = TMP1075_CONV_RATE,         \
+                          .i2c_bus = LM75_PARAM_I2C,              \
+                          .i2c_addr = CONFIG_LM75_I2C_ADDR,       \
+                          .shutdown_mode = CONFIG_OPERATION_MODE, \
+                          .tm_mode = CONFIG_THERMOSTAT_MODE,      \
+                          .polarity = CONFIG_OS_POLARITY,         \
+                          .fault_q = CONFIG_FAULT_QUEUE,          \
+                          .conv_rate_reg = CONFIG_TMP1075_CONV_RATE_REG }
+#  endif
 #endif /* LM75_PARAMS */
 
 /**
  * @brief LM75 power-up configuration
  */
-static const lm75_params_t lm75_params[] =
-{
-   LM75_PARAMS
+static const lm75_params_t lm75_params[] = {
+    LM75_PARAMS
 };
 
 #ifdef __cplusplus

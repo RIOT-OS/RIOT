@@ -31,7 +31,7 @@ extern "C" {
 /**
  * @brief Calculates @p a/ @p b with arithmetic rounding (.5 away from zero)
  */
-#define DIV_ROUND(a, b)  ((SIGNOF(a) * ((SIGNOF(a) * (a)) + (SIGNOF(b) * (b)) / 2) / (b)))
+#define DIV_ROUND(a, b)  ((SIGNOF(a) * ((SIGNOF(a) * (a)) + ((SIGNOF(b) * (b)) / 2)) / (b)))
 
 /**
  * @brief Calculates @p a/ @p b, always rounding up (towards positive infinity)
