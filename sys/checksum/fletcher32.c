@@ -42,7 +42,7 @@ uint32_t fletcher32_finish(fletcher32_ctx_t *ctx)
 
 void fletcher32_update(fletcher32_ctx_t *ctx, const void *data, size_t words)
 {
-    uintptr_t pos = (uintptr_t)data;
+    const uint8_t *pos = data;
     while (words) {
         unsigned tlen = words > 359 ? 359 : words;
         words -= tlen;
