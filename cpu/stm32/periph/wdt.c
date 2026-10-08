@@ -20,6 +20,7 @@
 #include <stdbool.h>
 
 #include "cpu.h"
+#include "mutex.h"
 #include "timex.h"
 
 #include "periph_cpu.h"
@@ -49,10 +50,14 @@ static uint8_t _prescaler = 0;
 static uint16_t _reload = IWDG_RLR_RL;
 static bool _started;
 
+/* When the PR, RR or WINR registers are unlocked, nobody else should
+ * try to unlock or lock them. */
+mutex_t _iwdg_unlocked;
+
 static inline uint32_t _wdt_time(uint8_t pre, uint16_t rel)
 {
     /* wdt_time (us) = LSI(us) x 4 x 2^PRE x RELOAD */
-    return (uint32_t)(((uint64_t)US_PER_SEC * 4 * (1 << pre) * rel ) / CLOCK_LSI);
+    return (uint32_t)(((uint64_t)US_PER_SEC * 4 * (1 << pre) * rel) / CLOCK_LSI);
 }
 
 static void _set_config(void)
@@ -65,10 +70,12 @@ static void _set_config(void)
      * before starting it. */
     while (IWDG->SR & (IWDG_SR_PVU | IWDG_SR_RVU)) {}
 
+    mutex_lock(&_iwdg_unlocked);
     IWDG->KR = IWDG_UNLOCK;
     IWDG->PR = _prescaler;
     IWDG->RLR = _reload;
     IWDG->KR = IWDG_LOCK;
+    mutex_unlock(&_iwdg_unlocked);
 
     /* Wait for the update before reloading the counter with the new value */
     while (IWDG->SR & (IWDG_SR_PVU | IWDG_SR_RVU)) {}
@@ -78,7 +85,7 @@ static void _set_config(void)
 static inline uint32_t _wdt_ticks(uint8_t pre, uint32_t rst_time)
 {
     /* ticks = rst_time(ms) x LSI(kHz) / (4 x 2^PRE) */
-    return (rst_time * (CLOCK_LSI / MS_PER_SEC)) / (4U << pre);
+    return (rst_time * CLOCK_LSI) / (MS_PER_SEC * (4U << pre));
 }
 
 static uint8_t _find_prescaler(uint32_t rst_time)
