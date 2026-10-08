@@ -391,7 +391,7 @@ int main(void)
         _ipv6_count_stack,
         THREAD_STACKSIZE_DEFAULT,
         GNRC_NETIF_PRIO - 1,
-        THREAD_CREATE_STACKTEST,
+        0,
         _ipv6_count_thread,
         NULL,
         "6lo_count"

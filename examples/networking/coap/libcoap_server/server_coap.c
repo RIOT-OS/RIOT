@@ -232,7 +232,7 @@ static void start_server(void)
     server_pid = thread_create(server_stack,
                                sizeof(server_stack),
                                THREAD_PRIORITY_MAIN - 1,
-                               THREAD_CREATE_STACKTEST,
+                               0,
                                server_coap_run, NULL, "libcoap_server");
 
     /* Uncommon but better be sure */
