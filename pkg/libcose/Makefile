@@ -1,5 +1,5 @@
 PKG_NAME=libcose
-PKG_URL=https://github.com/bergzand/libcose
+PKG_URL=https://github.com/libcose/libcose
 PKG_VERSION=ea1fed87d6ca9b478f8bed323af97e6b192c0a6d
 PKG_LICENSE=LGPL-2.1-only
 
