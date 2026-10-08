@@ -431,8 +431,9 @@ static int _init(netdev_t *netdev)
     /* This function already sets the PAN ID to the default one */
     netdev_ieee802154_reset(netdev_ieee802154);
 
-    uint16_t chan = submac->phy_conf.common.channel;
-    int16_t tx_power = submac->phy_conf.common.pow;
+    const ieee802154_phy_conf_t *conf = (const ieee802154_phy_conf_t *)&submac->phy_conf;
+    uint16_t chan = conf->channel;
+    int16_t tx_power = conf->pow;
     static const netopt_enable_t ack_req =
         IS_ACTIVE(CONFIG_IEEE802154_DEFAULT_ACK_REQ) ? NETOPT_ENABLE : NETOPT_DISABLE;
 

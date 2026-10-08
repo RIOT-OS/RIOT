@@ -518,11 +518,11 @@ typedef struct {
 /**
  * @brief Union of all supported PHY configurations
  *
- * All members start with @ref ieee802154_phy_conf_t, so @p super.phy_mode
- * can always be read to determine which member is valid.
+ * All members start with @ref ieee802154_phy_conf_t so a pointer to this
+ * union can be cast to `ieee802154_phy_conf_t *` to access the common
+ * settings.
  */
 typedef union {
-    ieee802154_phy_conf_t common;           /**< common settings */
     ieee802154_oqpsk_conf_t oqpsk;          /**< valid if phy_mode == OQPSK */
     ieee802154_bpsk_conf_t bpsk;            /**< valid if phy_mode == BPSK */
 #if IS_USED(MODULE_IEEE802154_PHY_MR_OQPSK)

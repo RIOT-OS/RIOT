@@ -706,6 +706,7 @@ int ieee802154_submac_init(ieee802154_submac_t *submac, const network_uint16_t *
                            const eui64_t *ext_addr)
 {
     ieee802154_dev_t *dev = &submac->dev;
+    ieee802154_phy_conf_t *conf = (ieee802154_phy_conf_t *)&submac->phy_conf;
 
     submac->fsm_state = IEEE802154_FSM_STATE_RX;
 
@@ -724,13 +725,13 @@ int ieee802154_submac_init(ieee802154_submac_t *submac, const network_uint16_t *
     submac->csma_retries = CONFIG_IEEE802154_DEFAULT_CSMA_CA_RETRIES;
     submac->be.max = CONFIG_IEEE802154_DEFAULT_CSMA_CA_MAX_BE;
 
-    submac->phy_conf.common.pow = CONFIG_IEEE802154_DEFAULT_TXPOWER;
+    conf->pow = CONFIG_IEEE802154_DEFAULT_TXPOWER;
 
     if (ieee802154_radio_has_24_ghz(dev)) {
-        submac->phy_conf.common.channel = CONFIG_IEEE802154_DEFAULT_CHANNEL;
+        conf->channel = CONFIG_IEEE802154_DEFAULT_CHANNEL;
     }
     else {
-        submac->phy_conf.common.channel = CONFIG_IEEE802154_DEFAULT_SUBGHZ_CHANNEL;
+        conf->channel = CONFIG_IEEE802154_DEFAULT_SUBGHZ_CHANNEL;
     }
 
     /* Get supported PHY modes */
@@ -744,7 +745,7 @@ int ieee802154_submac_init(ieee802154_submac_t *submac, const network_uint16_t *
     if (CONFIG_IEEE802154_DEFAULT_PHY_MODE != IEEE802154_PHY_DISABLED &&
         (supported_phy_modes & default_phy_cap)) {
         /* Check if default PHY is supported */
-        submac->phy_conf.common.phy_mode = CONFIG_IEEE802154_DEFAULT_PHY_MODE;
+        conf->phy_mode = CONFIG_IEEE802154_DEFAULT_PHY_MODE;
     }
     else {
         /* Get first set bit, and use it as the default,
@@ -754,7 +755,7 @@ int ieee802154_submac_init(ieee802154_submac_t *submac, const network_uint16_t *
          * IEEE 802.15.4g-2012 PHY modes. */
         unsigned bit = bitarithm_lsb(supported_phy_modes);
 
-        submac->phy_conf.common.phy_mode = ieee802154_cap_to_phy_mode(1 << bit);
+        conf->phy_mode = ieee802154_cap_to_phy_mode(1 << bit);
     }
 
     /* If the radio is still not in TRX_OFF state, spin */
@@ -765,20 +766,21 @@ int ieee802154_submac_init(ieee802154_submac_t *submac, const network_uint16_t *
     ieee802154_radio_config_addr_filter(dev, IEEE802154_AF_EXT_ADDR, &submac->ext_addr);
     ieee802154_radio_config_addr_filter(dev, IEEE802154_AF_PANID, &submac->panid);
 
+    /* Configure PHY settings (mode, channel, TX power) */
 #ifdef MODULE_NETDEV_IEEE802154_MR_OQPSK
-    if (submac->phy_conf.common.phy_mode == IEEE802154_PHY_MR_OQPSK) {
+    if (conf->phy_mode == IEEE802154_PHY_MR_OQPSK) {
         submac->phy_conf.mr_oqpsk.chips = CONFIG_IEEE802154_MR_OQPSK_DEFAULT_CHIPS;
         submac->phy_conf.mr_oqpsk.rate_mode = CONFIG_IEEE802154_MR_OQPSK_DEFAULT_RATE;
     }
 #endif
 #ifdef MODULE_NETDEV_IEEE802154_MR_OFDM
-    if (submac->phy_conf.common.phy_mode == IEEE802154_PHY_MR_OFDM) {
+    if (conf->phy_mode == IEEE802154_PHY_MR_OFDM) {
         submac->phy_conf.mr_ofdm.option = CONFIG_IEEE802154_MR_OFDM_DEFAULT_OPTION;
         submac->phy_conf.mr_ofdm.scheme = CONFIG_IEEE802154_MR_OFDM_DEFAULT_SCHEME;
     }
 #endif
 #ifdef MODULE_NETDEV_IEEE802154_MR_FSK
-    if (submac->phy_conf.common.phy_mode == IEEE802154_PHY_MR_FSK) {
+    if (conf->phy_mode == IEEE802154_PHY_MR_FSK) {
         submac->phy_conf.mr_fsk.srate = CONFIG_IEEE802154_MR_FSK_DEFAULT_SRATE;
         submac->phy_conf.mr_fsk.mod_ord = CONFIG_IEEE802154_MR_FSK_DEFAULT_MOD_ORD;
         submac->phy_conf.mr_fsk.mod_idx = CONFIG_IEEE802154_MR_FSK_DEFAULT_MOD_IDX;
@@ -786,7 +788,7 @@ int ieee802154_submac_init(ieee802154_submac_t *submac, const network_uint16_t *
     }
 #endif
 
-    ieee802154_submac_config_phy(submac, &submac->phy_conf.common);
+    ieee802154_submac_config_phy(submac, conf);
     ieee802154_radio_set_cca_threshold(dev,
                                        CONFIG_IEEE802154_CCA_THRESH_DEFAULT);
 
@@ -811,6 +813,7 @@ int ieee802154_set_phy_conf(ieee802154_submac_t *submac, const ieee802154_phy_co
     ieee802154_dev_t *dev = &submac->dev;
     int res;
     ieee802154_fsm_state_t current_state = submac->fsm_state;
+    ieee802154_phy_conf_t *submac_conf = (ieee802154_phy_conf_t *)&submac->phy_conf;
 
     /* Changing state can be only performed on IDLE or RX state */
     if (current_state != IEEE802154_FSM_STATE_RX && current_state != IEEE802154_FSM_STATE_IDLE) {
@@ -829,7 +832,7 @@ int ieee802154_set_phy_conf(ieee802154_submac_t *submac, const ieee802154_phy_co
     if (res >= 0) {
         /* keep current mode on NO_OP */
         ieee802154_phy_mode_t mode = conf->phy_mode == IEEE802154_PHY_NO_OP ?
-                                     submac->phy_conf.common.phy_mode : conf->phy_mode;
+                                     submac_conf->phy_mode : conf->phy_mode;
 
         size_t conf_size = sizeof(ieee802154_phy_conf_t);
 
@@ -874,7 +877,7 @@ int ieee802154_set_phy_conf(ieee802154_submac_t *submac, const ieee802154_phy_co
 
         if (res >= 0) {
             memcpy(&submac->phy_conf, conf, conf_size);
-            submac->phy_conf.common.phy_mode = mode;
+            submac_conf->phy_mode = mode;
         }
     }
 
