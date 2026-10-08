@@ -87,7 +87,7 @@ int main(void)
 
         thread_task_func_t handler = i % 3 ? (waiters_cnt++, waiter) : forever_waiter;
         int res = thread_create(stacks[i], sizeof(stacks[0]),
-                                prio, THREAD_CREATE_STACKTEST, handler,
+                                prio, 0, handler,
                                 (void *)(uintptr_t)i, "waiter");
         expect(res >= 0);
     }
