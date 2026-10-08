@@ -61,7 +61,7 @@ jobs:
           fi
 
   tasks:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-26.04
     needs: [check-secret]
     if: needs.check-secret.outputs.secret-configured == 'true'
     timeout-minutes: 360
