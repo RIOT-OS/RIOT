@@ -33,11 +33,15 @@ extern "C" {
 #  define ADC_DEVS          (3U)
 #endif
 
+/**
+ * @name    Real time counter configuration
+ * @{
+ */
 /* determined with tests/periph/rtt_min */
 #define RTT_MIN_OFFSET (4U)
+/** @} */
 
 #ifndef DOXYGEN
-
 /**
  * @brief   Starting address of the ROM bootloader
  *          see application note AN2606

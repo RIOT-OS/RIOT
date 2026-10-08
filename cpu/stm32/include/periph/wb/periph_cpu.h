@@ -40,13 +40,17 @@ extern "C" {
 #  define ADC_T_ADCVREG_STUP_US (20)
 #endif
 
+/**
+ * @name    Real time counter configuration
+ * @{
+ */
 #if defined(CPU_MODEL_STM32WB55RG)
 /* determined with tests/periph/rtt_min */
 #  define RTT_MIN_OFFSET (4U)
 #endif
+/** @} */
 
 #ifndef DOXYGEN
-
 /**
  * @brief   Starting address of the ROM bootloader
  *          see application note AN2606
