@@ -33,6 +33,7 @@ ifeq (llvm,$(TOOLCHAIN))
   CFLAGS += -Wno-strict-prototypes
   CFLAGS += -Wno-format-nonliteral
   CFLAGS += -Wno-unused-but-set-variable
+  CFLAGS += -Wno-tautological-constant-out-of-range-compare
 endif
 
 include $(RIOTBASE)/Makefile.base
