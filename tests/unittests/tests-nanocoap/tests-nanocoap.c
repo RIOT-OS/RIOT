@@ -439,7 +439,7 @@ static void test_nanocoap__get_query(void)
     TEST_ASSERT_EQUAL_INT(0, res);
     len = coap_builder_msg_size(&state);
     TEST_ASSERT(len > 0);
-    TEST_ASSERT_EQUAL_INT(len, coap_parse(&pkt, buf, len));
+    TEST_ASSERT_EQUAL_INT(len, coap_parse_udp(&pkt, buf, len));
     coap_get_uri_query_string(&pkt, query, sizeof(query));
     /* skip initial '&' from coap_get_uri_query_string() */
     TEST_ASSERT_EQUAL_STRING(qs, &query[1]);
@@ -489,7 +489,7 @@ static void test_nanocoap__get_multi_query(void)
     TEST_ASSERT_EQUAL_INT(0, res);
     len = coap_builder_msg_size(&state);
     TEST_ASSERT(len > 0);
-    TEST_ASSERT_EQUAL_INT(len, coap_parse(&pkt, buf, len));
+    TEST_ASSERT_EQUAL_INT(len, coap_parse_udp(&pkt, buf, len));
     coap_get_uri_query_string(&pkt, query, sizeof(query));
     /* skip initial '&' from coap_get_uri_query_string() */
     TEST_ASSERT_EQUAL_STRING(qs, &query[1]);
@@ -1227,13 +1227,12 @@ static void test_nanocoap__token_length_ext(void)
     const char *token = "0123456789ABCDEF";
 
     uint8_t buf[32];
-    coap_udp_hdr_t *hdr = (void *)buf;
 
     /* attempt to build a request with an overlong token (which would require
      * an 8-bit extended token length field); this must be rejected */
-    TEST_ASSERT_EQUAL_INT(-EINVAL, coap_build_hdr(hdr, COAP_TYPE_CON,
-                                                  (void *)token, strlen(token),
-                                                  COAP_METHOD_DELETE, 23));
+    TEST_ASSERT_EQUAL_INT(-EINVAL, coap_build_udp_hdr(buf, sizeof(buf), COAP_TYPE_CON,
+                                                      token, strlen(token),
+                                                      COAP_METHOD_DELETE, 23));
 
     uint8_t msg_long_token[] = {
         /* Ver = 1, T = CON, TKL = 13 for 1 byte extended token length: */
@@ -1270,8 +1269,8 @@ static void test_nanocoap___rst_message(void)
     /* trivial case: build a reset message */
     memset(buf, 0x55, sizeof(buf));
     TEST_ASSERT_EQUAL_INT(sizeof(rst_expected),
-                          coap_build_hdr((void *)buf, COAP_TYPE_RST, NULL, 0,
-                                         0, 0x1337));
+                          coap_build_udp_hdr(buf, sizeof(buf), COAP_TYPE_RST,
+                                             NULL, 0, 0, 0x1337));
     TEST_ASSERT(0 == memcmp(rst_expected, buf, sizeof(rst_expected)));
     /* did it write past the expected bytes? */
     TEST_ASSERT_EQUAL_INT(0x55, buf[sizeof(rst_expected)]);
@@ -1317,7 +1316,8 @@ static void test_nanocoap__out_of_bounds_option(void)
     };
 
     coap_pkt_t pkt;
-    TEST_ASSERT_EQUAL_INT(-EBADMSG, coap_parse(&pkt, invalid_msg, sizeof(invalid_msg)));
+    TEST_ASSERT_EQUAL_INT(-EBADMSG, coap_parse_udp(&pkt, invalid_msg,
+                                                   sizeof(invalid_msg)));
 }
 
 /* Test if coap_build_reply_header() is implemented correctly. */
@@ -1350,7 +1350,8 @@ static void test_nanocoap__coap_build_reply_header(void)
     const size_t response_expected_hdr_len = sizeof(response_expected);
 
     coap_pkt_t pkt;
-    TEST_ASSERT_EQUAL_INT(sizeof(request), coap_parse(&pkt, request, sizeof(request)));
+    TEST_ASSERT_EQUAL_INT(sizeof(request), coap_parse_udp(&pkt, request,
+                                                          sizeof(request)));
 
     void *payload = NULL;
     size_t payload_len_max = SIZE_MAX;
