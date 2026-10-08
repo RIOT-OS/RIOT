@@ -502,6 +502,20 @@ typedef struct {
 } ieee802154_mr_fsk_conf_t;
 
 /**
+ * @brief extension for IEEE 802.15.4 O-QPSK PHY
+ */
+typedef struct {
+    ieee802154_phy_conf_t super;        /**< common settings */
+} ieee802154_oqpsk_conf_t;
+
+/**
+ * @brief extension for IEEE 802.15.4 BPSK PHY
+ */
+typedef struct {
+    ieee802154_phy_conf_t super;        /**< common settings */
+} ieee802154_bpsk_conf_t;
+
+/**
  * @brief Union of all supported PHY configurations
  *
  * All members start with @ref ieee802154_phy_conf_t so a pointer to this
