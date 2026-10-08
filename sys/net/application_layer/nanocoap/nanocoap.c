@@ -99,7 +99,6 @@ bool coap_is_hdr_in_bounds(const coap_pkt_t *pkt, size_t len)
 ssize_t coap_parse_udp(coap_pkt_t *pkt, uint8_t *buf, size_t len)
 {
     pkt->buf = buf;
-    coap_udp_hdr_t *hdr = (coap_udp_hdr_t *)buf;
 
     pkt->payload = NULL;
     pkt->payload_len = 0;
@@ -111,16 +110,14 @@ ssize_t coap_parse_udp(coap_pkt_t *pkt, uint8_t *buf, size_t len)
         return -EBADMSG;
     }
 
-    uint8_t *pkt_pos = coap_hdr_data_ptr(hdr);
-    uint8_t *pkt_end = buf + len;
-
     if ((coap_get_code_raw(pkt) == 0) && (len > sizeof(coap_udp_hdr_t))) {
         DEBUG("empty msg too long\n");
         return -EBADMSG;
     }
 
     /* pkt_pos range is validated after options parsing loop below */
-    pkt_pos += coap_get_token_len(pkt);
+    uint8_t *pkt_pos = coap_get_token(pkt) + coap_get_token_len(pkt);
+    uint8_t *pkt_end = buf + len;
 
     coap_optpos_t *optpos = pkt->options;
     unsigned option_count = 0;
@@ -136,39 +133,38 @@ ssize_t coap_parse_udp(coap_pkt_t *pkt, uint8_t *buf, size_t len)
             DEBUG("payload len = %u\n", pkt->payload_len);
             break;
         }
-        else {
-            int option_delta = _decode_value(option_byte >> 4, &pkt_pos, pkt_end);
-            if (option_delta < 0) {
-                DEBUG("bad op delta\n");
-                return -EBADMSG;
-            }
-            int option_len = _decode_value(option_byte & 0xf, &pkt_pos, pkt_end);
-            if (option_len < 0) {
-                DEBUG("bad op len\n");
-                return -EBADMSG;
-            }
-            option_nr += option_delta;
-            DEBUG("option count=%u nr=%u len=%i\n", option_count, option_nr, option_len);
 
-            if (option_delta) {
-                if (option_count >= CONFIG_NANOCOAP_NOPTS_MAX) {
-                    DEBUG("nanocoap: max nr of options exceeded\n");
-                    return -ENOMEM;
-                }
-
-                /* check if option is critical */
-                if (option_nr & 1) {
-                    bf_set(pkt->opt_crit, option_count);
-                }
-                optpos->opt_num = option_nr;
-                optpos->offset = (uintptr_t)option_start - (uintptr_t)hdr;
-                DEBUG("optpos option_nr=%u %u\n", (unsigned)option_nr, (unsigned)optpos->offset);
-                optpos++;
-                option_count++;
-            }
-
-            pkt_pos += option_len;
+        int option_delta = _decode_value(option_byte >> 4, &pkt_pos, pkt_end);
+        if (option_delta < 0) {
+            DEBUG("bad op delta\n");
+            return -EBADMSG;
         }
+        int option_len = _decode_value(option_byte & 0xf, &pkt_pos, pkt_end);
+        if (option_len < 0) {
+            DEBUG("bad op len\n");
+            return -EBADMSG;
+        }
+        option_nr += option_delta;
+        DEBUG("option count=%u nr=%u len=%i\n", option_count, option_nr, option_len);
+
+        if (option_delta) {
+            if (option_count >= CONFIG_NANOCOAP_NOPTS_MAX) {
+                DEBUG("nanocoap: max nr of options exceeded\n");
+                return -ENOMEM;
+            }
+
+            /* check if option is critical */
+            if (option_nr & 1) {
+                bf_set(pkt->opt_crit, option_count);
+            }
+            optpos->opt_num = option_nr;
+            optpos->offset = (uintptr_t)option_start - (uintptr_t)buf;
+            DEBUG("optpos option_nr=%u %u\n", (unsigned)option_nr, (unsigned)optpos->offset);
+            optpos++;
+            option_count++;
+        }
+
+        pkt_pos += option_len;
     }
 
     if (pkt_pos > pkt_end) {
@@ -190,7 +186,7 @@ ssize_t coap_parse_udp(coap_pkt_t *pkt, uint8_t *buf, size_t len)
     DEBUG("coap pkt parsed. code=%u detail=%u payload_len=%u, nopts=%u, 0x%02x\n",
           coap_get_code_class(pkt),
           coap_get_code_detail(pkt),
-          pkt->payload_len, option_count, hdr->code);
+          pkt->payload_len, option_count, coap_get_code_raw(pkt));
 
     return len;
 }
@@ -754,7 +750,7 @@ ssize_t coap_build_reply(coap_pkt_t *pkt, unsigned code,
     len += max_data_len;
 
     /* HACK: many CoAP handlers assume that the pkt buffer is also used for the response */
-    pkt->hdr = (void *)rbuf;
+    pkt->buf = rbuf;
 
     return len;
 }
@@ -788,7 +784,7 @@ ssize_t coap_build_udp_hdr(void *buf, size_t buf_len, uint8_t type,
      * undefined behavior, so have to treat this explicitly. We could use
      * memmove(), but we know that either `src` and `dest` do not overlap
      * at all, or fully. So we can be a bit more efficient here. */
-    void *token_dest = coap_hdr_data_ptr(hdr);
+    void *token_dest = buf;
     if (token_dest != token) {
         memcpy(token_dest, token, token_len);
     }
