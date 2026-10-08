@@ -69,7 +69,7 @@ extern netdev_tap_t netdev_tap;
  *
  * The host thread is only created when the RIOT thread is scheduled for the
  * first time. Until then the RIOT stack may legitimately be reused (e.g. by
- * tests/core/thread_flood), and resources are only spent on threads that
+ * `tests/core/thread_flood`), and resources are only spent on threads that
  * actually run.
  */
 typedef struct {
