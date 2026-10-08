@@ -33,7 +33,6 @@
 #if defined(__FreeBSD__)
 #  include <pthread_np.h>
 #endif
-#include <setjmp.h>
 #include <signal.h>
 #include <stdbool.h>
 #include <stddef.h>
@@ -92,6 +91,7 @@ typedef struct {
  */
 static int (*real_pthread_create)(pthread_t *thread, const pthread_attr_t *attr,
                                   void *(*start_routine)(void *), void *arg);
+static int (*real_pthread_exit)(void *retval);
 static int (*real_pthread_join)(pthread_t thread, void **retval);
 static pthread_t (*real_pthread_self)(void);
 static int (*real_pthread_attr_init)(pthread_attr_t *attr);
@@ -104,11 +104,6 @@ static int (*real_pthread_attr_destroy)(pthread_attr_t *attr);
  * @brief   Host thread of the calling host thread, NULL for the main host thread
  */
 static __thread native_thread_t *_self;
-
-/**
- * @brief   Used by an exiting thread to return from its host thread function
- */
-static __thread jmp_buf *_exit_buf;
 
 /**
  * @brief   Host thread of the last RIOT thread that exited, still to be joined
@@ -266,7 +261,6 @@ void _native_switch_to_active(void)
 void thread_print_stack(void)
 {
     DEBUG_CPU("thread_print_stack: not implemented yet!\n");
-    return;
 }
 
 /* This function calculates the ISR stack usage */
@@ -321,9 +315,8 @@ void cpu_switch_context_exit(void)
     _exited = true;
     _schedule(next);
 
-    /* the new CPU owner joins this host thread before touching anything,
-     * so it is still safe to access our own thread local storage */
-    longjmp(*_exit_buf, 1);
+    real_pthread_exit(NULL);
+    UNREACHABLE();
 }
 
 void thread_yield_higher(void)
@@ -343,6 +336,7 @@ void native_cpu_init(void)
         const char *name;
     } lookups[] = {
         { (void **)&real_pthread_create, "pthread_create" },
+        { (void **)&real_pthread_exit, "pthread_exit" },
         { (void **)&real_pthread_join, "pthread_join" },
         { (void **)&real_pthread_self, "pthread_self" },
         { (void **)&real_pthread_attr_init, "pthread_attr_init" },
@@ -386,31 +380,27 @@ static void _set_host_thread_name(native_thread_t *self, const char *name)
 static void *_thread_entry(void *arg)
 {
     native_thread_t *self = arg;
-    jmp_buf exit_buf;
 
     /* the host thread starts out as CPU owner */
     self->pthread = real_pthread_self();
     _self = self;
-    _exit_buf = &exit_buf;
 
     _reap_zombie();
 
     /* the name is only assigned after thread_stack_init() returned */
     _set_host_thread_name(self, thread_getname(thread_getpid()));
 
-    if (setjmp(exit_buf) == 0) {
-        /* RIOT threads start with interrupts enabled */
-        _native_in_isr = 0;
-        irq_enable();
+    /* RIOT threads start with interrupts enabled */
+    _native_in_isr = 0;
+    irq_enable();
 
-        self->task_func(self->arg);
-        sched_task_exit();
-    }
+    self->task_func(self->arg);
+    sched_task_exit();
 
     return NULL;
 }
 
-char *thread_stack_init(thread_task_func_t task_func, void *arg, void *stack_start, int stacksize)
+char *thread_stack_init(thread_task_func_t task_func, void *arg, void *stack_start, int stack_size)
 {
     native_thread_t *ctx;
 
@@ -418,7 +408,7 @@ char *thread_stack_init(thread_task_func_t task_func, void *arg, void *stack_sta
 
     /* Place the host thread control block at the top of the RIOT stack,
      * the remainder is used as stack of the host thread. */
-    uintptr_t top = (uintptr_t)stack_start + stacksize - sizeof(native_thread_t);
+    uintptr_t top = (uintptr_t)stack_start + stack_size - sizeof(native_thread_t);
     top &= ~(uintptr_t)(_Alignof(max_align_t) - 1);
     expect(top >= (uintptr_t)stack_start);
     ctx = (native_thread_t *)top;
@@ -435,7 +425,7 @@ char *thread_stack_init(thread_task_func_t task_func, void *arg, void *stack_sta
     /* the host libc refuses to run a thread on a smaller stack */
     if (top < bottom || ctx->stack_size < (size_t)PTHREAD_STACK_MIN) {
         errx(EXIT_FAILURE, "thread_stack_init: stack too small, need at least "
-             "%ld bytes (+ overhead), got %d", (long)PTHREAD_STACK_MIN, stacksize);
+             "%ld bytes (+ overhead), got %d", (long)PTHREAD_STACK_MIN, stack_size);
     }
 
     return (char *)ctx;
