@@ -766,19 +766,19 @@ int ieee802154_submac_init(ieee802154_submac_t *submac, const network_uint16_t *
     ieee802154_radio_config_addr_filter(dev, IEEE802154_AF_PANID, &submac->panid);
 
 #ifdef MODULE_NETDEV_IEEE802154_MR_OQPSK
-    if (submac->phy_conf.super.phy_mode == IEEE802154_PHY_MR_OQPSK) {
+    if (submac->phy_conf.common.phy_mode == IEEE802154_PHY_MR_OQPSK) {
         submac->phy_conf.mr_oqpsk.chips = CONFIG_IEEE802154_MR_OQPSK_DEFAULT_CHIPS;
         submac->phy_conf.mr_oqpsk.rate_mode = CONFIG_IEEE802154_MR_OQPSK_DEFAULT_RATE;
     }
 #endif
 #ifdef MODULE_NETDEV_IEEE802154_MR_OFDM
-    if (submac->phy_conf.super.phy_mode == IEEE802154_PHY_MR_OFDM) {
+    if (submac->phy_conf.common.phy_mode == IEEE802154_PHY_MR_OFDM) {
         submac->phy_conf.mr_ofdm.option = CONFIG_IEEE802154_MR_OFDM_DEFAULT_OPTION;
         submac->phy_conf.mr_ofdm.scheme = CONFIG_IEEE802154_MR_OFDM_DEFAULT_SCHEME;
     }
 #endif
 #ifdef MODULE_NETDEV_IEEE802154_MR_FSK
-    if (submac->phy_conf.super.phy_mode == IEEE802154_PHY_MR_FSK) {
+    if (submac->phy_conf.common.phy_mode == IEEE802154_PHY_MR_FSK) {
         submac->phy_conf.mr_fsk.srate = CONFIG_IEEE802154_MR_FSK_DEFAULT_SRATE;
         submac->phy_conf.mr_fsk.mod_ord = CONFIG_IEEE802154_MR_FSK_DEFAULT_MOD_ORD;
         submac->phy_conf.mr_fsk.mod_idx = CONFIG_IEEE802154_MR_FSK_DEFAULT_MOD_IDX;
