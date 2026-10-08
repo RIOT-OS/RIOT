@@ -153,8 +153,7 @@ extern "C" {
  * This macro allows to specify a certain link local IPv6 address to be assigned
  * to a network interface on startup, which might be handy for testing.
  * Note: a) a interface will keep its auto-generated link local address, too
- *       b) the address is incremented by the interface PID unless
-            `CONFIG_GNRC_IPV6_STATIC_LLADDR_IS_FIXED` is set.
+ *       b) the same static link local address is used for all interfaces
  *
  * To use the macro just add it to `CFLAGS` in the application's Makefile, like:
  *
@@ -166,20 +165,6 @@ extern "C" {
 #define CONFIG_GNRC_IPV6_STATIC_LLADDR
 #endif /* DOXYGEN */
 /** @} */
-
-/**
- * @brief   Use the same static IPv6 link local address on every network interface
- *
- * @deprecated  Will be removed after release 2025.07 - after this the static link-local
- *              address will always be fixed unless a use-case for the auto-increment
- *              can be found.
- *
- * When CONFIG_GNRC_IPV6_STATIC_LLADDR is used, to not add the interface pid to the
- * set static address but use the same static link local address for all interfaces.
- */
-#ifndef CONFIG_GNRC_IPV6_STATIC_LLADDR_IS_FIXED
-#define CONFIG_GNRC_IPV6_STATIC_LLADDR_IS_FIXED 1
-#endif
 
 /**
  * @brief   Select interfaces by driver types for setting static link local

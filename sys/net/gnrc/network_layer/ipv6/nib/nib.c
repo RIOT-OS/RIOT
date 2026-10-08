@@ -151,11 +151,8 @@ static bool _add_static_lladdr(gnrc_netif_t *netif)
         return false;
     }
 
-    DEBUG("nib: interface #%u: adding static link-local address \"%s\"%s\n",
-            netif->pid,
-            CONFIG_GNRC_IPV6_STATIC_LLADDR,
-            IS_ACTIVE(CONFIG_GNRC_IPV6_STATIC_LLADDR_IS_FIXED) ?
-                " (fixed)" : " (+ interface number)");
+    DEBUG("nib: interface #%u: adding static link-local address \"%s\"\n",
+          netif->pid, CONFIG_GNRC_IPV6_STATIC_LLADDR);
     /* parse addr from string and explicitly set a link local prefix
      * if ifnum > 1 each interface will get its own link local address
      * with CONFIG_GNRC_IPV6_STATIC_LLADDR + i
@@ -164,9 +161,6 @@ static bool _add_static_lladdr(gnrc_netif_t *netif)
     ipv6_addr_t lladdr;
 
     if (ipv6_addr_from_str(&lladdr, lladdr_str) != NULL) {
-        if (!IS_ACTIVE(CONFIG_GNRC_IPV6_STATIC_LLADDR_IS_FIXED)) {
-            lladdr.u8[15] += netif->pid;
-        }
         assert(ipv6_addr_is_link_local(&lladdr));
         return gnrc_netif_ipv6_addr_add_internal(
                 netif, &lladdr, 64U, GNRC_NETIF_IPV6_ADDRS_FLAGS_STATE_VALID
