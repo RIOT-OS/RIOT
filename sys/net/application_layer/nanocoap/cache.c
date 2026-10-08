@@ -17,7 +17,6 @@
 
 #include <string.h>
 
-#include "kernel_defines.h"
 #include "net/nanocoap/cache.h"
 #include "hashes/sha256.h"
 
@@ -136,12 +135,12 @@ void nanocoap_cache_key_generate(const coap_pkt_t *req, uint8_t *cache_key)
     sha256_init(&ctx);
 
     _cache_key_digest_opts(req, &ctx, !(IS_USED(MODULE_GCOAP_FORWARD_PROXY)), true);
-    switch (req->hdr->code) {
-        case COAP_METHOD_FETCH:
-            sha256_update(&ctx, req->payload, req->payload_len);
-            break;
-        default:
-            break;
+    switch (coap_get_code_raw(req)) {
+    case COAP_METHOD_FETCH:
+        sha256_update(&ctx, req->payload, req->payload_len);
+        break;
+    default:
+        break;
     }
     sha256_final(&ctx, cache_key);
 }
@@ -199,16 +198,16 @@ nanocoap_cache_entry_t *nanocoap_cache_process(const uint8_t *cache_key, unsigne
     ce = nanocoap_cache_key_lookup(cache_key);
 
     /* This response is not cacheable. */
-    if (resp->hdr->code == COAP_CODE_CREATED) {
+    if (coap_get_code_raw(resp) == COAP_CODE_CREATED) {
         /* NO OP */
     }
     /* This response is not cacheable. However, a cache MUST mark any
-       stored response for the deleted resource as not fresh.
-    */
-    else if (resp->hdr->code == COAP_CODE_DELETED) {
+     * stored response for the deleted/changed resource as not fresh. */
+    else if ((coap_get_code_raw(resp) == COAP_CODE_DELETED) ||
+             (coap_get_code_raw(resp) == COAP_CODE_CHANGED)) {
         if (ce) {
             /* set max_age to now(), so that the cache is considered
-             * stale immdiately */
+             * stale immediately */
             ce->max_age = ztimer_now(ZTIMER_SEC);
         }
     }
@@ -223,7 +222,7 @@ nanocoap_cache_entry_t *nanocoap_cache_process(const uint8_t *cache_key, unsigne
        response received. (Unsafe options may trigger similar
        option-specific processing as defined by the option.)
     */
-    else if (resp->hdr->code == COAP_CODE_VALID) {
+    else if (coap_get_code_raw(resp) == COAP_CODE_VALID) {
         if (ce) {
             /* refresh max_age() */
             uint32_t max_age = 60;
@@ -232,21 +231,11 @@ nanocoap_cache_entry_t *nanocoap_cache_process(const uint8_t *cache_key, unsigne
         }
         /* TODO: handle the copying of the new options (if changed) */
     }
-    /* This response is not cacheable. However, a cache MUST mark any
-       stored response for the changed resource as not fresh.
-    */
-    else if (resp->hdr->code == COAP_CODE_CHANGED) {
-        if (ce) {
-            /* set max_age to now(), so that the cache is considered
-             * stale immdiately */
-            ce->max_age = ztimer_now(ZTIMER_SEC);
-        }
-    }
     /* This response is cacheable: Caches can use the Max-Age Option
        to determine freshness and (if present) the
        ETag Option for validation.
     */
-    else if (resp->hdr->code == COAP_CODE_CONTENT) {
+    else if (coap_get_code_raw(resp) == COAP_CODE_CONTENT) {
         if ((ce = nanocoap_cache_add_by_key(cache_key, request_method,
                                             resp, resp_len)) == NULL) {
             /* no space left in the cache? */
@@ -264,9 +253,8 @@ static nanocoap_cache_entry_t *_nanocoap_cache_pop(void)
     if (node != NULL) {
         return container_of(node, nanocoap_cache_entry_t, node);
     }
-    else {
-        return NULL;
-    }
+
+    return NULL;
 }
 
 nanocoap_cache_entry_t *nanocoap_cache_add_by_key(const uint8_t *cache_key,
@@ -306,9 +294,9 @@ nanocoap_cache_entry_t *nanocoap_cache_add_by_key(const uint8_t *cache_key,
 
     memcpy(ce->cache_key, cache_key, CONFIG_NANOCOAP_CACHE_KEY_LENGTH);
     memcpy(&ce->response_pkt, resp, sizeof(coap_pkt_t));
-    memcpy(&ce->response_buf, resp->hdr, resp_len);
-    ce->response_pkt.hdr = (coap_hdr_t *) ce->response_buf;
-    ce->response_pkt.payload = ce->response_buf + (resp->payload - ((uint8_t *)resp->hdr));
+    memcpy(&ce->response_buf, resp->buf, resp_len);
+    ce->response_pkt.buf = ce->response_buf;
+    ce->response_pkt.payload = ce->response_buf + (resp->payload - resp->buf);
     ce->response_len = resp_len;
     ce->request_method = request_method;
 
