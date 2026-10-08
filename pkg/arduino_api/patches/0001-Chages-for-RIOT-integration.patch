@@ -1,7 +1,7 @@
-From 450ac61995792240213e2d05ab83039e4ef07df0 Mon Sep 17 00:00:00 2001
+From 8c5b17a4ec01c71c9c35290995fa903fb4911692 Mon Sep 17 00:00:00 2001
 From: =?UTF-8?q?J=2E=20David=20Ib=C3=A1=C3=B1ez?= <jdavid.ibp@gmail.com>
 Date: Wed, 13 Oct 2021 09:25:24 +0200
-Subject: [PATCH 1/1] Chages for RIOT integration
+Subject: [PATCH] Chages for RIOT integration
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
@@ -16,10 +16,10 @@ Signed-off-by: J. David Ibáñez <jdavid.ibp@gmail.com>
  api/Stream.h     |  2 +-
  3 files changed, 1 insertion(+), 48 deletions(-)
 
-diff --git api/Common.h api/Common.h
+diff --git a/api/Common.h b/api/Common.h
 index c40a35a..c2d9de4 100644
---- api/Common.h
-+++ api/Common.h
+--- a/api/Common.h
++++ b/api/Common.h
 @@ -109,9 +109,6 @@ unsigned long pulseInLong(pin_size_t pin, uint8_t state, unsigned long timeout);
  void shiftOut(pin_size_t dataPin, pin_size_t clockPin, BitOrder bitOrder, uint8_t val);
  uint8_t shiftIn(pin_size_t dataPin, pin_size_t clockPin, BitOrder bitOrder);
@@ -30,10 +30,10 @@ index c40a35a..c2d9de4 100644
  
  void setup(void);
  void loop(void);
-diff --git api/Interrupts.h api/Interrupts.h
+diff --git a/api/Interrupts.h b/api/Interrupts.h
 index e306fc7..e69de29 100644
---- api/Interrupts.h
-+++ api/Interrupts.h
+--- a/api/Interrupts.h
++++ b/api/Interrupts.h
 @@ -1,44 +0,0 @@
 -#ifndef W_INTERRUPTS_CPP
 -#define W_INTERRUPTS_CPP
@@ -79,10 +79,10 @@ index e306fc7..e69de29 100644
 -}
 -#endif
 -#endif
-diff --git api/Stream.h api/Stream.h
+diff --git a/api/Stream.h b/api/Stream.h
 index e81c71b..b22d0b2 100644
---- api/Stream.h
-+++ api/Stream.h
+--- a/api/Stream.h
++++ b/api/Stream.h
 @@ -130,4 +130,4 @@ class Stream : public Print
  
  }
@@ -91,5 +91,5 @@ index e81c71b..b22d0b2 100644
 \ No newline at end of file
 +using namespace arduino;
 -- 
-2.32.0
+2.34.1
 
