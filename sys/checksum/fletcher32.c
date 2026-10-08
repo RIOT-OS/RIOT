@@ -47,7 +47,7 @@ void fletcher32_update(fletcher32_ctx_t *ctx, const void *data, size_t words)
         unsigned tlen = words > 359 ? 359 : words;
         words -= tlen;
         do {
-            ctx->sum1 += unaligned_get_u16((void *)pos);
+            ctx->sum1 += unaligned_get_u16(pos);
             pos += sizeof(uint16_t);
             ctx->sum2 += ctx->sum1;
         } while (--tlen);
