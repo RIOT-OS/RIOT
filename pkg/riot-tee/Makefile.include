@@ -1,6 +1,3 @@
-# SPDX-FileCopyrightText: 2024 HAW Hamburg
-# SPDX-License-Identifier: LGPL-2.1-only
-
 ARCHIVES += $(BINDIR)/pkg-build/riot-tee/api/libriot_tee_api.a
 
 # The secure image and the application are flashed as one file, so that
@@ -17,7 +14,7 @@ RIOT_TEE_COMBINED_BIN = $(BINDIR)/$(APPLICATION).combined.bin
 # application is linked.
 $(RIOT_TEE_EXTENDED_BIN): $$(ELFFILE)
 	$(Q)$(OBJCOPY) -O binary $(RIOT_TEE_ELF) $@.tmp
-	$(Q)truncate -s $$(($(SECURE_FLASH_SIZE))) $@.tmp
+	$(Q)truncate -s $$(($(TEE_FLASH_SIZE))) $@.tmp
 	$(Q)mv $@.tmp $@
 
 $(RIOT_TEE_COMBINED_BIN): $(RIOT_TEE_EXTENDED_BIN) $$(BINFILE)

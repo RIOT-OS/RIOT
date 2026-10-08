@@ -14,7 +14,7 @@ ifneq (,$(filter trustzone_m_nonsecure,$(USEMODULE)))
 
   RAM_LEN = $(NS_RAM_SIZE)
   RAM_START_ADDR ?= $(NS_RAM_START)
-  ROM_OFFSET = $(SECURE_FLASH_SIZE)
+  ROM_OFFSET = $(TEE_FLASH_SIZE)
 endif
 
 FLASHFILE ?= $(BINFILE)
