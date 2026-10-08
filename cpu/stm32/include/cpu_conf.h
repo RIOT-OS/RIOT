@@ -36,12 +36,15 @@ extern "C" {
 #endif
 
 /**
- * @brief   Enable workaround for bug in WFI by issuing an ISB
+ * @brief   Enable workaround for bug in WFI by issuing a NOP and an ISB
  *
  * This works around a bug on STM32 systems, see [1] for details, or [2] for
- * an archive.org backup.
+ * an archive.org backup. The NOP is required on the STM32L1 when any of the
+ * DBG_SLEEP, DBG_STOP or DBG_STANDBY bits in DBGMCU_CR are set [3] and [4].
  * [1]: https://cliffle.com/blog/stm32-wfi-bug
  * [2]: https://web.archive.org/web/20231205101603/https://cliffle.com/blog/stm32-wfi-bug/
+ * [3]: https://community.st.com/stm32-mcus-products-25/stm32l1-hardfault-when-returning-from-wfi-only-when-debugger-attached-85076
+ * [4]: https://community.st.com/stm32-mcus-products-25/wfi-hardfault-on-wakeup-87798
  */
 #define CORTEXM_ISB_REQUIRED_AFTER_WFI  1
 

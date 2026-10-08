@@ -157,10 +157,15 @@ static inline void cortexm_sleep(int deep)
     /* ensure that all memory accesses have completed and trigger sleeping */
     unsigned state = irq_disable();
     __DSB();
-    __WFI();
-    /* Some CPUs require an ISB after WFI to work around silicon bugs */
 #if CORTEXM_ISB_REQUIRED_AFTER_WFI
-    __ISB();
+    /* Some CPUs require an ISB after WFI to work around silicon bugs.
+     * The STM32L1 additionally fetches a 32-bit instruction directly following
+     * the WFI incorrectly on wake-up if any of the DBGMCU low-power debug bits
+     * is set, so a 16-bit NOP is placed in between. A single asm statement
+     * ensures that the compiler does not put anything else in there. */
+    __asm__ volatile ("wfi\n nop\n isb" ::: "memory");
+#else
+    __WFI();
 #endif
     irq_restore(state);
 }
