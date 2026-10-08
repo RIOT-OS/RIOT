@@ -1239,7 +1239,7 @@ static inline size_t gcoap_request_memo_get_tkl(const gcoap_request_memo_t *memo
 /**
  * @brief   Get the request header length from a @ref gcoap_request_memo_t
  *
- * @notes   Header length includes everything  up to including the CoAP Token,
+ * @note    Header length includes everything up to and including the CoAP Token,
  *          but excludes the CoAP Options
  *
  * @param[in]   memo    The memo to get the request header length from
