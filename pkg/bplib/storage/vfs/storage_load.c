@@ -175,7 +175,7 @@ static int _next_bundle_path(bundle_path_iterator_t* iterator,
         snprintf(iterator->path + BPLIB_STOR_DATA_LEN,
             BPLIB_STOR_PATHLEN_DAT - BPLIB_STOR_DATA_LEN,
             "/%s", entry.d_name);
-        iterator->node_val = strtoull(entry.d_name, NULL, 16);
+        iterator->node_val = decoded;
         res = vfs_opendir(&iterator->service_dir, iterator->path);
         if (res < 0) {
             return res;
@@ -222,7 +222,7 @@ static int _next_bundle_path(bundle_path_iterator_t* iterator,
         snprintf(iterator->path + acc_len,
             BPLIB_STOR_PATHLEN_DAT - acc_len,
             "/%s", entry.d_name);
-        iterator->service_val = strtoull(entry.d_name, NULL, 16);
+        iterator->service_val = decoded;
         res = vfs_opendir(&iterator->bundle_dir, iterator->path);
         if (res < 0) {
             return res;
