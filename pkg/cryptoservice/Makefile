@@ -1,10 +1,7 @@
-# SPDX-FileCopyrightText: 2024 HAW Hamburg
-# SPDX-License-Identifier: LGPL-2.1-only
-
 PKG_NAME = cryptoservice
 PKG_URL = https://github.com/janthies/CryptoService.git
 PKG_VERSION = 9b0f00e7863a79322bd5d198ff70bbe2f9b779be
-PKG_LICENSE = unknown
+PKG_LICENSE = LGPL-2.1-only
 
 include $(RIOTBASE)/pkg/pkg.mk
 
