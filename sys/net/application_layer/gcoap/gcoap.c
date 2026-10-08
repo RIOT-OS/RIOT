@@ -1447,7 +1447,7 @@ static ssize_t _cache_build_response(nanocoap_cache_entry_t *ce, coap_pkt_t *pdu
 static void _copy_hdr_from_req_memo(coap_pkt_t *pdu, gcoap_request_memo_t *memo)
 {
     size_t hdr_len = gcoap_request_memo_get_hdr_len(memo);
-    memcpy(pdu->buf, gcoap_request_memo_get_hdr(memo), hdr_len);
+    memcpy(pdu->buf, gcoap_request_memo_get_buf(memo), hdr_len);
 }
 
 static void _receive_from_cache_cb(void *ctx)
