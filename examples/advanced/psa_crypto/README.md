@@ -1,7 +1,7 @@
 # Example Applications for PSA Crypto
 This example application is supposed to show two things:
 1. How to use basic functions of the PSA Crypto API
-2. How to configure the implementation with Kconfig dependency resolution vs. Make dependency resolution
+2. How to configure the implementation with Kconfig or Make
 
 ## Basic usage of PSA Crypto
 There are four example operations:
