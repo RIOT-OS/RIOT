@@ -15,8 +15,8 @@ except ImportError:
 
 
 def parse_samples(fname: str):
-    with open(fname, "r") as f:
-        data = f.read().encode("ascii")
+    with open(fname, "r", encoding="utf-8", errors="replace") as f:
+        data = f.read()
     for line in data.splitlines():
         try:
             data = json.loads(line)
