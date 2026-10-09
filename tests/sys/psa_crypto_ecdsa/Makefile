@@ -17,10 +17,12 @@ CFLAGS += -DCONFIG_PSA_SINGLE_KEY_COUNT=1
 
 include $(RIOTBASE)/Makefile.include
 
-ifneq (,$(filter psa_asymmetric_ecc_p256r1_backend_microecc,$(USEMODULE)))
-  CFLAGS += -DTHREAD_STACKSIZE_MAIN=4096
-endif
+ifeq (,$(filter native%,$(BOARD)))
+  ifneq (,$(filter psa_asymmetric_ecc_p256r1_backend_microecc,$(USEMODULE)))
+    CFLAGS += -DTHREAD_STACKSIZE_MAIN=4096
+  endif
 
-ifneq (,$(filter psa_asymmetric_ecc_p256r1_backend_periph,$(USEMODULE)))
-  CFLAGS += -DTHREAD_STACKSIZE_MAIN=7000
+  ifneq (,$(filter psa_asymmetric_ecc_p256r1_backend_periph,$(USEMODULE)))
+    CFLAGS += -DTHREAD_STACKSIZE_MAIN=7000
+  endif
 endif
