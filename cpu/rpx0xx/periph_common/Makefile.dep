@@ -1,0 +1,9 @@
+# enable reset into the ROM bootloader via USB, requires CDC ACM to be used
+ifneq (,$(filter usbus_cdc_acm,$(USEMODULE)))
+  USEMODULE += usb_board_reset
+endif
+
+# the reset into the bootloader uses the ROM constants of the Pico SDK
+ifneq (,$(filter usb_board_reset,$(USEMODULE)))
+  USEPKG += picosdk
+endif
