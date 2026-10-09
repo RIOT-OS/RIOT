@@ -1248,8 +1248,7 @@ static inline size_t gcoap_request_memo_get_tkl(const gcoap_request_memo_t *memo
  */
 static inline size_t gcoap_request_memo_get_hdr_len(const gcoap_request_memo_t *memo)
 {
-    /*
-     * CoAP header without options is static header plus Token */
+    /* CoAP header without options is static header plus Token */
     return sizeof(coap_udp_hdr_t) + gcoap_request_memo_get_tkl(memo);
 }
 
@@ -1262,7 +1261,6 @@ static inline size_t gcoap_request_memo_get_hdr_len(const gcoap_request_memo_t *
  */
 static inline void * gcoap_request_memo_get_token(gcoap_request_memo_t *memo)
 {
-    /* BUG: Dropping const qualifier */
     uint8_t *buf = gcoap_request_memo_get_buf(memo);
     return buf + sizeof(coap_udp_hdr_t);
 }
