@@ -8,12 +8,5 @@ LINKER_SCRIPT ?= cortexm.ld
 INCLUDES += -I$(RIOTCPU)/nrf5x_common/include
 INCLUDES += -I$(BINDIR)/pkg-build/nrfx
 
-# Only explicitly fetch vendor headers standalone if nrfx is not already pulled
-# in as a full package. The vendor headers are always required and will be
-# copied to the $(PKG_BUILD_DIR) folder in both cases.
-ifeq (,$(filter nrfx,$(USEPKG)))
-fetch_nrfx_vendor_headers: FORCE $(CLEAN)
-	$(Q)+$(MAKE) -C $(RIOTPKG)/nrfx
-
-BUILDDEPS += fetch_nrfx_vendor_headers
-endif
+PSEUDOMODULES += nrfx_full
+PSEUDOMODULES += nrfx_headers_only

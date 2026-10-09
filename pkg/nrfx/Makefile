@@ -52,7 +52,7 @@ else ifneq (,$(filter nrf53%,$(CPU_FAM)))
 endif
 
 # The sparse paths have to be set before calling `pkg/pkg.mk`
-ifeq (,$(filter nrfx,$(USEPKG)))
+ifeq (,$(filter nrfx_full,$(USEMODULE)))
   PKG_SPARSE_PATHS = $(NRFX_SPARSE_PATHS)
 endif
 

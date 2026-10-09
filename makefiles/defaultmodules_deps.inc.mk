@@ -22,6 +22,17 @@ ifneq (,$(filter auto_init_libcose_crypt,$(USEMODULE)))
   USEMODULE += libcose_crypt_init
 endif
 
+# Any nRF CPU will select nrfx_headers_only. If an application or another
+# package selects USEPKG+=nrfx, the nrfx_full module will be selected
+# to tell pkg/nrfx to fetch all files.
+ifneq (,$(filter nrfx_headers_only,$(USEMODULE)))
+  ifneq (,$(filter nrfx,$(USEPKG)))
+    USEMODULE += nrfx_full
+  else
+    USEPKG += nrfx
+  endif
+endif
+
 ifneq (,$(filter random,$(USEMODULE)))
   # select default prng if no prng is selected
   ifeq (,$(filter prng_%,$(USEMODULE)))
