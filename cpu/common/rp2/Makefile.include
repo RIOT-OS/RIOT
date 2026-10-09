@@ -1,0 +1,4 @@
+ifneq (,$(filter usb_board_reset,$(USEMODULE)))
+  include $(RIOTMAKE)/tools/usb_board_reset.mk
+  INCLUDES += -isystem$(PKGDIRBASE)/picosdk/src/rp2_common/boot_bootrom_headers/include
+endif
