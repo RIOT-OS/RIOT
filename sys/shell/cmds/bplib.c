@@ -214,7 +214,7 @@ static bplib_nc_canonical_block_t __resolve_block_type(const char* str) {
     if (strcmp(str, "ct") == 0) {
         return BPLIB_CUSTODY_TRANSFER_BLOCK;
     }
-    
+
     return BPLIB_INVALID_BLOCK;
 }
 
@@ -231,7 +231,7 @@ static bool __resolve_crc_str(const char* str, BPLib_CRC_Type_t* crc) {
     else {
         return false;
     }
-    
+
     return true;
 }
 
@@ -293,7 +293,7 @@ static int _bp_contact(int argc, char **argv)
     }
     else {
        __print_help_bp_contact();
-        return 1; 
+        return 1;
     }
 
     return 0;
@@ -330,7 +330,7 @@ static int _bp_channel_block(int argc, char **argv, int c)
     bplib_nc_canonical_block_t block = __resolve_block_type(argv[4]);
     if (block == BPLIB_INVALID_BLOCK) {
         __print_help_bp_channel();
-        return 1; 
+        return 1;
     }
 
     BPLib_Status_t rv = BPLIB_SUCCESS;
@@ -356,7 +356,7 @@ static int _bp_channel_block(int argc, char **argv, int c)
                 printf(STR_INVALID_VALUE, argv[6]);
                 return 1;
             }
-                
+
             rv = bplib_channel_set_block_crc_type(c, block, crc);
         }
         else {
@@ -381,7 +381,7 @@ static int _bp_channel_block(int argc, char **argv, int c)
     }
     else {
         __print_help_bp_channel();
-        return 1; 
+        return 1;
     }
 
     /* A valid command was executed, but it might have failed */
@@ -510,7 +510,7 @@ static int _bp_channel(int argc, char **argv)
     }
     else {
        __print_help_bp_channel();
-        return 1; 
+        return 1;
     }
 
     return 0;
