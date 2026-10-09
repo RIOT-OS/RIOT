@@ -169,7 +169,7 @@ static int test_timer(unsigned num, uint32_t timer_freq)
             printf("      - init: %8" PRIu32 "\n", atomic_load_u32(&timeouts[i]));
         }
         else {
-            assume((i > 1) && (i < ARRAY_SIZE(timeouts)));
+            assume((i >= 1) && (i < ARRAY_SIZE(timeouts)));
             printf("      - diff: %8" PRIu32 "\n",
                    atomic_load_u32(&timeouts[i]) - atomic_load_u32(&timeouts[i - 1]));
         }
