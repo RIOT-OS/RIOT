@@ -55,6 +55,24 @@
 
 #define SETUP_PACKET_LEN        (8U)
 
+/**
+ * @name    Workaround for RP2040 erratum RP2040-E5
+ * @{
+ */
+#define E5_DP_PIN               (15U)   /**< GPIO used to force the line state */
+#define E5_FUNCSEL_USB_DEBUG    (8U)    /**< USB debug muxing function of GPIO15 */
+#define E5_FORCE_J_US           (1000U) /**< Duration of the forced J state */
+#define E5_AFFECTED_REVISION    (1U)    /**< Chip revision of RP2040-B0/B1 */
+/** @} */
+
+/**
+ * @name    Line states as reported in SIE_STATUS.LINE_STATE
+ * @{
+ */
+#define LINE_STATE_SE0          (0U)
+#define LINE_STATE_J            (1U)
+/** @} */
+
 #define BUF_CTRL_FULL           USBCTRL_DPRAM_EP0_IN_BUFFER_CONTROL_FULL_0_Msk
 #define BUF_CTRL_PID            USBCTRL_DPRAM_EP0_IN_BUFFER_CONTROL_PID_0_Msk
 #define BUF_CTRL_STALL          USBCTRL_DPRAM_EP0_IN_BUFFER_CONTROL_STALL_Msk
@@ -425,6 +443,83 @@ static void _bus_reset(void)
     _usbdev.setup_pending = false;
 }
 
+static uint32_t _line_state(void)
+{
+    return (USBCTRL_REGS->SIE_STATUS & USBCTRL_REGS_SIE_STATUS_LINE_STATE_Msk) >>
+           USBCTRL_REGS_SIE_STATUS_LINE_STATE_Pos;
+}
+
+/*
+ * Workaround for erratum RP2040-E5 "USB device fails to exit RESET state on
+ * busy USB bus", taken from the Pico SDK (rp2040_usb_device_enumeration.c).
+ *
+ * After a bus reset, the controller expects 800 us of J state before it
+ * considers the device connected. On a hub that forwards packets of other
+ * devices this may never happen. Therefore the J state is forced for 1 ms by
+ * temporarily routing the USB input path through GPIO15.
+ *
+ * The workaround busy waits until the bus reset is over, which takes up to
+ * 15 ms, and modifies the configuration of GPIO15 in the meantime.
+ */
+static void _enumeration_fix(void)
+{
+    if (((SYSINFO->CHIP_ID & SYSINFO_CHIP_ID_REVISION_Msk) >>
+         SYSINFO_CHIP_ID_REVISION_Pos) != E5_AFFECTED_REVISION) {
+        /* fixed in RP2040-B2 */
+        return;
+    }
+    if (!(USBCTRL_REGS->SIE_CTRL & USBCTRL_REGS_SIE_CTRL_PULLUP_EN_Msk)) {
+        /* not attached to the host */
+        return;
+    }
+
+    DEBUG("[rpx0xx usb] applying workaround for RP2040-E5\n");
+
+    /* wait for the end of the bus reset */
+    while (_line_state() == LINE_STATE_SE0) {}
+
+    uint32_t io_prev = *gpio_io_register(E5_DP_PIN);
+    uint32_t pad_prev = *gpio_pad_register(E5_DP_PIN);
+
+    /* enable the bus keeper and tristate the pin so that the USB muxing does
+     * not affect the pin state */
+    io_reg_atomic_set(gpio_pad_register(E5_DP_PIN),
+                      PADS_BANK0_GPIO0_PUE_Msk | PADS_BANK0_GPIO0_PDE_Msk);
+    io_reg_write_dont_corrupt(gpio_io_register(E5_DP_PIN),
+                              OUTPUT_ENABLE_OVERRIDE_DISABLE << IO_BANK0_GPIO0_CTRL_OEOVER_Pos,
+                              IO_BANK0_GPIO0_CTRL_OEOVER_Msk);
+    io_reg_write_dont_corrupt(gpio_io_register(E5_DP_PIN),
+                              E5_FUNCSEL_USB_DEBUG << IO_BANK0_GPIO0_CTRL_FUNCSEL_Pos,
+                              IO_BANK0_GPIO0_CTRL_FUNCSEL_Msk);
+    /* J state is DP = 1 and DM = 0 for a full speed device, DM is already
+     * gated as long as GPIO16 is not set to the USB debug function */
+    io_reg_write_dont_corrupt(gpio_io_register(E5_DP_PIN),
+                              INPUT_OVERRIDE_HIGH << IO_BANK0_GPIO0_CTRL_INOVER_Pos,
+                              IO_BANK0_GPIO0_CTRL_INOVER_Msk);
+
+    /* keep the DP pull-up enabled while the PHY is not used */
+    io_reg_atomic_set(&USBCTRL_REGS->USBPHY_DIRECT,
+                      USBCTRL_REGS_USBPHY_DIRECT_DP_PULLUP_EN_Msk);
+    io_reg_atomic_set(&USBCTRL_REGS->USBPHY_DIRECT_OVERRIDE,
+                      USBCTRL_REGS_USBPHY_DIRECT_OVERRIDE_DP_PULLUP_EN_OVERRIDE_EN_Msk);
+
+    /* switch to the GPIO PHY with J state forced */
+    USBCTRL_REGS->USB_MUXING = USBCTRL_REGS_USB_MUXING_TO_DIGITAL_PAD_Msk |
+                               USBCTRL_REGS_USB_MUXING_SOFTCON_Msk;
+    assert(_line_state() == LINE_STATE_J);
+
+    busy_wait_us(E5_FORCE_J_US);
+    while (!(USBCTRL_REGS->SIE_STATUS & USBCTRL_REGS_SIE_STATUS_CONNECTED_Msk)) {}
+
+    /* switch back to the USB PHY and restore GPIO15 */
+    USBCTRL_REGS->USB_MUXING = USBCTRL_REGS_USB_MUXING_TO_PHY_Msk |
+                               USBCTRL_REGS_USB_MUXING_SOFTCON_Msk;
+    io_reg_atomic_clear(&USBCTRL_REGS->USBPHY_DIRECT_OVERRIDE,
+                        USBCTRL_REGS_USBPHY_DIRECT_OVERRIDE_DP_PULLUP_EN_OVERRIDE_EN_Msk);
+    *gpio_io_register(E5_DP_PIN) = io_prev;
+    *gpio_pad_register(E5_DP_PIN) = pad_prev;
+}
+
 static void _esr(usbdev_t *dev)
 {
     unsigned state = irq_disable();
@@ -435,6 +530,7 @@ static void _esr(usbdev_t *dev)
     if (events & USBCTRL_REGS_INTS_BUS_RESET_Msk) {
         DEBUG("[rpx0xx usb] bus reset\n");
         _bus_reset();
+        _enumeration_fix();
         dev->cb(dev, USBDEV_EVENT_RESET);
     }
     if (events & USBCTRL_REGS_INTS_DEV_SUSPEND_Msk) {
