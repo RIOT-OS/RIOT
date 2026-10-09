@@ -36,6 +36,8 @@
 #include "hardware/regs/spi.h"
 #include "hardware/regs/timer.h"
 #include "hardware/regs/uart.h"
+#include "hardware/regs/usb.h"
+#include "hardware/regs/usb_device_dpram.h"
 #include "hardware/regs/watchdog.h"
 #include "hardware/regs/xosc.h"
 
