@@ -5,6 +5,27 @@
 # and / or
 #export APPS="examples/basic/hello-world tests/unittests"
 
+# The quickbuild boards should cover all CPU architectures and the most
+# important CPU families supported by RIOT:
+#
+# adafruit-itsybitsy-m4  ARMv7-M Cortex-M4F, SAMD51 (sam0 samd5x)
+# arduino-uno            AVR ATmega328P, only 2 KiB RAM / 32 KiB flash
+# atmega256rfr2-xpro     AVR ATmega256RFR2, megaRF with integrated radio
+# esp32-wroom-32         Xtensa LX6, ESP32
+# esp32c3-devkit         RISC-V rv32imc, ESP32-C3 (RISC-V code of esp_common)
+# esp32s3-devkit         Xtensa LX7, ESP32-S3
+# hifive1b               RISC-V rv32imac, SiFive FE310 (PLIC/CLINT)
+# iotlab-m3              ARMv7-M Cortex-M3 without FPU, STM32F1
+# msb-430                MSP430 x1xx, MSP430F1612
+# msba2                  ARMv4T ARM7TDMI-S, NXP LPC2387
+# native32               native, 32 bit host build
+# native64               native, 64 bit host build
+# nrf52840dk             ARMv7-M Cortex-M4F, nRF52 (BLE / IEEE 802.15.4)
+# nrf9160dk              ARMv8-M Cortex-M33 with TrustZone, nRF9160
+# samr21-xpro            ARMv6-M Cortex-M0+, SAMR21 (sam0 samd21, at86rf2xx)
+# stk3200                ARMv6-M Cortex-M0+, EFM32 Zero Gecko (Gecko SDK)
+# stm32f429i-disc1       ARMv7-M Cortex-M4F, STM32F4
+# zedboard-noelv         RISC-V rv64imac, Gaisler NOEL-V (only rv64 platform)
 QUICKBUILD_BOARDS="
 adafruit-itsybitsy-m4
 arduino-uno
@@ -20,10 +41,10 @@ native32
 native64
 nrf52840dk
 nrf9160dk
-qn9080dk
 samr21-xpro
 stk3200
-stm32f429i-disc1"
+stm32f429i-disc1
+zedboard-noelv"
 
 # this configures boards that are available via pifleet
 case "${CI_MURDOCK_PROJECT}" in
