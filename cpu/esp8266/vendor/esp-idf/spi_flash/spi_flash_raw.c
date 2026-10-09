@@ -32,6 +32,9 @@ void Cache_Read_Enable_2(void)
 {
     SET_PERI_REG_MASK(PERIPHS_SPI_FLASH_CTRL,SPI_ENABLE_AHB);
     SET_PERI_REG_MASK(CACHE_FLASH_CTRL_REG,CACHE_READ_EN_BIT);
+#ifdef RIOT_VERSION
+    while (!(REG_READ(CACHE_FLASH_CTRL_REG) & CACHE_READ_EN_BIT)) { }
+#endif
 }
 void Cache_Read_Enable_New(void) __attribute__((alias("Cache_Read_Enable_2")));
 
