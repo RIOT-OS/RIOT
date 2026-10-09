@@ -100,7 +100,7 @@ class StatelessDHCPv6Test(Automaton):
 
     def send_RA(self):
         """
-        Composes and send an NDP Router Advertisement (RA).
+        Compose and send an NDP Router Advertisement (RA).
 
         The RA contains a prefix which will be used by the RIOT application for
         configuring a global IPv6 addresses using Stateless Address

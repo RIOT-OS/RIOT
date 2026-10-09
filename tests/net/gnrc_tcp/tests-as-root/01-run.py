@@ -22,7 +22,7 @@ _GNRC_TCP_NO_TIMEOUT = 1
 @Runner(timeout=5)
 def test_connection_lifecycle_as_client(child):
     """Open/close a single connection as TCP client."""
-    # Setup Host as server
+    # Setup host as server
     with HostTcpServer(generate_port_number()) as host_srv:
         # Setup Riot as client
         with RiotTcpClient(child, host_srv):
@@ -36,7 +36,7 @@ def test_connection_lifecycle_as_server(child):
     """Open/close a single connection as TCP server."""
     # Setup RIOT as server
     with RiotTcpServer(child, generate_port_number()) as riot_srv:
-        # Setup Host as client
+        # Setup host as client
         with HostTcpClient(riot_srv):
             # Accept and close connection
             riot_srv.accept(timeout_ms=1000)
@@ -82,15 +82,15 @@ def test_gnrc_tcp_listen_tcb_discards_unread_data_on_reuse(child):
 
 @Runner(timeout=5)
 def test_send_data_from_riot_to_host(child):
-    """Send Data from RIOT Node to Host system."""
-    # Setup Host as server
+    """Send Data from RIOT node to host system."""
+    # Setup host as server
     with HostTcpServer(generate_port_number()) as host_srv:
-        # Setup Riot as client
+        # Setup RIOT as client
         with RiotTcpClient(child, host_srv) as riot_cli:
             # Accept and close connection
             host_srv.accept()
 
-            # Send Data from RIOT to Host system and verify reception
+            # Send Data from RIOT to host system and verify reception
             data = '0123456789' * 200
             riot_cli.send(timeout_ms=0, payload_to_send=data)
             host_srv.receive(data)
@@ -101,15 +101,15 @@ def test_send_data_from_riot_to_host(child):
 
 @Runner(timeout=5)
 def test_send_data_from_host_to_riot(child):
-    """Send Data from Host system to RIOT node."""
+    """Send Data from host system to RIOT node."""
     # Setup RIOT as server
     with RiotTcpServer(child, generate_port_number()) as riot_srv:
-        # Setup Host as client
+        # Setup host as client
         with HostTcpClient(riot_srv) as host_cli:
             # Accept and close connection
             riot_srv.accept(timeout_ms=1000)
 
-            # Send Data from Host system to RIOT
+            # Send Data from host system to RIOT
             data = '0123456789' * 200
             host_cli.send(data)
             riot_srv.receive(timeout_ms=1000, sent_payload=data)
@@ -126,7 +126,7 @@ def test_gnrc_tcp_garbage_packets_short_payload(child):
     """
     # Setup RIOT as server
     with RiotTcpServer(child, generate_port_number()) as riot_srv:
-        # Setup Host as client
+        # Setup host as client
         with HostTcpClient(riot_srv) as host_cli:
             # Accept new connection
             riot_srv.accept(timeout_ms=2000)
@@ -261,7 +261,7 @@ def test_gnrc_tcp_garbage_packets_option_parsing(child):
 @Runner(timeout=5)
 def test_gnrc_tcp_recv_behavior_on_closed_connection(child):
     """Ensure that `gnrc_tcp_recv` does not block if a connection was closed already."""
-    # Setup Host as server
+    # Setup host as server
     with HostTcpServer(generate_port_number()) as host_srv:
         # Setup Riot as client
         with RiotTcpClient(child, host_srv) as riot_cli:
@@ -516,7 +516,7 @@ def test_gnrc_tcp_get_local_returns_0(child):
     """
     local_port = 30423
 
-    # Setup Host as server
+    # Setup host as server
     with HostTcpServer(generate_port_number()) as host_srv:
         # Setup Riot as client
         with RiotTcpClient(child, host_srv, local_port) as riot_cli:
@@ -552,7 +552,7 @@ def test_gnrc_tcp_get_remote_returns_0(child):
 
     The used endpoint contains the expected connection parameters.
     """
-    # Setup Host as server
+    # Setup host as server
     with HostTcpServer(generate_port_number()) as host_srv:
         # Setup Riot as client
         with RiotTcpClient(child, host_srv) as riot_cli:
@@ -665,7 +665,7 @@ def test_gnrc_tcp_recv_respects_GNRC_TCP_NO_TIMEOUT(child):
     pexpect_timeout_sec = _GNRC_TCP_NO_TIMEOUT + 1
     payload = "12345"
 
-    # Setup Host as server
+    # Setup host as server
     with HostTcpServer(generate_port_number()) as host_srv:
         # Setup Riot as client
         with RiotTcpClient(child, host_srv):

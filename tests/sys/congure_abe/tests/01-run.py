@@ -160,7 +160,7 @@ class TestCongUREABEDefaultInitTests(TestCongUREBase):
         self.assertEqual(state['consts']['cwnd_upper'], 2190)
         self.assertEqual(state['consts']['init_ssthresh'], 0xffff)
         self.assertEqual(state['consts']['frthresh'], 3)
-        # https://tools.ietf.org/html/rfc8511#section-3.1
+        # https://www.rfc-editor.org/info/rfc8511/#section-3.1
         beta_ecn = (state['consts']['abe_multiplier_numerator'] /
                     state['consts']['abe_multiplier_denominator'])
         self.assertAlmostEqual(beta_ecn, 0.8)
@@ -173,7 +173,7 @@ class TestCongUREABEDefaultInitTests(TestCongUREBase):
         This is inherited from `congure_reno`, so it should be the same as
         in `tests/congure_reno`.
 
-        https://tools.ietf.org/html/rfc5681#section-3.1
+        See: https://www.rfc-editor.org/info/rfc5681/#section-3.1
 
         > IW, the initial value of cwnd, MUST be set using the following
         > guidelines as an upper bound.
@@ -240,6 +240,12 @@ class TestCongUREABE(TestCongUREBase):
         # name chosen to be in line with RFC
         """
         Test the slow start increase with N larger than SMSS.
+
+        This is inherited from `congure_reno`. During slow start, the
+        congestion window is increased by at most SMSS bytes per ACK, even
+        if the number of newly acknowledged bytes N exceeds SMSS.
+
+        See: https://www.rfc-editor.org/info/rfc5681/#section-3.1
         """
         state = self.cong_state()
         init_cwnd = state['cwnd']
@@ -262,6 +268,12 @@ class TestCongUREABE(TestCongUREBase):
     def test_enter_fast_retransmit(self):
         """
         Check that fast retransmit is entered if all conditions are true.
+
+        This is inherited from `congure_reno`. After three duplicate ACKs
+        that fulfill all conditions for a duplicate ACK, the fast retransmit
+        callback is expected to be called exactly once.
+
+        See: https://www.rfc-editor.org/info/rfc5681/#section-2
         """
         state = self.cong_state()
         self.assertEqual(0, self.get_ff_calls())
@@ -290,7 +302,7 @@ class TestCongUREABE(TestCongUREBase):
         """
         Test the reaction to an ECN-CE with a small flight size.
 
-        https://tools.ietf.org/html/rfc8511#section-3
+        See: https://www.rfc-editor.org/info/rfc8511/#section-3
 
         > As permitted by RFC 8311, this document specifies a sender-side
         > change to TCP where receipt of a packet with the ECN-Echo flag SHOULD

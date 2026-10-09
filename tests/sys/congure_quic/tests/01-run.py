@@ -193,11 +193,10 @@ class TestCongUREQUICDefaultInitTests(TestCongUREBase):
     """
     Test the default initialization of `congure_quic`, based on RFC 9002.
 
-    The implementation is based on
+    The implementation is based on the following notes, so we can check the
+    viability based on that.
 
-    https://www.rfc-editor.org/info/rfc9002/#section-appendix.b
-
-    so we can check the viability based on that.
+    See: https://www.rfc-editor.org/info/rfc9002/#section-appendix.b
     """
 
     def setUp(self):
@@ -278,11 +277,10 @@ class TestCongUREQUICDefault(TestCongUREBase):
     """
     Test `congure_quic` with the default configuration, based on RFC 9002.
 
-    The implementation is based on
+    The implementation is based on the following notes, so we can check the
+    viability based on that.
 
-    https://www.rfc-editor.org/info/rfc9002/#section-appendix.b
-
-    so we can check the viability based on that.
+    See: https://www.rfc-editor.org/info/rfc9002/#section-appendix.b
     """
 
     def setUp(self):
@@ -295,7 +293,11 @@ class TestCongUREQUICDefault(TestCongUREBase):
         self.ack_delay = 10
 
     def test_on_packet_sent(self):
-        """Test https://www.rfc-editor.org/info/rfc9002/#section-b.4 compliance."""
+        """
+        Test the compliance with RFC9002 Section B.4.
+
+        See: https://www.rfc-editor.org/info/rfc9002/#section-b.4
+        """
         state = self.cong_state()
         init_in_flight_size = state['in_flight_size']
         self.cong_report_msg_sent(self.sent_bytes)
@@ -317,7 +319,11 @@ class TestCongUREQUICDefault(TestCongUREBase):
         return msg, ack
 
     def test_on_packet_ack_no_rtt_sample(self, state=None):
-        """Test https://www.rfc-editor.org/info/rfc9002/#section-a.7 compliance."""
+        """
+        Test the compliance with RFC9002 Section A.7.
+
+        See: https://www.rfc-editor.org/info/rfc9002/#section-a.7
+        """
         if state is None:
             state = self.cong_state()
         # From A.7, UpdateRtt
@@ -354,7 +360,11 @@ class TestCongUREQUICDefault(TestCongUREBase):
         self.assertGreater(state['first_rtt_sample'], 0)
 
     def test_on_packet_ack_rtt_sample_greater_rtt(self):
-        """Test https://www.rfc-editor.org/info/rfc9002/#section-a.7 compliance."""
+        """
+        Test the compliance with RFC9002 Section A.7.
+
+        See: https://www.rfc-editor.org/info/rfc9002/#section-a.7
+        """
         # set first RTT sample
         self.test_on_packet_ack_no_rtt_sample()
         state = self.cong_state()
@@ -378,7 +388,11 @@ class TestCongUREQUICDefault(TestCongUREBase):
                                     init_rtt_var, adjusted_rtt)
 
     def test_on_packet_ack_rtt_sample_less_rtt(self):
-        """Test https://www.rfc-editor.org/info/rfc9002/#section-a.7 compliance."""
+        """
+        Test the compliance with RFC9002 Section A.7.
+
+        See: https://www.rfc-editor.org/info/rfc9002/#section-a.7
+        """
         # set first RTT sample
         self.test_on_packet_ack_no_rtt_sample()
         state = self.cong_state()
@@ -402,7 +416,11 @@ class TestCongUREQUICDefault(TestCongUREBase):
                                     init_rtt_var, adjusted_rtt)
 
     def test_on_packet_ack_not_limited_slow_start(self):
-        """Test https://www.rfc-editor.org/info/rfc9002/#section-b.5 compliance."""
+        """
+        Test the compliance with RFC9002 Section B.5.
+
+        See: https://www.rfc-editor.org/info/rfc9002/#section-b.5
+        """
         state = self.cong_state()
         self.assertSlowStart(state)
         self.assertNotInRecovery(state)
@@ -420,7 +438,11 @@ class TestCongUREQUICDefault(TestCongUREBase):
         self.assertEqual(state['cwnd'], init_cwnd + msg['size'])
 
     def test_on_packet_ack_not_limited_congestion_avoidance(self):
-        """Test https://www.rfc-editor.org/info/rfc9002/#section-b.5 compliance."""
+        """
+        Test the compliance with RFC9002 Section B.5.
+
+        See: https://www.rfc-editor.org/info/rfc9002/#section-b.5
+        """
         state = self.cong_state()
         # enforce congestion avoidance
         self.set_ssthresh(state['cwnd'] - 100)
@@ -447,7 +469,11 @@ class TestCongUREQUICDefault(TestCongUREBase):
         )
 
     def test_on_packet_ack_not_limited_recovery(self):
-        """Test https://www.rfc-editor.org/info/rfc9002/#section-b.5 compliance."""
+        """
+        Test the compliance with RFC9002 Section B.5.
+
+        See: https://www.rfc-editor.org/info/rfc9002/#section-b.5
+        """
         # enforce recovery mode for given send time 1000 and ack recv time 1120
         self.set_recovery_start(1130)
         state = self.cong_state()
@@ -467,7 +493,11 @@ class TestCongUREQUICDefault(TestCongUREBase):
         self.assertEqual(state['cwnd'], init_cwnd)
 
     def test_on_packet_ack_limited(self):
-        """Test https://www.rfc-editor.org/info/rfc9002/#section-b.5 compliance."""
+        """
+        Test the compliance with RFC9002 Section B.5.
+
+        See: https://www.rfc-editor.org/info/rfc9002/#section-b.5
+        """
         # set to limited by application or flow control
         self.set_limited(True)
         state = self.cong_state()
@@ -500,7 +530,11 @@ class TestCongUREQUICDefault(TestCongUREBase):
     def assertOnNewCongestionEvent(self, state, init_cwnd, init_ssthresh,
                                    in_recovery=False,
                                    persistent_congestion=False):
-        """Test https://www.rfc-editor.org/info/rfc9002/#section-b.6 compliance."""
+        """
+        Test the compliance with RFC9002 Section B.6.
+
+        See: https://www.rfc-editor.org/info/rfc9002/#section-b.6
+        """
         if persistent_congestion:
             # persistent congestion triggers return to slow start; see
             # https://www.rfc-editor.org/info/rfc9002/#section-7.3
@@ -543,7 +577,11 @@ class TestCongUREQUICDefault(TestCongUREBase):
             self.assertMaybeSendOnePacket(state)
 
     def test_on_ecn_information_not_recovery(self):
-        """Test https://www.rfc-editor.org/info/rfc9002/#section-b.7 compliance."""
+        """
+        Test the compliance with RFC9002 Section B.7.
+
+        See: https://www.rfc-editor.org/info/rfc9002/#section-b.7
+        """
         state = self.cong_state()
         init_cwnd = state['cwnd']
         init_ssthresh = state['ssthresh']
@@ -554,7 +592,11 @@ class TestCongUREQUICDefault(TestCongUREBase):
         self.assertNotEqual(state['cwnd'], state['consts']['min_wnd'])
 
     def test_on_ecn_information_not_recovery_low_ssthresh(self):
-        """Test https://www.rfc-editor.org/info/rfc9002/#section-b.7 compliance."""
+        """
+        Test the compliance with RFC9002 Section B.7.
+
+        See: https://www.rfc-editor.org/info/rfc9002/#section-b.7
+        """
         state = self.cong_state()
         # enforce new cwnd to be smaller than `min_wnd`
         init_cwnd = state['consts']['min_wnd']
@@ -567,7 +609,11 @@ class TestCongUREQUICDefault(TestCongUREBase):
         self.assertEqual(state['cwnd'], state['consts']['min_wnd'])
 
     def test_on_ecn_information_recovery(self):
-        """Test https://www.rfc-editor.org/info/rfc9002/#section-b.7 compliance."""
+        """
+        Test the compliance with RFC9002 Section B.7.
+
+        See: https://www.rfc-editor.org/info/rfc9002/#section-b.7
+        """
         # enforce recovery mode for given send time = 1000
         self.set_recovery_start(2000)
         state = self.cong_state()
@@ -592,7 +638,11 @@ class TestCongUREQUICDefault(TestCongUREBase):
         self.cong_report_msgs_lost(msgs)
 
     def test_on_packets_lost_not_recovery_no_pc(self):
-        """Test https://www.rfc-editor.org/info/rfc9002/#section-b.8 compliance."""
+        """
+        Test the compliance with RFC9002 Section B.8.
+
+        See: https://www.rfc-editor.org/info/rfc9002/#section-b.8
+        """
         msgs = [{'send_time': 1000, 'size': 124, 'resends': 1},
                 {'send_time': 1050, 'size': 643, 'resends': 0},
                 {'send_time': 1100, 'size': 134, 'resends': 0}]
@@ -613,7 +663,11 @@ class TestCongUREQUICDefault(TestCongUREBase):
         self.assertOnNewCongestionEvent(state, init_cwnd, init_ssthresh)
 
     def test_on_packets_lost_not_recovery_no_pc_low_cwnd(self):
-        """Test https://www.rfc-editor.org/info/rfc9002/#section-b.8 compliance."""
+        """
+        Test the compliance with RFC9002 Section B.8.
+
+        See: https://www.rfc-editor.org/info/rfc9002/#section-b.8
+        """
         msgs = [{'send_time': 1000, 'size': 124, 'resends': 1},
                 {'send_time': 1050, 'size': 643, 'resends': 0},
                 {'send_time': 1100, 'size': 134, 'resends': 0}]
@@ -638,7 +692,11 @@ class TestCongUREQUICDefault(TestCongUREBase):
         self.assertOnNewCongestionEvent(state, init_cwnd, init_ssthresh)
 
     def test_on_packets_lost_recovery_no_pc(self):
-        """Test https://www.rfc-editor.org/info/rfc9002/#section-b.8 compliance."""
+        """
+        Test the compliance with RFC9002 Section B.8.
+
+        See: https://www.rfc-editor.org/info/rfc9002/#section-b.8
+        """
         msgs = [{'send_time': 1000, 'size': 124, 'resends': 1},
                 {'send_time': 1050, 'size': 643, 'resends': 0},
                 {'send_time': 1100, 'size': 134, 'resends': 0}]
@@ -662,7 +720,11 @@ class TestCongUREQUICDefault(TestCongUREBase):
                                         in_recovery=True)
 
     def test_on_packets_lost_not_recovery_pc(self):
-        """Test https://www.rfc-editor.org/info/rfc9002/#section-b.8 compliance."""
+        """
+        Test the compliance with RFC9002 Section B.8.
+
+        See: https://www.rfc-editor.org/info/rfc9002/#section-b.8
+        """
         # trigger message + ACK and check if UpdateRTT (see A.7) was called
         # correctly to have an RTT sample
         msg, ack = self.test_on_packet_ack_no_rtt_sample(self.cong_state())
@@ -701,7 +763,11 @@ class TestCongUREQUICDefault(TestCongUREBase):
                                         persistent_congestion=True)
 
     def test_on_packets_lost_not_recovery_pc_low_cwnd(self):
-        """Test https://www.rfc-editor.org/info/rfc9002/#section-b.8 compliance."""
+        """
+        Test the compliance with RFC9002 Section B.8.
+
+        See: https://www.rfc-editor.org/info/rfc9002/#section-b.8
+        """
         # trigger message + ACK and check if UpdateRTT (see A.7) was called
         # correctly to have an RTT sample
         msg, ack = self.test_on_packet_ack_no_rtt_sample(self.cong_state())
@@ -746,7 +812,11 @@ class TestCongUREQUICDefault(TestCongUREBase):
                                         persistent_congestion=True)
 
     def test_on_packets_lost_recovery_pc(self):
-        """Test https://www.rfc-editor.org/info/rfc9002/#section-b.8 compliance."""
+        """
+        Test the compliance with RFC9002 Section B.8.
+
+        See: https://www.rfc-editor.org/info/rfc9002/#section-b.8
+        """
         # trigger message + ACK and check if UpdateRTT (see A.7) was called
         # correctly to have an RTT sample
         msg, ack = self.test_on_packet_ack_no_rtt_sample(self.cong_state())
@@ -794,7 +864,11 @@ class TestCongUREQUICDefault(TestCongUREBase):
         self.assertNotInRecovery(state)
 
     def test_removing_discarded_packets_from_bytes_in_flight(self):
-        """Test https://www.rfc-editor.org/info/rfc9002/#section-b.9 compliance."""
+        """
+        Test the compliance with RFC9002 Section B.9.
+
+        See: https://www.rfc-editor.org/info/rfc9002/#section-b.9
+        """
         state = self.cong_state()
         init_in_flight_size = state['in_flight_size']
         self.cong_report_msg_sent(1337)
@@ -803,7 +877,11 @@ class TestCongUREQUICDefault(TestCongUREBase):
         self.assertEqual(state['in_flight_size'], init_in_flight_size)
 
     def test_pacing(self):
-        """Test https://www.rfc-editor.org/info/rfc9002/#section-7.7 compliance."""
+        """
+        Test the compliance with RFC9002 Section 7.7.
+
+        See: https://www.rfc-editor.org/info/rfc9002/#section-7.7
+        """
         state = self.cong_state()
         self.assertGreater(state["smoothed_rtt"], 0)
         self.assertGreater(state["cwnd"], 0)
