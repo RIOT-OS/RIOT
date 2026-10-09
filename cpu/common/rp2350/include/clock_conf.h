@@ -91,6 +91,12 @@
 /** Selected field value for the system clock control register
  * to select the peripheral clock */
 #define CLK_SYS_SELECTED_PERI_FIELD_VALUE 2u
+/** Feedback divider of the USB PLL: 12 MHz * 100 = 1200 MHz VCO frequency */
+#define PLL_USB_FEEDBACK_DIVIDER_VALUE 100u
+/** Post divider 1 of the USB PLL: 1200 MHz / 5 = 240 MHz */
+#define PLL_USB_PD1 5u
+/** Post divider 2 of the USB PLL: 240 MHz / 5 = 48 MHz */
+#define PLL_USB_PD2 5u
 /** RIOT core clock frequency defined as the CPU frequency */
 #define CLOCK_CORECLOCK MHZ(12u)
 
@@ -151,6 +157,12 @@ void clock_reset(void);
  * @see RP2350 Docs Chapter 8, mostly 8.2 for more details
  */
 void cpu_clock_init(void);
+
+/**
+ * @brief Configures the USB PLL to 48 MHz and sets CLK_USB to it
+ * @pre The XOSC must be running, see cpu_clock_init()
+ */
+void clock_usb_init(void);
 
 #ifdef __cplusplus
 }
