@@ -1220,6 +1220,7 @@ static inline coap_udp_hdr_t *gcoap_request_memo_get_hdr(const gcoap_request_mem
  * @brief   Get the request header's Token length from a @ref gcoap_request_memo_t
  *
  * @param[in]   memo    The memo to get the request header length from
+ *
  * @return  The length of the request header's Token stored in @p memo
  */
 static inline size_t gcoap_request_memo_get_tkl(const gcoap_request_memo_t *memo)
