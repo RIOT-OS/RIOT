@@ -1254,8 +1254,10 @@ static inline size_t gcoap_request_memo_get_hdr_len(const gcoap_request_memo_t *
 }
 
 /**
- * @brief   Get the request header's CoAP Token from a @ref gcoap_request_memo_t
- * @param[in]   memo    The request memo to get the request's Token from
+ * @brief   Get the request header's CoAP token from a @ref gcoap_request_memo_t
+ *
+ * @param[in]   memo    The request memo to get the request's token from
+ *
  * @return  Pointer to the CoAP Token inside the request header copy in @p memo
  */
 static inline void * gcoap_request_memo_get_token(gcoap_request_memo_t *memo)
