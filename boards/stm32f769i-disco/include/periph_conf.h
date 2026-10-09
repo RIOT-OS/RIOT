@@ -151,8 +151,8 @@ static const fmc_bank_conf_t fmc_bank_config[] = {
         .bank = FMC_BANK_5,
         .mem_type = FMC_SDRAM,
         .data_width = FMC_BUS_WIDTH_32BIT,
-        .address = 0xc0000000,               /* Bank 6 is mapped to 0xc0000000 */
-        .size = MiB(16),                      /* Size in MByte, 4M x 32 Bit */
+        .address = 0xc0000000,               /* Bank 5 is mapped to 0xc0000000 */
+        .size = MiB(16),                     /* Size in MByte, 4M x 32 Bit */
         .sdram = {
             .clk_period = 2,                 /* SDCLK = 2 x HCLK */
             .row_bits = 12,                  /* A11..A0 used for row address */

@@ -412,10 +412,10 @@ int _fcntl_r (struct _reent *r, int fd, int cmd, int arg)
  */
 _off_t _lseek_r(struct _reent *r, int fd, _off_t off, int whence)
 {
-    int res = vfs_lseek(fd, off, whence);
+    off_t res = vfs_lseek(fd, off, whence);
     if (res < 0) {
         /* vfs returns negative error codes */
-        r->_errno = -res;
+        r->_errno = -(int)res;
         return -1;
     }
     return res;

@@ -132,7 +132,7 @@ static void _irq(pio_t pio, pio_irq_line_t irq, uint32_t status)
 
 void pio_init(pio_t pio)
 {
-    assert(pio <= PIO_NUMOF);
+    assert(pio < PIO_NUMOF);
     NVIC_EnableIRQ(pio_config[pio].irqn0);
     NVIC_EnableIRQ(pio_config[pio].irqn1);
 }
@@ -146,7 +146,7 @@ void pio_start_programs(void)
 
 pio_sm_t pio_sm_lock(pio_t pio)
 {
-    assert(pio <= PIO_NUMOF);
+    assert(pio < PIO_NUMOF);
 
     uint32_t pos = 0;
     bool exch;
@@ -158,7 +158,7 @@ pio_sm_t pio_sm_lock(pio_t pio)
 
 void pio_sm_unlock(pio_t pio, pio_sm_t sm)
 {
-    assert(pio <= PIO_NUMOF);
+    assert(pio < PIO_NUMOF);
     assert((unsigned)sm < PIO_SM_NUMOF);
 
     _atomic_clear_mask_u32(&_sm_mask[pio], (1u << sm));
@@ -166,7 +166,7 @@ void pio_sm_unlock(pio_t pio, pio_sm_t sm)
 
 void pio_sm_start(pio_t pio, pio_sm_t sm)
 {
-    assert(pio <= PIO_NUMOF);
+    assert(pio < PIO_NUMOF);
     assert((unsigned)sm < PIO_SM_NUMOF);
 
     PIO0_Type *dev = pio_config[pio].dev;
@@ -177,7 +177,7 @@ void pio_sm_start(pio_t pio, pio_sm_t sm)
 
 void pio_sm_stop(pio_t pio, pio_sm_t sm)
 {
-    assert(pio <= PIO_NUMOF);
+    assert(pio < PIO_NUMOF);
     assert((unsigned)sm < PIO_SM_NUMOF);
 
     PIO0_Type *dev = pio_config[pio].dev;
@@ -186,7 +186,7 @@ void pio_sm_stop(pio_t pio, pio_sm_t sm)
 
 int pio_alloc_program(pio_t pio, pio_program_t *prog)
 {
-    assert(pio <= PIO_NUMOF);
+    assert(pio < PIO_NUMOF);
 
     if (!prog->instr_numof) {
         return 0;
@@ -238,7 +238,7 @@ int pio_alloc_program_sm_lock_any(pio_t *pio_ptr, pio_sm_t *sm_ptr, pio_program_
 
 void pio_free_program(pio_t pio, pio_program_t *prog)
 {
-    assert(pio <= PIO_NUMOF);
+    assert(pio < PIO_NUMOF);
 
     if (!prog->instr_numof || prog->instr_numof > PIO_INSTR_NUMOF ||
         prog->location < 0 || prog->location >= PIO_INSTR_NUMOF) {
@@ -253,7 +253,7 @@ void pio_free_program(pio_t pio, pio_program_t *prog)
 }
 
 int pio_sm_exec(pio_t pio, pio_sm_t sm, pio_instr_t inst) {
-    assert(pio <= PIO_NUMOF);
+    assert(pio < PIO_NUMOF);
     assert((unsigned)sm < PIO_SM_NUMOF);
 
     PIO0_Type *dev = pio_config[pio].dev;
@@ -266,7 +266,7 @@ int pio_sm_exec(pio_t pio, pio_sm_t sm, pio_instr_t inst) {
 }
 
 void pio_sm_exec_block(pio_t pio, pio_sm_t sm, pio_instr_t inst) {
-    assert(pio <= PIO_NUMOF);
+    assert(pio < PIO_NUMOF);
     assert((unsigned)sm < PIO_SM_NUMOF);
 
     PIO0_Type *dev = pio_config[pio].dev;
@@ -277,7 +277,7 @@ void pio_sm_exec_block(pio_t pio, pio_sm_t sm, pio_instr_t inst) {
 
 int pio_write_program(pio_t pio, pio_program_t *prog, const pio_instr_t *prog_instr)
 {
-    assert(pio <= PIO_NUMOF);
+    assert(pio < PIO_NUMOF);
 
     if (prog->location < 0 || prog->location > PIO_INSTR_NUMOF) {
         return -EFAULT;
@@ -297,7 +297,7 @@ int pio_write_program(pio_t pio, pio_program_t *prog, const pio_instr_t *prog_in
 
 void pio_sm_reset(pio_t pio, pio_sm_t sm)
 {
-    assert(pio <= PIO_NUMOF);
+    assert(pio < PIO_NUMOF);
     assert((unsigned)sm < PIO_SM_NUMOF);
 
     PIO0_Type *dev = pio_config[pio].dev;
@@ -311,7 +311,7 @@ void pio_sm_reset(pio_t pio, pio_sm_t sm)
 
 void pio_sm_restart(pio_t pio, pio_sm_t sm)
 {
-    assert(pio <= PIO_NUMOF);
+    assert(pio < PIO_NUMOF);
     assert((unsigned)sm < PIO_SM_NUMOF);
 
     PIO0_Type *dev = pio_config[pio].dev;
@@ -322,7 +322,7 @@ void pio_sm_restart(pio_t pio, pio_sm_t sm)
 
 void pio_set_isr_vec(pio_t pio, pio_sm_t sm, const pio_isr_vec_t *vec)
 {
-    assert(pio <= PIO_NUMOF);
+    assert(pio < PIO_NUMOF);
     assert((unsigned)sm < PIO_SM_NUMOF);
     unsigned irq = irq_disable();
     /* something is wrong when something overrides an existing isr */
@@ -333,7 +333,7 @@ void pio_set_isr_vec(pio_t pio, pio_sm_t sm, const pio_isr_vec_t *vec)
 
 void pio_set_isr_sm_vec(pio_t pio, unsigned irq_num, const pio_isr_sm_vec_t *vec)
 {
-    assert(pio <= PIO_NUMOF);
+    assert(pio < PIO_NUMOF);
     assert(irq_num < 4); /* irq 0 to 3 are routed to NVIC */
     unsigned irq = irq_disable();
     /* something is wrong when something overrides an existing isr */
@@ -344,7 +344,7 @@ void pio_set_isr_sm_vec(pio_t pio, unsigned irq_num, const pio_isr_sm_vec_t *vec
 
 void pio_sm_set_out_pins(pio_t pio, pio_sm_t sm, gpio_t pin_base, unsigned pin_count)
 {
-    assert(pio <= PIO_NUMOF);
+    assert(pio < PIO_NUMOF);
     assert((unsigned)sm < PIO_SM_NUMOF);
 
     PIO0_Type *dev = pio_config[pio].dev;
@@ -357,7 +357,7 @@ void pio_sm_set_out_pins(pio_t pio, pio_sm_t sm, gpio_t pin_base, unsigned pin_c
 
 void pio_sm_set_in_pins(pio_t pio, pio_sm_t sm, gpio_t pin_base)
 {
-    assert(pio <= PIO_NUMOF);
+    assert(pio < PIO_NUMOF);
     assert((unsigned)sm < PIO_SM_NUMOF);
 
     PIO0_Type *dev = pio_config[pio].dev;
@@ -369,7 +369,7 @@ void pio_sm_set_in_pins(pio_t pio, pio_sm_t sm, gpio_t pin_base)
 
 void pio_sm_set_set_pins(pio_t pio, pio_sm_t sm, gpio_t pin_base, unsigned pin_count)
 {
-    assert(pio <= PIO_NUMOF);
+    assert(pio < PIO_NUMOF);
     assert((unsigned)sm < PIO_SM_NUMOF);
 
     PIO0_Type *dev = pio_config[pio].dev;
@@ -382,7 +382,7 @@ void pio_sm_set_set_pins(pio_t pio, pio_sm_t sm, gpio_t pin_base, unsigned pin_c
 
 void pio_sm_set_sideset_pins(pio_t pio, pio_sm_t sm, gpio_t pin_base)
 {
-    assert(pio <= PIO_NUMOF);
+    assert(pio < PIO_NUMOF);
     assert((unsigned)sm < PIO_SM_NUMOF);
 
     PIO0_Type *dev = pio_config[pio].dev;
@@ -394,7 +394,7 @@ void pio_sm_set_sideset_pins(pio_t pio, pio_sm_t sm, gpio_t pin_base)
 
 void pio_sm_set_sideset_count(pio_t pio, pio_sm_t sm, unsigned pin_count, bool enable)
 {
-    assert(pio <= PIO_NUMOF);
+    assert(pio < PIO_NUMOF);
     assert((unsigned)sm < PIO_SM_NUMOF);
     PIO0_Type *dev = pio_config[pio].dev;
 
@@ -409,7 +409,7 @@ void pio_sm_set_sideset_count(pio_t pio, pio_sm_t sm, unsigned pin_count, bool e
 
 void pio_sm_set_sideset_target(pio_t pio, pio_sm_t sm, bool pindir)
 {
-    assert(pio <= PIO_NUMOF);
+    assert(pio < PIO_NUMOF);
     assert((unsigned)sm < PIO_SM_NUMOF);
 
     PIO0_Type *dev = pio_config[pio].dev;
@@ -436,7 +436,7 @@ pio_sm_clkdiv_t pio_sm_clkdiv(uint32_t f_hz)
 
 void pio_sm_set_clkdiv(pio_t pio, pio_sm_t sm, pio_sm_clkdiv_t clk)
 {
-    assert(pio <= PIO_NUMOF);
+    assert(pio < PIO_NUMOF);
     assert((unsigned)sm < PIO_SM_NUMOF);
 
     PIO0_Type *dev = pio_config[pio].dev;
@@ -456,7 +456,7 @@ void pio_sm_set_clkdiv(pio_t pio, pio_sm_t sm, pio_sm_clkdiv_t clk)
 
 void pio_sm_clkdiv_restart(pio_t pio, unsigned sm_mask)
 {
-    assert(pio <= PIO_NUMOF);
+    assert(pio < PIO_NUMOF);
 
     PIO0_Type *dev = pio_config[pio].dev;
     io_reg_atomic_set(&dev->CTRL, (sm_mask & PIO_SM_ALL) << PIO0_CTRL_CLKDIV_RESTART_Pos);
@@ -464,7 +464,7 @@ void pio_sm_clkdiv_restart(pio_t pio, unsigned sm_mask)
 
 void pio_sm_set_wrap(pio_t pio, pio_sm_t sm, unsigned prog_loc, uint8_t top, uint8_t bottom)
 {
-    assert(pio <= PIO_NUMOF);
+    assert(pio < PIO_NUMOF);
     assert((unsigned)sm < PIO_SM_NUMOF);
 
     PIO0_Type *dev = pio_config[pio].dev;
@@ -477,7 +477,7 @@ void pio_sm_set_wrap(pio_t pio, pio_sm_t sm, unsigned prog_loc, uint8_t top, uin
 
 void pio_sm_set_jmp_pin(pio_t pio, pio_sm_t sm, gpio_t pin)
 {
-    assert(pio <= PIO_NUMOF);
+    assert(pio < PIO_NUMOF);
     assert((unsigned)sm < PIO_SM_NUMOF);
 
     PIO0_Type *dev = pio_config[pio].dev;
@@ -489,7 +489,7 @@ void pio_sm_set_jmp_pin(pio_t pio, pio_sm_t sm, gpio_t pin)
 
 void pio_sm_set_in_shift(pio_t pio, pio_sm_t sm, bool right, bool autopush, unsigned threshold)
 {
-    assert(pio <= PIO_NUMOF);
+    assert(pio < PIO_NUMOF);
     assert((unsigned)sm < PIO_SM_NUMOF);
 
     PIO0_Type *dev = pio_config[pio].dev;
@@ -505,7 +505,7 @@ void pio_sm_set_in_shift(pio_t pio, pio_sm_t sm, bool right, bool autopush, unsi
 
 void pio_sm_set_out_shift(pio_t pio, pio_sm_t sm, bool right, bool autopull, unsigned threshold)
 {
-    assert(pio <= PIO_NUMOF);
+    assert(pio < PIO_NUMOF);
     assert((unsigned)sm < PIO_SM_NUMOF);
 
     PIO0_Type *dev = pio_config[pio].dev;
@@ -521,7 +521,7 @@ void pio_sm_set_out_shift(pio_t pio, pio_sm_t sm, bool right, bool autopull, uns
 
 void pio_sm_set_fifo_join_rx(pio_t pio, pio_sm_t sm)
 {
-    assert(pio <= PIO_NUMOF);
+    assert(pio < PIO_NUMOF);
     assert((unsigned)sm < PIO_SM_NUMOF);
 
     PIO0_Type *dev = pio_config[pio].dev;
@@ -533,7 +533,7 @@ void pio_sm_set_fifo_join_rx(pio_t pio, pio_sm_t sm)
 
 void pio_sm_set_fifo_join_tx(pio_t pio, pio_sm_t sm)
 {
-    assert(pio <= PIO_NUMOF);
+    assert(pio < PIO_NUMOF);
     assert((unsigned)sm < PIO_SM_NUMOF);
 
     PIO0_Type *dev = pio_config[pio].dev;
@@ -545,7 +545,7 @@ void pio_sm_set_fifo_join_tx(pio_t pio, pio_sm_t sm)
 
 void pio_sm_reset_fifos(pio_t pio, pio_sm_t sm)
 {
-    assert(pio <= PIO_NUMOF);
+    assert(pio < PIO_NUMOF);
     assert((unsigned)sm < PIO_SM_NUMOF);
 
     PIO0_Type *dev = pio_config[pio].dev;
@@ -557,7 +557,7 @@ void pio_sm_reset_fifos(pio_t pio, pio_sm_t sm)
 
 void pio_sm_clear_fifos(pio_t pio, pio_sm_t sm)
 {
-    assert(pio <= PIO_NUMOF);
+    assert(pio < PIO_NUMOF);
     assert((unsigned)sm < PIO_SM_NUMOF);
 
     PIO0_Type *dev = pio_config[pio].dev;
@@ -568,7 +568,7 @@ void pio_sm_clear_fifos(pio_t pio, pio_sm_t sm)
 
 void pio_irq_enable(pio_t pio, pio_irq_line_t irq, pio_irq_source_t irq_mask)
 {
-    assert(pio <= PIO_NUMOF);
+    assert(pio < PIO_NUMOF);
     assert((unsigned)irq < PIO_IRQ_LINE_NUMOF);
 
     uint32_t val = irq_mask & PIO_IRQ_ALL;
@@ -583,7 +583,7 @@ void pio_irq_enable(pio_t pio, pio_irq_line_t irq, pio_irq_source_t irq_mask)
 
 void pio_irq_disable(pio_t pio, pio_irq_line_t irq, pio_irq_source_t irq_mask)
 {
-    assert(pio <= PIO_NUMOF);
+    assert(pio < PIO_NUMOF);
     assert((unsigned)irq < PIO_IRQ_LINE_NUMOF);
 
     uint32_t val = irq_mask & PIO_IRQ_ALL;
@@ -598,7 +598,7 @@ void pio_irq_disable(pio_t pio, pio_irq_line_t irq, pio_irq_source_t irq_mask)
 
 int pio_sm_transmit_word(pio_t pio, pio_sm_t sm, uint32_t word)
 {
-    assert(pio <= PIO_NUMOF);
+    assert(pio < PIO_NUMOF);
     assert((unsigned)sm < PIO_SM_NUMOF);
 
     PIO0_Type *dev = pio_config[pio].dev;
@@ -611,7 +611,7 @@ int pio_sm_transmit_word(pio_t pio, pio_sm_t sm, uint32_t word)
 
 void pio_sm_transmit_word_block(pio_t pio, pio_sm_t sm, uint32_t word)
 {
-    assert(pio <= PIO_NUMOF);
+    assert(pio < PIO_NUMOF);
     assert((unsigned)sm < PIO_SM_NUMOF);
 
     PIO0_Type *dev = pio_config[pio].dev;
@@ -621,7 +621,7 @@ void pio_sm_transmit_word_block(pio_t pio, pio_sm_t sm, uint32_t word)
 
 void pio_sm_transmit_words_block(pio_t pio, pio_sm_t sm, const uint32_t *words, unsigned count)
 {
-    assert(pio <= PIO_NUMOF);
+    assert(pio < PIO_NUMOF);
     assert((unsigned)sm < PIO_SM_NUMOF);
 
     while (count--) {
@@ -631,7 +631,7 @@ void pio_sm_transmit_words_block(pio_t pio, pio_sm_t sm, const uint32_t *words, 
 
 int pio_sm_receive_word(pio_t pio, pio_sm_t sm, uint32_t *word)
 {
-    assert(pio <= PIO_NUMOF);
+    assert(pio < PIO_NUMOF);
     assert((unsigned)sm < PIO_SM_NUMOF);
 
     PIO0_Type *dev = pio_config[pio].dev;
@@ -647,7 +647,7 @@ int pio_sm_receive_word(pio_t pio, pio_sm_t sm, uint32_t *word)
 
 void pio_sm_receive_word_block(pio_t pio, pio_sm_t sm, uint32_t *word)
 {
-    assert(pio <= PIO_NUMOF);
+    assert(pio < PIO_NUMOF);
     assert((unsigned)sm < PIO_SM_NUMOF);
 
     PIO0_Type *dev = pio_config[pio].dev;
@@ -660,7 +660,7 @@ void pio_sm_receive_word_block(pio_t pio, pio_sm_t sm, uint32_t *word)
 
 void pio_sm_receive_words_block(pio_t pio, pio_sm_t sm, uint32_t *word, unsigned count)
 {
-    assert(pio <= PIO_NUMOF);
+    assert(pio < PIO_NUMOF);
     assert((unsigned)sm < PIO_SM_NUMOF);
 
     while (count--) {
@@ -670,14 +670,14 @@ void pio_sm_receive_words_block(pio_t pio, pio_sm_t sm, uint32_t *word, unsigned
 
 uint32_t pio_irq_get(pio_t pio)
 {
-    assert(pio <= PIO_NUMOF);
+    assert(pio < PIO_NUMOF);
 
     return pio_config[pio].dev->IRQ;
 }
 
 void pio_irq_clear(pio_t pio, unsigned irq_flags)
 {
-    assert(pio <= PIO_NUMOF);
+    assert(pio < PIO_NUMOF);
 
     pio_config[pio].dev->IRQ = irq_flags & ((1u << PIO_IRQ_NUMOF) - 1);
 }
@@ -686,7 +686,7 @@ int pio_sm_init_common(pio_t pio, pio_sm_t sm,
                        const pio_program_t *prog,
                        const pio_program_conf_t *conf)
 {
-    assert(pio <= PIO_NUMOF);
+    assert(pio < PIO_NUMOF);
     assert((unsigned)sm < PIO_SM_NUMOF);
 
     if (prog->location < 0                      ||
@@ -720,7 +720,7 @@ int pio_sm_init_common(pio_t pio, pio_sm_t sm,
 
 void pio_sm_set_pindirs_with_mask(pio_t pio, pio_sm_t sm, gpio_t values, gpio_t mask)
 {
-    assert(pio <= PIO_NUMOF);
+    assert(pio < PIO_NUMOF);
     assert((unsigned)sm < PIO_SM_NUMOF);
 
     PIO0_Type *dev = pio_config[pio].dev;
@@ -738,7 +738,7 @@ void pio_sm_set_pindirs_with_mask(pio_t pio, pio_sm_t sm, gpio_t values, gpio_t 
 
 void pio_sm_set_pins_with_mask(pio_t pio, pio_sm_t sm, gpio_t values, gpio_t mask)
 {
-    assert(pio <= PIO_NUMOF);
+    assert(pio < PIO_NUMOF);
     assert((unsigned)sm < PIO_SM_NUMOF);
 
     PIO0_Type *dev = pio_config[pio].dev;
@@ -779,7 +779,7 @@ static void _pio_pins_configure(pio_t pio, pio_sm_t sm, const pio_gpio_init_t *p
 
 void pio_sm_set_set_pins_init(pio_t pio, pio_sm_t sm, const pio_gpio_init_t *pin_init)
 {
-    assert(pio <= PIO_NUMOF);
+    assert(pio < PIO_NUMOF);
     assert((unsigned)sm < PIO_SM_NUMOF);
     assert(pin_init->gpio_base < 32);
     assert(pin_init->gpio_count <= 5);
@@ -792,7 +792,7 @@ void pio_sm_set_set_pins_init(pio_t pio, pio_sm_t sm, const pio_gpio_init_t *pin
 
 void pio_sm_set_out_pins_init(pio_t pio, pio_sm_t sm, const pio_gpio_init_t *pin_init)
 {
-    assert(pio <= PIO_NUMOF);
+    assert(pio < PIO_NUMOF);
     assert((unsigned)sm < PIO_SM_NUMOF);
     assert(pin_init);
     assert(pin_init->gpio_base < 32);
@@ -806,7 +806,7 @@ void pio_sm_set_out_pins_init(pio_t pio, pio_sm_t sm, const pio_gpio_init_t *pin
 
 void pio_sm_set_sideset_pins_init(pio_t pio, pio_sm_t sm, const pio_gpio_init_t *pin_init)
 {
-    assert(pio <= PIO_NUMOF);
+    assert(pio < PIO_NUMOF);
     assert((unsigned)sm < PIO_SM_NUMOF);
     assert(pin_init);
     assert(pin_init->gpio_base < 32);
@@ -819,7 +819,7 @@ void pio_sm_set_sideset_pins_init(pio_t pio, pio_sm_t sm, const pio_gpio_init_t 
 
 void pio_print_status(pio_t pio)
 {
-    assert(pio <= PIO_NUMOF);
+    assert(pio < PIO_NUMOF);
 
     PIO0_Type *dev = pio_config[pio].dev;
     /* FIFO status */
@@ -846,7 +846,7 @@ void pio_print_status(pio_t pio)
 
 void pio_print_debug(pio_t pio)
 {
-    assert(pio <= PIO_NUMOF);
+    assert(pio < PIO_NUMOF);
 
     PIO0_Type *dev = pio_config[pio].dev;
     uint32_t debug = dev->FDEBUG;

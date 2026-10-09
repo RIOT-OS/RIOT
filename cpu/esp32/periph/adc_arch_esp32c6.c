@@ -8,7 +8,7 @@
  * @{
  *
  * @file
- * @brief       Architecture-specific ADC/DAC definitions for ESP32-C2 variant (family)
+ * @brief       Architecture-specific ADC/DAC definitions for ESP32-C6 variant (family)
  *
  * @author      Gunar Schorcht <gunar@schorcht.net>
  *

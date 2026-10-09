@@ -52,9 +52,6 @@ static void _read_and_dump(void)
         }
         puts("");
     }
-    else if (res == QMC5883L_OVERFLOW) {
-        puts("Reading - overflow");
-    }
     else if (res == QMC5883L_NODATA) {
         puts("Reading - no new data available");
     }
