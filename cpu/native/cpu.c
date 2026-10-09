@@ -331,7 +331,7 @@ void thread_yield_higher(void)
 
 void native_cpu_init(void)
 {
-    static const struct {
+    const struct {
         void **fn;
         const char *name;
     } lookups[] = {
