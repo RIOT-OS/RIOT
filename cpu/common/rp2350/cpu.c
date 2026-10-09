@@ -22,6 +22,7 @@
 #include "cpu.h"
 #include "clock_conf.h"
 #include "kernel_init.h"
+#include "modules.h"
 #include "periph/init.h"
 #include "periph/uart.h"
 #include "periph_conf.h"
@@ -45,6 +46,11 @@ void rp2350_init(void)
 
     /* initialize the CPU clock */
     cpu_clock_init();
+
+    /* the USB device controller needs a 48 MHz clock */
+    if (IS_USED(MODULE_PERIPH_USBDEV)) {
+        clock_usb_init();
+    }
 
     /* initialize the early peripherals */
     early_init();
