@@ -18,6 +18,8 @@ def parse_samples(fname: str):
     with open(fname, "r", encoding="utf-8", errors="replace") as f:
         data = f.read()
     for line in data.splitlines():
+        if '"samples"' not in line:
+            continue
         try:
             data = json.loads(line)
             if "samples" in data and "configured_sample_rate_in_Hz" in data:

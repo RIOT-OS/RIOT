@@ -25,7 +25,7 @@ Maybe one really wants to check the signals are correct, there is a
 
 One can run the following
 ```shell
-make flash test | grep -a '"samples"' > /tmp/pdm
+make flash test > /tmp/pdm
 ../../../dist/tools/pdm_to_wav/pdm_to_wav.py /tmp/pdm --output-file /tmp/output
 ```
 
