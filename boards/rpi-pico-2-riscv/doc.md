@@ -141,5 +141,6 @@ The following peripherals are supported:
 - UART
     - The UART Baudrate is set to 115200.
     - UART does not work via USB, you need to connect it directly to the GPIO pins.
+- USB device
 
 More peripherals will be added in the future.

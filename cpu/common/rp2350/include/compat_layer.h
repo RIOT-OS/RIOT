@@ -11,7 +11,8 @@
  * @{
  *
  * @file
- * @brief           Compatibility layer for different CPU architectures
+ * @brief           Compatibility layer for different CPU architectures and
+ *                  families
  *
  * @author          Tom Hert <git@annsann.eu>
  */
@@ -118,6 +119,45 @@ static inline uint32_t* rp_get_vector_poiner(void)
     return &_isr_vectors;
 #endif
 }
+
+/**
+ * @name    Helper functions with the names used by the RP2040 port, for code
+ *          shared by both CPUs
+ * @{
+ */
+/**
+ * @brief   Atomically set the bits of @p mask in the register @p reg
+ */
+static inline void io_reg_atomic_set(volatile uint32_t *reg, uint32_t mask)
+{
+    atomic_set(reg, mask);
+}
+
+/**
+ * @brief   Atomically clear the bits of @p mask in the register @p reg
+ */
+static inline void io_reg_atomic_clear(volatile uint32_t *reg, uint32_t mask)
+{
+    atomic_clear(reg, mask);
+}
+
+/**
+ * @brief   Put the hardware components in @p components into reset
+ */
+static inline void periph_reset(uint32_t components)
+{
+    atomic_set(&RESETS->RESET, components);
+}
+
+/**
+ * @brief   Take the hardware components in @p components out of reset and
+ *          wait until the reset is done
+ */
+static inline void periph_reset_done(uint32_t components)
+{
+    reset_component(components, components);
+}
+/** @} */
 
 #ifdef __cplusplus
 }

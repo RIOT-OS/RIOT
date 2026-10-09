@@ -8,9 +8,12 @@
  * @{
  *
  * @file
- * @brief       Low level USB device driver for the RP2040
+ * @brief       Low level USB device driver for the RP2040 and RP2350
  *
- * The USB controller of the RP2040 uses a 4 KiB dual port RAM (DPRAM) which
+ * The USB controllers of the RP2040 and the RP2350 are identical. Both use
+ * the register definitions of the Pico SDK.
+ *
+ * The USB controller uses a 4 KiB dual port RAM (DPRAM) which
  * contains the endpoint configuration, the buffer control registers and the
  * data buffers. Setup packets are always written to the beginning of the
  * DPRAM, independent of the state of the EP0 OUT buffer. They are passed to
@@ -32,7 +35,6 @@
 #include <errno.h>
 #include <stdbool.h>
 #include <stdint.h>
-#include <string.h>
 
 #include "bitarithm.h"
 #include "busy_wait.h"
@@ -64,23 +66,25 @@
 
 #define SETUP_PACKET_LEN        (8U)
 
+#ifdef RP2040
 /**
  * @name    Workaround for RP2040 erratum RP2040-E5
  * @{
  */
-#define E5_DP_PIN               (15U)   /**< GPIO used to force the line state */
-#define E5_FUNCSEL_USB_DEBUG    (8U)    /**< USB debug muxing function of GPIO15 */
-#define E5_FORCE_J_US           (1000U) /**< Duration of the forced J state */
-#define E5_AFFECTED_REVISION    (1U)    /**< Chip revision of RP2040-B0/B1 */
+#  define E5_DP_PIN             (15U)   /**< GPIO used to force the line state */
+#  define E5_FUNCSEL_USB_DEBUG  (8U)    /**< USB debug muxing function of GPIO15 */
+#  define E5_FORCE_J_US         (1000U) /**< Duration of the forced J state */
+#  define E5_AFFECTED_REVISION  (1U)    /**< Chip revision of RP2040-B0/B1 */
 /** @} */
 
 /**
  * @name    Line states as reported in SIE_STATUS.LINE_STATE
  * @{
  */
-#define LINE_STATE_SE0          (0U)
-#define LINE_STATE_J            (1U)
+#  define LINE_STATE_SE0        (0U)
+#  define LINE_STATE_J          (1U)
 /** @} */
+#endif /* RP2040 */
 
 #define BUF_CTRL_FULL           USB_DEVICE_DPRAM_EP0_IN_BUFFER_CONTROL_FULL_0_BITS
 #define BUF_CTRL_PID            USB_DEVICE_DPRAM_EP0_IN_BUFFER_CONTROL_PID_0_BITS
@@ -168,6 +172,28 @@ static void _buf_arm(_rpx0xx_ep_t *hw_ep, size_t len)
     *reg = val | BUF_CTRL_AVAILABLE;
 }
 
+/* The DPRAM is mapped as device memory, which does not allow unaligned
+ * accesses. memcpy() may use unaligned word accesses on cores that support
+ * them for normal memory (e.g. the Cortex-M33 of the RP2350), so the DPRAM is
+ * accessed byte wise. */
+static void _dpram_write(uint8_t *dpram, const uint8_t *buf, size_t len)
+{
+    volatile uint8_t *dst = dpram;
+
+    for (size_t i = 0; i < len; i++) {
+        dst[i] = buf[i];
+    }
+}
+
+static void _dpram_read(uint8_t *buf, const uint8_t *dpram, size_t len)
+{
+    const volatile uint8_t *src = dpram;
+
+    for (size_t i = 0; i < len; i++) {
+        buf[i] = src[i];
+    }
+}
+
 static void _buf_disarm(_rpx0xx_ep_t *hw_ep)
 {
     *_buf_ctrl(&hw_ep->ep) = 0;
@@ -193,7 +219,9 @@ static void _init(usbdev_t *dev)
     periph_reset(RESETS_RESET_USBCTRL_BITS);
     periph_reset_done(RESETS_RESET_USBCTRL_BITS);
 
-    memset((void *)USB_DPRAM, 0, DPRAM_SIZE);
+    for (uint16_t i = 0; i < DPRAM_SIZE / sizeof(uint32_t); i++) {
+        ((volatile uint32_t *)USB_DPRAM)[i] = 0;
+    }
 
     /* connect the controller to the internal PHY */
     USB->USB_MUXING = USB_USB_MUXING_TO_PHY_BITS |
@@ -429,7 +457,7 @@ static int _xmit(usbdev_ep_t *ep, uint8_t *buf, size_t len)
     hw_ep->rx_len = 0;
 
     if (ep->dir == USB_EP_DIR_IN) {
-        memcpy(hw_ep->dpram_buf, buf, len);
+        _dpram_write(hw_ep->dpram_buf, buf, len);
     }
     _buf_arm(hw_ep, len);
 
@@ -450,6 +478,7 @@ static void _bus_reset(void)
     _usbdev.setup_pending = false;
 }
 
+#ifdef RP2040
 static uint32_t _line_state(void)
 {
     return (USB->SIE_STATUS & USB_SIE_STATUS_LINE_STATE_BITS) >>
@@ -526,6 +555,12 @@ static void _enumeration_fix(void)
     *gpio_io_register(E5_DP_PIN) = io_prev;
     *gpio_pad_register(E5_DP_PIN) = pad_prev;
 }
+#else
+static inline void _enumeration_fix(void)
+{
+    /* only the RP2040 is affected by RP2040-E5 */
+}
+#endif /* RP2040 */
 
 static void _esr(usbdev_t *dev)
 {
@@ -562,7 +597,7 @@ static void _setup_complete(void)
     ep0_in->pending = false;
 
     if (ep0_out->buf) {
-        memcpy(ep0_out->buf, (void *)USB_DPRAM, SETUP_PACKET_LEN);
+        _dpram_read(ep0_out->buf, (uint8_t *)USB_DPRAM, SETUP_PACKET_LEN);
     }
     ep0_out->rx_len = SETUP_PACKET_LEN;
     _usbdev.dev.epcb(&ep0_out->ep, USBDEV_EVENT_TR_COMPLETE);
@@ -582,7 +617,7 @@ static void _ep_esr(usbdev_ep_t *ep)
         if (ep->dir == USB_EP_DIR_OUT) {
             size_t len = *_buf_ctrl(ep) & BUF_CTRL_LENGTH;
             if (hw_ep->buf) {
-                memcpy(hw_ep->buf, hw_ep->dpram_buf, len);
+                _dpram_read(hw_ep->buf, hw_ep->dpram_buf, len);
             }
             hw_ep->rx_len = len;
         }
@@ -619,7 +654,7 @@ void isr_usbctrl(void)
         /* BUFF_STATUS bits are write 1 to clear */
         USB->BUFF_STATUS = status;
         while (status) {
-            uint8_t idx;
+            uint8_t idx = 0;
             status = bitarithm_test_and_clear(status, &idx);
             _usbdev.eps[idx].pending = true;
             _usbdev.dev.epcb(&_usbdev.eps[idx].ep, USBDEV_EVENT_ESR);
