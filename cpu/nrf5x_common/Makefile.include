@@ -7,6 +7,3 @@ LINKER_SCRIPT ?= cortexm.ld
 
 INCLUDES += -I$(RIOTCPU)/nrf5x_common/include
 INCLUDES += -I$(BINDIR)/pkg-build/nrfx
-
-PSEUDOMODULES += nrfx_full
-PSEUDOMODULES += nrfx_headers_only
