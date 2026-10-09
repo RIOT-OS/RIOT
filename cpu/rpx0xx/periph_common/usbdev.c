@@ -8,9 +8,13 @@
  * @{
  *
  * @file
- * @brief       Low level USB device driver for the RP2040
+ * @brief       Low level USB device driver for the RP2040 and RP2350
  *
- * The USB controller of the RP2040 uses a 4 KiB dual port RAM (DPRAM) which
+ * The USB controllers of the RP2040 and the RP2350 are identical. The
+ * register names of the RP2040 vendor header are used, the RP2350 maps them
+ * to the register names of the Pico SDK in `usbdev_regs.h`.
+ *
+ * The USB controller uses a 4 KiB dual port RAM (DPRAM) which
  * contains the endpoint configuration, the buffer control registers and the
  * data buffers. Setup packets are always written to the beginning of the
  * DPRAM, independent of the state of the EP0 OUT buffer. They are passed to
@@ -30,7 +34,6 @@
 #include <errno.h>
 #include <stdbool.h>
 #include <stdint.h>
-#include <string.h>
 
 #include "bitarithm.h"
 #include "busy_wait.h"
@@ -39,6 +42,10 @@
 #include "irq.h"
 #include "periph/usbdev.h"
 #include "periph_cpu.h"
+
+#ifdef CPU_FAM_RP2350
+#include "usbdev_regs.h"
+#endif
 
 #define ENABLE_DEBUG 0
 #include "debug.h"
@@ -55,6 +62,7 @@
 
 #define SETUP_PACKET_LEN        (8U)
 
+#ifndef CPU_FAM_RP2350
 /**
  * @name    Workaround for RP2040 erratum RP2040-E5
  * @{
@@ -72,6 +80,7 @@
 #define LINE_STATE_SE0          (0U)
 #define LINE_STATE_J            (1U)
 /** @} */
+#endif /* !CPU_FAM_RP2350 */
 
 #define BUF_CTRL_FULL           USBCTRL_DPRAM_EP0_IN_BUFFER_CONTROL_FULL_0_Msk
 #define BUF_CTRL_PID            USBCTRL_DPRAM_EP0_IN_BUFFER_CONTROL_PID_0_Msk
@@ -159,6 +168,30 @@ static void _buf_arm(_rpx0xx_ep_t *hw_ep, size_t len)
     *reg = val | BUF_CTRL_AVAILABLE;
 }
 
+/*
+ * The DPRAM is mapped as device memory, which does not allow unaligned
+ * accesses. memcpy() may use unaligned word accesses on cores that support
+ * them for normal memory (e.g. the Cortex-M33 of the RP2350), so the DPRAM is
+ * accessed byte wise.
+ */
+static void _dpram_write(uint8_t *dpram, const uint8_t *buf, size_t len)
+{
+    volatile uint8_t *dst = dpram;
+
+    for (size_t i = 0; i < len; i++) {
+        dst[i] = buf[i];
+    }
+}
+
+static void _dpram_read(uint8_t *buf, const uint8_t *dpram, size_t len)
+{
+    const volatile uint8_t *src = dpram;
+
+    for (size_t i = 0; i < len; i++) {
+        buf[i] = src[i];
+    }
+}
+
 static void _buf_disarm(_rpx0xx_ep_t *hw_ep)
 {
     *_buf_ctrl(&hw_ep->ep) = 0;
@@ -184,7 +217,9 @@ static void _init(usbdev_t *dev)
     periph_reset(RESETS_RESET_usbctrl_Msk);
     periph_reset_done(RESETS_RESET_usbctrl_Msk);
 
-    memset((void *)USBCTRL_DPRAM, 0, DPRAM_SIZE);
+    for (uint16_t i = 0; i < DPRAM_SIZE / sizeof(uint32_t); i++) {
+        ((volatile uint32_t *)USBCTRL_DPRAM)[i] = 0;
+    }
 
     /* connect the controller to the internal PHY */
     USBCTRL_REGS->USB_MUXING = USBCTRL_REGS_USB_MUXING_TO_PHY_Msk |
@@ -422,7 +457,7 @@ static int _xmit(usbdev_ep_t *ep, uint8_t *buf, size_t len)
     hw_ep->rx_len = 0;
 
     if (ep->dir == USB_EP_DIR_IN) {
-        memcpy(hw_ep->dpram_buf, buf, len);
+        _dpram_write(hw_ep->dpram_buf, buf, len);
     }
     _buf_arm(hw_ep, len);
 
@@ -443,6 +478,7 @@ static void _bus_reset(void)
     _usbdev.setup_pending = false;
 }
 
+#ifndef CPU_FAM_RP2350
 static uint32_t _line_state(void)
 {
     return (USBCTRL_REGS->SIE_STATUS & USBCTRL_REGS_SIE_STATUS_LINE_STATE_Msk) >>
@@ -519,6 +555,12 @@ static void _enumeration_fix(void)
     *gpio_io_register(E5_DP_PIN) = io_prev;
     *gpio_pad_register(E5_DP_PIN) = pad_prev;
 }
+#else
+static inline void _enumeration_fix(void)
+{
+    /* RP2040-E5 does not affect the RP2350 */
+}
+#endif /* !CPU_FAM_RP2350 */
 
 static void _esr(usbdev_t *dev)
 {
@@ -555,7 +597,7 @@ static void _setup_complete(void)
     ep0_in->pending = false;
 
     if (ep0_out->buf) {
-        memcpy(ep0_out->buf, (void *)USBCTRL_DPRAM, SETUP_PACKET_LEN);
+        _dpram_read(ep0_out->buf, (uint8_t *)USBCTRL_DPRAM, SETUP_PACKET_LEN);
     }
     ep0_out->rx_len = SETUP_PACKET_LEN;
     _usbdev.dev.epcb(&ep0_out->ep, USBDEV_EVENT_TR_COMPLETE);
@@ -575,7 +617,7 @@ static void _ep_esr(usbdev_ep_t *ep)
         if (ep->dir == USB_EP_DIR_OUT) {
             size_t len = *_buf_ctrl(ep) & BUF_CTRL_LENGTH;
             if (hw_ep->buf) {
-                memcpy(hw_ep->buf, hw_ep->dpram_buf, len);
+                _dpram_read(hw_ep->buf, hw_ep->dpram_buf, len);
             }
             hw_ep->rx_len = len;
         }
@@ -612,7 +654,7 @@ void isr_usbctrl(void)
         /* BUFF_STATUS bits are write 1 to clear */
         USBCTRL_REGS->BUFF_STATUS = status;
         while (status) {
-            uint8_t idx;
+            uint8_t idx = 0;
             status = bitarithm_test_and_clear(status, &idx);
             _usbdev.eps[idx].pending = true;
             _usbdev.dev.epcb(&_usbdev.eps[idx].ep, USBDEV_EVENT_ESR);
