@@ -623,6 +623,14 @@ void clock_ref_configure_aux_source(uint32_t f_in, uint32_t f_out,
 void clock_periph_configure(uint32_t aux);
 
 /**
+ * @brief   Configure the usb clock to run from a dedicated auxiliary
+ *          clock source
+ *
+ * @param   aux     Auxiliary clock source
+ */
+void clock_usb_configure(uint32_t aux);
+
+/**
  * @brief   Configure gpio21 as clock output pin
  *
  * @details Can be used as an external clock source for another circuit or
@@ -817,6 +825,11 @@ typedef struct {
 #define PERIPH_SPI_NEEDS_TRANSFER_REG
 #define PERIPH_SPI_NEEDS_TRANSFER_REGS
 #define PERIPH_SPI_NEEDS_TRANSFER_BYTE
+
+/**
+ * @brief   Number of USB device endpoints per direction, including EP0
+ */
+#define USBDEV_NUM_ENDPOINTS    16
 
 #ifdef __cplusplus
 }
