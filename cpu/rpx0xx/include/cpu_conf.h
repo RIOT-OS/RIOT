@@ -34,6 +34,7 @@
 #include "hardware/regs/resets.h"
 #include "hardware/regs/rosc.h"
 #include "hardware/regs/spi.h"
+#include "hardware/regs/sysinfo.h"
 #include "hardware/regs/timer.h"
 #include "hardware/regs/uart.h"
 #include "hardware/regs/usb.h"
