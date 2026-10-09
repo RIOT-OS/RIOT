@@ -190,7 +190,7 @@ def _riot_applications_dirs(riotdir):
 
 def check_is_board(riotdir, board):
     """
-    Verify if board is a RIOT board.
+    Verify if the board is a RIOT board.
 
     :raises ValueError: on invalid board
     :returns: board name
@@ -307,7 +307,7 @@ class RIOTApplication:
 
     def board_is_supported(self, jobs=False):
         """
-        Return if current board is supported.
+        Check if the current board is supported.
 
         :param jobs: Number of parallel jobs allowed
         """
@@ -694,7 +694,7 @@ def list_from_string(list_str=None):
 
 def _strip_board_equal(board):
     """
-    Sanitizy board if given as BOARD=board.
+    Sanitize the board if provided as BOARD=board.
 
     Increase RIOT compatibility.
     """
