@@ -21,6 +21,9 @@ include $(RIOTBASE)/Makefile.dep
 # on the USEMODULE, which is present after the `Makefile.dep` resolution
 include $(RIOTBOARD)/Makefile.features
 
+# include the global cpu features for the same reason
+include $(RIOTCPU)/Makefile.features
+
 # check if required features are provided and update $(FEATURES_USED)
 include $(RIOTMAKE)/features_check.inc.mk
 
