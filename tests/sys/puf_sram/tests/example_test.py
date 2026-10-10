@@ -1,11 +1,8 @@
 #!/usr/bin/env python3
 
-# Copyright (c) 2018 Kevin Weiss, for HAW Hamburg  <kevin.weiss@haw-hamburg.de>
-# Copyright (C) 2018 Peter Kietzmann, for HAW Hamburg <peter.kietzmann@haw-hamburg.de>
-#
-# This file is subject to the terms and conditions of the GNU Lesser
-# General Public License v2.1. See the file LICENSE in the top level
-# directory for more details.
+# SPDX-FileCopyrightText: 2018 Kevin Weiss, for HAW Hamburg  <kevin.weiss@haw-hamburg.de>
+# SPDX-FileCopyrightText: 2018 Peter Kietzmann, for HAW Hamburg <peter.kietzmann@haw-hamburg.de>
+# SPDX-License-Identifier: LGPL-2.1-only
 
 import argparse
 import puf_sram_if
