@@ -97,6 +97,13 @@ extern "C" {
 #define TCPIP_THREAD_STACKSIZE        (3072)
 #endif
 
+/**
+ * @brief   Override the default lwIP netdev thread stack size
+ */
+#ifndef LWIP_NETDEV_STACKSIZE
+#  define LWIP_NETDEV_STACKSIZE       (THREAD_STACKSIZE_LARGE)
+#endif
+
 #ifndef ESP_WIFI_STACKSIZE
 /** Stack size for the WiFi thread */
 #define ESP_WIFI_STACKSIZE            (1536)
