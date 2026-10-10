@@ -654,6 +654,11 @@ typedef struct {
  */
 #define RTT_MAX_VALUE       (0xFFFFFFFFUL)
 
+/**
+ * @brief   RTT minimum offset valid for all ESP32x SoCs
+ */
+#define RTT_MIN_OFFSET (1U)
+
 /** @} */
 
 /**
