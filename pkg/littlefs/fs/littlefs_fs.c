@@ -22,6 +22,7 @@
 #include <string.h>
 
 #include "fs/littlefs_fs.h"
+#include "string_utils.h"
 
 #define ENABLE_DEBUG 0
 #include <debug.h>
@@ -503,7 +504,7 @@ static int _readdir(vfs_DIR *dirp, vfs_dirent_t *entry)
     int ret = lfs_dir_read(&fs->fs, dir, &info);
     if (ret >= 0) {
         entry->d_ino = info.type;
-        strncpy(entry->d_name, info.name, VFS_NAME_MAX - 1);
+        strscpy(entry->d_name, info.name, sizeof(entry->d_name));
     }
 
     mutex_unlock(&fs->lock);
