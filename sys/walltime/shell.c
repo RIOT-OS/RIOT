@@ -71,8 +71,13 @@ static int cmd_walltime(int argc, char **argv)
             return res;
         }
 
-        fmt_time_tm_iso8601(out, &now, ' ');
-        print(out, 20);
+        res = fmt_time_tm_iso8601(out, &now, ' ');
+        if (res < 0) {
+            printf("formatting time failed: %d\n", res);
+            return res;
+        }
+
+        print(out, res);
         print("\n", 1);
     }
     else if (argc == 4 && strcmp(argv[1], "set") == 0) {
