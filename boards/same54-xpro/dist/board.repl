@@ -1,0 +1,124 @@
+sysbus:
+    init:
+        Tag <0x10000 0x70000> "slot0_partition"
+        Tag <0x80000 0x70000> "slot1_partition"
+        Tag <0x0 0x10000> "boot_partition / mac_address"
+        Tag <0xf0000 0x10000> "storage_partition"
+        Tag <0x42000c00 0x2400> "tcc2 / tcc3 / tc4 / tc5 / ac / trng"
+        Tag <0x41016000 0x2000> "tcc0"
+        Tag <0x41018000 0x2000> "tcc1"
+        Tag <0x43001000 0x2000> "tcc4 / tc6 / tc7 / adc0 / adc1 / dac"
+        Tag <0x40000c00 0x400> "rstc"
+        Tag <0x40002400 0x400> "rtc"
+        Tag <0x40003800 0x400> "tc0"
+        Tag <0x40003c00 0x400> "tc1"
+        Tag <0x4101a000 0x400> "tc2"
+        Tag <0x4101c000 0x400> "tc3"
+        Tag <0x42000800 0x400> "gmac"
+        Tag <0x45000000 0x234> "sdhc0"
+        Tag <0x46000000 0x234> "sdhc1"
+        Tag <0x41008000 0x200> "porta / pinctrl / portb / portc / portd"
+        Tag <0x40001c00 0x140> "clock"
+        Tag <0x40001000 0x58> "clock"
+        Tag <0x4100a000 0x50> "dmac"
+        Tag <0x40002800 0x38> "eic"
+        Tag <0x41014000 0x31> "sercom3"
+        Tag <0x43000000 0x31> "sercom4"
+        Tag <0x43000800 0x31> "sercom6"
+        Tag <0x43000c00 0x31> "sercom7"
+        Tag <0x41004000 0x30> "nvmctrl"
+        Tag <0xe000ed90 0x2c> "mpu"
+        Tag <0x40000800 0x24> "clock"
+        Tag <0x40001400 0x20> "clock"
+        Tag <0xe000e010 0x10> "systick"
+        Tag <0x40002000 0xd> "wdt"
+        Tag <0x800080 0x8> "nvm_sw_calib_area"
+        Tag <0x806010 0x4> "hwinfo"
+        Tag <0x806014 0x4> "hwinfo"
+        Tag <0x806018 0x4> "hwinfo"
+        Tag <0x8061fc 0x4> "hwinfo"
+
+flash0: Memory.MappedMemory @ sysbus 0x0
+    size: 0x100000
+
+userrow: Memory.ArrayMemory @ sysbus 0x804000
+    size: 0x200
+
+sram0: Memory.MappedMemory @ sysbus 0x20000000
+    size: 0x40000
+
+nvic0: IRQControllers.NVIC @ {
+    sysbus new Bus.BusPointRegistration { address: 0xe000e000; cpu: cpu0 }
+}
+    -> cpu0@0
+    systickFrequency: 120000000
+
+cpu0: CPU.CortexM @ sysbus
+    cpuType: "cortex-m4f"
+    nvic: nvic0
+
+porta: GPIOPort.SAMD21_GPIO @ sysbus 0x41008000
+portb: GPIOPort.SAMD21_GPIO @ sysbus 0x41008080
+portc: GPIOPort.SAMD21_GPIO @ sysbus 0x41008100
+portd: GPIOPort.SAMD21_GPIO @ sysbus 0x41008180
+
+sercom0: UART.SAMD5_UART @ sysbus 0x40003000
+    DreIRQ->nvic0@46
+    TxcIRQ->nvic0@47
+    RxcIRQ->nvic0@48
+    MiscIRQ->nvic0@49
+
+sercom1: UART.SAMD5_UART @ sysbus 0x40003400
+    DreIRQ->nvic0@50
+    TxcIRQ->nvic0@51
+    RxcIRQ->nvic0@52
+    MiscIRQ->nvic0@53
+
+sercom2: UART.SAMD5_UART @ sysbus 0x41012000
+    DreIRQ->nvic0@54
+    TxcIRQ->nvic0@55
+    RxcIRQ->nvic0@56
+    MiscIRQ->nvic0@57
+
+// Broken: I2C peripheral simulation not complete enough to work with RIOT's
+//         I2C driver
+sercom3: I2C.SAMD21_I2C @ sysbus 0x41014000
+    IRQ->nvic0@58
+
+sercom4: SPI.SAM_SPI @ sysbus 0x43000000
+    IRQ->nvic0@62
+
+sercom5: UART.SAMD5_UART @ sysbus 0x43000400
+    DreIRQ->nvic0@66
+    TxcIRQ->nvic0@67
+    RxcIRQ->nvic0@68
+    MiscIRQ->nvic0@69
+
+sercom6: SPI.SAM_SPI @ sysbus 0x43000800
+    IRQ->nvic0@70
+
+// Broken: I2C peripheral simulation not complete enough to work with RIOT's
+//         I2C driver
+sercom7: I2C.SAMD21_I2C @ sysbus 0x43000c00
+    IRQ->nvic0@74
+
+
+// cortex-m overlay
+
+dwt: Miscellaneous.DWT @ sysbus 0xE0001000
+    frequency: 72000000
+
+// microchip,same54 overlay
+
+sysbus:
+    init add:
+        ApplySVD @https://dl.antmicro.com/projects/renode/svd/ATSAME54P20A.svd.gz
+        Tag <0x40000810 0x14> "MCLK_MASKS" 0xFFFFFFFF
+        Tag <0x40001010 4> "OSCCTRL_STATUS" 0xFFFFFFFF
+        Tag <0x4000101C 4> "OSCCTRL_DFLLCTRLA" 0x2
+        Tag <0x40001030 4> "OSCCTRL_DPLL0CTRLA" 0x2
+        Tag <0x40001040 4> "OSCCTRL_DPLL0STATUS" 0x3
+        Tag <0x4000140C 4> "OSC32KCTRL_STATUS" 0xFFFFFFFF
+        Tag <0x40001C20 0x40> "GCLK_GENCTRL" 0x100
+        Tag <0x40001C80 0xC0> "GCLK_PCHCTRL" 0x40
+        Tag <0x4000180C 4> "SUPC_STATUS" 0x100 // SUPC->STATUS.reg = SUPC_STATUS_VREGRDY

@@ -11,3 +11,8 @@ CFLAGS += -DSAM0_GCLK_PERIPH=9
 CFLAGS += -DSAM0_GCLK_100MHZ=10
 
 include $(RIOTMAKE)/boards/sam0.inc.mk
+
+# This needs to match the SERCOM used for UART. SERCOM2 is the only SERCOM that
+# is routed to the integradted eDBG debugger in hardware, so this is unlikely
+# to change.
+RENODE_SYSBUS_UART := sercom2
