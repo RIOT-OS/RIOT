@@ -222,6 +222,61 @@ void gpio_irq_disable(gpio_t pin);
 
 #endif /* defined(MODULE_PERIPH_GPIO_IRQ) || defined(DOXYGEN) */
 
+#if defined(MODULE_PERIPH_GPIO_EVENT) || defined(DOXYGEN)
+/**
+ * @brief   Initialize a GPIO pin for event usage
+ *
+ * The event is triggered on the defined flank(s).
+ *
+ * @note    You have to add the module `periph_gpio_event` to your project to
+ *          enable this function
+ *
+ * @param[in] pin       pin to initialize
+ * @param[in] flank     define the active flank(s)
+ *
+ * @return              EXTINT line number on success
+ * @return              -1 on error
+ */
+int gpio_init_event(gpio_t pin, gpio_flank_t flank);
+
+/**
+ * @brief   Enable the GPIO event for the given pin
+ *
+ * @note    You have to add the module `periph_gpio_event` to your project to
+ *          enable this function
+ *
+ * @param[in] pin       the pin to enable the event for
+ */
+void gpio_event_enable(gpio_t pin);
+
+/**
+ * @brief   Disable the GPIO event for the given pin
+ *
+ * @note    You have to add the module `periph_gpio_event` to your project to
+ *          enable this function
+ *
+ * @param[in] pin       the pin to disable the event for
+ */
+void gpio_event_disable(gpio_t pin);
+
+/**
+ * @brief   Configures how a hardware event is generated from the GPIO pin
+ *
+ * @note    You have to add the module `periph_gpio_event` to your project to
+ *          enable this function
+ *
+ * @param[in] pin       GPIO pin to configure the event for
+ * @param[in] channel   Event channel to use
+ * @param[in] path      Event path (synchronous or asynchronous)
+ * @param[in] edge      Edge that triggers the event
+ *
+ * @retval              0 on success
+ * @retval              -1 on error
+ */
+int gpio_event_gen(gpio_t pin, event_channel_t channel,
+                   event_path_t path, event_edge_t edge);
+#endif /* defined(MODULE_PERIPH_GPIO_EVENT) || defined(DOXYGEN) */
+
 /**
  * @brief   Get the current value of the given pin
  *

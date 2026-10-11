@@ -26,11 +26,14 @@
  */
 
 #include <assert.h>
+#include <stdlib.h>
+#include <string.h>
 
 #include "cpu.h"
 #include "mutex.h"
 #include "periph/spi.h"
 #include "pm_layered.h"
+#include "bitfield.h"
 
 #define ENABLE_DEBUG 0
 #include "debug.h"
@@ -41,15 +44,33 @@
 static mutex_t locks[SPI_NUMOF];
 
 #ifdef MODULE_PERIPH_DMA
+
+#ifndef CONFIG_SPI_DMA_DESC_EXP
+#  define CONFIG_SPI_DMA_DESC_EXP       1
+#endif
+
 struct dma_state {
     dma_t tx_dma;
     dma_t rx_dma;
+    dma_cb_t cb;
+    void *arg;
+    bool acquired;
 };
 
 static struct dma_state _dma_state[SPI_NUMOF];
 
-static DmacDescriptor DMA_DESCRIPTOR_ATTRS tx_desc[SPI_NUMOF];
-static DmacDescriptor DMA_DESCRIPTOR_ATTRS rx_desc[SPI_NUMOF];
+BITFIELD(_dma_desc, 1u << CONFIG_SPI_DMA_DESC_EXP)[SPI_NUMOF];
+static DmacDescriptor DMA_DESCRIPTOR_ATTRS _desc[SPI_NUMOF][1u  << CONFIG_SPI_DMA_DESC_EXP];
+
+static int _dma_get(spi_t bus)
+{
+    return bf_get_unset(_dma_desc[bus], 1u << CONFIG_SPI_DMA_DESC_EXP);
+}
+
+static void _dma_put(spi_t bus, int idx)
+{
+    bf_unset(_dma_desc[bus], idx);
+}
 #endif
 
 /**
@@ -138,7 +159,7 @@ static inline void _enable(SercomSpi *dev)
 #endif
 }
 
-static inline bool _use_dma(spi_t bus)
+static inline bool _dma_supported(spi_t bus)
 {
 #ifdef MODULE_PERIPH_DMA
     return (spi_config[bus].tx_trigger != DMA_TRIGGER_DISABLED) &&
@@ -149,36 +170,127 @@ static inline bool _use_dma(spi_t bus)
 #endif
 }
 
+static inline bool _dma_valid(spi_t bus)
+{
 #ifdef MODULE_PERIPH_DMA
+    return _dma_state[bus].rx_dma != UINT8_MAX && _dma_state[bus].tx_dma != UINT8_MAX;
+#else
+    (void)bus;
+    return false;
+#endif
+}
+
+static inline bool _dma_acquired(spi_t bus)
+{
+#ifdef MODULE_PERIPH_DMA
+    return _dma_state[bus].acquired;
+#else
+    (void)bus;
+    return false;
+#endif
+}
+
+#ifdef MODULE_PERIPH_DMA
+const volatile void *_reg_rx_data(spi_t bus)
+{
+    if (_is_qspi(bus)) {
+#ifdef QSPI
+        return &QSPI->RXDATA.reg;
+#endif
+    }
+    else {
+        return &dev(bus)->DATA.reg;
+    }
+}
+
+volatile void *_reg_tx_data(spi_t bus)
+{
+    if (_is_qspi(bus)) {
+#ifdef QSPI
+        return &QSPI->TXDATA.reg;
+#endif
+    }
+    else {
+        return &dev(bus)->DATA.reg;
+    }
+}
+
 static void _unlock(void *ctx)
 {
     mutex_unlock(ctx);
 }
+
+static void _dma_cb(void *ctx)
+{
+    struct dma_state *state = (struct dma_state *)ctx;
+    if (state->cb) {
+        state->cb(state->arg);
+    }
+}
 #endif
 
-static inline void _init_dma(spi_t bus, const volatile void *reg_rx, volatile void *reg_tx)
+static inline void _init_dma(spi_t bus)
 {
-    if (!_use_dma(bus)) {
+    if (!_dma_supported(bus)) {
         return;
     }
-
 #ifdef MODULE_PERIPH_DMA
     _dma_state[bus].rx_dma = dma_acquire_channel();
     _dma_state[bus].tx_dma = dma_acquire_channel();
-
-    dma_setup(_dma_state[bus].tx_dma,
-              spi_config[bus].tx_trigger, 0, NULL, NULL);
-    dma_setup(_dma_state[bus].rx_dma,
-              spi_config[bus].rx_trigger, 1, _unlock, NULL);
-
-    dma_prepare(_dma_state[bus].rx_dma, DMAC_BTCTRL_BEATSIZE_BYTE_Val,
-                (void*)reg_rx, NULL, 1, 0);
-    dma_prepare(_dma_state[bus].tx_dma, DMAC_BTCTRL_BEATSIZE_BYTE_Val,
-                NULL, (void*)reg_tx, 0, 0);
-#else
-    (void)reg_rx;
-    (void)reg_tx;
+    assert(_dma_state[bus].rx_dma != UINT8_MAX);
+    assert(_dma_state[bus].tx_dma != UINT8_MAX);
 #endif
+    (void)bus;
+}
+
+static inline void _deinit_dma(spi_t bus)
+{
+#ifdef MODULE_PERIPH_DMA
+    dma_release_channel(_dma_state[bus].rx_dma);
+    dma_release_channel(_dma_state[bus].tx_dma);
+    _dma_state[bus].rx_dma = UINT8_MAX;
+    _dma_state[bus].tx_dma = UINT8_MAX;
+#endif
+    (void)bus;
+}
+
+#if defined(DMAC_CHCTRLB_TRIGACT_BURST_Val) || defined(DMAC_CHCTRLA_TRIGACT_BURST_Val)
+#define SPI_DMA_TRIGACT     DMA_TRIGACT_BURST
+#else
+#define SPI_DMA_TRIGACT     DMA_TRIGACT_BEAT
+#endif
+
+static inline int _acquire_dma(spi_t bus)
+{
+#ifdef MODULE_PERIPH_DMA
+    const volatile void *rx = _reg_rx_data(bus);
+    volatile void *tx = _reg_tx_data(bus);
+    if (!_dma_acquired(bus)) {
+        /* setup default DMA configuration, but can be changed as needed */
+        dma_setup(_dma_state[bus].tx_dma, SPI_DMA_TRIGACT,
+                  spi_config[bus].tx_trigger, 0, NULL, NULL);
+        dma_setup(_dma_state[bus].rx_dma, SPI_DMA_TRIGACT,
+                  spi_config[bus].rx_trigger, 1, _dma_cb, &_dma_state[bus]);
+
+        dma_prepare(_dma_state[bus].rx_dma, DMAC_BTCTRL_BEATSIZE_BYTE_Val,
+                    (const void *)rx, NULL, 1, 0, DMA_BLOCKACT_NONE);
+        dma_prepare(_dma_state[bus].tx_dma, DMAC_BTCTRL_BEATSIZE_BYTE_Val,
+                    NULL, (void *)tx, 0, 0, DMA_BLOCKACT_NONE);
+        _dma_state[bus].acquired = true;
+    }
+    return 0;
+#else
+    (void)bus;
+    return -ENOTSUP;
+#endif
+}
+
+static inline void _release_dma(spi_t bus)
+{
+#ifdef MODULE_PERIPH_DMA
+    _dma_state[bus].acquired = false;
+#endif
+    (void)bus;
 }
 
 /**
@@ -194,9 +306,8 @@ static void _init_qspi(spi_t bus)
     QSPI->CTRLB.reg = QSPI_CTRLB_MODE_SPI
                     | QSPI_CTRLB_CSMODE_LASTXFER
                     | QSPI_CTRLB_DATALEN_8BITS;
-
-    /* set up DMA channels */
-    _init_dma(bus, &QSPI->RXDATA.reg, &QSPI->TXDATA.reg);
+    /* acquire DMA channels */
+    _init_dma(bus);
 }
 
 static void _qspi_acquire(spi_mode_t mode, spi_clk_t clk)
@@ -266,9 +377,8 @@ static void _init_spi(spi_t bus, SercomSpi *dev)
     /* enable receiver and configure character size to 8-bit
      * no synchronization needed, as SERCOM device is not enabled */
     dev->CTRLB.reg = SERCOM_SPI_CTRLB_CHSIZE(0) | SERCOM_SPI_CTRLB_RXEN;
-
-    /* set up DMA channels */
-    _init_dma(bus, &dev->DATA.reg, &dev->DATA.reg);
+    /* acquire DMA channels */
+    _init_dma(bus);
 }
 
 static void _spi_acquire(spi_t bus, spi_mode_t mode, spi_clk_t clk)
@@ -438,10 +548,17 @@ void spi_acquire(spi_t bus, spi_cs_t cs, spi_mode_t mode, spi_clk_t clk)
 
     /* mux clk_pin to SPI peripheral */
     gpio_init_mux(spi_config[bus].clk_pin, spi_config[bus].clk_mux);
+
+#if IS_USED(MODULE_PERIPH_DMA) && !IS_USED(MODULE_PERIPH_SPI_DMA)
+    spi_acquire_dma(bus);
+#endif
 }
 
 void spi_release(spi_t bus)
 {
+#if IS_USED(MODULE_PERIPH_DMA) && !IS_USED(MODULE_PERIPH_SPI_DMA)
+    spi_release_dma(bus);
+#endif
     /* Demux clk_pin back to GPIO_OUT function. Otherwise it will get HIGH-Z
      * and lead to unexpected current draw by SPI salves. */
     gpio_disable_mux(spi_config[bus].clk_pin);
@@ -470,14 +587,15 @@ static void _blocking_transfer(spi_t bus, const void *out, void *in, size_t len)
 
 #ifdef MODULE_PERIPH_DMA
 
-static void _dma_execute(spi_t bus)
+static void _dma_execute_blocking(spi_t bus)
 {
 #if IS_ACTIVE(MODULE_PM_LAYERED) && defined(SAM0_SPI_PM_BLOCK)
     pm_block(SAM0_SPI_PM_BLOCK);
 #endif
 
     mutex_t lock = MUTEX_INIT_LOCKED;
-    dma_set_cb_arg(_dma_state[bus].rx_dma, &lock);
+    spi_dma_set_cb(bus, _unlock);
+    spi_dma_set_cb_arg(bus, &lock);
 
     dma_start(_dma_state[bus].rx_dma);
     dma_start(_dma_state[bus].tx_dma);
@@ -496,7 +614,7 @@ static void _dma_transfer(spi_t bus, const uint8_t *out, uint8_t *in,
     uint8_t *in_addr = in ? in + len : &tmp;
     dma_prepare_dst(_dma_state[bus].rx_dma, in_addr, len, in ? true : false);
     dma_prepare_src(_dma_state[bus].tx_dma, out_addr, len, out ? true : false);
-    _dma_execute(bus);
+    _dma_execute_blocking(bus);
 }
 
 static void _dma_transfer_regs(spi_t bus, uint8_t reg, const uint8_t *out,
@@ -509,12 +627,20 @@ static void _dma_transfer_regs(spi_t bus, uint8_t reg, const uint8_t *out,
     dma_prepare_dst(_dma_state[bus].rx_dma, &tmp, 1, false);
     dma_prepare_src(_dma_state[bus].tx_dma, &reg, 1, false);
 
-    dma_append_dst(_dma_state[bus].rx_dma, &rx_desc[bus], in_addr,
+    int rx = _dma_get(bus);
+    assert(rx >= 0);
+    int tx = _dma_get(bus);
+    assert(tx >= 0);
+    DmacDescriptor *desc_rx =  &_desc[bus][rx];
+    DmacDescriptor *desc_tx =  &_desc[bus][tx];
+    dma_append_dst(_dma_state[bus].rx_dma, desc_rx, in_addr,
                    len, in ? true : false);
-    dma_append_src(_dma_state[bus].tx_dma, &tx_desc[bus], out_addr,
+    dma_append_src(_dma_state[bus].tx_dma, desc_tx, out_addr,
                    len, out ? true : false);
 
-    _dma_execute(bus);
+    _dma_execute_blocking(bus);
+    spi_dma_put_desc(bus, desc_rx);
+    spi_dma_put_desc(bus, desc_tx);
 }
 
 void spi_transfer_regs(spi_t bus, spi_cs_t cs,
@@ -524,7 +650,7 @@ void spi_transfer_regs(spi_t bus, spi_cs_t cs,
         gpio_clear((gpio_t)cs);
     }
 
-    if (_use_dma(bus)) {
+    if (_dma_acquired(bus)) {
         /* The DMA promises not to modify the const out data */
         _dma_transfer_regs(bus, reg, out, in, len);
     }
@@ -556,7 +682,7 @@ void spi_transfer_bytes(spi_t bus, spi_cs_t cs, bool cont,
         gpio_clear((gpio_t)cs);
     }
 
-    if (_use_dma(bus) && len > CONFIG_SPI_DMA_THRESHOLD_BYTES) {
+    if (_dma_acquired(bus) && len > CONFIG_SPI_DMA_THRESHOLD_BYTES) {
 #ifdef MODULE_PERIPH_DMA
         /* The DMA promises not to modify the const out data */
         _dma_transfer(bus, out, in, len);
@@ -570,3 +696,145 @@ void spi_transfer_bytes(spi_t bus, spi_cs_t cs, bool cont,
         gpio_set((gpio_t)cs);
     }
 }
+
+#if MODULE_PERIPH_SPI_DMA
+int spi_acquire_dma(spi_t bus)
+{
+    if (_dma_valid(bus)) {
+        return _acquire_dma(bus);
+    }
+    return -1;
+}
+
+void spi_release_dma(spi_t bus)
+{
+    if (_dma_valid(bus)) {
+        _release_dma(bus);
+    }
+}
+
+void spi_dma_set_cb(spi_t bus, dma_cb_t cb)
+{
+    _dma_state[bus].cb = cb;
+}
+
+void spi_dma_set_cb_arg(spi_t bus, void *arg)
+{
+    _dma_state[bus].arg = arg;
+}
+
+void *spi_dma_get_desc(spi_t bus)
+{
+    int idx = _dma_get(bus);
+    return idx >= 0 ? &_desc[bus][idx] : NULL;
+}
+
+void spi_dma_put_desc(spi_t bus, const void *desc)
+{
+    int idx = ((DmacDescriptor *)desc - (DmacDescriptor *)_desc[bus]);
+    assert(idx >= 0);
+    assert((unsigned)idx < (1u << CONFIG_SPI_DMA_DESC_EXP));
+    _dma_put(bus, idx);
+}
+
+static const uint8_t _out_null = 0;
+static uint8_t _in_null;
+
+void spi_dma_prepare_desc(spi_t bus, void *desc_rx, void *desc_tx,
+                          const void *out, void *in, size_t len,
+                          dma_blockact_t block_act_rx, dma_blockact_t block_act_tx)
+{
+    const volatile void *rx = _reg_rx_data(bus);
+    volatile void *tx = _reg_tx_data(bus);
+
+    const uint8_t *out_addr = out ? out + len : &_out_null;
+    uint8_t *in_addr = in ? in + len : &_in_null;
+    if (desc_rx) {
+        dma_prepare_descriptor(desc_rx, DMAC_BTCTRL_BEATSIZE_BYTE_Val,
+                               (const void *)rx, in_addr, len,
+                               in ? DMA_INCR_DEST : DMA_INCR_NONE, block_act_rx);
+    }
+    if (desc_tx) {
+        dma_prepare_descriptor(desc_tx, DMAC_BTCTRL_BEATSIZE_BYTE_Val,
+                               out_addr, (void *)tx, len,
+                               out ? DMA_INCR_SRC : DMA_INCR_NONE, block_act_tx);
+    }
+}
+
+void spi_dma_prepare(spi_t bus, const void *out, void *in, size_t len,
+                     dma_blockact_t block_act_rx, dma_blockact_t block_act_tx)
+{
+    const volatile void *rx = _reg_rx_data(bus);
+    volatile void *tx = _reg_tx_data(bus);
+
+    const uint8_t *out_addr = out ? out + len : &_out_null;
+    uint8_t *in_addr = in ? in + len : &_in_null;
+    dma_prepare(_dma_state[bus].rx_dma, DMAC_BTCTRL_BEATSIZE_BYTE_Val,
+                (const void *)rx, in_addr, len, !!in, block_act_rx);
+    dma_prepare(_dma_state[bus].tx_dma, DMAC_BTCTRL_BEATSIZE_BYTE_Val,
+                out_addr, (void *)tx, len, !!out, block_act_tx);
+}
+
+void spi_dma_setup(spi_t bus,
+                   unsigned trigger_rx, dma_trigact_t trigact_rx, dma_cb_t cb_rx, void *arg_rx,
+                   unsigned trigger_tx, dma_trigact_t trigact_tx, dma_cb_t cb_tx, void *arg_tx)
+{
+    dma_setup(_dma_state[bus].tx_dma, trigact_tx,
+              trigger_tx, 0, cb_tx, arg_tx);
+    dma_setup(_dma_state[bus].rx_dma, trigact_rx,
+              trigger_rx, 1, cb_rx, arg_rx);
+}
+
+void spi_dma_append(spi_t bus, void *desc_rx, void *desc_tx,
+                    const void *out, void *in, size_t len)
+{
+    const uint8_t *out_addr = out ? out + len : &_out_null;
+    uint8_t *in_addr = in ? in + len : &_in_null;
+    if (desc_rx) {
+        dma_append_dst(_dma_state[bus].rx_dma, desc_rx, in_addr, len, !!in);
+    }
+    if (desc_tx) {
+        dma_append_src(_dma_state[bus].tx_dma, desc_tx, out_addr, len, !!out);
+    }
+}
+
+void spi_dma_set_desc_rx(spi_t bus, void *desc)
+{
+    *(DmacDescriptor *)dma_descriptor(_dma_state[bus].rx_dma) = *(DmacDescriptor *)desc;
+}
+
+void spi_dma_set_desc_tx(spi_t bus, void *desc)
+{
+    *(DmacDescriptor *)dma_descriptor(_dma_state[bus].tx_dma) = *(DmacDescriptor *)desc;
+}
+
+const void *spi_dma_get_desc_rx(spi_t bus)
+{
+    return dma_descriptor(_dma_state[bus].rx_dma);
+}
+
+const void *spi_dma_get_desc_tx(spi_t bus)
+{
+    return dma_descriptor(_dma_state[bus].tx_dma);
+}
+
+void spi_dma_start_rx(spi_t bus)
+{
+    dma_start(_dma_state[bus].rx_dma);
+}
+
+void spi_dma_start_tx(spi_t bus)
+{
+    dma_start(_dma_state[bus].tx_dma);
+}
+
+dma_t spi_dma_rx(spi_t bus)
+{
+    return _dma_state[bus].rx_dma;
+}
+
+dma_t spi_dma_tx(spi_t bus)
+{
+    return _dma_state[bus].tx_dma;
+}
+#endif /* MODULE_PERIPH_SPI_DMA */
