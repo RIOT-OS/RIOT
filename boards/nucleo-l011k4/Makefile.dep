@@ -2,3 +2,7 @@
 FEATURES_REQUIRED += picolibc
 
 include $(RIOTBOARD)/common/nucleo32/Makefile.dep
+
+ifneq (,$(filter mtd,$(USEMODULE)))
+  USEMODULE  += mtd_eeprom
+endif

@@ -1,1 +1,5 @@
 USEMODULE += boards_common_atmega
+
+ifneq (,$(filter mtd,$(USEMODULE)))
+  USEMODULE  += mtd_eeprom
+endif
