@@ -62,9 +62,9 @@ typedef enum {
     defined(CPU_FAM_STM32F7) || defined(CPU_FAM_STM32L0) || \
     defined(CPU_FAM_STM32L4) || defined(CPU_FAM_STM32WB) || \
     defined(CPU_FAM_STM32G4) || defined(CPU_FAM_STM32G0) || \
-    defined(CPU_FAM_STM32L5) || defined(CPU_FAM_STM32U5) || \
-    defined(CPU_FAM_STM32WL) || defined(CPU_FAM_STM32C0) || \
-    defined(CPU_FAM_STM32H7)
+    defined(CPU_FAM_STM32L5) || defined(CPU_FAM_STM32U3) || \
+    defined(CPU_FAM_STM32U5) || defined(CPU_FAM_STM32WL) || \
+    defined(CPU_FAM_STM32C0) || defined(CPU_FAM_STM32H7)
     I2C_SPEED_FAST_PLUS,    /**< fast plus mode: ~1Mbit/s */
 #endif
 } i2c_speed_t;
@@ -89,8 +89,9 @@ typedef struct {
     defined(CPU_FAM_STM32F7) || defined(CPU_FAM_STM32G0) || \
     defined(CPU_FAM_STM32G4) || defined(CPU_FAM_STM32L4) || \
     defined(CPU_FAM_STM32L5) || defined(CPU_FAM_STM32WB) || \
-    defined(CPU_FAM_STM32U5) || defined(CPU_FAM_STM32WL) || \
-    defined(CPU_FAM_STM32C0) || defined(CPU_FAM_STM32H7)
+    defined(CPU_FAM_STM32U3) || defined(CPU_FAM_STM32U5) || \
+    defined(CPU_FAM_STM32WL) || defined(CPU_FAM_STM32C0) || \
+    defined(CPU_FAM_STM32H7)
     uint32_t rcc_sw_mask;   /**< bit to switch I2C clock */
 #endif
 #if defined(CPU_FAM_STM32F1) || defined(CPU_FAM_STM32F2) || \
@@ -105,9 +106,9 @@ typedef struct {
     defined(CPU_FAM_STM32F7) || defined(CPU_FAM_STM32L0) || \
     defined(CPU_FAM_STM32L4) || defined(CPU_FAM_STM32L5) || \
     defined(CPU_FAM_STM32G0) || defined(CPU_FAM_STM32G4) || \
-    defined(CPU_FAM_STM32U5) || defined(CPU_FAM_STM32WB) || \
-    defined(CPU_FAM_STM32WL) || defined(CPU_FAM_STM32C0) || \
-    defined(CPU_FAM_STM32H7)
+    defined(CPU_FAM_STM32U3) || defined(CPU_FAM_STM32U5) || \
+    defined(CPU_FAM_STM32WB) || defined(CPU_FAM_STM32WL) || \
+    defined(CPU_FAM_STM32C0) || defined(CPU_FAM_STM32H7)
 /**
  * @brief   Structure for I2C timing register settings
  */
@@ -182,17 +183,17 @@ static const i2c_timing_param_t timing_params[] = {
 };
 #endif  /* CPU_FAM_STM32F0 || CPU_FAM_STM32F3 || CPU_FAM_STM32F7 ||
             CPU_FAM_STM32L0 || CPU_FAM_STM32L4 || CPU_FAM_STM32L5 ||
-            CPU_FAM_STM32G0 || CPU_FAM_STM32G4 || CPU_FAM_STM32U5 ||
-            CPU_FAM_STM32WB || CPU_FAM_STM32WL || CPU_FAM_STM32C0 ||
-            CPU_FAM_STM32H7 */
+            CPU_FAM_STM32G0 || CPU_FAM_STM32G4 || CPU_FAM_STM32U3 ||
+            CPU_FAM_STM32U5 || CPU_FAM_STM32WB || CPU_FAM_STM32WL ||
+            CPU_FAM_STM32C0 || CPU_FAM_STM32H7 */
 
 #if defined(CPU_FAM_STM32F0) || defined(CPU_FAM_STM32F3) || \
     defined(CPU_FAM_STM32F7) || defined(CPU_FAM_STM32G0) || \
     defined(CPU_FAM_STM32G4) || defined(CPU_FAM_STM32L0) || \
     defined(CPU_FAM_STM32L4) || defined(CPU_FAM_STM32L5) || \
-    defined(CPU_FAM_STM32U5) || defined(CPU_FAM_STM32WB) || \
-    defined(CPU_FAM_STM32WL) || defined(CPU_FAM_STM32C0) || \
-    defined(CPU_FAM_STM32H7)
+    defined(CPU_FAM_STM32U3) || defined(CPU_FAM_STM32U5) || \
+    defined(CPU_FAM_STM32WB) || defined(CPU_FAM_STM32WL) || \
+    defined(CPU_FAM_STM32C0) || defined(CPU_FAM_STM32H7)
 /**
  * @brief   The I2C implementation supports only a limited frame size.
  *          See i2c_1.c
