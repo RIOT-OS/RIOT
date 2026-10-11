@@ -17,8 +17,6 @@
 
 #include <stdio.h>
 
-#include "fmt.h"
-#include "shell.h"
 #include "msg.h"
 
 #define MAIN_QUEUE_SIZE     (8)
@@ -28,9 +26,5 @@ int main(void)
 {
     msg_init_queue(_main_msg_queue, MAIN_QUEUE_SIZE);
 
-    char line_buf[SHELL_DEFAULT_BUFSIZE];
-    shell_run(NULL, line_buf, SHELL_DEFAULT_BUFSIZE);
-
-    /* should be never reached */
     return 0;
 }

@@ -52,11 +52,7 @@ int main(void)
     wolfSSL_Init();
     wolfSSL_Debugging_ON();
 
-    /* start shell */
     LOG(LOG_INFO, "All up, running the shell now\n");
-    char line_buf[SHELL_DEFAULT_BUFSIZE];
-    shell_run(NULL, line_buf, SHELL_DEFAULT_BUFSIZE);
-
-    /* should be never reached */
+    /* shell starts implicitly after returning */
     return 0;
 }

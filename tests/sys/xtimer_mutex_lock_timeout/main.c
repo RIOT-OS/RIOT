@@ -326,15 +326,13 @@ SHELL_COMMAND(mutex_timeout_short_unlocked, "unlocked mutex (spin timeout)",
     cmd_test_xtimer_mutex_lock_timeout_short_unlocked);
 
 /**
- * @brief   main function starting shell
+ * @brief   main function
  *
  * @return 0 on success
  */
 int main(void)
 {
     puts("Starting shell...");
-    char line_buf[SHELL_DEFAULT_BUFSIZE];
-    shell_run(NULL, line_buf, SHELL_DEFAULT_BUFSIZE);
-
+    /* shell starts implicitly after returning */
     return 0;
 }
