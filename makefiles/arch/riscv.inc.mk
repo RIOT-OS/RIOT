@@ -51,6 +51,7 @@ endif
 
 ifeq ($(TOOLCHAIN),gnu)
   GCC_DEFAULTS_TO_NEW_RISCV_ISA ?= $(shell echo "typedef int dont_be_pedantic;" | $(TARGET_ARCH)-gcc -march=rv32imac -mabi=ilp32 -misa-spec=2.2 -E - > /dev/null 2>&1 && echo 1 || echo 0)
+  TOOLCHAIN_CAPABILITY_VARS += GCC_DEFAULTS_TO_NEW_RISCV_ISA
 endif
 
 GCC_DEFAULTS_TO_NEW_RISCV_ISA ?= 0
@@ -86,7 +87,9 @@ ifneq ($(TOOLCHAIN),llvm)
   ifeq (1,$(BUILD_IN_DOCKER))
     CFLAGS_NO_ASM += -malign-data=natural
   else
-    ifneq (,$(shell $(TARGET_ARCH)-gcc --help=target | grep '\-malign-data='))
+    GCC_SUPPORTS_MALIGN_DATA ?= $(shell $(TARGET_ARCH)-gcc --help=target | grep -q -- '-malign-data=' && echo 1 || echo 0)
+    TOOLCHAIN_CAPABILITY_VARS += GCC_SUPPORTS_MALIGN_DATA
+    ifeq (1,$(GCC_SUPPORTS_MALIGN_DATA))
       CFLAGS_NO_ASM += -malign-data=natural
     endif
   endif

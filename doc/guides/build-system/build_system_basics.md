@@ -255,6 +255,58 @@ If a `$(shell ...)` call cannot be avoided, for example because it needs to
 run an external tool or the actual file system, follow the memoization
 guidance below to prevent it from being executed more than once.
 
+### Make Toolchain Checks Overridable
+
+Some `$(shell ...)` calls probe the toolchain, for example to find out whether
+the compiler accepts a certain flag. Such a check runs the compiler, which
+takes tens of milliseconds, while its result only depends on the toolchain and
+not on the application that is being built. For a single build, the impact is
+negligible, but it adds up when building many applications in a row.
+
+To optimize this, every toolchain check should be overridable from the
+environment. This way, the result of a check can be injected from the
+environment.
+
+Instead of this:
+
+```makefile
+ifeq ($(shell $(CC) -std=c11 -E - 2>/dev/null >/dev/null </dev/null ; echo $$?),0)
+  CFLAGS += -std=c11
+endif
+```
+
+Use this:
+
+```makefile
+CC_SUPPORTS_STD_C11 ?= $(shell $(CC) -std=c11 -E - 2>/dev/null >/dev/null </dev/null && echo 1 || echo 0)
+TOOLCHAIN_CAPABILITY_VARS += CC_SUPPORTS_STD_C11
+
+ifeq (1,$(CC_SUPPORTS_STD_C11))
+  CFLAGS += -std=c11
+endif
+```
+
+A special target `make info-toolchain-capabilities` will print `key=value`
+pairs for the toolchain capabilities that were detected. The continuous
+integration system will cache this once per BOARD/TOOLCHAIN combination, and
+point `TOOLCHAIN_CAPABILITIES_MK` at the cached file for subsequent builds of
+that combination. `makefiles/info.inc.mk` includes that file, if set, before
+any of the checks run, so they are skipped in favor of the cached values.
+Local builds will not be affected.
+
+An example output of
+`BOARD=slstk3701a make info-toolchain-capabilities -C examples/basic/default --no-print-directory`:
+
+```
+PREFIXED_GDB_AVAILABLE=0
+LINKER_SUPPORTS_NOWARNRWX=1
+CC_SUPPORTS_STD_C11=1
+CC_SUPPORTS_STD_CXX14=1
+LINKER_SUPPORTS_NOEXECSTACK=1
+LINKER_SUPPORTS_NANO_SPECS=1
+NEWLIB_NANO_NEEDS_SHORT_WCHAR=0
+```
+
 ### Use Memoized for Variables Referencing a Function or Command
 
 #### Recursively Expanded Variable

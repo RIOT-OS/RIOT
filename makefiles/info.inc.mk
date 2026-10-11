@@ -6,6 +6,7 @@
         check-toolchain-supported \
         info-programmers-supported \
         info-rust \
+        info-toolchain-capabilities \
         generate-Makefile.ci \
         #
 
@@ -265,6 +266,31 @@ check-toolchain-supported:
 
 info-programmers-supported:
 	@echo $(sort $(PROGRAMMERS_SUPPORTED))
+
+# Prints the values discovered by the CC_SUPPORTS_*/LINKER_SUPPORTS_*/etc.
+# `?=` checks, one KEY=VALUE pair per line. This lets the discovery be forced
+# once (e.g. per BOARD/TOOLCHAIN) and the result be fed back into subsequent
+# builds, instead of every build re-running the checks.
+#
+# If TOOLCHAIN_CAPABILITIES_MK is set, the pairs are written directly to that
+# file instead of stdout. This is deliberately done from inside the recipe
+# (via shell redirection), rather than by capturing this target's stdout
+# from outside: GNU Make prints any '$(info ...)' encountered anywhere while
+# parsing the makefiles (e.g. sys/ztimer/Makefile.include) to stdout as well,
+# regardless of target, so capturing "make's stdout" would risk mixing such
+# unrelated messages into the cached file.
+info-toolchain-capabilities:
+	@( $(foreach v,$(TOOLCHAIN_CAPABILITY_VARS),echo $(v)=$($(v));) ) $(if $(TOOLCHAIN_CAPABILITIES_MK),> $(TOOLCHAIN_CAPABILITIES_MK))
+
+# Optional makefile fragment with pre-discovered toolchain capability
+# variables for this exact BOARD/TOOLCHAIN combination, e.g. as written by
+# `make info-toolchain-capabilities` above with TOOLCHAIN_CAPABILITIES_MK set
+# to a file, by an external caller (such as CI). This must be included
+# before the CC_SUPPORTS_*/LINKER_SUPPORTS_*/etc. `?=` checks below and in
+# the other makefiles that populate TOOLCHAIN_CAPABILITY_VARS, so their
+# checks are skipped once the values are already known. Silently does
+# nothing if unset or the file does not exist.
+-include $(TOOLCHAIN_CAPABILITIES_MK)
 
 info-rust:
 	cargo version
