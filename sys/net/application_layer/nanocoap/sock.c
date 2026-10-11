@@ -172,7 +172,7 @@ static int _sock_recv_buf(nanocoap_sock_t *sock, void **data, void **ctx, uint32
 
 static int _send_ack(nanocoap_sock_t *sock, coap_pkt_t *pkt)
 {
-    coap_hdr_t ack;
+    coap_udp_hdr_t ack;
 
     const iolist_t snip = {
         .iol_base = &ack,
@@ -1338,7 +1338,7 @@ ssize_t nanocoap_server_build_separate(const nanocoap_server_response_ctx_t *ctx
 {
     assert(type != COAP_TYPE_ACK);
     assert(type != COAP_TYPE_CON); /* TODO: add support */
-    if ((sizeof(coap_hdr_t) + COAP_TOKEN_LENGTH_MAX + 1) > buf_len) {
+    if ((sizeof(coap_udp_hdr_t) + COAP_TOKEN_LENGTH_MAX + 1) > buf_len) {
         return -EOVERFLOW;
     }
 
@@ -1380,7 +1380,7 @@ int nanocoap_server_send_separate(const nanocoap_server_response_ctx_t *ctx,
                                   unsigned code, unsigned type,
                                   const void *payload, size_t len)
 {
-    uint8_t rbuf[sizeof(coap_hdr_t) + COAP_TOKEN_LENGTH_MAX + 1];
+    uint8_t rbuf[sizeof(coap_udp_hdr_t) + COAP_TOKEN_LENGTH_MAX + 1];
 
     ssize_t hdr_len = nanocoap_server_build_separate(ctx, rbuf, sizeof(rbuf),
                                                      code, type, random_uint32());
@@ -1496,7 +1496,7 @@ void nanocoap_notify_observers(const coap_resource_t *res, const iolist_t *iol)
     mutex_lock(&_observer_pool_lock);
     for (size_t i = 0; i < CONFIG_NANOCOAP_MAX_OBSERVERS; i++) {
         if (_observer_pool[i].resource == res) {
-            uint8_t rbuf[sizeof(coap_hdr_t) + COAP_TOKEN_LENGTH_MAX + 1];
+            uint8_t rbuf[sizeof(coap_udp_hdr_t) + COAP_TOKEN_LENGTH_MAX + 1];
 
             ssize_t hdr_len = nanocoap_server_build_separate(&_observer_pool[i].response, rbuf, sizeof(rbuf),
                                                              COAP_CODE_CONTENT, COAP_TYPE_NON,
