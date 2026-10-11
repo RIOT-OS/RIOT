@@ -16,6 +16,7 @@ ifneq (,$(filter gnrc_lorawan,$(USEMODULE)))
   USEMODULE += hashes
   USEMODULE += iolist
   USEMODULE += crypto_aes_128
+  USEMODULE += event_timeout
 endif
 
 ifneq (,$(filter gnrc_lorawan_1_1,$(USEMODULE)))
