@@ -493,6 +493,7 @@ static uint8_t _write_cb(lwm2m_context_t * context, uint16_t instance_id, int nu
                 DEBUG("[lwm2m:security:write]: writing URI\n");
                 if (data->value.asBuffer.length > CONFIG_LWM2M_URI_MAX_SIZE - 1) {
                     result = COAP_400_BAD_REQUEST;
+                    break;
                 }
 
                 strncpy(instance->uri, (char *)data->value.asBuffer.buffer,
@@ -572,6 +573,7 @@ static uint8_t _write_cb(lwm2m_context_t * context, uint16_t instance_id, int nu
                 if (data->value.asBuffer.length >
                     CONFIG_LWM2M_OBJ_SECURITY_PUB_KEY_ID_BUFSIZE) {
                     result = COAP_500_INTERNAL_SERVER_ERROR;
+                    break;
                 }
 
                 /* copy the new value */
@@ -593,6 +595,7 @@ static uint8_t _write_cb(lwm2m_context_t * context, uint16_t instance_id, int nu
                 if (data->value.asBuffer.length >
                     CONFIG_LWM2M_OBJ_SECURITY_SEC_KEY_BUFSIZE) {
                     result = COAP_500_INTERNAL_SERVER_ERROR;
+                    break;
                 }
 
                 /* copy the new value */
@@ -614,6 +617,7 @@ static uint8_t _write_cb(lwm2m_context_t * context, uint16_t instance_id, int nu
                 if (data->value.asBuffer.length >
                     CONFIG_LWM2M_OBJ_SECURITY_SERVER_PUB_KEY_BUFSIZE) {
                     result = COAP_500_INTERNAL_SERVER_ERROR;
+                    break;
                 }
 
                 /* copy the new value */
