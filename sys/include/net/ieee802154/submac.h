@@ -464,6 +464,31 @@ static inline bool ieee802154_submac_state_is_idle(ieee802154_submac_t *submac)
 }
 
 /**
+ * @brief   Get the _aUnitBackoffPeriod_ MAC constant value in microseconds.
+ *
+ * @param[in] submac pointer to the SubMAC descriptor
+ *
+ * @return constant value in microseconds.
+ */
+static inline uint32_t ieee802154_get_unit_backoff_period(const ieee802154_submac_t *submac)
+{
+    /* XXX: for SUN PHY 920 MHz bands use phyCcaDuration */
+    return submac->csma_backoff_us;
+}
+
+/**
+ * @brief   Get the _macAckWaitDuration_ MAC attribute value in microseconds.
+ *
+ * @param[in] submac pointer to the SubMAC descriptor
+ *
+ * @return attribute value in microseconds.
+ */
+static inline uint32_t ieee802154_get_ack_wait_duration(const ieee802154_submac_t *submac)
+{
+    return submac->ack_timeout_us;
+}
+
+/**
  * @brief Init the IEEE 802.15.4 SubMAC
  *
  * The SubMAC state machine starts in RX state.

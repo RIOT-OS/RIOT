@@ -2,6 +2,7 @@ MODULE = ieee802154
 
 SRC = \
     ieee802154.c \
+    ieee802154_timings.c \
     #
 
 ifneq (,$(filter ieee802154_security,$(USEMODULE)))
