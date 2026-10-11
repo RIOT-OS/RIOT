@@ -528,7 +528,7 @@ void rtc_tamper_pin_disable(gpio_t pin)
     atomic_clear_bit_u32(atomic_bit_u32(&tampctr, 2 * in));
 }
 
-void rtc_tamper_enable(void)
+void rtc_tamper_enable(rtc_alarm_cb_t cb, void *arg)
 {
     DEBUG("enable tamper\n");
 
@@ -537,6 +537,9 @@ void rtc_tamper_enable(void)
 
     /* write TAMPCTRL register */
     _set_tampctrl(tampctr);
+
+    tamper_cb.cb = cb;
+    tamper_cb.arg = arg;
 
     /* work around errata 2.17.4:
      * ignore the first tamper event on the rising edge */
