@@ -18,6 +18,7 @@
 #include "mutex.h"
 #include "native_internal.h"
 #include "fs/native_fs.h"
+#include "string_utils.h"
 #include "vfs.h"
 
 #define ENABLE_DEBUG 0
@@ -241,7 +242,7 @@ static int _readdir(vfs_DIR *dirp, vfs_dirent_t *entry)
     }
 
     entry->d_ino = dirent->d_ino;
-    strncpy(entry->d_name, (char *)dirent->d_name, sizeof(entry->d_name));
+    strscpy(entry->d_name, dirent->d_name, sizeof(entry->d_name));
 
     return 1;
 }
