@@ -1,0 +1,36 @@
+From d98718fd726b0d83efdec2b623f1201a4a58474d Mon Sep 17 00:00:00 2001
+From: Geovane Fedrecheski <geonnave@gmail.com>
+Date: Fri, 28 Jul 2023 12:08:58 +0200
+Subject: [PATCH] Add flag to disable interrupts on nRF CryptoCell
+
+---
+ wolfcrypt/src/port/arm/cryptoCell.c | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/wolfcrypt/src/port/arm/cryptoCell.c b/wolfcrypt/src/port/arm/cryptoCell.c
+index 3e7b8ce..d595f8d 100644
+--- a/wolfcrypt/src/port/arm/cryptoCell.c
++++ b/wolfcrypt/src/port/arm/cryptoCell.c
+@@ -58,7 +58,9 @@ static void cc310_enable(void)
+     /* Enable the CC310 HW/IQ once*/
+ 
+     NRF_CRYPTOCELL->ENABLE = 1;
++#ifndef WOLFSSL_CRYPTOCELL_NO_INTERRUPTS
+     NVIC_EnableIRQ(CRYPTOCELL_IRQn);
++#endif
+ }
+ 
+ static void cc310_disable(void)
+@@ -68,7 +70,9 @@ static void cc310_disable(void)
+     /* Disable HW/IRQ if no more users */
+     if (cc310_enableCount == 0) {
+         NRF_CRYPTOCELL->ENABLE = 0;
++#ifndef WOLFSSL_CRYPTOCELL_NO_INTERRUPTS
+         NVIC_DisableIRQ(CRYPTOCELL_IRQn);
++#endif
+     }
+ }
+ 
+-- 
+2.34.1
+
