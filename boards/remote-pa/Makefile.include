@@ -1,5 +1,5 @@
 # define the default port depending on the host OS
 PORT_LINUX  ?= /dev/ttyUSB1
-PORT_DARWIN ?= $(firstword $(sort $(wildcard /dev/tty.usbserial*)))
+PORT_DARWIN ?= $(firstword $(sort $(wildcard /dev/cu.usbserial*)))
 
 include $(RIOTBOARD)/common/remote/Makefile.include

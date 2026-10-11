@@ -10,7 +10,7 @@ ifeq ($(TEENSY_LOADER),$(FLASHER))
 endif
 
 # define the default port depending on the host OS
-PORT_DARWIN ?= $(firstword $(sort $(wildcard /dev/tty.usbserial-*)))
+PORT_DARWIN ?= $(firstword $(sort $(wildcard /dev/cu.usbserial*)))
 
 $(TEENSY_LOADER):
 	@echo "[INFO] teensy_loader binary not found - building it from source now"

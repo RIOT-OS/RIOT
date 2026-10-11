@@ -176,7 +176,7 @@ port (depending on the host OS):
 
 ```makefile
 PORT_LINUX ?= /dev/ttyACM0
-PORT_DARWIN ?= $(firstword $(sort $(wildcard /dev/tty.usbmodem*)))
+PORT_DARWIN ?= $(firstword $(sort $(wildcard /dev/cu.usbmodem*)))
 ```
 
 So if the board is also using this, there's no need to redefine these variables
@@ -189,7 +189,7 @@ content in its `Makefile.include`:
 ```makefile
 # Define the default port depending on the host OS
 PORT_LINUX ?= /dev/ttyUSB0
-PORT_DARWIN ?= $(firstword $(sort $(wildcard /dev/tty.usbserial*)))
+PORT_DARWIN ?= $(firstword $(sort $(wildcard /dev/cu.usbserial*)))
 
 # this board uses OpenOCD
 PROGRAMMER ?= openocd
