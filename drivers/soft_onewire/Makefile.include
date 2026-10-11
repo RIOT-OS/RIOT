@@ -1,0 +1,6 @@
+USEMODULE_INCLUDES_soft_onewire := $(LAST_MAKEFILEDIR)/include
+USEMODULE_INCLUDES += $(USEMODULE_INCLUDES_soft_onewire)
+
+PSEUDOMODULES += soft_onewire_2pins
+PSEUDOMODULES += soft_onewire_hwtimer
+PSEUDOMODULES += soft_onewire_pwr

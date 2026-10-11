@@ -1,0 +1,9 @@
+FEATURES_REQUIRED += periph_gpio
+
+USEMODULE += onewire
+
+ifneq (,$(filter soft_onewire_hwtimer,$(USEMODULE)))
+  FEATURES_REQUIRED += periph_timer
+else
+  USEMODULE += ztimer_usec
+endif
