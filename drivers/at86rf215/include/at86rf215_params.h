@@ -28,27 +28,27 @@ extern "C" {
  * @{
  */
 #ifndef AT86RF215_PARAM_SPI
-#define AT86RF215_PARAM_SPI         (SPI_DEV(1))
+#  define AT86RF215_PARAM_SPI         (SPI_DEV(1))
 #endif
 #ifndef AT86RF215_PARAM_SPI_CLK
-#define AT86RF215_PARAM_SPI_CLK     (SPI_CLK_5MHZ)
+#  define AT86RF215_PARAM_SPI_CLK     (SPI_CLK_5MHZ)
 #endif
 #ifndef AT86RF215_PARAM_CS
-#define AT86RF215_PARAM_CS          (GPIO_PIN(2, 14))
+#  define AT86RF215_PARAM_CS          (GPIO_PIN(2, 14))
 #endif
 #ifndef AT86RF215_PARAM_INT
-#define AT86RF215_PARAM_INT         (GPIO_PIN(2, 30))
+#  define AT86RF215_PARAM_INT         (GPIO_PIN(2, 30))
 #endif
 #ifndef AT86RF215_PARAM_RESET
-#define AT86RF215_PARAM_RESET       (GPIO_PIN(3, 10))
+#  define AT86RF215_PARAM_RESET       (GPIO_PIN(3, 10))
 #endif
 
 #ifndef AT86RF215_PARAMS
-#define AT86RF215_PARAMS            { .spi = AT86RF215_PARAM_SPI,         \
-                                      .spi_clk = AT86RF215_PARAM_SPI_CLK, \
-                                      .cs_pin = AT86RF215_PARAM_CS,       \
-                                      .int_pin = AT86RF215_PARAM_INT,     \
-                                      .reset_pin = AT86RF215_PARAM_RESET }
+#  define AT86RF215_PARAMS            { .spi = AT86RF215_PARAM_SPI,         \
+                                        .spi_clk = AT86RF215_PARAM_SPI_CLK, \
+                                        .cs_pin = AT86RF215_PARAM_CS,       \
+                                        .int_pin = AT86RF215_PARAM_INT,     \
+                                        .reset_pin = AT86RF215_PARAM_RESET }
 #endif
 /**@}*/
 

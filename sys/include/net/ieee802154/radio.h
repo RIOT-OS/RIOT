@@ -167,7 +167,7 @@ typedef enum {
      */
     IEEE802154_CAP_SRC_ADDR_MATCH       = BIT19,
     /**
-     * @brief the devices records timestamps on received frames
+     * @brief The device records timestamps on received frames
      */
     IEEE802154_CAP_RX_TIMESTAMP         = BIT20,
     /**
@@ -181,6 +181,13 @@ typedef enum {
      * e.g. for software handling of the ACK reply.
      */
     IEEE802154_CAP_FRAME_RETENTION      = BIT21,
+    /**
+     * @brief The device supports auto RX after a transmission
+     *
+     * The device automatically goes to state RX after a transmission
+     * with ACK Req bit set.
+     */
+    IEEE802154_CAP_AUTO_TX2RX           = BIT22,
 } ieee802154_rf_caps_t;
 
 /**
@@ -397,8 +404,10 @@ typedef struct {
      * The minimum and maximum values are 0 (-174 dBm) and 254 (80 dBm).
      */
     uint8_t rssi;
-    uint8_t lqi;            /**< LQI of the received frame */
-    uint64_t timestamp;     /**< Timestamp value of a received frame in ns */
+    uint8_t lqi;        /**< LQI of the received frame */
+#if IS_USED(MODULE_IEEE802154_RX_TIMESTAMP)
+    uint64_t timestamp; /**< Timestamp value of a received frame in ns */
+#endif
 } ieee802154_rx_info_t;
 
 /**
@@ -500,6 +509,25 @@ typedef struct {
     uint8_t mod_idx;                    /**< modulation index */
     ieee802154_mr_fsk_fec_t fec;        /**< forward error correction */
 } ieee802154_mr_fsk_conf_t;
+
+/**
+ * @brief Union of all supported PHY configurations
+ *
+ * All members start with @ref ieee802154_phy_conf_t, so @p super.phy_mode
+ * can always be read to determine which member is valid.
+ */
+typedef union {
+    ieee802154_phy_conf_t super;            /**< common settings */
+#if IS_USED(MODULE_IEEE802154_PHY_MR_OQPSK)
+    ieee802154_mr_oqpsk_conf_t mr_oqpsk;    /**< valid if phy_mode == MR_OQPSK */
+#endif
+#if IS_USED(MODULE_IEEE802154_PHY_MR_OFDM)
+    ieee802154_mr_ofdm_conf_t mr_ofdm;      /**< valid if phy_mode == MR_OFDM */
+#endif
+#if IS_USED(MODULE_IEEE802154_PHY_MR_FSK)
+    ieee802154_mr_fsk_conf_t mr_fsk;        /**< valid if phy_mode == MR_FSK */
+#endif
+} ieee802154_phy_pib_t;
 
 /**
  * @brief IEEE 802.15.4 radio operations
