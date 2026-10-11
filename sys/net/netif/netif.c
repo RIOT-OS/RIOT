@@ -22,11 +22,19 @@
 
 static list_node_t netif_list;
 
-int netif_register(netif_t *netif)
+int netif_register(netif_t *netif, netif_type_t type, uint8_t index)
 {
     if (netif == NULL) {
         return -EINVAL;
     }
+
+#ifdef MODULE_NETIF_REGISTER
+    netif->type = type;
+    netif->index = index;
+#else
+    (void)type;
+    (void)index;
+#endif
 
     unsigned state = irq_disable();
     list_add(&netif_list, &netif->node);
