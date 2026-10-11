@@ -80,7 +80,6 @@
 #include <string.h>
 #include <unistd.h>
 
-#include "bitarithm.h"
 #include "bitfield.h"
 #include "byteorder.h"
 #include "iolist.h"
@@ -457,14 +456,28 @@ typedef struct {
 
 /**
  * @brief   Block1 helper struct
+ * @internal
+ *
+ * @note    Generic Block1 / Block2 helper struct for shared Block1 / Block2
+ *          code. Use @ref coap_block1_t or @ref coap_block2_t instead for
+ *          user facing code.
  */
-typedef struct {
+struct _coap_block {
     size_t offset;                  /**< offset of received data            */
     uint32_t blknum;                /**< block number                       */
     uint8_t szx;                    /**< szx value                          */
-    int8_t more;                    /**< -1 for no option, 0 for last block,
-                                          1 for more blocks coming          */
-} coap_block1_t;
+    bool more;                      /**< 0 for last block, 1 for more blocks coming */
+};
+
+/**
+ * @brief   Block1 helper struct
+ */
+typedef struct _coap_block coap_block1_t;
+
+/**
+ * @brief   Block2 helper struct
+ */
+typedef struct _coap_block coap_block2_t;
 
 /**
  * @brief Blockwise transfer helper struct
@@ -1264,6 +1277,8 @@ static inline bool coap_block2_finish(coap_block_slicer_t *slicer)
  *
  * @retval       0          Success
  * @retval       -EBADMSG   @p pkt contains an invalid block options
+ * @retval       -EOVERFLOW slice specified by block option exceeds address
+ *                          space (16-bit / 8-bit MCUs only)
  */
 WARN_UNUSED_RESULT
 int coap_block2_init(coap_pkt_t *pkt, coap_block_slicer_t *slicer);
@@ -1361,24 +1376,35 @@ int coap_blockwise_put_char(coap_builder_t *state, coap_block_slicer_t *slicer, 
 int coap_blockwise_put_char_pkt(coap_pkt_t *pdu, coap_block_slicer_t *slicer, char c);
 
 /**
- * @brief    Block option getter
+ * @brief    Internal Block Option getter
+ *
+ * @internal
+ *
+ * @note    Use @ref coap_get_block1 or @ref coap_get_block2 instead
  *
  * This function gets a CoAP packet's block option and parses it into a helper
  * structure.
  *
- * If no block option is present in @p pkt, the values in @p block will be
- * initialized with zero. That implies both block->offset and block->more are
- * also valid in that case, as packet with offset==0 and more==0 means it contains
- * all the payload for the corresponding request.
+ * If no block option is present in @p pkt, the values in @p block will
+ * be initialized with defaults. That implies both `block->offset` and
+ * `block->more` are also valid in that case, as a packet with `offset==0` and
+ * `more==0` means it contains all the payload for the corresponding request.
+ * `block-szx` will be set to `CONFIG_NANOCOAP_BLOCKSIZE_DEFAULT` when no
+ * option is present.
  *
  * @param[in]   pkt     pkt to work on
  * @param[out]  block   ptr to preallocated coap_block1_t structure
  * @param[in]   option  block1 or block2
  *
- * @returns     0 if block option not present
- * @returns     1 if structure has been filled
+ * @retval      1           option present and parsed, @p block filled with
+ *                          parsed values
+ * @retval      0           option not present, @p block filled with defaults
+ * @retval      -EBADMSG    option present, but invalid encoding
+ * @retval      -EOVERFLOW  `block->offset` is overflown. (8-bit / 16-bit MCU
+ *                          and offset >= 64 KiB)
  */
-int coap_get_block(coap_pkt_t *pkt, coap_block1_t *block, uint16_t option);
+WARN_UNUSED_RESULT
+int coap_get_block(coap_pkt_t *pkt, struct _coap_block *block, uint16_t option);
 
 /**
  * @brief    Block1 option getter
@@ -1386,17 +1412,24 @@ int coap_get_block(coap_pkt_t *pkt, coap_block1_t *block, uint16_t option);
  * This function gets a CoAP packet's block1 option and parses it into a helper
  * structure.
  *
- * If no block1 option is present in @p pkt, the values in @p block1 will be
- * initialized with zero. That implies both block1->offset and block1->more are
- * also valid in that case, as packet with offset==0 and more==0 means it contains
- * all the payload for the corresponding request.
+ * If no block option is present in @p pkt, the values in @p block will
+ * be initialized with defaults. That implies both `block->offset` and
+ * `block->more` are also valid in that case, as a packet with `offset==0` and
+ * `more==0` means it contains all the payload for the corresponding request.
+ * `block-szx` will be set to `CONFIG_NANOCOAP_BLOCKSIZE_DEFAULT` when no
+ * option is present.
  *
  * @param[in]   pkt     pkt to work on
  * @param[out]  block   ptr to preallocated coap_block1_t structure
  *
- * @returns     0 if block1 option not present
- * @returns     1 if structure has been filled
+ * @retval      1           option present and parsed, @p block filled with
+ *                          parsed values
+ * @retval      0           option not present, @p block filled with defaults
+ * @retval      -EBADMSG    option present, but invalid encoding
+ * @retval      -EOVERFLOW  `block->offset` is overflown. (8-bit / 16-bit MCU
+ *                          and offset >= 64 KiB)
  */
+WARN_UNUSED_RESULT
 static inline int coap_get_block1(coap_pkt_t *pkt, coap_block1_t *block)
 {
     return coap_get_block(pkt, block, COAP_OPT_BLOCK1);
@@ -1406,29 +1439,24 @@ static inline int coap_get_block1(coap_pkt_t *pkt, coap_block1_t *block)
  * @brief    Block2 option getter
  *
  * @param[in]   pkt     pkt to work on
- * @param[out]  block   ptr to preallocated coap_block1_t structure
+ * @param[out]  block   ptr to preallocated coap_block2_t structure
  *
- * @returns     0 if block2 option not present
- * @returns     1 if structure has been filled
+ * @retval      1           option present and parsed, @p block filled with
+ *                          parsed values
+ * @retval      0           option not present, @p block filled with defaults
+ * @retval      -EBADMSG    option present, but invalid encoding
+ * @retval      -EOVERFLOW  `block->offset` is overflown. (8-bit / 16-bit MCU
+ *                          and offset >= 64 KiB)
+ *
+ * @note        CoAP servers should use @ref coap_block2_init instead. It will
+ *              internally parse the request's Block2 Option (when present) and
+ *              set up response slicing accordingly.
  */
-static inline int coap_get_block2(coap_pkt_t *pkt, coap_block1_t *block)
+WARN_UNUSED_RESULT
+static inline int coap_get_block2(coap_pkt_t *pkt, coap_block2_t *block)
 {
     return coap_get_block(pkt, block, COAP_OPT_BLOCK2);
 }
-
-/**
- * @brief    Generic block option getter
- *
- * @param[in]   pkt     pkt to work on
- * @param[in]   option  actual block option number to get
- * @param[out]  blknum  block number
- * @param[out]  szx     SZX value
- *
- * @returns     -1 if option not found
- * @returns     0 if more flag is not set
- * @returns     1 if more flag is set
- */
-int coap_get_blockopt(coap_pkt_t *pkt, uint16_t option, uint32_t *blknum, uint8_t *szx);
 
 /**
  * @brief    Check whether any of the packet's options that are critical

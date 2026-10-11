@@ -463,39 +463,6 @@ int coap_iterate_uri_query(coap_pkt_t *pkt, void **opt_pos,
     return 2; /* Key and values found */
 }
 
-int coap_get_blockopt(coap_pkt_t *pkt, uint16_t option, uint32_t *blknum, uint8_t *szx)
-{
-    uint8_t *optpos = coap_find_option(pkt, option);
-    if (!optpos) {
-        return -1;
-    }
-
-    int option_len;
-    uint16_t delta;
-
-    uint8_t *data_start = _parse_option(pkt, optpos, &delta, &option_len);
-    if (!data_start) {
-        DEBUG("nanocoap: invalid start data\n");
-        return -1;
-    }
-
-    /* option is 0 to 3 bytes in length, see
-     * https://www.rfc-editor.org/info/rfc7959/#section-2.1 */
-    if (option_len > 3) {
-        DEBUG("nanocoap: invalid option length\n");
-        return -1;
-    }
-
-    uint32_t blkopt = _decode_uint(data_start, option_len);
-
-    DEBUG("nanocoap: blkopt len: %i\n", option_len);
-    DEBUG("nanocoap: blkopt: 0x%08x\n", (unsigned)blkopt);
-    *blknum = blkopt >> COAP_BLOCKWISE_NUM_OFF;
-    *szx = blkopt & COAP_BLOCKWISE_SZX_MASK;
-
-    return (blkopt & 0x8) ? 1 : 0;
-}
-
 bool coap_find_uri_query(coap_pkt_t *pkt, const char *key, const char **value, size_t *len)
 {
     uint8_t *opt_pos = NULL;
@@ -1151,13 +1118,66 @@ static unsigned _slicer2blkopt(coap_block_slicer_t *slicer, bool more)
     return (blknum << 4) | _size2szx(blksize) | (more ? 0x8 : 0);
 }
 
-int coap_get_block(coap_pkt_t *pkt, coap_block1_t *block, uint16_t option)
+int coap_get_block(coap_pkt_t *pkt, struct _coap_block *block, uint16_t option)
 {
-    block->blknum = 0;
-    block->more = coap_get_blockopt(pkt, option, &block->blknum, &block->szx);
-    block->offset = block->blknum << (block->szx + 4);
+    /* API contract: Initialize @p block with a reasonable default when no
+     * block option is present */
+    *block = (struct _coap_block){ .szx = CONFIG_NANOCOAP_BLOCKSIZE_DEFAULT };
 
-    return block->more >= 0;
+    uint8_t *optpos = coap_find_option(pkt, option);
+    if (!optpos) {
+        return 0;
+    }
+
+    int option_len;
+    uint16_t delta;
+
+    uint8_t *data_start = _parse_option(pkt, optpos, &delta, &option_len);
+    if (!data_start) {
+        DEBUG("nanocoap: invalid start data\n");
+        return -EBADMSG;
+    }
+
+    /* option is 0 to 3 bytes in length, see
+     * https://www.rfc-editor.org/info/rfc7959/#section-2.1 */
+    if (option_len > 3) {
+        DEBUG("nanocoap: invalid option length\n");
+        return -EBADMSG;
+    }
+
+    uint32_t blkopt = _decode_uint(data_start, option_len);
+
+    DEBUG("nanocoap: blkopt len: %i\n", option_len);
+    DEBUG("nanocoap: blkopt: 0x%08x\n", (unsigned)blkopt);
+    uint8_t szx = blkopt & COAP_BLOCKWISE_SZX_MASK;
+    if (szx > COAP_BLOCKSIZE_1024) {
+        DEBUG_PUTS("nanocoap: No support for draft-bormann-core-block-bert-01");
+        return -EBADMSG;
+    }
+
+    block->szx = szx;
+    block->blknum = blkopt >> COAP_BLOCKWISE_NUM_OFF;
+    block->more = (bool)(blkopt & 0x8);
+
+    /* as blkopt is at most 24 bits, `blknum = blkopt >> 4` is at most 0xfffff
+     * as `szx = `blkopt & 7`, `szx + 4` is at most 11. Since
+     * `0xfffff << 11 == 0x7ffff800 < UINT32_MAX`, the following is defined
+     * behavior and never overflows on 32-bit arithmetic: */
+    uint32_t offset = block->blknum << (block->szx + 4);
+
+    /* On 8-bit / 16-bit, casting uint32_t to size_t loses precision. We guard
+     * this check to avoid `-Wtype-limits` warning about an impossible if
+     * condition on 32-bit / 64-bit systems. */
+#if SIZE_MAX < UINT32_MAX
+    if (offset > SIZE_MAX) {
+        return -EOVERFLOW;
+    }
+#endif
+
+    block->offset = offset;
+
+
+    return 1;
 }
 
 int coap_put_block1_ok(coap_builder_t *state, coap_block1_t *block1)
@@ -1547,28 +1567,33 @@ int coap_block_slicer_init(coap_block_slicer_t *slicer, size_t blknum,
 
 int coap_block2_init(coap_pkt_t *pkt, coap_block_slicer_t *slicer)
 {
-    uint32_t blknum = 0;
-    uint8_t szx = CONFIG_NANOCOAP_BLOCK_SIZE_MAX;
-
+    static_assert(CONFIG_NANOCOAP_BLOCKSIZE_DEFAULT <= CONFIG_NANOCOAP_BLOCK_SIZE_MAX,
+                  "The default block size must not be larger than the maximum");
+    coap_block2_t block2;
     /* Retrieve the block2 option from the client request */
-    if (coap_get_blockopt(pkt, COAP_OPT_BLOCK2, &blknum, &szx) >= 0) {
+    int err = coap_get_block2(pkt, &block2);
+    if (err < 0) {
+        return err;
+    }
+
+    if (err == 1) {
         /* If the client's requested block size is not acceptable (too large),
          * we go with the maximum we are willing to do and recompute the
          * block number to stay at the same offset. */
-        if (szx > CONFIG_NANOCOAP_BLOCK_SIZE_MAX) {
-            unsigned shift = szx - CONFIG_NANOCOAP_BLOCK_SIZE_MAX;
-            szx = CONFIG_NANOCOAP_BLOCK_SIZE_MAX;
-            uint64_t tmp = blknum;
+        if (block2.szx > CONFIG_NANOCOAP_BLOCK_SIZE_MAX) {
+            unsigned shift = block2.szx - CONFIG_NANOCOAP_BLOCK_SIZE_MAX;
+            block2.szx = CONFIG_NANOCOAP_BLOCK_SIZE_MAX;
+            uint64_t tmp = block2.blknum;
             tmp <<= shift;
             if (tmp > COAP_BLOCKWISE_NUM_MAX) {
                 return -EBADMSG;
             }
-            blknum = tmp;
+            block2.blknum = tmp;
         }
     }
 
-    if (coap_block_slicer_init(slicer, blknum, coap_szx2size(szx))) {
-        return -EBADMSG;
+    if (coap_block_slicer_init(slicer, block2.blknum, coap_szx2size(block2.szx))) {
+        return -EOVERFLOW;
     }
 
     return 0;
@@ -1697,7 +1722,9 @@ ssize_t coap_well_known_core_default_handler(coap_pkt_t *pkt, uint8_t *buf, \
     coap_builder_t state;
     int err = coap_block2_init(pkt, &slicer);
     if (err) {
-        return err;
+        const char *errmsg = "Block2";
+        return coap_reply_simple(pkt, COAP_CODE_BAD_OPTION, buf, len,
+                                 COAP_FORMAT_TEXT, errmsg, strlen(errmsg));
     }
     err = coap_builder_init_reply(&state, buf, len, pkt, COAP_CODE_CONTENT);
     if (err) {

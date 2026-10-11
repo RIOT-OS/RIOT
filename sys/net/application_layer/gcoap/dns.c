@@ -674,7 +674,14 @@ static void _resp_handler(const gcoap_request_memo_t *memo, coap_pkt_t *pdu,
         }
         return;
     }
-    if (coap_get_block2(pdu, &block)) {
+
+    int blockwise = coap_get_block2(pdu, &block);
+    if (blockwise < 0) {
+        DEBUG_PUTS("gcoap_dns: invalid Block2 Option");
+        context->res = -EBADMSG;
+        goto unlock;
+    }
+    if (blockwise) {
         uint8_t *dns_buf = context->dns_buf;
 
         if ((block.offset + pdu->payload_len) > CONFIG_DNS_MSG_LEN) {

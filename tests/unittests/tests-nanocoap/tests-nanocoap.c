@@ -1394,6 +1394,100 @@ static void test_nanocoap__coap_szx2size(void)
     TEST_ASSERT_EQUAL_INT(COAP_BLOCKSIZE_32, coap_size2szx(63));
 }
 
+/* Test if coap_get_block2() is working correctly. Since coap_get_block1() has
+ * the exact same implementation, we are not testing it separately. */
+static void test_nanocoap__coap_get_block2(void)
+{
+    uint8_t request_no_block_opt[] = {
+        /* version = 1, type = CON, Token Len = 3 */
+        (COAP_V1 << 6) | (COAP_TYPE_CON << 4) | 3,
+        COAP_METHOD_GET,
+        0x13, 0x37, /* Message ID = 0x1337 */
+        0xca, 0xfe, 0x42, /* Token = 0xcafe42 */
+         /* Option Delta: 11 (11 + 0 = 11 = URI-Path)
+          * Option Length: 3 */
+        (COAP_OPT_URI_PATH << 4) | (3),
+        'f', 'o', 'o',
+    };
+
+    const uint8_t blknum = 8;
+    const coap_blksize_t szx = COAP_BLOCKSIZE_32;
+    const bool more = true;
+    uint8_t request_valid_block2_opt[] = {
+        /* version = 1, type = CON, Token Len = 3 */
+        (COAP_V1 << 6) | (COAP_TYPE_CON << 4) | 3,
+        COAP_METHOD_GET,
+        0x13, 0x37, /* Message ID = 0x1337 */
+        0xca, 0xfe, 0x42, /* Token = 0xcafe42 */
+         /* Option Delta: 11 (11 + 0 = 11 = URI-Path)
+          * Option Length: 3 */
+        (COAP_OPT_URI_PATH << 4) | (3),
+        'f', 'o', 'o',
+        ((COAP_OPT_BLOCK2 - COAP_OPT_URI_PATH) << 4) | 1,
+        (blknum << COAP_BLOCKWISE_NUM_OFF) | (more << COAP_BLOCKWISE_MORE_OFF) | szx,
+    };
+
+    uint8_t request_invalid_block2_opt[] = {
+        /* version = 1, type = CON, Token Len = 3 */
+        (COAP_V1 << 6) | (COAP_TYPE_CON << 4) | 3,
+        COAP_METHOD_GET,
+        0x13, 0x37, /* Message ID = 0x1337 */
+        0xca, 0xfe, 0x42, /* Token = 0xcafe42 */
+         /* Option Delta: 11 (11 + 0 = 11 = URI-Path)
+          * Option Length: 3 */
+        (COAP_OPT_URI_PATH << 4) | (3),
+        'f', 'o', 'o',
+        ((COAP_OPT_BLOCK2 - COAP_OPT_URI_PATH) << 4) | 4,
+        0xff, 0xff, 0xff, 0xff
+    };
+
+    uint8_t request_block2_opt_bert[] = {
+        /* version = 1, type = CON, Token Len = 3 */
+        (COAP_V1 << 6) | (COAP_TYPE_CON << 4) | 3,
+        COAP_METHOD_GET,
+        0x13, 0x37, /* Message ID = 0x1337 */
+        0xca, 0xfe, 0x42, /* Token = 0xcafe42 */
+         /* Option Delta: 11 (11 + 0 = 11 = URI-Path)
+          * Option Length: 3 */
+        (COAP_OPT_URI_PATH << 4) | (3),
+        'f', 'o', 'o',
+        ((COAP_OPT_BLOCK2 - COAP_OPT_URI_PATH) << 4) | 1,
+        (blknum << COAP_BLOCKWISE_NUM_OFF) | (more << COAP_BLOCKWISE_MORE_OFF) | (COAP_BLOCKSIZE_1024 + 1),
+    };
+
+    coap_pkt_t pkt;
+    coap_block2_t block2;
+
+    memset(&block2, 0xff, sizeof(block2));
+    TEST_ASSERT_EQUAL_INT(sizeof(request_no_block_opt),
+                          coap_parse(&pkt, request_no_block_opt, sizeof(request_no_block_opt)));
+    TEST_ASSERT_EQUAL_INT(0, coap_get_block2(&pkt, &block2));
+    TEST_ASSERT_EQUAL_INT(0, block2.blknum);
+    TEST_ASSERT_EQUAL_INT(CONFIG_NANOCOAP_BLOCKSIZE_DEFAULT, block2.szx);
+    TEST_ASSERT_EQUAL_INT(0, block2.offset);
+    TEST_ASSERT_EQUAL_INT(0, block2.more);
+
+    memset(&block2, 0xff, sizeof(block2));
+    TEST_ASSERT_EQUAL_INT(sizeof(request_valid_block2_opt),
+                          coap_parse(&pkt, request_valid_block2_opt, sizeof(request_valid_block2_opt)));
+    TEST_ASSERT_EQUAL_INT(1, coap_get_block2(&pkt, &block2));
+    TEST_ASSERT_EQUAL_INT(blknum, block2.blknum);
+    TEST_ASSERT_EQUAL_INT(szx, block2.szx);
+    TEST_ASSERT_EQUAL_INT(blknum * coap_szx2size(szx), block2.offset);
+    TEST_ASSERT_EQUAL_INT(more, block2.more);
+
+    memset(&block2, 0xff, sizeof(block2));
+    TEST_ASSERT_EQUAL_INT(sizeof(request_invalid_block2_opt),
+                          coap_parse(&pkt, request_invalid_block2_opt, sizeof(request_invalid_block2_opt)));
+    TEST_ASSERT_EQUAL_INT(-EBADMSG, coap_get_block2(&pkt, &block2));
+
+    /* No support for https://datatracker.ietf.org/doc/html/draft-bormann-core-block-bert-01 */
+    memset(&block2, 0xff, sizeof(block2));
+    TEST_ASSERT_EQUAL_INT(sizeof(request_block2_opt_bert),
+                          coap_parse(&pkt, request_block2_opt_bert, sizeof(request_block2_opt_bert)));
+    TEST_ASSERT_EQUAL_INT(-EBADMSG, coap_get_block2(&pkt, &block2));
+}
+
 static Test *tests_nanocoap_tests(void)
 {
     EMB_UNIT_TESTFIXTURES(fixtures) {
@@ -1436,6 +1530,7 @@ static Test *tests_nanocoap_tests(void)
         new_TestFixture(test_nanocoap__out_of_bounds_option),
         new_TestFixture(test_nanocoap__coap_build_reply_header),
         new_TestFixture(test_nanocoap__coap_szx2size),
+        new_TestFixture(test_nanocoap__coap_get_block2),
     };
 
     EMB_UNIT_TESTCALLER(nanocoap_tests, NULL, NULL, fixtures);
