@@ -1,0 +1,6 @@
+ifneq (,$(filter saul_default,$(USEMODULE)))
+  USEMODULE += saul_gpio
+  USEMODULE += sht3x
+endif
+
+USEMODULE += boards_common_esp32
