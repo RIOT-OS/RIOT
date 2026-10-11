@@ -38,6 +38,9 @@ typedef int (*coap_link_format_handler_t)(char *entry, void *ctx);
 /**
  * @brief   Downloads the resource behind @p path via blockwise GET
  *
+ * @pre         @p dirent_buf_len is at least 2 (but that would allow only for
+ *              single letter paths due to `'\0'` termination)
+ *
  * @param[in]   sock    Connection to the server
  * @param[in]   path    path of the resource
  * @param[in]   cb      Callback to execute for each resource entry
@@ -45,8 +48,11 @@ typedef int (*coap_link_format_handler_t)(char *entry, void *ctx);
  * @param[out]  dirent_buf      Response buffer
  * @param[in]   dirent_buf_len  Length of the response buffer
  *
- * @returns     0 on success
- * @returns     <0 on error
+ * @retval      0           success
+ * @retval      -EINVAL     one or more arguments invalid
+ * @retval      -EOVERFLOW  buffer in @p dirent_buf too small for at least one
+ *                          entry, aborted listing early
+ * @retval      <0          other error (negative errno returned to indicate cause)
  */
 int nanocoap_link_format_get(nanocoap_sock_t *sock, const char *path,
                              coap_link_format_handler_t cb, void *arg,
@@ -55,14 +61,20 @@ int nanocoap_link_format_get(nanocoap_sock_t *sock, const char *path,
 /**
  * @brief   Downloads the resource behind @p url via blockwise GET
  *
+ * @pre         @p dirent_buf_len is at least 2 (but that would allow only for
+ *              single letter paths due to `'\0'` termination)
+ *
  * @param[in]   url     URL to the resource
  * @param[in]   cb      Callback to execute for each resource entry
  * @param[in]   arg     Optional callback argument
  * @param[out]  dirent_buf      Response buffer
  * @param[in]   dirent_buf_len  Length of the response buffer
  *
- * @returns     0 on success
- * @returns     <0 on error
+ * @retval      0           success
+ * @retval      -EINVAL     one or more arguments invalid
+ * @retval      -EOVERFLOW  buffer in @p dirent_buf too small for at least one
+ *                          entry, aborted listing early
+ * @retval      <0          other error (negative errno returned to indicate cause)
  */
 int nanocoap_link_format_get_url(const char *url,
                                  coap_link_format_handler_t cb, void *arg,
