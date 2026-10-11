@@ -239,9 +239,47 @@ endif
 
 # Override LOG_LEVEL if variable is set and if CFLAGS doesn't already contain
 # a LOG_LEVEL config
+VALID_LOG_LEVELS = NONE ERROR WARNING INFO DEBUG ALL
 ifdef LOG_LEVEL
   ifeq (,$(filter -DLOG_LEVEL=%,$(CFLAGS)))
-    CFLAGS += -DLOG_LEVEL=$(LOG_LEVEL)
+    ifneq (,$(filter 0 1 2 3 4 5 6 7 8 9 10,$(strip $(LOG_LEVEL))))
+      CFLAGS += -DLOG_LEVEL=$(LOG_LEVEL)
+    else ifneq (,$(filter $(VALID_LOG_LEVELS),$(patsubst LOG_%,%,$(LOG_LEVEL))))
+      CFLAGS += -DLOG_LEVEL=LOG_$(patsubst LOG_%,%,$(LOG_LEVEL))
+    else
+      $(error Invalid log level: $(strip $(LOG_LEVEL)))
+    endif
+  else
+    $(warning LOG_LEVEL overruled by $(filter -DLOG_LEVEL=%,$(CFLAGS)))
+  endif
+endif
+
+# Set log unit prefixes from "core.sched ztimer" to "core.sched", "ztimer"s
+ifneq ($(origin LOG), undefined)
+  # Turn on new selective logging system only if LOG is present
+  CFLAGS += -DLOG_SELECTIVE=1
+  ifeq (ALL,$(strip $(LOG)))
+    CFLAGS += -DLOG_SELECTIVE_ALL=1
+  else ifneq (,$(strip $(LOG)))
+    LOG_LEVELS_INVALID = $(filter-out $(LOG), \
+      $(filter-out $(VALID_LOG_LEVELS), \
+        $(notdir $(subst =,/,$(LOG))) \
+      ))
+    ifneq ($(LOG_LEVELS_INVALID),)
+      $(error Invalid log levels: $(LOG_LEVELS_INVALID))
+    endif
+    # e.g., LOG="ztimer=DEBUG coap=WARNING wifi" turns into
+    # R(u,l,"ztimer",LOG_DEBUG) R(u,l,"coap",LOG_WARNING) P(u,l,"wifi",L)
+    # where R is the rule macro for checking the requested u(nit) and l(evel)
+    # against the list of selected log units and levels from LOG, and L
+    # the default log level when you don't add `=LOG_SOME_LEVEL` in LOG.
+    _log_rule = R\(u,l,\"$(firstword $(1))\",$(if $(word 2,$(1)),LOG_$(word 2,$(1)),L)\)
+    # log.h uses _LOG_SELECTIVE_RULES(R,u,l,L) to build a predicate (OR clause)
+    # to check if a message can be logged from the given unit u at the requested
+    # level l, e.g., u=LOG_UNIT, l=LOG_INFO when you do `LOG(LOG_INFO, "..")`.
+    # L is set to LOG_LEVEL at the expansion site of the LOG macro.
+    CFLAGS_WITH_MACROS += \
+      -D_LOG_SELECTIVE_RULES\(R,u,l,L\)="$(foreach c,$(LOG),$(call _log_rule,$(subst =, ,$(c))))"
   endif
 endif
 

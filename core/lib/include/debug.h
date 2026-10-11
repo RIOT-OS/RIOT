@@ -1,26 +1,36 @@
 /*
  * SPDX-FileCopyrightText: 2014 Freie Universität Berlin
+ * SPDX-FileCopyrightText: 2026 TU Dresden
  * SPDX-License-Identifier: LGPL-2.1-only
  */
 
 #pragma once
 
 /**
+ * @defgroup    core_util_debug Debugging
  * @ingroup     core_util
+ * @brief       Macros for debugging and printing debug messages
  * @{
- *
+ */
+
+/**
  * @file
- * @brief       Debug-header
- *
- * @details     If *ENABLE_DEBUG* is defined inside an implementation file, all
- *              calls to ::DEBUG will work the same as *printf* and output the
- *              given information to stdout. If *ENABLE_DEBUG* is not defined,
- *              all calls to ::DEBUG will be ignored.
+ * @brief       Debug header
  *
  * @author      Kaspar Schleiser <kaspar@schleiser.de>
+ * @author      Mikolai Gütschow <mikolai.guetschow@tu-dresden.de>
+ *
+ * If *ENABLE_DEBUG* is defined inside an implementation file, all
+ * calls to ::DEBUG will work the same as *printf* and output the
+ * given information to stdout. If *ENABLE_DEBUG* is not defined,
+ * all calls to ::DEBUG will be ignored.
  */
 
 #include <stdio.h>
+#include <string.h>
+
+#include "ansi_style.h"
+#include "irq.h"
 #include "sched.h"
 #include "thread.h"
 
@@ -29,35 +39,10 @@ extern "C" {
 #endif
 
 /**
- * @def DEBUG_PRINT
- *
- * @brief Print debug information if the calling thread stack is large enough
- *
- * Use this macro the same as `printf`. When `DEVELHELP` is defined inside an
- * implementation file, all usages of ::DEBUG_PRINT will print the given
- * information to stdout after verifying the stack is big enough. If `DEVELHELP`
- * is not set, this check is not performed. (CPU exception may occur)
+ * @name Breakpoints
+ * @{
  */
-#ifdef DEVELHELP
-#include "cpu_conf.h"
-#define DEBUG_PRINT(...) \
-    do { \
-        if ((thread_get_active() == NULL) || \
-            (thread_get_active()->stack_size >= \
-             THREAD_EXTRA_STACKSIZE_PRINTF)) { \
-            printf(__VA_ARGS__); \
-        } \
-        else { \
-            puts("Cannot debug, stack too small. Consider using DEBUG_PUTS()."); \
-        } \
-    } while (0)
-#else
-#define DEBUG_PRINT(...) printf(__VA_ARGS__)
-#endif
-
 /**
- * @def DEBUG_BREAKPOINT
- *
  * @brief Set a debug breakpoint
  *
  * When `DEVELHELP` is enabled, this traps the CPU and allows to debug the
@@ -70,78 +55,204 @@ extern "C" {
  * @param val   Breakpoint context for debugger, usually ignored.
  */
 #ifdef DEVELHELP
-#include "architecture.h"
-#define DEBUG_BREAKPOINT(val)   ARCHITECTURE_BREAKPOINT(val)
+#  include "architecture.h"
+#  define DEBUG_BREAKPOINT(val) ARCHITECTURE_BREAKPOINT(val)
 #else
-#define DEBUG_BREAKPOINT(val)   (void)0
+#  define DEBUG_BREAKPOINT(val) (void)0
 #endif
+/** @} */ /* end of section */
 
 /**
- * @name Debugging defines
+ * @name Configuring debug printing
  * @{
  */
+
 /**
  * @brief   This macro can be defined as 0 or other on a file-based level.
  *          @ref DEBUG() will generate output only if ENABLE_DEBUG is non-zero.
  */
 #if !defined(ENABLE_DEBUG) || defined(DOXYGEN)
-#define ENABLE_DEBUG 0
+#  define ENABLE_DEBUG 0
 #endif
 
 /**
- * @def DEBUG_FUNC
- *
- * @brief   Contains the function name if given compiler supports it.
- *          Otherwise it is an empty string.
- */
-# if defined(__cplusplus) && defined(__GNUC__)
-#  define DEBUG_FUNC __PRETTY_FUNCTION__
-# elif __STDC_VERSION__ >= 199901L
-#  define DEBUG_FUNC __func__
-# elif __GNUC__ >= 2
-#  define DEBUG_FUNC __FUNCTION__
-# else
-#  define DEBUG_FUNC ""
-# endif
-
-/**
- * @def DEBUG
- *
- * @brief Print debug information to stdout
- *
- * @note    This looks similar to the @ref LOG_DEBUG() function. However, it is
- *          enabled on a per-file basis. Prefer @ref DEBUG for debug output
- *          relevant for debugging a module in RIOT. Prefer @ref LOG_DEBUG() for
- *          debug output relevant for application developers using your module
- *          (e.g. to hint potentially incorrect / inefficient use of your
- *          library).
- * @details If a variable is only accessed by `DEBUG()`, the compiler will
- *          warn about unused variables when `ENABLE_DEBUG` is set to `0`.
- */
-#define DEBUG(...) do { if (ENABLE_DEBUG) { DEBUG_PRINT(__VA_ARGS__); } } while (0)
-
-/**
- * @def DEBUG_PUTS
- *
- * @brief Print debug information to stdout using puts(), so no stack size
- *        restrictions do apply.
- */
-#define DEBUG_PUTS(str) do { if (ENABLE_DEBUG) { puts(str); } } while (0)
-/** @} */
-
-/**
- * @def DEBUG_EXTRA_STACKSIZE
- *
  * @brief Extra stacksize needed when ENABLE_DEBUG==1
+ *
+ * @deprecated This macro definition does not work anyway as ENABLE_DEBUG
+ *             is only set on file-level. Just remove its usages.
+ *             Will be removed after release 2027.04.
  */
 #if ENABLE_DEBUG
-#define DEBUG_EXTRA_STACKSIZE THREAD_EXTRA_STACKSIZE_PRINTF
+#  define DEBUG_EXTRA_STACKSIZE THREAD_EXTRA_STACKSIZE_PRINTF
 #else
-#define DEBUG_EXTRA_STACKSIZE (0)
+#  define DEBUG_EXTRA_STACKSIZE THREAD_EXTRA_STACKSIZE_PRINTF
 #endif
+
+/**
+ * @brief Treat  @ref DEBUG, @ref DEBUG_CONT, @ref DEBUG_PUTS like @ref LOG_DEBUG
+ *
+ * **Default**: Enabled (1)
+ *
+ * If turned off, `DEBUG` invocations route directly to `printf` and `puts`.
+ * If turned on, `DEBUG` is treated like @ref LOG_DEBUG.
+ *
+ * Some deployments may rely on a custom log backend that does not expect
+ * to handle all DEBUG messages additionally. To help the transition,
+ * turn off CONFIG_DEBUG_AS_LOG for the old, separate behavior of DEBUG and LOG.
+ */
+#if !defined(CONFIG_DEBUG_AS_LOG) || defined(DOXYGEN)
+#  define CONFIG_DEBUG_AS_LOG 1
+#endif
+
+#if CONFIG_DEBUG_AS_LOG
+#  include "log.h"
+#endif
+
+/**
+ * @brief   Contains the function name if compiler supports it.
+ *          Otherwise it is an empty string.
+ */
+#if defined(__cplusplus) && defined(__GNUC__)
+#  define DEBUG_FUNC __PRETTY_FUNCTION__
+#elif __STDC_VERSION__ >= 199901L
+#  define DEBUG_FUNC __func__
+#elif __GNUC__ >= 2
+#  define DEBUG_FUNC __FUNCTION__
+#else
+#  define DEBUG_FUNC ""
+#endif
+
+/** @} */ /* end of section */
+
+/**
+ * @name Debug print implementation details
+ * @{
+ */
+
+/**
+ * @brief Check whether the stack of the current thread (or ISR) is big enough in total
+ *        for printf formatting when `DEVELHELP` is enabled.
+ *
+ * @warning This only checks for the whole stack size, not for the currently free part of it.
+ *
+ * @private
+ *
+ * @param    print              Whether to print a warning message
+ * @retval   true               Stack is sufficiently big, or `DEVELHELP` is disabled
+ * @retval   false              Stack is too small
+ */
+static inline bool _debug_sufficient_stack(bool print)
+{
+    /* DO NOT call any function here that invokes DEBUG OR LOG in here. */
+#if IS_ACTIVE(DEVELHELP)
+    const thread_t *thread = thread_get_active();
+    if (((thread != NULL) && (thread->stack_size < THREAD_EXTRA_STACKSIZE_PRINTF)) ||
+#  ifdef ISR_STACKSIZE
+        (irq_is_in() && (ISR_STACKSIZE < THREAD_EXTRA_STACKSIZE_PRINTF))) {
+#  else
+        false) {
+#  endif
+        if (print) {
+            puts("Cannot debug, stack too small."
+                 "Consider using DEBUG_PUTS() or increasing the stack size.");
+        }
+        return false;
+    }
+#endif /* IS_ACTIVE(DEVELHELP) */
+    (void)print;
+    return true;
+}
+
+/**
+ * @brief Get thread name of the currently running thread, or "<isr>"
+ *
+ * @private
+ *
+ * @return   the thread name, or "<isr>"
+ */
+static inline const char* _debug_thread_name_or_isr(void)
+{
+    const thread_t *thread = thread_get_active();
+    return (irq_is_in() || thread == NULL) ? "<isr>" : thread_get_name(thread);
+}
+
+/** @} */ /* end of section */
+
+#if CONFIG_DEBUG_AS_LOG || defined(DOXYGEN)
+/**
+ * @name User-facing debug message API
+ * @{
+ */
+
+/**
+ * @brief ...
+ */
+#  define DEBUG(...) do { _LOG_PROLOGUE                                              \
+        if (_CAN_DEBUG_H(LOG_DEBUG, LOG_UNIT) && _debug_sufficient_stack(false)) {  \
+            LOG_WITH_UNIT(LOG_DEBUG, LOG_UNIT, __VA_ARGS__);                                 \
+        }                                                                           \
+    } while (0) _LOG_EPILOGUE
+
+/**
+ * @brief Begin printing debug information to stdout
+ *
+ * Use this macro if you need to debug-log multiple items using @ref DEBUG_CONT
+ */
+#  define DEBUG_BEGIN(...) do { _LOG_PROLOGUE                                         \
+        if (_CAN_DEBUG_H(LOG_DEBUG, LOG_UNIT) && _debug_sufficient_stack(false)) {  \
+            LOG_BEGIN_WITH_UNIT(LOG_DEBUG, LOG_UNIT, __VA_ARGS__);                        \
+        }                                                                           \
+    } while (0) _LOG_EPILOGUE
+
+/**
+ * @brief Continue printing debug information to stdout, without repeating the prefix
+ *
+ * Use this macro the same way as `printf` if you want to continue printing to the
+ * same line that has been started with @ref DEBUG_BEGIN previously.
+ */
+#  define DEBUG_CONT(...) do { _LOG_PROLOGUE                                         \
+        if (_CAN_DEBUG_H(LOG_DEBUG, LOG_UNIT) && _debug_sufficient_stack(false)) {  \
+            LOG_CONT_WITH_UNIT(LOG_DEBUG, LOG_UNIT, __VA_ARGS__);                        \
+        }                                                                           \
+    } while (0) _LOG_EPILOGUE
+
+/**
+ * @brief End printing debug information to stdout
+ *
+ * Use this macro if have debug-logged multiple items before using @ref DEBUG_CONT
+ */
+#  define DEBUG_END(...) do { _LOG_PROLOGUE                                         \
+        if (_CAN_DEBUG_H(LOG_DEBUG, LOG_UNIT) && _debug_sufficient_stack(false)) {  \
+            LOG_END_WITH_UNIT(LOG_DEBUG, LOG_UNIT, __VA_ARGS__);                        \
+        }                                                                           \
+    } while (0) _LOG_EPILOGUE
+
+#  define DEBUG_PUTS(str) DEBUG(str)
+#else
+#  define DEBUG(str) do { _LOG_PROLOGUE                                         \
+        if (ENABLE_DEBUG && _debug_sufficient_stack(false)) {  \
+            printf(str);                                    \
+        }                                                                           \
+    } while (0) _LOG_EPILOGUE
+#  define DEBUG_BEGIN(...) DEBUG(__VA_ARGS__)
+#  define DEBUG_CONT(...) DEBUG(__VA_ARGS__)
+#  define DEBUG_END(...) DEBUG(__VA_ARGS__)
+#  define DEBUG_PUTS(str) do { _LOG_PROLOGUE                                         \
+        if (ENABLE_DEBUG && _debug_sufficient_stack(false)) {  \
+            puts(str);                                    \
+        }                                                                           \
+    } while (0) _LOG_EPILOGUE
+#endif
+
+/**
+ * @deprecated use @ref DEBUG instead. Will be removed after release 2027.04.
+ */
+#define DEBUG_PRINT(...) DEBUG(__VA_ARGS__)
+
+/** @} */ /* end of section */
 
 #ifdef __cplusplus
 }
 #endif
 
-/** @} */
+/** @} */ /* end of group */

@@ -1,1 +1,0 @@
-USEMODULE_INCLUDES += $(RIOTBASE)/sys/log_printfnoformat/include
