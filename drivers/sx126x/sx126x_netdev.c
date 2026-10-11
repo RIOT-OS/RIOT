@@ -14,20 +14,19 @@
  */
 
 #include <assert.h>
+#include <errno.h>
 #include <stddef.h>
 #include <string.h>
-#include <errno.h>
 
 #include "architecture.h"
 #include "iolist.h"
-#include "net/netopt.h"
+#include "net/lora.h"
 #include "net/netdev.h"
 #include "net/netdev/lora.h"
-#include "net/lora.h"
-
+#include "net/netopt.h"
 #include "sx126x.h"
-#include "sx126x_netdev.h"
 #include "sx126x_internal.h"
+#include "sx126x_netdev.h"
 
 #define ENABLE_DEBUG 0
 #include "debug.h"
@@ -382,9 +381,7 @@ static int _set(netdev_t *netdev, netopt_t opt, const void *val, size_t len)
     case NETOPT_SPREADING_FACTOR:
         assert(len <= sizeof(uint8_t));
         uint8_t sf = *((const uint8_t *)val);
-        const uint8_t max_sf = sx126x_is_llcc68(dev)
-                               ? llcc68_max_sf
-                               : sx126x_max_sf;
+        const uint8_t max_sf = sx126x_is_llcc68(dev) ? llcc68_max_sf : sx126x_max_sf;
         if ((sf < LORA_SF5) || (sf > max_sf)) {
             res = -EINVAL;
             break;

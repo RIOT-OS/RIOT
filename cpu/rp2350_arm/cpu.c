@@ -14,9 +14,9 @@
  * @author          Tom Hert <git@annsann.eu>
  */
 
+#include "compat_layer.h"
 #include "cpu.h"
 #include "periph_cpu.h"
-#include "compat_layer.h"
 
 void cpu_init(void)
 {

@@ -17,75 +17,48 @@
 
 #include <errno.h>
 
-#include "sx126x_netdev.h"
-
 #include "log.h"
 #include "macros/units.h"
 #include "net/lora.h"
 #include "periph/spi.h"
-
 #include "sx126x.h"
-#include "sx126x_regs.h"
-#include "sx126x_params.h"
 #include "sx126x_internal.h"
+#include "sx126x_netdev.h"
+#include "sx126x_params.h"
+#include "sx126x_regs.h"
 
 #define ENABLE_DEBUG 0
 #include "debug.h"
 
 #ifndef CONFIG_SX126X_PKT_TYPE_DEFAULT
-#define CONFIG_SX126X_PKT_TYPE_DEFAULT          (SX126X_PKT_TYPE_LORA)
+#  define CONFIG_SX126X_PKT_TYPE_DEFAULT          (SX126X_PKT_TYPE_LORA)
 #endif
 
 #ifndef CONFIG_SX126X_CHANNEL_DEFAULT
-#define CONFIG_SX126X_CHANNEL_DEFAULT           (868300000UL)   /* in Hz */
+#  define CONFIG_SX126X_CHANNEL_DEFAULT           (868300000UL)   /* in Hz */
 #endif
 
 #ifndef CONFIG_SX126X_TX_POWER_DEFAULT
-#define CONFIG_SX126X_TX_POWER_DEFAULT          (14U)           /* in dBm */
+#  define CONFIG_SX126X_TX_POWER_DEFAULT          (14U)           /* in dBm */
 #endif
 
 #ifndef CONFIG_SX126X_RAMP_TIME_DEFAULT
-#define CONFIG_SX126X_RAMP_TIME_DEFAULT         (SX126X_RAMP_10_US)
+#  define CONFIG_SX126X_RAMP_TIME_DEFAULT         (SX126X_RAMP_10_US)
 #endif
 
 #if IS_USED(MODULE_SX1268)
 /* sx1268 */
 const sx126x_pa_cfg_params_t sx1268_pa_cfg[] = {
     /* 10 dBm */
-    {
-        .pa_duty_cycle = 0x00,
-        .hp_max = 0x03,
-        .device_sel = 0x00,
-        .pa_lut = 0x01
-    },
+    { .pa_duty_cycle = 0x00, .hp_max = 0x03, .device_sel = 0x00, .pa_lut = 0x01 },
     /* 14 dBm */
-    {
-        .pa_duty_cycle = 0x04,
-        .hp_max = 0x06,
-        .device_sel = 0x00,
-        .pa_lut = 0x01
-    },
+    { .pa_duty_cycle = 0x04, .hp_max = 0x06, .device_sel = 0x00, .pa_lut = 0x01 },
     /* 17 dBm */
-    {
-        .pa_duty_cycle = 0x02,
-        .hp_max = 0x03,
-        .device_sel = 0x00,
-        .pa_lut = 0x01
-    },
+    { .pa_duty_cycle = 0x02, .hp_max = 0x03, .device_sel = 0x00, .pa_lut = 0x01 },
     /* 20 dBm */
-    {
-        .pa_duty_cycle = 0x03,
-        .hp_max = 0x05,
-        .device_sel = 0x00,
-        .pa_lut = 0x01
-    },
+    { .pa_duty_cycle = 0x03, .hp_max = 0x05, .device_sel = 0x00, .pa_lut = 0x01 },
     /* 22 dBm */
-    {
-        .pa_duty_cycle = 0x04,
-        .hp_max = 0x07,
-        .device_sel = 0x00,
-        .pa_lut = 0x01
-    },
+    { .pa_duty_cycle = 0x04, .hp_max = 0x07, .device_sel = 0x00, .pa_lut = 0x01 },
 };
 #endif
 
@@ -93,26 +66,11 @@ const sx126x_pa_cfg_params_t sx1268_pa_cfg[] = {
 /* sx1261 */
 const sx126x_pa_cfg_params_t lpa_cfg[] = {
     /* 10 dBm */
-    {
-        .pa_duty_cycle = 0x01,
-        .hp_max = 0x00,
-        .device_sel = 0x01,
-        .pa_lut = 0x01
-    },
+    { .pa_duty_cycle = 0x01, .hp_max = 0x00, .device_sel = 0x01, .pa_lut = 0x01 },
     /* 14 dBm */
-    {
-        .pa_duty_cycle = 0x04,
-        .hp_max = 0x00,
-        .device_sel = 0x01,
-        .pa_lut = 0x01
-    },
+    { .pa_duty_cycle = 0x04, .hp_max = 0x00, .device_sel = 0x01, .pa_lut = 0x01 },
     /* 15 dBm */
-    {
-        .pa_duty_cycle = 0x06,
-        .hp_max = 0x00,
-        .device_sel = 0x01,
-        .pa_lut = 0x01
-    },
+    { .pa_duty_cycle = 0x06, .hp_max = 0x00, .device_sel = 0x01, .pa_lut = 0x01 },
 };
 #endif
 
@@ -120,33 +78,13 @@ const sx126x_pa_cfg_params_t lpa_cfg[] = {
 /* sx1262, llcc68 */
 const sx126x_pa_cfg_params_t hpa_cfg[] = {
     /* 14 dBm */
-    {
-        .pa_duty_cycle = 0x02,
-        .hp_max = 0x02,
-        .device_sel = 0x00,
-        .pa_lut = 0x01
-    },
+    { .pa_duty_cycle = 0x02, .hp_max = 0x02, .device_sel = 0x00, .pa_lut = 0x01 },
     /* 17 dBm */
-    {
-        .pa_duty_cycle = 0x02,
-        .hp_max = 0x03,
-        .device_sel = 0x00,
-        .pa_lut = 0x01
-    },
+    { .pa_duty_cycle = 0x02, .hp_max = 0x03, .device_sel = 0x00, .pa_lut = 0x01 },
     /* 20 dBm */
-    {
-        .pa_duty_cycle = 0x03,
-        .hp_max = 0x05,
-        .device_sel = 0x00,
-        .pa_lut = 0x01
-    },
+    { .pa_duty_cycle = 0x03, .hp_max = 0x05, .device_sel = 0x00, .pa_lut = 0x01 },
     /* 22 dBm */
-    {
-        .pa_duty_cycle = 0x04,
-        .hp_max = 0x07,
-        .device_sel = 0x00,
-        .pa_lut = 0x01
-    }
+    { .pa_duty_cycle = 0x04, .hp_max = 0x07, .device_sel = 0x00, .pa_lut = 0x01 }
 };
 #endif
 
@@ -165,7 +103,7 @@ static int8_t _select_pa_cfg(sx126x_t *dev, int8_t tx_power_dbm,
             return 10;
         }
         else if (tx_power_dbm <= 14) {
-#if IS_USED(MODULE_SX126X_RF_SWITCH)
+#  if IS_USED(MODULE_SX126X_RF_SWITCH)
             /* Only lora-e5 and nucleo-wl55jc are using this module
             I think the parameter was introduced because 14dbm can be
             achieved with both LPA and HPA settings. */
@@ -175,9 +113,9 @@ static int8_t _select_pa_cfg(sx126x_t *dev, int8_t tx_power_dbm,
             else {
                 *pa_cfg = &hpa_cfg[0];
             }
-#else
+#  else
             *pa_cfg = &hpa_cfg[0];
-#endif
+#  endif
             return 14;
         }
         else if (tx_power_dbm <= 17) {
@@ -274,8 +212,8 @@ static const uint16_t _bw_khz[3] = {
 
 static uint8_t _compute_ldro(sx126x_t *dev)
 {
-    uint32_t symbol_len =
-        (uint32_t)(1 << dev->mod_params.sf) / _bw_khz[dev->mod_params.bw - SX126X_LORA_BW_125];
+    uint32_t symbol_len = (uint32_t)(1 << dev->mod_params.sf) /
+                          _bw_khz[dev->mod_params.bw - SX126X_LORA_BW_125];
 
     if (symbol_len >= 16) {
         return 0x01;
@@ -289,7 +227,7 @@ static void sx126x_init_default_config(sx126x_t *dev)
     /* packet type must be set first */
     sx126x_set_pkt_type(dev, SX126X_PKT_TYPE_LORA);
     sx126x_set_channel(dev, CONFIG_SX126X_CHANNEL_DEFAULT);
-    sx126x_set_tx_power(dev,  CONFIG_SX126X_TX_POWER_DEFAULT, CONFIG_SX126X_RAMP_TIME_DEFAULT);
+    sx126x_set_tx_power(dev, CONFIG_SX126X_TX_POWER_DEFAULT, CONFIG_SX126X_RAMP_TIME_DEFAULT);
 #ifdef CONFIG_SX126X_DEFAULT_SYNC_WORD
     sx126x_set_lora_sync_word(dev, CONFIG_SX126X_DEFAULT_SYNC_WORD);
 #endif
@@ -302,13 +240,10 @@ static void sx126x_init_default_config(sx126x_t *dev)
 
     dev->pkt_params.pld_len_in_bytes = 0;
     dev->pkt_params.crc_is_on = !IS_ACTIVE(CONFIG_LORA_PAYLOAD_CRC_OFF_DEFAULT);
-    dev->pkt_params.header_type = (
-        IS_ACTIVE(CONFIG_LORA_FIXED_HEADER_LEN_MODE_DEFAULT) ? true : false
-        );
+    dev->pkt_params.header_type = (IS_ACTIVE(CONFIG_LORA_FIXED_HEADER_LEN_MODE_DEFAULT) ? true :
+                                                                                          false);
     dev->pkt_params.preamble_len_in_symb = CONFIG_LORA_PREAMBLE_LENGTH_DEFAULT;
-    dev->pkt_params.invert_iq_is_on = (
-        IS_ACTIVE(CONFIG_LORA_IQ_INVERTED_DEFAULT) ? true : false
-        );
+    dev->pkt_params.invert_iq_is_on = (IS_ACTIVE(CONFIG_LORA_IQ_INVERTED_DEFAULT) ? true : false);
     sx126x_set_lora_pkt_params(dev, &dev->pkt_params);
 }
 
@@ -342,8 +277,8 @@ static bool _sx126x_detect(sx126x_t *dev)
     if ((pkt_type == SX126X_PKT_TYPE_LORA) && (radio_status.chip_mode)) {
         return true;
     }
-    DEBUG("[sx126x] pkt_type = %x, radio_status.chip_mode = %u\n",
-               (unsigned)pkt_type, (unsigned)radio_status.chip_mode);
+    DEBUG("[sx126x] pkt_type = %x, radio_status.chip_mode = %u\n", (unsigned)pkt_type,
+          (unsigned)radio_status.chip_mode);
     LOG_ERROR("[sx126x] No device detected\n");
     return false;
 }
@@ -354,8 +289,8 @@ int sx126x_init(sx126x_t *dev)
     int res = spi_init_cs(dev->params->spi, dev->params->nss_pin);
 
     if (res != SPI_OK) {
-        DEBUG("[sx126x] error: failed to initialize SPI_%i device (code %i)\n",
-              dev->params->spi, res);
+        DEBUG("[sx126x] error: failed to initialize SPI_%i device (code %i)\n", dev->params->spi,
+              res);
         return -1;
     }
 
@@ -405,7 +340,7 @@ int sx126x_init(sx126x_t *dev)
     }
 #endif
 #if IS_USED(MODULE_SX126X_DIO3)
-     if (dev->params->dio3_mode == SX126X_DIO3_TCXO) {
+    if (dev->params->dio3_mode == SX126X_DIO3_TCXO) {
         sx126x_set_dio3_as_tcxo_ctrl(dev, dev->params->dio3_arg.tcxo_volt,
                                      dev->params->dio3_arg.tcxo_timeout);
         /* Once the command SetDIO3AsTCXOCtrl(...) is sent to the device,
@@ -413,8 +348,7 @@ int sx126x_init(sx126x_t *dev)
            changed to 0x2F (33.4 pF) to filter any spurious injection which could occur
            and be propagated to the PLL.- Verify that. */
         uint8_t trimming_capacitor_values[2] = { 0 };
-        sx126x_read_register(dev, SX126X_REG_XTATRIM,
-                             trimming_capacitor_values,
+        sx126x_read_register(dev, SX126X_REG_XTATRIM, trimming_capacitor_values,
                              sizeof(trimming_capacitor_values));
         /* 11.3 pF + x * 0.47pF  = 33.4pF | x = 0x2f*/
         if (trimming_capacitor_values[0] != 0x2f) {
