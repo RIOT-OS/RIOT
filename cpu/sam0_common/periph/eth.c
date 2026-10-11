@@ -15,21 +15,19 @@
  * @}
  */
 
+#include <stdalign.h>
+#include <string.h>
+
 #include "iolist.h"
 #include "mii.h"
-#include "net/eui48.h"
 #include "net/ethernet.h"
-#include "net/netdev/eth.h"
-
+#include "net/eui48.h"
 #include "periph/gpio.h"
-
 #include "sam0_eth_netdev.h"
 
 #define ENABLE_DEBUG 0
 #include "debug.h"
-#include "log.h"
 
-#include <string.h>
 
 /* Internal helpers */
 #define PHY_READ_OP 0x02
@@ -75,8 +73,8 @@ struct eth_buf_desc {
 /* GMAC buffer descriptors */
 #define GMAC_DESC_ALIGNMENT 8
 #define GMAC_BUF_ALIGNMENT  32
-static struct eth_buf_desc rx_desc[ETH_RX_BUFFER_COUNT] __attribute__((aligned(GMAC_DESC_ALIGNMENT)));
-static struct eth_buf_desc tx_desc[ETH_TX_BUFFER_COUNT] __attribute__((aligned(GMAC_DESC_ALIGNMENT)));
+static alignas(GMAC_DESC_ALIGNMENT) struct eth_buf_desc rx_desc[ETH_RX_BUFFER_COUNT];
+static alignas(GMAC_DESC_ALIGNMENT) struct eth_buf_desc tx_desc[ETH_TX_BUFFER_COUNT];
 
 static struct eth_buf_desc *rx_curr;
 static struct eth_buf_desc *tx_curr;
@@ -86,8 +84,8 @@ static struct eth_buf_desc *tx_curr;
 static uint8_t  tx_idx;
 static uint8_t  rx_idx;
 
-static uint8_t  rx_buf[ETH_RX_BUFFER_COUNT][ETH_RX_BUFFER_SIZE] __attribute__((aligned(GMAC_BUF_ALIGNMENT)));
-static uint8_t  tx_buf[ETH_TX_BUFFER_COUNT][ETH_TX_BUFFER_SIZE] __attribute__((aligned(GMAC_BUF_ALIGNMENT)));
+static alignas(GMAC_BUF_ALIGNMENT) uint8_t  rx_buf[ETH_RX_BUFFER_COUNT][ETH_RX_BUFFER_SIZE];
+static alignas(GMAC_BUF_ALIGNMENT) uint8_t  tx_buf[ETH_TX_BUFFER_COUNT][ETH_TX_BUFFER_SIZE];
 extern sam0_eth_netdev_t _sam0_eth_dev;
 
 static bool _is_sleeping;
