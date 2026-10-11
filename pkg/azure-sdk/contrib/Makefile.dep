@@ -1,0 +1,2 @@
+USEMODULE += azure-sdk-core
+USEMODULE += azure-sdk
