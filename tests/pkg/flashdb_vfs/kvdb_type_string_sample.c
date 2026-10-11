@@ -13,6 +13,8 @@
 #include <flashdb.h>
 #include <string.h>
 
+#include "string_utils.h"
+
 #ifdef FDB_USING_KVDB
 
 #define FDB_LOG_TAG "[sample][kvdb][string]"
@@ -38,7 +40,7 @@ void kvdb_type_string_sample(fdb_kvdb_t kvdb)
         return_value = fdb_kv_get(kvdb, "temp");
         /* the return value is NULL when get the value failed */
         if (return_value != NULL) {
-            strncpy(temp_data, return_value, sizeof(temp_data));
+            strscpy(temp_data, return_value, sizeof(temp_data));
             printf("get the 'temp' value is: %s\n", temp_data);
         }
     }
