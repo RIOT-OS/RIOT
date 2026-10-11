@@ -164,40 +164,39 @@ static void _isr(netdev_t *netdev)
         DEBUG("[sx126x] netdev: SX126X_IRQ_TX_DONE\n");
         netdev->event_callback(netdev, NETDEV_EVENT_TX_COMPLETE);
     }
-    else if (irq_mask & SX126X_IRQ_RX_DONE) {
-        DEBUG("[sx126x] netdev: SX126X_IRQ_RX_DONE\n");
-        netdev->event_callback(netdev, NETDEV_EVENT_RX_COMPLETE);
+    if (irq_mask & SX126X_IRQ_RX_DONE) {
+        if (irq_mask & SX126X_IRQ_CRC_ERROR) {
+            DEBUG("[sx126x] netdev: SX126X_IRQ_CRC_ERROR\n");
+            netdev->event_callback(netdev, NETDEV_EVENT_CRC_ERROR);
+        }
+        else {
+            DEBUG("[sx126x] netdev: SX126X_IRQ_RX_DONE\n");
+            netdev->event_callback(netdev, NETDEV_EVENT_RX_COMPLETE);
+        }
     }
-    else if (irq_mask & SX126X_IRQ_PREAMBLE_DETECTED) {
+    if (irq_mask & SX126X_IRQ_PREAMBLE_DETECTED) {
         DEBUG("[sx126x] netdev: SX126X_IRQ_PREAMBLE_DETECTED\n");
     }
-    else if (irq_mask & SX126X_IRQ_SYNC_WORD_VALID) {
+    if (irq_mask & SX126X_IRQ_SYNC_WORD_VALID) {
         DEBUG("[sx126x] netdev: SX126X_IRQ_SYNC_WORD_VALID\n");
     }
-    else if (irq_mask & SX126X_IRQ_HEADER_VALID) {
+    if (irq_mask & SX126X_IRQ_HEADER_VALID) {
         DEBUG("[sx126x] netdev: SX126X_IRQ_HEADER_VALID\n");
         netdev->event_callback(netdev, NETDEV_EVENT_RX_STARTED);
     }
-    else if (irq_mask & SX126X_IRQ_HEADER_ERROR) {
+    if (irq_mask & SX126X_IRQ_HEADER_ERROR) {
         DEBUG("[sx126x] netdev: SX126X_IRQ_HEADER_ERROR\n");
     }
-    else if (irq_mask & SX126X_IRQ_CRC_ERROR) {
-        DEBUG("[sx126x] netdev: SX126X_IRQ_CRC_ERROR\n");
-        netdev->event_callback(netdev, NETDEV_EVENT_CRC_ERROR);
-    }
-    else if (irq_mask & SX126X_IRQ_CAD_DONE) {
+    if (irq_mask & SX126X_IRQ_CAD_DONE) {
         DEBUG("[sx126x] netdev: SX126X_IRQ_CAD_DONE\n");
         netdev->event_callback(netdev, NETDEV_EVENT_CAD_DONE);
     }
-    else if (irq_mask & SX126X_IRQ_CAD_DETECTED) {
+    if (irq_mask & SX126X_IRQ_CAD_DETECTED) {
         DEBUG("[sx126x] netdev: SX126X_IRQ_CAD_DETECTED\n");
     }
-    else if (irq_mask & SX126X_IRQ_TIMEOUT) {
+    if (irq_mask & SX126X_IRQ_TIMEOUT) {
         DEBUG("[sx126x] netdev: SX126X_IRQ_TIMEOUT\n");
         netdev->event_callback(netdev, NETDEV_EVENT_RX_TIMEOUT);
-    }
-    else {
-        DEBUG("[sx126x] netdev: SX126X_IRQ_NONE\n");
     }
 }
 
