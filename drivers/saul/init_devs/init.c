@@ -187,6 +187,10 @@ void saul_init_devs(void)
         extern void auto_init_lis2dh12(void);
         auto_init_lis2dh12();
     }
+    if (IS_USED(MODULE_LIS331DLH)) {
+        extern void auto_init_lis331dlh(void);
+        auto_init_lis331dlh();
+    }
     if (IS_USED(MODULE_LIS3DH)) {
         extern void auto_init_lis3dh(void);
         auto_init_lis3dh();
