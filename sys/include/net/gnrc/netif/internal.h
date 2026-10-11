@@ -33,11 +33,6 @@ extern "C" {
 #endif
 
 /**
- * @brief   Message type to send from @ref net_gnrc_netif_pktq
- */
-#define GNRC_NETIF_PKTQ_DEQUEUE_MSG     (0x1233)
-
-/**
  * @brief   Acquires exclusive access to the interface
  *
  * @param[in] netif the network interface
