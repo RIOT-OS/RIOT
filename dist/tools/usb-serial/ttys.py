@@ -1,4 +1,15 @@
-#!/usr/bin/env python3
+#!/usr/bin/env -S uv run
+
+# SPDX-FileCopyrightText: 2023 Otto-von-Guericke-Universität Magdeburg
+# SPDX-FileCopyrightText: 2026 ML!PA Consulting GmbH
+# SPDX-License-Identifier: LGPL-2.1-only
+
+# /// script
+# requires-python = ">=3.10"
+# dependencies = [
+#   "pyudev"
+# ]
+# ///
 """
 Command line utility to list and filter TTYs
 """
