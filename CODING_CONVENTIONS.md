@@ -694,13 +694,16 @@ not a string literal`.
 * Code shall report no error when running the
   [Flake8](http://flake8.pycqa.org/en/latest/) tool, e.g:
     * for style checks described in
-      [PEP 8](https://www.python.org/dev/peps/pep-0008/),
+      [PEP 8](https://peps.python.org/pep-0008),
     * for lint checks provided by
       [Pyflakes](https://pypi.python.org/pypi/pyflakes),
     * for complexity checks provided by the
       [McCabe project](https://pypi.python.org/pypi/mccabe)
 * A line length of maximum of 120 is allowed instead of 79 as per PEP 8. This
   increases tests readability as they can expects long line of output.
+* [PEP 257](https://peps.python.org/pep-0257) docstring conventions shall be
+  followed. Of the two styles PEP 257 permits for multi-line docstrings, we use
+  the one where the summary line starts on the line after the opening quotes.
 * Only runnable scripts shall start with `#!/usr/bin/env python3`
 * Runnable scripts shall use the following scheme:
 

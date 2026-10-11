@@ -48,10 +48,11 @@ def run(testfunc, timeout=TIMEOUT, echo=True, traceback=False):
 
 
 def check_unittests(child, timeout=TIMEOUT, nb_tests=None):
-    """ Check the number of unit tests that passed, and return the amount.
+    """
+    Check the number of unit tests that passed, and return the amount.
 
-        If the amount of expected tests to pass is known, nd_tests can be set
-        to perform an exact match against that number.
+    If the amount of expected tests to pass is known, `nb_tests` can be set
+    to perform an exact match against that number.
     """
     if nb_tests is None:
         child.expect(r'OK \((\d+) tests\)', timeout=timeout)

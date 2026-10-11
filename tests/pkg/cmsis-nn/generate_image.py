@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
 
-"""Generate a binary file from a sample image of the CIFAR-10 dataset.
+"""
+Generate a binary file from a sample image of the CIFAR-10 dataset.
+
 Pixel of the sample are stored as uint8, images have size 32x32x3.
 """
 

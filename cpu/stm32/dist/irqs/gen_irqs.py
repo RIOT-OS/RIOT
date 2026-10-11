@@ -51,7 +51,7 @@ ALIASES = {
 
 
 def list_cpu_lines(cmsis_dir, cpu_fam):
-    """Returns the list CPU lines for a given family"""
+    """Return the list of CPU lines for a given family."""
     headers = os.listdir(cmsis_dir)
     if "Templates" in headers:
         headers.remove("Templates")
@@ -140,7 +140,7 @@ def generate_irqs(context):
 
 
 def main(args):
-    """Main function."""
+    """Run the main function."""
     cpu_lines = list_cpu_lines(args.cmsis_dir, args.cpu_fam)
     irq_numofs = {
         cpu_line: irq_numof(args.cmsis_dir, cpu_line)

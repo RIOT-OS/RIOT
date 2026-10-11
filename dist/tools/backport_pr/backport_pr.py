@@ -36,6 +36,8 @@ BACKPORT_BRANCH = "backport/{release}/{origbranch}"
 
 def _get_labels(pull_request):
     """
+    Return the sorted labels for the backport of the given pull request.
+
     >>> _get_labels({'labels': [{'name': 'test'}, {'name': 'abcd'}]})
     ['Process: release backport', 'abcd', 'test']
     >>> _get_labels({'labels': [{'name': 'Reviewed: what'}, \
@@ -56,7 +58,8 @@ def _get_labels(pull_request):
 
 
 def _branch_name_strip(branch_name, prefix=RELEASE_PREFIX, suffix=RELEASE_SUFFIX):
-    """Strip suffix and prefix.
+    """
+    Strip suffix and prefix.
 
     >>> _branch_name_strip('2018.10-branch')
     '2018.10'
@@ -70,7 +73,8 @@ def _branch_name_strip(branch_name, prefix=RELEASE_PREFIX, suffix=RELEASE_SUFFIX
 
 
 def _get_latest_release(branches):
-    """Get latest release from a list of branches.
+    """
+    Get latest release from a list of branches.
 
     >>> _get_latest_release([{'name': '2018.10-branch'}, \
         {'name': '2020.10-branch'}])
@@ -119,7 +123,7 @@ def _delete_worktree(repo, workdir):
 
 def main():
     # pylint:disable=too-many-locals,too-many-branches,too-many-statements
-    """Main function of this script."""
+    """Run the main function of this script."""
     keyfile = os.path.join(os.environ["HOME"], GITHUBTOKEN_FILE)
     parser = argparse.ArgumentParser()
     parser.add_argument(

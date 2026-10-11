@@ -56,14 +56,13 @@ def _relpath_p(path, start):
 
 
 def mkconstfs(files, root_path, mount_point, constfs_name):
-    """Generate a C file containing a constant file system
+    """
+    Generate a C file containing a constant file system.
 
     Return
     ------
-
     chunks: Iterator yielding fragments of the of the output file.
     """
-
     filemap = {f: (_mkident(i), _relpath_p(f, root_path))
                for i, f in enumerate(files)}
 
@@ -91,11 +90,11 @@ def _mkident(k):
 
 
 def print_file_data(local_fname, varname, target_fname=""):
-    """Convert a file into a static C array:
+    """
+    Convert a file into a static C array.
 
     Parameters
     ----------
-
     local_fname: real Path (where the file is on this machine's fs)
     target_fname: name that the file will have in the constfs.
     output_file: File-like object where the array will be written.
@@ -105,14 +104,13 @@ def print_file_data(local_fname, varname, target_fname=""):
 
     chunks: Iterator yielding fragments of the of the output text.
     """
-
     yield BLOB_DECL.format(fname=target_fname, varname=varname)
 
     def byte2s(b):
         return "0x{},".format(hexlify(b).decode('utf-8'))
 
     def chunk(iterable, blocksize):
-        """Break a single iterable into chunks of maximum size 'blocksize'"""
+        """Break a single iterable into chunks of maximum size `blocksize`."""
         return (x for _, x in itertools.groupby(enumerate(iterable),
                                                 lambda x: x[0]//blocksize))
 

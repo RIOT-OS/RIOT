@@ -1,10 +1,14 @@
 #!/usr/bin/env python3
 
-"""Verify that a pair of .bin/.elf has the particle_monofirmware_module_info at
+"""
+Verify and populate the module info of a Particle monofirmware.
+
+Verify that a pair of `.bin`/`.elf` has the `particle_monofirmware_module_info` at
 the right place. If there is a particle_monofirmware_checksum symbol, verify
 that the module_info says the firmware ends at it, and populate the
 checksum. Otherwise, append the checksum and set the end-of-firmware field
-accordingly."""
+accordingly.
+"""
 
 import os
 import sys

@@ -154,10 +154,11 @@ def check_cmd(child, cmd, expected):
 
 def check_help(child):
     """
-    Runs the `help_json` and `help` command to check if the list of commands
+    Check the output of the `help_json` and `help` commands.
+
+    Runs the `help_json` and `help` commands to check if the lists of commands
     and descriptions match and contain a list of expected commands.
     """
-
     # Run help_json to get the list of commands present
     child.expect(PROMPT)
     child.sendline('help_json')

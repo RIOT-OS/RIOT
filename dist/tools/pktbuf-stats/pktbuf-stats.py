@@ -9,6 +9,8 @@
 # @author   Martine Lenders <m.lenders@fu-berlin.de>
 
 """
+Parse the output of the `pktbuf` command and the `gnrc_pktbuf_stats()` function.
+
 Script to parse the output of the `pktbuf` (provided by the `shell_cmd_gnrc_pktbuf`
 pseudo-module) command and the `gnrc_pktbuf_stats()` function.
 """
@@ -63,24 +65,20 @@ PROTNUMS = {n: name[8:] for name, n in vars(socket).items()
 
 
 class NoDebugSymbolsError(Exception):
-    """
-    Error to convey that no debugging symbols were found in the provided ELF
-    file
-    """
+    """Error to convey that no debugging symbols were found in the provided ELF file."""
+
     pass
 
 
 class LineNotFound(Exception):
-    """
-    Error to convey that GDB output was not found
-    """
+    """Error to convey that GDB output was not found."""
+
     pass
 
 
 class InconsistentPktbuf(Exception):
-    """
-    Error to indicate inconsistencies in the packet buffer stats
-    """
+    """Error to indicate inconsistencies in the packet buffer stats."""
+
     pass
 
 
@@ -131,7 +129,7 @@ def _parse_struct_print(line):
 
 def get_struct_size(elffile, struct):
     """
-    Determines the size in bytes of a struct from a given ELF file.
+    Determine the size in bytes of a struct from a given ELF file.
 
     Parameters:
         elffile (string-like): Path to an ELF file.
@@ -158,7 +156,7 @@ def get_struct_size(elffile, struct):
 
 def get_struct_members(elffile, struct):
     """
-    Determines the members of a struct from a given ELF file.
+    Determine the members of a struct from a given ELF file.
 
     Parameters:
         elffile (string-like): Path to an ELF file.
@@ -192,7 +190,7 @@ def get_struct_members(elffile, struct):
 
 def get_struct_member_size(elffile, struct, member):
     """
-    Determines the size in bytes of a member of a struct from a given ELF file.
+    Determine the size in bytes of a member of a struct from a given ELF file.
 
     Parameters:
         elffile (string-like): Path to an ELF file.
@@ -220,7 +218,7 @@ def get_struct_member_size(elffile, struct, member):
 
 def get_struct(elffile, struct_name):
     """
-    Gets struct definition dictionary of a struct from a given ELF file.
+    Get the struct definition dictionary of a struct from a given ELF file.
 
     Parameters:
         elffile (string-like): Path to an ELF file.
@@ -266,7 +264,7 @@ def get_struct(elffile, struct_name):
 
 def to_nettype(elffile, number):
     """
-    Gets a gnrc_nettype name by its number.
+    Get a `gnrc_nettype` name by its number.
 
     Parameters:
         elffile (string-like): Path to an ELF file.
@@ -294,7 +292,7 @@ def to_nettype(elffile, number):
 
 def parse_struct(struct_dict, byts):
     """
-    Parses a struct from a given bytes chunk
+    Parse a struct from a given bytes chunk.
 
     Parameters:
         struct_dict (dict): a struct descriptor dictionary as returned by
@@ -323,7 +321,7 @@ def parse_struct(struct_dict, byts):
 
 def parse_hexdump(dump):
     """
-    Generator to parse the packet buffer dump into a processable dictionary
+    Parse the packet buffer dump into a processable dictionary.
 
     Parameters:
         dump (string): The output of the `gnrcp_pktbuf_stats()` function / the
@@ -435,7 +433,7 @@ def parse_hexdump(dump):
 
 def empty_pktbuf(pktbuf):
     """
-    Checks if the packet buffer is empty.
+    Check if the packet buffer is empty.
 
     Parameters:
         pktbuf (dict): packet buffer descriptor as returned by parse_hexdump().
@@ -452,7 +450,7 @@ def empty_pktbuf(pktbuf):
 
 def in_pktbuf(pktbuf, addr):
     """
-    Checks if a given address is in the packet buffer.
+    Check if a given address is in the packet buffer.
 
     Parameters:
         pktbuf (dict): packet buffer descriptor as returned by parse_hexdump().
@@ -469,7 +467,7 @@ def in_pktbuf(pktbuf, addr):
 
 def in_segment(segment, addr):
     """
-    Checks if a given address is in the packet buffer segment.
+    Check if a given address is in the packet buffer segment.
 
     Parameters:
         segment (dict): packet buffer segment descriptor as they exist in the
@@ -506,7 +504,7 @@ def _tidyup_pktsnip(elffile, pktsnip):
 
 def identify_pktsnip(elffile, content, pktbuf):
     """
-    Tries to identify a pktsnip from a given chunk content descriptor.
+    Try to identify a `pktsnip` from a given chunk content descriptor.
 
     Parameters:
         elffile (str): Path to an ELF file.
@@ -576,7 +574,7 @@ def identify_pktsnip(elffile, content, pktbuf):
 
 def identify_struct(elffile, content, pktsnip):
     """
-    Tries to identify a struct in the given content via the provided pktsnip.
+    Try to identify a struct in the given content via the provided `pktsnip`.
 
     Parameters:
         elffile: Path to an ELF file.
@@ -695,9 +693,7 @@ def main():
 
 # Subparsers
 def gnrc_netif_parser(data_dict):
-    """
-    Sub-parser for GNRC netif headers.
-    """
+    """Sub-parser for GNRC netif headers."""
     src_len = data_dict["src_l2addr_len"]
     dst_len = data_dict["dst_l2addr_len"]
     if (src_len > 0) and (len(data_dict["padding"]) >= src_len):
@@ -720,9 +716,7 @@ def gnrc_netif_parser(data_dict):
 
 
 def ipv6_hdr_parser(data_dict):
-    """
-    Sub-parser for IPv6 headers.
-    """
+    """Parse IPv6 headers."""
     data_dict["nh"] = PROTNUMS.get(data_dict["nh"], data_dict["nh"])
     data_dict["version"] = data_dict["v_tc_fl"] >> 28
     data_dict["tc"] = {"ecn": (data_dict["v_tc_fl"] & 0x0c000000) >> 26,
