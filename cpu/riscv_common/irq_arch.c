@@ -80,7 +80,7 @@ void riscv_irq_init(void)
 /**
  * @brief Global trap and interrupt handler
  */
-__attribute((used)) static void handle_trap(uword_t mcause)
+__attribute((used)) void handle_trap(uword_t mcause)
 {
     /*  Tell RIOT to set sched_context_switch_request instead of
      *  calling thread_yield(). */
