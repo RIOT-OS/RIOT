@@ -1,0 +1,23 @@
+ARCHIVES += $(BINDIR)/pkg-build/riot-tee/api/libriot_tee_api.a
+
+# The secure image and the application are flashed as one file, so that
+# `make flash` always writes a matching pair: the secure image, padded with
+# zeros up to the start of the application, followed by the application.
+# makefiles/boot/riotboot.mk builds its bootloader + application image the
+# same way.
+RIOT_TEE_ELF = $(BINDIR)/pkg-build/riot-tee/riot-tee.elf
+RIOT_TEE_EXTENDED_BIN = $(BINDIR)/riot-tee.extended.bin
+RIOT_TEE_COMBINED_BIN = $(BINDIR)/$(APPLICATION).combined.bin
+
+# ELFFILE and BINFILE are only defined after this file is read, hence `$$`.
+# riot-tee.elf comes out of the package build, which is done before the
+# application is linked.
+$(RIOT_TEE_EXTENDED_BIN): $$(ELFFILE)
+	$(Q)$(OBJCOPY) -O binary $(RIOT_TEE_ELF) $@.tmp
+	$(Q)truncate -s $$(($(TEE_FLASH_SIZE))) $@.tmp
+	$(Q)mv $@.tmp $@
+
+$(RIOT_TEE_COMBINED_BIN): $(RIOT_TEE_EXTENDED_BIN) $$(BINFILE)
+	$(Q)cat $^ > $@
+
+FLASHFILE = $(RIOT_TEE_COMBINED_BIN)

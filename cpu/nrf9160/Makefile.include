@@ -8,6 +8,13 @@ ifneq (,$(filter trustzone_m_nonsecure,$(USEMODULE)))
   # Shared nRF/Cortex-M code has to select the non-secure peripheral aliases.
   # This define is also evaluated by `nrfx`.
   CFLAGS += -DNRF_TRUSTZONE_NONSECURE
+
+  # The secure image owns the lower part of flash and RAM.
+  include $(RIOTPKG)/riot-tee/riot-tee-layout.mk
+
+  RAM_LEN = $(NS_RAM_SIZE)
+  RAM_START_ADDR ?= $(NS_RAM_START)
+  ROM_OFFSET = $(TEE_FLASH_SIZE)
 endif
 
 FLASHFILE ?= $(BINFILE)
