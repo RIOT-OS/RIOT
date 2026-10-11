@@ -17,6 +17,12 @@ else
   CFLAGS += -DFATFS_FFCONF_OPT_FS_NORTC=0
 endif
 
+ifneq (,$(filter fatfs_threadsafe,$(USEMODULE)))
+  CFLAGS += -DFATFS_FFCONF_OPT_FS_REENTRANT=1
+endif
+
 ifeq ($(OS),Darwin)
   CFLAGS += -Wno-empty-body
 endif
+
+PSEUDOMODULES += fatfs_threadsafe
