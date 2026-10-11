@@ -13,8 +13,9 @@
  * @author  Bennet Hattesen
  */
 
-#include <stdint.h>
 #include <errno.h>
+#include <stdint.h>
+
 #include "architecture.h"
 #include "net/unicoap/transport.h"
 
@@ -27,12 +28,12 @@
 /* Provides unicoap_receiver_buffer */
 UNICOAP_DECL_RECEIVER_STORAGE_EXTERN;
 
-extern int unicoap_messaging_process_rfc7252(const uint8_t *pdu, size_t size, bool truncated,
-                                             unicoap_packet_t *packet);
+extern int unicoap_messaging_process_rfc7252(const uint8_t* pdu, size_t size, bool truncated,
+                                             unicoap_packet_t* packet);
 
-void unicoap_slipdev_recv_handler(event_t *event)
+void unicoap_slipdev_recv_handler(event_t* event)
 {
-    slipdev_t *dev = container_of(event, slipdev_t, rxevent);
+    slipdev_t* dev = container_of(event, slipdev_t, rxevent);
 
     unicoap_endpoint_t remote = {
         .proto = UNICOAP_PROTO_SLIPMUX,
@@ -61,7 +62,7 @@ void unicoap_slipdev_recv_handler(event_t *event)
     }
 }
 
-int unicoap_transport_sendv_slipmux(iolist_t *iolist, const unicoap_endpoint_t *remote)
+int unicoap_transport_sendv_slipmux(iolist_t* iolist, const unicoap_endpoint_t* remote)
 {
     _SLIPMUX_DEBUG("sendv: %" PRIuSIZE " bytes via UART(%d)\n", iolist_size(iolist),
                    remote->slipmux_ep->config.uart);
@@ -71,13 +72,13 @@ int unicoap_transport_sendv_slipmux(iolist_t *iolist, const unicoap_endpoint_t *
     return 0;
 }
 
-int unicoap_init_slipmux(event_queue_t *queue)
+int unicoap_init_slipmux(event_queue_t* queue)
 {
     slipdev_coap_set_event_queue(queue);
     return 0;
 }
 
-int unicoap_deinit_slipmux(event_queue_t *queue)
+int unicoap_deinit_slipmux(event_queue_t* queue)
 {
     (void)queue;
     slipdev_coap_unset_event_queue();

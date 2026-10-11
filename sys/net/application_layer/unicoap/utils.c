@@ -16,15 +16,15 @@
 #include <stdbool.h>
 
 #include "iolist.h"
-
-#include "net/unicoap/options.h"
 #include "net/unicoap/message.h"
+#include "net/unicoap/options.h"
 
 #define ENABLE_DEBUG CONFIG_UNICOAP_DEBUG_LOGGING
 #include "debug.h"
 #include "private.h"
 
-size_t unicoap_path_component_count(const unicoap_pathspec_t* path) {
+size_t unicoap_path_component_count(const unicoap_pathspec_t* path)
+{
     size_t count = 0;
     assert(path);
     if (!path->_components) {
@@ -42,7 +42,8 @@ size_t unicoap_path_component_count(const unicoap_pathspec_t* path) {
     return count;
 }
 
-void unicoap_print_path(const unicoap_pathspec_t* path) {
+void unicoap_print_path(const unicoap_pathspec_t* path)
+{
     assert(path);
     if (!path->_components) {
         printf("/");
@@ -58,7 +59,8 @@ void unicoap_print_path(const unicoap_pathspec_t* path) {
     }
 }
 
-ssize_t unicoap_path_stringify(const unicoap_pathspec_t* path, char* buffer, size_t capacity) {
+ssize_t unicoap_path_stringify(const unicoap_pathspec_t* path, char* buffer, size_t capacity)
+{
     if (capacity == 0) {
         return -ENOBUFS;
     }
@@ -87,7 +89,8 @@ ssize_t unicoap_path_stringify(const unicoap_pathspec_t* path, char* buffer, siz
     return og_capacity - capacity;
 }
 
-bool unicoap_path_is_equal(const unicoap_pathspec_t* lhs, const unicoap_pathspec_t* rhs) {
+bool unicoap_path_is_equal(const unicoap_pathspec_t* lhs, const unicoap_pathspec_t* rhs)
+{
     assert(lhs);
     assert(rhs);
 
@@ -116,8 +119,8 @@ bool unicoap_path_is_equal(const unicoap_pathspec_t* lhs, const unicoap_pathspec
 }
 
 bool unicoap_path_matches_string(const unicoap_pathspec_t* path,
-                                 const char* string, size_t string_length, bool match_subtree) {
-
+                                 const char* string, size_t string_length, bool match_subtree)
+{
     assert(path);
     assert(string);
 
@@ -167,7 +170,8 @@ bool unicoap_path_matches_string(const unicoap_pathspec_t* path,
         /* There may be more path components in the string options.
          * But this is fine as subpaths are allowed. */
         return true;
-    } else {
+    }
+    else {
         /* Make sure we read all path components in the string, i.e., the actual path is not longer
          * than the given path's. */
         for (size_t i = 0; i < string_length; i += 1) {
@@ -180,7 +184,8 @@ bool unicoap_path_matches_string(const unicoap_pathspec_t* path,
 }
 
 bool unicoap_path_matches_options(const unicoap_pathspec_t* path,
-                                  const unicoap_options_t* options, bool match_subtree) {
+                                  const unicoap_options_t* options, bool match_subtree)
+{
     assert(path);
     assert(options);
     assert(options->entries->data);
@@ -218,20 +223,23 @@ bool unicoap_path_matches_options(const unicoap_pathspec_t* path,
     if (match_subtree) {
         /* There may be more Uri-Path options. But this is fine as subpaths are allowed. */
         return true;
-    } else {
+    }
+    else {
         /* Make sure we read all options, i.e., the actual path is not longer than the given
          * paths's. */
         return unicoap_options_get_next_uri_path_component(&iterator, &uri_component) == -1;
     }
 }
 
-static inline void iolist_init(iolist_t* iolist, uint8_t* buffer, size_t size, iolist_t* next) {
+static inline void iolist_init(iolist_t* iolist, uint8_t* buffer, size_t size, iolist_t* next)
+{
     iolist->iol_base = buffer;
     iolist->iol_len = size;
     iolist->iol_next = next;
 }
 
-static inline bool iolist_is_empty(const iolist_t* iolist) {
+static inline bool iolist_is_empty(const iolist_t* iolist)
+{
     while (iolist) {
         if (iolist->iol_len > 0) {
             return false;
@@ -242,7 +250,8 @@ static inline bool iolist_is_empty(const iolist_t* iolist) {
     return true;
 }
 
-static void iolist_append(iolist_t** iolist, iolist_t* chunk) {
+static void iolist_append(iolist_t** iolist, iolist_t* chunk)
+{
     assert(iolist);
     if (*iolist) {
         iolist_t* v = *iolist;
@@ -256,7 +265,8 @@ static void iolist_append(iolist_t** iolist, iolist_t* chunk) {
     }
 }
 
-bool unicoap_message_payload_is_empty(const unicoap_message_t* message) {
+bool unicoap_message_payload_is_empty(const unicoap_message_t* message)
+{
     switch (message->payload_representation) {
     case UNICOAP_PAYLOAD_NONCONTIGUOUS:
         return iolist_is_empty(message->payload_chunks);
@@ -269,7 +279,8 @@ bool unicoap_message_payload_is_empty(const unicoap_message_t* message) {
 }
 
 ssize_t unicoap_message_payload_copy(const unicoap_message_t* message, uint8_t* buffer,
-                                     size_t capacity) {
+                                     size_t capacity)
+{
     switch (message->payload_representation) {
     case UNICOAP_PAYLOAD_NONCONTIGUOUS:
         return iolist_to_buffer(message->payload_chunks, buffer, capacity);
@@ -288,7 +299,8 @@ ssize_t unicoap_message_payload_copy(const unicoap_message_t* message, uint8_t* 
 }
 
 ssize_t unicoap_message_payload_make_contiguous(unicoap_message_t* message, uint8_t* buffer,
-                                                size_t capacity) {
+                                                size_t capacity)
+{
     switch (message->payload_representation) {
     case UNICOAP_PAYLOAD_NONCONTIGUOUS: {
         assert(buffer);
@@ -311,7 +323,8 @@ ssize_t unicoap_message_payload_make_contiguous(unicoap_message_t* message, uint
     }
 }
 
-void unicoap_message_payload_append_chunk(unicoap_message_t* message, iolist_t* chunk) {
+void unicoap_message_payload_append_chunk(unicoap_message_t* message, iolist_t* chunk)
+{
     assert(message->payload_representation == UNICOAP_PAYLOAD_NONCONTIGUOUS);
     if (message->payload_chunks) {
         iolist_append(&message->payload_chunks, chunk);
@@ -322,7 +335,8 @@ void unicoap_message_payload_append_chunk(unicoap_message_t* message, iolist_t* 
 }
 
 static inline iolist_t* _append_payload_to_iolist(const unicoap_message_t* message,
-                                                  iolist_t* element) {
+                                                  iolist_t* element)
+{
     switch (message->payload_representation) {
     case UNICOAP_PAYLOAD_NONCONTIGUOUS:
         return message->payload_chunks;
@@ -339,7 +353,8 @@ static const uint8_t _payload_separator = 0xff;
 
 int unicoap_pdu_buildv_options_and_payload(uint8_t* header, size_t header_size,
                                            const unicoap_message_t* message,
-                                           iolist_t iolists[UNICOAP_PDU_IOLIST_COUNT]) {
+                                           iolist_t iolists[UNICOAP_PDU_IOLIST_COUNT])
+{
     assert(header);
     assert(message);
     assert(iolists);
@@ -366,7 +381,8 @@ int unicoap_pdu_buildv_options_and_payload(uint8_t* header, size_t header_size,
 }
 
 ssize_t unicoap_pdu_build_options_and_payload(uint8_t* pdu, size_t capacity,
-                                              const unicoap_message_t* message) {
+                                              const unicoap_message_t* message)
+{
     assert(pdu);
     assert(message);
 
@@ -396,7 +412,8 @@ ssize_t unicoap_pdu_build_options_and_payload(uint8_t* pdu, size_t capacity,
     }
 }
 
-bool unicoap_message_code_is_response(uint8_t code) {
+bool unicoap_message_code_is_response(uint8_t code)
+{
     switch (unicoap_code_class(code)) {
     case UNICOAP_CODE_CLASS_RESPONSE_SUCCESS:
     case UNICOAP_CODE_CLASS_RESPONSE_CLIENT_FAILURE:
@@ -431,7 +448,8 @@ unicoap_status_t unicoap_response_status_from_errno(int error) {
     }
 }
 
-const char* unicoap_string_from_code_class(uint8_t code) {
+const char* unicoap_string_from_code_class(uint8_t code)
+{
     if (code == UNICOAP_CODE_EMPTY) {
         return "EMPTY";
     }
@@ -453,7 +471,8 @@ const char* unicoap_string_from_code_class(uint8_t code) {
     }
 }
 
-const char* unicoap_string_from_code(uint8_t code) {
+const char* unicoap_string_from_code(uint8_t code)
+{
     if (code == UNICOAP_CODE_EMPTY) {
         return "Empty";
     }
@@ -475,7 +494,8 @@ const char* unicoap_string_from_code(uint8_t code) {
     }
 }
 
-const char* unicoap_string_from_signal(unicoap_signal_t signal) {
+const char* unicoap_string_from_signal(unicoap_signal_t signal)
+{
     switch (signal) {
     case UNICOAP_SIGNAL_CAPABILITIES_SETTINGS:
         return "CSM";
@@ -492,7 +512,8 @@ const char* unicoap_string_from_signal(unicoap_signal_t signal) {
     }
 }
 
-const char* unicoap_string_from_method(unicoap_method_t method) {
+const char* unicoap_string_from_method(unicoap_method_t method)
+{
     switch (method) {
     case UNICOAP_METHOD_GET:
         return "GET";
@@ -513,7 +534,8 @@ const char* unicoap_string_from_method(unicoap_method_t method) {
     }
 }
 
-const char* unicoap_string_from_status(unicoap_status_t status) {
+const char* unicoap_string_from_status(unicoap_status_t status)
+{
     switch (status) {
     case UNICOAP_STATUS_CREATED:
         return "Created";
@@ -572,7 +594,8 @@ const char* unicoap_string_from_status(unicoap_status_t status) {
     }
 }
 
-const char* unicoap_string_from_option_number(unicoap_option_number_t number) {
+const char* unicoap_string_from_option_number(unicoap_option_number_t number)
+{
     switch (number) {
     case UNICOAP_OPTION_SIZE1:
         return "Size1";
@@ -633,12 +656,14 @@ const char* unicoap_string_from_option_number(unicoap_option_number_t number) {
     }
 }
 
-int unicoap_print_code(uint8_t code, char* string) {
-    return sprintf(string, UNICOAP_CODE_CLASS_DETAIL_FORMAT, unicoap_code_class(code),
-                   unicoap_code_detail(code));
+int unicoap_print_code(uint8_t code)
+{
+    return printf(UNICOAP_CODE_CLASS_DETAIL_FORMAT, unicoap_code_class(code),
+                  unicoap_code_detail(code));
 }
 
-bool unicoap_response_is_optional(unicoap_options_t* options, unicoap_status_t status) {
+bool unicoap_response_is_optional(unicoap_options_t* options, unicoap_status_t status)
+{
     uint8_t no_response;
     if (unicoap_options_get_no_response(options, &no_response) >= 0) {
         const uint8_t no_response_index = (status >> 5) - 1;
@@ -654,7 +679,8 @@ bool unicoap_response_is_optional(unicoap_options_t* options, unicoap_status_t s
     return false;
 }
 
-void unicoap_options_dump_all(const unicoap_options_t* options) {
+void unicoap_options_dump_all(const unicoap_options_t* options)
+{
     unicoap_options_iterator_t iterator = { 0 };
     unicoap_options_iterator_init(&iterator, (unicoap_options_t*)options);
     const uint8_t* value = NULL;
@@ -671,7 +697,8 @@ void unicoap_options_dump_all(const unicoap_options_t* options) {
     }
 }
 
-void unicoap_options_print_uri_path(const unicoap_options_t* options) {
+void unicoap_options_print_uri_path(const unicoap_options_t* options)
+{
     assert(options);
     unicoap_options_iterator_t iterator;
     /* Disqualifying the const here is fine as the iterator is only used locally and options
@@ -691,7 +718,8 @@ void unicoap_options_print_uri_path(const unicoap_options_t* options) {
     }
 }
 
-void unicoap_print_protocols(unicoap_proto_set_t protocols) {
+void unicoap_print_protocols(unicoap_proto_set_t protocols)
+{
     if (likely(protocols == UNICOAP_PROTOCOLS_ALLOW_ALL)) {
         printf("<all>");
     }
@@ -706,7 +734,8 @@ void unicoap_print_protocols(unicoap_proto_set_t protocols) {
     }
 }
 
-void unicoap_print_methods(unicoap_method_set_t methods) {
+void unicoap_print_methods(unicoap_method_set_t methods)
+{
     printf("[ ");
     for (unicoap_method_t m = 1; m < (sizeof(unicoap_method_t) * 8); m += 1) {
         if (methods & UNICOAP_METHOD_FLAG(m)) {
@@ -716,7 +745,8 @@ void unicoap_print_methods(unicoap_method_set_t methods) {
     printf("]");
 }
 
-void unicoap_print_resource_flags(unicoap_resource_flags_t flags) {
+void unicoap_print_resource_flags(unicoap_resource_flags_t flags)
+{
     printf("[ ");
     if (flags & UNICOAP_RESOURCE_FLAG_RELIABLE) {
         printf("RELIABLE ");
@@ -727,7 +757,8 @@ void unicoap_print_resource_flags(unicoap_resource_flags_t flags) {
     printf("]");
 }
 
-void unicoap_print_resource(const unicoap_resource_t* resource) {
+void unicoap_print_resource(const unicoap_resource_t* resource)
+{
     printf("<");
     unicoap_print_path(&resource->path);
     printf(" methods=");
@@ -739,22 +770,32 @@ void unicoap_print_resource(const unicoap_resource_t* resource) {
     printf(">");
 }
 
-void unicoap_assist_emit_diagnostic_missing_driver(unicoap_proto_t proto) {
+void unicoap_print_request_flags(unicoap_request_flags_t flags)
+{
+    printf("[ ");
+    if (flags & UNICOAP_REQUEST_FLAG_RELIABLE) {
+        printf("RELIABLE ");
+    }
+    printf("]");
+}
+
+void unicoap_assist_emit_diagnostic_missing_driver(unicoap_proto_t proto)
+{
     if (IS_ACTIVE(CONFIG_UNICOAP_ASSIST)) {
         switch (proto) {
         case UNICOAP_PROTO_UDP:
             unicoap_assist(API_ERROR("CoAP over UDP driver missing")
-                           FIXIT("USEMODULE += unicoap_driver_udp"));
+                               FIXIT("USEMODULE += unicoap_driver_udp"));
             break;
 
         case UNICOAP_PROTO_DTLS:
             unicoap_assist(API_ERROR("CoAP over DTLS driver missing")
-                           FIXIT("USEMODULE += unicoap_driver_dtls"));
+                               FIXIT("USEMODULE += unicoap_driver_dtls"));
             break;
 
         case UNICOAP_PROTO_SLIPMUX:
             unicoap_assist(API_ERROR("CoAP over Slipmux driver missing")
-                           FIXIT("USEMODULE += unicoap_driver_slipmux"));
+                               FIXIT("USEMODULE += unicoap_driver_slipmux"));
             break;
 
         default:
