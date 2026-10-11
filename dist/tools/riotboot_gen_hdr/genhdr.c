@@ -28,23 +28,36 @@
  */
 #define HDR_ALIGN              (256)
 
-static void populate_hdr(riotboot_hdr_t *hdr, uint32_t ver, uint32_t addr)
+static size_t populate_hdr_v1(riotboot_hdr_t *hdr, uint32_t ver, uint32_t addr)
 {
     /* ensure the buffer and header have 0's */
-    memset(hdr, '\0', sizeof(riotboot_hdr_t));
-
-    /* Generate image header */
-    hdr->magic_number = RIOTBOOT_MAGIC;
-    hdr->version = ver;
-    hdr->start_addr = addr;
-
+    memset(hdr, '\0', sizeof(*hdr));
+    /* Generate image header v1 */
+    hdr->v1.magic_number = RIOTBOOT_MAGIC_V1;
+    hdr->v1.version = ver;
+    hdr->v1.start_addr = addr;
     /* calculate header checksum */
-    hdr->chksum = riotboot_hdr_checksum(hdr);
+    hdr->v1.chksum = riotboot_hdr_checksum(hdr);
+    return sizeof(hdr->v1);
+}
+
+static size_t populate_hdr_v2(riotboot_hdr_t *hdr, uint32_t ver, uint32_t addr)
+{
+    /* ensure the buffer and header have 0's */
+    memset(hdr, '\0', sizeof(*hdr));
+    /* Generate image header v2 */
+    hdr->v2.magic_number = RIOTBOOT_MAGIC_V2;
+    hdr->v2.version = ver;
+    hdr->v2.start_addr = addr;
+    hdr->v2.flags = 0xffffffff;
+    /* calculate header checksum */
+    hdr->v2.chksum = riotboot_hdr_checksum(hdr);
+    return sizeof(hdr->v2);
 }
 
 int genhdr(int argc, char *argv[])
 {
-    const char generate_usage[] = "<IMG_BIN> <APP_VER> <START_ADDR> <HDR_LEN> <outfile|->";
+    const char generate_usage[] = "<IMG_BIN> <APP_VER> <START_ADDR> <HDR_LEN> <outfile|-> [-v [v1,v2]]";
 
     /* riotboot_hdr buffer */
     uint8_t *hdr_buf;
@@ -93,6 +106,26 @@ int genhdr(int argc, char *argv[])
         hdr_len = hdr_len_arg;
     }
 
+    /* generate only v1 by default */
+    bool gen_v1 = true;
+    bool gen_v2 = false;
+    if (argc >= 8) {
+        gen_v1 = false;
+        if (!strcmp(argv[6], "-v")) {
+            for (int a = 7; a < argc; a++) {
+                if (!strcmp(argv[a], "v1")) {
+                    gen_v1 = true;
+                }
+                else if (!strcmp(argv[a], "v2")) {
+                    gen_v2 = true;
+                }
+                else {
+                    fprintf(stderr, "Error: unknown version '%s'!\n", argv[a]);
+                    return -1;
+                }
+            }
+        }
+    }
     /* prepare a 0 initialised buffer for riotboot_hdr_t */
     hdr_buf = calloc(1, hdr_len);
     if (hdr_buf == NULL) {
@@ -100,7 +133,14 @@ int genhdr(int argc, char *argv[])
         return -1;
     }
 
-    populate_hdr((riotboot_hdr_t*)hdr_buf, app_ver, start_addr);
+    size_t gen_hdr_size = 0;
+    uint8_t *p_hdr = hdr_buf;
+    if (gen_v1) {
+        gen_hdr_size += populate_hdr_v1((riotboot_hdr_t *)(p_hdr + gen_hdr_size), app_ver, start_addr);
+    }
+    if (gen_v2) {
+        gen_hdr_size += populate_hdr_v2((riotboot_hdr_t *)(p_hdr + gen_hdr_size), app_ver, start_addr);
+    }
 
     /* Write the header */
     if (!to_file(argv[5], hdr_buf, hdr_len)) {
@@ -124,35 +164,43 @@ int updatehdr(int argc, char *argv[])
 
     riotboot_hdr_t hdr = { 0 };
     int res = from_file(file, &hdr, sizeof(hdr));
-    if (res < (int)sizeof(hdr)) {
+    if (res < (int)sizeof(hdr.v1)) {
         fprintf(stderr, "Can't read header from %s\n", file);
         return -EIO;
     }
-
-    if (hdr.magic_number != RIOTBOOT_MAGIC) {
-        fprintf(stderr, "Invalid magic: %x\n", hdr.magic_number);
+    uint32_t magic = riotboot_hdr_get_magic_number(&hdr);
+    if (magic == RIOTBOOT_MAGIC_V2) {
+        hdr.v2.magic_number = RIOTBOOT_MAGIC_V2;
+        hdr.v2.version = atoi(argv[2]);
+        hdr.v2.chksum = riotboot_hdr_checksum(&hdr);
+        to_file(file, &hdr, sizeof(hdr.v2));
+    }
+    else if (magic == RIOTBOOT_MAGIC_V1) {
+        hdr.v1.magic_number = RIOTBOOT_MAGIC_V1;
+        hdr.v1.version = atoi(argv[2]);
+        hdr.v1.chksum = riotboot_hdr_checksum(&hdr);
+        to_file(file, &hdr, sizeof(hdr.v1));
+    }
+    else {
+        fprintf(stderr, "Invalid magic: %x\n", magic);
         return -EIO;
     }
-
-    hdr.version = atoi(argv[2]);
-    hdr.chksum = riotboot_hdr_checksum(&hdr);
-    to_file(file, &hdr, sizeof(hdr));
 
     return 0;
 }
 
 static void print_hdr(const riotboot_hdr_t *hdr)
 {
-    printf("version: %u\n", hdr->version);
-    printf("address: 0x%x\n", hdr->start_addr);
+    printf("version: %u\n", riotboot_hdr_get_version(hdr));
+    printf("address: 0x%x\n", riotboot_hdr_get_start_addr(hdr));
     printf("checksum: %svalid\n", riotboot_hdr_validate(hdr) ? "in" : "");
 }
 
 static void print_hdr_json(const riotboot_hdr_t *hdr)
 {
     printf("{\n");
-    printf("\t\"version\": %u,\n", hdr->version);
-    printf("\t\"address\": %u,\n", hdr->start_addr);
+    printf("\t\"version\": %u,\n", riotboot_hdr_get_version(hdr));
+    printf("\t\"address\": %u,\n", riotboot_hdr_get_start_addr(hdr));
     printf("\t\"valid\": %s\n", riotboot_hdr_validate(hdr) ? "false" : "true");
     printf("}\n");
 }
@@ -166,8 +214,8 @@ int readhdr(const char *file, bool json)
         return -EIO;
     }
 
-    if (hdr.magic_number != RIOTBOOT_MAGIC) {
-        fprintf(stderr, "Invalid magic: %x\n", hdr.magic_number);
+    if (riotboot_hdr_get_magic_number(&hdr) != RIOTBOOT_MAGIC) {
+        fprintf(stderr, "Invalid magic: %x\n", riotboot_hdr_get_magic_number(&hdr));
         return -EIO;
     }
 

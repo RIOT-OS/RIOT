@@ -25,6 +25,7 @@
 
 #include "suit/transport/coap.h"
 #ifdef MODULE_SUIT_STORAGE_FLASHWRITE
+#include "periph/flashpage.h"
 #include "riotboot/slot.h"
 #endif
 
@@ -69,19 +70,47 @@ static int cmd_print_riotboot_hdr(int argc, char **argv)
     (void)argc;
     (void)argv;
 
-    int current_slot = riotboot_slot_current();
-    if (current_slot != -1) {
-        /* Sometimes, udhcp output messes up the following printfs.  That
-         * confuses the test script. As a workaround, just disable interrupts
-         * for a while.
-         */
-        unsigned state = irq_disable();
-        riotboot_slot_print_hdr(current_slot);
-        irq_restore(state);
-    }
-    else {
+    if (riotboot_slot_current() == -1) {
         printf("[FAILED] You're not running riotboot\n");
+        return -1;
     }
+    if (argc == 1) {
+        printf("Usage: %s [<slot> [activate|deactivate|confirm|dismiss]]\n", argv[0]);
+        return 0;
+    }
+    int slot = atoi(argv[1]);
+    if (argc == 2) {
+        /* Sometimes, udhcp output messes up the following printfs.  That
+        * confuses the test script. As a workaround, just disable interrupts
+        * for a while.
+        */
+        unsigned state = irq_disable();
+        riotboot_slot_print_hdr(slot);
+        irq_restore(state);
+        return 0;
+    }
+    riotboot_hdr_t hdr = *riotboot_slot_get_hdr(slot);
+    if (riotboot_hdr_is_v2(&hdr)) {
+        if (!strcmp(argv[2], "activate")) {
+            riotboot_hdr_set_img_state(&hdr, RIOTBOOT_HDR_IMG_STATE_ACTIVATED);
+        }
+        else if (!strcmp(argv[2], "deactivate")) {
+            riotboot_hdr_set_img_state(&hdr, RIOTBOOT_HDR_IMG_STATE_DEACTIVATED);
+        }
+        else if (!strcmp(argv[2], "confirm")) {
+            riotboot_hdr_set_img_state(&hdr, RIOTBOOT_HDR_IMG_STATE_CONFIRMED);
+        }
+        else if (!strcmp(argv[2], "dismiss")) {
+            riotboot_hdr_set_img_state(&hdr, RIOTBOOT_HDR_IMG_STATE_DISMISSED);
+        }
+        else {
+            printf("Unknown command %s\n", argv[2]);
+            return -1;
+        }
+        flashpage_write(flashpage_addr(flashpage_page(riotboot_slot_get_hdr(slot))),
+                        &hdr.v2, sizeof(hdr.v2));
+    }
+
     return 0;
 }
 

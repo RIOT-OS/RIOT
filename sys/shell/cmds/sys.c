@@ -69,7 +69,8 @@ static int _version_handler(int argc, char **argv)
     int slot = riotboot_slot_current();
     if (slot >= 0) {
         const riotboot_hdr_t *hdr = riotboot_slot_get_hdr(slot);
-        printf("%s v%"PRIu32", slot %u\n", RIOT_APPLICATION, hdr->version, slot);
+        printf("%s v%"PRIu32", slot %u\n", RIOT_APPLICATION,
+               riotboot_hdr_get_version(hdr), slot);
     }
 #endif
 #ifdef CONFIG_RIOT_VERSION_EXTRA
