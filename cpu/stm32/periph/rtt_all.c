@@ -121,6 +121,22 @@ void rtt_init(void)
     /* stop the timer and reset configuration */
     LPTIM1->CR = 0;
 
+#if defined(CPU_FAM_STM32F7) && IS_ACTIVE(CONFIG_BOARD_HAS_LSE)
+    /* Workaround for the STM32F7: LPTIM1 never sets ARROK when LSE is
+     * selected as its clock right after the LSE was (re)started, e.g. after
+     * flashing a firmware that used LSI without a power cycle. Running LPTIM1
+     * from LSI once before switching to LSE avoids this. The root cause is
+     * not known yet and is possibly a hardware bug. */
+    RCC->CSR |= RCC_CSR_LSION;
+    while (!(RCC->CSR & RCC_CSR_LSIRDY)) {}
+    CLOCK_SRC_REG &= ~(CLOCK_SRC_MASK);
+    CLOCK_SRC_REG |= RCC_DCKCFGR2_LPTIM1SEL_0;
+    LPTIM1->CR = LPTIM_CR_ENABLE;
+    LPTIM1->ICR = LPTIM_ICR_ARROKCF;
+    LPTIM1->ARR = RTT_MAX_VALUE;
+    while (!(LPTIM1->ISR & LPTIM_ISR_ARROK)) {}
+    LPTIM1->CR = 0;
+#endif
     /* select low speed clock (LSI or LSE) */
     CLOCK_SRC_REG &= ~(CLOCK_SRC_MASK);
     CLOCK_SRC_REG |= CLOCK_SRC_CFG;
