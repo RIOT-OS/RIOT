@@ -51,6 +51,7 @@ USEMODULE += l2util
 USEMODULE += eui_provider
 USEMODULE += ieee802154
 USEMODULE += ieee802154_submac
+USEMODULE += ieee802154_submac_soft_ack
 USEMODULE += ztimer_usec
 USEMODULE += ztimer_msec
 

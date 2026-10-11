@@ -4,3 +4,8 @@ USEMODULE += ieee802154
 USEMODULE += ieee802154_submac
 USEMODULE += iolist
 USEMODULE += ztimer_usec
+
+ifneq (,$(filter netdev_ieee802154_submac_soft_ack,$(USEMODULE)))
+  USEMODULE += ieee802154_submac_soft_ack
+  $(warning SubMAC Soft ACK has been renamed to ieee802154_submac_soft_ack. Will be removed after release 2027.04)
+endif

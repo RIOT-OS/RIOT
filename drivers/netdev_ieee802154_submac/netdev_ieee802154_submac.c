@@ -151,18 +151,6 @@ static int _set(netdev_t *netdev, netopt_t opt, const void *value,
                                  opt, value, value_len);
 }
 
-void ieee802154_submac_bh_request(ieee802154_submac_t *submac)
-{
-    netdev_ieee802154_submac_t *netdev_submac = container_of(submac,
-                                                             netdev_ieee802154_submac_t,
-                                                             submac);
-
-    netdev_t *netdev = &netdev_submac->dev.netdev;
-    _isr_flags_set(netdev_submac, NETDEV_SUBMAC_FLAGS_BH_REQUEST);
-    DEBUG("IEEE802154 submac: ieee802154_submac_bh_request(): post NETDEV_EVENT_ISR\n");
-    netdev->event_callback(netdev, NETDEV_EVENT_ISR);
-}
-
 void ieee802154_submac_ack_timer_set(ieee802154_submac_t *submac)
 {
     netdev_ieee802154_submac_t *netdev_submac = container_of(submac,
@@ -222,12 +210,11 @@ static void _isr(netdev_t *netdev)
         flags = _isr_flags_get_clear(netdev_submac,
                                      NETDEV_SUBMAC_FLAGS_CRC_ERROR
                                      | NETDEV_SUBMAC_FLAGS_ACK_TIMEOUT
-                                     | NETDEV_SUBMAC_FLAGS_BH_REQUEST
                                      | NETDEV_SUBMAC_FLAGS_RX_DONE
                                      | NETDEV_SUBMAC_FLAGS_TX_DONE);
 
         if (flags & NETDEV_SUBMAC_FLAGS_CRC_ERROR) {
-            DEBUG("IEEE802154 submac:c NETDEV_SUBMAC_FLAGS_CRC_ERROR\n");
+            DEBUG("IEEE802154 submac: _isr(): NETDEV_SUBMAC_FLAGS_CRC_ERROR\n");
             ieee802154_submac_crc_error_cb(submac);
             flags &= ~NETDEV_SUBMAC_FLAGS_CRC_ERROR;
         }
@@ -236,12 +223,6 @@ static void _isr(netdev_t *netdev)
             DEBUG("IEEE802154 submac: _isr(): NETDEV_SUBMAC_FLAGS_ACK_TIMEOUT\n");
             ieee802154_submac_ack_timeout_fired(submac);
             flags &= ~NETDEV_SUBMAC_FLAGS_ACK_TIMEOUT;
-        }
-
-        if (flags & NETDEV_SUBMAC_FLAGS_BH_REQUEST) {
-            DEBUG("IEEE802154 submac: _isr(): NETDEV_SUBMAC_FLAGS_BH_REQUEST\n");
-            ieee802154_submac_bh_process(submac);
-            flags &= ~NETDEV_SUBMAC_FLAGS_BH_REQUEST;
         }
 
         if (flags & NETDEV_SUBMAC_FLAGS_RX_DONE) {
@@ -284,7 +265,7 @@ static int _recv(netdev_t *netdev, void *buf, size_t len, void *info)
                                                              netdev_ieee802154_submac_t,
                                                              dev);
     ieee802154_submac_t *submac = &netdev_submac->submac;
-    ieee802154_rx_info_t rx_info;
+    ieee802154_rx_info_t rx_info = { 0 };
 
     if (buf == NULL && len == 0) {
         return ieee802154_get_frame_length(submac);
@@ -309,30 +290,6 @@ static int _recv(netdev_t *netdev, void *buf, size_t len, void *info)
 
     }
 
-#if IS_USED(MODULE_NETDEV_IEEE802154_SUBMAC_SOFT_ACK)
-    const uint8_t *mhr = buf;
-    if ((mhr[0] & IEEE802154_FCF_TYPE_MASK) == IEEE802154_FCF_TYPE_DATA &&
-        (mhr[0] & IEEE802154_FCF_ACK_REQ)) {
-        ieee802154_filter_mode_t mode;
-        if (!ieee802154_radio_has_capability(&submac->dev, IEEE802154_CAP_AUTO_ACK) &&
-            (ieee802154_radio_get_frame_filter_mode(&submac->dev, &mode) < 0
-                || mode == IEEE802154_FILTER_ACCEPT)) {
-            /* send ACK if not handled by the driver and not in promiscuous mode */
-            uint8_t ack[IEEE802154_ACK_FRAME_LEN - IEEE802154_FCS_LEN]
-                = { IEEE802154_FCF_TYPE_ACK, 0x00, ieee802154_get_seq(mhr) };
-            iolist_t io = {
-                .iol_base = ack,
-                .iol_len = sizeof(ack),
-                .iol_next = NULL
-            };
-            DEBUG("IEEE802154 submac: Sending ACK\n");
-            int snd = _send(netdev, &io);
-            if (snd < 0) {
-                DEBUG("IEEE802154 submac: failed to send ACK (%d)\n", snd);
-            }
-        }
-    }
-#endif
     return res;
 }
 
