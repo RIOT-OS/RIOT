@@ -1,0 +1,17 @@
+#pragma once
+
+#define MYNEWT_VAL_BLE_TRANSPORT_UART_PORT        (1)
+#define MYNEWT_VAL_BLE_TRANSPORT_UART_BAUDRATE    (115200)
+#define MYNEWT_VAL_BLE_TRANSPORT_UART_DATA_BITS   (8)
+#define MYNEWT_VAL_BLE_TRANSPORT_UART_STOP_BITS   (1)
+
+#ifndef MYNEWT_VAL_BLE_TRANSPORT_MONITOR
+#define MYNEWT_VAL_BLE_TRANSPORT_MONITOR (0)
+#endif
+
+#define MYNEWT_VAL_BLE_TRANSPORT_UART_FLOW_CONTROL__none   (0)
+#define MYNEWT_VAL_BLE_TRANSPORT_UART_FLOW_CONTROL__rtscts (1)
+
+/* Do NOT override LL transport here */
+
+#include_next "syscfg/syscfg.h"
