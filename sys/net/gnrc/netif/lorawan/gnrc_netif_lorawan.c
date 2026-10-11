@@ -170,7 +170,7 @@ void gnrc_lorawan_mcps_confirm(gnrc_lorawan_t *mac, mcps_confirm_t *confirm)
 {
     (void)mac;
 
-    gnrc_pktbuf_release_error((gnrc_pktsnip_t *)confirm->msdu, confirm->status);
+    gnrc_pktbuf_release_error((gnrc_pktsnip_t *)confirm->context, confirm->status);
 
     DEBUG("gnrc_lorawan: transmission finished with status %i\n",
           confirm->status);
@@ -370,8 +370,6 @@ static int _send(gnrc_netif_t *netif, gnrc_pktsnip_t *payload)
         goto end;
     }
 
-    /* Remove the netif hdr snip and point to the MSDU */
-    payload = gnrc_pktbuf_remove_snip(payload, payload);
 
     if (netif->lorawan.flags & GNRC_NETIF_LORAWAN_FLAGS_LINK_CHECK) {
         mlme_request.type = MLME_LINK_CHECK;
@@ -382,8 +380,9 @@ static int _send(gnrc_netif_t *netif, gnrc_pktsnip_t *payload)
     mcps_request_t req =
     { .type = netif->lorawan.ack_req ? MCPS_CONFIRMED : MCPS_UNCONFIRMED,
       .data =
-      { .pkt = (iolist_t *)payload, .port = port,
-        .dr = netif->lorawan.datarate } };
+      { .pkt = (iolist_t *)payload->next, .port = port,
+        .dr = netif->lorawan.datarate,
+        .context = payload } };
     mcps_confirm_t conf;
 
     gnrc_lorawan_mcps_request(&netif->lorawan.mac, &req, &conf);
