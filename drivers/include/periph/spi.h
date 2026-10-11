@@ -474,6 +474,227 @@ static inline uint16_t spi_transfer_u16_be(spi_t bus, spi_cs_t cs, bool cont, ui
     return be16toh(receive);
 }
 
+#if MODULE_PERIPH_SPI_DMA
+/**
+ * @brief   Set the callback function for SPI DMA transfers
+ *
+ * @note    This function requires feature `periph_spi_dma`.
+ *
+ * @param[in] bus   SPI bus to configure
+ * @param[in] cb    Callback function to be called upon SPI receive completion
+ */
+void spi_dma_set_cb(spi_t bus, dma_cb_t cb);
+
+/**
+ * @brief   Set the argument for the SPI DMA callback function
+ *
+ * @note    This function requires feature `periph_spi_dma`.
+ *
+ * @param[in] bus   SPI bus to configure
+ * @param[in] arg   Argument to be passed to the callback function
+ */
+void spi_dma_set_cb_arg(spi_t bus, void *arg);
+
+/**
+ * @brief   Subsequent SPI API calls will use DMA transfer when beneficial
+ *
+ * This must only be called when the SPI bus has been acquired.
+ *
+ * @note    This function requires feature `periph_spi_dma`.
+ *
+ * @param[in] bus   SPI bus to configure
+ *
+ * @retval  0   success
+ * @retval  <0  failure
+ */
+int spi_acquire_dma(spi_t bus);
+
+/**
+ * @brief   Subsequent SPI API calls will no longer use DMA transfer
+ *
+ * This must only be called when the SPI bus has been acquired.
+ *
+ * @note    This function requires feature `periph_spi_dma`.
+ *
+ * @param[in] bus   SPI bus to configure
+ */
+void spi_release_dma(spi_t bus);
+
+/**
+ * @brief   Allocate a DMA descriptor to be used for SPI transfers Rx or Tx
+ *
+ * @note    This function requires feature `periph_spi_dma`.
+ *
+ * @param[in] bus   SPI bus to configure
+ *
+ * @return  Pointer to the allocated DMA descriptor
+ */
+void *spi_dma_get_desc(spi_t bus);
+
+/**
+ * @brief   Free a previously allocated DMA descriptor for SPI transfers
+ *
+ * @note    This function requires feature `periph_spi_dma`.
+ *
+ * @param[in] bus   SPI bus to configure
+ * @param[in] desc  DMA descriptor to free
+ */
+void spi_dma_put_desc(spi_t bus, const void *desc);
+
+/**
+ * @brief   Prepare allocated DMA descriptors for SPI transfers
+ *
+ * @note    This function requires feature `periph_spi_dma`.
+ *
+ * @param[in] bus           SPI bus to configure
+ * @param[in] desc_rx       DMA descriptor for receiving data, may be NULL
+ * @param[in] desc_tx       DMA descriptor for transmitting data, may be NULL
+ * @param[in] out           Pointer to the data to be transmitted, may be NULL
+ * @param[in] in            Pointer to the buffer for received data, may be NULL
+ * @param[in] len           Length of the data to be transferred
+ * @param[in] block_act_rx  Action to be taken upon completion of the receive block
+ * @param[in] block_act_tx  Action to be taken upon completion of the transmit block
+ */
+void spi_dma_prepare_desc(spi_t bus, void *desc_rx, void *desc_tx,
+                          const void *out, void *in, size_t len,
+                          dma_blockact_t block_act_rx, dma_blockact_t block_act_tx);
+
+/**
+ * @brief   Setup DMA channels for SPI transfers
+ *
+ * @note    This function requires feature `periph_spi_dma`.
+ *
+ * @param[in] bus           SPI bus to configure
+ * @param[in] trigger_rx    DMA trigger granularityfor the receive channel
+ * @param[in] trigact_rx    DMA trigger granularity for the receive channel
+ * @param[in] cb_rx         Callback function for the receive channel
+ * @param[in] arg_rx        Argument for the receive channel callback
+ * @param[in] trigger_tx    DMA trigger for the transmit channel
+ * @param[in] trigact_tx    DMA trigger granularity for the transmit channel
+ * @param[in] cb_tx         Callback function for the transmit channel
+ * @param[in] arg_tx        Argument for the transmit channel callback
+ */
+void spi_dma_setup(spi_t bus,
+                   unsigned trigger_rx, dma_trigact_t trigact_rx, dma_cb_t cb_rx, void *arg_rx,
+                   unsigned trigger_tx, dma_trigact_t trigact_tx, dma_cb_t cb_tx, void *arg_tx);
+
+/**
+ * @brief   Prepare first descriptor DMA channel for SPI transfers
+ *
+ * @note    This function requires feature `periph_spi_dma`.
+ *
+ * @param[in] bus           SPI bus to configure
+ * @param[in] out           Pointer to the data to be transmitted, may be NULL
+ * @param[in] in            Pointer to the buffer for received data, may be NULL
+ * @param[in] len           Length of the data to be transferred
+ * @param[in] block_act_rx  Action to be taken upon completion of the receive block
+ * @param[in] block_act_tx  Action to be taken upon completion of the transmit block
+ */
+void spi_dma_prepare(spi_t bus, const void *out, void *in, size_t len,
+                     dma_blockact_t block_act_rx, dma_blockact_t block_act_tx);
+
+/**
+ * @brief   Append prepared DMA descriptors for SPI transfer
+ *
+ * @note    This function requires feature `periph_spi_dma`.
+ *
+ * @param[in] bus           SPI bus to configure
+ * @param[in] desc_rx       DMA descriptor for receiving data, may be NULL
+ * @param[in] desc_tx       DMA descriptor for transmitting data, may be NULL
+ * @param[in] out           Pointer to the data to be transmitted, may be NULL
+ * @param[in] in            Pointer to the buffer for received data, may be NULL
+ * @param[in] len           Length of the data to be transferred
+ */
+void spi_dma_append(spi_t bus, void *desc_rx, void *desc_tx,
+                    const void *out, void *in, size_t len);
+
+/**
+ * @brief   Set the first SPI Rx DMA descriptor
+ *
+ * The descriptor must be prepared and it may be a chain of prepared descriptors
+ *
+ * @note    This function requires feature `periph_spi_dma`.
+ *
+ * @param[in] bus   SPI bus to configure
+ * @param[in] desc  DMA descriptor for receiving data
+ */
+void spi_dma_set_desc_rx(spi_t bus, void *desc);
+
+/**
+ * @brief   Set the first SPI Tx DMA descriptor
+ *
+ * The descriptor must be prepared and it may be a chain of prepared descriptors
+ *
+ * @note    This function requires feature `periph_spi_dma`.
+ *
+ * @param[in] bus   SPI bus to configure
+ * @param[in] desc  DMA descriptor for transmitting data
+ */
+void spi_dma_set_desc_tx(spi_t bus, void *desc);
+
+/**
+ * @brief   Get the first SPI Rx DMA descriptor
+ *
+ * @note    This function requires feature `periph_spi_dma`.
+ *
+ * @param[in] bus   SPI bus to query
+ *
+ * @return  Pointer to the first DMA descriptor for receiving data
+ */
+const void *spi_dma_get_desc_rx(spi_t bus);
+
+/**
+ * @brief   Get the first SPI Tx DMA descriptor
+ *
+ * @note    This function requires feature `periph_spi_dma`.
+ *
+ * @param[in] bus   SPI bus to query
+ *
+ * @return  Pointer to the first DMA descriptor for transmitting data
+ */
+const void *spi_dma_get_desc_tx(spi_t bus);
+
+/**
+ * @brief   Start SPI Rx DMA channel
+ *
+ * @note    This function requires feature `periph_spi_dma`.
+ *
+ * @param[in] bus   SPI bus to configure
+ */
+void spi_dma_start_rx(spi_t bus);
+
+/**
+ * @brief   Start SPI Tx DMA channel
+ *
+ * @note    This function requires feature `periph_spi_dma`.
+ *
+ * @param[in] bus   SPI bus to configure
+ */
+void spi_dma_start_tx(spi_t bus);
+
+/**
+ * @brief   Get the SPI Rx DMA channel
+ *
+ * @note    This function requires feature `periph_spi_dma`.
+ *
+ * @param[in] bus   SPI bus to query
+ *
+ * @return  DMA channel for receiving data
+ */
+dma_t spi_dma_rx(spi_t bus);
+
+/**
+ * @brief   Get the SPI Tx DMA channel
+ *
+ * @note    This function requires feature `periph_spi_dma`.
+ *
+ * @param[in] bus       SPI bus to query
+ *
+ * @return  DMA channel for transmitting data
+ */
+dma_t spi_dma_tx(spi_t bus);
+#endif /* MODULE_PERIPH_SPI_DMA */
+
 #ifdef __cplusplus
 }
 #endif

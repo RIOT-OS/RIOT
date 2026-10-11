@@ -202,6 +202,13 @@ void dac_set(dac_t line, uint16_t value)
 }
 
 #ifdef MODULE_PERIPH_DAC_PLAY
+
+#if defined(DMAC_CHCTRLB_TRIGACT_BURST_Val) || defined(DMAC_CHCTRLA_TRIGACT_BURST_Val)
+#define DAC_DMA_TRIGACT DMA_TRIGACT_BURST
+#else
+#define DAC_DMA_TRIGACT DMA_TRIGACT_BEAT
+#endif
+
 int dac_play_setup(dac_t line, dma_cb_t cb, void *arg)
 {
     uint8_t dmac_id;
@@ -220,7 +227,7 @@ int dac_play_setup(dac_t line, dma_cb_t cb, void *arg)
         return -ENOMEM;
     }
 
-    dma_setup(tx_dma[line], dmac_id, 0, cb, arg);
+    dma_setup(tx_dma[line], DAC_DMA_TRIGACT, dmac_id, 0, cb, arg);
 
     return 0;
 }
@@ -248,7 +255,7 @@ void dac_play(dac_t line, const uint16_t *buf, size_t len, uint8_t flags)
 
     /* source buffer will be set by dac_play() */
     dma_prepare(tx_dma[line], DMAC_BTCTRL_BEATSIZE_HWORD_Val,
-                buf + len, dst, len, DMA_INCR_SRC);
+                buf + len, dst, len, DMA_INCR_SRC, DMA_BLOCKACT_NONE);
 
     if (flags & DAC_PLAY_LOOPED) {
         dma_enable_loop(tx_dma[line]);
