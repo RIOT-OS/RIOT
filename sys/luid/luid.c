@@ -95,7 +95,7 @@ void luid_get_eui48(eui48_t *addr)
 void luid_netdev_get_eui48(const netdev_t *netdev, eui48_t *addr)
 {
     luid_base(addr, sizeof(*addr));
-#ifdef MODULE_NETDEV_REGISTER
+#ifdef MODULE_NETIF_REGISTER
     addr->uint8[4] ^= netdev->type;
     addr->uint8[5] ^= netdev->index;
 #else
@@ -119,7 +119,7 @@ void luid_get_eui64(eui64_t *addr)
 void luid_netdev_get_eui64(const netdev_t *netdev, eui64_t *addr)
 {
     luid_base(addr, sizeof(*addr));
-#ifdef MODULE_NETDEV_REGISTER
+#ifdef MODULE_NETIF_REGISTER
     addr->uint8[6] ^= netdev->type;
     addr->uint8[7] ^= netdev->index;
 #else
