@@ -18,7 +18,9 @@
 
 #include "embUnit.h"
 
+#include "byteorder.h"
 #include "net/ipv4/hdr.h"
+#include "net/protnum.h"
 
 #include "unittests-constants.h"
 #include "tests-ipv4_hdr.h"
@@ -155,6 +157,52 @@ static void test_ipv4_hdr_get_fo(void)
     TEST_ASSERT_EQUAL_INT(0x0abc, ipv4_hdr_get_fo((ipv4_hdr_t *)val));
 }
 
+static void test_ipv4_hdr_csum(void)
+{
+    uint8_t val[] = {
+        0x45, 0x00, 0x00, 0x3c, 0x1c, 0x46, 0x40, 0x00,
+        0x40, 0x06, 0x00, 0x00, 0xac, 0x10, 0x0a, 0x63,
+        0xac, 0x10, 0x0a, 0x0c
+    };
+
+    TEST_ASSERT_EQUAL_INT(0xb1e6,
+                          byteorder_ntohs(ipv4_hdr_csum((ipv4_hdr_t *)val)));
+}
+
+static void test_ipv4_hdr_inet_csum__initial_sum_overflows(void)
+{
+    uint16_t sum = 0xffff, res;
+    uint8_t val[] = {
+        0x45, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, /* IPv4 header */
+        0x00, 0x06, 0x00, 0x00, 0x0a, 0x00, 0x00, 0x01,
+        0x0a, 0x00, 0x00, 0x02
+    };
+
+    res = ipv4_hdr_inet_csum(sum, (ipv4_hdr_t *)val, PROTNUM_TCP, 0x0100);
+
+    /* take 1's-complement for correct checksum */
+    res = ~res;
+
+    TEST_ASSERT_EQUAL_INT(0xeaf6, res);
+}
+
+static void test_ipv4_hdr_inet_csum__initial_sum_0(void)
+{
+    uint16_t res, payload_len = 40;
+    uint8_t val[] = {
+        0x45, 0x00, 0x00, 0x3c, 0x1c, 0x46, 0x40, 0x00, /* IPv4 header */
+        0x40, 0x06, 0x00, 0x00, 0xac, 0x10, 0x0a, 0x63,
+        0xac, 0x10, 0x0a, 0x0c
+    };
+
+    res = ipv4_hdr_inet_csum(0, (ipv4_hdr_t *)val, PROTNUM_TCP, payload_len);
+
+    /* take 1's-complement for correct checksum */
+    res = ~res;
+
+    TEST_ASSERT_EQUAL_INT(0x9341, res);
+}
+
 Test *tests_ipv4_hdr_tests(void)
 {
     EMB_UNIT_TESTFIXTURES(fixtures) {
@@ -166,6 +214,9 @@ Test *tests_ipv4_hdr_tests(void)
         new_TestFixture(test_ipv4_hdr_get_flags),
         new_TestFixture(test_ipv4_hdr_set_fo),
         new_TestFixture(test_ipv4_hdr_get_fo),
+        new_TestFixture(test_ipv4_hdr_csum),
+        new_TestFixture(test_ipv4_hdr_inet_csum__initial_sum_overflows),
+        new_TestFixture(test_ipv4_hdr_inet_csum__initial_sum_0),
     };
 
     EMB_UNIT_TESTCALLER(ipv4_hdr_tests, NULL, NULL, fixtures);
