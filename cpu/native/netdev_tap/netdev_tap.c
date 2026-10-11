@@ -373,7 +373,7 @@ static int _init(netdev_t *netdev)
         _native_pending_syscalls_up();
         warn("ioctl TUNSETIFF");
         warnx("probably the tap interface (%s) does not exist or is already in use", name);
-        real_exit(EXIT_FAILURE);
+        return -ENODEV;
     }
 
     /* get MAC address */

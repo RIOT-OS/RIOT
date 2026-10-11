@@ -6,12 +6,18 @@
 # General Public License v2.1. See the file LICENSE in the top level
 # directory for more details.
 
+import os
 import sys
 from testrunner import run
 
 
 ADJUST_SET_MARGIN = 1
 ADJUST_SLEEP_MARGIN = 1
+
+if os.environ.get('BOARD', '').startswith('native'):
+    # native runs on top of a multi-user OS, the wakeup latency of a sleeping
+    # thread varies a lot between measurements
+    ADJUST_SLEEP_MARGIN = 20
 
 
 def testfunc(child):
