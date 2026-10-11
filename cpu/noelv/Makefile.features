@@ -1,4 +1,12 @@
-CPU_CORE := rv64imac
+# The NOEL-V is XLEN-parametrizable, the ISA of the synthesized core is
+# selected by the board via CPU_MODEL
+ifeq (noelv_rv32imac,$(CPU_MODEL))
+  CPU_CORE := rv32imac
+else ifeq (noelv_rv64imac,$(CPU_MODEL))
+  CPU_CORE := rv64imac
+else
+  $(error Unknown NOEL-V CPU model: $(CPU_MODEL))
+endif
 
 FEATURES_PROVIDED += periph_gpio
 FEATURES_PROVIDED += periph_pm

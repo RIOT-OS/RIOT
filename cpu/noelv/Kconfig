@@ -3,22 +3,31 @@
 
 config CPU_FAM_NOELV
     bool
-    select CPU_CORE_RV64IMAC
+
+## CPU Models
+config CPU_MODEL_NOELV_RV32IMAC
+    bool
+    select CPU_FAM_NOELV
+    select CPU_CORE_RV32IMAC
 
 config CPU_MODEL_NOELV_RV64IMAC
     bool
     select CPU_FAM_NOELV
+    select CPU_CORE_RV64IMAC
 
+## CPU common symbols
 config CPU_FAM
     default "noelv" if CPU_FAM_NOELV
 
 config CPU_MODEL
+    default "noelv_rv32imac" if CPU_MODEL_NOELV_RV32IMAC
     default "noelv_rv64imac" if CPU_MODEL_NOELV_RV64IMAC
 
 config CPU
     default "noelv" if CPU_FAM_NOELV
 
 config CPU_CORE
+    default "rv32imac" if CPU_CORE_RV32IMAC
     default "rv64imac" if CPU_CORE_RV64IMAC
 
 source "$(RIOTCPU)/riscv_common/Kconfig"
