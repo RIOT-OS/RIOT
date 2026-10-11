@@ -1,0 +1,746 @@
+/*
+ * SPDX-FileCopyrightText: 2026 ML!PA Consulting Gmbh
+ * SPDX-License-Identifier: LGPL-2.1-only
+ */
+
+#pragma once
+
+/**
+ * @defgroup    cpu_sam0_common_evsys sam0 Event System
+ * @ingroup     cpu_sam0_common
+ * @brief       Event System interface functions for sam0 class devices
+ *
+ * @{
+ *
+ * @file
+ * @brief       Event System interface functions for sam0 class devices
+ *
+ * @author      Fabian Hüßler <fabian.huessler@ml-pa.com>
+ */
+
+#include <stdbool.h>
+
+#include "cpu.h"
+#include "cpu_conf.h"
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+/**
+ * @brief   Event channel
+ */
+typedef int event_channel_t;
+
+/**
+ * @brief   Event channel path
+ */
+typedef enum {
+    EVENT_PATH_ASYNCHRONOUS = EVSYS_CHANNEL_PATH_ASYNCHRONOUS_Val, /**< Asynchronous event path */
+    EVENT_PATH_SYNCHRONOUS = EVSYS_CHANNEL_PATH_SYNCHRONOUS_Val, /**< Synchronous event path */
+    EVENT_PATH_RESYNCHRONIZED = EVSYS_CHANNEL_PATH_RESYNCHRONIZED_Val, /**< Resynchronized event path */
+} event_path_t;
+
+/**
+ * @brief   Event channel edge selection
+ */
+typedef enum {
+    EVENT_EDGE_NONE = EVSYS_CHANNEL_EDGSEL_NO_EVT_OUTPUT_Val, /**< No event output */
+    EVENT_EDGE_RISING = EVSYS_CHANNEL_EDGSEL_RISING_EDGE_Val, /**< Rising edge event */
+    EVENT_EDGE_FALLING = EVSYS_CHANNEL_EDGSEL_FALLING_EDGE_Val, /**< Falling edge event */
+    EVENT_EDGE_BOTH = EVSYS_CHANNEL_EDGSEL_BOTH_EDGES_Val, /**< Both edges event */
+} event_edge_t;
+
+/**
+ * @brief   Event generator IDs
+ */
+typedef enum {
+    EVENT_EVGEN_NONE = 0,
+#ifdef EVSYS_ID_GEN_OSCCTRL_XOSC_FAIL_0
+    EVENT_EVGEN_OSCCTRL_XOSC_FAIL_0 = EVSYS_ID_GEN_OSCCTRL_XOSC_FAIL_0,
+#endif
+#ifdef EVSYS_ID_GEN_OSCCTRL_XOSC_FAIL_1
+    EVENT_EVGEN_OSCCTRL_XOSC_FAIL_1 = EVSYS_ID_GEN_OSCCTRL_XOSC_FAIL_1,
+#endif
+#ifdef EVSYS_ID_GEN_OSC32KCTRL_XOSC32K_FAIL
+    EVENT_EVGEN_OSC32KCTRL_XOSC32K_FAIL = EVSYS_ID_GEN_OSC32KCTRL_XOSC32K_FAIL,
+#endif
+#ifdef EVSYS_ID_GEN_RTC_PER_0
+    EVENT_EVGEN_RTC_PER_0 = EVSYS_ID_GEN_RTC_PER_0,
+#endif
+#ifdef EVSYS_ID_GEN_RTC_PER_1
+    EVENT_EVGEN_RTC_PER_1 = EVSYS_ID_GEN_RTC_PER_1,
+#endif
+#ifdef EVSYS_ID_GEN_RTC_PER_2
+    EVENT_EVGEN_RTC_PER_2 = EVSYS_ID_GEN_RTC_PER_2,
+#endif
+#ifdef EVSYS_ID_GEN_RTC_PER_3
+    EVENT_EVGEN_RTC_PER_3 = EVSYS_ID_GEN_RTC_PER_3,
+#endif
+#ifdef EVSYS_ID_GEN_RTC_PER_4
+    EVENT_EVGEN_RTC_PER_4 = EVSYS_ID_GEN_RTC_PER_4,
+#endif
+#ifdef EVSYS_ID_GEN_RTC_PER_5
+    EVENT_EVGEN_RTC_PER_5 = EVSYS_ID_GEN_RTC_PER_5,
+#endif
+#ifdef EVSYS_ID_GEN_RTC_PER_6
+    EVENT_EVGEN_RTC_PER_6 = EVSYS_ID_GEN_RTC_PER_6,
+#endif
+#ifdef EVSYS_ID_GEN_RTC_PER_7
+    EVENT_EVGEN_RTC_PER_7 = EVSYS_ID_GEN_RTC_PER_7,
+#endif
+#ifdef EVSYS_ID_GEN_RTC_CMP_0
+    EVENT_EVGEN_RTC_CMP_0 = EVSYS_ID_GEN_RTC_CMP_0,
+#endif
+#ifdef EVSYS_ID_GEN_RTC_CMP_1
+    EVENT_EVGEN_RTC_CMP_1 = EVSYS_ID_GEN_RTC_CMP_1,
+#endif
+#ifdef EVSYS_ID_GEN_RTC_CMP_2
+    EVENT_EVGEN_RTC_CMP_2 = EVSYS_ID_GEN_RTC_CMP_2,
+#endif
+#ifdef EVSYS_ID_GEN_RTC_CMP_3
+    EVENT_EVGEN_RTC_CMP_3 = EVSYS_ID_GEN_RTC_CMP_3,
+#endif
+#ifdef EVSYS_ID_GEN_RTC_TAMPER
+    EVENT_EVGEN_RTC_TAMPER = EVSYS_ID_GEN_RTC_TAMPER,
+#endif
+#ifdef EVSYS_ID_GEN_RTC_OVF
+    EVENT_EVGEN_RTC_OVF = EVSYS_ID_GEN_RTC_OVF,
+#endif
+#ifdef EVSYS_ID_GEN_EIC_EXTINT_0
+    EVENT_EVGEN_EIC_EXTINT_0 = EVSYS_ID_GEN_EIC_EXTINT_0,
+#endif
+#ifdef EVSYS_ID_GEN_EIC_EXTINT_1
+    EVENT_EVGEN_EIC_EXTINT_1 = EVSYS_ID_GEN_EIC_EXTINT_1,
+#endif
+#ifdef EVSYS_ID_GEN_EIC_EXTINT_2
+    EVENT_EVGEN_EIC_EXTINT_2 = EVSYS_ID_GEN_EIC_EXTINT_2,
+#endif
+#ifdef EVSYS_ID_GEN_EIC_EXTINT_3
+    EVENT_EVGEN_EIC_EXTINT_3 = EVSYS_ID_GEN_EIC_EXTINT_3,
+#endif
+#ifdef EVSYS_ID_GEN_EIC_EXTINT_4
+    EVENT_EVGEN_EIC_EXTINT_4 = EVSYS_ID_GEN_EIC_EXTINT_4,
+#endif
+#ifdef EVSYS_ID_GEN_EIC_EXTINT_5
+    EVENT_EVGEN_EIC_EXTINT_5 = EVSYS_ID_GEN_EIC_EXTINT_5,
+#endif
+#ifdef EVSYS_ID_GEN_EIC_EXTINT_6
+    EVENT_EVGEN_EIC_EXTINT_6 = EVSYS_ID_GEN_EIC_EXTINT_6,
+#endif
+#ifdef EVSYS_ID_GEN_EIC_EXTINT_7
+    EVENT_EVGEN_EIC_EXTINT_7 = EVSYS_ID_GEN_EIC_EXTINT_7,
+#endif
+#ifdef EVSYS_ID_GEN_EIC_EXTINT_8
+    EVENT_EVGEN_EIC_EXTINT_8 = EVSYS_ID_GEN_EIC_EXTINT_8,
+#endif
+#ifdef EVSYS_ID_GEN_EIC_EXTINT_9
+    EVENT_EVGEN_EIC_EXTINT_9 = EVSYS_ID_GEN_EIC_EXTINT_9,
+#endif
+#ifdef EVSYS_ID_GEN_EIC_EXTINT_10
+    EVENT_EVGEN_EIC_EXTINT_10 = EVSYS_ID_GEN_EIC_EXTINT_10,
+#endif
+#ifdef EVSYS_ID_GEN_EIC_EXTINT_11
+    EVENT_EVGEN_EIC_EXTINT_11 = EVSYS_ID_GEN_EIC_EXTINT_11,
+#endif
+#ifdef EVSYS_ID_GEN_EIC_EXTINT_12
+    EVENT_EVGEN_EIC_EXTINT_12 = EVSYS_ID_GEN_EIC_EXTINT_12,
+#endif
+#ifdef EVSYS_ID_GEN_EIC_EXTINT_13
+    EVENT_EVGEN_EIC_EXTINT_13 = EVSYS_ID_GEN_EIC_EXTINT_13,
+#endif
+#ifdef EVSYS_ID_GEN_EIC_EXTINT_14
+    EVENT_EVGEN_EIC_EXTINT_14 = EVSYS_ID_GEN_EIC_EXTINT_14,
+#endif
+#ifdef EVSYS_ID_GEN_EIC_EXTINT_15
+    EVENT_EVGEN_EIC_EXTINT_15 = EVSYS_ID_GEN_EIC_EXTINT_15,
+#endif
+#ifdef EVSYS_ID_GEN_DMAC_CH_0
+    EVENT_EVGEN_DMAC_CH_0 = EVSYS_ID_GEN_DMAC_CH_0,
+#endif
+#ifdef EVSYS_ID_GEN_DMAC_CH_1
+    EVENT_EVGEN_DMAC_CH_1 = EVSYS_ID_GEN_DMAC_CH_1,
+#endif
+#ifdef EVSYS_ID_GEN_DMAC_CH_2
+    EVENT_EVGEN_DMAC_CH_2 = EVSYS_ID_GEN_DMAC_CH_2,
+#endif
+#ifdef EVSYS_ID_GEN_DMAC_CH_3
+    EVENT_EVGEN_DMAC_CH_3 = EVSYS_ID_GEN_DMAC_CH_3,
+#endif
+#ifdef EVSYS_ID_GEN_PAC_ACCERR
+    EVENT_EVGEN_PAC_ACCERR = EVSYS_ID_GEN_PAC_ACCERR,
+#endif
+#ifdef EVSYS_ID_GEN_TCC0_OVF
+    EVENT_EVGEN_TCC0_OVF = EVSYS_ID_GEN_TCC0_OVF,
+#endif
+#ifdef EVSYS_ID_GEN_TCC0_TRG
+    EVENT_EVGEN_TCC0_TRG = EVSYS_ID_GEN_TCC0_TRG,
+#endif
+#ifdef EVSYS_ID_GEN_TCC0_CNT
+    EVENT_EVGEN_TCC0_CNT = EVSYS_ID_GEN_TCC0_CNT,
+#endif
+#ifdef EVSYS_ID_GEN_TCC0_MCX_0
+    EVENT_EVGEN_TCC0_MCX_0 = EVSYS_ID_GEN_TCC0_MCX_0,
+#endif
+#ifdef EVSYS_ID_GEN_TCC0_MCX_1
+    EVENT_EVGEN_TCC0_MCX_1 = EVSYS_ID_GEN_TCC0_MCX_1,
+#endif
+#ifdef EVSYS_ID_GEN_TCC0_MCX_2
+    EVENT_EVGEN_TCC0_MCX_2 = EVSYS_ID_GEN_TCC0_MCX_2,
+#endif
+#ifdef EVSYS_ID_GEN_TCC0_MCX_3
+    EVENT_EVGEN_TCC0_MCX_3 = EVSYS_ID_GEN_TCC0_MCX_3,
+#endif
+#ifdef EVSYS_ID_GEN_TCC0_MCX_4
+    EVENT_EVGEN_TCC0_MCX_4 = EVSYS_ID_GEN_TCC0_MCX_4,
+#endif
+#ifdef EVSYS_ID_GEN_TCC0_MCX_5
+    EVENT_EVGEN_TCC0_MCX_5 = EVSYS_ID_GEN_TCC0_MCX_5,
+#endif
+#ifdef EVSYS_ID_GEN_TCC1_OVF
+    EVENT_EVGEN_TCC1_OVF = EVSYS_ID_GEN_TCC1_OVF,
+#endif
+#ifdef EVSYS_ID_GEN_TCC1_TRG
+    EVENT_EVGEN_TCC1_TRG = EVSYS_ID_GEN_TCC1_TRG,
+#endif
+#ifdef EVSYS_ID_GEN_TCC1_CNT
+    EVENT_EVGEN_TCC1_CNT = EVSYS_ID_GEN_TCC1_CNT,
+#endif
+#ifdef EVSYS_ID_GEN_TCC1_MCX_0
+    EVENT_EVGEN_TCC1_MCX_0 = EVSYS_ID_GEN_TCC1_MCX_0,
+#endif
+#ifdef EVSYS_ID_GEN_TCC1_MCX_1
+    EVENT_EVGEN_TCC1_MCX_1 = EVSYS_ID_GEN_TCC1_MCX_1,
+#endif
+#ifdef EVSYS_ID_GEN_TCC1_MCX_2
+    EVENT_EVGEN_TCC1_MCX_2 = EVSYS_ID_GEN_TCC1_MCX_2,
+#endif
+#ifdef EVSYS_ID_GEN_TCC1_MCX_3
+    EVENT_EVGEN_TCC1_MCX_3 = EVSYS_ID_GEN_TCC1_MCX_3,
+#endif
+#ifdef EVSYS_ID_GEN_TCC2_OVF
+    EVENT_EVGEN_TCC2_OVF = EVSYS_ID_GEN_TCC2_OVF,
+#endif
+#ifdef EVSYS_ID_GEN_TCC2_TRG
+    EVENT_EVGEN_TCC2_TRG = EVSYS_ID_GEN_TCC2_TRG,
+#endif
+#ifdef EVSYS_ID_GEN_TCC2_CNT
+    EVENT_EVGEN_TCC2_CNT = EVSYS_ID_GEN_TCC2_CNT,
+#endif
+#ifdef EVSYS_ID_GEN_TCC2_MCX_0
+    EVENT_EVGEN_TCC2_MCX_0 = EVSYS_ID_GEN_TCC2_MCX_0,
+#endif
+#ifdef EVSYS_ID_GEN_TCC2_MCX_1
+    EVENT_EVGEN_TCC2_MCX_1 = EVSYS_ID_GEN_TCC2_MCX_1,
+#endif
+#ifdef EVSYS_ID_GEN_TCC2_MCX_2
+    EVENT_EVGEN_TCC2_MCX_2 = EVSYS_ID_GEN_TCC2_MCX_2,
+#endif
+#ifdef EVSYS_ID_GEN_TCC3_OVF
+    EVENT_EVGEN_TCC3_OVF = EVSYS_ID_GEN_TCC3_OVF,
+#endif
+#ifdef EVSYS_ID_GEN_TCC3_TRG
+    EVENT_EVGEN_TCC3_TRG = EVSYS_ID_GEN_TCC3_TRG,
+#endif
+#ifdef EVSYS_ID_GEN_TCC3_CNT
+    EVENT_EVGEN_TCC3_CNT = EVSYS_ID_GEN_TCC3_CNT,
+#endif
+#ifdef EVSYS_ID_GEN_TCC3_MCX_0
+    EVENT_EVGEN_TCC3_MCX_0 = EVSYS_ID_GEN_TCC3_MCX_0,
+#endif
+#ifdef EVSYS_ID_GEN_TCC3_MCX_1
+    EVENT_EVGEN_TCC3_MCX_1 = EVSYS_ID_GEN_TCC3_MCX_1,
+#endif
+#ifdef EVSYS_ID_GEN_TCC4_OVF
+    EVENT_EVGEN_TCC4_OVF = EVSYS_ID_GEN_TCC4_OVF,
+#endif
+#ifdef EVSYS_ID_GEN_TCC4_TRG
+    EVENT_EVGEN_TCC4_TRG = EVSYS_ID_GEN_TCC4_TRG,
+#endif
+#ifdef EVSYS_ID_GEN_TCC4_CNT
+    EVENT_EVGEN_TCC4_CNT = EVSYS_ID_GEN_TCC4_CNT,
+#endif
+#ifdef EVSYS_ID_GEN_TCC4_MCX_0
+    EVENT_EVGEN_TCC4_MCX_0 = EVSYS_ID_GEN_TCC4_MCX_0,
+#endif
+#ifdef EVSYS_ID_GEN_TCC4_MCX_1
+    EVENT_EVGEN_TCC4_MCX_1 = EVSYS_ID_GEN_TCC4_MCX_1,
+#endif
+#ifdef EVSYS_ID_GEN_TC0_OVF
+    EVENT_EVGEN_TC0_OVF = EVSYS_ID_GEN_TC0_OVF,
+#endif
+#ifdef EVSYS_ID_GEN_TC0_MCX_0
+    EVENT_EVGEN_TC0_MCX_0 = EVSYS_ID_GEN_TC0_MCX_0,
+#endif
+#ifdef EVSYS_ID_GEN_TC0_MCX_1
+    EVENT_EVGEN_TC0_MCX_1 = EVSYS_ID_GEN_TC0_MCX_1,
+#endif
+#ifdef EVSYS_ID_GEN_TC1_OVF
+    EVENT_EVGEN_TC1_OVF = EVSYS_ID_GEN_TC1_OVF,
+#endif
+#ifdef EVSYS_ID_GEN_TC1_MCX_0
+    EVENT_EVGEN_TC1_MCX_0 = EVSYS_ID_GEN_TC1_MCX_0,
+#endif
+#ifdef EVSYS_ID_GEN_TC1_MCX_1
+    EVENT_EVGEN_TC1_MCX_1 = EVSYS_ID_GEN_TC1_MCX_1,
+#endif
+#ifdef EVSYS_ID_GEN_TC2_OVF
+    EVENT_EVGEN_TC2_OVF = EVSYS_ID_GEN_TC2_OVF,
+#endif
+#ifdef EVSYS_ID_GEN_TC2_MCX_0
+    EVENT_EVGEN_TC2_MCX_0 = EVSYS_ID_GEN_TC2_MCX_0,
+#endif
+#ifdef EVSYS_ID_GEN_TC2_MCX_1
+    EVENT_EVGEN_TC2_MCX_1 = EVSYS_ID_GEN_TC2_MCX_1,
+#endif
+#ifdef EVSYS_ID_GEN_TC3_OVF
+    EVENT_EVGEN_TC3_OVF = EVSYS_ID_GEN_TC3_OVF,
+#endif
+#ifdef EVSYS_ID_GEN_TC3_MCX_0
+    EVENT_EVGEN_TC3_MCX_0 = EVSYS_ID_GEN_TC3_MCX_0,
+#endif
+#ifdef EVSYS_ID_GEN_TC3_MCX_1
+    EVENT_EVGEN_TC3_MCX_1 = EVSYS_ID_GEN_TC3_MCX_1,
+#endif
+#ifdef EVSYS_ID_GEN_TC4_OVF
+    EVENT_EVGEN_TC4_OVF = EVSYS_ID_GEN_TC4_OVF,
+#endif
+#ifdef EVSYS_ID_GEN_TC4_MCX_0
+    EVENT_EVGEN_TC4_MCX_0 = EVSYS_ID_GEN_TC4_MCX_0,
+#endif
+#ifdef EVSYS_ID_GEN_TC4_MCX_1
+    EVENT_EVGEN_TC4_MCX_1 = EVSYS_ID_GEN_TC4_MCX_1,
+#endif
+#ifdef EVSYS_ID_GEN_TC5_OVF
+    EVENT_EVGEN_TC5_OVF = EVSYS_ID_GEN_TC5_OVF,
+#endif
+#ifdef EVSYS_ID_GEN_TC5_MCX_0
+    EVENT_EVGEN_TC5_MCX_0 = EVSYS_ID_GEN_TC5_MCX_0,
+#endif
+#ifdef EVSYS_ID_GEN_TC5_MCX_1
+    EVENT_EVGEN_TC5_MCX_1 = EVSYS_ID_GEN_TC5_MCX_1,
+#endif
+#ifdef EVSYS_ID_GEN_TC6_OVF
+    EVENT_EVGEN_TC6_OVF = EVSYS_ID_GEN_TC6_OVF,
+#endif
+#ifdef EVSYS_ID_GEN_TC6_MCX_0
+    EVENT_EVGEN_TC6_MCX_0 = EVSYS_ID_GEN_TC6_MCX_0,
+#endif
+#ifdef EVSYS_ID_GEN_TC6_MCX_1
+    EVENT_EVGEN_TC6_MCX_1 = EVSYS_ID_GEN_TC6_MCX_1,
+#endif
+#ifdef EVSYS_ID_GEN_TC7_OVF
+    EVENT_EVGEN_TC7_OVF = EVSYS_ID_GEN_TC7_OVF,
+#endif
+#ifdef EVSYS_ID_GEN_TC7_MCX_0
+    EVENT_EVGEN_TC7_MCX_0 = EVSYS_ID_GEN_TC7_MCX_0,
+#endif
+#ifdef EVSYS_ID_GEN_TC7_MCX_1
+    EVENT_EVGEN_TC7_MCX_1 = EVSYS_ID_GEN_TC7_MCX_1,
+#endif
+#ifdef EVSYS_ID_GEN_PDEC_OVF
+    EVENT_EVGEN_PDEC_OVF = EVSYS_ID_GEN_PDEC_OVF,
+#endif
+#ifdef EVSYS_ID_GEN_PDEC_ERR
+    EVENT_EVGEN_PDEC_ERR = EVSYS_ID_GEN_PDEC_ERR,
+#endif
+#ifdef EVSYS_ID_GEN_PDEC_DIR
+    EVENT_EVGEN_PDEC_DIR = EVSYS_ID_GEN_PDEC_DIR,
+#endif
+#ifdef EVSYS_ID_GEN_PDEC_VLC
+    EVENT_EVGEN_PDEC_VLC = EVSYS_ID_GEN_PDEC_VLC,
+#endif
+#ifdef EVSYS_ID_GEN_PDEC_MCX_0
+    EVENT_EVGEN_PDEC_MCX_0 = EVSYS_ID_GEN_PDEC_MCX_0,
+#endif
+#ifdef EVSYS_ID_GEN_PDEC_MCX_1
+    EVENT_EVGEN_PDEC_MCX_1 = EVSYS_ID_GEN_PDEC_MCX_1,
+#endif
+#ifdef EVSYS_ID_GEN_ADC0_RESRDY
+    EVENT_EVGEN_ADC0_RESRDY = EVSYS_ID_GEN_ADC0_RESRDY,
+#endif
+#ifdef EVSYS_ID_GEN_ADC0_WINMON
+    EVENT_EVGEN_ADC0_WINMON = EVSYS_ID_GEN_ADC0_WINMON,
+#endif
+#ifdef EVSYS_ID_GEN_ADC1_RESRDY
+    EVENT_EVGEN_ADC1_RESRDY = EVSYS_ID_GEN_ADC1_RESRDY,
+#endif
+#ifdef EVSYS_ID_GEN_AC_COMP_0
+    EVENT_EVGEN_AC_COMP_0 = EVSYS_ID_GEN_AC_COMP_0,
+#endif
+#ifdef EVSYS_ID_GEN_AC_COMP_1
+    EVENT_EVGEN_AC_COMP_1 = EVSYS_ID_GEN_AC_COMP_1,
+#endif
+#ifdef EVSYS_ID_GEN_AC_WIN_0
+    EVENT_EVGEN_AC_WIN_0 = EVSYS_ID_GEN_AC_WIN_0,
+#endif
+#ifdef EVSYS_ID_GEN_DAC_EMPTY_0
+    EVENT_EVGEN_DAC_EMPTY_0 = EVSYS_ID_GEN_DAC_EMPTY_0,
+#endif
+#ifdef EVSYS_ID_GEN_DAC_EMPTY_1
+    EVENT_EVGEN_DAC_EMPTY_1 = EVSYS_ID_GEN_DAC_EMPTY_1,
+#endif
+#ifdef EVSYS_ID_GEN_DAC_RESRDY_0
+    EVENT_EVGEN_DAC_RESRDY_0 = EVSYS_ID_GEN_DAC_RESRDY_0,
+#endif
+#ifdef EVSYS_ID_GEN_DAC_RESRDY_1
+    EVENT_EVGEN_DAC_RESRDY_1 = EVSYS_ID_GEN_DAC_RESRDY_1,
+#endif
+#ifdef EVSYS_ID_GEN_GMAC_TSU_CMP
+    EVENT_EVGEN_GMAC_TSU_CMP = EVSYS_ID_GEN_GMAC_TSU_CMP,
+#endif
+#ifdef EVSYS_ID_GEN_TRNG_READY
+    EVENT_EVGEN_TRNG_READY = EVSYS_ID_GEN_TRNG_READY,
+#endif
+#ifdef EVSYS_ID_GEN_CCL_LUTOUT_0
+    EVENT_EVGEN_CCL_LUTOUT_0 = EVSYS_ID_GEN_CCL_LUTOUT_0,
+#endif
+#ifdef EVSYS_ID_GEN_CCL_LUTOUT_1
+    EVENT_EVGEN_CCL_LUTOUT_1 = EVSYS_ID_GEN_CCL_LUTOUT_1,
+#endif
+#ifdef EVSYS_ID_GEN_CCL_LUTOUT_2
+    EVENT_EVGEN_CCL_LUTOUT_2 = EVSYS_ID_GEN_CCL_LUTOUT_2,
+#endif
+#ifdef EVSYS_ID_GEN_CCL_LUTOUT_3
+    EVENT_EVGEN_CCL_LUTOUT_3 = EVSYS_ID_GEN_CCL_LUTOUT_3,
+#endif
+
+#ifdef EVSYS_ID_GEN_ADC_RESRDY
+    EVENT_EVGEN_ADC_RESRDY = EVSYS_ID_GEN_ADC_RESRDY,
+#endif
+#ifdef EVSYS_ID_GEN_ADC_WINMON
+    EVENT_EVGEN_ADC_WINMON = EVSYS_ID_GEN_ADC_WINMON,
+#endif
+#ifdef EVSYS_ID_GEN_DAC_EMPTY
+    EVENT_EVGEN_DAC_EMPTY = EVSYS_ID_GEN_DAC_EMPTY,
+#endif
+
+#ifdef EVSYS_ID_GEN_EIC_EXTINT_16
+    EVENT_EVGEN_EIC_EXTINT_16 = EVSYS_ID_GEN_EIC_EXTINT_16,
+#endif
+#ifdef EVSYS_ID_GEN_EIC_EXTINT_17
+    EVENT_EVGEN_EIC_EXTINT_17 = EVSYS_ID_GEN_EIC_EXTINT_17,
+#endif
+
+#ifdef EVSYS_ID_GEN_ADC1_WINMON
+    EVENT_EVGEN_ADC1_WINMON = EVSYS_ID_GEN_ADC1_WINMON,
+#endif
+
+#ifdef EVSYS_ID_GEN_AC1_COMP_0
+    EVENT_EVGEN_AC1_COMP_0 = EVSYS_ID_GEN_AC1_COMP_0,
+#endif
+#ifdef EVSYS_ID_GEN_AC1_COMP_1
+    EVENT_EVGEN_AC1_COMP_1 = EVSYS_ID_GEN_AC1_COMP_1,
+#endif
+#ifdef EVSYS_ID_GEN_AC1_WIN_0
+    EVENT_EVGEN_AC1_WIN_0 = EVSYS_ID_GEN_AC1_WIN_0,
+#endif
+
+#ifdef EVSYS_ID_GEN_TCC3_MCX_2
+    EVENT_EVGEN_TCC3_MCX_2 = EVSYS_ID_GEN_TCC3_MCX_2,
+#endif
+#ifdef EVSYS_ID_GEN_TCC3_MCX_3
+    EVENT_EVGEN_TCC3_MCX_3 = EVSYS_ID_GEN_TCC3_MCX_3,
+#endif
+
+} event_generator_t;
+
+/**
+ * @brief   Event user IDs
+ */
+typedef enum {
+#ifdef EVSYS_ID_USER_RTC_TAMPER
+    EVENT_USER_RTC_TAMPER = EVSYS_ID_USER_RTC_TAMPER,  /* A */
+#endif
+
+#ifdef EVSYS_ID_USER_PORT_EV_0
+    EVENT_USER_PORT_EV_0 = EVSYS_ID_USER_PORT_EV_0,  /* A */
+#endif
+#ifdef EVSYS_ID_USER_PORT_EV_1
+    EVENT_USER_PORT_EV_1 = EVSYS_ID_USER_PORT_EV_1,  /* A */
+#endif
+#ifdef EVSYS_ID_USER_PORT_EV_2
+    EVENT_USER_PORT_EV_2 = EVSYS_ID_USER_PORT_EV_2,  /* A */
+#endif
+#ifdef EVSYS_ID_USER_PORT_EV_3
+    EVENT_USER_PORT_EV_3 = EVSYS_ID_USER_PORT_EV_3,  /* A */
+#endif
+
+#ifdef EVSYS_ID_USER_DMAC_CH_0
+    EVENT_USER_DMAC_CH_0 = EVSYS_ID_USER_DMAC_CH_0,  /* S, R */
+#endif
+#ifdef EVSYS_ID_USER_DMAC_CH_1
+    EVENT_USER_DMAC_CH_1 = EVSYS_ID_USER_DMAC_CH_1,  /* S, R */
+#endif
+#ifdef EVSYS_ID_USER_DMAC_CH_2
+    EVENT_USER_DMAC_CH_2 = EVSYS_ID_USER_DMAC_CH_2,  /* S, R */
+#endif
+#ifdef EVSYS_ID_USER_DMAC_CH_3
+    EVENT_USER_DMAC_CH_3 = EVSYS_ID_USER_DMAC_CH_3,  /* S, R */
+#endif
+#ifdef EVSYS_ID_USER_DMAC_CH_4
+    EVENT_USER_DMAC_CH_4 = EVSYS_ID_USER_DMAC_CH_4,  /* S, R */
+#endif
+#ifdef EVSYS_ID_USER_DMAC_CH_5
+    EVENT_USER_DMAC_CH_5 = EVSYS_ID_USER_DMAC_CH_5,  /* S, R */
+#endif
+#ifdef EVSYS_ID_USER_DMAC_CH_6
+    EVENT_USER_DMAC_CH_6 = EVSYS_ID_USER_DMAC_CH_6,  /* S, R */
+#endif
+#ifdef EVSYS_ID_USER_DMAC_CH_7
+    EVENT_USER_DMAC_CH_7 = EVSYS_ID_USER_DMAC_CH_7,  /* S, R */
+#endif
+#ifdef EVSYS_ID_USER_DMAC_CH_8
+    EVENT_USER_DMAC_CH_8 = EVSYS_ID_USER_DMAC_CH_8,  /* S, R */
+#endif
+
+#ifdef EVSYS_ID_USER_CM4_TRACE_START
+    EVENT_USER_CM4_TRACE_START = EVSYS_ID_USER_CM4_TRACE_START, /* S, R */
+#endif
+#ifdef EVSYS_ID_USER_CM4_TRACE_STOP
+    EVENT_USER_CM4_TRACE_STOP = EVSYS_ID_USER_CM4_TRACE_STOP, /* S, R */
+#endif
+#ifdef EVSYS_ID_USER_CM4_TRACE_TRIG
+    EVENT_USER_CM4_TRACE_TRIG = EVSYS_ID_USER_CM4_TRACE_TRIG, /* S, R */
+#endif
+
+#ifdef EVSYS_ID_USER_TCC0_EV_0
+    EVENT_USER_TCC0_EV_0 = EVSYS_ID_USER_TCC0_EV_0, /* A, S, R */
+#endif
+#ifdef EVSYS_ID_USER_TCC0_EV_1
+    EVENT_USER_TCC0_EV_1 = EVSYS_ID_USER_TCC0_EV_1, /* A, S, R */
+#endif
+
+#ifdef EVSYS_ID_USER_TCC0_MC_0
+    EVENT_USER_TCC0_MC_0 = EVSYS_ID_USER_TCC0_MC_0, /* A, S, R */
+#endif
+#ifdef EVSYS_ID_USER_TCC0_MC_1
+    EVENT_USER_TCC0_MC_1 = EVSYS_ID_USER_TCC0_MC_1, /* A, S, R */
+#endif
+#ifdef EVSYS_ID_USER_TCC0_MC_2
+    EVENT_USER_TCC0_MC_2 = EVSYS_ID_USER_TCC0_MC_2, /* A, S, R */
+#endif
+#ifdef EVSYS_ID_USER_TCC0_MC_3
+    EVENT_USER_TCC0_MC_3 = EVSYS_ID_USER_TCC0_MC_3, /* A, S, R */
+#endif
+#ifdef EVSYS_ID_USER_TCC0_MC_4
+    EVENT_USER_TCC0_MC_4 = EVSYS_ID_USER_TCC0_MC_4, /* A, S, R */
+#endif
+#ifdef EVSYS_ID_USER_TCC0_MC_5
+    EVENT_USER_TCC0_MC_5 = EVSYS_ID_USER_TCC0_MC_5, /* A, S, R */
+#endif
+
+#ifdef EVSYS_ID_USER_TCC1_EV_0
+    EVENT_USER_TCC1_EV_0 = EVSYS_ID_USER_TCC1_EV_0, /* A, S, R */
+#endif
+#ifdef EVSYS_ID_USER_TCC1_EV_1
+    EVENT_USER_TCC1_EV_1 = EVSYS_ID_USER_TCC1_EV_1, /* A, S, R */
+#endif
+
+#ifdef EVSYS_ID_USER_TCC1_MC_0
+    EVENT_USER_TCC1_MC_0 = EVSYS_ID_USER_TCC1_MC_0, /* A, S, R */
+#endif
+#ifdef EVSYS_ID_USER_TCC1_MC_1
+    EVENT_USER_TCC1_MC_1 = EVSYS_ID_USER_TCC1_MC_1, /* A, S, R */
+#endif
+#ifdef EVSYS_ID_USER_TCC1_MC_2
+    EVENT_USER_TCC1_MC_2 = EVSYS_ID_USER_TCC1_MC_2, /* A, S, R */
+#endif
+#ifdef EVSYS_ID_USER_TCC1_MC_3
+    EVENT_USER_TCC1_MC_3 = EVSYS_ID_USER_TCC1_MC_3, /* A, S, R */
+#endif
+
+#ifdef EVSYS_ID_USER_TCC2_EV_0
+    EVENT_USER_TCC2_EV_0 = EVSYS_ID_USER_TCC2_EV_0, /* A, S, R */
+#endif
+#ifdef EVSYS_ID_USER_TCC2_EV_1
+    EVENT_USER_TCC2_EV_1 = EVSYS_ID_USER_TCC2_EV_1, /* A, S, R */
+#endif
+#ifdef EVSYS_ID_USER_TCC2_MC_0
+    EVENT_USER_TCC2_MC_0 = EVSYS_ID_USER_TCC2_MC_0, /* A, S, R */
+#endif
+#ifdef EVSYS_ID_USER_TCC2_MC_1
+    EVENT_USER_TCC2_MC_1 = EVSYS_ID_USER_TCC2_MC_1, /* A, S, R */
+#endif
+#ifdef EVSYS_ID_USER_TCC2_MC_2
+    EVENT_USER_TCC2_MC_2 = EVSYS_ID_USER_TCC2_MC_2, /* A, S, R */
+#endif
+#ifdef EVSYS_ID_USER_TCC3_EV_0
+    EVENT_USER_TCC3_EV_0 = EVSYS_ID_USER_TCC3_EV_0, /* A, S, R */
+#endif
+#ifdef EVSYS_ID_USER_TCC3_EV_1
+    EVENT_USER_TCC3_EV_1 = EVSYS_ID_USER_TCC3_EV_1, /* A, S, R */
+#endif
+#ifdef EVSYS_ID_USER_TCC3_MC_0
+    EVENT_USER_TCC3_MC_0 = EVSYS_ID_USER_TCC3_MC_0, /* A, S, R */
+#endif
+#ifdef EVSYS_ID_USER_TCC3_MC_1
+    EVENT_USER_TCC3_MC_1 = EVSYS_ID_USER_TCC3_MC_1, /* A, S, R */
+#endif
+#ifdef EVSYS_ID_USER_TCC4_EV_0
+    EVENT_USER_TCC4_EV_0 = EVSYS_ID_USER_TCC4_EV_0, /* A, S, R */
+#endif
+#ifdef EVSYS_ID_USER_TCC4_EV_1
+    EVENT_USER_TCC4_EV_1 = EVSYS_ID_USER_TCC4_EV_1, /* A, S, R */
+#endif
+#ifdef EVSYS_ID_USER_TCC4_MC_0
+    EVENT_USER_TCC4_MC_0 = EVSYS_ID_USER_TCC4_MC_0, /* A, S, R */
+#endif
+#ifdef EVSYS_ID_USER_TCC4_MC_1
+    EVENT_USER_TCC4_MC_1 = EVSYS_ID_USER_TCC4_MC_1, /* A, S, R */
+#endif
+#ifdef EVSYS_ID_USER_TC0_EVU
+    EVENT_USER_TC0_EVU = EVSYS_ID_USER_TC0_EVU, /* A, S, R */
+#endif
+#ifdef EVSYS_ID_USER_TC1_EVU
+    EVENT_USER_TC1_EVU = EVSYS_ID_USER_TC1_EVU, /* A, S, R */
+#endif
+#ifdef EVSYS_ID_USER_TC2_EVU
+    EVENT_USER_TC2_EVU = EVSYS_ID_USER_TC2_EVU, /* A, S, R */
+#endif
+#ifdef EVSYS_ID_USER_TC3_EVU
+    EVENT_USER_TC3_EVU = EVSYS_ID_USER_TC3_EVU, /* A, S, R */
+#endif
+#ifdef EVSYS_ID_USER_TC4_EVU
+    EVENT_USER_TC4_EVU = EVSYS_ID_USER_TC4_EVU, /* A, S, R */
+#endif
+#ifdef EVSYS_ID_USER_TC5_EVU
+    EVENT_USER_TC5_EVU = EVSYS_ID_USER_TC5_EVU, /* A, S, R */
+#endif
+#ifdef EVSYS_ID_USER_TC6_EVU
+    EVENT_USER_TC6_EVU = EVSYS_ID_USER_TC6_EVU, /* A, S, R */
+#endif
+#ifdef EVSYS_ID_USER_TC7_EVU
+    EVENT_USER_TC7_EVU = EVSYS_ID_USER_TC7_EVU, /* A, S, R */
+#endif
+
+#ifdef EVSYS_ID_USER_PDEC_EVU_0
+    EVENT_USER_PDEC_EVU_0 = EVSYS_ID_USER_PDEC_EVU_0, /* A, S, R */
+#endif
+#ifdef EVSYS_ID_USER_PDEC_EVU_1
+    EVENT_USER_PDEC_EVU_1 = EVSYS_ID_USER_PDEC_EVU_1, /* A, S, R */
+#endif
+#ifdef EVSYS_ID_USER_PDEC_EVU_2
+    EVENT_USER_PDEC_EVU_2 = EVSYS_ID_USER_PDEC_EVU_2, /* A, S, R */
+#endif
+
+#ifdef EVSYS_ID_USER_ADC0_START
+    EVENT_USER_ADC0_START = EVSYS_ID_USER_ADC0_START, /* A, S, R */
+#endif
+#ifdef EVSYS_ID_USER_ADC0_SYNC
+    EVENT_USER_ADC0_SYNC = EVSYS_ID_USER_ADC0_SYNC, /* A, S, R */
+#endif
+#ifdef EVSYS_ID_USER_ADC1_START
+    EVENT_USER_ADC1_START = EVSYS_ID_USER_ADC1_START, /* A, S, R */
+#endif
+#ifdef EVSYS_ID_USER_ADC1_SYNC
+    EVENT_USER_ADC1_SYNC = EVSYS_ID_USER_ADC1_SYNC, /* A, S, R */
+#endif
+
+#ifdef EVSYS_ID_USER_AC_SOC_0
+    EVENT_USER_AC_SOC_0 = EVSYS_ID_USER_AC_SOC_0, /* A */
+#endif
+#ifdef EVSYS_ID_USER_AC_SOC_1
+    EVENT_USER_AC_SOC_1 = EVSYS_ID_USER_AC_SOC_1, /* A */
+#endif
+
+#ifdef EVSYS_ID_USER_DAC_START_0
+    EVENT_USER_DAC_START_0 = EVSYS_ID_USER_DAC_START_0, /* A */
+#endif
+#ifdef EVSYS_ID_USER_DAC_START_1
+    EVENT_USER_DAC_START_1 = EVSYS_ID_USER_DAC_START_1, /* A */
+#endif
+
+#ifdef EVSYS_ID_USER_CCL_LUTIN_0
+    EVENT_USER_CCL_LUTIN_0 = EVSYS_ID_USER_CCL_LUTIN_0, /* A */
+#endif
+#ifdef EVSYS_ID_USER_CCL_LUTIN_1
+    EVENT_USER_CCL_LUTIN_1 = EVSYS_ID_USER_CCL_LUTIN_1, /* A */
+#endif
+#ifdef EVSYS_ID_USER_CCL_LUTIN_2
+    EVENT_USER_CCL_LUTIN_2 = EVSYS_ID_USER_CCL_LUTIN_2, /* A */
+#endif
+#ifdef EVSYS_ID_USER_CCL_LUTIN_3
+    EVENT_USER_CCL_LUTIN_3 = EVSYS_ID_USER_CCL_LUTIN_3, /* A */
+#endif
+
+#ifdef EVSYS_ID_USER_ADC_START
+    EVENT_USER_ADC_START = EVSYS_ID_USER_ADC_START, /* A, S, R */
+#endif
+
+#ifdef EVSYS_ID_USER_ADC_SYNC
+    EVENT_USER_ADC_SYNC = EVSYS_ID_USER_ADC_SYNC, /* A, S, R */
+#endif
+
+#ifdef EVSYS_ID_USER_MTB_START
+    EVENT_USER_MTB_START = EVSYS_ID_USER_MTB_START, /* A */
+#endif
+#ifdef EVSYS_ID_USER_MTB_STOP
+    EVENT_USER_MTB_STOP = EVSYS_ID_USER_MTB_STOP, /* A */
+#endif
+
+#ifdef EVSYS_ID_USER_AC1_SOC_0
+    EVENT_USER_AC1_SOC_0 = EVSYS_ID_USER_AC1_SOC_0, /* A */
+#endif
+#ifdef EVSYS_ID_USER_AC1_SOC_1
+    EVENT_USER_AC1_SOC_1 = EVSYS_ID_USER_AC1_SOC_1, /* A */
+#endif
+
+#ifdef EVSYS_ID_USER_PTC_STCONV
+    EVENT_USER_PTC_STCONV = EVSYS_ID_USER_PTC_STCONV, /* A */
+#endif
+
+} event_user_t;
+
+/**
+ * @brief   Initialize peripheral event system
+ */
+void periph_event_init(void);
+
+/**
+ * @brief   Allocate a peripheral event channel
+ *
+ * @return  Channel number
+ */
+int periph_event_channel_alloc(void);
+
+/**
+ * @brief   Free a peripheral event channel
+ *
+ * @param channel  Channel number to free
+ */
+void periph_event_channel_free(event_channel_t channel);
+
+/**
+ * @brief   Configure a peripheral event channel
+ *
+ * @param[in] channel       Channel number to configure
+ * @param[in] generator     Event generator to attach to the channel
+ * @param[in] path          Event path configuration
+ * @param[in] edge          Event edge configuration
+ */
+void periph_event_channel_config(event_channel_t channel,
+                                 event_generator_t generator,
+                                 event_path_t path,
+                                 event_edge_t edge);
+
+/**
+ * @brief   Attach a user to a peripheral event channel
+ *
+ * @param[in] channel  Channel number to attach the user to
+ * @param[in] user     User to attach to the channel
+ */
+void periph_event_attach(event_channel_t channel, event_user_t user);
+
+/**
+ * @brief   Detach a user from a peripheral event channel
+ *
+ * @param[in] channel  Channel number to detach the user from
+ * @param[in] user     User to detach from the channel
+ */
+void periph_event_detach(event_channel_t channel, event_user_t user);
+
+#ifdef __cplusplus
+}
+#endif
+/** @} */

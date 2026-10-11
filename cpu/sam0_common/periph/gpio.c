@@ -66,8 +66,6 @@
 #define CONFIG_SAM0_GCLK_GPIO       (SAM0_GCLK_MAIN)
 #endif
 
-#ifdef MODULE_PERIPH_GPIO_IRQ
-
 /**
  * @brief   Number of external interrupt lines
  */
@@ -94,6 +92,7 @@ typedef enum {
     _EIC_CLOCK_SLOW
 } gpio_eic_clock_t;
 
+#ifdef MODULE_PERIPH_GPIO_IRQ
 static gpio_isr_ctx_t gpio_config[NUMOF_IRQS];
 #endif /* MODULE_PERIPH_GPIO_IRQ */
 
@@ -239,7 +238,6 @@ void gpio_write(gpio_t pin, bool value)
     }
 }
 
-#ifdef MODULE_PERIPH_GPIO_IRQ
 
 #ifdef CPU_COMMON_SAMD21
 #define EIC_SYNC() while (_EIC->STATUS.reg & EIC_STATUS_SYNCBUSY)
@@ -247,6 +245,7 @@ void gpio_write(gpio_t pin, bool value)
 #define EIC_SYNC() while (_EIC->SYNCBUSY.reg & EIC_SYNCBUSY_ENABLE)
 #endif
 
+#if MODULE_PERIPH_GPIO_IRQ || MODULE_PERIPH_GPIO_EVENT
 static int _exti(gpio_t pin)
 {
     unsigned port_num = ((pin >> 7) & 0x03);
@@ -256,7 +255,8 @@ static int _exti(gpio_t pin)
     }
     return exti_config[port_num][_pin_pos(pin)];
 }
-
+#endif /* MODULE_PERIPH_GPIO_IRQ || MODULE_PERIPH_GPIO_EVENT */
+#ifdef MODULE_PERIPH_GPIO_IRQ
 /* check if an RTC tamper pin was configured as interrupt */
 __attribute__ ((unused))
 static bool _rtc_irq_enabled(void)
@@ -566,6 +566,87 @@ ISR_EICn(15)
 #endif /* CPU_COMMON_SAML1X || CPU_COMMON_SAMD5X */
 
 #else /* MODULE_PERIPH_GPIO_IRQ */
+
+#if MODULE_PERIPH_GPIO_EVENT
+int gpio_init_event(gpio_t pin, gpio_flank_t flank)
+{
+    int exti = _exti(pin);
+    if (exti == -1) {
+        return -1;
+    }
+
+    /* 1. Configure pin multiplexer for EIC (Function A) */
+    gpio_init(pin, GPIO_IN);
+    gpio_init_mux(pin, GPIO_MUX_A);
+    /* 2. Enable EIC clocks */
+#ifdef CPU_COMMON_SAMD21
+    PM->APBAMASK.reg |= PM_APBAMASK_EIC;
+    GCLK->CLKCTRL.reg = EIC_GCLK_ID
+                      | GCLK_CLKCTRL_CLKEN
+                      | GCLK_CLKCTRL_GEN(CONFIG_SAM0_GCLK_GPIO);
+    while (GCLK->STATUS.reg & GCLK_STATUS_SYNCBUSY) {}
+#else /* CPU_COMMON_SAMD5X CPU_COMMON_SAML21) */
+    MCLK->APBAMASK.reg |= MCLK_APBAMASK_EIC;
+    GCLK->PCHCTRL[EIC_GCLK_ID].reg = GCLK_PCHCTRL_CHEN | GCLK_PCHCTRL_GEN(CONFIG_SAM0_GCLK_GPIO);
+    /* Disable EIC to configure registers safely */
+    _EIC->CTRLA.reg = 0;
+    EIC_SYNC();
+#endif
+    /* 3. Configure active flank */
+    _EIC->CONFIG[exti >> 3].reg &= ~(0xF << ((exti & 0x7) * 4));
+    _EIC->CONFIG[exti >> 3].reg |=  (flank << ((exti & 0x7) * 4));
+
+    /* 4. ENABLE EIC EVENT OUTPUT */
+    _EIC->EVCTRL.reg |= (1 << exti);
+
+    /* 5. DISABLE CPU Interrupts (Keep NVIC clear for zero CPU load) */
+    _EIC->INTENCLR.reg = (1 << exti);
+    _EIC->INTFLAG.reg  = (1 << exti); /* Clear any stale flags */
+
+    /* 6. Enable EIC peripheral */
+#ifdef CPU_COMMON_SAMD21
+    _EIC->CTRL.reg = EIC_CTRL_ENABLE;
+#else /* CPU_COMMON_SAML21 */
+    _EIC->CTRLA.reg = EIC_CTRLA_ENABLE;
+#endif
+    EIC_SYNC();
+    return 0;
+}
+
+int gpio_event_gen(gpio_t pin,
+                   event_channel_t channel,
+                   event_path_t path,
+                   event_edge_t edge)
+{
+    int exti = _exti(pin);
+    if (exti == -1) {
+        return -1;
+    }
+    periph_event_channel_config(channel,
+                                EVSYS_ID_GEN_EIC_EXTINT_0 + exti,
+                                path, edge);
+    return 0;
+}
+
+void gpio_event_enable(gpio_t pin)
+{
+    int exti = _exti(pin);
+    if (exti == -1) {
+        return;
+    }
+    _EIC->EVCTRL.reg |= (1 << exti);
+}
+
+void gpio_event_disable(gpio_t pin)
+{
+    int exti = _exti(pin);
+    if (exti == -1) {
+        return;
+    }
+    _EIC->EVCTRL.reg &= ~(1 << exti);
+}
+
+#endif /* MODULE_PERIPH_GPIO_EVENT */
 
 void gpio_pm_cb_enter(int deep)
 {
