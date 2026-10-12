@@ -23,6 +23,7 @@
 #include "fs/spiffs_fs.h"
 
 #include "kernel_defines.h"
+#include "string_utils.h"
 
 #define ENABLE_DEBUG 0
 #include <debug.h>
@@ -394,7 +395,7 @@ static int _readdir(vfs_DIR *dirp, vfs_dirent_t *entry)
 
     if (ret) {
         entry->d_ino = e.obj_id;
-        strncpy(entry->d_name, (char*) e.name, VFS_NAME_MAX);
+        strscpy(entry->d_name, (char *)e.name, sizeof(entry->d_name));
         return 1;
     }
     else {

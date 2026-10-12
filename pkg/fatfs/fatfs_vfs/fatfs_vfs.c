@@ -24,6 +24,7 @@
 #include <string.h>
 
 #include "fs/fatfs.h"
+#include "string_utils.h"
 
 #include "time.h"
 #include "mutex.h"
@@ -232,7 +233,7 @@ static int _open(vfs_file_t *filp, const char *name, int flags, mode_t mode)
     DEBUG("fatfs_vfs.c: _open: private_data = %p, name = %s; flags = 0x%x\n",
           filp->mp->private_data, name, flags);
 
-    strncpy(fd->fname, fs_desc->abs_path_str_buff, VFS_NAME_MAX);
+    strscpy(fd->fname, fs_desc->abs_path_str_buff, sizeof(fd->fname));
 
     uint8_t fatfs_flags = 0;
 
@@ -437,7 +438,7 @@ static int _readdir(vfs_DIR *dirp, vfs_dirent_t *entry)
         }
         else {
             entry->d_ino = 0; //TODO: set this properly
-            strncpy(entry->d_name, fi.fname, VFS_NAME_MAX);
+            strscpy(entry->d_name, fi.fname, sizeof(entry->d_name));
             return 1;
         }
     }
