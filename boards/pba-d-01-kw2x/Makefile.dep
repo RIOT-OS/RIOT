@@ -2,6 +2,10 @@ ifneq (,$(filter netdev_default,$(USEMODULE)))
   USEMODULE += kw2xrf
 endif
 
+ifneq (,$(filter ieee802154_submac,$(USEMODULE)))
+  USEMODULE += ieee802154_submac_soft_csma_ca
+endif
+
 ifneq (,$(filter saul_default,$(USEMODULE)))
   USEMODULE += saul_gpio
   USEMODULE += hdc1000
