@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 # SPDX-FileCopyrightText: 2017 Alexandre Abadie <alexandre.abadie@inria.fr>
+# SPDX-FileCopyrightText: 2022 Christian Amsüss <chrysn@fsfe.org>
 # SPDX-License-Identifier: LGPL-2.1-only
 
 import json

@@ -1,6 +1,6 @@
 /*
  * SPDX-FileCopyrightText: 2011 Petteri Aimonen <jpa at nanopb.mail.kapsi.fi>
- * SPDX-License-Identifier: NONE
+ * SPDX-License-Identifier: Zlib
  */
 
 /**
