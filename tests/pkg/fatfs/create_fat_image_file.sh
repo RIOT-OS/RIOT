@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-# SPDX-FileCopyrightText: 2017 HAW-Hamburg
+# SPDX-FileCopyrightText: 2017 HAW Hamburg
 # SPDX-License-Identifier: LGPL-2.1-only
 
 dd if=/dev/zero of=riot_fatfs_disk.img bs=1M count="$1"

@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-# SPDX-FileCopyrightText: 2018 Kevin Weiss, for HAW Hamburg  <kevin.weiss@haw-hamburg.de>
+# SPDX-FileCopyrightText: 2018 Kevin Weiss, for HAW Hamburg <kevin.weiss@haw-hamburg.de>
 # SPDX-License-Identifier: LGPL-2.1-only
 
 import serial
