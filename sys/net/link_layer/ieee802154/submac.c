@@ -456,7 +456,9 @@ ieee802154_fsm_state_t ieee802154_submac_process_ev(ieee802154_submac_t *submac,
         break;
     case IEEE802154_FSM_STATE_WAIT_FOR_ACK:
         DEBUG("IEEE802154 submac: ieee802154_submac_process_ev(): IEEE802154_FSM_STATE_WAIT_FOR_ACK + %s\n", str_ev[ev]);
-        new_state = _fsm_state_wait_for_ack(submac, ev);
+        /* this state should not be reached if the device already handles ACK */
+        new_state = IS_USED(MODULE_IEEE802154_SUBMAC_SOFT_FRAME_RETRANS) ?
+                    _fsm_state_wait_for_ack(submac, ev) : IEEE802154_FSM_STATE_INVALID;
         break;
     default:
         DEBUG("IEEE802154 submac: ieee802154_submac_process_ev(): INVALID STATE\n");
