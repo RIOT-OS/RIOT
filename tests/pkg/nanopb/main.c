@@ -1,6 +1,11 @@
 /*
  * SPDX-FileCopyrightText: 2011 Petteri Aimonen <jpa at nanopb.mail.kapsi.fi>
  * SPDX-License-Identifier: Zlib
+ *
+ * This file has been taken from
+ * https://github.com/nanopb/nanopb/tree/master/examples/simple
+ * (commit 5866b34) and changed to integrate well with RIOT (and comply to
+ * RIOT's coding conventions).
  */
 
 /**
