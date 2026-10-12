@@ -32,13 +32,22 @@ extern "C" {
  *     0x42, 1, 0x42
  * };
  *
+ * // Retrieve individual tags
  * ssize_t res = 0;
  * uint8_t* value = NULL;
  * if ((res = tlv_find(tlv, sizeof(tlv), 0x42, &value)) < 0) {
  *   // Handle error...
  * }
- * printf("tag=0x42 length="PRIdSIZE" value[0]=%02x\n", res, value[0]);
+ * printf("tag=0x42 length=%"PRIdSIZE" value[0]=%02x\n", res, value[0]);
  *
+ * // Iterate over all tags
+ * uint8_t tag = 0;
+ * size_t length = 0;
+ * TLV_ITER(tlv, sizeof(tlv), &tag, &length, &value) {
+ *   printf("tag=%02x length=%"PRIuSIZE" value[0]=%02x\n", tag, length, value[0]);
+ * }
+ *
+ * // Write tags
  * uint8_t buffer[50] = {};
  * char message[] = "Hello, World!";
  * if ((res = tlv_append(buffer, sizeof(buffer), 0x42, sizeof(message) - 1, (uint8_t*)message)) < 0) {
@@ -213,6 +222,42 @@ ssize_t tlv_remove(
     uint8_t tag
 );
 
+/** @} */
+
+/**
+ * @name Iterating
+ * @{
+ */
+/**
+ * @brief For-loop clause for iterating over all TLV tags and their values
+ *
+ * @param[in,out] buffer Buffer pointer to the start of the TLV entry
+ * @param size Total number of valid TLV bytes
+ * @param[in,out] tag The tag
+ * @param[in,out] value_length Number of bytes belonging to @p value
+ * @param[in,out] value Value pointer
+ *
+ * ## Example
+ * ```c
+ * uint8_t tag = 0;
+ * size_t length = 0;
+ * const uint8_t* value = NULL;
+ *
+ * TLV_ITER(tlv, sizeof(tlv), &tag, &length, &value) {
+ *   printf("tag=%02x length=%"PRIuSIZE" value=[", tag, length);
+ *   for (size_t i = 0; i < length; i += 1) {
+ *     printf("%02x", value[i]);
+ *   }
+ *   printf("]\n");
+ * }
+ * ```
+ */
+#define TLV_ITER(buffer, size, tag, length, value) \
+    for (ssize_t tlv_off = 0, res = 0;                                        \
+         tlv_off < (ssize_t)(size) &&                                         \
+         (res = tlv_decode((buffer) + tlv_off, (size) - (size_t)tlv_off, tag, \
+                            length, value)) > 0;                              \
+         tlv_off += (size_t)res)
 /** @} */
 
 /** @} */
