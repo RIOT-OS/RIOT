@@ -482,6 +482,7 @@ PSEUDOMODULES += shell_cmd_at30tse75x
 PSEUDOMODULES += shell_cmd_benchmark_udp
 PSEUDOMODULES += shell_cmd_bplib
 PSEUDOMODULES += shell_cmd_ccn-lite-utils
+PSEUDOMODULES += shell_cmd_coap
 PSEUDOMODULES += shell_cmd_conn_can
 PSEUDOMODULES += shell_cmd_cord_ep
 PSEUDOMODULES += shell_cmd_coreclk
@@ -613,17 +614,23 @@ PSEUDOMODULES += test_utils_main_exit_cb
 PSEUDOMODULES += tiny_strerror_as_strerror
 PSEUDOMODULES += tiny_strerror_minimal
 
+# Request cancellation support
+PSEUDOMODULES += unicoap_client_cancellation
+
+# URI support in unicoap client API
+PSEUDOMODULES += unicoap_client_uri
+
 # An umbrella module for the unicoap_driver_rfc7252_common_pdu
 # and unicoap_driver_rfc7252_common_messaging modules
 PSEUDOMODULES += unicoap_driver_rfc7252_common
 # Alias for unicoap_driver_rfc7252_common_pdu, and is hence a pseudomodule
 PSEUDOMODULES += unicoap_driver_rfc7252_pdu
 
-# Common sock dependencies of sock-based CoAP drivers in unicoap
-PSEUDOMODULES += unicoap_sock_support
-
 # XFA support for CoAP resource definitions in unicoap server
 PSEUDOMODULES += unicoap_server_resource_declarations
+
+# Common sock dependencies of sock-based CoAP drivers in unicoap
+PSEUDOMODULES += unicoap_sock_support
 
 PSEUDOMODULES += usbus_urb
 

@@ -453,7 +453,7 @@ static inline ssize_t unicoap_options_get_next_${suffix(o)}_by_name${nullTermina
  * ${docRetCorrupted(o)}
  * ${docRetNoBufSCopy(o, o.continuous)}
  * ${o.prefix ? `* @pre @p capacity must be greater than zero\n *` : ""}
- * This function creates a string from all \`${o.name}\` options by joining them with the \`${o.separator}\` separator. ${o.prefix ? `\n * The string will bear the \`${o.prefix}\` prefix even if there is no \`${o.name}\` option.`: ""}
+ * This function creates a string from all \`${o.name}\` options by joining them with the \`${o.separator}\` separator.${o.prefix ? `\n * The string will bear the \`${o.prefix}\` prefix even if there is no \`${o.name}\` option.`: ""}
  * The string will not be null-terminated. The resulting string uses UTF-8 encoding.
  */
 static inline ssize_t unicoap_options_copy_${suffixPlural(o)}(
@@ -535,7 +535,7 @@ static inline ssize_t unicoap_options_${op(o)}_${suffix(o)}(
  */
 static inline ssize_t unicoap_options_${op(o)}_${suffix(o)}(
     unicoap_options_t* options,
-    ${type(o)} ${o.singular}${sizeParam(o)}
+    const ${type(o)} ${o.singular}${sizeParam(o)}
 ) {
     ${assertPre(o)}${_set(o)}
 }`
@@ -556,7 +556,7 @@ static inline ssize_t unicoap_options_${op(o)}_${suffix(o)}(
  */
 static inline ssize_t unicoap_options_${op(o)}_${suffix(o)}_string(
     unicoap_options_t* options,
-    ${type(o)} ${o.singular}
+    const ${type(o)} ${o.singular}
 ) {
     return unicoap_options_${op(o)}_${suffix(o)}(options, ${o.singular}, strlen(${o.singular}));
 }`
@@ -577,7 +577,7 @@ static inline ssize_t unicoap_options_${op(o)}_${suffix(o)}_string(
  */
 static inline ssize_t unicoap_options_add_${suffixPlural(o)}(
     unicoap_options_t* options,
-    ${type(o)} ${o.continuous}${sizeParam(o)}
+    const ${type(o)} ${o.continuous}${sizeParam(o)}
 ) {
     return unicoap_options_add_values_joined(options, ${constant(o)}, ${cast(o)}${o.continuous}, ${sizeParamName(o)}, '${o.separator}');
 }`
@@ -600,7 +600,7 @@ static inline ssize_t unicoap_options_add_${suffixPlural(o)}(
  */
 static inline ssize_t unicoap_options_add_${suffixPlural(o)}_string(
     unicoap_options_t* options,
-    ${type(o)} ${o.continuous}
+    const ${type(o)} ${o.continuous}
 ) {
     return unicoap_options_add_${suffixPlural(o)}(options, ${o.continuous}, strlen(${o.continuous}));
 }`
@@ -619,7 +619,7 @@ static inline ssize_t unicoap_options_add_${suffixPlural(o)}_string(
  */
 static inline ssize_t unicoap_options_${op(o)}_${suffix(o)}(
     unicoap_options_t* options,
-    ${type(o)} ${o.singular}${sizeParam(o)}
+    const ${type(o)} ${o.singular}${sizeParam(o)}
 ) {
     ${assertPre(o)}${_set(o)}
 }`
