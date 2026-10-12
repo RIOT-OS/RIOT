@@ -11,7 +11,7 @@ description: Best practices and recommended tools for RIOT development
 ### Dos
  * Use static memory. See also [Static vs. Dynamic Memory](#static-vs-dynamic-memory).
  * Select the priorities carefully.
- * Minimize stack usage with `DEVELHELP` and `CREATE_STACKTEST`.
+ * Minimize stack usage with `DEVELHELP` or `SCHED_TEST_STACK`.
  * Use threads to increase flexibility, modularity and robustness by leveraging IPC.
  * Use unsigned or signed integer (`unsigned`, `int`, `size_t` or `ssize_t`) for loop variables wherever possible,
    but keep in mind that on some platforms an `int` has a width of only 16-bit. In general, you should avoid types

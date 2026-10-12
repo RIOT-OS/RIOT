@@ -235,15 +235,6 @@ struct _thread {
  * This flag is ignored when DEVELHELP or SCHED_TEST_STACK is not enabled
  */
 #define THREAD_CREATE_NO_STACKTEST      (8)
-
-/**
- * @brief Legacy flag kept for compatibility.
- *
- * @deprecated will be removed after 2025.07 release
- *
- * This is always enabled with `DEVELHELP=1` or `SCHED_TEST_STACK`.
- */
-#define THREAD_CREATE_STACKTEST         (0)
 /** @} */
 
 /**
