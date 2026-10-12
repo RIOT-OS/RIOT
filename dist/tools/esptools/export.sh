@@ -175,8 +175,7 @@ if [ -z "$1" ]; then
     echo "<platform> = xtensa | riscv"
 elif [ "$1" = "all" ]; then
     # only one representative per architecture is required for target "all"
-    ARCH_ALL="esp8266 esp32 esp32c3"
-    for arch in ${ARCH_ALL}; do
+    for arch in esp8266 esp32 esp32c3; do
         export_arch "$arch"
     done
     export_gdb xtensa
