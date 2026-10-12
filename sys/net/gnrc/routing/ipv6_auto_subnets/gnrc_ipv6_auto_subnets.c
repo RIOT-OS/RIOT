@@ -403,7 +403,8 @@ static void _configure_subnets(uint8_t subnets, uint8_t start_idx, gnrc_netif_t 
     uint32_t valid_ltime = byteorder_ntohl(pio->valid_ltime);
     uint32_t pref_ltime = byteorder_ntohl(pio->pref_ltime);
     const uint8_t prefix_len = pio->prefix_len;
-    uint8_t new_prefix_len, subnet_len;
+    uint16_t new_prefix_len;
+    uint8_t subnet_len;
 
     DEBUG("auto_subnets: create %u subnets, start with %u\n", subnets, start_idx);
 
