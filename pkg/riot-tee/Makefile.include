@@ -1,5 +1,10 @@
 ARCHIVES += $(BINDIR)/pkg-build/riot-tee/api/libriot_tee_api.a
 
+# riot-tee owns the beginning of flash and RAM; the application is linked behind it
+include $(RIOTPKG)/riot-tee/riot-tee-layout.mk
+ROM_OFFSET = $(TEE_FLASH_SIZE)
+RAM_OFFSET = $(TEE_RAM_SIZE)
+
 # The secure image and the application are flashed as one file, so that
 # `make flash` always writes a matching pair: the secure image, padded with
 # zeros up to the start of the application, followed by the application.
