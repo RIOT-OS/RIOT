@@ -61,7 +61,7 @@ extern "C" {
 /**
  * @brief Reads one TLV entry and decodes it into tag, length, and value
  *
- * @param[in,out] cursor Cursor pointer to the start of the TLV entry
+ * @param[in,out] buffer Buffer pointer to the start of the TLV entry
  * @param size Total number of valid TLV bytes
  * @param[in,out] tag The tag read
  * @param[in,out] value_length Number of bytes belonging to @p value
@@ -73,7 +73,7 @@ extern "C" {
  * @retval -EBADMSG The given TLV entry is malformed
  */
 ssize_t tlv_decode(
-    const uint8_t** cursor,
+    const uint8_t* buffer,
     size_t size,
     uint8_t* tag,
     size_t* value_length,
@@ -97,7 +97,7 @@ ssize_t tlv_find(
     uint8_t const* buffer,
     size_t size,
     uint8_t tag,
-    uint8_t const** value
+    const uint8_t** value
 );
 
 /** @} */
@@ -110,7 +110,7 @@ ssize_t tlv_find(
 /**
  * @brief Writes one TLV entry, encoding tag, length, and value
  *
- * @param[in,out] cursor Cursor pointer to where TLV entry is to be written
+ * @param[in,out] buffer Cursor pointer to where TLV entry is to be written
  * @param capacity Available capacity in bytes in the buffer @p cursor points into
  * @param tag The tag to write
  * @param value_length The length of @p value in bytes
@@ -122,11 +122,11 @@ ssize_t tlv_find(
  * @retval -ENOBUFS The buffer has insufficient capacity to write this TLV entry
  */
 ssize_t tlv_encode(
-    uint8_t** cursor,
+    uint8_t* buffer,
     size_t capacity,
     uint8_t tag,
     size_t value_length,
-    uint8_t const* value
+    const uint8_t* value
 );
 
 /**
@@ -159,9 +159,8 @@ static inline ssize_t tlv_append(
     const uint8_t* value
 ) {
     assert(size <= capacity);
-    uint8_t* cursor = buffer + size;
-    ssize_t additional = tlv_encode(&cursor, capacity - size, tag, value_length, value);
-    return additional < 0 ? additional : (ssize_t)size + additional;
+    ssize_t encoded = tlv_encode(buffer + size, capacity - size, tag, value_length, value);
+    return encoded < 0 ? encoded : (ssize_t)size + encoded;
 }
 
 /**
@@ -191,8 +190,8 @@ ssize_t tlv_update(
     size_t size,
     size_t capacity,
     uint8_t tag,
-    uint16_t length,
-    uint8_t const* value
+    uint16_t value_length,
+    const uint8_t* value
 );
 
 /**

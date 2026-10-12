@@ -11,15 +11,14 @@ static inline size_t tlv_encoded_size(size_t length) {
 }
 
 ssize_t tlv_decode(
-    const uint8_t** cursor,
+    const uint8_t* buffer,
     size_t size,
     uint8_t* tag,
     size_t* value_length,
     const uint8_t** value
 ) {
-    assert(cursor);
-    assert(tag);
-    const uint8_t* _cursor = *cursor;
+    assert(buffer);
+    const uint8_t* _cursor = buffer;
 
     if (size < 2) {
         return -EBADMSG;
@@ -54,26 +53,26 @@ ssize_t tlv_decode(
         *value_length = length;
     }
     _cursor += length;
-    ssize_t consumed = _cursor - *cursor;
-    *cursor = _cursor;
+    ssize_t consumed = _cursor - buffer;
     return consumed;
 }
 
 
 ssize_t tlv_find(
-    uint8_t const* buffer,
+    const uint8_t* buffer,
     size_t size,
     uint8_t tag,
-    uint8_t const** value
+    const uint8_t** value
 ) {
     ssize_t res = 0;
     size_t value_length = 0;
     uint8_t value_tag = 0;
     while (size > 0) {
-        if ((res = tlv_decode(&buffer, size, &value_tag, &value_length, value)) < 0) {
+        if ((res = tlv_decode(buffer, size, &value_tag, &value_length, value)) < 0) {
             return res;
         }
         size -= (size_t)res;
+        buffer += (ptrdiff_t)res;
         if (value_tag == tag) {
             return (ssize_t)value_length;
         }
@@ -82,34 +81,34 @@ ssize_t tlv_find(
 }
 
 ssize_t tlv_encode(
-    uint8_t** cursor,
+    uint8_t* buffer,
     size_t capacity,
     uint8_t tag,
     size_t length,
-    uint8_t const* value
+    const uint8_t* value
 ) {
     assert(cursor);
     assert(length <= UINT16_MAX);
     if (capacity < tlv_encoded_size(length)) {
         return -ENOBUFS;
     }
-    uint8_t* buffer = *cursor;
-    *(*cursor)++ = tag;
+    uint8_t* cursor = buffer;
+    *cursor++ = tag;
 
     if (length < 0xFF) {
-        *(*cursor)++ = (uint8_t)length;
+        *cursor++ = (uint8_t)length;
     } else {
-        *(*cursor)++ = 0xFF;
-        *(*cursor)++ = (uint8_t)(length >> 8);
-        *(*cursor)++ = (uint8_t)(length & 0xFF);
+        *cursor++ = 0xFF;
+        *cursor++ = (uint8_t)(length >> 8);
+        *cursor++ = (uint8_t)(length & 0xFF);
     }
 
     if (length > 0) {
         assert(value);
-        memcpy(*cursor, value, length);
-        *cursor += length;
+        memcpy(cursor, value, length);
     }
-    return (size_t)(ptrdiff_t)(*cursor - buffer);
+    cursor += length;
+    return (size_t)(ptrdiff_t)(cursor - buffer);
 }
 
 ssize_t tlv_update(
@@ -123,7 +122,6 @@ ssize_t tlv_update(
     assert(buffer);
     assert(capacity >= size);
     uint8_t* cursor = buffer;
-    size_t new_encoded = tlv_encoded_size(length);
 
     ssize_t res = 0;
     size_t value_length = 0;
@@ -131,7 +129,7 @@ ssize_t tlv_update(
     size_t read = 0;
     while (read < size) {
         if ((res = tlv_decode(
-            (const uint8_t**)&cursor,
+            cursor,
             size - read, &value_tag,
             &value_length,
             NULL
@@ -139,19 +137,21 @@ ssize_t tlv_update(
             return res;
         }
         read += (size_t)res;
+        cursor += (ptrdiff_t)res;
         if (value_tag == tag) {
             break;
         }
     }
 
     if (value_tag != tag) {
-        if ((res = tlv_encode(&cursor, capacity - size, tag, length, value)) < 0) {
+        if ((res = tlv_encode(buffer + size, capacity - size, tag, length, value)) < 0) {
             return res;
         }
-        return size + new_encoded;
+        return size + (size_t)res;
     }
 
-    size_t old_encoded = tlv_encoded_size(value_length);
+    size_t old_encoded = (size_t)res;
+    size_t new_encoded = tlv_encoded_size(length);
     size_t new_size  = (size_t)size - old_encoded + new_encoded;
 
     if (new_size > capacity) {
@@ -160,7 +160,7 @@ ssize_t tlv_update(
 
     memmove(cursor - old_encoded + new_encoded, cursor, size - (size_t)(ptrdiff_t)(cursor - buffer));
     cursor -= old_encoded;
-    ssize_t n = tlv_encode(&cursor, new_encoded, tag, length, value);
+    ssize_t n = tlv_encode(cursor, new_encoded, tag, length, value);
     assert(n == (ssize_t)new_encoded);
     if (n < 0) {
         return n;
@@ -180,7 +180,7 @@ ssize_t tlv_remove(
     size_t read = size;
     while (read > 0) {
         if ((res = tlv_decode(
-            (const uint8_t**)&cursor,
+            cursor,
             read,
             &value_tag,
             &value_length,
@@ -190,10 +190,11 @@ ssize_t tlv_remove(
         }
         read -= (size_t)res;
         if (value_tag == tag) {
-            size_t encoded = tlv_encoded_size(value_length);
-            memmove(cursor - encoded, cursor, read);
-            cursor -= encoded;
+            size_t encoded = (size_t)res;
+            memmove(cursor, cursor + encoded, read);
             size -= encoded;
+        } else {
+            cursor += (ptrdiff_t)res;
         }
     }
     return size;

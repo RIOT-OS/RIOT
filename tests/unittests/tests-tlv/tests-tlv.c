@@ -16,18 +16,16 @@ static uint8_t long_copy[640];
 static void test_tlv_decode_short(void)
 {
     const uint8_t raw[] = { 0x01, 0x03, 'a', 'b', 'c' };
-    const uint8_t *cursor = raw;
     uint8_t tag = 0;
     size_t length = 0;
     const uint8_t *value = NULL;
 
-    ssize_t decoded = tlv_decode(&cursor, sizeof(raw), &tag, &length, &value);
+    ssize_t decoded = tlv_decode(raw, sizeof(raw), &tag, &length, &value);
 
     TEST_ASSERT_EQUAL_INT(sizeof(raw), decoded);
     TEST_ASSERT_EQUAL_INT(0x01, tag);
     TEST_ASSERT_EQUAL_INT(3, length);
     TEST_ASSERT(value == &raw[2]);
-    TEST_ASSERT(cursor == &raw[sizeof(raw)]);
 }
 
 static void test_tlv_decode_sequence(void)
@@ -36,36 +34,31 @@ static void test_tlv_decode_sequence(void)
     const uint8_t raw[] = { 0x01, 0x03, 'a', 'b', 'c',
                             0x02, 0x00,
                             0x03, 0x01, 'z' };
-    const uint8_t *cursor = raw;
     uint8_t tag = 0;
     size_t length = 0;
     const uint8_t *value = NULL;
     ssize_t decoded;
 
-    decoded = tlv_decode(&cursor, sizeof(raw), &tag, &length, &value);
+    decoded = tlv_decode(raw, sizeof(raw), &tag, &length, &value);
     TEST_ASSERT_EQUAL_INT(5, decoded);
     TEST_ASSERT_EQUAL_INT(0x01, tag);
     TEST_ASSERT_EQUAL_INT(3, length);
     TEST_ASSERT(value == &raw[2]);
-    TEST_ASSERT(cursor == &raw[5]);
 
-    decoded = tlv_decode(&cursor, 5, &tag, &length, &value);
+    decoded = tlv_decode(&raw[5], 5, &tag, &length, &value);
     TEST_ASSERT_EQUAL_INT(2, decoded);
     TEST_ASSERT_EQUAL_INT(0x02, tag);
     TEST_ASSERT_EQUAL_INT(0, length);
-    TEST_ASSERT(cursor == &raw[7]);
 
-    decoded = tlv_decode(&cursor, 3, &tag, &length, &value);
+    decoded = tlv_decode(&raw[7], 3, &tag, &length, &value);
     TEST_ASSERT_EQUAL_INT(3, decoded); /* last element: nothing remaining */
     TEST_ASSERT_EQUAL_INT(0x03, tag);
     TEST_ASSERT_EQUAL_INT(1, length);
     TEST_ASSERT(value == &raw[9]);
-    TEST_ASSERT(cursor == &raw[10]);
 }
 
 static void test_tlv_decode_long_form(void)
 {
-    const uint8_t *cursor = long_buf;
     uint8_t tag = 0;
     size_t length = 0;
     const uint8_t *value = NULL;
@@ -82,24 +75,21 @@ static void test_tlv_decode_long_form(void)
     long_buf[305] = 0x01;
     long_buf[306] = 'x';
 
-    decoded = tlv_decode(&cursor, 307, &tag, &length, &value);
+    decoded = tlv_decode(long_buf, 307, &tag, &length, &value);
     TEST_ASSERT_EQUAL_INT(304, decoded);
     TEST_ASSERT_EQUAL_INT(0x09, tag);
     TEST_ASSERT_EQUAL_INT(300, length);
     TEST_ASSERT(value == &long_buf[4]);
-    TEST_ASSERT(cursor == &long_buf[304]);
 
-    decoded = tlv_decode(&cursor, 3, &tag, &length, &value);
+    decoded = tlv_decode(&long_buf[304], 3, &tag, &length, &value);
     TEST_ASSERT_EQUAL_INT(3, decoded);
     TEST_ASSERT_EQUAL_INT(0x07, tag);
     TEST_ASSERT_EQUAL_INT(1, length);
     TEST_ASSERT(value == &long_buf[306]);
-    TEST_ASSERT(cursor == &long_buf[307]);
 }
 
 static void test_tlv_decode_longest_short(void)
 {
-    const uint8_t *cursor = long_buf;
     uint8_t tag = 0;
     size_t length = 0;
     const uint8_t *value = NULL;
@@ -110,18 +100,16 @@ static void test_tlv_decode_longest_short(void)
     long_buf[1] = 0xFE;
     memset(&long_buf[2], 'a', 254);
 
-    ssize_t decoded = tlv_decode(&cursor, 256, &tag, &length, &value);
+    ssize_t decoded = tlv_decode(long_buf, 256, &tag, &length, &value);
 
     TEST_ASSERT_EQUAL_INT(256, decoded);
     TEST_ASSERT_EQUAL_INT(0x01, tag);
     TEST_ASSERT_EQUAL_INT(254, length);
     TEST_ASSERT(value == &long_buf[2]);
-    TEST_ASSERT(cursor == &long_buf[256]);
 }
 
 static void test_tlv_decode_shortest_long(void)
 {
-    const uint8_t *cursor = long_buf;
     uint8_t tag = 0;
     size_t length = 0;
     const uint8_t *value = NULL;
@@ -134,29 +122,26 @@ static void test_tlv_decode_shortest_long(void)
     long_buf[3] = 0xFF;
     memset(&long_buf[4], 'b', 255);
 
-    ssize_t decoded = tlv_decode(&cursor, 259, &tag, &length, &value);
+    ssize_t decoded = tlv_decode(long_buf, 259, &tag, &length, &value);
 
     TEST_ASSERT_EQUAL_INT(259, decoded);
     TEST_ASSERT_EQUAL_INT(0x02, tag);
     TEST_ASSERT_EQUAL_INT(255, length);
     TEST_ASSERT(value == &long_buf[4]);
-    TEST_ASSERT(cursor == &long_buf[259]);
 }
 
 static void test_tlv_decode_too_short(void)
 {
     const uint8_t raw[] = { 0x01 };
-    const uint8_t *cursor = raw;
     uint8_t tag = 0;
     size_t length = 0;
     const uint8_t *value = NULL;
 
     /* nothing at all */
-    TEST_ASSERT_EQUAL_INT(-EBADMSG, tlv_decode(&cursor, 0, &tag, &length, &value));
+    TEST_ASSERT_EQUAL_INT(-EBADMSG, tlv_decode(raw, 0, &tag, &length, &value));
 
     /* a tag without a lengthgth */
-    cursor = raw;
-    TEST_ASSERT_EQUAL_INT(-EBADMSG, tlv_decode(&cursor, sizeof(raw), &tag, &length, &value));
+    TEST_ASSERT_EQUAL_INT(-EBADMSG, tlv_decode(raw, sizeof(raw), &tag, &length, &value));
 }
 
 static void test_tlv_decode_truncated(void)
@@ -165,22 +150,17 @@ static void test_tlv_decode_truncated(void)
     const uint8_t long_marker[] = { 0x01, 0xFF };             /* no lengthgth */
     const uint8_t long_hdr[] = { 0x01, 0xFF, 0x01 };          /* half a lengthgth */
     const uint8_t long_nodata[] = { 0x01, 0xFF, 0x01, 0x00 }; /* 256, has 0 */
-    const uint8_t *cursor;
     uint8_t tag = 0;
     size_t length = 0;
     const uint8_t *value = NULL;
 
-    cursor = short_value;
-    TEST_ASSERT_EQUAL_INT(-EBADMSG, tlv_decode(&cursor, sizeof(short_value), &tag, &length, &value));
+    TEST_ASSERT_EQUAL_INT(-EBADMSG, tlv_decode(short_value, sizeof(short_value), &tag, &length, &value));
 
-    cursor = long_marker;
-    TEST_ASSERT_EQUAL_INT(-EBADMSG, tlv_decode(&cursor, sizeof(long_marker), &tag, &length, &value));
+    TEST_ASSERT_EQUAL_INT(-EBADMSG, tlv_decode(long_marker, sizeof(long_marker), &tag, &length, &value));
 
-    cursor = long_hdr;
-    TEST_ASSERT_EQUAL_INT(-EBADMSG, tlv_decode(&cursor, sizeof(long_hdr), &tag, &length, &value));
+    TEST_ASSERT_EQUAL_INT(-EBADMSG, tlv_decode(long_hdr, sizeof(long_hdr), &tag, &length, &value));
 
-    cursor = long_nodata;
-    TEST_ASSERT_EQUAL_INT(-EBADMSG, tlv_decode(&cursor, sizeof(long_nodata), &tag, &length, &value));
+    TEST_ASSERT_EQUAL_INT(-EBADMSG, tlv_decode(long_nodata, sizeof(long_nodata), &tag, &length, &value));
 
     /* long form, 300 bytes announced, 299 present */
     memset(long_buf, 0xEE, sizeof(long_buf));
@@ -189,16 +169,14 @@ static void test_tlv_decode_truncated(void)
     long_buf[2] = 0x01;
     long_buf[3] = 0x2C;
     memset(&long_buf[4], 0x42, 299);
-    cursor = long_buf;
-    TEST_ASSERT_EQUAL_INT(-EBADMSG, tlv_decode(&cursor, 303, &tag, &length, &value));
+    TEST_ASSERT_EQUAL_INT(-EBADMSG, tlv_decode(long_buf, 303, &tag, &length, &value));
 
     /* short form, 254 bytes announced, 253 present */
     memset(long_buf, 0xEE, sizeof(long_buf));
     long_buf[0] = 0x01;
     long_buf[1] = 0xFE;
     memset(&long_buf[2], 0x42, 253);
-    cursor = long_buf;
-    TEST_ASSERT_EQUAL_INT(-EBADMSG, tlv_decode(&cursor, 255, &tag, &length, &value));
+    TEST_ASSERT_EQUAL_INT(-EBADMSG, tlv_decode(long_buf, 255, &tag, &length, &value));
 }
 
 static void test_tlv_decode_noncanonical(void)
@@ -206,16 +184,13 @@ static void test_tlv_decode_noncanonical(void)
     /* the long form must not be used for lengthgths below 0xFF */
     const uint8_t length5[] = { 0x01, 0xFF, 0x00, 0x05, 'a', 'b', 'c', 'd', 'e' };
     const uint8_t length0[] = { 0x01, 0xFF, 0x00, 0x00 };
-    const uint8_t *cursor;
     uint8_t tag = 0;
     size_t length = 0;
     const uint8_t *value = NULL;
 
-    cursor = length5;
-    TEST_ASSERT_EQUAL_INT(-EBADMSG, tlv_decode(&cursor, sizeof(length5), &tag, &length, &value));
+    TEST_ASSERT_EQUAL_INT(-EBADMSG, tlv_decode(length5, sizeof(length5), &tag, &length, &value));
 
-    cursor = length0;
-    TEST_ASSERT_EQUAL_INT(-EBADMSG, tlv_decode(&cursor, sizeof(length0), &tag, &length, &value));
+    TEST_ASSERT_EQUAL_INT(-EBADMSG, tlv_decode(length0, sizeof(length0), &tag, &length, &value));
 
     /* 254 = 0x00FE in long form, with all 254 bytes present */
     memset(long_buf, 0xEE, sizeof(long_buf));
@@ -224,8 +199,7 @@ static void test_tlv_decode_noncanonical(void)
     long_buf[2] = 0x00;
     long_buf[3] = 0xFE;
     memset(&long_buf[4], 0x42, 254);
-    cursor = long_buf;
-    TEST_ASSERT_EQUAL_INT(-EBADMSG, tlv_decode(&cursor, 258, &tag, &length, &value));
+    TEST_ASSERT_EQUAL_INT(-EBADMSG, tlv_decode(long_buf, 258, &tag, &length, &value));
 }
 
 static void test_tlv_decode_error_untouched(void)
@@ -234,52 +208,39 @@ static void test_tlv_decode_error_untouched(void)
     const uint8_t long_hdr[] = { 0x01, 0xFF, 0x01 };
     const uint8_t long_nodata[] = { 0x01, 0xFF, 0x01, 0x00 };
     const uint8_t noncanon[] = { 0x01, 0xFF, 0x00, 0x05, 'a', 'b', 'c', 'd', 'e' };
-    const uint8_t *cursor;
     uint8_t tag;
     size_t length;
     const uint8_t *value;
 
-    /* on -EBADMSG the cursor and all outputs keep their old values */
-    cursor = short_value;
+    /* on -EBADMSG all outputs keep their old values */
     tag = 0x55;
     length = 0x1234;
     value = NULL;
-    TEST_ASSERT_EQUAL_INT(-EBADMSG,
-        tlv_decode(&cursor, sizeof(short_value), &tag, &length, &value));
-    TEST_ASSERT(cursor == short_value);
+    TEST_ASSERT_EQUAL_INT(-EBADMSG, tlv_decode(short_value, sizeof(short_value), &tag, &length, &value));
     TEST_ASSERT_EQUAL_INT(0x55, tag);
     TEST_ASSERT_EQUAL_INT(0x1234, length);
     TEST_ASSERT(value == NULL);
 
-    cursor = long_hdr;
     tag = 0x55;
     length = 0x1234;
     value = NULL;
-    TEST_ASSERT_EQUAL_INT(-EBADMSG,
-        tlv_decode(&cursor, sizeof(long_hdr), &tag, &length, &value));
-    TEST_ASSERT(cursor == long_hdr);
+    TEST_ASSERT_EQUAL_INT(-EBADMSG, tlv_decode(long_hdr, sizeof(long_hdr), &tag, &length, &value));
     TEST_ASSERT_EQUAL_INT(0x55, tag);
     TEST_ASSERT_EQUAL_INT(0x1234, length);
     TEST_ASSERT(value == NULL);
 
-    cursor = long_nodata;
     tag = 0x55;
     length = 0x1234;
     value = NULL;
-    TEST_ASSERT_EQUAL_INT(-EBADMSG,
-        tlv_decode(&cursor, sizeof(long_nodata), &tag, &length, &value));
-    TEST_ASSERT(cursor == long_nodata);
+    TEST_ASSERT_EQUAL_INT(-EBADMSG, tlv_decode(long_nodata, sizeof(long_nodata), &tag, &length, &value));
     TEST_ASSERT_EQUAL_INT(0x55, tag);
     TEST_ASSERT_EQUAL_INT(0x1234, length);
     TEST_ASSERT(value == NULL);
 
-    cursor = noncanon;
     tag = 0x55;
     length = 0x1234;
     value = NULL;
-    TEST_ASSERT_EQUAL_INT(-EBADMSG,
-        tlv_decode(&cursor, sizeof(noncanon), &tag, &length, &value));
-    TEST_ASSERT(cursor == noncanon);
+    TEST_ASSERT_EQUAL_INT(-EBADMSG, tlv_decode(noncanon, sizeof(noncanon), &tag, &length, &value));
     TEST_ASSERT_EQUAL_INT(0x55, tag);
     TEST_ASSERT_EQUAL_INT(0x1234, length);
     TEST_ASSERT(value == NULL);
@@ -440,13 +401,11 @@ static void test_tlv_encode_short(void)
 {
     uint8_t buf[8] = { 0xEE, 0xEE, 0xEE, 0xEE, 0xEE, 0xEE, 0xEE, 0xEE };
     const uint8_t expected[5] = { 0x01, 0x03, 'a', 'b', 'c' };
-    uint8_t *cursor = buf;
 
     /* capacity is exactly the encoded size */
-    ssize_t r = tlv_encode(&cursor, sizeof(expected), 0x01, 3, (const uint8_t *)"abc");
+    ssize_t r = tlv_encode(buf, sizeof(expected), 0x01, 3, (const uint8_t *)"abc");
 
     TEST_ASSERT_EQUAL_INT(sizeof(expected), r);
-    TEST_ASSERT(cursor == &buf[sizeof(expected)]);
     TEST_ASSERT(memcmp(buf, expected, sizeof(expected)) == 0);
     TEST_ASSERT_EQUAL_INT(0xEE, buf[sizeof(expected)]);
     TEST_ASSERT_EQUAL_INT(0xEE, buf[sizeof(buf) - 1]);
@@ -455,12 +414,10 @@ static void test_tlv_encode_short(void)
 static void test_tlv_encode_zero_lengthgth(void)
 {
     uint8_t buf[4] = { 0xEE, 0xEE, 0xEE, 0xEE };
-    uint8_t *cursor = buf;
 
-    ssize_t r = tlv_encode(&cursor, 2, 0x03, 0, NULL);
+    ssize_t r = tlv_encode(buf, 2, 0x03, 0, NULL);
 
     TEST_ASSERT_EQUAL_INT(2, r);
-    TEST_ASSERT(cursor == &buf[2]);
     TEST_ASSERT_EQUAL_INT(0x03, buf[0]);
     TEST_ASSERT_EQUAL_INT(0x00, buf[1]);
     TEST_ASSERT_EQUAL_INT(0xEE, buf[2]);
@@ -474,20 +431,16 @@ static void test_tlv_encode_sequence(void)
     const uint8_t expected[10] = { 0x01, 0x03, 'a', 'b', 'c',
                                    0x02, 0x00,
                                    0x03, 0x01, 'z' };
-    uint8_t *cursor = buf;
     ssize_t r;
 
-    r = tlv_encode(&cursor, sizeof(buf), 0x01, 3, (const uint8_t *)"abc");
+    r = tlv_encode(buf, sizeof(buf), 0x01, 3, (const uint8_t *)"abc");
     TEST_ASSERT_EQUAL_INT(5, r);
-    TEST_ASSERT(cursor == &buf[5]);
 
-    r = tlv_encode(&cursor, 11, 0x02, 0, NULL);
+    r = tlv_encode(&buf[5], 11, 0x02, 0, NULL);
     TEST_ASSERT_EQUAL_INT(2, r);
-    TEST_ASSERT(cursor == &buf[7]);
 
-    r = tlv_encode(&cursor, 9, 0x03, 1, (const uint8_t *)"z");
+    r = tlv_encode(&buf[7], 9, 0x03, 1, (const uint8_t *)"z");
     TEST_ASSERT_EQUAL_INT(3, r);
-    TEST_ASSERT(cursor == &buf[sizeof(expected)]);
 
     TEST_ASSERT(memcmp(buf, expected, sizeof(expected)) == 0);
     TEST_ASSERT_EQUAL_INT(0xEE, buf[sizeof(expected)]);
@@ -495,16 +448,14 @@ static void test_tlv_encode_sequence(void)
 
 static void test_tlv_encode_longest_short(void)
 {
-    uint8_t *cursor = long_buf;
 
     memset(long_buf, 0xEE, sizeof(long_buf));
     memset(long_ref, 'a', 254);
 
     /* 254 bytes: single lengthgth byte 0xFE, exact fit */
-    ssize_t r = tlv_encode(&cursor, 256, 0x01, 254, long_ref);
+    ssize_t r = tlv_encode(long_buf, 256, 0x01, 254, long_ref);
 
     TEST_ASSERT_EQUAL_INT(256, r);
-    TEST_ASSERT(cursor == &long_buf[256]);
     TEST_ASSERT_EQUAL_INT(0x01, long_buf[0]);
     TEST_ASSERT_EQUAL_INT(0xFE, long_buf[1]);
     TEST_ASSERT(memcmp(&long_buf[2], long_ref, 254) == 0);
@@ -513,16 +464,14 @@ static void test_tlv_encode_longest_short(void)
 
 static void test_tlv_encode_shortest_long(void)
 {
-    uint8_t *cursor = long_buf;
 
     memset(long_buf, 0xEE, sizeof(long_buf));
     memset(long_ref, 'b', 255);
 
     /* 255 bytes: 0xFF marker + 16 bit big endian lengthgth 0x00FF, exact fit */
-    ssize_t r = tlv_encode(&cursor, 259, 0x02, 255, long_ref);
+    ssize_t r = tlv_encode(long_buf, 259, 0x02, 255, long_ref);
 
     TEST_ASSERT_EQUAL_INT(259, r);
-    TEST_ASSERT(cursor == &long_buf[259]);
     TEST_ASSERT_EQUAL_INT(0x02, long_buf[0]);
     TEST_ASSERT_EQUAL_INT(0xFF, long_buf[1]);
     TEST_ASSERT_EQUAL_INT(0x00, long_buf[2]);
@@ -533,16 +482,14 @@ static void test_tlv_encode_shortest_long(void)
 
 static void test_tlv_encode_long(void)
 {
-    uint8_t *cursor = long_buf;
 
     memset(long_buf, 0xEE, sizeof(long_buf));
     memset(long_ref, 0xAB, sizeof(long_ref));
 
     /* 300 = 0x012C */
-    ssize_t r = tlv_encode(&cursor, 304, 0x02, sizeof(long_ref), long_ref);
+    ssize_t r = tlv_encode(long_buf, 304, 0x02, sizeof(long_ref), long_ref);
 
     TEST_ASSERT_EQUAL_INT(304, r);
-    TEST_ASSERT(cursor == &long_buf[304]);
     TEST_ASSERT_EQUAL_INT(0x02, long_buf[0]);
     TEST_ASSERT_EQUAL_INT(0xFF, long_buf[1]);
     TEST_ASSERT_EQUAL_INT(0x01, long_buf[2]);
@@ -555,51 +502,39 @@ static void test_tlv_encode_nobufs_short(void)
 {
     uint8_t buf[8];
     const uint8_t untouched[8] = { 0xEE, 0xEE, 0xEE, 0xEE, 0xEE, 0xEE, 0xEE, 0xEE };
-    uint8_t *cursor;
     ssize_t r;
 
     /* needs 5, one byte short */
     memset(buf, 0xEE, sizeof(buf));
-    cursor = buf;
-    r = tlv_encode(&cursor, 4, 0x01, 3, (const uint8_t *)"abc");
+    r = tlv_encode(buf, 4, 0x01, 3, (const uint8_t *)"abc");
     TEST_ASSERT_EQUAL_INT(-ENOBUFS, r);
-    TEST_ASSERT(cursor == buf);
     TEST_ASSERT(memcmp(buf, untouched, sizeof(untouched)) == 0);
 
     /* needs 2, one byte short */
     memset(buf, 0xEE, sizeof(buf));
-    cursor = buf;
-    r = tlv_encode(&cursor, 1, 0x01, 0, NULL);
+    r = tlv_encode(buf, 1, 0x01, 0, NULL);
     TEST_ASSERT_EQUAL_INT(-ENOBUFS, r);
-    TEST_ASSERT(cursor == buf);
     TEST_ASSERT(memcmp(buf, untouched, sizeof(untouched)) == 0);
 
     /* needs 5, much too small */
     memset(buf, 0xEE, sizeof(buf));
-    cursor = buf;
-    r = tlv_encode(&cursor, 0, 0x01, 3, (const uint8_t *)"abc");
+    r = tlv_encode(buf, 0, 0x01, 3, (const uint8_t *)"abc");
     TEST_ASSERT_EQUAL_INT(-ENOBUFS, r);
-    TEST_ASSERT(cursor == buf);
     TEST_ASSERT(memcmp(buf, untouched, sizeof(untouched)) == 0);
 
     memset(buf, 0xEE, sizeof(buf));
-    cursor = buf;
-    r = tlv_encode(&cursor, 1, 0x01, 3, (const uint8_t *)"abc");
+    r = tlv_encode(buf, 1, 0x01, 3, (const uint8_t *)"abc");
     TEST_ASSERT_EQUAL_INT(-ENOBUFS, r);
-    TEST_ASSERT(cursor == buf);
     TEST_ASSERT(memcmp(buf, untouched, sizeof(untouched)) == 0);
 
     memset(buf, 0xEE, sizeof(buf));
-    cursor = buf;
-    r = tlv_encode(&cursor, 3, 0x01, 3, (const uint8_t *)"abc");
+    r = tlv_encode(buf, 3, 0x01, 3, (const uint8_t *)"abc");
     TEST_ASSERT_EQUAL_INT(-ENOBUFS, r);
-    TEST_ASSERT(cursor == buf);
     TEST_ASSERT(memcmp(buf, untouched, sizeof(untouched)) == 0);
 }
 
 static void test_tlv_encode_nobufs_long(void)
 {
-    uint8_t *cursor;
     ssize_t r;
     int bad;
 
@@ -607,10 +542,8 @@ static void test_tlv_encode_nobufs_long(void)
 
     /* 255 bytes need 259: one byte short */
     memset(long_buf, 0xEE, sizeof(long_buf));
-    cursor = long_buf;
-    r = tlv_encode(&cursor, 258, 0x01, 255, long_ref);
+    r = tlv_encode(long_buf, 258, 0x01, 255, long_ref);
     TEST_ASSERT_EQUAL_INT(-ENOBUFS, r);
-    TEST_ASSERT(cursor == long_buf);
     bad = 0;
     for (size_t i = 0; i < sizeof(long_buf); i++) {
         if (long_buf[i] != 0xEE) {
@@ -621,10 +554,8 @@ static void test_tlv_encode_nobufs_long(void)
 
     /* the long header only partly fits */
     memset(long_buf, 0xEE, sizeof(long_buf));
-    cursor = long_buf;
-    r = tlv_encode(&cursor, 3, 0x01, 255, long_ref);
+    r = tlv_encode(long_buf, 3, 0x01, 255, long_ref);
     TEST_ASSERT_EQUAL_INT(-ENOBUFS, r);
-    TEST_ASSERT(cursor == long_buf);
     bad = 0;
     for (size_t i = 0; i < sizeof(long_buf); i++) {
         if (long_buf[i] != 0xEE) {
@@ -635,10 +566,8 @@ static void test_tlv_encode_nobufs_long(void)
 
     /* 300 bytes need 304: one byte short */
     memset(long_buf, 0xEE, sizeof(long_buf));
-    cursor = long_buf;
-    r = tlv_encode(&cursor, 303, 0x01, sizeof(long_ref), long_ref);
+    r = tlv_encode(long_buf, 303, 0x01, sizeof(long_ref), long_ref);
     TEST_ASSERT_EQUAL_INT(-ENOBUFS, r);
-    TEST_ASSERT(cursor == long_buf);
     bad = 0;
     for (size_t i = 0; i < sizeof(long_buf); i++) {
         if (long_buf[i] != 0xEE) {
@@ -648,10 +577,8 @@ static void test_tlv_encode_nobufs_long(void)
     TEST_ASSERT_EQUAL_INT(0, bad);
 
     memset(long_buf, 0xEE, sizeof(long_buf));
-    cursor = long_buf;
-    r = tlv_encode(&cursor, 0, 0x01, sizeof(long_ref), long_ref);
+    r = tlv_encode(long_buf, 0, 0x01, sizeof(long_ref), long_ref);
     TEST_ASSERT_EQUAL_INT(-ENOBUFS, r);
-    TEST_ASSERT(cursor == long_buf);
     bad = 0;
     for (size_t i = 0; i < sizeof(long_buf); i++) {
         if (long_buf[i] != 0xEE) {
