@@ -59,7 +59,7 @@ extern "C" {
 /**
  * @brief   stack size of an ieee802154 device
  */
-#define IEEE802154_STACKSIZE_DEFAULT    (MAX(520, GNRC_NETIF_STACKSIZE_DEFAULT) + \
+#define IEEE802154_STACKSIZE_DEFAULT    (MAX(528, GNRC_NETIF_STACKSIZE_DEFAULT) + \
                                          IEEE802154_SECURITY_EXTRA_STACKSIZE + \
                                          IEEE802154_OPENDSME_EXTRA_STACKSIZE)
 #endif
