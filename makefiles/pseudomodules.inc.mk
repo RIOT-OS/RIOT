@@ -306,6 +306,7 @@ PSEUDOMODULES += ieee802154_rx_timestamp
 PSEUDOMODULES += ieee802154_security
 PSEUDOMODULES += ieee802154_submac
 PSEUDOMODULES += ieee802154_submac_soft_csma_ca
+PSEUDOMODULES += ieee802154_submac_soft_frame_retrans
 PSEUDOMODULES += ipv4
 PSEUDOMODULES += ipv6
 

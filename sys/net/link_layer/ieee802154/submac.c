@@ -60,12 +60,21 @@ static char *str_ev[IEEE802154_FSM_EV_NUMOF] = {
 
 static inline bool _does_handle_ack(ieee802154_dev_t *dev)
 {
+    if (!IS_USED(MODULE_IEEE802154_SUBMAC_SOFT_FRAME_RETRANS)) {
+        return true;
+    }
     return ieee802154_radio_has_frame_retrans(dev) ||
            ieee802154_radio_has_irq_ack_timeout(dev);
 }
 
 static inline bool _does_handle_csma(ieee802154_dev_t *dev)
 {
+    /* HW retransmission implies HW CSMA-CA */
+    if (!IS_USED(MODULE_IEEE802154_SUBMAC_SOFT_CSMA_CA) ||
+        !IS_USED(MODULE_IEEE802154_SUBMAC_SOFT_FRAME_RETRANS)) {
+        return true;
+    }
+
     return ieee802154_radio_has_frame_retrans(dev) ||
            ieee802154_radio_has_auto_csma(dev);
 }

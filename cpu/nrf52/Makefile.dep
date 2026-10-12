@@ -19,6 +19,7 @@ ifneq (,$(filter nrf802154,$(USEMODULE)))
   endif
   ifneq (,$(filter ieee802154_submac,$(USEMODULE)))
     USEMODULE += ieee802154_submac_soft_csma_ca
+    USEMODULE += ieee802154_submac_soft_frame_retrans
   endif
 endif
 
