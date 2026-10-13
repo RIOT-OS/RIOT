@@ -45,7 +45,7 @@ unicoap_scheduled_event_t _dtls_session_triage_event = { 0 };
            CONFIG_UNICOAP_GET_LOCAL_ENDPOINTS will be ignored for the dtls transport"
 #endif
 
-int unicoap_transport_connect_dtls(const sock_udp_ep_t* remote, sock_dtls_session_t* session)
+int unicoap_transport_connect_dtls(const sock_udp_ep_t* remote, unicoap_sock_dtls_session_t* session)
 {
     assert(remote);
     assert(session);
@@ -78,7 +78,7 @@ int unicoap_transport_connect_dtls(const sock_udp_ep_t* remote, sock_dtls_sessio
     }
 }
 
-int unicoap_transport_disconnect_dtls(sock_dtls_session_t* session)
+int unicoap_transport_disconnect_dtls(unicoap_sock_dtls_session_t* session)
 {
     assert(session);
     _DTLS_AUTH_DEBUG("disconnecting\n");
