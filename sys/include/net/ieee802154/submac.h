@@ -190,16 +190,20 @@ struct ieee802154_submac {
     eui64_t ext_addr;                   /**< IEEE 802.15.4 extended address */
     network_uint16_t short_addr;        /**< IEEE 802.15.4 short address */
     const ieee802154_submac_cb_t *cb;   /**< pointer to the SubMAC callbacks */
+#if IS_USED(MODULE_IEEE802154_SUBMAC_SOFT_CSMA_CA)
     ieee802154_csma_be_t be;            /**< CSMA-CA backoff exponent params */
-    bool wait_for_ack;                  /**< SubMAC is waiting for an ACK frame */
-    uint16_t ack_timeout_us;            /**< ACK timeout in µs */
     uint16_t csma_backoff_us;           /**< CSMA sender backoff period in µs */
+    uint8_t csma_retries;               /**< maximum number of CSMA-CA retries */
+    uint8_t backoff_mask;               /**< internal value used for random backoff calculation */
+    uint8_t csma_retries_nb;            /**< current number of CSMA-CA retries */
+#endif
+#if IS_USED(MODULE_IEEE802154_SUBMAC_SOFT_FRAME_RETRANS)
+    uint8_t retrans;                    /**< current number of retransmissions */
+    bool wait_for_ack;                  /**< SubMAC is waiting for an ACK frame */
+#endif
+    uint16_t ack_timeout_us;            /**< ACK timeout in µs */
     uint16_t panid;                     /**< IEEE 802.15.4 PAN ID */
     uint16_t channel_num;               /**< IEEE 802.15.4 channel number */
-    uint8_t retrans;                    /**< current number of retransmissions */
-    uint8_t csma_retries_nb;            /**< current number of CSMA-CA retries */
-    uint8_t backoff_mask;               /**< internal value used for random backoff calculation */
-    uint8_t csma_retries;               /**< maximum number of CSMA-CA retries */
     int8_t tx_pow;                      /**< Transmission power (in dBm) */
     ieee802154_fsm_state_t fsm_state;    /**< State of the SubMAC */
     ieee802154_phy_mode_t phy_mode;     /**< IEEE 802.15.4 PHY mode */
