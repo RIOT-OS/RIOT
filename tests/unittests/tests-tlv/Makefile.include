@@ -1,1 +1,4 @@
 USEMODULE += tlv
+USEMODULE += tlv_writer
+USEMODULE += tlv_simple
+USEMODULE += tlv_ber

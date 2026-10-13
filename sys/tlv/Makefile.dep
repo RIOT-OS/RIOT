@@ -1,0 +1,3 @@
+ifneq (,$(filter tlv_ber tlv_simple,$(USEMODULE)))
+  USEMODULE += tlv_simple
+endif

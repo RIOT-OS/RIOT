@@ -613,6 +613,8 @@ PSEUDOMODULES += test_utils_main_exit_cb
 PSEUDOMODULES += tiny_strerror_as_strerror
 PSEUDOMODULES += tiny_strerror_minimal
 
+PSEUDOMODULES += tlv_%
+
 # An umbrella module for the unicoap_driver_rfc7252_common_pdu
 # and unicoap_driver_rfc7252_common_messaging modules
 PSEUDOMODULES += unicoap_driver_rfc7252_common

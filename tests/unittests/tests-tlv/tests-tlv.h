@@ -26,13 +26,6 @@ extern "C" {
  */
 void tests_tlv(void);
 
-/**
- * @brief Generates tests for timex
- *
- * @return embUnit tests if successful, NULL if not.
- */
-Test *tests_tlv_tests(void);
-
 #ifdef __cplusplus
 }
 #endif
