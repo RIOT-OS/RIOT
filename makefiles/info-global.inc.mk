@@ -78,8 +78,8 @@ info-buildsizes-diff: SHELL=bash
 info-buildsizes-diff:
 	@echo -e "text\tdata\tbss\tdec\tBOARD/BINDIRBASE\n"; \
 	COMMON_BOARDS=(); ONLY_OLD=(); ONLY_NEW=(); \
-	SUPPORTED_BOARDS="$($(MAKE) info-boards-supported --no-print-directory -j)"; \
-	for board in $(SUPPORTED_BOARDS); do \
+	SUPPORTED_BOARDS="$$($(MAKE) info-boards-supported --no-print-directory -j)"; \
+	for board in $${SUPPORTED_BOARDS}; do \
 	  if [[ -e "$${OLDBIN}/$${board}" && -e "$${NEWBIN}/$${board}" ]]; then \
 	    COMMON_BOARDS+=($${board}); \
 	  elif [[ -e "$${OLDBIN}/$${board}" ]]; then \
