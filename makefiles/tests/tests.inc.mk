@@ -17,6 +17,14 @@ TESTS ?= $(foreach file,$(wildcard $(APPDIR)/tests/*[^~]),\
 # this. In order to make local builds behave similar, add the term deps here.
 # See #11762.
 TEST_DEPS += $(TERMDEPS)
+# With `make -j all test` (e.g. `DOCKER_MAKE_ARGS=-j` when running both goals
+# in the docker container), `test` would otherwise run in parallel to `all` and
+# might try to execute the application while it is still being linked.
+# Enforce that `all` finishes before `test` starts if both are requested.
+ifneq (,$(filter all,$(MAKECMDGOALS)))
+test: | all
+endif
+
 # these variables can be used to use e.g. pytest to execute the tests instead of
 # executing them as a script
 TEST_EXECUTOR ?=
