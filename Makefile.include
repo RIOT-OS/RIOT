@@ -792,9 +792,18 @@ termdeps: $(TERMDEPS)
 # therefore the terminal will be called before the compilation is done.
 # Setting `term` to NOTPARALLEL makes sure it is not executed during compilation.
 .NOTPARALLEL: term
+
+# Is (native) binary going to be run in docker and we are not yet in docker?
+# (term is only added DOCKER_MAKECMDGOALS if BOARD=native%)
+ifeq (1-0-term,$(BUILD_IN_DOCKER)-$(INSIDE_DOCKER)-$(filter term,$(DOCKER_MAKECMDGOALS)))
+# Yes --> defer term until in docker container
+term: ..in-docker-container
+else
+# No --> run term in this context
 term: $(TERMDEPS)
 	$(call check_cmd,$(TERMPROG),Terminal program)
 	${TERMENV} $(TERMPROG) $(TERMFLAGS) $(TERMTEE)
+endif
 
 # Term without the pyterm added logging
 # PYTERMFLAGS must be exported for `jlink.sh term-rtt`.

@@ -163,8 +163,9 @@ export default defineConfig({
               {
                 label: "Getting Started",
                 items: [
-                  "getting-started/install-wsl",
                   "getting-started/installing",
+                  "getting-started/installing/wsl",
+                  "getting-started/installing/vm",
                   "getting-started/flashing",
                   "getting-started/building_example",
                   "getting-started/finding_modules",
@@ -306,6 +307,7 @@ export default defineConfig({
   redirects: {
     "/misc/io_mapping_and_shields": "/board_specific/io_mapping_and_shields",
     "/c_tutorials/coap": "/networking/unicoap/introduction",
+    "/getting-started/install-wsl": "/getting-started/installing/windows",
   },
   vite: {
     server: {

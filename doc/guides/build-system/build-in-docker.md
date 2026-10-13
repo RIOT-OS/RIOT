@@ -32,6 +32,13 @@ variable `DOCKER_IMAGE`, for example:
 BUILD_IN_DOCKER=1 DOCKER_IMAGE="local/tinybuild-native64:latest" make
 ```
 
+You may use the provided minimal Docker image instead of [riot/riotbuild] for that.
+
+```shell
+cd RIOT
+docker build -t local/tinybuild-native64 dist/tools/setup/
+```
+
 ## Targets run in Docker: DOCKER_MAKECMDGOALS_POSSIBLE
 
 Currently, only build-related targets are run in the Docker container, the exact

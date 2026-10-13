@@ -1,0 +1,115 @@
+---
+title: Developing on ARM Linux and macOS 
+description: Compiling and running under ARM Linux and VMs for macOS
+---
+
+import Contact from '@components/contact.astro';
+
+<Contact />
+
+:::note
+This guide only covers Apple Silicon Macs, i.e., those with M-series chips, and
+Linux distributions running on 64-bit ARM CPUs.
+:::
+
+Building RIOT binaries and running apps on the [native](/boards/native64/) board
+is not supported natively on macOS as our build largely system assumes Linux.
+Apps built for the [native](/boards/native64/) board currently assume your
+CPU has an Intel/AMD `x86` 64-bit architecture.
+
+This guide gives you an overview over how to run build using `make`
+or `make term` to run apps built for the [native board](/boards/native64/).
+Flashing binaries onto hardware board should be supported without a Linux VM.
+Usually `make flash` will also build the binary, which you cannot on macOS.
+Hence, you should run `make flash-only` on macOS to flash binaries.
+
+You may choose between the following options.
+Approaches to boot Linux VMs categories fall into these categories:
+- Emulating an Intel/AMD CPU (`x86_64`, also called `amd64`) to run a Linux
+  VM is slow, because every instruction has to be translated.
+  This means the compiler will be an `x86_64` program too that needs to
+  be translated to ARM.
+- Virtualizing an ARM (`aarch64`) Linux VM on an Apple Silicon Mac (`arm64`) or
+  ARM Linux machine (`aarch64`) is
+  fast, because the guest's instructions run directly on the host CPU.
+  `aarch64`, used on Linux, and `arm64`, used on macOS,
+  are two names for the same architecture. The compiler can run natively,
+  i.e., will be much faster than on an emulated `x86_64` CPU.
+  This latter approach still allows you to run individual `x86_64` programs
+  inside an ARM VM through two mechanisms called Rosetta or QEMU user-mode
+  emulation. Using Rosetta to translate a `x86_64` is much faster than QEMU
+  emulation. If the ARM Linux is not running in a VM on macOS, i.e., you have
+  a real ARM Linux machine, QEMU user-mode emulation is the only option.
+
+RIOT already cross-compiles an `x86_64` binary when you compile for the `native`
+board on ARM Linux (whether in a VM or not).
+This means you do need an ARM Linux VM on macOS, but not necessarily if you
+already have an ARM Linux running on your host.
+To install or check cross-compilation tools, run
+`bash dist/tools/setup/install.sh`. When you compile for the `native` board,
+you should see a message `Experimental cross-compilation to x86 64-bit` being
+printed.
+
+To virtualize ARM Linux, you may find the table of tools below useful.
+Using the respective VM tool, you will need to
+    - create a VM/container that
+      - uses `Virtualization.framework` (`vz`), if the VM runs on macOS
+      - has Rosetta (and `binfmt`) enabled, if the VM runs on macOS
+      - has at least the RIOT tree mounted as writable, e.g., using `virtiofs`
+    - run one or both of the following commands in the VM/container using
+      something like `your-vm-exec <shell cmds such as make>`,
+      if the ARM Linux VM runs on macOS, but optionally in an ARM Linux
+      VM/container on ARM Linux itself too, e.g., because of package dependencies
+      - `make` to build
+      - `make term` if you have built the app for the `native64` board
+
+| Tool | Containers in shared VM | Docker backend | GUI | Screen | Rosetta | Virtualization |
+| ---- | ----------------------- | -------------- | --- | ------ | ------- | -------------- |
+| [Lima](https://lima-vm.io)                            | ✓ | ✓ |   |   | ✓ | ✓ |
+| [Colima](colima.run)                                  | ✓ | ✓ |   |   | ✓ | ✓ |
+| [OrbStack](https://orbstack.dev)                      | ✓ | ✓ | ✓ |   | ✓ | ✓ |
+| [Apple container](https://github.com/apple/container) | ✓ |   |   |   | ✓ | ✓ |
+| [Socktainer](https://socktainer.github.io)            | ✓ | ✓ |   |   | ✓ | ✓ |
+| [Tart](https://tart.run)                              |   |   |   | ✓ | ✓ | ✓ |
+| [Incus](https://linuxcontainers.org/incus)            | ✓ |   |   |   | ✓ | ✓ |
+| [Multipass](https://multipass.run)                    |   |   | ✓ |   | manually | ✓ |
+
+Some of these VM tools can serve as a backend for the `docker` command, so
+you can build a Docker image and then just set `BUILD_IN_DOCKER=1` instead
+of prefixing each `make` command with `your-vm-exec` or opening a shell
+in your VM each time. You can still prefix you `make` commands with
+`BUILD_IN_DOCKER=1 make`, though.
+
+`x86_64` binaries in an ARM Docker container will run as long as the host
+kernel can run them. This means that if we have a basically transparent Docker
+image that passes through the ARM architecture of its host, this will be fast.
+This means, on ARM Linux hosts, it does not matter where you build or run
+(`native`) binaries -- it is merely a question of whether you want to isolate
+the build process or the execution on `native`.
+
+In `dist/tools/setup/Dockerfile`, we provide such as small Dockerfile that
+just runs `dist/tools/setup/install.sh` to install dependencies --
+the same install script you would run on your Linux host.
+This Dockerfile can be used on any Linux.
+Note that you may need to mount or provide `~/.cargo/git` and `~/.cargo/registry
+if you do use `BUILD_IN_DOCKER` with the small Dockerfile provided instead of
+`riot/riotbuild`.
+
+```shell title="On ARM Linux (VM) run:"
+cd RIOT
+
+# Build image on ARM Linux
+docker build -t local/ubuntu-riot dist/tools/setup/
+
+export BUILD_IN_DOCKER=1
+export DOCKER_IMAGE="local/ubuntu-riot:latest"
+
+make
+make term
+```
+
+:::caution
+The `riot/riotbuild` docker image is currently only available for the
+`x86_64`/`amd64` platform, i.e., every binary, including compilers and compiled
+binaries by you, will be compiled for `x86_64` and such a CPU will thus be emulated.
+:::

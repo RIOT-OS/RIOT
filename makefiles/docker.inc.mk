@@ -31,6 +31,7 @@ DOCKER_MAKECMDGOALS_POSSIBLE := \
 ifneq (, $(filter native%,$(BOARD)))
   DOCKER_MAKECMDGOALS_POSSIBLE += flash
   DOCKER_MAKECMDGOALS_POSSIBLE += test
+  DOCKER_MAKECMDGOALS_POSSIBLE += term
 endif
 
 export DOCKER_MAKECMDGOALS_POSSIBLE
@@ -152,7 +153,9 @@ DOCKER_USER_OPT = $(if $(_docker_is_podman),--userns keep-id,--user $(DOCKER_USE
 DOCKER_RUN_FLAGS ?= --rm --tty $(DOCKER_USER_OPT)
 
 # Explicitly set the platform to what the image is expecting
-DOCKER_RUN_FLAGS += --platform linux/amd64
+ifeq (,$(filter arm64 aarch64,$(OS_ARCH)))
+  DOCKER_RUN_FLAGS += --platform linux/amd64
+endif
 
 # allow setting make args from command line like '-j'
 DOCKER_MAKE_ARGS ?=

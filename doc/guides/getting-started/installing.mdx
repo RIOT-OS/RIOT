@@ -3,11 +3,15 @@ title: Setup Development Environment
 description: Setting up a development environment for RIOT
 ---
 
+import { Tabs, TabItem } from '@components/Tabs.astro';
 import Contact from '@components/contact.astro';
 
 <Contact />
 
-### Choosing the Right Operating System
+### Operating Systems
+
+How you set up your development environment depends on the operating system you
+are running. Please follow the correspond operating system guide below.
 
 #### Linux (Recommended)
 Most of the RIOT OS developers are using Linux on their development PCs, so you can expect the
@@ -19,45 +23,86 @@ and has the most extensive documentation and community support.
 Some distributions, such as Fedora, do not provide the necessary packages for
 cross compilation. In this case, it is recommended to use the
 [RIOT Docker Container](/build-system/build-in-docker/).
+Native development under ARM Linux is not officially supported.
+However, we do offer cross-compiling to x86 64-bit for the 
+[`native` board](/boards/native64/) under 64-bit ARM Linux.
+
+
+Skip ahead to [Installing Required Software Packages](#installing-required-software-packages).
+
+#### macOS (Apple Silicon)
+Native development under macOS is not officially supported.
+We recommend running a Linux VM or using the [RIOT Docker Container](/build-system/build-in-docker/).
+
+:::note
+Please follow the [installation guide for Linux VMs](/getting-started/installing/vm).
+:::
 
 #### Windows
 Windows is supported through Windows Subsystem for Linux (WSL).
 The experience is not as streamlined as on Linux, but it is still possible to develop with RIOT.
 
 :::note
-Please follow the [installation guide for WSL](/getting-started/install-wsl) to set up your development environment.
+Please follow the [installation guide for Windows](/getting-started/installing/wsl).
 
-Afterwards, you can follow the Ubuntu installation guide. The installation of the required software packages is the same for both Ubuntu and WSL.
+Afterwards, please follow the [Linux installation guide](#installing-required-software-packages).
+The installation of the required software packages is the same for both Ubuntu and WSL.
 :::
 
-#### macOS
-Native development on macOS machines is not officially supported.
+## Installing Required Software Packages
 
-What works well is using Linux in a virtual machine, but at much lower performance than running Linux natively.
+You may may install packages using a shell script provided by us alternatively.
+If so, [skip to the next section](#cloning-the-riot-repository-and-first-steps).
 
-We also offer Docker images that make it a bit easier to develop on macOS.
+### Manually Installing Packages
+If you prefer to install packages manually, type the following command in your terminal
+to determine your CPU architecture.
 
-## Installing the Required Software Packages
-
-:::note
-It is also possible to run RIOT in a Docker container.
-
-This is especially useful if you want to avoid installing the required software packages on your host system. For more information, see the [Build in Docker](/build-system/build-in-docker/) guide.
-:::
+```bash title="Command to check CPU architecture"
+uname -m
+```
 
 Depending on the operation distribution you are using, the installation of the required software packages may vary.
+Select the correct CPU architecture and operating system you are running and
+install the required packages by pasting the command below into your terminal.
 
-#### Ubuntu
+<Tabs syncKey="cpu">
+    <TabItem label="Intel/AMD 64-bit (x86_64)">
+        <Tabs syncKey="os">
+            <TabItem label="Ubuntu/Debian">
+            ```bash title="Command to install required packages (on x86_64 Ubuntu/Debian)"
+            sudo apt install make python3-serial python3-psutil wget unzip git openocd gdb-multiarch esptool podman-docker clangd clang gcc-multilib
+            ```
+            </TabItem>
+            <TabItem label="Arch Linux">
+            ```bash title="Command to install required packages (on x86_64 Arch Linux)"
+            sudo pacman -S make base-devel python-pyserial python-psutil wget unzip git openocd gdb esptool podman-docker clang gcc-multilib
+            ```
+            </TabItem>
+        </Tabs>
+    </TabItem>
+    <TabItem label="Intel/AMD 32-bit (i686)">
+        <Tabs syncKey="os">
+            <TabItem label="Ubuntu/Debian">
+            ```bash title="Command to install required packages (on x86_64 Ubuntu/Debian)"
+            sudo apt install make python3-serial python3-psutil wget unzip git openocd gdb-multiarch esptool podman-docker clangd clang
+            ```
+            </TabItem>
+        </Tabs>
+    </TabItem>
+    <TabItem label="ARM 64-bit (aarch64)">
+        <Tabs syncKey="os">
+            <TabItem label="Ubuntu/Debian">
+            ```bash title="Command to install required packages (on x86_64 Ubuntu/Debian)"
+            sudo apt install make python3-serial python3-psutil wget unzip git openocd gdb-multiarch esptool podman-docker clangd clang gcc-x86-64-linux-gnu g++-x86-64-linux-gnu libc6-dev-amd64-cross libc6-amd64-cross qemu-user-binfmt binfmt-support
+            ```
+            </TabItem>
+        </Tabs>
+    </TabItem>
+</Tabs>
 
-```bash title="Ubuntu command to install required packages"
-    sudo apt install make gcc-multilib python3-serial python3-psutil wget unzip git openocd gdb-multiarch esptool podman-docker clangd clang
-```
-
-#### Arch Linux
-
-```bash title="Arch Linux command to install required packages"
-    sudo pacman -S make base-devel gcc-multilib python-pyserial python-psutil wget unzip git openocd gdb esptool podman-docker clang
-```
+<br />
+<br />
 
 This will show something like this depending on your distribution:
 
@@ -69,7 +114,7 @@ This will show something like this depending on your distribution:
 
 ![Ubuntu terminal after installation completed](img/03-Install_Base_Packages-02.png)
 
-## Cloning the RIOT Repository and First Steps in the Terminal
+## Cloning the RIOT Repository and First Steps
 
 :::note
 Even if you subsequently work only via VS Code, do **NOT** skip this step.
@@ -91,6 +136,9 @@ more detail on how to set up your own project folder structure so don't worry ab
 - Open the terminal.
 - Type `git clone https://github.com/RIOT-OS/RIOT` and confirm with the return-key
 - This may take some time. Eventually, it will print `done.` when it completed
+- If you haven't installed the required packages above, type
+  `bash dist/tools/setup/install.sh` to install them now. If you did, you can skip
+  this step.
 - Type `cd RIOT/examples/basic/hello-world` and confirm with the return-key to enter
   the folder `hello-world` example app in the RIOT repo
 - Type `make` and confirm with the return key to build the app for the board
@@ -288,9 +336,16 @@ tool for its architecture is used.
 
 #### Architecture: native
 
-* On 64 bit systems: multilib versions for your host compilers, standard C library, and development
-  headers
-    * Alternatively: Compile with `BUILD_IN_DOCKER=1`. Note that for running the executable you
-      still need a multilib system (or 32 bit Linux) with glibc a standard C library.
+* Building
+    * Under Intel/AMD `x86` 64-bit Linux:
+      Requires `multilib` versions for your host compilers to run binaries compiled for the
+      [`native32`](/boards/native32/) board, if you wish to do that. We recommend
+      the [`native64`](/boards/native64/) board to run RIOT apps on your local machine.
+      This will be fast.
+    * Under ARM 64-bit Linux:
+      Cross-compile `x86` 64-bit binary and run using `qemu-user-static`.
+      This will be rather slow.
+    * For each of those two options, you can also [compile
+      (or run on the `native` board) in a Docker container](/build-system/build-in-docker/).
 * A C library supporting the deprecated POSIX.1-2001 ucontext library (e.g. glibc, FreeBSD's libc)
 * Optional: GDB for debugging. (Prefer the multiarch version, this will also work for other boards)
