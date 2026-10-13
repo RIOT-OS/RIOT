@@ -8,6 +8,14 @@ ifeq (,$(filter $(MATCH_MAKE_VERSION),$(MAKE_VERSION)))
       $(MATCH_MAKE_VERSION) or later.)
 endif
 
+# RIOT does not support building multiple top-level commands at the same time,
+# e.g. "flash term" might start the terminal before flashing is done.
+# Setting .NOTPARALLEL globally solves this issue and is the simpler fix
+# compared to complex inter-dependencies (which would have to find the
+# balance between rebuilding and not rebuilding).
+# Note: this does not affect submakes, they are still built parallel.
+.NOTPARALLEL:
+
 #
 # enable second expansion of prerequisites.
 #
@@ -788,10 +796,6 @@ TERMFLASHDEPS ?= $(filter flash flash-only,$(MAKECMDGOALS))
 TERMDEPS += $(TERMFLASHDEPS)
 termdeps: $(TERMDEPS)
 
-# (At least) the native targets don't have `flash` as a dependency,
-# therefore the terminal will be called before the compilation is done.
-# Setting `term` to NOTPARALLEL makes sure it is not executed during compilation.
-.NOTPARALLEL: term
 term: $(TERMDEPS)
 	$(call check_cmd,$(TERMPROG),Terminal program)
 	${TERMENV} $(TERMPROG) $(TERMFLAGS) $(TERMTEE)
