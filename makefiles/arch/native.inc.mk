@@ -37,6 +37,27 @@ ifeq (,$(filter -std=%, $(CFLAGS)))
   CFLAGS += -std=gnu11
 endif
 
+# Native does not compile on ARM, so cross-compile to x86 instead
+ifneq (,$(filter arm64 aarch64,$(OS_ARCH)))
+  _CROSS_TARGET := x86_64-linux-gnu
+  _CROSS_PREFIX := $(_CROSS_TARGET)-
+  _CROSS_LIBS := /usr/$(_CROSS_TARGET)/lib
+  _CROSS_AVAILABLE := $(and $(shell command -v $(_CROSS_PREFIX)gcc 2>/dev/null),$(wildcard $(_CROSS_LIBS)/ld-linux-x86-64.so.2),$(wildcard $(_CROSS_LIBS)/libc.so.6))
+  ifneq (,$(_CROSS_AVAILABLE))
+    $(info Experimental cross-compilation to x86 64-bit)
+    PREFIX = $(_CROSS_PREFIX)
+    ifeq (llvm,$(TOOLCHAIN))
+      # GCC still does linking
+      TARGET_ARCH_LLVM = $(_CROSS_TARGET)
+      CFLAGS += -target $(_CROSS_TARGET)
+      CXXFLAGS += -target $(_CROSS_TARGET)
+    endif
+    LD_LIBRARY_PATH = $(_CROSS_LIBS)
+    LINKFLAGS += -Wl,--dynamic-linker=$(_CROSS_LIBS)/ld-linux-x86-64.so.2
+    LINKFLAGS += -Wl,-rpath,$(_CROSS_LIBS)
+  endif
+endif
+
 ifeq ($(NATIVE_ARCH_BIT),64)
   CFLAGS += -m64
   LINKFLAGS += -m64
