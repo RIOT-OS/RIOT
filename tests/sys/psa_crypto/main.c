@@ -23,9 +23,7 @@
 void addFailurePSA(const char *func, psa_status_t errcode, long line, const char *file)
 {
     static char msg[128];
-    strncpy(msg, func, sizeof(msg));
-    strcat(msg, ": ");
-    strcat(msg, psa_status_to_humanly_readable(errcode));
+    snprintf(msg, sizeof(msg), "%s: %s", func, psa_status_to_humanly_readable(errcode));
     addFailure(msg, line, file);
 }
 

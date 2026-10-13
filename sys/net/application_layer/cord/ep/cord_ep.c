@@ -257,11 +257,13 @@ int cord_ep_register(const sock_udp_ep_t *remote, const char *regif)
         }
     }
     else {
-        if (strlen(_rd_regif) >= sizeof(_rd_regif)) {
+        size_t regif_len = strlen(regif);
+        if (regif_len >= sizeof(_rd_regif)) {
             retval = CORD_EP_OVERFLOW;
             goto end;
         }
-        strncpy(_rd_regif, regif, sizeof(_rd_regif));
+
+        memcpy(_rd_regif, regif, regif_len + 1);
     }
 
     /* build and send CoAP POST request to the RD's registration interface */

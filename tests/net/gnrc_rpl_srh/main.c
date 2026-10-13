@@ -53,7 +53,7 @@
 #define IPV6_ELIDED_PREFIX  (13)
 
 #define SRH_SEG_LEFT        (2)
-#define MAX_BUF_SIZE        ((sizeof(gnrc_rpl_srh_t) + 2) + sizeof(ipv6_addr_t))
+#define MAX_BUF_SIZE        (sizeof(gnrc_rpl_srh_t) + (2 * sizeof(ipv6_addr_t)))
 
 static ipv6_hdr_t hdr;
 static uint8_t buf[MAX_BUF_SIZE];

@@ -12,6 +12,10 @@ CFLAGS += -Wno-unused
 CFLAGS += -Wno-unused-parameter
 CFLAGS += -Wno-format
 
+# File paths are built with snprintf() and checked for truncation afterwards,
+# which newer GCC versions still report
+CFLAGS += -Wno-format-truncation
+
 .PHONY: flashdb_fal
 
 all: $(filter flashdb_fal, $(USEMODULE))

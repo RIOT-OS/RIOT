@@ -104,7 +104,7 @@ static int _ccnl_content(int argc, char **argv)
         if ((pos + arg_len) > BUF_SIZE) {
             arg_len = BUF_SIZE - pos;
         }
-        strncpy(&buf[pos], argv[i], arg_len);
+        memcpy(&buf[pos], argv[i], arg_len);
         pos += arg_len;
         /* increment pos _after_ adding ' ' */
         buf[pos++] = ' ';

@@ -496,8 +496,8 @@ static uint8_t _write_cb(lwm2m_context_t * context, uint16_t instance_id, int nu
                     break;
                 }
 
-                strncpy(instance->uri, (char *)data->value.asBuffer.buffer,
-                        data->value.asBuffer.length);
+                memcpy(instance->uri, data->value.asBuffer.buffer,
+                       data->value.asBuffer.length);
                 instance->uri[data->value.asBuffer.length] = '\0';
                 result = COAP_204_CHANGED;
                 break;
@@ -788,8 +788,7 @@ static int _initialize_new_instance(lwm2m_obj_security_inst_t *instance, uint16_
         return -ENOMEM;
     }
 
-    strncpy(instance->uri, args->server_uri, uri_len);
-    instance->uri[uri_len] = '\0';
+    memcpy(instance->uri, args->server_uri, uri_len + 1);
 
 #if IS_USED(MODULE_WAKAAMA_CLIENT_DTLS)
     if (LWM2M_SECURITY_MODE_NONE != args->security_mode) {
