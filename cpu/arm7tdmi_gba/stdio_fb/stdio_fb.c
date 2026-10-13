@@ -68,21 +68,14 @@ static void drawChar(unsigned char c, int x, int y, unsigned short fgColour,
     }
 }
 
-void stdio_init(void)
+static void _init(void)
 {
     /* setup bitmap mode */
     GBA_DISPCNT = GBA_DISPCNT_BGMODE_3 | GBA_DISPCNT_SDBG_2;
     clearScreen();
 }
 
-ssize_t stdio_read(void *buffer, size_t count)
-{
-    (void)buffer;
-    (void)count;
-    return 0;
-}
-
-ssize_t stdio_write(const void *buffer, size_t len)
+static ssize_t _write(const void *buffer, size_t len)
 {
     static unsigned short row = 0;
     static unsigned short cursor = 0;
@@ -108,3 +101,5 @@ ssize_t stdio_write(const void *buffer, size_t len)
     }
     return len;
 }
+
+STDIO_PROVIDER(STDIO_GBA_FB, _init, NULL, _write)
