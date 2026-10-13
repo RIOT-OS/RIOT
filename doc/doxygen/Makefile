@@ -52,12 +52,13 @@ endif
 include $(RIOTMAKE)/utils/ansi.mk
 include $(RIOTMAKE)/color.inc.mk
 
+.NOTPARALLEL:
+
 .PHONY: doc doc-man doc-latex
 doc doc-man doc-latex: graphviz-check $(DOCUMENTATION_FORMAT) doxygen-version
 
 # Check the Doxygen version and print a warning
 .PHONY: doxygen-version
-.NOTPARALLEL: doxygen-version
 doxygen-version:
 	@if [ "`{ echo "$(DOXYGEN_MIN_VERSION)"; echo "$(DOXYGEN_CUR_VERSION)"; } | \
 	  sort -V | head -n1`" != "$(DOXYGEN_MIN_VERSION)" ]; then \

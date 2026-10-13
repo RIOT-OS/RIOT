@@ -33,10 +33,10 @@ SHOULD_RUN_KCONFIG ?=
 
 include $(RIOTBASE)/Makefile.include
 
+.NOTPARALLEL:
+
 # Add target to run MicroPython's own test suite against the RIOT-OS port.
 .PHONY: mpy-test
-.NOTPARALLEL: mpy-test
-
 include $(RIOTBASE)/makefiles/color.inc.mk
 
 # Add support for running MicroPython's own test suite. These tests assume a
