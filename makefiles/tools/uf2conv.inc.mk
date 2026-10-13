@@ -7,6 +7,11 @@ FFLAGS  ?= $(UF2CONV_FLAGS) $(FLASHFILE) --base $(IMAGE_OFFSET)
 
 PREFLASH_DELAY ?= 2
 
+# The check for the SoftDevice should not run parallel to the preflash-sleep,
+# otherwise the device won't be in bootloader mode yet when trying to check
+# the SoftDevice version.
+.NOTPARALLEL:
+
 # Enforce FLASHFILE formats that include address information.
 # This ensures correct address offsets even if the flashfile was compile with a different
 # UF2_SOFTDEV value (and thus ROM_OFFSET) than the one that is currently set.
@@ -30,8 +35,3 @@ ifeq ($(RIOTTOOLS)/uf2/uf2conv.py,$(FLASHER))
   FLASHDEPS += flashfile-format-check
   FLASHDEPS += uf2-softdevice-check
 endif
-
-# The check for the SoftDevice should not run parallel to the preflash-sleep,
-# otherwise the device won't be in bootloader mode yet when trying to check
-# the SoftDevice version.
-.NOTPARALLEL: uf2-softdevice-check

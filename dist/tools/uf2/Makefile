@@ -17,7 +17,7 @@ $(CURDIR)/uf2families.json:
 	cp $(PKG_SOURCE_DIR)/utils/uf2families.json .
 
 # avoid that the files are accessed before they were copied
-.NOTPARALLEL: $(CURDIR)/uf2conv.py $(CURDIR)/uf2families.json
+.NOTPARALLEL:
 
 clean::
 	@rm -rf $(CURDIR)/uf2conv.py
