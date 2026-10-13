@@ -314,12 +314,16 @@ typedef __typeof__(simple_tlv_encode) *_tlv_encoder_t;
  * ## Usage example
  * ```c
  * ssize_t res;
- * uint8_t tlv[64];
- * tlv_writer_t w = BER_TLV_WRITER(tlv, 0, sizeof(tlv));
+ * uint8_t tlv[64] = {
+ *  0x9F, 0x02, 
+ *     6,
+ *     0, 0, 0, 0, 0x12, 0x34
+ * };
+ * tlv_writer_t w = BER_TLV_WRITER(tlv, 9, sizeof(tlv));
  * 
  * // Amount Authorised
  * const uint8_t amount[] = { 0x00, 0x00, 0x00, 0x00, 0x12, 0x34 };
- * if ((res = tlv_writer_add(&w, 0x9F02, sizeof(amount), amount)) < 0) {
+ * if ((res = tlv_writer_set(&w, 0x9F02, sizeof(amount), amount)) < 0) {
  *     // handle error
  * }
  * 
@@ -340,14 +344,7 @@ typedef __typeof__(simple_tlv_encode) *_tlv_encoder_t;
  * if ((res = tlv_writer_add(&w, 0x9C, sizeof(type), type)) < 0) {
  *     // handle error
  * }
- * 
- * // ... Later ...
- * 
- * const uint8_t new_amount[] = { 0x00, 0x00, 0x00, 0x00, 0x99, 0x99 };
- * if ((res = tlv_writer_set(&w, 0x9F02, sizeof(new_amount), new_amount)) < 0) {
- *     // handle error
- * }
- * 
+ *
  * // ... Later ...
  * 
  * const uint8_t* value = NULL;
