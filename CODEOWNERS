@@ -112,6 +112,7 @@ Cargo.*                                     @chrysn
 /sys/event/                                 @kaspar030
 /sys/evtimer/                               @kaspar030
 /sys/fmt/                                   @kaspar030
+/sys/net/                                   @miri64
 /sys/net/application_layer/gcoap/           @chrysn
 /sys/net/application_layer/nanocoap/        @kaspar030 @chrysn
 /sys/net/application_layer/unicoap/         @carl-tud @mguetschow
@@ -123,7 +124,6 @@ Cargo.*                                     @chrysn
 /sys/net/gnrc/link_layer/lorawan/           @jia200x
 /sys/net/gnrc/netif/                        @miri64 @jia200x
 /sys/net/gnrc/routing/rpl/                  @emmanuelsearch
-/sys/net/                                   @miri64
 /sys/pm_layered/                            @kaspar030
 /sys/psa_crypto/                            @mguetschow
 /sys/random/fortuna/                        @basilfx
