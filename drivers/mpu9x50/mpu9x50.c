@@ -462,7 +462,10 @@ static int compass_init(mpu9x50_t *dev)
     conf_bypass(dev, 1);
 
     /* Check whether compass answers correctly */
-    i2c_read_reg(DEV_I2C, DEV_COMP_ADDR, COMPASS_WHOAMI_REG, data, 0);
+    if (i2c_read_reg(DEV_I2C, DEV_COMP_ADDR, COMPASS_WHOAMI_REG, data, 0) < 0) {
+        DEBUG("[Error] Cannot read compass ID\n");
+        return -1;
+    }
     if (data[0] != MPU9X50_COMP_WHOAMI_ANSWER) {
         DEBUG("[Error] Wrong answer from compass\n");
         return -1;
