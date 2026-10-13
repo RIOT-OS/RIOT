@@ -27,8 +27,9 @@ DOCKER_MAKECMDGOALS_POSSIBLE := \
   tests-% \
   #
 
-# On native, we also can run the test in docker
+# On native, we also can run the flash-only and test in docker
 ifneq (, $(filter native%,$(BOARD)))
+  DOCKER_MAKECMDGOALS_POSSIBLE += flash-only
   DOCKER_MAKECMDGOALS_POSSIBLE += test
 endif
 
