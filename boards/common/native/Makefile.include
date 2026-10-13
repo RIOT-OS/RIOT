@@ -16,6 +16,12 @@ ifeq (pyterm,$(RIOT_TERMINAL))
   PROCARGS := --process-args
 else
   TERMPROG ?= $(FLASHFILE)
+  # The native terminal executes the application itself, so it must be linked
+  # completely before `term`, `cleanterm` or `test` start (also with `make -j`).
+  # When building in Docker, the ELF is built inside the container instead.
+  ifneq (1,$(BUILD_IN_DOCKER))
+    TERMDEPS += $(TERMPROG)
+  endif
 endif
 
 ZEP_IP ?= [::1]
