@@ -76,9 +76,13 @@ int main(void)
            " message.\n"
            "On failure, this test prints an error message.\n\n");
 
-    printf("testing periph_timer %u, freq %lu, bits = %u\n",
-           TEST_TIMER_DEV, TEST_TIMER_FREQ, TEST_TIMER_WIDTH);
-    timer_init(TEST_TIMER_DEV, TEST_TIMER_FREQ, cb, thread_get_active());
+    printf("testing periph_timer %u, freq %lu, bits = %u\n", TEST_TIMER_DEV, TEST_TIMER_FREQ,
+           TEST_TIMER_WIDTH);
+
+    if (timer_init(TEST_TIMER_DEV, TEST_TIMER_FREQ, cb, thread_get_active()) != 0) {
+        puts("ERROR: timer_init() failed.\nTEST FAILED");
+        return EXIT_FAILURE;
+    }
 
     uint32_t interval = 16;
     const unsigned max_repetitions = 128;
@@ -87,13 +91,12 @@ int main(void)
             uint32_t before = timer_read(TEST_TIMER_DEV);
             timer_set(TEST_TIMER_DEV, 0, interval);
             while (!thread_flags_clear(1)) {
-                uint32_t diff = (timer_read(TEST_TIMER_DEV) - before)
-                                & TEST_TIMER_MAX;
+                uint32_t diff = (timer_read(TEST_TIMER_DEV) - before) & TEST_TIMER_MAX;
                 if (diff > TEST_MAX_DIFF) {
                     printf("ERROR: too long delay, aborted after %" PRIu32
-                            " (TEST_MAX_DIFF=%lu) on repetition %u\n"
-                            "TEST FAILED\n",
-                            diff, TEST_MAX_DIFF, rep);
+                           " (TEST_MAX_DIFF=%lu) on repetition %u\n"
+                           "TEST FAILED\n",
+                           diff, TEST_MAX_DIFF, rep);
                     return EXIT_FAILURE;
                 }
             }
