@@ -43,16 +43,9 @@
 #define MGBA_REG_LOG_BUFFER   (uint32_t volatile *)(0x4FFF600)
 #define MGBA_REG_LOG_SEND     (uint32_t volatile *)(0x4FFF700)
 
-void stdio_init(void)
+static void _init(void)
 {
     *MGBA_REG_LOG_ENABLE = MGBA_LOG_ENABLE_MAGIC;
-}
-
-ssize_t stdio_read(void *buffer, size_t count)
-{
-    (void)buffer;
-    (void)count;
-    return 0;
 }
 
 static inline void _send_msg(const void *buffer, size_t len)
@@ -61,7 +54,7 @@ static inline void _send_msg(const void *buffer, size_t len)
     *MGBA_REG_LOG_SEND = MGBA_LOGLEVEL;
 }
 
-ssize_t stdio_write(const void *buffer, size_t len)
+static ssize_t _write(const void *buffer, size_t len)
 {
     if (len == 0) {
         return 0;
@@ -83,3 +76,5 @@ ssize_t stdio_write(const void *buffer, size_t len)
 
     return len;
 }
+
+STDIO_PROVIDER(STDIO_GBA_MGBA, _init, NULL, _write)
