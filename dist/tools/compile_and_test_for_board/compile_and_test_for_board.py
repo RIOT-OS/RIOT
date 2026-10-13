@@ -2,6 +2,8 @@
 
 # pylint: disable=line-too-long
 """
+Handle compilation and tests for one board.
+
 This script handles building all applications and tests for one board and also
 execute tests if they are available.
 
@@ -117,7 +119,8 @@ MAKE = os.environ.get("MAKE", "make")
 
 
 class ErrorInTest(Exception):
-    """Custom exception for a failed test.
+    """
+    Custom exception for a failed test.
 
     It contains the step that failed in 'message', the 'application' and the
     'errorfile' path to the execution error.
@@ -157,7 +160,8 @@ def _expand_apps_directories(apps_dirs, riotdir, skip=False):
 
 
 def apps_directories(riotdir, apps_dirs=None, apps_dirs_skip=None):
-    """Return sorted list of test directories relative to `riotdir`.
+    """
+    Return sorted list of test directories relative to `riotdir`.
 
     By default it uses RIOT 'info-applications' command to list them.
 
@@ -185,7 +189,8 @@ def _riot_applications_dirs(riotdir):
 
 
 def check_is_board(riotdir, board):
-    """Verify if board is a RIOT board.
+    """
+    Verify if the board is a RIOT board.
 
     :raises ValueError: on invalid board
     :returns: board name
@@ -199,7 +204,8 @@ def check_is_board(riotdir, board):
 
 
 def create_directory(directory, clean=False, mode=0o755):
-    """Directory creation helper with `clean` option.
+    """
+    Directory creation helper with `clean` option.
 
     :param clean: tries deleting the directory before re-creating it
     """
@@ -212,7 +218,8 @@ def create_directory(directory, clean=False, mode=0o755):
 
 
 def is_in_directory(path, directory):
-    """Return if `path` is inside `directory`.
+    """
+    Return if `path` is inside `directory`.
 
     >>> is_in_directory('RIOT/a/b/c', 'RIOT')
     True
@@ -231,7 +238,8 @@ def is_in_directory(path, directory):
 
 # pylint: disable=too-many-instance-attributes
 class RIOTApplication:
-    """RIOT Application representation.
+    """
+    RIOT Application representation.
 
     Allows calling make commands on an application for a board.
 
@@ -283,7 +291,8 @@ class RIOTApplication:
         return appname
 
     def has_test(self):
-        """Detect if the application has tests.
+        """
+        Detect if the application has tests.
 
         Check TEST_AVAILABLE_TARGETS execute without error.
         """
@@ -297,7 +306,8 @@ class RIOTApplication:
         return has_test
 
     def board_is_supported(self, jobs=False):
-        """Return if current board is supported.
+        """
+        Check if the current board is supported.
 
         :param jobs: Number of parallel jobs allowed
         """
@@ -345,7 +355,8 @@ class RIOTApplication:
             )
 
     def run_compilation_and_test(self, **test_kwargs):
-        """Same as `compilation_and_test` but handles exception.
+        """
+        Do the same as `compilation_and_test` but handle exceptions.
 
         :returns: 0 on success and 1 on error.
         """
@@ -387,7 +398,8 @@ class RIOTApplication:
         # pylint:disable=too-many-arguments
         # pylint:disable=too-many-nested-blocks
         # pylint:disable=too-many-branches
-        """Compile and execute test if available.
+        """
+        Compile and execute test if available.
 
         Checks for board supported/enough memory, compiles.
         If there are tests, also flash the device and run them.
@@ -403,7 +415,6 @@ class RIOTApplication:
         :param jobs: Number of parallel jobs allowed
         :raises ErrorInTest: on execution failed during one step
         """
-
         # Ignore incompatible APPS
         if not self.board_is_supported(jobs):
             create_directory(self.resultdir, clean=True)
@@ -502,7 +513,8 @@ class RIOTApplication:
         return out
 
     def make_with_outfile(self, name, args, save_output=False, setuptasks=None):
-        """Run make but save result in an outfile.
+        """
+        Run make but save result in an outfile.
 
         It will be saved in `self.resultdir/name.[success|failure]`.
 
@@ -542,7 +554,8 @@ class RIOTApplication:
             self._make_handle_error(name, err)
 
     def _make_get_previous_output(self, name):
-        """Get previous result output for step `name`.
+        """
+        Get previous result output for step `name`.
 
         Returns `output` if it is there, None if not.
         """
@@ -572,11 +585,11 @@ class RIOTApplication:
         raise ErrorInTest(name, self, outfile)
 
     def _write_resultfile(self, name, status, body=""):
-        """Write `body` to result file `name.status`.
+        """
+        Write `body` to result file `name.status`.
 
         It also deletes other `name.*` files before.
         """
-
         # Delete previous status files
         resultfiles = glob.glob(self._outfile(f"{name}.*"))
         for resultfile in resultfiles:
@@ -603,7 +616,8 @@ TOOLCHAIN_SCRIPT = "dist/tools/ci/print_toolchain_versions.sh"
 
 
 def print_toolchain(riotdir):
-    """Print toolchain using RIOT script.
+    """
+    Print toolchain using RIOT script.
 
     Does not handle any execution error
     """
@@ -658,7 +672,8 @@ def save_failure_summary(resultdir, summary):
 
 
 def list_from_string(list_str=None):
-    """Get list of items from `list_str`
+    """
+    Get list of items from `list_str`.
 
     >>> list_from_string(None)
     []
@@ -678,7 +693,8 @@ def list_from_string(list_str=None):
 
 
 def _strip_board_equal(board):
-    """Sanitizy board if given as BOARD=board.
+    """
+    Sanitize the board if provided as BOARD=board.
 
     Increase RIOT compatibility.
     """

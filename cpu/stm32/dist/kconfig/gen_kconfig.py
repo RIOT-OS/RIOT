@@ -102,7 +102,7 @@ def get_context(cpu_fam, models, lines):
 
 
 def generate_kconfig(kconfig, context, overwrite, verbose):
-    """Generic kconfig file generator."""
+    """Generate a Kconfig file from a template."""
     loader = FileSystemLoader(searchpath=CURRENT_DIR)
     env = Environment(
         loader=loader, trim_blocks=False, lstrip_blocks=True,
@@ -134,7 +134,7 @@ def generate_kconfig(kconfig, context, overwrite, verbose):
 
 
 def main(args):
-    """Main function."""
+    """Run the main function."""
     models = parse_sheet(args.cpu_fam, args.sheets)
     lines = parse_cpu_lines(args.cmsis_dir, args.cpu_fam)
     context = get_context(args.cpu_fam, models, lines)

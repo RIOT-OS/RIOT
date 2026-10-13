@@ -5,6 +5,8 @@
 # SPDX-License-Identifier: ISC
 
 """
+Merge multiple configuration sources and generate Kconfig related outputs.
+
 This script is used to merge multiple configuration sources and generate
 different outputs related to Kconfig:
 
@@ -41,9 +43,8 @@ DEFAULT_SYNC_DEPS_PATH = "deps/"
 
 
 class Colors:
-    """
-    ASCII colors for logging.
-    """
+    """ASCII colors for logging."""
+
     GREEN = "\033[1;32m"
     RED = "\033[1;31m"
     YELLOW = "\033[1;33m"
@@ -53,38 +54,36 @@ class Colors:
 
 class NoConfigurationFile(Exception):
     """
-    Raised when an operation that requires a configuration input file is
-    executed but the file is not specified.
+    Raised when a required configuration input file is not specified.
+
+    This is raised when an operation that requires a configuration input file
+    is executed but the file is not specified.
     """
+
     pass
 
 
 def is_module(symbol):
-    """
-    Checks if a given symbol represents a module, depending on its prefix.
-    """
+    """Check if a given symbol represents a module, depending on its prefix."""
     return symbol.name.startswith("MODULE_")
 
 
 def is_error(symbol):
-    """
-    Checks if a given symbol represents an error, depending on its prefix.
-    """
+    """Check if a given symbol represents an error, depending on its prefix."""
     return symbol.name.startswith("ERROR_")
 
 
 def log_error(message):
-    """
-    Convenience function to log an error.
-    """
+    """Log an error."""
     log(message, level=logging.ERROR)
 
 
 def log(message, level=logging.DEBUG, color=None):
     """
-    Logs a message using 'logging', with a given color and level. If no level is
-    passed the message is logged using debug level. If no color is passed the
-    following rules apply:
+    Log a message using `logging`, with a given color and level.
+
+    If no level is passed the message is logged using debug level. If no color
+    is passed the following rules apply:
         - error messages are RED
         - warning messages are YELLOW
         - all other messages have no color
@@ -107,8 +106,9 @@ def log(message, level=logging.DEBUG, color=None):
 
 def merge_configs(kconf, configs=[]):
     """
-    Merges multiple configuration files given a Kconfig tree. configs should be
-    an array of paths to the files that need to be merged.
+    Merge multiple configuration files given a Kconfig tree.
+
+    `configs` should be an array of paths to the files that need to be merged.
     """
     # Enable warnings for assignments to undefined symbols
     kconf.warn_assign_undef = True
@@ -131,8 +131,9 @@ def merge_configs(kconf, configs=[]):
 
 def check_config_symbols(kconf):
     """
-    Verifies that symbols got the values assigned by the user. This does not
-    check choices. For that, please refer to check_config_choices.
+    Verify that symbols got the values assigned by the user.
+
+    This does not check choices. For that, please refer to `check_config_choices`.
     """
     ret = True
 
@@ -185,8 +186,10 @@ def check_config_symbols(kconf):
 
 def check_config_choices(kconf):
     """
-    Verifies that the choice options that have been selected after processing
-    the configuration match what the user selected.
+    Verify that the selected choice options match what the user selected.
+
+    The choice options that have been selected after processing the
+    configuration are compared to what the user selected.
     This is verified separately from the rest of the symbols because as we
     are merging multiple configuration files the choice selection can be
     overridden, so this check needs a different logic.
@@ -238,7 +241,7 @@ def check_application_symbol(kconf):
 
 def check_configs(kconf):
     """
-    Verifies that the generated configuration is valid.
+    Verify that the generated configuration is valid.
 
     A configuration is not valid when:
         - A module could not be set to the value defined by the user.
@@ -252,7 +255,9 @@ def check_configs(kconf):
 
 def get_sym_missing_deps(sym):
     """
-    Returns an array of strings, where each element is the string representation
+    Return the missing dependencies of a symbol.
+
+    Return an array of strings, where each element is the string representation
     of the expressions on which `sym` depends and are missing.
     """
     # this splits the top expressions that are connected via AND (&&)
@@ -277,8 +282,9 @@ def get_sym_missing_deps(sym):
 
 def get_sym_applying_range(sym):
     """
-    Returns the first range that applies to a symbol (the active range) and the
-    condition when it is not a constant.
+    Return the first range that applies to a symbol (the active range).
+
+    The condition is returned as well when it is not a constant.
     The return value is a tuple holding string representations of the range like
     so:
         (low, high, condition)

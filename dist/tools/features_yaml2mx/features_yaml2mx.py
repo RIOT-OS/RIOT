@@ -1,7 +1,10 @@
 #!/usr/bin/env python3
 """
-Command line utility generate trivial Makefile listing all existing features in
-RIOT and a matching documentation in Markdown format from single YAML file.
+Generate the list of existing features from a single YAML file.
+
+Command line utility to generate a trivial Makefile listing all existing
+features in RIOT and a matching documentation in Markdown format from a single
+YAML file.
 """
 import argparse
 import yaml
@@ -9,7 +12,7 @@ import yaml
 
 def collect_features(parsed):
     """
-    Collect all features from a parsed YAML file
+    Collect all features from a parsed YAML file.
 
     :param parsed: Parsed YAML file
     :type parsed: dict
@@ -26,8 +29,10 @@ def collect_features(parsed):
 
 def write_makefile(outfile, yaml_path, parsed):
     """
-    Extract the list of features from the given parsed YAML file and writes
-    them into file at the given path in Makefile syntax, e.g.
+    Write the features from the given parsed YAML file in Makefile syntax.
+
+    Extract the list of features from the given parsed YAML file and write
+    them into the file at the given path in Makefile syntax, e.g.
 
         FEATURES_EXISTING := \
             feat_a \
@@ -56,8 +61,9 @@ def write_makefile(outfile, yaml_path, parsed):
 
 def write_md_section(outfile, group, level):
     """
-    Write a section documenting certain features to the given file in markdown
-    format.
+    Write a section documenting certain features in markdown format.
+
+    The section is written to the given file.
 
     :param outfile: The file to write the section to
     :type outfile:  file
@@ -92,8 +98,9 @@ def write_md_section(outfile, group, level):
 
 def write_mdfile(outfile, yaml_path, parsed):
     """
-    Write the given contents from the parsed YAML file as markdown
-    documentation to the given file
+    Write the parsed YAML file contents as markdown documentation.
+
+    The documentation is written to the given file.
 
     :param outfile:     The file to write the documentation to
     :type outfile:      file
@@ -118,7 +125,9 @@ WARNING: This has been auto-generated from {yaml_path}.
 
 def convert_features(yaml_file, mk_file, md_file):
     """
-    Convert the YAML file identified by the given path to a Makefile and
+    Convert the YAML file to a Makefile and a markdown file.
+
+    The YAML file identified by the given path is converted to a Makefile and
     to a markdown file, if their paths are given.
 
     :param yaml_file:   Path to the YAML file to read

@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
 """
-Command line utility to get the image sha256 sum and the manifest sha256 sum
-of the latest image at dockerhub.
+Command line utility to get the SHA-256 sums of the latest image at Docker Hub.
+
+It gets both the image SHA-256 sum and the manifest SHA-256 sum.
 """
 import http.client
 import json
@@ -10,7 +11,7 @@ import sys
 
 def get_docker_token(repo):
     """
-    Get an API access token for the docker registry
+    Get an API access token for the docker registry.
 
     :param repo: the repository the API token should be valid for
     :type repo: str
@@ -32,7 +33,7 @@ def get_docker_token(repo):
 
 def get_manifest(repo, tag="latest", token=None):
     """
-    Get the manifest of the given repo
+    Get the manifest of the given repo.
 
     :param repo: The repository to get the latest manifest of
     :type repo: str
@@ -64,8 +65,9 @@ def get_manifest(repo, tag="latest", token=None):
 
 def get_upstream_digests(repo, tag="latest", token=None):
     """
-    Get the SHA256 hash of the latest image of the given repo at dockerhub
-    as string of hex digests
+    Get the SHA-256 hash of the latest image of the given repo at Docker Hub.
+
+    The hash is returned as string of hex digests.
 
     :param repo: The repository to get the hash from
     :type repo: str

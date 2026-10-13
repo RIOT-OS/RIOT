@@ -1,9 +1,7 @@
 # SPDX-FileCopyrightText: 2021 Inria
 # SPDX-License-Identifier: LGPL-2.1-only
 
-"""
-twr-aloha shell interactions
-"""
+"""twr-aloha shell interactions."""
 
 import re
 
