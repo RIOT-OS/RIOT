@@ -701,14 +701,31 @@ not a string literal`.
       [McCabe project](https://pypi.python.org/pypi/mccabe)
 * A line length of maximum of 120 is allowed instead of 79 as per PEP 8. This
   increases tests readability as they can expects long line of output.
-* Only runnable scripts shall start with `#!/usr/bin/env python3`
+* All runnable scripts and only runnable scripts **MUST** have a shebang
+* Runnable scripts **SHOULD** use `#!/usr/bin/env -S uv run` as shebang
+* [PEP 723 Inline script metadata](https://peps.python.org/pep-0723/) **SHOULD**
+  be used for runnable scripts to declare dependencies
+* Calls to the python executables from the build system **MUST** be done with
+  the wrapper `PYTHON3_WITH_PEP723` if they have PEP 723 annotations.
+    * E.g. to run `dist/tools/fancy/fancy.py` use the following snippet:
+      `$(Q)$(PYTHON3_WITH_PEP723) $(RIOTTOOLS)/fancy/fancy.py`
+    * In the CI, `PYTHON3_WITH_PEP723` is overwritten as `python3` and the
+      CI container **MUST** ship all required python modules to avoid duplicate
+      downloads and slower CI time due to venv setup time
 * Runnable scripts shall use the following scheme:
 
 ```python
-#!/usr/bin/env python3
+#!/usr/bin/env -S uv run
 
 # SPDX-FileCopyrightText: 2026 <your name/company>
 # SPDX-License-Identifier: LGPL-2.1-only
+
+# /// script
+# requires-python = ">=3.10"
+# dependencies = [
+#   "pyudev"
+# ]
+# ///
 
 # put the module imports first
 # see https://www.python.org/dev/peps/pep-0008/#imports
