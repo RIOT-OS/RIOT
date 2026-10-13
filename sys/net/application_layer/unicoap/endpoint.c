@@ -208,6 +208,10 @@ static int _populate_address(uri_parser_result_t* parsed, unicoap_endpoint_t* en
     ipv6_addr_t* v6addr = unicoap_endpoint_get_ipv6_addr(endpoint);
     ipv4_addr_t* v4addr = unicoap_endpoint_get_ipv4_addr(endpoint);
     if (parsed->ipv6addr && (parsed->ipv6addr_len > 0)) {
+        if (!IS_USED(MODULE_IPV6_ADDR)) {
+            unicoap_assist(API_ERROR("IPv6 address support missing") FIXIT("USEMODULE += ipv6_addr"));
+            return -ENOTSUP;
+        }
         if (!ipv6_addr_from_buf(v6addr, parsed->ipv6addr, parsed->ipv6addr_len)) {
             _URI_DEBUG("failed to parse ipv6 addr\n");
             return -EINVAL;
@@ -215,7 +219,8 @@ static int _populate_address(uri_parser_result_t* parsed, unicoap_endpoint_t* en
         *unicoap_endpoint_get_address_family(endpoint) = AF_INET6;
         return 0;
     }
-    else if (ipv4_addr_from_buf(v4addr, parsed->host, parsed->host_len)) {
+    else if (IS_USED(MODULE_IPV4_ADDR) &&
+             ipv4_addr_from_buf(v4addr, parsed->host, parsed->host_len)) {
         /* The host part is actually an IPv4 address literal. */
         *unicoap_endpoint_get_address_family(endpoint) = AF_INET;
         return 0;
@@ -242,7 +247,9 @@ static int _populate_address(uri_parser_result_t* parsed, unicoap_endpoint_t* en
         }
         return _UNICOAP_URI_RESOLVED_HOST;
 #else
-        unicoap_assist(API_ERROR("DNS support missing") FIXIT("USEMODULE += dns"));
+        unicoap_assist(API_ERROR("DNS or IPv4 address support missing")
+                       FIXIT("USEMODULE += dns")
+                       FIXIT("USEMODULE += ipv4_addr"));
         return -ENOTSUP;
 #endif
     }
