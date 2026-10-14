@@ -522,6 +522,8 @@ groups:
           only provided by some STM32 MCUs.)
   - name: periph_pio
     help: A Programmable IO (PIO) is present. (Currently only RP2040)
+  - name: periph_pdm
+    help: A Pulse Density Modulation (PDM) peripheral is present.
 
   groups:
   - title: General-Purpose Input/Output (GPIO)
