@@ -18,6 +18,7 @@ BOARD_INSUFFICIENT_MEMORY := \
     feather-m0-lora \
     feather-m0-wifi \
     firefly \
+    gba_cartridge \
     gd32vf103c-start \
     generic-cc2538-cc2592-dk \
     hamilton \

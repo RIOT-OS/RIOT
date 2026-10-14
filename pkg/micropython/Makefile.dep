@@ -5,5 +5,7 @@ USEMODULE += stdio_available
 USEMODULE += stdio_notify
 USEMODULE += xtimer
 
+FEATURES_REQUIRED += periph_gpio
+
 # MicroPython does not compile for 8 and 16 bit architectures
 FEATURES_BLACKLIST += arch_8bit arch_16bit
