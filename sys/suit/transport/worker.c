@@ -219,7 +219,8 @@ bool suit_worker_trigger(const char *url, size_t len)
     assert(len != 0); /* A zero-length URI is invalid, but _url[0] == '\0' is
                          special to _suit_worker_thread */
 
-    if (len == 0 || len > sizeof(_url)) {
+    if (len == 0 || len >= sizeof(_url)) {
+        mutex_unlock(&_worker_lock);
         return false;
     }
 
