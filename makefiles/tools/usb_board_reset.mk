@@ -29,11 +29,13 @@ TESTRUNNER_CONNECT_DELAY ?= $(TERM_DELAY)
 $(call target-export-variables,test,TESTRUNNER_CONNECT_DELAY)
 
 ifneq (,$(filter flash flash-only,$(MAKECMDGOALS)))
+.PHONY: preflash-delay
 preflash-delay: preflash
 	sleep $(PREFLASH_DELAY)
 endif
 
 ifneq (,$(filter test term test-with-config,$(MAKECMDGOALS)))
+.PHONY: term-delay
 term-delay: $(TERMDELAYDEPS)
 	sleep $(TERM_DELAY)
 endif

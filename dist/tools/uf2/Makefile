@@ -5,19 +5,19 @@ PKG_LICENSE=MIT
 
 RIOTBASE ?= $(CURDIR)/../../..
 
+PKG_SPARSE_PATHS  = utils/uf2conv.py
+PKG_SPARSE_PATHS += utils/uf2families.json
+
 include $(RIOTBASE)/pkg/pkg.mk
 
 all: $(CURDIR)/uf2conv.py $(CURDIR)/uf2families.json
 
-$(CURDIR)/uf2conv.py:
-	cp $(PKG_SOURCE_DIR)/utils/uf2conv.py .
-	chmod a+x uf2conv.py
+$(CURDIR)/uf2conv.py: $(PKG_PREPARED)
+	@cp $(PKG_SOURCE_DIR)/utils/uf2conv.py $@
+	@chmod a+x $@
 
-$(CURDIR)/uf2families.json:
-	cp $(PKG_SOURCE_DIR)/utils/uf2families.json .
-
-# avoid that the files are accessed before they were copied
-.NOTPARALLEL:
+$(CURDIR)/uf2families.json: $(PKG_PREPARED)
+	@cp $(PKG_SOURCE_DIR)/utils/uf2families.json $@
 
 clean::
 	@rm -rf $(CURDIR)/uf2conv.py

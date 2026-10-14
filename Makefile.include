@@ -8,13 +8,17 @@ ifeq (,$(filter $(MATCH_MAKE_VERSION),$(MAKE_VERSION)))
       $(MATCH_MAKE_VERSION) or later.)
 endif
 
-# RIOT does not support building multiple top-level commands at the same time,
+# RIOT does not support building multiple top-level goals at the same time,
 # e.g. "flash term" might start the terminal before flashing is done.
-# Setting .NOTPARALLEL globally solves this issue and is the simpler fix
-# compared to complex inter-dependencies (which would have to find the
-# balance between rebuilding and not rebuilding).
-# Note: this does not affect submakes, they are still built parallel.
-.NOTPARALLEL:
+# While setting .NOTPARALLEL globally solves this issue, it also prevents
+# implicit goals such as `BUILDDEPS`, `pkg-prepare`, ... from running in
+# parallel. Instead, the command-line issued goals are chained as order-only
+# prerequisites of each other.
+# Note: this implies that goals are issued in the right order!
+_prev_goal :=
+$(foreach goal,$(MAKECMDGOALS),\
+  $(if $(_prev_goal),$(eval $(goal): | $(_prev_goal)))\
+  $(eval _prev_goal := $(goal)))
 
 #
 # enable second expansion of prerequisites.
@@ -529,7 +533,7 @@ include $(RIOTMAKE)/bindist.inc.mk
 include $(RIOTMAKE)/modules.inc.mk
 
 
-.PHONY: all link clean flash flash-only termdeps term doc doc-man doc-latex debug debug-server reset objdump help info-modules
+.PHONY: all link clean flash flash-only preflash termdeps term doc doc-man doc-latex debug debug-server reset objdump help info-modules
 .PHONY: print-size elffile lstfile binfile hexfile flashfile cosy
 .PHONY: ..in-docker-container
 
@@ -779,7 +783,10 @@ flash: all $(FLASHDEPS)
 flash-only: $(FLASHDEPS)
 	$(flash-recipe)
 
-preflash: $(BUILD_BEFORE_FLASH)
+# The `preflash` step has to run after `all` or `flash` (which includes `all`)
+# but before `flash`. Usually it is used to bring the device into a bootloader
+# state.
+preflash: $(if $(filter all flash,$(MAKECMDGOALS)),all) | $$(filter $$(FLASHER),$$(FLASHDEPS))
 	$(PREFLASHER_PREFIX)$(PREFLASHER) $(PREFFLAGS)
 
 # graphical memory usage analyzer
