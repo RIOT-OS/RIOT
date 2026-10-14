@@ -367,6 +367,11 @@ static ssize_t _put_file(coap_pkt_t *pdu, uint8_t *buf, size_t len,
     }
     ret = O_WRONLY;
     ret |= (create ? O_CREAT | O_APPEND : 0);
+    if (!create && !request->options.exists.block1) {
+        /* PUT replaces the whole resource; with Block1 we allow random access
+         * writes instead and can't truncate */
+        ret |= O_TRUNC;
+    }
     if ((fd = vfs_open(request->namebuf, ret, 0666)) < 0) {
         ret = fd;
         goto unlink_on_error;
