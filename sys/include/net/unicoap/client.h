@@ -79,6 +79,14 @@ typedef struct {
      * Leave set to zero to fall back to @ref CONFIG_UNICOAP_TIMEOUT_CLIENT_RESPONSE_MS
      */
     uint32_t timeout_ms;
+
+    /**
+     * @brief Local endpoint to send request from
+     *
+     * Defaults to whatever default endpoint is configured in driver
+     * responsible for the given @ref unicoap_destination_t.
+     */
+    unicoap_endpoint_t* local;
 } unicoap_request_parameters_t;
 /** @} */
 

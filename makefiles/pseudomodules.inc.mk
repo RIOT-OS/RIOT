@@ -620,6 +620,11 @@ PSEUDOMODULES += unicoap_client_cancellation
 # URI support in unicoap client API
 PSEUDOMODULES += unicoap_client_uri
 
+PSEUDOMODULES += unicoap_driver_dtls
+PSEUDOMODULES += unicoap_driver_dtls_init_default
+PSEUDOMODULES += unicoap_driver_udp
+PSEUDOMODULES += unicoap_driver_udp_init_default
+
 # An umbrella module for the unicoap_driver_rfc7252_common_pdu
 # and unicoap_driver_rfc7252_common_messaging modules
 PSEUDOMODULES += unicoap_driver_rfc7252_common

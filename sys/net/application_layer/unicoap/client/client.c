@@ -120,6 +120,7 @@ int unicoap_client_send_request_body(unicoap_message_t* request,
     /* TODO: Observe */
     uint8_t token[CONFIG_UNICOAP_GENERATED_TOKEN_LENGTH];
     unicoap_packet_t packet = { .remote = endpoint,
+                                .local = parameters ? parameters->local : NULL,
                                 .message = request,
                                 .properties = {
                                     .token = token,
