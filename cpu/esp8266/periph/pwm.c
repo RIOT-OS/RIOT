@@ -16,6 +16,7 @@
  */
 
 #include <assert.h>
+#include <inttypes.h>
 
 #include "cpu.h"
 #include "log.h"
@@ -112,7 +113,8 @@ static void _pwm_stop(void)
 
 uint32_t pwm_init(pwm_t pwm, pwm_mode_t mode, uint32_t freq, uint16_t res)
 {
-    DEBUG ("%s pwm=%u mode=%u freq=%u, res=%u\n", __func__, pwm, mode, freq, res);
+    DEBUG ("%s pwm=%u mode=%u freq=%" PRIu32 ", res=%" PRIu16 "\n",
+           __func__, pwm, mode, freq, res);
 
     uint8_t _pwm_channel_gpio_num = sizeof(pwm0_channels) >> 2;
 
