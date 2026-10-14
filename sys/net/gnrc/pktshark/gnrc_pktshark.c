@@ -357,7 +357,7 @@ static bool _dump_coap(const void *buf, size_t len)
     }
 
     coap_pkt_t pkt;
-    if (coap_parse(&pkt, (void *)buf, len) < 0) {
+    if (coap_parse_udp(&pkt, (void *)buf, len) < 0) {
         return false;
     }
 
