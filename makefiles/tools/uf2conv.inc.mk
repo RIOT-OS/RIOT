@@ -7,11 +7,6 @@ FFLAGS  ?= $(UF2CONV_FLAGS) $(FLASHFILE) --base $(IMAGE_OFFSET)
 
 PREFLASH_DELAY ?= 2
 
-# The check for the SoftDevice should not run parallel to the preflash-sleep,
-# otherwise the device won't be in bootloader mode yet when trying to check
-# the SoftDevice version.
-.NOTPARALLEL:
-
 # Enforce FLASHFILE formats that include address information.
 # This ensures correct address offsets even if the flashfile was compile with a different
 # UF2_SOFTDEV value (and thus ROM_OFFSET) than the one that is currently set.
@@ -24,7 +19,10 @@ flashfile-format-check:
 
 # Execute the SoftDevice check. It verifies that the SoftDevice is present if
 # needed, that the versions match and that it is not accidentally overridden.
-uf2-softdevice-check:
+# The softdevice check has to be executed after the preflash-delay, otherwise
+# the device won't be in bootloader mode yet.
+.PHONY: uf2-softdevice-check
+uf2-softdevice-check: | $$(filter preflash-delay,$$(FLASHDEPS))
 	@UF2_SOFTDEV=$(UF2_SOFTDEV) UF2_MOUNTPOINT=$(UF2_MOUNTPOINT) $(RIOTTOOLS)/uf2/nrf52_softdevice_check.sh
 	@if [ $$? -ne 0 ]; then \
 		exit 1; \
