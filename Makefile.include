@@ -533,7 +533,7 @@ include $(RIOTMAKE)/bindist.inc.mk
 include $(RIOTMAKE)/modules.inc.mk
 
 
-.PHONY: all link clean flash flash-only termdeps term doc doc-man doc-latex debug debug-server reset objdump help info-modules
+.PHONY: all link clean flash flash-only preflash termdeps term doc doc-man doc-latex debug debug-server reset objdump help info-modules
 .PHONY: print-size elffile lstfile binfile hexfile flashfile cosy
 .PHONY: ..in-docker-container
 
@@ -783,7 +783,10 @@ flash: all $(FLASHDEPS)
 flash-only: $(FLASHDEPS)
 	$(flash-recipe)
 
-preflash: $(BUILD_BEFORE_FLASH)
+# The `preflash` step has to run after `all` or `flash` (which includes `all`)
+# but before `flash`. Usually it is used to bring the device into a bootloader
+# state.
+preflash: $(if $(filter all flash,$(MAKECMDGOALS)),all) | $$(filter $$(FLASHER),$$(FLASHDEPS))
 	$(PREFLASHER_PREFIX)$(PREFLASHER) $(PREFFLAGS)
 
 # graphical memory usage analyzer
