@@ -172,9 +172,10 @@ static const char *_consume_authority(uri_parser_result_t *result, const char *u
     const char *ipv6_end = NULL;
     /* validate IPv6 form */
     if (result->host[0] == '[') {
-        ipv6_end = _strchrb(result->host, uri_end, ']');
-        /* found end marker of IPv6 form beyond authority part */
-        if (ipv6_end >= authority_end) {
+        ipv6_end = _strchrb(result->host, authority_end, ']');
+
+        /* no closing ']' within authority part */
+        if (!ipv6_end) {
             return NULL;
         }
 
