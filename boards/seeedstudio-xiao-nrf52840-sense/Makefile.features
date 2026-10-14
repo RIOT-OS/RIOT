@@ -1,5 +1,8 @@
 CPU_MODEL = nrf52840xxaa
 
+# Put defined MCU peripherals here (in alphabetical order)
+FEATURES_PROVIDED += periph_pdm
+
 # the board initialization requires low level GPIO configuration
 FEATURES_REQUIRED += periph_gpio_ll
 

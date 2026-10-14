@@ -111,6 +111,43 @@ extern "C" {
 #define ILI9341_PARAM_OFFSET_X  (80)
 /** @} */
 
+/**
+ * @name    PDM microphone configuration
+ *
+ * The board has a MP34DT01-M PDM microphone.
+ * @{
+ */
+/**
+ * @brief   GPIO pin for the data line
+ */
+#ifndef PDM_DIN_PIN
+#  define PDM_DIN_PIN GPIO_PIN(0, 0)
+#endif
+
+/**
+ * @brief   GPIO pin for the clock
+ */
+#ifndef PDM_CLK_PIN
+#  define PDM_CLK_PIN GPIO_PIN(0, 1)
+#endif
+
+/**
+ * @brief   Minimum clock frequency of the MP34DT01-M in normal mode
+ * @see     https://www.st.com/resource/en/datasheet/mp34dt01-m.pdf
+ */
+#ifndef PDM_MIC_CLK_MIN_HZ
+#  define PDM_MIC_CLK_MIN_HZ 1000000
+#endif
+
+/**
+ * @brief   Maximum clock frequency of the MP34DT01-M in normal mode
+ * @see     https://www.st.com/resource/en/datasheet/mp34dt01-m.pdf
+ */
+#ifndef PDM_MIC_CLK_MAX_HZ
+#  define PDM_MIC_CLK_MAX_HZ 3250000
+#endif
+/** @} */
+
 #ifdef __cplusplus
 }
 #endif
