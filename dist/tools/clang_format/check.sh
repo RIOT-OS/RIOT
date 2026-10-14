@@ -92,11 +92,11 @@ for F in "${FILES_ARR[@]}"; do
                         DIFFLEN="${LINE#@@ -*,}"
                         DIFFLEN="${DIFFLEN%%[!0-9]*}"
                         DIFFLEN=$((DIFFLEN==0?1:DIFFLEN))
-                        DIFFHUNK="${LINE}"
+                        DIFFHUNK="${LINE//\\/\\\\}"
                         ;;
                     *)
                         if [ -n "${DIFFLINE}" ]; then
-                            DIFFHUNK+=$'\n'"${LINE}"
+                            DIFFHUNK+=$'\n'"${LINE//\\/\\\\}"
                         fi
                         ;;
                 esac
