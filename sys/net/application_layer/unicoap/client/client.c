@@ -15,6 +15,7 @@
 #include <string.h>
 
 #include "mutex.h"
+#include "net/netif.h"
 
 #if IS_USED(MODULE_DNS)
 #  include "net/dns.h"

@@ -406,7 +406,7 @@ static int _sendv(iolist_t* list, const unicoap_endpoint_t* remote, const unicoa
 static int _disconnect(_transmission_t* transmission)
 {
     if (IS_USED(MODULE_UNICOAP_DRIVER_DTLS)) {
-        extern int unicoap_transport_disconnect_dtls(sock_dtls_session_t * session);
+        extern int unicoap_transport_disconnect_dtls(unicoap_sock_dtls_session_t * session);
         unicoap_sock_dtls_session_t* session = _transmission_get_session(transmission);
         if (session) {
             return unicoap_transport_disconnect_dtls(session);
@@ -424,7 +424,7 @@ static int _connect(unicoap_packet_t* packet, _transmission_t** transmission)
          * We'll then send any unsent PDUs (in carbon copy buffer of each transmission associated)
          * with endpoint attached to event. We need a carbon copy to delay sending until
          * that happens */
-        extern int unicoap_transport_connect_dtls(const sock_udp_ep_t* remote, sock_dtls_session_t* session);
+        extern int unicoap_transport_connect_dtls(const sock_udp_ep_t* remote, unicoap_sock_dtls_session_t* session);
 
         bool transmission_provided = (*transmission != NULL);
 
