@@ -31,8 +31,6 @@
 #define QPSK_CHANNEL_SPACING_24GHZ      (5000U)    /* kHz */
 #define QPSK_CENTER_FREQUENCY_24GHZ     (2350000U - CCF0_24G_OFFSET) /* Hz  */
 
-#define LEGACY_QPSK_SYMBOL_TIME_US      (16)
-
 /* Table 6-103. O-QPSK Transmitter Frontend Configuration */
 static uint8_t _TXCUTC_PARAMP(uint8_t chips)
 {
@@ -147,66 +145,6 @@ static inline uint8_t _AGCC(uint8_t chips)
     }
 }
 
-static inline uint16_t _get_symbol_duration_us(uint8_t chips)
-{
-    /* 802.15.4g, Table 183 / Table 165 */
-    switch (chips) {
-    case BB_FCHIP100:
-        return 320;
-    case BB_FCHIP200:
-        return 160;
-    case BB_FCHIP1000:
-    case BB_FCHIP2000:
-    default:
-        return 64;
-    }
-}
-
-static inline uint8_t _get_cca_duration_syms(uint8_t chips)
-{
-    /* 802.15.4g, Table 188 */
-    return (chips < BB_FCHIP1000) ? 4 : 8;
-}
-
-static inline uint8_t _get_shr_duration_syms(uint8_t chips)
-{
-    /* 802.15.4g, Table 184 / Table 165 */
-    return (chips < BB_FCHIP1000) ? 48 : 72;
-}
-
-static uint8_t _get_spreading(uint8_t chips, uint8_t mode)
-{
-    if (mode == 4) {
-        return 1;
-    }
-
-    uint8_t spread = 1 << (3 - mode);
-
-    if (chips == BB_FCHIP1000) {
-        return 2 * spread;
-    }
-
-    if (chips == BB_FCHIP2000) {
-        return 4 * spread;
-    }
-
-    return spread;
-}
-
-static inline uint8_t _get_ack_psdu_duration_syms(uint8_t chips, uint8_t mode)
-{
-    /* pg. 119, section 18.3.2.14 */
-    static const uint8_t sym_len[] = { 32, 32, 64, 128 };
-    const uint8_t Ns = sym_len[chips];
-    const uint8_t Rspread = _get_spreading(chips, mode);
-    /* Nd == 63, since ACK length is 5 or 7 octets only */
-    const uint16_t Npsdu = Rspread * 2 * 63;
-
-    /* phyPSDUDuration = ceiling(Npsdu / Ns) + ceiling(Npsdu / Mp) */
-    /* with Mp = Np * 16, see Table 182 */
-    return (Npsdu + Ns/2) / Ns + (Npsdu + 8 * Ns) / (16 * Ns);
-}
-
 static uint8_t _set_mode(at86rf215_t *dev, uint8_t mode)
 {
     mode = AT86RF215_MR_OQPSK_MODE(mode);
@@ -219,7 +157,7 @@ static uint8_t _set_mode(at86rf215_t *dev, uint8_t mode)
     /* TODO: make this configurable */
     uint8_t rxm = RXM_MR_OQPSK;
 
-    if (dev->flags & AT86RF215_OPT_RPC) {
+    if (dev->rpc_enable) {
         rxm |= OQPSKC2_RPC_MASK;                /* enable Reduced Power Consumption */
     }
 
@@ -289,40 +227,6 @@ static void _set_legacy(at86rf215_t *dev, bool high_rate)
                        | OQPSKC2_ENPROP_MASK);  /* enable RX of proprietary modes */
 }
 
-static inline void _set_ack_timeout_legacy(at86rf215_t *dev)
-{
-    dev->ack_timeout_usec = IEEE802154_ACK_TIMEOUT_SYMS * LEGACY_QPSK_SYMBOL_TIME_US;
-    DEBUG("[%s] ACK timeout: %"PRIu32" µs\n", "legacy O-QPSK", dev->ack_timeout_usec);
-}
-
-static void _set_ack_timeout(at86rf215_t *dev, uint8_t chips, uint8_t mode)
-{
-    /* see 802.15.4g-2012, p. 30 */
-    uint16_t symbols = _get_cca_duration_syms(chips)
-                     + _get_shr_duration_syms(chips)
-                     + 15   /* PHR duration */
-                     + _get_ack_psdu_duration_syms(chips, mode);
-
-    dev->ack_timeout_usec = _get_symbol_duration_us(chips) * symbols
-                          + IEEE802154G_ATURNAROUNDTIME_US;
-
-    DEBUG("[%s] ACK timeout: %"PRIu32" µs\n", "O-QPSK", dev->ack_timeout_usec);
-}
-
-static inline void _set_csma_backoff_period(at86rf215_t *dev, uint8_t chips)
-{
-    dev->csma_backoff_period = _get_cca_duration_syms(chips) * _get_symbol_duration_us(chips)
-                             + IEEE802154G_ATURNAROUNDTIME_US;
-    DEBUG("[%s] CSMA BACKOFF: %"PRIu32" µs\n", "O-QPSK", dev->csma_backoff_period);
-}
-
-static inline void _set_csma_backoff_period_legacy(at86rf215_t *dev)
-{
-    dev->csma_backoff_period = (IEEE802154_ATURNAROUNDTIME_IN_SYMBOLS + IEEE802154_CCA_DURATION_IN_SYMBOLS)
-                             * LEGACY_QPSK_SYMBOL_TIME_US;
-    DEBUG("[%s] CSMA BACKOFF: %"PRIu32" µs\n", "legacy O-QPSK", dev->csma_backoff_period);
-}
-
 void _end_configure_OQPSK(at86rf215_t *dev)
 {
     /* set channel spacing with 25 kHz resolution */
@@ -339,11 +243,11 @@ void _end_configure_OQPSK(at86rf215_t *dev)
 
     /* make sure the channel config is still valid */
     dev->num_chans = is_subGHz(dev) ? 1 : 16;
-    dev->netdev.chan = at86rf215_chan_valid(dev, dev->netdev.chan);
-    at86rf215_reg_write16(dev, dev->RF->RG_CNL, dev->netdev.chan);
+    dev->channel = at86rf215_chan_valid(dev, dev->channel);
+    at86rf215_reg_write16(dev, dev->RF->RG_CNL, dev->channel);
 
     /* disable FSK preamble switching */
-#ifdef MODULE_NETDEV_IEEE802154_MR_FSK
+#ifdef MODULE_IEEE802154_PHY_MR_FSK
     dev->fsk_pl = 0;
 #endif
 
@@ -375,9 +279,6 @@ int at86rf215_configure_OQPSK(at86rf215_t *dev, uint8_t chips, uint8_t mode)
 
     _set_mode(dev, mode);
     _set_chips(dev, chips);
-    _set_csma_backoff_period(dev, chips);
-    _set_ack_timeout(dev, chips, mode);
-
     _end_configure_OQPSK(dev);
 
     return 0;
@@ -391,9 +292,6 @@ int at86rf215_configure_legacy_OQPSK(at86rf215_t *dev, bool high_rate)
     at86rf215_reg_write(dev, dev->BBC->RG_PC, 0);
 
     _set_legacy(dev, high_rate);
-    _set_csma_backoff_period_legacy(dev);
-    _set_ack_timeout_legacy(dev);
-
     _end_configure_OQPSK(dev);
 
     return 0;
@@ -413,8 +311,6 @@ int at86rf215_OQPSK_set_chips(at86rf215_t *dev, uint8_t chips)
     at86rf215_await_state_end(dev, RF_STATE_TX);
 
     _set_chips(dev, chips);
-    _set_csma_backoff_period(dev, chips);
-    _set_ack_timeout(dev, chips, mode >> OQPSKPHRTX_MOD_SHIFT);
 
     return 0;
 }
@@ -439,8 +335,6 @@ int at86rf215_OQPSK_set_mode(at86rf215_t *dev, uint8_t mode)
     }
 
     _set_mode(dev, mode);
-    _set_csma_backoff_period(dev, chips);
-    _set_ack_timeout(dev, chips, mode);
 
     return 0;
 }
@@ -459,9 +353,6 @@ int at86rf215_OQPSK_set_mode_legacy(at86rf215_t *dev, bool high_rate)
     } else {
         at86rf215_reg_write(dev, dev->BBC->RG_OQPSKC3, 0);
     }
-
-    _set_csma_backoff_period_legacy(dev);
-    _set_ack_timeout_legacy(dev);
 
     return 0;
 }

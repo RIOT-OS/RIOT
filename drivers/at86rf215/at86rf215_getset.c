@@ -18,6 +18,8 @@
 
 #include "at86rf215.h"
 #include "at86rf215_internal.h"
+#include "at86rf215_registers.h"
+#include "net/ieee802154.h"
 #include "periph/spi.h"
 
 #define ENABLE_DEBUG 0
@@ -39,12 +41,6 @@ uint16_t at86rf215_get_addr_short(const at86rf215_t *dev, uint8_t filter)
 
 void at86rf215_set_addr_short(at86rf215_t *dev, uint8_t filter, uint16_t addr)
 {
-    /* do not overwrite node address for filters other than 0 */
-    if (filter == 0) {
-        dev->netdev.short_addr[0] = (uint8_t)(addr);
-        dev->netdev.short_addr[1] = (uint8_t)(addr >> 8);
-    }
-
     if (filter > 3) {
         return;
     }
@@ -76,7 +72,6 @@ uint64_t at86rf215_get_addr_long(const at86rf215_t *dev)
 
 void at86rf215_set_addr_long(at86rf215_t *dev, uint64_t addr)
 {
-    memcpy(dev->netdev.long_addr, &addr, sizeof(addr));
     addr = ntohll(addr);
     at86rf215_reg_write_bytes(dev, dev->BBC->RG_MACEA0, &addr, sizeof(addr));
 }
@@ -105,14 +100,14 @@ void at86rf215_set_chan(at86rf215_t *dev, uint16_t channel)
     uint8_t old_state = at86rf215_get_rf_state(dev);
 
     /* frequency has to be updated in TRXOFF or TXPREP (datatsheet: 6.3.2) */
-    if (old_state == RF_STATE_RX) {
-        at86rf215_rf_cmd(dev, CMD_RF_TXPREP);
+    if (old_state != RF_STATE_TRXOFF && old_state != RF_STATE_TXPREP) {
+        at86rf215_rf_cmd(dev, CMD_RF_TRXOFF);
+        at86rf215_await_state(dev, RF_STATE_TRXOFF);
     }
 
     at86rf215_reg_write16(dev, dev->RF->RG_CNL, channel);
-    dev->netdev.chan = channel;
+    dev->channel = channel;
 
-    /* enable the radio again */
     if (old_state == RF_STATE_RX) {
         at86rf215_rf_cmd(dev, old_state);
     }
@@ -146,10 +141,6 @@ uint16_t at86rf215_get_pan(const at86rf215_t *dev, uint8_t filter)
 
 void at86rf215_set_pan(at86rf215_t *dev, uint8_t filter, uint16_t pan)
 {
-    if (filter == 0) {
-        dev->netdev.pan = pan;
-    }
-
     if (filter > 3) {
         return;
     }
@@ -199,12 +190,12 @@ void at86rf215_set_txpower(const at86rf215_t *dev, int16_t txpower)
 
 int8_t at86rf215_get_cca_threshold(const at86rf215_t *dev)
 {
-    return dev->csma_ed;
+    return dev->cca_thresh;
 }
 
 void at86rf215_set_cca_threshold(at86rf215_t *dev, int8_t value)
 {
-    dev->csma_ed = value;
+    dev->cca_thresh = value;
     at86rf215_reg_write(dev, dev->BBC->RG_AMEDT, value);
 }
 
@@ -215,20 +206,20 @@ int8_t at86rf215_get_ed_level(at86rf215_t *dev)
 
 void at86rf215_enable_rpc(at86rf215_t *dev)
 {
-    if (!(dev->flags & AT86RF215_OPT_RPC) || !CONFIG_AT86RF215_RPC_EN) {
+    if (!dev->rpc_enable || !CONFIG_AT86RF215_RPC_EN) {
         return;
     }
 
     /* no Reduced Power mode available for OFDM */
 
-#ifdef MODULE_NETDEV_IEEE802154_MR_FSK
+#ifdef MODULE_IEEE802154_PHY_MR_FSK
     if (dev->fsk_pl) {
         /* MR-FSK */
         at86rf215_reg_or(dev, dev->BBC->RG_FSKRPC, FSKRPC_EN_MASK);
         return;
     }
 #endif
-#ifdef MODULE_NETDEV_IEEE802154_MR_OQPSK
+#ifdef MODULE_IEEE802154_PHY_MR_OQPSK
     {
         /* MR-O-QPSK */
         at86rf215_reg_or(dev, dev->BBC->RG_OQPSKC2, OQPSKC2_RPC_MASK);
@@ -238,164 +229,25 @@ void at86rf215_enable_rpc(at86rf215_t *dev)
 
 void at86rf215_disable_rpc(at86rf215_t *dev)
 {
-    if (!(dev->flags & AT86RF215_OPT_RPC) || !CONFIG_AT86RF215_RPC_EN) {
+    if (!dev->rpc_enable || !CONFIG_AT86RF215_RPC_EN) {
         return;
     }
 
     /* no Reduced Power mode available for OFDM */
 
-#ifdef MODULE_NETDEV_IEEE802154_MR_FSK
+#ifdef MODULE_IEEE802154_PHY_MR_FSK
     if (dev->fsk_pl) {
         /* MR-FSK */
         at86rf215_reg_and(dev, dev->BBC->RG_FSKRPC, ~FSKRPC_EN_MASK);
         return;
     }
 #endif
-#ifdef MODULE_NETDEV_IEEE802154_MR_OQPSK
+#ifdef MODULE_IEEE802154_PHY_MR_OQPSK
     {
         /* MR-O-QPSK */
         at86rf215_reg_and(dev, dev->BBC->RG_OQPSKC2, ~OQPSKC2_RPC_MASK);
     }
 #endif
-}
-
-void at86rf215_set_option(at86rf215_t *dev, uint16_t option, bool state)
-{
-    /* set option field */
-    dev->flags = (state) ? (dev->flags |  option)
-                         : (dev->flags & ~option);
-
-    switch (option) {
-        case AT86RF215_OPT_PROMISCUOUS:
-            if (state) {
-                at86rf215_reg_or(dev, dev->BBC->RG_AFC0, AFC0_PM_MASK);
-            } else {
-                at86rf215_reg_and(dev, dev->BBC->RG_AFC0, ~AFC0_PM_MASK);
-            }
-
-            break;
-        case AT86RF215_OPT_AUTOACK:
-            if (state) {
-                at86rf215_reg_or(dev, dev->BBC->RG_AMCS, AMCS_AACK_MASK);
-            } else {
-                at86rf215_reg_and(dev, dev->BBC->RG_AMCS, ~AMCS_AACK_MASK);
-            }
-
-            break;
-        case AT86RF215_OPT_CCATX:
-            if (state){
-                at86rf215_reg_or(dev, dev->BBC->RG_AMCS, AMCS_CCATX_MASK);
-            } else {
-                at86rf215_reg_and(dev, dev->BBC->RG_AMCS, ~AMCS_CCATX_MASK);
-            }
-
-            break;
-        case AT86RF215_OPT_RPC:
-            if (state) {
-                at86rf215_enable_rpc(dev);
-            } else {
-                at86rf215_disable_rpc(dev);
-            }
-
-            break;
-        default:
-            /* do nothing */
-            break;
-    }
-}
-
-static void _wake_from_sleep(at86rf215_t *dev)
-{
-    /* wake the transceiver */
-    at86rf215_rf_cmd(dev, CMD_RF_TRXOFF);
-    at86rf215_await_state(dev, RF_STATE_TRXOFF);
-
-    /* config is lost after SLEEP */
-    at86rf215_reset(dev);
-
-    /* if both transceivers were sleeping, the chip entered DEEP_SLEEP.
-       Waking one device in that mode wakes the other one too. */
-    if (dev->sibling && dev->sibling->state == AT86RF215_STATE_SLEEP) {
-        at86rf215_rf_cmd(dev->sibling, CMD_RF_SLEEP);
-    }
-}
-
-bool at86rf215_set_rx_from_idle(at86rf215_t *dev, uint8_t *state)
-{
-    if (dev->state == AT86RF215_STATE_SLEEP) {
-        _wake_from_sleep(dev);
-    }
-
-    uint8_t s;
-    while ((s = at86rf215_get_rf_state(dev)) == RF_STATE_TRANSITION) {}
-
-    if (state) {
-        *state = s;
-    }
-
-    if (s == RF_STATE_RESET) {
-        at86rf215_rf_cmd(dev, CMD_RF_TRXOFF);
-        at86rf215_await_state(dev, RF_STATE_TRXOFF);
-        s = RF_STATE_TRXOFF;
-    }
-
-    if (s == RF_STATE_TRXOFF) {
-        at86rf215_rf_cmd(dev, CMD_RF_RX);
-        at86rf215_await_state(dev, RF_STATE_RX);
-        s = RF_STATE_RX;
-    }
-
-    if (s == RF_STATE_RX) {
-        return true;
-    }
-
-    return false;
-}
-
-bool at86rf215_set_idle_from_rx(at86rf215_t *dev, uint8_t state)
-{
-    if (state == RF_STATE_TX || state == CMD_RF_TXPREP) {
-        return false;
-    }
-
-    if (dev->state == AT86RF215_STATE_SLEEP) {
-        if (state == CMD_RF_SLEEP) {
-            return true;
-        }
-
-        _wake_from_sleep(dev);
-    }
-
-    uint8_t s;
-    while ((s = at86rf215_get_rf_state(dev)) == RF_STATE_TRANSITION) {}
-
-    if (s != RF_STATE_RX) {
-        return false;
-    }
-
-    if (state == RF_STATE_RX) {
-        return true;
-    }
-
-    at86rf215_rf_cmd(dev, CMD_RF_TRXOFF);
-    at86rf215_await_state(dev, RF_STATE_TRXOFF);
-
-    if (state == RF_STATE_TRXOFF) {
-        return true;
-    }
-
-    /* clear IRQ */
-    at86rf215_reg_read(dev, dev->BBC->RG_IRQS);
-    at86rf215_reg_read(dev, dev->RF->RG_IRQS);
-    at86rf215_rf_cmd(dev, CMD_RF_SLEEP);
-
-    dev->state = AT86RF215_STATE_SLEEP;
-
-    if (state == RF_STATE_RESET) {
-        return true;
-    }
-
-    return false;
 }
 
 int at86rf215_enable_batmon(at86rf215_t *dev, unsigned voltage)
@@ -404,7 +256,7 @@ int at86rf215_enable_batmon(at86rf215_t *dev, unsigned voltage)
 
     /* only configure BATMON on one interface */
     if (!is_subGHz(dev) && dev->sibling != NULL) {
-        dev = dev->sibling;
+        dev = dev->sibling->priv;
     }
 
     /* ensure valid range */
@@ -437,9 +289,31 @@ void at86rf215_disable_batmon(at86rf215_t *dev)
 {
     /* only configure BATMON on one interface */
     if (!is_subGHz(dev) && dev->sibling != NULL) {
-        dev = dev->sibling;
+        dev = dev->sibling->priv;
     }
 
     /* disable interrupt */
     at86rf215_reg_and(dev, dev->RF->RG_IRQM, ~RF_IRQ_BATLOW);
+}
+
+void at86rf215_set_promisc(at86rf215_t *dev, bool enable)
+{
+    if (enable) {
+        at86rf215_reg_or(dev, dev->BBC->RG_AFC0, AFC0_PM_MASK);
+    } else {
+        at86rf215_reg_and(dev, dev->BBC->RG_AFC0, ~AFC0_PM_MASK);
+    }
+}
+
+void at86rf215_set_auto_mode(at86rf215_t *dev, at86rf215_auto_mode_t mode, bool enable)
+{
+    uint8_t amcs = at86rf215_reg_read(dev, dev->BBC->RG_AMCS);
+    /* The datasheet recommends to use only one automatic mode at a time.
+     * Therefore disabling an automatic mode returns the transceiver to basic mode */
+    if (!enable) {
+        mode = AT86RF215_AM_BASIC;
+    }
+    amcs = (amcs & ~(AMCS_AACK_MASK | AMCS_TX2RX_MASK | AMCS_CCATX_MASK)) | mode;
+    at86rf215_reg_write(dev, dev->BBC->RG_AMCS, amcs);
+    dev->auto_mode = mode;
 }
