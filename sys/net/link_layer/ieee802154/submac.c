@@ -14,6 +14,7 @@
 #include <stdio.h>
 #include <string.h>
 #include "net/ieee802154/submac.h"
+#include "net/ieee802154_timings.h"
 #include "net/ieee802154.h"
 #include "ztimer.h"
 #include "random.h"
@@ -24,8 +25,6 @@
 #define ENABLE_DEBUG 0
 #include "debug.h"
 
-#define CSMA_SENDER_BACKOFF_PERIOD_UNIT_US  (320U)
-#define ACK_TIMEOUT_US                      (864U)
 /* 2.4 GHz, 250 kb/s, O-QPSK 62.5 ksymbols/s, 1 / 62 500 s = 16 µs */
 /* 12 symbols -> 12 * 16us = 192us */
 #define SIFS_PERIOD_US                      (192U)
@@ -499,204 +498,12 @@ int ieee802154_send(ieee802154_submac_t *submac, const iolist_t *iolist)
     return 0;
 }
 
-/*
- * MR-OQPSK timing calculations
- *
- * The standard unfortunately does not list the formula, instead it has to be pieced together
- * from scattered information and tables in the IEEE 802.15.4 document - may contain errors.
- */
-
-static uint8_t _mr_oqpsk_spreading(uint8_t chips, uint8_t mode)
-{
-    if (mode == 4) {
-        return 1;
-    }
-
-    uint8_t spread = 1 << (3 - mode);
-
-    if (chips == IEEE802154_MR_OQPSK_CHIPS_1000) {
-        return 2 * spread;
-    }
-
-    if (chips == IEEE802154_MR_OQPSK_CHIPS_2000) {
-        return 4 * spread;
-    }
-
-    return spread;
-}
-
-static inline uint16_t _mr_oqpsk_symbol_duration_us(uint8_t chips)
-{
-    /* 802.15.4g, Table 183 / Table 165 */
-    switch (chips) {
-    case IEEE802154_MR_OQPSK_CHIPS_100:
-        return 320;
-    case IEEE802154_MR_OQPSK_CHIPS_200:
-        return 160;
-    case IEEE802154_MR_OQPSK_CHIPS_1000:
-    case IEEE802154_MR_OQPSK_CHIPS_2000:
-    default:
-        return 64;
-    }
-}
-
-static inline uint8_t _mr_oqpsk_cca_duration_syms(uint8_t chips)
-{
-    /* 802.15.4g, Table 188 */
-    return (chips < IEEE802154_MR_OQPSK_CHIPS_1000) ? 4 : 8;
-}
-
-static inline uint8_t _mr_oqpsk_shr_duration_syms(uint8_t chips)
-{
-    /* 802.15.4g, Table 184 / Table 165 */
-    return (chips < IEEE802154_MR_OQPSK_CHIPS_1000) ? 48 : 72;
-}
-
-static inline uint8_t _mr_oqpsk_ack_psdu_duration_syms(uint8_t chips, uint8_t mode)
-{
-    /* pg. 119, section 18.3.2.14 */
-    static const uint8_t sym_len[] = { 32, 32, 64, 128 };
-    const uint8_t Ns = sym_len[chips];
-    const uint8_t Rspread = _mr_oqpsk_spreading(chips, mode);
-    /* Nd == 63, since ACK length is 5 or 7 octets only */
-    const uint16_t Npsdu = Rspread * 2 * 63;
-
-    /* phyPSDUDuration = ceiling(Npsdu / Ns) + ceiling(Npsdu / Mp) */
-    /* with Mp = Np * 16, see Table 182 */
-    return (Npsdu + Ns/2) / Ns + (Npsdu + 8 * Ns) / (16 * Ns);
-}
-
-MAYBE_UNUSED
-static inline uint16_t _mr_oqpsk_ack_timeout_us(const ieee802154_mr_oqpsk_conf_t *conf)
-{
-    /* see 802.15.4g-2012, p. 30 */
-    uint16_t symbols = _mr_oqpsk_cca_duration_syms(conf->chips)
-                     + _mr_oqpsk_shr_duration_syms(conf->chips)
-                     + 15   /* PHR duration */
-                     + _mr_oqpsk_ack_psdu_duration_syms(conf->chips, conf->rate_mode);
-
-    return _mr_oqpsk_symbol_duration_us(conf->chips) * symbols
-         + IEEE802154G_ATURNAROUNDTIME_US;
-}
-
-MAYBE_UNUSED
-static inline uint16_t _mr_oqpsk_csma_backoff_period_us(const ieee802154_mr_oqpsk_conf_t *conf)
-{
-    return _mr_oqpsk_cca_duration_syms(conf->chips) * _mr_oqpsk_symbol_duration_us(conf->chips)
-         + IEEE802154G_ATURNAROUNDTIME_US;
-}
-
-/*
- * MR-OFDM timing calculations
- *
- * The standard unfortunately does not list the formula, instead it has to be pieced together
- * from scattered information and tables in the IEEE 802.15.4 document - may contain errors.
- */
-
-static unsigned _mr_ofdm_frame_duration(uint8_t option, uint8_t scheme, uint8_t bytes)
-{
-    /* Table 150 - phySymbolsPerOctet values for MR-OFDM PHY, IEEE 802.15.4g-2012 */
-    static const uint8_t quot[] = { 3, 3, 6, 12, 18, 24, 36 };
-
-    --option;
-    /* phyMaxFrameDuration = phySHRDuration + phyPHRDuration
-     *                     + ceiling [(aMaxPHYPacketSize + 1) x phySymbolsPerOctet] */
-    const unsigned phySHRDuration = 6;
-    const unsigned phyPHRDuration = option ? 6 : 3;
-    const unsigned phyPDUDuration = ((bytes + 1) * (1 << option) + quot[scheme] - 1)
-                                  / quot[scheme];
-
-    return (phySHRDuration + phyPHRDuration + phyPDUDuration) * IEEE802154_MR_OFDM_SYMBOL_TIME_US;
-}
-
-static inline uint16_t _mr_ofdm_csma_backoff_period_us(const ieee802154_mr_ofdm_conf_t *conf)
-{
-    (void)conf;
-
-    return IEEE802154_CCA_DURATION_IN_SYMBOLS * IEEE802154_MR_OFDM_SYMBOL_TIME_US
-         + IEEE802154G_ATURNAROUNDTIME_US;
-}
-
-MAYBE_UNUSED
-static inline uint16_t _mr_ofdm_ack_timeout_us(const ieee802154_mr_ofdm_conf_t *conf)
-{
-    return _mr_ofdm_csma_backoff_period_us(conf)
-         + IEEE802154G_ATURNAROUNDTIME_US
-         + _mr_ofdm_frame_duration(conf->option, conf->scheme, IEEE802154_ACK_FRAME_LEN);
-}
-
-/*
- * MR-FSK timing calculations
- *
- * The standard unfortunately does not list the formula, instead it has to be pieced together
- * from scattered information and tables in the IEEE 802.15.4 document - may contain errors.
- */
-
-MAYBE_UNUSED
-static inline uint16_t _mr_fsk_csma_backoff_period_us(const ieee802154_mr_fsk_conf_t *conf)
-{
-    (void)conf;
-
-    return IEEE802154_CCA_DURATION_IN_SYMBOLS * IEEE802154_MR_FSK_SYMBOL_TIME_US
-         + IEEE802154G_ATURNAROUNDTIME_US;
-}
-
-MAYBE_UNUSED
-static inline uint16_t _mr_fsk_ack_timeout_us(const ieee802154_mr_fsk_conf_t *conf)
-{
-    uint8_t ack_len = IEEE802154_ACK_FRAME_LEN;
-    uint8_t fsk_pl = ieee802154_mr_fsk_plen(conf->srate);
-
-    /* PHR uses same data rate as PSDU */
-    ack_len += 2;
-
-    /* 4-FSK doubles data rate */
-    if (conf->mod_ord == 4) {
-        ack_len /= 2;
-    }
-
-    /* forward error correction halves data rate */
-    if (conf->fec) {
-        ack_len *= 2;
-    }
-
-    return _mr_fsk_csma_backoff_period_us(conf)
-         + IEEE802154G_ATURNAROUNDTIME_US
-         /* long Preamble + SFD; SFD=2 */
-         + ((fsk_pl * 8 + 2) + ack_len) * 8 * IEEE802154_MR_FSK_SYMBOL_TIME_US;
-}
-
 static int ieee802154_submac_config_phy(ieee802154_submac_t *submac,
                                         const ieee802154_phy_conf_t *conf)
 {
-    switch (conf->phy_mode) {
-    case IEEE802154_PHY_OQPSK:
-        submac->ack_timeout_us = ACK_TIMEOUT_US;
-        submac->csma_backoff_us = CSMA_SENDER_BACKOFF_PERIOD_UNIT_US;
-        break;
-#ifdef MODULE_NETDEV_IEEE802154_MR_OQPSK
-    case IEEE802154_PHY_MR_OQPSK:
-        submac->ack_timeout_us = _mr_oqpsk_ack_timeout_us((void *)conf);
-        submac->csma_backoff_us = _mr_oqpsk_csma_backoff_period_us((void *)conf);
-        break;
-#endif
-#ifdef MODULE_NETDEV_IEEE802154_MR_OFDM
-    case IEEE802154_PHY_MR_OFDM:
-        submac->ack_timeout_us = _mr_ofdm_ack_timeout_us((void *)conf);
-        submac->csma_backoff_us = _mr_ofdm_csma_backoff_period_us((void *)conf);
-        break;
-#endif
-#ifdef MODULE_NETDEV_IEEE802154_MR_FSK
-    case IEEE802154_PHY_MR_FSK:
-        submac->ack_timeout_us = _mr_fsk_ack_timeout_us((void *)conf);
-        submac->csma_backoff_us = _mr_fsk_csma_backoff_period_us((void *)conf);
-        break;
-#endif
-    case IEEE802154_PHY_NO_OP:
-    case IEEE802154_PHY_DISABLED:
-        break;
-    default:
-        return -EINVAL;
+    if (conf->phy_mode != IEEE802154_PHY_DISABLED && conf->phy_mode != IEEE802154_PHY_NO_OP) {
+        submac->csma_backoff_us = ieee802154_calculate_unit_backoff_period(conf);
+        submac->ack_timeout_us = ieee802154_calculate_ack_wait_duration(conf);
     }
 
     return ieee802154_radio_config_phy(&submac->dev, conf);

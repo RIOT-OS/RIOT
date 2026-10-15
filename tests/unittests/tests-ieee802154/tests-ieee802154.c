@@ -1243,5 +1243,6 @@ Test *tests_ieee802154_tests(void)
 void tests_ieee802154(void)
 {
     TESTS_RUN(tests_ieee802154_tests());
+    TESTS_RUN(tests_ieee802154_timings_tests());
 }
 /** @} */

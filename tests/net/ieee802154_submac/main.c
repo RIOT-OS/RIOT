@@ -26,6 +26,7 @@
 #include "net/netdev.h"
 #include "shell.h"
 #include "net/ieee802154/submac.h"
+#include "net/ieee802154_timings.h"
 #include "net/ieee802154.h"
 #include "net/netdev/ieee802154_submac.h"
 #include "net/l2util.h"
@@ -79,11 +80,13 @@ static const uint8_t payload[] =
 static int print_addr(int argc, char **argv);
 static int txtsnd(int argc, char **argv);
 static int txtsnd_multiple_times(int argc, char **argv);
+static int constants(int argc, char **argv);
 
 static const shell_command_t shell_commands[] = {
     { "print_addr", "Print IEEE802.15.4 addresses", print_addr },
     { "txtsnd", "Send IEEE 802.15.4 packet", txtsnd },
     { "txtsnd_n", "Send multiple IEEE 802.15.4 packets", txtsnd_multiple_times },
+    { "constants", "Print summary of IEEE 802.15.4 PHY/MAC constants and attributes", constants },
     { NULL, NULL, NULL }
 };
 
@@ -477,6 +480,25 @@ static int _init(void)
     if (res < 0) {
         return res;
     }
+
+    return 0;
+}
+
+static int constants(int argc, char **argv)
+{
+    (void)argc;
+    (void)argv;
+
+    ieee802154_phy_conf_t conf = {
+        .phy_mode = submac.phy_mode,
+        .channel = submac.channel_num,
+    };
+
+    printf("Symbol duration: %"PRIu16" us\n", ieee802154_get_symbol_duration(&conf));
+    printf("Turn-around time: %"PRIu32" us\n", ieee802154_get_turnaround_time(&conf));
+    printf("CCA time: %"PRIu32" us\n", ieee802154_get_cca_time(&conf));
+    printf("Unit backoff period: %"PRIu32" us\n", ieee802154_get_unit_backoff_period(&submac));
+    printf("ACK wait duration: %"PRIu32" us\n", ieee802154_get_ack_wait_duration(&submac));
 
     return 0;
 }
