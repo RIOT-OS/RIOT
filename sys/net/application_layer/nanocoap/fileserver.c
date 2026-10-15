@@ -316,7 +316,11 @@ static ssize_t _get_file(coap_pkt_t *pdu, uint8_t *buf, size_t len,
 
 late_err:
     vfs_close(fd);
-    return _error_handler(pdu, buf, len, COAP_CODE_INTERNAL_SERVER_ERROR);
+
+    coap_pkt_set_code(pdu, COAP_CODE_INTERNAL_SERVER_ERROR);
+    pdu->options_len = 0;
+    pdu->payload = pdu->buf + coap_get_total_hdr_len(pdu);
+    return coap_opt_finish(pdu, COAP_OPT_FINISH_NONE);
 }
 
 #if IS_USED(MODULE_NANOCOAP_FILESERVER_PUT)
