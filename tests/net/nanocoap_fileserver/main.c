@@ -60,7 +60,7 @@ static int _request(unsigned method, const char *path, const req_t *req)
     uint8_t buf[BUF_SIZE];
     coap_pkt_t pkt;
     req_t none = {0};
-    char uri[64];
+    char uri[128];
 
     if (!req) {
         req = &none;
@@ -262,6 +262,19 @@ static void test_get_empty_file(void)
 {
     _write_file("/empty", "");
     TEST_ASSERT_EQUAL_INT(COAP_CODE_CONTENT, _get("/empty", NULL));
+    TEST_ASSERT_EQUAL_INT(0, _resp.payload_len);
+}
+
+static void test_get_read_error(void)
+{
+    /* a directory without trailing '/' is served as a file: open() succeeds,
+     * but read() fails with EISDIR after the response header was already
+     * written, which must result in 5.00 Internal Server Error */
+    char name[64];
+    snprintf(name, sizeof(name), "%s/dir", TEST_ROOT);
+    TEST_ASSERT_EQUAL_INT(0, vfs_mkdir(name, 0777));
+
+    TEST_ASSERT_EQUAL_INT(COAP_CODE_INTERNAL_SERVER_ERROR, _get("/dir", NULL));
     TEST_ASSERT_EQUAL_INT(0, _resp.payload_len);
 }
 
@@ -566,6 +579,7 @@ Test *tests_fileserver(void)
         new_TestFixture(test_get_blockwise),
         new_TestFixture(test_get_exact_block_size),
         new_TestFixture(test_get_empty_file),
+        new_TestFixture(test_get_read_error),
         new_TestFixture(test_etag),
         new_TestFixture(test_directory_listing),
         new_TestFixture(test_directory_listing_blockwise),
