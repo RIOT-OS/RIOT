@@ -101,7 +101,13 @@ int adcxx1c_enable_alert(adcxx1c_t *dev, adcxx1c_cb_t cb, void *arg)
     int status;
 
     i2c_acquire(DEV);
-    i2c_read_reg(DEV, ADDR, ADCXX1C_CONF_ADDR, &reg, 0);
+    status = i2c_read_reg(DEV, ADDR, ADCXX1C_CONF_ADDR, &reg, 0);
+    if (status < 0) {
+        i2c_release(DEV);
+        DEBUG("[adcxx1c] enable_alert - error: unable to read configuration "
+              "(err=%d)\n", status);
+        return ADCXX1C_NOI2C;
+    }
     reg |= (gpio_is_valid(dev->params.alert_pin) ? ADCXX1C_CONF_ALERT_PIN_EN : 0)
             | ADCXX1C_CONF_ALERT_FLAG_EN;
     status = i2c_write_reg(DEV, ADDR, ADCXX1C_CONF_ADDR, reg, 0);

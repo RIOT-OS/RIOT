@@ -47,7 +47,11 @@ int mag3110_init(mag3110_t *dev, const mag3110_params_t *params)
 
     i2c_acquire(BUS);
     /* test device */
-    i2c_read_regs(BUS, ADDR, MAG3110_WHO_AM_I, &reg, 1, 0);
+    if (i2c_read_regs(BUS, ADDR, MAG3110_WHO_AM_I, &reg, 1, 0) < 0) {
+        i2c_release(BUS);
+        LOG_ERROR("mag3110_init: failed to read WHO_AM_I!\n");
+        return -MAG3110_ERROR_I2C;
+    }
     if (reg != dev->params.type) {
         i2c_release(BUS);
         LOG_ERROR("mag3110_init: invalid WHO_AM_I value (0x%02x)!\n", (int)reg);

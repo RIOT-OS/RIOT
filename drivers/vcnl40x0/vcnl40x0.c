@@ -58,8 +58,12 @@ int vcnl40x0_init(vcnl40x0_t *dev, const vcnl40x0_params_t *params)
 
     /* Check sensor ID */
     uint8_t checkid;
-    i2c_read_reg(DEV_I2C, DEV_ADDR, VCNL40X0_REG_PRODUCT_ID,
-                  &checkid, 0);
+    if (i2c_read_reg(DEV_I2C, DEV_ADDR, VCNL40X0_REG_PRODUCT_ID,
+                     &checkid, 0) != 0) {
+        DEBUG("[vcnl40x0] Error: cannot read device ID\n");
+        i2c_release(DEV_I2C);
+        return -VCNL40X0_ERR_I2C;
+    }
     if ((checkid & VCNL40X0_PRODUCT_MASK_PRODUCT_ID) != VCNL40X0_PRODUCT_ID) {
         DEBUG("[vcnl40x0] Error: wrong device ID '0x%02x', expected '0x%02x'\n",
               checkid, VCNL40X0_PRODUCT_ID);
