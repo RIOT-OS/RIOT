@@ -210,8 +210,15 @@ static int _request_op(ieee802154_dev_t *dev, ieee802154_hal_op_t op, void *ctx)
         if (cfg.ifs) {
             goto end;
         }
-        NRF_RADIO->SHORTS = cfg.cca_send ? CCA_SHORTS : DEFAULT_SHORTS;
-        NRF_RADIO->TASKS_TXEN = 1;
+
+        if (cfg.cca_send) {
+            NRF_RADIO->SHORTS = CCA_SHORTS;
+            NRF_RADIO->TASKS_RXEN = 1;
+        }
+        else {
+            NRF_RADIO->SHORTS = DEFAULT_SHORTS;
+            NRF_RADIO->TASKS_TXEN = 1;
+        }
         state = STATE_TX;
         break;
     case IEEE802154_HAL_OP_SET_RX:
