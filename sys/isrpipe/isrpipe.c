@@ -68,13 +68,3 @@ uint8_t isrpipe_read_one(isrpipe_t *isrpipe)
 
     return res;
 }
-
-void isrpipe_clear(isrpipe_t *isrpipe)
-{
-    tsrb_clear(&isrpipe->tsrb);
-}
-
-unsigned int isrpipe_available(isrpipe_t *isrpipe)
-{
-    return tsrb_avail(&isrpipe->tsrb);
-}
