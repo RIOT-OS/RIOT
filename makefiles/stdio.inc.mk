@@ -101,6 +101,10 @@ ifneq (,$(filter stdio_notify,$(USEMODULE)))
   USEMODULE += stdin
 endif
 
+ifneq (,$(filter stdio_resume,$(USEMODULE)))
+  USEMODULE += stdin
+endif
+
 ifneq (,$(filter stdin,$(USEMODULE)))
   USEMODULE += isrpipe
 endif
