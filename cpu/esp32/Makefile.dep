@@ -196,7 +196,6 @@ ifneq (,$(filter shell,$(USEMODULE)))
 endif
 
 ifneq (,$(filter stdio_usb_serial_jtag, $(USEMODULE)))
-  USEMODULE += tsrb
   ifneq (,$(filter stdin,$(USEMODULE)))
     USEMODULE += stdio_usb_serial_jtag_rx
   endif
