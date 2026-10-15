@@ -38,6 +38,12 @@
 
 void print_stack_usage_metric(const char *name, void *stack, unsigned max_size)
 {
+    /* the stack is only filled with canaries and the stack size and thread
+     * names are only available with DEVELHELP */
+    if (!IS_ACTIVE(DEVELHELP)) {
+        return;
+    }
+
     /* thread_create() aligns the start of an unaligned stack (e.g. the idle
      * stack passed by core/lib/init.c), so the stack painting starts there */
     unsigned misalignment = (uintptr_t)stack % alignof(void *);

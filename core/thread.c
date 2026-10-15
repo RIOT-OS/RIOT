@@ -291,8 +291,7 @@ kernel_pid_t thread_create(char *stack, int stacksize, uint8_t priority,
     _init_tls(thread->tls);
 #endif
 
-#if defined(DEVELHELP) || defined(SCHED_TEST_STACK) || \
-    defined(MODULE_TEST_UTILS_PRINT_STACK_USAGE)
+#if IS_ACTIVE(SCHED_TEST_STACK)
     if (flags & THREAD_CREATE_NO_STACKTEST) {
         /* create stack guard. Alignment has been handled above, so silence
          * -Wcast-align */

@@ -33,9 +33,7 @@
 #  include "mpu.h"
 #endif
 
-#ifdef MODULE_TEST_UTILS_PRINT_STACK_USAGE
-#  include "test_utils/print_stack_usage.h"
-#endif
+#include "test_utils/print_stack_usage.h"
 
 #define ENABLE_DEBUG 0
 #include "debug.h"
@@ -310,10 +308,11 @@ NORETURN void sched_task_exit(void)
     DEBUG("sched_task_exit: ending thread %" PRIkernel_pid "...\n",
           thread_getpid());
 
-#if defined(MODULE_TEST_UTILS_PRINT_STACK_USAGE) && defined(DEVELHELP)
-    thread_t *me = thread_get_active();
-    print_stack_usage_metric(me->name, me->stack_start, me->stack_size);
-#endif
+    if (IS_USED(MODULE_TEST_UTILS_PRINT_STACK_USAGE)) {
+        thread_t *me = thread_get_active();
+        print_stack_usage_metric(thread_get_name(me), thread_get_stackstart(me),
+                                 thread_get_stacksize(me));
+    }
 
     (void)irq_disable();
     sched_threads[thread_getpid()] = NULL;

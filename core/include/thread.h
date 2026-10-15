@@ -232,7 +232,8 @@ struct _thread {
 /**
  * @brief Never write markers into the thread's stack to measure stack usage
  *
- * This flag is ignored when DEVELHELP or SCHED_TEST_STACK is not enabled
+ * This flag is ignored if `SCHED_TEST_STACK` is 0 or not defined.
+ * `SCHED_TEST_STACK` defaults to 1 with `DEVELHELP=1`.
  */
 #define THREAD_CREATE_NO_STACKTEST      (8)
 /** @} */
@@ -501,7 +502,9 @@ static inline const char *thread_getname(kernel_pid_t pid)
  * Only works if the stack is filled with canaries
  * (`*((uintptr_t *)ptr) == (uintptr_t)ptr` for naturally aligned `ptr` within
  * the stack).
- * This is enabled if `DEVELHELP` or `SCHED_TEST_STACK` is set.
+ * This is done by thread_create() if `SCHED_TEST_STACK` is 1 (the default
+ * with `DEVELHELP=1`), unless the thread is created with
+ * @ref THREAD_CREATE_NO_STACKTEST.
  *
  * @param[in] stack     The stack you want to measure, must be aligned to
  *                      `alignof(void *)`. Try

@@ -14,6 +14,10 @@
  * each thread is printed when it exits, and the stack usage of the idle
  * thread is printed when `main()` returns.
  *
+ * @note    Nothing is printed unless `DEVELHELP` is enabled, as the stacks
+ *          are only filled with canaries and the stack sizes and thread names
+ *          are only stored with `DEVELHELP`.
+ *
  * @{
  * @file
  * @brief       Print the stack usage of threads
@@ -27,6 +31,8 @@ extern "C" {
 
 /**
  * @brief   Print the stack usage of a stack in JSON metric format
+ *
+ * Does nothing if `DEVELHELP` is not enabled.
  *
  * @param[in]   name        Name of the thread to print.
  * @param[in]   stack       Start of the stack, as passed to thread_create()
