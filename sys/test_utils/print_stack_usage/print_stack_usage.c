@@ -17,6 +17,9 @@
  * @author      Kaspar Schleiser <kaspar@schleiser.de>
  */
 
+#include <stdalign.h>
+#include <stdint.h>
+
 #include "thread.h"
 #include "log.h"
 #include "test_utils/print_stack_usage.h"
@@ -35,7 +38,14 @@
 
 void print_stack_usage_metric(const char *name, void *stack, unsigned max_size)
 {
-    unsigned free = measure_stack_free_internal(stack, max_size);
+    /* thread_create() aligns the start of an unaligned stack (e.g. the idle
+     * stack passed by core/lib/init.c), so the stack painting starts there */
+    unsigned misalignment = (uintptr_t)stack % alignof(void *);
+    if (misalignment) {
+        misalignment = alignof(void *) - misalignment;
+    }
+    unsigned free = measure_stack_free_internal((char *)stack + misalignment,
+                                                max_size - misalignment);
 
     if ((LOG_LEVEL >= LOG_INFO) &&
         (thread_get_stacksize(thread_get_active()) >= MIN_SIZE)) {

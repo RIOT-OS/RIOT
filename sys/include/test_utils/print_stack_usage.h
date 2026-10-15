@@ -29,7 +29,8 @@ extern "C" {
  * @brief   Print the stack usage of a stack in JSON metric format
  *
  * @param[in]   name        Name of the thread to print.
- * @param[in]   stack       Start of the stack, as passed to thread_create().
+ * @param[in]   stack       Start of the stack, as passed to thread_create()
+ *                          (may be unaligned).
  * @param[in]   max_size    Size of the stack in bytes, as passed to
  *                          thread_create().
  */
