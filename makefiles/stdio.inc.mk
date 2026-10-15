@@ -92,6 +92,12 @@ ifneq (,$(filter stdio_telnet,$(USEMODULE)))
   USEMODULE += telnet
 endif
 
+ifneq (,$(filter stdio_native,$(USEMODULE)))
+  ifneq (,$(filter stdin,$(USEMODULE)))
+    DEFAULT_MODULE += stdio_resume
+  endif
+endif
+
 ifneq (,$(filter stdio_udp,$(USEMODULE)))
   USEMODULE += sock_udp
   USEMODULE += sock_async
