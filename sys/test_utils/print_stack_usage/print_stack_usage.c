@@ -7,7 +7,7 @@
  */
 
 /**
- * @ingroup     sys
+ * @ingroup     test_utils_print_stack_usage
  * @{
  *
  * @file
@@ -19,17 +19,18 @@
 
 #include "thread.h"
 #include "log.h"
+#include "test_utils/print_stack_usage.h"
 
 #if MODULE_FMT
-#include "fmt.h"
+#  include "fmt.h"
 #else
-#include <stdio.h>
+#  include <stdio.h>
 #endif
 
 #if MODULE_FMT
-# define MIN_SIZE   (THREAD_STACKSIZE_TINY)
+#  define MIN_SIZE  (THREAD_STACKSIZE_TINY)
 #else
-# define MIN_SIZE   (THREAD_STACKSIZE_TINY + THREAD_EXTRA_STACKSIZE_PRINTF)
+#  define MIN_SIZE  (THREAD_STACKSIZE_TINY + THREAD_EXTRA_STACKSIZE_PRINTF)
 #endif
 
 void print_stack_usage_metric(const char *name, void *stack, unsigned max_size)
@@ -47,24 +48,8 @@ void print_stack_usage_metric(const char *name, void *stack, unsigned max_size)
         print_u32_dec(max_size - free);
         print_str("}]}\n");
 #else
-        printf(
-            "{ \"threads\": [{ \"name\": \"%s\", \"stack_size\": %u, \"stack_used\": %u }]}\n",
-            name, max_size, max_size - free);
+        printf("{ \"threads\": [{ \"name\": \"%s\", \"stack_size\": %u, \"stack_used\": %u }]}\n",
+               name, max_size, max_size - free);
 #endif
     }
 }
-
-#ifdef DEVELHELP
-void test_utils_print_stack_usage(void)
-{
-    for (kernel_pid_t i = KERNEL_PID_FIRST; i <= KERNEL_PID_LAST; i++) {
-        thread_t *p = thread_get(i);
-
-        if (p == NULL) {
-            continue;
-        }
-        print_stack_usage_metric(thread_get_name(p), thread_get_stackstart(
-                                     p), thread_get_stacksize(p));
-    }
-}
-#endif
