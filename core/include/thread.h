@@ -495,7 +495,7 @@ static inline const char *thread_getname(kernel_pid_t pid)
 #endif
 
 /**
- * @brief       Measures the stack usage of a stack
+ * @brief       Measure the stack usage of a stack
  * @internal    Should not be used externally
  *
  * Only works if the stack is filled with canaries
@@ -503,11 +503,15 @@ static inline const char *thread_getname(kernel_pid_t pid)
  * the stack).
  * This is enabled if `DEVELHELP` or `SCHED_TEST_STACK` is set.
  *
- * @param[in] stack     the stack you want to measure. Try
- *                      `thread_get_stackstart(thread_get_active())`
- * @param[in] size      size of @p stack in bytes
+ * @param[in] stack     The stack you want to measure, must be aligned to
+ *                      `alignof(void *)`. Try
+ *                      `thread_get_stackstart(thread_get_active())`, which
+ *                      is aligned by thread_create(), but is `NULL` if the
+ *                      stack start is not stored for the thread.
+ * @param[in] size      Size of @p stack in bytes.
  *
- * @return              the amount of unused space of the thread's stack
+ * @return              The amount of unused space of the thread's stack.
+ * @retval              0 if @p stack is `NULL`.
  */
 ACCESS(read_only, 1, 2)
 uintptr_t measure_stack_free_internal(const char *stack, size_t size);
