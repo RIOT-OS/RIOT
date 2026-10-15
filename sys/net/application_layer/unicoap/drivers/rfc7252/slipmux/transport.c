@@ -28,7 +28,8 @@
 /* Provides unicoap_receiver_buffer */
 UNICOAP_DECL_RECEIVER_STORAGE_EXTERN;
 
-extern int unicoap_messaging_process_rfc7252(const uint8_t* pdu, size_t size, bool truncated,
+extern int unicoap_messaging_process_rfc7252(const uint8_t* pdu, size_t size,
+                                             unicoap_messaging_rfc7252_event_type_t event,
                                              unicoap_packet_t* packet);
 
 void unicoap_slipdev_recv_handler(event_t* event)
@@ -58,7 +59,8 @@ void unicoap_slipdev_recv_handler(event_t* event)
             }
             return;
         }
-        unicoap_messaging_process_rfc7252(unicoap_receiver_buffer, len, false, &packet);
+        unicoap_messaging_process_rfc7252(unicoap_receiver_buffer, len,
+                                          UNICOAP_MESSAGING_RFC7252_EVENT_RX, &packet);
     }
 }
 

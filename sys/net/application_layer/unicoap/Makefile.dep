@@ -122,6 +122,7 @@ endif
 ifneq (,$(filter unicoap_driver_slipmux,$(USEMODULE)))
   # CoAP over Slipmux uses RFC 7252 messaging layer
   USEMODULE += unicoap_driver_rfc7252_common
+  USEMODULE += slipdev_config
 endif
 
 # MARK: unicoap_driver_extension_point
