@@ -343,7 +343,7 @@ static int _handle_fsm_ev_tx_ack(ieee802154_submac_t *submac, uint8_t seq_num)
     }
     /* write frame to radio */
     ieee802154_radio_write(dev, submac->psdu);
-    /* do is synchronously so upper layer wouldn't notice */
+    /* do it synchronously so upper layer wouldn't notice */
     _fsm_state_prepare(submac, IEEE802154_FSM_EV_BH, IEEE802154_FCF_TYPE_ACK);
     return 0;
 }
@@ -368,6 +368,7 @@ static ieee802154_fsm_state_t _fsm_state_rx(ieee802154_submac_t *submac, ieee802
         assert(rx_len <= (int)IEEE802154_FRAME_LEN_MAX);
         /* Make sure it's not an ACK frame */
         if (rx_len <= (int)IEEE802154_MIN_FRAME_LEN) {
+            /* Skip ACK frame */
             ieee802154_radio_read(dev, NULL, 0, NULL);
 
             /* If the radio doesn't support RX Continuous, go to RX */
