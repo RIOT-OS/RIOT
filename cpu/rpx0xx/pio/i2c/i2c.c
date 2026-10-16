@@ -46,7 +46,10 @@ enum {
 /**
  * @brief   Internal PIO I2C buses initialized from PIO_I2C_CONFIG
  */
-static pio_i2c_bus_t _bus[PIO_I2C_NUMOF];
+static pio_i2c_bus_t _bus[PIO_I2C_NUMOF] = {
+    /* no state machine locked yet */
+    [0 ... PIO_I2C_NUMOF - 1] = { .sm = -1 },
+};
 #endif
 
 /**
@@ -72,10 +75,10 @@ static void pio_i2c_init_pins(pio_t pio, pio_sm_t sm, gpio_t sda, gpio_t scl)
         .output_enable_override = OUTPUT_ENABLE_OVERRIDE_INVERT
     };
     /* Assume that SDA is mapped as the first set pin (bit 0),
-       and SCL is mapped as the second set pin (bit 1).
-       Try to avoid glitching the bus while connecting the IOs. Get things set
-       up so that pin is driven down when PIO asserts OE low, and pulled up
-       otherwise. */
+     * and SCL is mapped as the second set pin (bit 1).
+     * Try to avoid glitching the bus while connecting the IOs. Get things set
+     * up so that pin is driven down when PIO asserts OE low, and pulled up
+     * otherwise. */
     gpio_set_pad_config(scl, pad_ctrl);
     gpio_set_pad_config(sda, pad_ctrl);
     pio_sm_set_pins_with_mask(pio, sm, (1u << sda) | (1u << scl), (1u << sda) | (1u << scl));
@@ -206,19 +209,24 @@ int pio_i2c_init_program(pio_t pio)
 
 void pio_i2c_deinit_program(pio_t pio)
 {
+    /* the program is shared between all buses on this PIO */
+    if (_prog[pio].ref_mask) {
+        return;
+    }
     pio_free_program(pio, &_prog[pio].base);
 }
 
 pio_sm_t pio_i2c_sm_lock(pio_t pio, pio_i2c_bus_t *i2c)
 {
-    pio_sm_t sm = i2c->sm;
-    if (!(_prog[pio].ref_mask & PIO_SM_MASK(sm))) {
-        if ((sm = pio_sm_lock(pio)) >= 0) {
-            _prog[pio].ref_mask |= PIO_SM_MASK(sm);
-            i2c->pio = pio;
-            i2c->sm = sm;
-            mutex_init(&i2c->mtx);
-        }
+    if (i2c->sm >= 0) {
+        return i2c->sm;
+    }
+    pio_sm_t sm = pio_sm_lock(pio);
+    if (sm >= 0) {
+        _prog[pio].ref_mask |= PIO_SM_MASK(sm);
+        i2c->pio = pio;
+        i2c->sm = sm;
+        mutex_init(&i2c->mtx);
     }
     return sm;
 }
@@ -227,13 +235,14 @@ void pio_i2c_sm_unlock(pio_i2c_bus_t *i2c)
 {
     _prog[i2c->pio].ref_mask &= ~PIO_SM_MASK(i2c->sm);
     pio_sm_unlock(i2c->pio, i2c->sm);
+    i2c->sm = -1;
 }
 
 void pio_i2c_start_programs(void)
 {
     for (int i = 0; i < (int)pio_i2c_numof(); i++) {
         pio_i2c_bus_t *i2c = pio_i2c_get(i);
-        if (i2c) {
+        if (i2c && (i2c->sm >= 0)) {
             pio_sm_start(i2c->pio, i2c->sm);
         }
     }
@@ -243,7 +252,7 @@ void pio_i2c_stop_programs(void)
 {
     for (int i = 0; i < (int)pio_i2c_numof(); i++) {
         pio_i2c_bus_t *i2c = pio_i2c_get(i);
-        if (i2c) {
+        if (i2c && (i2c->sm >= 0)) {
             pio_sm_stop(i2c->pio, i2c->sm);
         }
     }
@@ -284,9 +293,9 @@ int pio_i2c_init(pio_i2c_bus_t *bus,
     pio_i2c_init_pins(pio, sm, sda, scl);
     pio_irq_clear(pio, pio_irq_rel_index(I2C_PIO_IRQN, sm));
     /* Given the absolute interrupt index I2C_PIO_IRQN
-       and the relative interrupt instruction in the PIO program,
-       sm will raise the interrupt flag pio_irq_rel_index(I2C_PIO_IRQN, sm)
-       in the IRQ register. */
+     * and the relative interrupt instruction in the PIO program,
+     * sm will raise the interrupt flag pio_irq_rel_index(I2C_PIO_IRQN, sm)
+     * in the IRQ register. */
     pio_set_isr_sm_vec(pio, pio_irq_rel_index(I2C_PIO_IRQN, sm), &_vec);
     pio_irq_enable(pio, irq, PIO_IRQ_SM_0 << pio_irq_rel_index(I2C_PIO_IRQN, sm));
     pio_sm_clear_fifos(pio, sm);
@@ -365,10 +374,10 @@ int pio_i2c_read_bytes(pio_t pio, pio_sm_t sm, uint16_t addr,
             pio_sm_clear_fifos(pio, sm);
             break;
         }
-        /* len == 1 means final (last byte in transfer) */
-        /* 0xff is a dummy data byte */
-        /* Any NAK except for the last byte will cause the transfer to fail */
-        /* see frame documentation in i2c.pio */
+        /* len == 1 means final (last byte in transfer)
+         * 0xff is a dummy data byte
+         * Any NAK except for the last byte will cause the transfer to fail
+         * see frame documentation in i2c.pio */
         if (len && !pio_sm_transmit_word(pio, sm, I2C_DATA_FRAME(len == 1, 0xff, len == 1) << 16)) {
             len--;
             error = -EIO;
@@ -428,10 +437,10 @@ int pio_i2c_write_bytes(pio_t pio, pio_sm_t sm, uint16_t addr,
             pio_sm_clear_fifos(pio, sm);
             break;
         }
-        /* len == 1 means final (last byte in transfer) */
-        /* transmit next data byte */
-        /* don´t abort on NAK */
-        /* see frame documentation in i2c.pio */
+        /* len == 1 means final (last byte in transfer)
+         * transmit next data byte
+         * don´t abort on NAK
+         * see frame documentation in i2c.pio */
         if (len && !pio_sm_transmit_word(pio, sm, I2C_DATA_FRAME(len == 1, *(uint8_t *)data, 1) << 16)) {
             len--;
             data = ((uint8_t *)data) + 1;
