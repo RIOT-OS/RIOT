@@ -56,7 +56,7 @@ _annotate_hunk() {
     if [ "${DIFFLINE}" -eq 0 ]; then
         DIFFLINE=1
     fi
-    github_annotate "$ANNOTATION_MESSAGE" warning \
+    github_annotate warning "$ANNOTATION_MESSAGE" \
     "file=${DIFFFILE},line=${DIFFLINE},endLine=${DIFFENDL},title=clang-format proposes \
 the following patch"
 }
