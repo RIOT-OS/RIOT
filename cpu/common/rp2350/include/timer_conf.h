@@ -24,14 +24,22 @@
 /** Number of alarm channels per timer block */
 #define TIMER_CHANNEL_NUMOF 4u
 
+/** Timer 0 Channel 0 ISR */
 #define TIMER_0_ISRA    isr_timer0_0
+/** Timer 0 Channel 1 ISR */
 #define TIMER_0_ISRB    isr_timer0_1
+/** Timer 0 Channel 2 ISR */
 #define TIMER_0_ISRC    isr_timer0_2
+/** Timer 0 Channel 3 ISR */
 #define TIMER_0_ISRD    isr_timer0_3
 
+/** Timer 1 Channel 0 ISR */
 #define TIMER_1_ISRA    isr_timer1_0
+/** Timer 1 Channel 1 ISR */
 #define TIMER_1_ISRB    isr_timer1_1
+/** Timer 1 Channel 2 ISR */
 #define TIMER_1_ISRC    isr_timer1_2
+/** Timer 1 Channel 3 ISR */
 #define TIMER_1_ISRD    isr_timer1_3
 
 /**
