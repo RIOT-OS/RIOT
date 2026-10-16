@@ -27,9 +27,9 @@ extern "C" {
  */
 #define EUI64_PROVIDER_FUNC   native_cli_get_eui64
 #ifndef EUI64_PROVIDER_TYPE
-#define EUI64_PROVIDER_TYPE   NETDEV_SOCKET_ZEP
+#define EUI64_PROVIDER_TYPE   NETIF_SOCKET_ZEP
 #endif
-#define EUI64_PROVIDER_INDEX  NETDEV_INDEX_ANY
+#define EUI64_PROVIDER_INDEX  NETIF_INDEX_ANY
 /** @} */
 
 #ifdef __cplusplus

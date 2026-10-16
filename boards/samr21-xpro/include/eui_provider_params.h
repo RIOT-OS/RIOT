@@ -39,7 +39,7 @@ static inline int _edbg_get_eui64(uint8_t index, eui64_t *addr)
  * @{
  */
 #define EUI64_PROVIDER_FUNC   _edbg_get_eui64
-#define EUI64_PROVIDER_TYPE   NETDEV_AT86RF2XX
+#define EUI64_PROVIDER_TYPE   NETIF_AT86RF2XX
 #define EUI64_PROVIDER_INDEX  0
 /** @} */
 
