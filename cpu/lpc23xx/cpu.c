@@ -57,33 +57,31 @@ void cpu_clock_scale(uint32_t source, uint32_t target, uint32_t *prescale)
     PCLKSEL1 = (PCLKSEL1 & ~(BIT12 | BIT13)) | (pclksel << 12); /* timer 2 */
 }
 
-/******************************************************************************
-** Function name:       install_irq
-**
-** Descriptions:        Install interrupt handler
-** parameters:          Interrupt number, interrupt handler address,
-**                      interrupt priority
-** Returned value:      true or false, return false if IntNum is out of range
-**
-******************************************************************************/
-#define VIC_BASE_ADDR   0xFFFFF000
+#define VIC_BASE_ADDR   0xFFFFF000 ///< Base address of the Vector Interrupt Controller
 
+/**
+ * @brief   Install interrupt handler
+ * @param[in]   IntNumber   IRQ number to install a handler for
+ * @param[in]   HandlerAddr Function pointer of the ISR
+ * @param[in]   Priority    IRQ priority to program
+ * @retval      true        Success
+ * @retval      false       Failure (invalid argument(s))
+ */
 bool install_irq(int IntNumber, void (*HandlerAddr)(void), int Priority)
 {
+    if (IntNumber >= VIC_SIZE) {
+        return false;
+    }
+
     VICIntEnClr = 1 << IntNumber;   /* Disable Interrupt */
 
-    if (IntNumber >= VIC_SIZE) {
-        return (false);
-    }
-    else {
-        /* find first un-assigned VIC address for the handler */
-        int *vect_addr = (int *)(VIC_BASE_ADDR + VECT_ADDR_INDEX + IntNumber * 4);
-        int *vect_cntl = (int *)(VIC_BASE_ADDR + VECT_CNTL_INDEX + IntNumber * 4);
-        *vect_addr = (int)HandlerAddr;  /* set interrupt vector */
-        *vect_cntl = Priority;
-        VICIntEnable = 1 << IntNumber;  /* Enable Interrupt */
-        return(true);
-    }
+    /* find first un-assigned VIC address for the handler */
+    int *vect_addr = (int *)(VIC_BASE_ADDR + VECT_ADDR_INDEX + IntNumber * 4);
+    int *vect_cntl = (int *)(VIC_BASE_ADDR + VECT_CNTL_INDEX + IntNumber * 4);
+    *vect_addr = (int)HandlerAddr;  /* set interrupt vector */
+    *vect_cntl = Priority;
+    VICIntEnable = 1 << IntNumber;  /* Enable Interrupt */
+    return true;
 }
 
 void arm_reset(void)
@@ -112,7 +110,7 @@ void arm_reset(void)
 }
 
 /**
- * @brief Initialize the CPU, set IRQ priorities, clocks
+ * @brief   Initialize the CPU, set IRQ priorities, clocks
  */
 void cpu_init(void)
 {
