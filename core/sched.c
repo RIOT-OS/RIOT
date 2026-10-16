@@ -30,22 +30,24 @@
 #include "panic.h"
 
 #ifdef MODULE_MPU_STACK_GUARD
-#include "mpu.h"
+#  include "mpu.h"
 #endif
+
+#include "test_utils/print_stack_usage.h"
 
 #define ENABLE_DEBUG 0
 #include "debug.h"
 
 #ifdef PICOLIBC_TLS
-#include <picotls.h>
+#  include <picotls.h>
 #endif
 
 /* Needed by OpenOCD to read sched_threads */
 #if defined(__APPLE__) && defined(__MACH__)
- #define FORCE_USED_SECTION __attribute__((used)) __attribute__((section( \
+#  define FORCE_USED_SECTION __attribute__((used)) __attribute__((section( \
                                                                      "__OPENOCD,__openocd")))
 #else
- #define FORCE_USED_SECTION __attribute__((used)) __attribute__((section( \
+#  define FORCE_USED_SECTION __attribute__((used)) __attribute__((section( \
                                                                      ".openocd")))
 #endif
 
@@ -306,11 +308,11 @@ NORETURN void sched_task_exit(void)
     DEBUG("sched_task_exit: ending thread %" PRIkernel_pid "...\n",
           thread_getpid());
 
-#if defined(MODULE_TEST_UTILS_PRINT_STACK_USAGE) && defined(DEVELHELP)
-    void print_stack_usage_metric(const char *name, void *stack, unsigned max_size);
-    thread_t *me = thread_get_active();
-    print_stack_usage_metric(me->name, me->stack_start, me->stack_size);
-#endif
+    if (IS_USED(MODULE_TEST_UTILS_PRINT_STACK_USAGE)) {
+        thread_t *me = thread_get_active();
+        print_stack_usage_metric(thread_get_name(me), thread_get_stackstart(me),
+                                 thread_get_stacksize(me));
+    }
 
     (void)irq_disable();
     sched_threads[thread_getpid()] = NULL;

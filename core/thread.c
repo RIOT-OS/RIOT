@@ -205,8 +205,13 @@ void thread_add_to_list(list_node_t *list, thread_t *thread)
 
 uintptr_t measure_stack_free_internal(const char *stack, size_t size)
 {
-    /* Alignment of stack has been fixed (if needed) by thread_create(), so
-     * we can silence -Wcast-align here */
+    /* thread_get_stackstart() returns NULL if the stack start is not stored */
+    if (stack == NULL) {
+        return 0;
+    }
+
+    /* The stack has to be aligned (as done by thread_create()), so we can
+     * silence -Wcast-align here */
     uintptr_t *stackp = (uintptr_t *)(uintptr_t)stack;
     uintptr_t end = (uintptr_t)stack + size;
 
@@ -286,8 +291,7 @@ kernel_pid_t thread_create(char *stack, int stacksize, uint8_t priority,
     _init_tls(thread->tls);
 #endif
 
-#if defined(DEVELHELP) || defined(SCHED_TEST_STACK) || \
-    defined(MODULE_TEST_UTILS_PRINT_STACK_USAGE)
+#if IS_ACTIVE(SCHED_TEST_STACK)
     if (flags & THREAD_CREATE_NO_STACKTEST) {
         /* create stack guard. Alignment has been handled above, so silence
          * -Wcast-align */
