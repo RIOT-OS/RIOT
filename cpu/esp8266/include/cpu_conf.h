@@ -97,6 +97,9 @@ extern "C" {
 #define TCPIP_THREAD_STACKSIZE        (3072)
 #endif
 
+/**
+ * @brief   Override the default lwIP netdev thread stack size
+ */
 #ifndef LWIP_NETDEV_STACKSIZE
 #  define LWIP_NETDEV_STACKSIZE       (2048)
 #endif
