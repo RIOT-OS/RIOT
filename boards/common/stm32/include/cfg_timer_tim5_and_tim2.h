@@ -26,13 +26,21 @@ extern "C" {
  * @name   Timer configuration
  * @{
  */
+#define TIMER_0_MAX_VALUE     (0xffffffff) /**< max value */
+#if defined(CPU_FAM_STM32L0) || defined(CPU_FAM_STM32L1)
+#  define TIMER_1_MAX_VALUE   (0x0000ffff) /**< max value */
+#else
+#  define TIMER_1_MAX_VALUE   (0xffffffff) /**< max value */
+#endif
+
+
 static const timer_conf_t timer_config[] = {
     /* intentionally not sorted alphabetically: E.g. on STM32L1 TIM5 is
      * 32 bit while TIM2 is only 16 bit. ztimer defaults to the first timer
      * defined and does profit from using a 32 bit timer */
     {
         .dev      = TIM5,
-        .max      = 0xffffffff,
+        .max      = TIMER_0_MAX_VALUE,
 #if defined(RCC_APB1ENR1_TIM5EN)
         .rcc_mask = RCC_APB1ENR1_TIM5EN,
 #elif defined(RCC_APB1LENR_TIM5EN) /* for STM32H753ZI */
@@ -45,11 +53,7 @@ static const timer_conf_t timer_config[] = {
     },
     {
         .dev      = TIM2,
-#if defined(CPU_FAM_STM32L0) || defined(CPU_FAM_STM32L1)
-        .max      = 0x0000ffff,
-#else
-        .max      = 0xffffffff,
-#endif
+        .max      = TIMER_1_MAX_VALUE,
 #if defined(RCC_APB1ENR1_TIM2EN)
         .rcc_mask = RCC_APB1ENR1_TIM2EN,
 #elif defined(RCC_MC_APB1ENSETR_TIM2EN)

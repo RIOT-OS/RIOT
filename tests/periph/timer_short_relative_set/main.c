@@ -78,8 +78,8 @@ int main(void)
            " message.\n"
            "On failure, this test prints an error message.\n\n");
 
-    printf("testing periph_timer %u, freq %lu, max = 0x%x\n", TEST_TIMER_DEV, test_timer_freq,
-           TEST_TIMER_MAX);
+    printf("testing periph_timer %u, freq %" PRIu32 ", max = 0x%lx\n", TEST_TIMER_DEV, test_timer_freq,
+           (unsigned long) TEST_TIMER_MAX);
 
     if (timer_init(TEST_TIMER_DEV, test_timer_freq, cb, thread_get_active()) != 0) {
         puts("ERROR: timer_init() failed.\nTEST FAILED");
