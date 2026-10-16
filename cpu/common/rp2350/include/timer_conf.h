@@ -24,6 +24,16 @@
 /** Number of alarm channels per timer block */
 #define TIMER_CHANNEL_NUMOF 4u
 
+#define TIMER_0_ISRA    isr_timer0_0
+#define TIMER_0_ISRB    isr_timer0_1
+#define TIMER_0_ISRC    isr_timer0_2
+#define TIMER_0_ISRD    isr_timer0_3
+
+#define TIMER_1_ISRA    isr_timer1_0
+#define TIMER_1_ISRB    isr_timer1_1
+#define TIMER_1_ISRC    isr_timer1_2
+#define TIMER_1_ISRD    isr_timer1_3
+
 /**
  * @brief   A low-level timer_set() implementation is provided
  */
