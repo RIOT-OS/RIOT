@@ -1,6 +1,6 @@
 /*
- * SPDX-License-Identifier: BSD-3-Clause-Clear
  * SPDX-FileCopyrightText: 2016-2017 NXP
+ * SPDX-License-Identifier: BSD-3-Clause-Clear
  */
 
 /**
