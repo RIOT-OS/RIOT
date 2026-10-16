@@ -43,8 +43,16 @@
 #include "periph/usbdev.h"
 #include "periph_cpu.h"
 
-#ifdef CPU_FAM_RP2350
-#include "usbdev_regs.h"
+#include "compat_layer.h"
+
+#include "regs/resets.h"
+#include "regs/usb.h"
+#include "regs/usb_device_dpram.h"
+
+#if defined(CPU_FAM_RP2040)
+#  include "RP2040.h"
+#elif defined(CPU_FAM_RP2350)
+#  include "RP2350.h"
 #endif
 
 #define ENABLE_DEBUG 0
@@ -62,38 +70,38 @@
 
 #define SETUP_PACKET_LEN        (8U)
 
-#ifndef CPU_FAM_RP2350
+#ifdef CPU_FAM_RP2040
 /**
  * @name    Workaround for RP2040 erratum RP2040-E5
  * @{
  */
-#define E5_DP_PIN               (15U)   /**< GPIO used to force the line state */
-#define E5_FUNCSEL_USB_DEBUG    (8U)    /**< USB debug muxing function of GPIO15 */
-#define E5_FORCE_J_US           (1000U) /**< Duration of the forced J state */
-#define E5_AFFECTED_REVISION    (1U)    /**< Chip revision of RP2040-B0/B1 */
+#  define E5_DP_PIN             (15U)   /**< GPIO used to force the line state */
+#  define E5_FUNCSEL_USB_DEBUG  (8U)    /**< USB debug muxing function of GPIO15 */
+#  define E5_FORCE_J_US         (1000U) /**< Duration of the forced J state */
+#  define E5_AFFECTED_REVISION  (1U)    /**< Chip revision of RP2040-B0/B1 */
 /** @} */
 
 /**
  * @name    Line states as reported in SIE_STATUS.LINE_STATE
  * @{
  */
-#define LINE_STATE_SE0          (0U)
-#define LINE_STATE_J            (1U)
+#  define LINE_STATE_SE0        (0U)
+#  define LINE_STATE_J          (1U)
 /** @} */
-#endif /* !CPU_FAM_RP2350 */
+#endif
 
-#define BUF_CTRL_FULL           USBCTRL_DPRAM_EP0_IN_BUFFER_CONTROL_FULL_0_Msk
-#define BUF_CTRL_PID            USBCTRL_DPRAM_EP0_IN_BUFFER_CONTROL_PID_0_Msk
-#define BUF_CTRL_STALL          USBCTRL_DPRAM_EP0_IN_BUFFER_CONTROL_STALL_Msk
-#define BUF_CTRL_AVAILABLE      USBCTRL_DPRAM_EP0_IN_BUFFER_CONTROL_AVAILABLE_0_Msk
-#define BUF_CTRL_LENGTH         USBCTRL_DPRAM_EP0_IN_BUFFER_CONTROL_LENGTH_0_Msk
+#define BUF_CTRL_FULL           USB_DEVICE_DPRAM_EP0_IN_BUFFER_CONTROL_FULL_0_BITS
+#define BUF_CTRL_PID            USB_DEVICE_DPRAM_EP0_IN_BUFFER_CONTROL_PID_0_BITS
+#define BUF_CTRL_STALL          USB_DEVICE_DPRAM_EP0_IN_BUFFER_CONTROL_STALL_BITS
+#define BUF_CTRL_AVAILABLE      USB_DEVICE_DPRAM_EP0_IN_BUFFER_CONTROL_AVAILABLE_0_BITS
+#define BUF_CTRL_LENGTH         USB_DEVICE_DPRAM_EP0_IN_BUFFER_CONTROL_LENGTH_0_BITS
 
 /**
  * @brief   Interrupts handled on device level
  */
-#define DEV_IRQS                (USBCTRL_REGS_INTS_BUS_RESET_Msk | \
-                                 USBCTRL_REGS_INTS_DEV_SUSPEND_Msk | \
-                                 USBCTRL_REGS_INTS_DEV_RESUME_FROM_HOST_Msk)
+#define DEV_IRQS                (USB_INTS_BUS_RESET_BITS | \
+                                 USB_INTS_DEV_SUSPEND_BITS | \
+                                 USB_INTS_DEV_RESUME_FROM_HOST_BITS)
 
 typedef struct {
     usbdev_ep_t ep;             /**< Generic endpoint struct, must be first */
@@ -136,13 +144,13 @@ static inline _rpx0xx_ep_t *_hw_ep(usbdev_ep_t *ep)
 static inline volatile uint32_t *_ep_ctrl(const usbdev_ep_t *ep)
 {
     assert(ep->num > 0);
-    return &USBCTRL_DPRAM->EP1_IN_CONTROL + _ep_idx(ep->num - 1, ep->dir);
+    return &USB_DPRAM->EP1_IN_CONTROL + _ep_idx(ep->num - 1, ep->dir);
 }
 
 /* EPx_IN_BUFFER_CONTROL / EPx_OUT_BUFFER_CONTROL */
 static inline volatile uint32_t *_buf_ctrl(const usbdev_ep_t *ep)
 {
-    return &USBCTRL_DPRAM->EP0_IN_BUFFER_CONTROL + _ep_idx(ep->num, ep->dir);
+    return &USB_DPRAM->EP0_IN_BUFFER_CONTROL + _ep_idx(ep->num, ep->dir);
 }
 
 static void _buf_arm(_rpx0xx_ep_t *hw_ep, size_t len)
@@ -214,24 +222,24 @@ static void _init(usbdev_t *dev)
     (void)dev;
     DEBUG("[rpx0xx usb] init\n");
 
-    periph_reset(RESETS_RESET_usbctrl_Msk);
-    periph_reset_done(RESETS_RESET_usbctrl_Msk);
+    atomic_set(&RESETS->RESET, RESETS_RESET_USBCTRL_BITS);
+    reset_component(RESETS_RESET_USBCTRL_BITS, RESETS_RESET_USBCTRL_BITS);
 
     for (uint16_t i = 0; i < DPRAM_SIZE / sizeof(uint32_t); i++) {
-        ((volatile uint32_t *)USBCTRL_DPRAM)[i] = 0;
+        ((volatile uint32_t *)USB_DPRAM)[i] = 0;
     }
 
     /* connect the controller to the internal PHY */
-    USBCTRL_REGS->USB_MUXING = USBCTRL_REGS_USB_MUXING_TO_PHY_Msk |
-                               USBCTRL_REGS_USB_MUXING_SOFTCON_Msk;
+    USB->USB_MUXING = USB_USB_MUXING_TO_PHY_BITS |
+                               USB_USB_MUXING_SOFTCON_BITS;
     /* VBUS is not connected to the controller, pretend it is always there */
-    USBCTRL_REGS->USB_PWR = USBCTRL_REGS_USB_PWR_VBUS_DETECT_Msk |
-                            USBCTRL_REGS_USB_PWR_VBUS_DETECT_OVERRIDE_EN_Msk;
-    USBCTRL_REGS->MAIN_CTRL = USBCTRL_REGS_MAIN_CTRL_CONTROLLER_EN_Msk;
+    USB->USB_PWR = USB_USB_PWR_VBUS_DETECT_BITS |
+                            USB_USB_PWR_VBUS_DETECT_OVERRIDE_EN_BITS;
+    USB->MAIN_CTRL = USB_MAIN_CTRL_CONTROLLER_EN_BITS;
     /* generate a buffer status interrupt for every EP0 buffer */
-    USBCTRL_REGS->SIE_CTRL = USBCTRL_REGS_SIE_CTRL_EP0_INT_1BUF_Msk;
-    USBCTRL_REGS->INTE = USBCTRL_REGS_INTE_BUFF_STATUS_Msk |
-                         USBCTRL_REGS_INTE_SETUP_REQ_Msk |
+    USB->SIE_CTRL = USB_SIE_CTRL_EP0_INT_1BUF_BITS;
+    USB->INTE = USB_INTE_BUFF_STATUS_BITS |
+                         USB_INTE_SETUP_REQ_BITS |
                          DEV_IRQS;
 
     NVIC_EnableIRQ(USBCTRL_IRQ_IRQn);
@@ -265,18 +273,18 @@ static int _set(usbdev_t *dev, usbopt_t opt, const void *value, size_t value_len
     switch (opt) {
     case USBOPT_ADDRESS:
         assert(value_len == sizeof(uint8_t));
-        USBCTRL_REGS->ADDR_ENDP = *(const uint8_t *)value &
-                                  USBCTRL_REGS_ADDR_ENDP_ADDRESS_Msk;
+        USB->ADDR_ENDP = *(const uint8_t *)value &
+                                  USB_ADDR_ENDP_ADDRESS_BITS;
         return sizeof(uint8_t);
     case USBOPT_ATTACH:
         assert(value_len == sizeof(usbopt_enable_t));
         if (*(const usbopt_enable_t *)value) {
-            io_reg_atomic_set(&USBCTRL_REGS->SIE_CTRL,
-                              USBCTRL_REGS_SIE_CTRL_PULLUP_EN_Msk);
+            atomic_set(&USB->SIE_CTRL,
+                              USB_SIE_CTRL_PULLUP_EN_BITS);
         }
         else {
-            io_reg_atomic_clear(&USBCTRL_REGS->SIE_CTRL,
-                                USBCTRL_REGS_SIE_CTRL_PULLUP_EN_Msk);
+            atomic_clear(&USB->SIE_CTRL,
+                                USB_SIE_CTRL_PULLUP_EN_BITS);
         }
         return sizeof(usbopt_enable_t);
     default:
@@ -322,7 +330,7 @@ static usbdev_ep_t *_new_ep(usbdev_t *dev, usb_ep_type_t type,
         _usbdev.dpram_next += alloc;
     }
 
-    hw_ep->dpram_buf = (uint8_t *)USBCTRL_DPRAM + hw_ep->dpram_offset;
+    hw_ep->dpram_buf = (uint8_t *)USB_DPRAM + hw_ep->dpram_offset;
     hw_ep->ep.dev = dev;
     hw_ep->ep.dir = dir;
     hw_ep->ep.type = type;
@@ -335,9 +343,9 @@ static void _ep0_stall(usbdev_t *dev)
 {
     (void)dev;
     /* EP_STALL_ARM is cleared automatically on the next setup packet */
-    io_reg_atomic_set(&USBCTRL_REGS->EP_STALL_ARM,
-                      USBCTRL_REGS_EP_STALL_ARM_EP0_IN_Msk |
-                      USBCTRL_REGS_EP_STALL_ARM_EP0_OUT_Msk);
+    atomic_set(&USB->EP_STALL_ARM,
+                      USB_EP_STALL_ARM_EP0_IN_BITS |
+                      USB_EP_STALL_ARM_EP0_OUT_BITS);
     *_buf_ctrl(&_get_ep(0, USB_EP_DIR_IN)->ep) = BUF_CTRL_STALL;
     *_buf_ctrl(&_get_ep(0, USB_EP_DIR_OUT)->ep) = BUF_CTRL_STALL;
 }
@@ -348,13 +356,13 @@ static void _ep_stall(usbdev_ep_t *ep, bool enable)
 
     if (ep->num == 0) {
         uint32_t mask = (ep->dir == USB_EP_DIR_IN)
-                      ? USBCTRL_REGS_EP_STALL_ARM_EP0_IN_Msk
-                      : USBCTRL_REGS_EP_STALL_ARM_EP0_OUT_Msk;
+                      ? USB_EP_STALL_ARM_EP0_IN_BITS
+                      : USB_EP_STALL_ARM_EP0_OUT_BITS;
         if (enable) {
-            io_reg_atomic_set(&USBCTRL_REGS->EP_STALL_ARM, mask);
+            atomic_set(&USB->EP_STALL_ARM, mask);
         }
         else {
-            io_reg_atomic_clear(&USBCTRL_REGS->EP_STALL_ARM, mask);
+            atomic_clear(&USB->EP_STALL_ARM, mask);
         }
     }
     if (enable) {
@@ -391,14 +399,14 @@ static void _ep_enable(usbdev_ep_t *ep, bool enable)
 
     if (enable) {
         static const uint8_t ep_types[] = {
-            [USB_EP_TYPE_CONTROL] = USBCTRL_DPRAM_EP1_IN_CONTROL_ENDPOINT_TYPE_Control,
-            [USB_EP_TYPE_INTERRUPT] = USBCTRL_DPRAM_EP1_IN_CONTROL_ENDPOINT_TYPE_Interrupt,
-            [USB_EP_TYPE_BULK] = USBCTRL_DPRAM_EP1_IN_CONTROL_ENDPOINT_TYPE_Bulk,
-            [USB_EP_TYPE_ISOCHRONOUS] = USBCTRL_DPRAM_EP1_IN_CONTROL_ENDPOINT_TYPE_Isochronous,
+            [USB_EP_TYPE_CONTROL] = USB_DEVICE_DPRAM_EP1_IN_CONTROL_ENDPOINT_TYPE_VALUE_CONTROL,
+            [USB_EP_TYPE_INTERRUPT] = USB_DEVICE_DPRAM_EP1_IN_CONTROL_ENDPOINT_TYPE_VALUE_INTERRUPT,
+            [USB_EP_TYPE_BULK] = USB_DEVICE_DPRAM_EP1_IN_CONTROL_ENDPOINT_TYPE_VALUE_BULK,
+            [USB_EP_TYPE_ISOCHRONOUS] = USB_DEVICE_DPRAM_EP1_IN_CONTROL_ENDPOINT_TYPE_VALUE_ISOCHRONOUS,
         };
-        *_ep_ctrl(ep) = USBCTRL_DPRAM_EP1_IN_CONTROL_ENABLE_Msk |
-                        USBCTRL_DPRAM_EP1_IN_CONTROL_INTERRUPT_PER_BUFF_Msk |
-                        (ep_types[ep->type] << USBCTRL_DPRAM_EP1_IN_CONTROL_ENDPOINT_TYPE_Pos) |
+        *_ep_ctrl(ep) = USB_DEVICE_DPRAM_EP1_IN_CONTROL_ENABLE_BITS |
+                        USB_DEVICE_DPRAM_EP1_IN_CONTROL_INTERRUPT_PER_BUFF_BITS |
+                        (ep_types[ep->type] << USB_DEVICE_DPRAM_EP1_IN_CONTROL_ENDPOINT_TYPE_LSB) |
                         _hw_ep(ep)->dpram_offset;
     }
     else {
@@ -469,20 +477,20 @@ static void _bus_reset(void)
     /* disarm all buffers and disable all endpoints except EP0, they are
      * enabled again by USBUS once the device is configured */
     for (uint8_t idx = 0; idx < ARRAY_SIZE(_usbdev.eps); idx++) {
-        (&USBCTRL_DPRAM->EP0_IN_BUFFER_CONTROL)[idx] = 0;
+        (&USB_DPRAM->EP0_IN_BUFFER_CONTROL)[idx] = 0;
         if (idx >= 2) {
-            (&USBCTRL_DPRAM->EP1_IN_CONTROL)[idx - 2] = 0;
+            (&USB_DPRAM->EP1_IN_CONTROL)[idx - 2] = 0;
         }
         _usbdev.eps[idx].pending = false;
     }
     _usbdev.setup_pending = false;
 }
 
-#ifndef CPU_FAM_RP2350
+#ifdef CPU_FAM_RP2040
 static uint32_t _line_state(void)
 {
-    return (USBCTRL_REGS->SIE_STATUS & USBCTRL_REGS_SIE_STATUS_LINE_STATE_Msk) >>
-           USBCTRL_REGS_SIE_STATUS_LINE_STATE_Pos;
+    return (USB->SIE_STATUS & USB_SIE_STATUS_LINE_STATE_Msk) >>
+           USB_SIE_STATUS_LINE_STATE_Pos;
 }
 
 /*
@@ -504,7 +512,7 @@ static void _enumeration_fix(void)
         /* fixed in RP2040-B2 */
         return;
     }
-    if (!(USBCTRL_REGS->SIE_CTRL & USBCTRL_REGS_SIE_CTRL_PULLUP_EN_Msk)) {
+    if (!(USB->SIE_CTRL & USB_SIE_CTRL_PULLUP_EN_Msk)) {
         /* not attached to the host */
         return;
     }
@@ -519,7 +527,7 @@ static void _enumeration_fix(void)
 
     /* enable the bus keeper and tristate the pin so that the USB muxing does
      * not affect the pin state */
-    io_reg_atomic_set(gpio_pad_register(E5_DP_PIN),
+    atomic_set(gpio_pad_register(E5_DP_PIN),
                       PADS_BANK0_GPIO0_PUE_Msk | PADS_BANK0_GPIO0_PDE_Msk);
     io_reg_write_dont_corrupt(gpio_io_register(E5_DP_PIN),
                               OUTPUT_ENABLE_OVERRIDE_DISABLE << IO_BANK0_GPIO0_CTRL_OEOVER_Pos,
@@ -534,24 +542,24 @@ static void _enumeration_fix(void)
                               IO_BANK0_GPIO0_CTRL_INOVER_Msk);
 
     /* keep the DP pull-up enabled while the PHY is not used */
-    io_reg_atomic_set(&USBCTRL_REGS->USBPHY_DIRECT,
-                      USBCTRL_REGS_USBPHY_DIRECT_DP_PULLUP_EN_Msk);
-    io_reg_atomic_set(&USBCTRL_REGS->USBPHY_DIRECT_OVERRIDE,
-                      USBCTRL_REGS_USBPHY_DIRECT_OVERRIDE_DP_PULLUP_EN_OVERRIDE_EN_Msk);
+    atomic_set(&USB->USBPHY_DIRECT,
+                      USB_USBPHY_DIRECT_DP_PULLUP_EN_Msk);
+    atomic_set(&USB->USBPHY_DIRECT_OVERRIDE,
+                      USB_USBPHY_DIRECT_OVERRIDE_DP_PULLUP_EN_OVERRIDE_EN_Msk);
 
     /* switch to the GPIO PHY with J state forced */
-    USBCTRL_REGS->USB_MUXING = USBCTRL_REGS_USB_MUXING_TO_DIGITAL_PAD_Msk |
-                               USBCTRL_REGS_USB_MUXING_SOFTCON_Msk;
+    USB->USB_MUXING = USB_USB_MUXING_TO_DIGITAL_PAD_Msk |
+                               USB_USB_MUXING_SOFTCON_Msk;
     assert(_line_state() == LINE_STATE_J);
 
     busy_wait_us(E5_FORCE_J_US);
-    while (!(USBCTRL_REGS->SIE_STATUS & USBCTRL_REGS_SIE_STATUS_CONNECTED_Msk)) {}
+    while (!(USB->SIE_STATUS & USB_SIE_STATUS_CONNECTED_Msk)) {}
 
     /* switch back to the USB PHY and restore GPIO15 */
-    USBCTRL_REGS->USB_MUXING = USBCTRL_REGS_USB_MUXING_TO_PHY_Msk |
-                               USBCTRL_REGS_USB_MUXING_SOFTCON_Msk;
-    io_reg_atomic_clear(&USBCTRL_REGS->USBPHY_DIRECT_OVERRIDE,
-                        USBCTRL_REGS_USBPHY_DIRECT_OVERRIDE_DP_PULLUP_EN_OVERRIDE_EN_Msk);
+    USB->USB_MUXING = USB_USB_MUXING_TO_PHY_Msk |
+                               USB_USB_MUXING_SOFTCON_Msk;
+    atomic_clear(&USB->USBPHY_DIRECT_OVERRIDE,
+                        USB_USBPHY_DIRECT_OVERRIDE_DP_PULLUP_EN_OVERRIDE_EN_Msk);
     *gpio_io_register(E5_DP_PIN) = io_prev;
     *gpio_pad_register(E5_DP_PIN) = pad_prev;
 }
@@ -560,7 +568,7 @@ static inline void _enumeration_fix(void)
 {
     /* RP2040-E5 does not affect the RP2350 */
 }
-#endif /* !CPU_FAM_RP2350 */
+#endif
 
 static void _esr(usbdev_t *dev)
 {
@@ -569,16 +577,16 @@ static void _esr(usbdev_t *dev)
     _usbdev.events = 0;
     irq_restore(state);
 
-    if (events & USBCTRL_REGS_INTS_BUS_RESET_Msk) {
+    if (events & USB_INTS_BUS_RESET_BITS) {
         DEBUG("[rpx0xx usb] bus reset\n");
         _bus_reset();
         _enumeration_fix();
         dev->cb(dev, USBDEV_EVENT_RESET);
     }
-    if (events & USBCTRL_REGS_INTS_DEV_SUSPEND_Msk) {
+    if (events & USB_INTS_DEV_SUSPEND_BITS) {
         dev->cb(dev, USBDEV_EVENT_SUSPEND);
     }
-    if (events & USBCTRL_REGS_INTS_DEV_RESUME_FROM_HOST_Msk) {
+    if (events & USB_INTS_DEV_RESUME_FROM_HOST_BITS) {
         dev->cb(dev, USBDEV_EVENT_RESUME);
     }
 }
@@ -597,7 +605,7 @@ static void _setup_complete(void)
     ep0_in->pending = false;
 
     if (ep0_out->buf) {
-        _dpram_read(ep0_out->buf, (uint8_t *)USBCTRL_DPRAM, SETUP_PACKET_LEN);
+        _dpram_read(ep0_out->buf, (uint8_t *)USB_DPRAM, SETUP_PACKET_LEN);
     }
     ep0_out->rx_len = SETUP_PACKET_LEN;
     _usbdev.dev.epcb(&ep0_out->ep, USBDEV_EVENT_TR_COMPLETE);
@@ -640,19 +648,19 @@ static void _ep_esr(usbdev_ep_t *ep)
 
 void isr_usbctrl(void)
 {
-    uint32_t ints = USBCTRL_REGS->INTS;
+    uint32_t ints = USB->INTS;
 
-    if (ints & USBCTRL_REGS_INTS_SETUP_REQ_Msk) {
+    if (ints & USB_INTS_SETUP_REQ_BITS) {
         /* SIE_STATUS bits are write 1 to clear */
-        USBCTRL_REGS->SIE_STATUS = USBCTRL_REGS_SIE_STATUS_SETUP_REC_Msk;
+        USB->SIE_STATUS = USB_SIE_STATUS_SETUP_REC_BITS;
         _usbdev.setup_pending = true;
         _usbdev.dev.epcb(&_get_ep(0, USB_EP_DIR_OUT)->ep, USBDEV_EVENT_ESR);
     }
 
-    if (ints & USBCTRL_REGS_INTS_BUFF_STATUS_Msk) {
-        uint32_t status = USBCTRL_REGS->BUFF_STATUS;
+    if (ints & USB_INTS_BUFF_STATUS_BITS) {
+        uint32_t status = USB->BUFF_STATUS;
         /* BUFF_STATUS bits are write 1 to clear */
-        USBCTRL_REGS->BUFF_STATUS = status;
+        USB->BUFF_STATUS = status;
         while (status) {
             uint8_t idx = 0;
             status = bitarithm_test_and_clear(status, &idx);
@@ -663,17 +671,17 @@ void isr_usbctrl(void)
 
     if (ints & DEV_IRQS) {
         uint32_t clear = 0;
-        if (ints & USBCTRL_REGS_INTS_BUS_RESET_Msk) {
-            clear |= USBCTRL_REGS_SIE_STATUS_BUS_RESET_Msk;
-            USBCTRL_REGS->ADDR_ENDP = 0;
+        if (ints & USB_INTS_BUS_RESET_BITS) {
+            clear |= USB_SIE_STATUS_BUS_RESET_BITS;
+            USB->ADDR_ENDP = 0;
         }
-        if (ints & USBCTRL_REGS_INTS_DEV_SUSPEND_Msk) {
-            clear |= USBCTRL_REGS_SIE_STATUS_SUSPENDED_Msk;
+        if (ints & USB_INTS_DEV_SUSPEND_BITS) {
+            clear |= USB_SIE_STATUS_SUSPENDED_BITS;
         }
-        if (ints & USBCTRL_REGS_INTS_DEV_RESUME_FROM_HOST_Msk) {
-            clear |= USBCTRL_REGS_SIE_STATUS_RESUME_Msk;
+        if (ints & USB_INTS_DEV_RESUME_FROM_HOST_BITS) {
+            clear |= USB_SIE_STATUS_RESUME_BITS;
         }
-        USBCTRL_REGS->SIE_STATUS = clear;
+        USB->SIE_STATUS = clear;
         _usbdev.events |= ints & DEV_IRQS;
         _usbdev.dev.cb(&_usbdev.dev, USBDEV_EVENT_ESR);
     }
