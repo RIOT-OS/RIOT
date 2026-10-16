@@ -164,7 +164,7 @@ BOARD=arduino-mega2560 PROGRAMMER=dragon_isp make clean all flash debug
             connected via USB, you also need to export `AVR_DEBUGINTERFACE` to
             the correct value.
 
-## Mac OSX El Capitan users
+## macOS users
 
 Mac users can flash this Arduino board by installing `avr-gcc` and `avrdude`
 from `brew`.
@@ -196,14 +196,3 @@ brew install avrdude --with-usb
 
 With this you should be allowed to compile and to flash code to the Arduino
 Mega.
-
-## Troubleshooting for serial connection
-
-In OSX El Capitan, there is no native driver working for the serial
-connection.
-
-In order to install it, you must download and install a CDC-ACM driver from
-[here](https://www.aten.com/global/en/products/usb-&-thunderbolt/usb-converters/uc232a/)
-(Go to Support and Downloads/Software & Driver/Mac Software).
-
-A reboot should be enough to find your Arduino on `/dev/tty.usbmodem*`
