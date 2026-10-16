@@ -543,6 +543,7 @@ static int _send(netdev_t *netdev, const iolist_t *iolist)
         if (((int)data_len + iolist->iol_len) > ESP_NOW_MAX_SIZE_RAW) {
             DEBUG("%s: payload length exceeds maximum(%u>%u)\n", __func__,
                   data_len + iolist->iol_len, ESP_NOW_MAX_SIZE_RAW);
+            mutex_unlock(&dev->dev_lock);
             return -EBADMSG;
         }
         if (iolist->iol_len) {
@@ -753,7 +754,9 @@ static void _isr(netdev_t *netdev)
         esp_now_scan_peers_start();
 #endif
     }
-    return;
+    else {
+        critical_exit();
+    }
 }
 
 static const netdev_driver_t _esp_now_driver =
