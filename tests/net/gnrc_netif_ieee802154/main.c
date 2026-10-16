@@ -33,10 +33,9 @@ int main(void)
                                                    netif->l2addr_len,
                                                    addr_str));
 #endif
-    gnrc_netreg_entry_t dump = GNRC_NETREG_ENTRY_INIT_PID(
-            GNRC_NETREG_DEMUX_CTX_ALL,
-            gnrc_pktdump_pid
-        );
+    /* must outlive main(), the registry keeps a pointer to it */
+    static gnrc_netreg_entry_t dump;
+    gnrc_netreg_entry_init_pid(&dump, GNRC_NETREG_DEMUX_CTX_ALL, gnrc_pktdump_pid);
     gnrc_netreg_register(GNRC_NETTYPE_UNDEF, &dump);
 
 #if IS_USED(MODULE_SHELL)
