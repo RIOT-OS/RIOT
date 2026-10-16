@@ -1,0 +1,2 @@
+USEMODULE += checksum
+USEMODULE += fmt

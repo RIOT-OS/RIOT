@@ -1,0 +1,2 @@
+PSEUDOMODULES += onewire_multidriver
+PSEUDOMODULES += onewire_oneslave
