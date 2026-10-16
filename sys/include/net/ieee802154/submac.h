@@ -89,6 +89,8 @@
  *
  *  Event/State  | RX | IDLE  | PREPARE | TX | WAIT FOR ACK | TX ACK
  * --------------|----|-------|---------|----|--------------|---------
+ * ENTRY**       | (X)| (X)   | X       | (X)| (X)          |(X)
+ * EXIT**        | (X)| (X)   | (X)     | (X)| (X)          |(X)
  * TX_DONE       | -  | -     | -       | X  | -            |X
  * RX_DONE       | X  | X*    | X*      | X* | X            |-
  * CRC_ERROR     | X  | X*    | X*      | X* | X            |-
@@ -100,6 +102,9 @@
  * *: RX_DONE and CRC_ERROR during these events might be a race condition
  *    between the ACK Timer and the radios RX_DONE event. If this happens, the
  *    SubMAC will react accordingly
+ *
+ * **: ENTRY and EXIT events are generated on every state transition.
+ *     Only PREPARE acts on ENTRY, all other states ignore them.
  *
  * Unexpected events will be reported and asserted.
  *

@@ -435,7 +435,6 @@ static ieee802154_submac_fsm_return_t _fsm_state_invalid(ieee802154_submac_t *su
 static ieee802154_submac_fsm_return_t _fsm_state_rx(ieee802154_submac_t *submac,
                                                     ieee802154_fsm_ev_t ev)
 {
-    DEBUG("IEEE802154 submac: _fsm_state_rx + %s\n", str_ev[ev]);
     ieee802154_dev_t *dev = &submac->dev;
     int res;
 
@@ -513,7 +512,6 @@ static ieee802154_submac_fsm_return_t _fsm_state_rx(ieee802154_submac_t *submac,
 static ieee802154_submac_fsm_return_t _fsm_state_idle(ieee802154_submac_t *submac,
                                                       ieee802154_fsm_ev_t ev)
 {
-    DEBUG("IEEE802154 submac: _fsm_state_idle + %s\n", str_ev[ev]);
     ieee802154_dev_t *dev = &submac->dev;
 
     switch (ev) {
@@ -552,7 +550,6 @@ static ieee802154_submac_fsm_return_t _fsm_state_idle(ieee802154_submac_t *subma
 static ieee802154_submac_fsm_return_t _fsm_state_prepare(ieee802154_submac_t *submac,
                                                          ieee802154_fsm_ev_t ev)
 {
-    DEBUG("IEEE802154 submac: _fsm_state_prepare + %s\n", str_ev[ev]);
     ieee802154_dev_t *dev = &submac->dev;
 
     switch (ev) {
@@ -661,7 +658,6 @@ static ieee802154_submac_fsm_return_t _fsm_state_tx_process_tx_done(ieee802154_s
 static ieee802154_submac_fsm_return_t _fsm_state_tx(ieee802154_submac_t *submac,
                                                     ieee802154_fsm_ev_t ev)
 {
-    DEBUG("IEEE802154 submac: _fsm_state_tx + %s\n", str_ev[ev]);
     ieee802154_tx_info_t info;
     int res;
 
@@ -699,7 +695,6 @@ static ieee802154_submac_fsm_return_t _fsm_state_tx(ieee802154_submac_t *submac,
 static ieee802154_submac_fsm_return_t _fsm_state_wait_for_ack(ieee802154_submac_t *submac,
                                                               ieee802154_fsm_ev_t ev)
 {
-    DEBUG("IEEE802154 submac: _fsm_state_wait_for_ack + %s\n", str_ev[ev]);
     uint8_t ack[3];
 
     switch (ev) {
@@ -739,7 +734,6 @@ static ieee802154_submac_fsm_return_t _fsm_state_wait_for_ack(ieee802154_submac_
 static ieee802154_submac_fsm_return_t _fsm_state_tx_ack(ieee802154_submac_t *submac,
                                                         ieee802154_fsm_ev_t ev)
 {
-    DEBUG("IEEE802154 submac: _fsm_state_tx_ack + %s\n", str_ev[ev]);
     ieee802154_dev_t *dev = &submac->dev;
     ieee802154_tx_info_t info;
     int res;
@@ -793,10 +787,7 @@ int ieee802154_submac_process_ev(ieee802154_submac_t *submac,
     submac->fsm_context_res = 0;
     while ((fsm_res = (*submac->fsm.fsm_state_cb)(submac, last_event)) ==
            IEEE802154_SUBMAC_FSM_RETURN_TRANSITION) {
-        if (_fsm_state_invalid == submac->fsm.fsm_state_cb) {
-            _print_state_transition(last_state, submac->fsm.fsm_state_cb, last_event);
-            assert(false);
-        }
+        _print_state_transition(last_state, submac->fsm.fsm_state_cb, last_event);
         fsm_res = (*last_state)(submac, IEEE802154_FSM_EV_EXIT);
         /* state shouldn`t make a transition on exit event */
         assert(fsm_res != IEEE802154_SUBMAC_FSM_RETURN_TRANSITION);
@@ -814,7 +805,7 @@ int ieee802154_send(ieee802154_submac_t *submac, const iolist_t *iolist)
         return 0;
     }
 
-    uint8_t fsm_busy =  atomic_load_u8(&submac->fsm.busy_status);
+    uint8_t fsm_busy = atomic_load_u8(&submac->fsm.busy_status);
     if (fsm_busy) {
         return -EBUSY;
     }
