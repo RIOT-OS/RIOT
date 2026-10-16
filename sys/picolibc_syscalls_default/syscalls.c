@@ -480,7 +480,7 @@ int fcntl(int fd, int cmd, int arg)
  * @return the new seek location in the file on success
  * @return -1 on error, @c errno set to a constant from errno.h to indicate the error
  */
-off_t lseek(int fd, _off_t off, int whence)
+off_t lseek(int fd, off_t off, int whence)
 {
 #ifdef MODULE_VFS
     off_t res = vfs_lseek(fd, off, whence);
