@@ -40,11 +40,6 @@
 #define ENABLE_DEBUG                0
 #include "debug.h"
 
-#define LWIP_NETDEV_NAME            "lwip_netdev_mux"
-#define LWIP_NETDEV_PRIO            (THREAD_PRIORITY_MAIN - 4)
-#ifndef LWIP_NETDEV_STACKSIZE
-#  define LWIP_NETDEV_STACKSIZE     (THREAD_STACKSIZE_DEFAULT)
-#endif
 #define LWIP_NETDEV_MSG_TYPE_EVENT  0x1235
 
 #define ETHERNET_IFNAME1 'E'
