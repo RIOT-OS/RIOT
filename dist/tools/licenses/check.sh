@@ -50,6 +50,15 @@ FILES=$(FILEREGEX='\.([sSch]|cpp)$' changed_files)
 
 # categorize files
 for FILE in ${FILES}; do
+    EXCLUDED=0
+    for EXCLUDED_FILE in $(cat "${SCRIPTREALDIR}/excluded_files"); do
+        if [ "${FILE}" = "${EXCLUDED_FILE}" ]; then
+            EXCLUDED=1
+        fi
+    done
+    if [ "${EXCLUDED}" -eq 1 ]; then
+        continue
+    fi
     FAIL=1
     head -100 "${ROOT}/${FILE}" | sed -e 's/[\/\*'"${TAB_CHAR}"']/ /g' | \
         paste -sd' ' | sed -e 's/[[:space:]][[:space:]]*/ /g' > "${TMP}"
