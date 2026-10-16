@@ -159,6 +159,26 @@ static inline uint8_t _get_csma_retries(ieee802154_submac_t *submac)
 #endif
 }
 
+static inline uint8_t _get_csma_be_min(ieee802154_submac_t *submac)
+{
+#if IS_USED(MODULE_IEEE802154_SUBMAC_SOFT_CSMA_CA)
+    return submac->be.min;
+#else
+    (void)submac;
+    return 0;
+#endif
+}
+
+static inline void _set_csma_backoff_mask(ieee802154_submac_t *submac, uint8_t backoff_mask)
+{
+#if IS_USED(MODULE_IEEE802154_SUBMAC_SOFT_CSMA_CA)
+    submac->backoff_mask = backoff_mask;
+#else
+    (void)submac;
+    (void)backoff_mask;
+#endif
+}
+
 static inline void _init_csma(ieee802154_submac_t *submac)
 {
 #if IS_USED(MODULE_IEEE802154_SUBMAC_SOFT_CSMA_CA)
@@ -610,9 +630,7 @@ int ieee802154_send(ieee802154_submac_t *submac, const iolist_t *iolist)
     _set_retrans(submac, 0);
     submac->psdu = iolist;
     _set_csma_retries_nb(submac, 0);
-#if IS_USED(MODULE_IEEE802154_SUBMAC_SOFT_CSMA_CA)
-    submac->backoff_mask = (1 << submac->be.min) - 1;
-#endif
+    _set_csma_backoff_mask(submac, (1 << _get_csma_be_min(submac)) - 1);
 
     if (!is_ack && ieee802154_submac_process_ev(submac, IEEE802154_FSM_EV_REQUEST_TX)
         != IEEE802154_FSM_STATE_PREPARE) {
