@@ -1,0 +1,30 @@
+# Copyright (c) 2022 Samuel Kayode
+#
+# This file is subject to the terms and conditions of the GNU Lesser
+# General Public License v2.1. See the file LICENSE in the top level
+# directory for more details.
+
+config MODULE_L6470
+    bool "L6470 motor driver"
+    depends on TEST_KCONFIG
+    select MODULE_PERIPH_SPI
+    select MODULE_PERIPH_GPIO
+    select MODULE_ZTIMER
+    select MODULE_ZTIMER_MSEC
+
+config MODULE_L6470_STBY
+    bool "Enable STBY/RST pin"
+    select MODULE_L6470_STBY
+    help
+        GPIO pin that resets the device, putting it into standby mode
+
+config HAVE_L6470_DAISY_CHAIN
+    bool "SPI Daisy Chain device"
+    select MODULE_L6470_DAISY_CHAIN
+    help
+        Enables support for spi daisy chain l6470 devices
+
+config HAVE_L6470
+    bool
+    help
+        Indicates that a L6470 sensor is present.
