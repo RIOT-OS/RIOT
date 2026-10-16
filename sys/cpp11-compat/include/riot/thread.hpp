@@ -18,6 +18,13 @@
  *
  * @author  Raphael Hiesgen <raphael.hiesgen (at) haw-hamburg.de>
  *
+ * @deprecated  The C++ compat threading API has several API flaws, such as use
+ *              of dynamic memory management, unconfigurable stack sizes, and
+ *              runtime crashes on memory fragmentation. It also has not been
+ *              maintained since 2015. Users should use the C API such as
+ *              @ref thread_create instead. This functionality will be dropped
+ *              after the 2027.04 release.
+ *
  * @}
  */
 
