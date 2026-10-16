@@ -21,6 +21,8 @@
 
 #include "bitarithm.h"
 #include "cpu.h"
+#include "macros/utils.h"
+#include "macros/units.h"
 #include "periph/usbdev.h"
 #include "VIC.h"
 
@@ -81,7 +83,7 @@
 
 static_assert(USBDEV_NUM_ENDPOINTS > 0 && USBDEV_NUM_ENDPOINTS <= 16,
               "LPC23xx supports at most 16 logical endpoints");
-static_assert(F_CCO % 96000000 == 0, "USB requires an even multiple of 48 MHz");
+static_assert(F_CCO % 48000000 == 0, "USB requires an even multiple of 48 MHz");
 static_assert(CLOCK_CORECLOCK >= 18000000, "USB requires a CPU clock of at least 18 MHz");
 #ifndef XTAL_HZ
 #error "USB requires a crystal clock source"
@@ -117,6 +119,7 @@ static void _wait_dev_int(uint32_t mask)
 /* Sets the 2-bit pin function/mode field starting at bit `shift`. */
 static void _pin_func(volatile unsigned long *reg, unsigned shift, unsigned val)
 {
+    /* TODO: move to gpio_ll_init() once we implement that API */
     *reg = (*reg & ~(3UL << shift)) | ((unsigned long)val << shift);
 }
 
@@ -167,16 +170,11 @@ static void _clear_ep_interrupts(void)
     }
 }
 
-static size_t _min(size_t a, size_t b)
-{
-    return a < b ? a : b;
-}
-
 static void _fifo_write(const uint8_t *buf, size_t len)
 {
     for (size_t pos = 0; pos < len; pos += sizeof(uint32_t)) {
         uint32_t word = 0;
-        memcpy(&word, buf + pos, _min(len - pos, sizeof(word)));
+        memcpy(&word, buf + pos, MIN(len - pos, sizeof(word)));
         TX_DATA = word;
     }
 }
@@ -187,7 +185,7 @@ static void _fifo_read(uint8_t *buf, size_t len, size_t keep)
     for (size_t pos = 0; pos < len; pos += sizeof(uint32_t)) {
         uint32_t word = RX_DATA;
         if (pos < keep) {
-            memcpy(buf + pos, &word, _min(keep - pos, sizeof(word)));
+            memcpy(buf + pos, &word, MIN(keep - pos, sizeof(word)));
         }
     }
 }
@@ -238,7 +236,7 @@ static void _init(usbdev_t *dev)
     pm_block(2);
 #endif
     PCONP |= PCUSB;
-    USBCLKCFG = F_CCO / 48000000 - 1;
+    USBCLKCFG = F_CCO / MHZ(48) - 1;
     USBClkCtrl = USB_CLOCKS;
     while ((USBClkSt & USB_CLOCKS) != USB_CLOCKS) {}
     DEBUG("lpc23xx_usb: clocks ready\n");
@@ -274,17 +272,28 @@ static void _init(usbdev_t *dev)
     DEBUG("lpc23xx_usb: init complete VBUS=%u\n", !!(FIO1PIN & VBUS_PIN));
 }
 
-/* Endpoint 0 is control, 15 is bulk, the others repeat interrupt/bulk/bulk
+/* Endpoint 0 is control, 15 is bulk, the others repeat interrupt/bulk/isochronous
  * following the endpoint layout of the LPC23xx. */
 static usb_ep_type_t _ep_type_supported(unsigned num)
 {
     if (num == 0) {
         return USB_EP_TYPE_CONTROL;
     }
-    if (num == 15 || num % 3 == 2) {
+    if (num == 15) {
         return USB_EP_TYPE_BULK;
     }
-    return num % 3 == 1 ? USB_EP_TYPE_INTERRUPT : USB_EP_TYPE_NONE;
+
+    switch (num % 3) {
+    case 0:
+        return USB_EP_TYPE_ISOCHRONOUS;
+    case 1:
+        return USB_EP_TYPE_INTERRUPT;
+    case 2:
+        return USB_EP_TYPE_BULK;
+    }
+
+    /* unreachable */
+    return USB_EP_TYPE_NONE;
 }
 
 static usbdev_ep_t *_new_ep(usbdev_t *dev, usb_ep_type_t type,
@@ -489,7 +498,7 @@ static bool _ep_read_packet(usbdev_ep_t *ep, lpc23xx_usb_ep_t *ctx, unsigned idx
     while (!(RX_PLENGTH & RX_PACKET_READY)) {}
     uint32_t packet = RX_PLENGTH;
     size_t len = packet & RX_LENGTH_MASK;
-    ctx->transferred = _min(len, ctx->size);
+    ctx->transferred = MIN(len, ctx->size);
     if (len > ctx->size) {
         DEBUG("lpc23xx_usb: truncating OUT packet (%u > %u)\n",
               (unsigned)len, (unsigned)ctx->size);
