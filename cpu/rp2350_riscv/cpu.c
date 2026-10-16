@@ -15,16 +15,16 @@
  * @}
  */
 
- #include <sys/unistd.h>
+#include <sys/unistd.h>
 
- #include "board.h"
- #include "cpu.h"
- #include "clock_conf.h"
- #include "kernel_init.h"
- #include "periph/init.h"
- #include "periph/uart.h"
- #include "periph_conf.h"
- #include "compat_layer.h"
+#include "board.h"
+#include "clock_conf.h"
+#include "compat_layer.h"
+#include "cpu.h"
+#include "kernel_init.h"
+#include "periph/init.h"
+#include "periph/uart.h"
+#include "periph_conf.h"
 
 /**
  * @brief Initialize the CPU, set IRQ priorities, clocks, peripheral

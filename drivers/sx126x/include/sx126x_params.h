@@ -186,10 +186,7 @@ extern "C" {
 /**
  * @brief   Configuration struct
  */
-static const sx126x_params_t sx126x_params[] =
-{
-    SX126X_PARAMS
-};
+static const sx126x_params_t sx126x_params[] = { SX126X_PARAMS };
 
 #ifdef __cplusplus
 }

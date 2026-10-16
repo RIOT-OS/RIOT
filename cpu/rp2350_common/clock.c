@@ -16,7 +16,8 @@
 
 #include "periph_cpu.h"
 
-void clock_reset(void) {
+void clock_reset(void)
+{
     /* Reset the clock system */
     reset_component(RESET_PLL_SYS, RESET_PLL_SYS);
 }
@@ -27,19 +28,18 @@ void clock_reset(void) {
  * clock system
  * @see RP2350 Docs Chapter 8, mostly 8.2 for more details
  */
-void cpu_clock_init(void) {
+void cpu_clock_init(void)
+{
     /* Enable the XOSC */
     xosc_start();
 
     /* Setup the PLL using the XOSC as the reference clock. */
-    PLL_SYS->FBDIV_INT =
-    PLL_FEEDBACK_DIVIDER_VALUE; /* Set the feedback divider */
+    PLL_SYS->FBDIV_INT = PLL_FEEDBACK_DIVIDER_VALUE; /* Set the feedback divider */
 
     /* Set the post-dividers for the PLL output.*/
     PLL_SYS->PRIM = PDIV;
     /* Turn on PLL */
-    atomic_clear(&PLL_SYS->PWR,
-        PLL_PWR_PD_BITS | PLL_PWR_VCOPD_BITS | PLL_PWR_POSTDIVPD_BITS);
+    atomic_clear(&PLL_SYS->PWR, PLL_PWR_PD_BITS | PLL_PWR_VCOPD_BITS | PLL_PWR_POSTDIVPD_BITS);
 
     /* sleep 10ms to allow the PLL to stabilize */
     xosc_sleep(10);
@@ -61,8 +61,7 @@ void cpu_clock_init(void) {
      * the value of the SRC field For example 0x0 is the first bit while 0x1 is
      * the second bit. In some way this makes sense, in some way I lost too much
      * time on this. */
-    while (CLOCKS->CLK_SYS_SELECTED != CLK_SYS_SELECTED_PERI_FIELD_VALUE) {
-    }
+    while (CLOCKS->CLK_SYS_SELECTED != CLK_SYS_SELECTED_PERI_FIELD_VALUE) {}
 
     /* AUXSRC = 0x0 -> CLK_SYS Indirectly through lower line */
     CLOCKS->CLK_PERI_CTRL = CLK_PERI_CTRL_ENABLE_BIT;

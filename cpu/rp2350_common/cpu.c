@@ -15,13 +15,13 @@
  * @}
  */
 
-#include "multicore.h"
 #include <sys/unistd.h>
 
 #include "board.h"
-#include "cpu.h"
 #include "clock_conf.h"
+#include "cpu.h"
 #include "kernel_init.h"
+#include "multicore.h"
 #include "periph/init.h"
 #include "periph/uart.h"
 #include "periph_conf.h"
