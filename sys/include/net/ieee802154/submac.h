@@ -58,10 +58,10 @@
  *   frames might be triggered using @ref ieee802154_send. The next SubMAC
  *   state would be PREPARE.
  * - RX: The device is ready to receive frames. In case the SubMAC receives a
- *   frame it will transmit an ACK frame if necessary then call
- *   @ref ieee802154_submac_cb_t::rx_done and immediately go
- *   to IDLE or TX ACK. Same as the IDLE state, it's possible
- *   to trigger frames using @ref ieee802154_send.
+ *   frame that requests an acknowledgement and the radio does not send ACKs
+ *   by itself, the SubMAC goes to TX ACK. Otherwise it calls
+ *   @ref ieee802154_submac_cb_t::rx_done and immediately goes to IDLE.
+ *   Same as the IDLE state, it's possible to trigger frames using @ref ieee802154_send.
  * - PREPARE: The frame is already in the framebuffer and waiting to be
  *   transmitted.  This state might handle CSMA-CA backoff timer in case the
  *   device doesn't support it. The SubMAC will then request the transmission
@@ -80,7 +80,7 @@
  *   retries or PREPARE otherwise.
  * - TX ACK: The last received frame required an acknowledgement. Sending
  *   further frames in this state is not permitted. After ACK transmission is
- *   completed, the SubMAC will go IDLE.
+ *   completed, the SubMAC calls @ref ieee802154_submac_cb_t::rx_done and immediately goes to IDLE.
  *
  * The events that trigger state machine changes are defined in
  * @ref ieee802154_fsm_state_t
