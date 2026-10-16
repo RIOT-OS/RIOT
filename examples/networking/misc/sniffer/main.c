@@ -114,21 +114,18 @@ void *rawdump(void *arg)
  */
 int main(void)
 {
-    gnrc_netreg_entry_t dump;
-
     puts("RIOT sniffer application");
 
     /* start and register rawdump thread */
     puts("Run the rawdump thread and register it");
-    dump.target.pid = thread_create(rawdmp_stack, sizeof(rawdmp_stack), RAWDUMP_PRIO,
+    kernel_pid_t pid = thread_create(rawdmp_stack, sizeof(rawdmp_stack), RAWDUMP_PRIO,
                                     0, rawdump, NULL, "rawdump");
-    dump.demux_ctx = GNRC_NETREG_DEMUX_CTX_ALL;
+
+    static gnrc_netreg_entry_t dump;
+    gnrc_netreg_entry_init_pid(&dump, GNRC_NETREG_DEMUX_CTX_ALL, pid);
     gnrc_netreg_register(GNRC_NETTYPE_UNDEF, &dump);
 
-    /* start the shell */
     puts("All ok, starting the shell now");
-    char line_buf[SHELL_DEFAULT_BUFSIZE];
-    shell_run(NULL, line_buf, SHELL_DEFAULT_BUFSIZE);
-
+    /* shell starts implicitly after returning */
     return 0;
 }
