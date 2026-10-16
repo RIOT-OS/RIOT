@@ -20,23 +20,30 @@
 extern "C" {
 #endif
 
-#ifndef DOXYGEN
+/**
+ * @name    Real time counter configuration
+ * @{
+ */
+/* determined with tests/periph/rtt_min */
+#define RTT_MIN_OFFSET (4U)
+/** @} */
 
+#ifndef DOXYGEN
 /**
  * @brief   ADC voltage regulator start-up time [us]
  */
-#define ADC_T_ADCVREG_STUP_US (20)
+#  define ADC_T_ADCVREG_STUP_US (20)
 
 /**
  * @brief   Available number of ADC devices
  */
-#define ADC_DEVS            (1U)
+#  define ADC_DEVS          (1U)
 
 /**
  * @brief   Override ADC resolution values
  * @{
  */
-#define HAVE_ADC_RES_T
+#  define HAVE_ADC_RES_T
 typedef enum {
     ADC_RES_6BIT  = (ADC_CFGR1_RES),    /**< ADC resolution: 6 bit */
     ADC_RES_8BIT  = (ADC_CFGR1_RES_1),  /**< ADC resolution: 8 bit */
@@ -49,16 +56,16 @@ typedef enum {
 
 /**
  * @brief   Starting address of the ROM bootloader
- *          see application note AN2606 ( Table 143 : System memory)
+ *          see application note AN2606 (Table 143: System memory)
  */
-#define STM32_BOOTLOADER_ADDR   (0x1FFF0000)
+#  define STM32_BOOTLOADER_ADDR (0x1FFF0000)
 
 /**
  * @name   Constants for internal VBAT ADC line
  * @{
  */
-#define VBAT_ADC_RES        ADC_RES_12BIT
-#define VBAT_ADC_MAX        4095
+#  define VBAT_ADC_RES      ADC_RES_12BIT
+#  define VBAT_ADC_MAX      4095
 /** @} */
 
 #endif /* ndef DOXYGEN */
@@ -148,7 +155,7 @@ typedef enum {
  * @brief Set this to 1 to enable hardware debugging.
  */
 #ifdef DOXYGEN
-#define CONFIG_STM32_WLX5XX_SUBGHZ_DEBUG
+#  define CONFIG_STM32_WLX5XX_SUBGHZ_DEBUG
 #endif
 /** @} */
 
