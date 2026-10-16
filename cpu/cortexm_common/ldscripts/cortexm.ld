@@ -22,10 +22,14 @@
 
 INCLUDE cortexm_rom_offset.ld
 
+_ram_offset = DEFINED( _ram_offset ) ? _ram_offset : 0x0;
+
+ASSERT(_ram_offset < _ram_length, "Specified RAM offset does not fit in RAM");
+
 MEMORY
 {
     rom      (rx)   : ORIGIN = _rom_start_addr + _rom_offset, LENGTH = _fw_rom_length
-    ram      (w!rx) : ORIGIN = _ram_start_addr,               LENGTH = _ram_length
+    ram      (w!rx) : ORIGIN = _ram_start_addr + _ram_offset, LENGTH = _ram_length - _ram_offset
 }
 
 INCLUDE cortexm_base.ld

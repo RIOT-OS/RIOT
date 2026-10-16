@@ -7,6 +7,10 @@
 
 menu "PSA Key Management Configuration"
 
+config PSA_SEALED_KEY_COUNT
+    int "Specifies number of allocated sealed key slots"
+    default 0
+
 config PSA_PROTECTED_KEY_COUNT
     int "Specifies number of allocated protected key slots"
     default 5 if USEMODULE_PSA_SECURE_ELEMENT
