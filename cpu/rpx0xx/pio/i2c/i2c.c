@@ -105,8 +105,8 @@ static void pio_i2c_resume_after_error(pio_t pio, pio_sm_t sm)
 {
     PIO0_Type *dev = pio_config[pio].dev;
     pio_sm_ctrl_regs_t *ctrl = &PIO_SM_CTRL_BASE(dev)[sm];
-    uint32_t jmp_addr = (ctrl->execctrl & PIO0_SM0_EXECCTRL_WRAP_BOTTOM_Msk)
-                         >> PIO0_SM0_EXECCTRL_WRAP_BOTTOM_Pos;
+    uint32_t jmp_addr = (ctrl->execctrl & PIO_SM0_EXECCTRL_WRAP_BOTTOM_BITS)
+                         >> PIO_SM0_EXECCTRL_WRAP_BOTTOM_LSB;
     pio_sm_exec(pio, sm, pio_inst_jmp(PIO_INST_JMP_COND_NONE, jmp_addr));
 }
 
@@ -114,8 +114,8 @@ static inline bool pio_i2c_check_idle(pio_t pio, pio_sm_t sm)
 {
     PIO0_Type *dev = pio_config[pio].dev;
     pio_sm_ctrl_regs_t *ctrl = &PIO_SM_CTRL_BASE(dev)[sm];
-    uint32_t idle = (ctrl->execctrl & PIO0_SM0_EXECCTRL_WRAP_BOTTOM_Msk)
-                    >> PIO0_SM0_EXECCTRL_WRAP_BOTTOM_Pos;
+    uint32_t idle = (ctrl->execctrl & PIO_SM0_EXECCTRL_WRAP_BOTTOM_BITS)
+                    >> PIO_SM0_EXECCTRL_WRAP_BOTTOM_LSB;
     return ctrl->addr == idle;
 }
 

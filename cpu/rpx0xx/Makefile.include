@@ -11,6 +11,9 @@ CFLAGS += -DRAM_START_ADDR=$(RAM_START_ADDR)
 
 INCLUDES += -I$(RIOTCPU)/rpx0xx/include
 
+INCLUDES += -isystem$(PKGDIRBASE)/picosdk/src/rp2_common/cmsis/stub/CMSIS/Device/RP2040/Include
+INCLUDES += -isystem$(PKGDIRBASE)/picosdk/src/rp2040/hardware_regs/include
+
 VECTORS_O       ?= $(BINDIR)/cpu/vectors.o
 VECTORS_FILE    := $(RIOTCPU)/rpx0xx/vectors.c
 

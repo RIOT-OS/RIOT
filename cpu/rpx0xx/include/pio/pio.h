@@ -666,34 +666,34 @@ static inline unsigned pio_irq_rel_sm(unsigned irq_abs, unsigned irq_rel) {
 typedef enum {
     /* lower 4 hardware IRQs which are issued with 'irq <0-3> [rel]' and are routed to NVIC */
     /* This does not encode the state machine index of which state machine fired! */
-    PIO_IRQ_SM_3                        = PIO0_INTR_SM3_Msk,            /**< Any state machine issued irq 3 */
-    PIO_IRQ_SM_2                        = PIO0_INTR_SM2_Msk,            /**< Any state machine issued irq 2 */
-    PIO_IRQ_SM_1                        = PIO0_INTR_SM1_Msk,            /**< Any state machine issued irq 1 */
-    PIO_IRQ_SM_0                        = PIO0_INTR_SM0_Msk,            /**< any state machine issued irq 0 */
+    PIO_IRQ_SM_3              = PIO_INTR_SM3_BITS,            /**< Any state machine issued irq 3 */
+    PIO_IRQ_SM_2              = PIO_INTR_SM2_BITS,            /**< Any state machine issued irq 2 */
+    PIO_IRQ_SM_1              = PIO_INTR_SM1_BITS,            /**< Any state machine issued irq 1 */
+    PIO_IRQ_SM_0              = PIO_INTR_SM0_BITS,            /**< any state machine issued irq 0 */
     /* FIFO interrupts per state machine */
-    PIO_IRQ_TXNFULL_SM3                 = PIO0_INTR_SM3_TXNFULL_Msk,    /**< SM3 TX FIFO is not full */
-    PIO_IRQ_TXNFULL_SM2                 = PIO0_INTR_SM2_TXNFULL_Msk,    /**< SM2 TX FIFO is not full */
-    PIO_IRQ_TXNFULL_SM1                 = PIO0_INTR_SM1_TXNFULL_Msk,    /**< SM1 TX FIFO is not full */
-    PIO_IRQ_TXNFULL_SM0                 = PIO0_INTR_SM0_TXNFULL_Msk,    /**< SM0 TX FIFO is not full */
-    PIO_IRQ_RXNEMPTY_SM3                = PIO0_INTR_SM3_RXNEMPTY_Msk,   /**< SM3 RX FIFO is not empty */
-    PIO_IRQ_RXNEMPTY_SM2                = PIO0_INTR_SM2_RXNEMPTY_Msk,   /**< SM2 RX FIFO is not empty */
-    PIO_IRQ_RXNEMPTY_SM1                = PIO0_INTR_SM1_RXNEMPTY_Msk,   /**< SM1 RX FIFO is not empty */
-    PIO_IRQ_RXNEMPTY_SM0                = PIO0_INTR_SM0_RXNEMPTY_Msk,   /**< SM0 RX FIFO is not empty */
+    PIO_IRQ_TXNFULL_SM3       = PIO_INTR_SM3_TXNFULL_BITS,    /**< SM3 TX FIFO is not full */
+    PIO_IRQ_TXNFULL_SM2       = PIO_INTR_SM2_TXNFULL_BITS,    /**< SM2 TX FIFO is not full */
+    PIO_IRQ_TXNFULL_SM1       = PIO_INTR_SM1_TXNFULL_BITS,    /**< SM1 TX FIFO is not full */
+    PIO_IRQ_TXNFULL_SM0       = PIO_INTR_SM0_TXNFULL_BITS,    /**< SM0 TX FIFO is not full */
+    PIO_IRQ_RXNEMPTY_SM3      = PIO_INTR_SM3_RXNEMPTY_BITS,   /**< SM3 RX FIFO is not empty */
+    PIO_IRQ_RXNEMPTY_SM2      = PIO_INTR_SM2_RXNEMPTY_BITS,   /**< SM2 RX FIFO is not empty */
+    PIO_IRQ_RXNEMPTY_SM1      = PIO_INTR_SM1_RXNEMPTY_BITS,   /**< SM1 RX FIFO is not empty */
+    PIO_IRQ_RXNEMPTY_SM0      = PIO_INTR_SM0_RXNEMPTY_BITS,   /**< SM0 RX FIFO is not empty */
     /* all routed state machine interrupts */
-    PIO_IRQ_ALL_SM                      = (PIO_IRQ_SM_3         |
-                                           PIO_IRQ_SM_2         |
-                                           PIO_IRQ_SM_1         |
-                                           PIO_IRQ_SM_0),               /**< All SM interrupts */
+    PIO_IRQ_ALL_SM            = (PIO_IRQ_SM_3         |
+                                 PIO_IRQ_SM_2         |
+                                 PIO_IRQ_SM_1         |
+                                 PIO_IRQ_SM_0),               /**< All SM interrupts */
     /* all interrupts */
-    PIO_IRQ_ALL                         = (PIO_IRQ_ALL_SM       |
-                                           PIO_IRQ_TXNFULL_SM3  |
-                                           PIO_IRQ_TXNFULL_SM2  |
-                                           PIO_IRQ_TXNFULL_SM1  |
-                                           PIO_IRQ_TXNFULL_SM0  |
-                                           PIO_IRQ_RXNEMPTY_SM3 |
-                                           PIO_IRQ_RXNEMPTY_SM2 |
-                                           PIO_IRQ_RXNEMPTY_SM1 |
-                                           PIO_IRQ_RXNEMPTY_SM0),   /**< All flags above */
+    PIO_IRQ_ALL               = (PIO_IRQ_ALL_SM       |
+                                 PIO_IRQ_TXNFULL_SM3  |
+                                 PIO_IRQ_TXNFULL_SM2  |
+                                 PIO_IRQ_TXNFULL_SM1  |
+                                 PIO_IRQ_TXNFULL_SM0  |
+                                 PIO_IRQ_RXNEMPTY_SM3 |
+                                 PIO_IRQ_RXNEMPTY_SM2 |
+                                 PIO_IRQ_RXNEMPTY_SM1 |
+                                 PIO_IRQ_RXNEMPTY_SM0),   /**< All flags above */
 } pio_irq_source_t;
 
 /**
@@ -1233,7 +1233,7 @@ void pio_print_debug(pio_t pio);
 static inline void pio_sm_clear_debug_txstall(pio_t pio, unsigned sm_mask)
 {
     io_reg_atomic_set(&pio_config[pio].dev->FDEBUG,
-                      ((sm_mask & PIO_SM_ALL) << PIO0_FDEBUG_TXSTALL_Pos));
+                      ((sm_mask & PIO_SM_ALL) << PIO_FDEBUG_TXSTALL_LSB));
 }
 
 /**
@@ -1245,7 +1245,7 @@ static inline void pio_sm_clear_debug_txstall(pio_t pio, unsigned sm_mask)
 static inline void pio_sm_clear_debug_txover(pio_t pio, unsigned sm_mask)
 {
     io_reg_atomic_set(&pio_config[pio].dev->FDEBUG,
-                      ((sm_mask & PIO_SM_ALL) << PIO0_FDEBUG_TXOVER_Pos));
+                      ((sm_mask & PIO_SM_ALL) << PIO_FDEBUG_TXOVER_LSB));
 }
 
 /**
@@ -1257,7 +1257,7 @@ static inline void pio_sm_clear_debug_txover(pio_t pio, unsigned sm_mask)
 static inline void pio_sm_clear_debug_rxunder(pio_t pio, unsigned sm_mask)
 {
     io_reg_atomic_set(&pio_config[pio].dev->FDEBUG,
-                      ((sm_mask & PIO_SM_ALL) << PIO0_FDEBUG_RXUNDER_Pos));
+                      ((sm_mask & PIO_SM_ALL) << PIO_FDEBUG_RXUNDER_LSB));
 }
 
 /**
@@ -1269,7 +1269,7 @@ static inline void pio_sm_clear_debug_rxunder(pio_t pio, unsigned sm_mask)
 static inline void pio_sm_clear_debug_rxstall(pio_t pio, unsigned sm_mask)
 {
     io_reg_atomic_set(&pio_config[pio].dev->FDEBUG,
-                      ((sm_mask & PIO_SM_ALL) << PIO0_FDEBUG_RXSTALL_Pos));
+                      ((sm_mask & PIO_SM_ALL) << PIO_FDEBUG_RXSTALL_LSB));
 }
 
 /**
@@ -1282,7 +1282,7 @@ static inline void pio_sm_clear_debug_rxstall(pio_t pio, unsigned sm_mask)
  */
 static inline bool pio_sm_tx_fifo_empty(pio_t pio, pio_sm_t sm)
 {
-    return !!(pio_config[pio].dev->FSTAT & ((1u << sm) << PIO0_FSTAT_TXEMPTY_Pos));
+    return !!(pio_config[pio].dev->FSTAT & ((1u << sm) << PIO_FSTAT_TXEMPTY_LSB));
 }
 
 /**
@@ -1295,7 +1295,7 @@ static inline bool pio_sm_tx_fifo_empty(pio_t pio, pio_sm_t sm)
  */
 static inline bool pio_sm_tx_fifo_full(pio_t pio, pio_sm_t sm)
 {
-    return !!(pio_config[pio].dev->FSTAT & ((1u << sm) << PIO0_FSTAT_TXFULL_Pos));
+    return !!(pio_config[pio].dev->FSTAT & ((1u << sm) << PIO_FSTAT_TXFULL_LSB));
 }
 
 /**
@@ -1308,7 +1308,7 @@ static inline bool pio_sm_tx_fifo_full(pio_t pio, pio_sm_t sm)
  */
 static inline bool pio_sm_rx_fifo_empty(pio_t pio, pio_sm_t sm)
 {
-    return !!(pio_config[pio].dev->FSTAT & ((1u << sm) << PIO0_FSTAT_RXEMPTY_Pos));
+    return !!(pio_config[pio].dev->FSTAT & ((1u << sm) << PIO_FSTAT_RXEMPTY_LSB));
 }
 
 /**
@@ -1321,7 +1321,7 @@ static inline bool pio_sm_rx_fifo_empty(pio_t pio, pio_sm_t sm)
  */
 static inline bool pio_sm_rx_fifo_full(pio_t pio, pio_sm_t sm)
 {
-    return !!((pio_config[pio].dev)->FSTAT & ((1u << sm) << PIO0_FSTAT_RXFULL_Pos));
+    return !!((pio_config[pio].dev)->FSTAT & ((1u << sm) << PIO_FSTAT_RXFULL_LSB));
 }
 
 #ifdef __cplusplus

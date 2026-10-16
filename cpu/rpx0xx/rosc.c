@@ -16,7 +16,7 @@
  * @}
  */
 
-#include "vendor/RP2040.h"
+#include "cpu.h"
 #include "io_reg.h"
 
 /**
@@ -28,19 +28,19 @@
 void rosc_start(void)
 {
     /* set drive strengths to default 0 */
-    io_reg_atomic_clear(&ROSC->FREQA, ROSC_FREQA_PASSWD_Msk);
-    io_reg_atomic_clear(&ROSC->FREQB, ROSC_FREQB_PASSWD_Msk);
+    io_reg_atomic_clear(&ROSC->FREQA, ROSC_FREQA_PASSWD_BITS);
+    io_reg_atomic_clear(&ROSC->FREQB, ROSC_FREQB_PASSWD_BITS);
     /* apply settings with magic value 0x9696 */
     const uint32_t magic = 0x9696U;
-    io_reg_write_dont_corrupt(&ROSC->FREQA, magic << ROSC_FREQA_PASSWD_Pos,
-                              ROSC_FREQA_PASSWD_Msk);
-    io_reg_write_dont_corrupt(&ROSC->FREQB, magic << ROSC_FREQB_PASSWD_Pos,
-                              ROSC_FREQB_PASSWD_Msk);
+    io_reg_write_dont_corrupt(&ROSC->FREQA, magic << ROSC_FREQA_PASSWD_LSB,
+                              ROSC_FREQA_PASSWD_BITS);
+    io_reg_write_dont_corrupt(&ROSC->FREQB, magic << ROSC_FREQB_PASSWD_LSB,
+                              ROSC_FREQB_PASSWD_BITS);
 
     /* default divider is 16 */
-    io_reg_write_dont_corrupt(&ROSC->DIV, 16 << ROSC_DIV_DIV_Pos, ROSC_DIV_DIV_Msk);
-    io_reg_atomic_set(&ROSC->CTRL, ROSC_CTRL_ENABLE_ENABLE << ROSC_CTRL_ENABLE_Pos);
-    while (!(ROSC->STATUS & ROSC_STATUS_STABLE_Msk)) { }
+    io_reg_write_dont_corrupt(&ROSC->DIV, 16 << ROSC_DIV_LSB, ROSC_DIV_BITS);
+    io_reg_atomic_set(&ROSC->CTRL, ROSC_CTRL_ENABLE_VALUE_ENABLE << ROSC_CTRL_ENABLE_LSB);
+    while (!(ROSC->STATUS & ROSC_STATUS_STABLE_BITS)) { }
 }
 
 /**
@@ -50,5 +50,5 @@ void rosc_start(void)
  */
 void rosc_stop(void)
 {
-    io_reg_atomic_set(&ROSC->CTRL, ROSC_CTRL_ENABLE_DISABLE << ROSC_CTRL_ENABLE_Pos);
+    io_reg_atomic_set(&ROSC->CTRL, ROSC_CTRL_ENABLE_VALUE_DISABLE << ROSC_CTRL_ENABLE_LSB);
 }
