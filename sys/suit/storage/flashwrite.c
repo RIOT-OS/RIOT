@@ -101,7 +101,11 @@ static int _flashwrite_install(suit_storage_t *storage,
     (void)manifest;
     suit_storage_flashwrite_t *fw = _get_fw(storage);
 
-    return riotboot_flashwrite_finish(&fw->writer);
+    int fin = riotboot_flashwrite_finish(&fw->writer);
+    if (fin < 0) {
+        return SUIT_ERR_STORAGE;
+    }
+    return fin;
 }
 
 static int _flashwrite_read(suit_storage_t *storage, uint8_t *buf,
@@ -109,17 +113,16 @@ static int _flashwrite_read(suit_storage_t *storage, uint8_t *buf,
 {
     suit_storage_flashwrite_t *fw = _get_fw(storage);
 
-    static const char _prefix[] = "RIOT";
-    static const size_t _prefix_len = sizeof(_prefix) - 1;
+    const uint32_t magic = RIOTBOOT_MAGIC;
     int target_slot = riotboot_slot_other();
     size_t slot_size = riotboot_slot_size(target_slot);
 
-    /* Insert the "RIOT" magic number */
-    if (offset < (_prefix_len)) {
-        size_t prefix_to_copy = _prefix_len - offset;
-        memcpy(buf, _prefix + offset, prefix_to_copy);
+    /* Insert the magic number */
+    if (offset < (sizeof(magic))) {
+        size_t prefix_to_copy = sizeof(magic) - offset;
+        memcpy(buf, &magic + offset, prefix_to_copy);
         len -= prefix_to_copy;
-        offset = _prefix_len;
+        offset = sizeof(magic);
         buf += prefix_to_copy;
 
     }
@@ -130,7 +133,7 @@ static int _flashwrite_read(suit_storage_t *storage, uint8_t *buf,
      * contains the magic number already copied above. */
     if (offset < RIOTBOOT_FLASHPAGE_BUFFER_SIZE) {
         const size_t chunk_remaining =
-            RIOTBOOT_FLASHPAGE_BUFFER_SIZE - _prefix_len;
+            RIOTBOOT_FLASHPAGE_BUFFER_SIZE - sizeof(magic);
         /* How much of the first page must be copied */
         size_t firstpage_to_copy = len > chunk_remaining ?
             (chunk_remaining) : len;
@@ -196,8 +199,8 @@ static int _flashwrite_get_seq_no(const suit_storage_t *storage,
             /* skip slot if metadata broken */
             continue;
         }
-        if (!valid || riot_hdr->version > max_seq_no) {
-            max_seq_no = riot_hdr->version;
+        if (!valid || riotboot_hdr_get_version(riot_hdr) > max_seq_no) {
+            max_seq_no = riotboot_hdr_get_version(riot_hdr);
             valid = true;
         }
     }
@@ -216,7 +219,7 @@ static int _flashwrite_set_seq_no(suit_storage_t *storage,
     int target_slot = riotboot_slot_other();
     const riotboot_hdr_t *hdr = riotboot_slot_get_hdr(target_slot);
 
-    if (hdr->version == seq_no) {
+    if (riotboot_hdr_get_version(hdr) == seq_no) {
         return SUIT_OK;
     }
 

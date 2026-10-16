@@ -140,9 +140,23 @@ int suit_handle_manifest_buf(const uint8_t *buffer, size_t size)
     riotboot_hdr_print(hdr);
     ztimer_sleep(ZTIMER_MSEC, 1 * MS_PER_SEC);
 
-    return riotboot_hdr_validate(hdr);
+    if ((res = riotboot_hdr_validate(hdr)) < 0) {
+        LOG_INFO("suit_worker: target slot header invalid\n");
+        return -EINVAL;
+    }
+    if (riotboot_hdr_get_flags(hdr) != UINT32_MAX) {
+        LOG_INFO("suit_worker: target slot header flags invalid\n");
+        return -EINVAL;
+    }
+    if (IS_USED(MODULE_RIOTBOOT_HDR_AUTO_ACTIVATE)) {
+        LOG_INFO("suit_worker: activating target slot\n");
+        riotboot_slot_activate_other(true);
+    }
+    else {
+        LOG_INFO("suit_worker: deactivating target slot\n");
+        riotboot_slot_activate_other(false);
+    }
 #endif
-
     return res;
 }
 
