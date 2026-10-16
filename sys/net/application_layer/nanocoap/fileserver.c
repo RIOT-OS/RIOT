@@ -14,12 +14,16 @@
  */
 
 #include <assert.h>
+#include <errno.h>
+#include <string.h>
+#include <sys/stat.h>
 #include <stdint.h>
 #include <stdbool.h>
 #include <unistd.h>
 #include <fcntl.h>
 
 #include "checksum/fletcher32.h"
+#include "mutex.h"
 #include "net/nanocoap/fileserver.h"
 #include "vfs.h"
 
@@ -54,7 +58,7 @@ static mutex_t _event_mtx;
 struct requestoptions {
     uint32_t etag;                  /**< Etag value in an Etag option */
     uint32_t if_match;              /**< Etag value in an If-Match option */
-    char if_match_len;              /**< Length of the Etag in an If-Match option */
+    uint8_t if_match_len;           /**< Length of the Etag in an If-Match option */
     struct {
         bool if_match        :1;    /**< Request carries an If-Match option */
         bool if_none_match   :1;    /**< Request carries an If-None-Match option */
@@ -88,14 +92,15 @@ static bool entry_is_dir(char *path, const char *name)
     /* reuse path buffer, it is already COAPFILESERVER_PATH_MAX bytes long */
     path[path_len] = '/';
     path[path_len + 1] = 0;
-    strncat(path, name, COAPFILESERVER_PATH_MAX - 1);
+    memcpy(&path[path_len + 1], name, name_len + 1);
 
-    if (vfs_stat(path, &stat)) {
+    int res = vfs_stat(path, &stat);
+    if (res) {
         DEBUG("vfs_stat(%s) failed\n", path);
     }
 
     path[path_len] = 0;
-    return (stat.st_mode & S_IFMT) == S_IFDIR;
+    return res == 0 && (stat.st_mode & S_IFMT) == S_IFDIR;
 }
 
 static unsigned _count_char(const char *s, char c)
@@ -145,7 +150,7 @@ static void stat_etag(struct stat *stat, uint32_t *etag)
 /** Create a CoAP response for a given errno (eg. EACCESS -> 4.03 Forbidden
  * etc., defaulting to 5.03 Internal Server Error), or interpret a positive
  * value for err as a CoAP response code */
-static size_t _error_handler(coap_pkt_t *pdu, uint8_t *buf, size_t len, int err)
+static ssize_t _error_handler(coap_pkt_t *pdu, uint8_t *buf, size_t len, int err)
 {
     uint8_t code = err;
     if (err < 0) {
@@ -157,12 +162,13 @@ static size_t _error_handler(coap_pkt_t *pdu, uint8_t *buf, size_t len, int err)
                 code = COAP_CODE_PATH_NOT_FOUND;
                 break;
             case -EBADMSG:
+            case -EINVAL:
                 code = COAP_CODE_BAD_REQUEST;
                 break;
             default:
                 code = COAP_CODE_INTERNAL_SERVER_ERROR;
         };
-        DEBUG("nanocoap_fileserver: Rejecting error %d (%s) as %d.%02d\n", err, strerror(err),
+        DEBUG("nanocoap_fileserver: Rejecting error %d (%s) as %d.%02d\n", err, strerror(-err),
               code >> 5, code & 0x1f);
     }
 
@@ -170,6 +176,13 @@ static size_t _error_handler(coap_pkt_t *pdu, uint8_t *buf, size_t len, int err)
         return -1;
     }
     return coap_opt_finish(pdu, COAP_OPT_FINISH_NONE);
+}
+
+/** Compare the Etag against the one given in an If-Match option */
+static bool _if_match_fails(const struct requestoptions *opts, uint32_t etag)
+{
+    return opts->exists.if_match && opts->if_match_len &&
+           memcmp(&etag, &opts->if_match, opts->if_match_len);
 }
 
 static void _calc_szx2(coap_pkt_t *pdu, size_t reserve, coap_block1_t *block2)
@@ -222,8 +235,7 @@ static ssize_t _get_file(coap_pkt_t *pdu, uint8_t *buf, size_t len,
     if (request->options.exists.block2 && !coap_get_block2(pdu, &block2)) {
         return _error_handler(pdu, buf, len, COAP_CODE_BAD_OPTION);
     }
-    if (request->options.exists.if_match &&
-        memcmp(&etag, &request->options.if_match, request->options.if_match_len)) {
+    if (_if_match_fails(&request->options, etag)) {
         return _error_handler(pdu, buf, len, COAP_CODE_PRECONDITION_FAILED);
     }
     if (request->options.exists.etag &&
@@ -251,7 +263,8 @@ static ssize_t _get_file(coap_pkt_t *pdu, uint8_t *buf, size_t len,
                &block2);
     err = coap_block_slicer_init(&slicer, block2.blknum, coap_szx2size(block2.szx));
     if (err) {
-        return _error_handler(pdu, buf, len, err);
+        vfs_close(fd);
+        return _error_handler(pdu, buf, len, -EBADMSG);
     }
     coap_opt_add_block2(pdu, &slicer, true);
 
@@ -303,8 +316,11 @@ static ssize_t _get_file(coap_pkt_t *pdu, uint8_t *buf, size_t len,
 
 late_err:
     vfs_close(fd);
+
     coap_pkt_set_code(pdu, COAP_CODE_INTERNAL_SERVER_ERROR);
-    return coap_get_total_hdr_len(pdu);
+    pdu->options_len = 0;
+    pdu->payload = pdu->buf + coap_get_total_hdr_len(pdu);
+    return coap_opt_finish(pdu, COAP_OPT_FINISH_NONE);
 }
 
 #if IS_USED(MODULE_NANOCOAP_FILESERVER_PUT)
@@ -319,12 +335,13 @@ static ssize_t _put_file(coap_pkt_t *pdu, uint8_t *buf, size_t len,
     if (create) {
         /* While a file 'f' is initially being created,
            we save the partial content in '.f' and rename it afterwards */
-        if (!(ret = strlen(request->namebuf)) || (unsigned)ret >= sizeof(request->namebuf) - 1) {
+        size_t name_len = strlen(request->namebuf);
+        char *file = strrchr(request->namebuf, '/');
+        if (!file || name_len >= sizeof(request->namebuf) - 1) {
             /* need one more char '.' */
             return _error_handler(pdu, buf, len, -ENOBUFS);
         }
-        char *file = strrchr(request->namebuf, '/');
-        memmove(file + 2, file + 1, strlen(file + 1));
+        memmove(file + 2, file + 1, strlen(file + 1) + 1);
         *(file + 1) = '.';
     }
     if (request->options.exists.block1 && !coap_get_block1(pdu, &block1)) {
@@ -342,14 +359,23 @@ static ssize_t _put_file(coap_pkt_t *pdu, uint8_t *buf, size_t len,
         _event_file(NANOCOAP_FILESERVER_PUT_FILE_START, request);
     }
     if (request->options.exists.if_match) {
+        if (create) {
+            ret = COAP_CODE_PRECONDITION_FAILED;
+            goto unlink_on_error;
+        }
         stat_etag(&stat, &etag); /* Etag before write */
-        if (create || memcmp(&etag, &request->options.if_match, request->options.if_match_len)) {
+        if (_if_match_fails(&request->options, etag)) {
             ret = COAP_CODE_PRECONDITION_FAILED;
             goto unlink_on_error;
         }
     }
     ret = O_WRONLY;
     ret |= (create ? O_CREAT | O_APPEND : 0);
+    if (!create && !request->options.exists.block1) {
+        /* PUT replaces the whole resource; with Block1 we allow random access
+         * writes instead and can't truncate */
+        ret |= O_TRUNC;
+    }
     if ((fd = vfs_open(request->namebuf, ret, 0666)) < 0) {
         ret = fd;
         goto unlink_on_error;
@@ -381,8 +407,11 @@ static ssize_t _put_file(coap_pkt_t *pdu, uint8_t *buf, size_t len,
             goto close_on_error;
         }
     }
-    if ((ret = vfs_write(fd, pdu->payload, pdu->payload_len)) < 0 ||
-        (unsigned)ret != pdu->payload_len) {
+    ret = vfs_write(fd, pdu->payload, pdu->payload_len);
+    if (ret >= 0 && (unsigned)ret != pdu->payload_len) {
+        ret = -EIO;
+    }
+    if (ret < 0) {
         goto close_on_error;
     }
     vfs_close(fd);
@@ -437,11 +466,9 @@ static ssize_t _delete_file(coap_pkt_t *pdu, uint8_t *buf, size_t len,
     if ((ret = vfs_stat(request->namebuf, &stat)) < 0) {
         return _error_handler(pdu, buf, len, ret);
     }
-    if (request->options.exists.if_match && request->options.if_match_len) {
-        stat_etag(&stat, &etag);
-        if (memcmp(&etag, &request->options.if_match, request->options.if_match_len)) {
-            return _error_handler(pdu, buf, len, COAP_CODE_PRECONDITION_FAILED);
-        }
+    stat_etag(&stat, &etag);
+    if (_if_match_fails(&request->options, etag)) {
+        return _error_handler(pdu, buf, len, COAP_CODE_PRECONDITION_FAILED);
     }
 
     _event_file(NANOCOAP_FILESERVER_DELETE_FILE, request);
@@ -484,13 +511,13 @@ static ssize_t _get_directory(coap_pkt_t *pdu, uint8_t *buf, size_t len,
     coap_block_slicer_t slicer;
     coap_block1_t block2 = { .szx = CONFIG_NANOCOAP_BLOCK_SIZE_MAX };
     if (request->options.exists.block2 && !coap_get_block2(pdu, &block2)) {
-        return _error_handler(pdu, buf, len, COAP_OPT_FINISH_NONE);
-    }
-    if ((err = vfs_opendir(&dir, request->namebuf)) < 0) {
-        return _error_handler(pdu, buf, len, err);
+        return _error_handler(pdu, buf, len, COAP_CODE_BAD_OPTION);
     }
     if (request->options.exists.if_match && request->options.if_match_len) {
         return _error_handler(pdu, buf, len, COAP_CODE_PRECONDITION_FAILED);
+    }
+    if ((err = vfs_opendir(&dir, request->namebuf)) < 0) {
+        return _error_handler(pdu, buf, len, err);
     }
     DEBUG("nanocoap_fileserver: Serving directory listing\n");
 
@@ -504,7 +531,8 @@ static ssize_t _get_directory(coap_pkt_t *pdu, uint8_t *buf, size_t len,
                &block2);
     err = coap_block_slicer_init(&slicer, block2.blknum, coap_szx2size(block2.szx));
     if (err) {
-        return _error_handler(pdu, buf, len, err);
+        vfs_closedir(&dir);
+        return _error_handler(pdu, buf, len, -EBADMSG);
     }
     coap_opt_add_block2(pdu, &slicer, true);
 
@@ -596,6 +624,10 @@ static ssize_t _delete_directory(coap_pkt_t *pdu, uint8_t *buf, size_t len,
             return _error_handler(pdu, buf, len, err);
         }
     }
+    else {
+        /* recursive deletion needs vfs_util */
+        return _error_handler(pdu, buf, len, COAP_CODE_NOT_IMPLEMENTED);
+    }
     if (_resp_init(pdu, buf, len, COAP_CODE_DELETED)) {
         return -1;
     }
@@ -637,8 +669,11 @@ ssize_t nanocoap_fileserver_handler(coap_pkt_t *pdu, uint8_t *buf, size_t len,
 
     /* If a root directory for the server was specified, use that */
     if (root && strlen(root) > 1) {
-        strncpy(request.namebuf, root, sizeof(request.namebuf));
         namelength = strlen(root);
+        if (namelength >= sizeof(request.namebuf)) {
+            return _error_handler(pdu, buf, len, COAP_CODE_INTERNAL_SERVER_ERROR);
+        }
+        memcpy(request.namebuf, root, namelength);
     }
     bool is_directory = true; /* either no path component at all or trailing '/' */
     {
@@ -688,7 +723,9 @@ ssize_t nanocoap_fileserver_handler(coap_pkt_t *pdu, uint8_t *buf, size_t len,
                         continue;
                     }
                     if (memchr(value, '\0', optlen) != NULL ||
-                        memchr(value, '/', optlen) != NULL) {
+                        memchr(value, '/', optlen) != NULL ||
+                        (optlen == 1 && value[0] == '.') ||
+                        (optlen == 2 && value[0] == '.' && value[1] == '.')) {
                         /* Path can not be expressed in the file system */
                         errorcode = COAP_CODE_PATH_NOT_FOUND;
                         goto error;
@@ -759,11 +796,7 @@ ssize_t nanocoap_fileserver_handler(coap_pkt_t *pdu, uint8_t *buf, size_t len,
         ? nanocoap_fileserver_directory_handler(pdu, buf, len, &request, root, resource)
         : nanocoap_fileserver_file_handler(pdu, buf, len, &request);
 error:
-    if (_resp_init(pdu, buf, len, errorcode)) {
-        return -1;
-    }
-    coap_opt_finish(pdu, COAP_OPT_FINISH_NONE);
-    return 0;
+    return _error_handler(pdu, buf, len, errorcode);
 }
 
 #ifdef MODULE_NANOCOAP_FILESERVER_CALLBACK
