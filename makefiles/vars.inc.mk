@@ -33,6 +33,8 @@ export DISABLE_MODULE        # Used in the application's Makefile to suppress DE
 # BUILDDEPS                  # Files / Makefile targets that need to be created before starting to build.
 # DEBUGDEPS                  # Files / Makefile targets that need to be created before starting a debug session.
 
+export LOG
+
 export RIOTBASE              # The root folder of RIOT. The folder where this very file lives in.
 export RIOTCPU               # For third party CPUs this folder is the base of the CPUs.
 export RIOTBOARD             # This folder is the base of the riot boards.
