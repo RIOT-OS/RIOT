@@ -1,0 +1,1 @@
+include $(RIOTCPU)/cortexm_common/Makefile.dep

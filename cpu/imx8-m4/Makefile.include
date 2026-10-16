@@ -1,0 +1,38 @@
+# Define the CPU family so we can differentiate between them in the code
+CFLAGS += -DCPU_FAM_$(shell echo $(CPU_FAM) | tr 'a-z-' 'A-Z_')
+
+export CPU_ARCH = cortex-m4f
+export CPU_FAM  = imx8mq
+
+# this CPU implementation doesn't use CMSIS initialization
+export CFLAGS += -DDONT_USE_CMSIS_INIT
+
+# For Cortex-M cpu we use the common cortexm.ld linker script
+LINKER_SCRIPT ?= cortexm.ld
+
+# use common periph functions
+USEMODULE += periph_common
+
+# export the common include directory
+export INCLUDES += -I$(RIOTCPU)/imx8-m4/include
+
+
+ROM_LEN ?= 0x00020000
+RAM_LEN ?= 0x00020000
+
+
+ROM_START_ADDR ?= 0x1FFE0000
+RAM_START_ADDR ?= 0x20000000
+
+# define the default flash-tool
+export PROGRAMMER ?= jlink
+export JLINK_IF := JTAG
+export FLASHER = $(RIOTBOARD)/$(BOARD)/dist/flash.sh
+export FFLAGS  = $(BINDIR) $(HEXFILE)
+export RESET = $(RIOTBOARD)/$(BOARD)/dist/reset.sh
+export RESET_FLAGS = $(BINDIR)
+export DEBUGGER = $(RIOTBOARD)/$(BOARD)/dist/debug.sh
+export DEBUGSERVER = JLinkGDBServer -device MIMX8MQ6_M4
+export DEBUGGER_FLAGS = $(BINDIR) $(ELFFILE)
+
+include $(RIOTMAKE)/arch/cortexm.inc.mk
