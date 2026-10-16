@@ -17,6 +17,7 @@
  * @author          Vincent Dupont <vincent@otakeys.com>
  */
 
+#include <stdalign.h>
 #include <stdint.h>
 
 #include "periph/cpu_gpio.h"
@@ -33,7 +34,7 @@ extern "C" {
 /**
  * @brief USBDEV buffer instantiation requirement
  */
-#define USBDEV_CPU_DMA_REQUIREMENTS    __attribute__((aligned(USBDEV_CPU_DMA_ALIGNMENT)))
+#define USBDEV_CPU_DMA_REQUIREMENTS    alignas(USBDEV_CPU_DMA_ALIGNMENT)
 
 /**
  * @name Flags used in stm32_usbdev_fs_config_t

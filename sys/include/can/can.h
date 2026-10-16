@@ -22,11 +22,12 @@
  * @author      Toon Stegen <toon.stegen@altran.com>
  */
 
+#include <stdalign.h>
+#include <stdint.h>
+
 #ifdef __cplusplus
 extern "C" {
 #endif
-
-#include <stdint.h>
 
 #if defined(__linux__)
 
@@ -104,7 +105,7 @@ struct can_frame {
     uint8_t __res0;     /**< reserved / padding */
     uint8_t __res1;     /**< reserved / padding */
     /** Frame data */
-    uint8_t data[CAN_MAX_DLEN] __attribute__((aligned(8)));
+    uint8_t alignas(8) data[CAN_MAX_DLEN];
 };
 
 #ifdef MODULE_FDCAN
