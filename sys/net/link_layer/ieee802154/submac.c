@@ -347,10 +347,15 @@ static ieee802154_submac_fsm_return_t _tx_end(ieee802154_submac_t *submac, int s
     return _state_transition(&submac->fsm, _fsm_state_idle);
 }
 
-static void _print_state_transition(ieee802154_fsm_state_cb_t old, ieee802154_fsm_state_cb_t new,
-                         ieee802154_fsm_ev_t ev)
+static inline void _print_state_transition(ieee802154_fsm_state_cb_t old, ieee802154_fsm_state_cb_t new,
+                                           ieee802154_fsm_ev_t ev)
 {
     DEBUG("%s--(%s)->%s\n", get_state_name(old), str_ev[ev], get_state_name(new));
+}
+
+static inline void _print_state_event(ieee802154_fsm_state_cb_t state, ieee802154_fsm_ev_t ev)
+{
+    DEBUG("%s + %s\n", get_state_name(state), str_ev[ev]);
 }
 
 static ieee802154_submac_fsm_return_t _handle_tx_no_ack(ieee802154_submac_t *submac)
@@ -785,6 +790,7 @@ int ieee802154_submac_process_ev(ieee802154_submac_t *submac,
         return -EBUSY;
     }
     submac->fsm_context_res = 0;
+    _print_state_event(submac->fsm.fsm_state_cb, ev);
     while ((fsm_res = (*submac->fsm.fsm_state_cb)(submac, last_event)) ==
            IEEE802154_SUBMAC_FSM_RETURN_TRANSITION) {
         _print_state_transition(last_state, submac->fsm.fsm_state_cb, last_event);
