@@ -1,3 +1,10 @@
+/*
+ * SPDX-FileCopyrightText: Marcel Sondaar
+ * SPDX-FileCopyrightText: Daniel Hepper <daniel@hepper.net>
+ * SPDX-FileCopyrightText: International Business Machines (public domain VGA fonts)
+ * SPDX-License-Identifier: Public Domain
+ */
+
 #pragma once
 
 #ifdef __cplusplus
