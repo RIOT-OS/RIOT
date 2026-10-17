@@ -117,7 +117,7 @@ void stmclk_disable_lfclk(void)
     if (IS_ACTIVE(CONFIG_BOARD_HAS_LSE)) {
         stmclk_dbp_unlock();
         RCC->REG_LSE &= ~(BIT_LSEON);
-        while (!(RCC->REG_LSE & BIT_LSERDY)) {}
+        while (RCC->REG_LSE & BIT_LSERDY) {}
         stmclk_dbp_lock();
     }
     else {
