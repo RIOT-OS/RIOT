@@ -5,8 +5,8 @@
 # SPDX-FileCopyrightText: 2020 Freie Universität Berlin
 # SPDX-License-Identifier: LGPL-2.1-only
 
+import argparse
 import os
-
 import kea
 import util
 

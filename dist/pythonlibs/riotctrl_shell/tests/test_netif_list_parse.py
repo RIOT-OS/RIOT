@@ -1,6 +1,7 @@
 # SPDX-FileCopyrightText: 2020 Freie Universität Berlin
 # SPDX-License-Identifier: LGPL-2.1-only
 
+"""Tests various example outputs of Ifconfig::ifconfig_list()"""
 import riotctrl_shell.netif
 
 

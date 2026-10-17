@@ -4,6 +4,7 @@
 # SPDX-FileCopyrightText: 2020 Freie Universität Berlin
 # SPDX-License-Identifier: LGPL-2.1-only
 
+import abc
 import sys
 
 

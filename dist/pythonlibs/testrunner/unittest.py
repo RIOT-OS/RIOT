@@ -1,6 +1,7 @@
 # SPDX-FileCopyrightText: 2018 -19 Freie Universität Berlin
 # SPDX-License-Identifier: LGPL-2.1-only
 
+import unittest
 from testrunner import setup_child, teardown_child
 
 

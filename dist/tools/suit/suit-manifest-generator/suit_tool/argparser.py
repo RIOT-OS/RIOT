@@ -3,6 +3,8 @@
 # SPDX-FileCopyrightText: 2019-2020 ARM Limited or its affiliates
 # SPDX-License-Identifier: Apache-2.0
 
+import sys, argparse, os
+from suit_tool import __version__
 from suit_tool import keygen
 from suit_tool import get_pubkey
 import json

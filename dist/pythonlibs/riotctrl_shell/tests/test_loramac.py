@@ -1,6 +1,7 @@
 # SPDX-FileCopyrightText: 2021 Inria
 # SPDX-License-Identifier: LGPL-2.1-only
 
+import pytest
 import riotctrl_shell.loramac
 
 from .common import init_ctrl

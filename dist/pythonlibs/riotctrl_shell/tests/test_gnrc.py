@@ -1,6 +1,7 @@
 # SPDX-FileCopyrightText: 2020 Freie Universität Berlin
 # SPDX-License-Identifier: LGPL-2.1-only
 
+import pytest
 import riotctrl_shell.gnrc
 
 from .common import init_ctrl

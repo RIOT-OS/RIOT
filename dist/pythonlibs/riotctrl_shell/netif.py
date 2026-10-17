@@ -1,6 +1,7 @@
 # SPDX-FileCopyrightText: 2020 Freie Universität Berlin
 # SPDX-License-Identifier: LGPL-2.1-only
 
+"""
 Shell interactions related to network interfaces
 
 Defines shell command interactions related to network interfaces

@@ -1,6 +1,7 @@
 # SPDX-FileCopyrightText: 2020 HAW Hamburg
 # SPDX-License-Identifier: LGPL-2.1-only
 
+"""
 CORD EP-related shell interactions
 
 Defines CORD EP-related shell command interactions

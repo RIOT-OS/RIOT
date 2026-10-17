@@ -4,6 +4,8 @@
 # SPDX-FileCopyrightText: 2018-2020 ARM Limited or its affiliates
 # SPDX-License-Identifier: Apache-2.0
 
+import logging
+import sys
 from suit_tool.argparser import MainArgumentParser
 from suit_tool import create, sign, parse, get_pubkey, keygen, sever  # , verify, cert, init
 
