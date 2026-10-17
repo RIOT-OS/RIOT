@@ -1,6 +1,7 @@
 # SPDX-FileCopyrightText: 2020 Freie Universität Berlin
 # SPDX-License-Identifier: LGPL-2.1-only
 
+"""
 sys-related shell interactions
 
 Defines sys-related shell command interactions

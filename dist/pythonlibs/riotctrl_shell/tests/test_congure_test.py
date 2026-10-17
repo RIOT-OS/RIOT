@@ -1,6 +1,7 @@
 # SPDX-FileCopyrightText: 2021 Freie Universität Berlin
 # SPDX-License-Identifier: LGPL-2.1-only
 
+import pytest
 import riotctrl_shell.congure_test
 
 from .common import init_ctrl

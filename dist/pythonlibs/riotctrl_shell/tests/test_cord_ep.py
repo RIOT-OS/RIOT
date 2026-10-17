@@ -1,6 +1,7 @@
 # SPDX-FileCopyrightText: 2020 HAW Hamburg
 # SPDX-License-Identifier: LGPL-2.1-only
 
+import pytest
 import riotctrl_shell.cord_ep
 
 from .common import init_ctrl

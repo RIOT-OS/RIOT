@@ -3,6 +3,9 @@
 # SPDX-FileCopyrightText: 2019 Otto-von-Guericke-Universität Magdeburg
 # SPDX-License-Identifier: LGPL-2.1-only
 
+# @author   Maximilian Deubel <maximilian.deubel@ovgu.de>
+# @author   Bas Stottelaar <basstottelaar@gmail.com>
+
 # /// script
 # requires-python = ">=3.10"
 # dependencies = [

@@ -1,6 +1,7 @@
 # SPDX-FileCopyrightText: 2021 Inria
 # SPDX-License-Identifier: LGPL-2.1-only
 
+"""
 Shell interactions related to Semtech Loramac package
 
 Defines shell command interactions related to Semtech Loramac package

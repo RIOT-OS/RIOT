@@ -1,6 +1,7 @@
 # SPDX-FileCopyrightText: 2021 Freie Universität Berlin
 # SPDX-License-Identifier: LGPL-2.1-only
 
+"""
 `congure_test`-related shell interactions
 
 Defines `congure_test`-related shell command interactions

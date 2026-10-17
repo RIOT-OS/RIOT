@@ -4,10 +4,10 @@
 # SPDX-FileCopyrightText: 2020 Freie Universität Berlin
 # SPDX-License-Identifier: LGPL-2.1-only
 
+import json
 import os
 import tempfile
 import time
-
 import base
 
 

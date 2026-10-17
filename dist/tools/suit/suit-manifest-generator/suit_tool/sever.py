@@ -3,6 +3,8 @@
 # SPDX-FileCopyrightText: 2019 ARM Limited or its affiliates
 # SPDX-License-Identifier: Apache-2.0
 
+from suit_tool.compile import compile_manifest
+import json
 import cbor2 as cbor
 import itertools
 import textwrap

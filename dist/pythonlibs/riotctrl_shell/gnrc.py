@@ -1,6 +1,7 @@
 # SPDX-FileCopyrightText: 2019-2020 Freie Universität Berlin
 # SPDX-License-Identifier: LGPL-2.1-only
 
+"""
 GNRC-related shell interactions
 
 Defines GNRC-related shell command interactions

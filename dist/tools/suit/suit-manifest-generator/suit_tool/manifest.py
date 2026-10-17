@@ -3,6 +3,8 @@
 # SPDX-FileCopyrightText: 2019-2020 ARM Limited or its affiliates
 # SPDX-License-Identifier: Apache-2.0
 
+import collections
+import binascii
 import cbor2 as cbor
 import json
 import copy

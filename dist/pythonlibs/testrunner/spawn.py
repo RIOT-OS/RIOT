@@ -4,6 +4,7 @@
 # SPDX-FileCopyrightText: 2014 Martine Lenders <mlenders@inf.fu-berlin.de>
 # SPDX-License-Identifier: LGPL-2.1-only
 
+import os
 import pexpect
 import signal
 import subprocess
