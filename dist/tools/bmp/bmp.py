@@ -1,13 +1,7 @@
 #!/usr/bin/env -S pipx run
 
-# Copyright (C) 2019 Otto-von-Guericke-Universität Magdeburg
-#
-# This file is subject to the terms and conditions of the GNU Lesser
-# General Public License v2.1. See the file LICENSE in the top level
-# directory for more details.
-#
-# @author   Maximilian Deubel <maximilian.deubel@ovgu.de>
-# @author   Bas Stottelaar <basstottelaar@gmail.com>
+# SPDX-FileCopyrightText: 2019 Otto-von-Guericke-Universität Magdeburg
+# SPDX-License-Identifier: LGPL-2.1-only
 
 # /// script
 # requires-python = ">=3.10"

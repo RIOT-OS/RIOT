@@ -1,14 +1,7 @@
 #! /bin/sh
-#
-# release-stats.sh
-# Copyright (C) 2017 Martine Lenders <mail@martine-lenders.eu>
-#
-# This file is subject to the terms and conditions of the GNU Lesser
-# General Public License v2.1. See the file LICENSE in the top level
-# directory for more details.
-#
-# This script is intended to help release managers to collect statistics about
-# a release for https://github.com/RIOT-OS/RIOT/wiki/release-statistics
+
+# SPDX-FileCopyrightText: 2017 Martine Lenders <mail@martine-lenders.eu>
+# SPDX-License-Identifier: LGPL-2.1-only
 
 RIOTBASE="$(realpath "$( cd "$(dirname "${0}")" && pwd )/../../..")"
 RELEASE="${1}"

@@ -1,13 +1,9 @@
-# Copyright (C) 2018-19 Freie Universität Berlin
-#               2017 Cenk Gündoğan <cenk.guendogan@haw-hamburg.de>
-#               2016 Kaspar Schleiser <kaspar@schleiser.de>
-#               2014 Martine Lenders <mlenders@inf.fu-berlin.de>
-#
-# This file is subject to the terms and conditions of the GNU Lesser
-# General Public License v2.1. See the file LICENSE in the top level
-# directory for more details.
+# SPDX-FileCopyrightText: 2018 -19 Freie Universität Berlin
+# SPDX-FileCopyrightText: 2017 Cenk Gündoğan <cenk.guendogan@haw-hamburg.de>
+# SPDX-FileCopyrightText: 2016 Kaspar Schleiser <kaspar@schleiser.de>
+# SPDX-FileCopyrightText: 2014 Martine Lenders <mlenders@inf.fu-berlin.de>
+# SPDX-License-Identifier: LGPL-2.1-only
 
-import os
 import sys
 from functools import partial
 from traceback import print_tb

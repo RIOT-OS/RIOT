@@ -1,17 +1,10 @@
 #!/usr/bin/env bash
-#
-# Copyright (C) 2018 Gaëtan Harter <gaetan.harter@fu-berlin.de>
-#
-# This file is subject to the terms and conditions of the GNU Lesser
-# General Public License v2.1. See the file LICENSE in the top level
-# directory for more details.
-#
 
-#
+# SPDX-FileCopyrightText: 2018 Gaëtan Harter <gaetan.harter@fu-berlin.de>
+# SPDX-License-Identifier: LGPL-2.1-only
+
 # Central test script to have sanity checks for the build system
 # It is run unconditionally on all files.
-#
-#
 
 export ENABLE_DOCKER_PINNING_TEST=${ENABLE_DOCKER_PINNING_TEST:-1}
 
