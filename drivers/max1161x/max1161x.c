@@ -95,7 +95,7 @@ int max1161x_init(max1161x_t *dev, const max1161x_params_t *params)
     if (status < 0) {
         i2c_release(DEV);
         DEBUG("[max1161x] init error: unable to write setup byte (err=%d)\n", status);
-        return -ENODEV;
+        return status;
     }
 
     status = _write_byte(dev, dev->config);
