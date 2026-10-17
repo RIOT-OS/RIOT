@@ -65,6 +65,7 @@ int max1161x_init(max1161x_t *dev, const max1161x_params_t *params)
     int status;
 
     assert(dev && params);
+    assert(params->channel < MAX1161X_NUM_CHANNELS);
 
     dev->params = *params;
 
@@ -151,7 +152,7 @@ int max1161x_read_channel_raw(max1161x_t *dev, max1161x_channel_t chan, int16_t 
     int status;
 
     assert(dev && raw);
-    assert((int)chan < MAX1161X_NUM_CHANNELS);
+    assert(chan < MAX1161X_NUM_CHANNELS);
 
     i2c_acquire(DEV);
 
