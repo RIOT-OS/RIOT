@@ -126,6 +126,10 @@ int sx127x_reset(const sx127x_t *dev)
 
 int sx127x_init(sx127x_t *dev)
 {
+    /* the timers are used by the upper layer and have to work even if the
+     * hardware init failed */
+    _init_timers(dev);
+
     /* Do internal initialization routines */
     if (_init_spi(dev) < 0) {
         DEBUG("[sx127x] error: failed to initialize SPI\n");
@@ -137,8 +141,6 @@ int sx127x_init(sx127x_t *dev)
         DEBUG("[sx127x] error: no valid device found\n");
         return -SX127X_ERR_NODEV;
     }
-
-    _init_timers(dev);
 
     if (gpio_is_valid(dev->params.reset_pin)) {
         /* reset pin should be left floating during POR */

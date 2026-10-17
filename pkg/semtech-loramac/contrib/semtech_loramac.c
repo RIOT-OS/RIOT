@@ -22,6 +22,7 @@
  * @}
  */
 
+#include <assert.h>
 #include <string.h>
 
 #include "msg.h"
@@ -825,6 +826,8 @@ void *_semtech_loramac_event_loop(void *arg)
 
 int semtech_loramac_init(semtech_loramac_t *mac)
 {
+    assert(mac && mac->netdev);
+
     loramac_netdev_ptr = mac->netdev;
     mac->netdev->event_callback = _semtech_loramac_event_cb;
 
@@ -840,9 +843,19 @@ int semtech_loramac_init(semtech_loramac_t *mac)
         return -1;
     }
 
+    int res = mac->netdev->driver->init(mac->netdev);
+    if (res < 0) {
+        DEBUG("[semtech-loramac] radio: failed to initialize radio\n");
+    }
+    else {
+        DEBUG("[semtech-loramac] radio: initialization successful\n");
+    }
+
+    /* Initialize the MAC even if the radio initialization failed, so that
+     * the MAC can be used safely and requests fail gracefully */
     _init_loramac(mac, &semtech_loramac_primitives, &semtech_loramac_callbacks);
 
-    return 0;
+    return res;
 }
 
 bool semtech_loramac_is_mac_joined(semtech_loramac_t *mac)
