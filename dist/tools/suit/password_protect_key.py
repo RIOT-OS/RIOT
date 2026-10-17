@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-# SPDX-FileCopyrightText: 2021 _ML!PA Consulting GmbH
+# SPDX-FileCopyrightText: 2021 ML!PA Consulting GmbH
 # SPDX-License-Identifier: NONE
 
 import sys

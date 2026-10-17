@@ -1,4 +1,4 @@
-# SPDX-FileCopyrightText: 2018 -19 Freie Universität Berlin
+# SPDX-FileCopyrightText: 2018-2019 Freie Universität Berlin
 # SPDX-FileCopyrightText: 2017 Cenk Gündoğan <cenk.guendogan@haw-hamburg.de>
 # SPDX-FileCopyrightText: 2016 Kaspar Schleiser <kaspar@schleiser.de>
 # SPDX-FileCopyrightText: 2014 Martine Lenders <mlenders@inf.fu-berlin.de>

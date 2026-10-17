@@ -1,6 +1,6 @@
 #!/usr/bin/env -S pipx run
 
-# SPDX-FileCopyrightText:2018 Freie Universitat Berlin
+# SPDX-FileCopyrightText: 2018 Freie Universitat Berlin
 # SPDX-FileCopyrightText: 2018 Inria
 # SPDX-License-Identifier: LGPL-2.1-only
 

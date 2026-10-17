@@ -1,5 +1,5 @@
 /*
- * SPDX-FileCopyrightText: 2014 Kaspar Schleiser <kaspar@schleiser.de
+ * SPDX-FileCopyrightText: 2014 Kaspar Schleiser <kaspar@schleiser.de>
  * SPDX-License-Identifier: Unlicense
  */
 

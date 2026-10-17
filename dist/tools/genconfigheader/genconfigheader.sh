@@ -1,6 +1,6 @@
 #!/bin/sh
 
-# SPDX-FileCopyrightText:2016 Eistec AB
+# SPDX-FileCopyrightText: 2016 Eistec AB
 # SPDX-License-Identifier: LGPL-2.1-only
 
 # Usage: $0 [CFLAGS]...

@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-# SPDX-FileCopyrightText: 2018-2019, Ulf Magnusson
+# SPDX-FileCopyrightText: 2018-2019 Ulf Magnusson
 # SPDX-FileCopyrightText: 2020 HAW Hamburg
 # SPDX-License-Identifier: ISC
 

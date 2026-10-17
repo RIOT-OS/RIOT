@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 # SPDX-FileCopyrightText: 2014 Philipp Rosenkranz <philipp.rosenkranz@fu-berlin.de>
-# SPDX-License-Identifier: NONE
+# SPDX-License-Identifier: LGPL-2.1-only
 
 
 import os
