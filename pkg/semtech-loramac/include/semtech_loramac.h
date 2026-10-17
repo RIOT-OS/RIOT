@@ -129,8 +129,8 @@ typedef struct {
  *
  * @param[in] mac          Pointer to loramac descriptor
  *
- * @return  0 on success
- * @return -1 on failure
+ * @retval  0 on success
+ * @retval <0 on failure
  */
 int semtech_loramac_init(semtech_loramac_t *mac);
 
