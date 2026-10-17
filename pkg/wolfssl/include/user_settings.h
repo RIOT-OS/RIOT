@@ -1,3 +1,8 @@
+/*
+ * SPDX-FileCopyrightText: 2017 wolfSSL Inc.
+ * SPDX-License-Identifier: LGPL-2.1-only
+ */
+
 #pragma once
 
 /* user_settings.h : custom configuration for wolfcrypt/wolfSSL */
