@@ -371,6 +371,9 @@ include $(RIOTCPU)/$(CPU)/Makefile.include
 # include global Makefile.include for `boards` modules
 include $(RIOTBASE)/boards/Makefile.include
 
+# include global Makefile.include for `cpu` modules
+include $(RIOTBASE)/cpu/Makefile.include
+
 # Include common programmer logic if available
 -include $(RIOTMAKE)/tools/$(PROGRAMMER).inc.mk
 

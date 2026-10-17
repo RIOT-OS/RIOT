@@ -7,4 +7,7 @@ ifneq (,$(filter pio_i2c periph_i2c,$(FEATURES_USED)))
   USEMODULE += pio_i2c
 endif
 
+# peripheral drivers shared with the RP2350
+USEMODULE += rpx0xx_periph_common
+
 include $(RIOTCPU)/cortexm_common/Makefile.dep

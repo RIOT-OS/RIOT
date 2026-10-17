@@ -1,3 +1,4 @@
 FEATURES_REQUIRED += periph_xh3irq
+USEMODULE += rp2350_riscv_periph
 include $(RIOTCPU)/rp2350_common/Makefile.dep
 include $(RIOTCPU)/riscv_common/Makefile.dep
