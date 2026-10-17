@@ -100,4 +100,27 @@ the logging process. If you enabled TMUX with `IOTLAB_TMUX`, detach from the
 server-side tmux process with `CTRL+A-D` (or as defined in your server-side
 `.tmux.conf` file)
 
+## Use a Single Node Like a Local One
+
+Using the extension `dist/testbed-support/makefile.iotlab.single.inc.mk` (also included automatically for IoT-LAB supported boards), a single node can be controlled as if it were local, i.e., you can interact with it with the normal `flash`, `term`, `debug`, etc. `make` targets. For this you need to provide some environment variables:
+
+- `IOTLAB_NODE` is required. If you only have one experiment running and only node of that board type in that experiment, you can set it to `auto`, e.g.,
+
+  ```sh
+  BOARD=iotlab-m3 IOTLAB_NODE=auto make -C examples/basic/hello-world flash
+  ```
+
+  You can also use the FQDN of the node if you have multiple nodes in your experiment.
+
+  ```sh
+  BOARD=iotlab-m3 IOTLAB_NODE=m3-42.grenoble.iot-lab.info \
+      make -C examples/basic/hello-world flash
+  ```
+
+  If you use `IOTLAB_NODE=auto`, the `make info-iotlab-node` command provides you with the FQDN of the node that was selected.
+
+- `IOTLAB_EXP_ID` is only required if you have more than one experiment running, similar as for the `iotlab-*` targets above. Running `make` without it will warn you about the ambiguity.
+
+The semantics of all other environment variables for the `iotlab-*` targets stay mostly the same, the ones involved in starting an experiment are ignored though.
+
 [IoT-LAB Wiki]: https://github.com/iot-lab/iot-lab/wiki/Riot-support
