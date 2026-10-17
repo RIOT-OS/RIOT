@@ -1,5 +1,5 @@
 /*
- * SPDX-FileCopyrightText: 2014 Hamburg University of Applied Sciences (HAW)
+ * SPDX-FileCopyrightText: 2014 HAW Hamburg
  * SPDX-License-Identifier: LGPL-2.1-only
  */
 

@@ -1,5 +1,5 @@
 /*
- * SPDX-FileCopyrightText: 2013 INRIA.
+ * SPDX-FileCopyrightText: 2013 INRIA
  * SPDX-License-Identifier: LGPL-2.1-only
  */
 

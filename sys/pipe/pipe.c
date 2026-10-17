@@ -1,6 +1,6 @@
 /*
- * SPDX-FileCopyrightText: 2014 René Kijewski  <rene.kijewski@fu-berlin.de>
- * SPDX-License-Identifier: NONE
+ * SPDX-FileCopyrightText: 2014 René Kijewski <rene.kijewski@fu-berlin.de>
+ * SPDX-License-Identifier: LGPL-2.1-or-later
  */
 
 /**

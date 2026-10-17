@@ -1,5 +1,5 @@
 /*
- * SPDX-FileCopyrightText: 2023 ML!PA Consulting Gmbh
+ * SPDX-FileCopyrightText: 2023 ML!PA Consulting GmbH
  * SPDX-License-Identifier: LGPL-2.1-only
  */
 

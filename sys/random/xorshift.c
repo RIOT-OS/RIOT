@@ -12,6 +12,8 @@
  *
  * @brief   Xorshift random number generator implementation
  *
+ * Code taken from Wikipedia (https://en.wikipedia.org/wiki/Xorshift)
+ *
  * @author Kaspar Schleiser <kaspar@schleiser.de>
  * @}
  */

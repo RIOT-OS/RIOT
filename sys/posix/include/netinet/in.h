@@ -1,5 +1,5 @@
 /*
- * SPDX-FileCopyrightText: 2013 -15 Freie Universität Berlin
+ * SPDX-FileCopyrightText: 2013-2015 Freie Universität Berlin
  * SPDX-License-Identifier: LGPL-2.1-only
  */
 

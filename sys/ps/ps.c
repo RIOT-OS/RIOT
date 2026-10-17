@@ -1,6 +1,18 @@
 /*
- * SPDX-FileCopyrightText: 2013 , INRIA.
+ * SPDX-FileCopyrightText: 2013 INRIA
  * SPDX-License-Identifier: LGPL-2.1-only
+ */
+
+ /**
+ * @ingroup sys_ps
+ * @{
+ * @file
+ * @brief   UNIX like ps command
+ * @author  Kaspar Schleiser <kaspar@schleiser.de>
+ *
+ * @note    The entry 'runtime_usec' in 'MODULE_SCHEDSTATISTICS' is limited
+ *          to 2**32 microseconds. So the entry gets reset after ~1.2 hours.
+ * @}
  */
 
 #include <stdio.h>

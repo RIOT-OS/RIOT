@@ -1,5 +1,6 @@
 /*
  * SPDX-FileCopyrightText: 2016 TriaGnoSys GmbH
+ * SPDX-FileCopyrightText: 2013-2015 Freie Universität Berlin
  * SPDX-License-Identifier: LGPL-2.1-only
  */
 

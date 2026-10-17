@@ -1,6 +1,16 @@
 /*
- * SPDX-FileCopyrightText: 2011 Mutsuo Saito, Makoto Matsumoto,
- * SPDX-License-Identifier: BSD-2-Clause
+ * SPDX-FileCopyrightText: 2011 Mutsuo Saito (Hiroshima University)
+ * SPDX-FileCopyrightText: 2011 Makoto Matsumoto (The University of Tokyo)
+ * SPDX-License-Identifier: BSD-3-Clause
+ */
+
+/**
+ * @file tinymt32.c
+ *
+ * @brief Tiny Mersenne Twister only 127 bit internal state
+ *
+ * @author Mutsuo Saito (Hiroshima University)
+ * @author Makoto Matsumoto (The University of Tokyo)
  */
 
 #include "tinymt32.h"

@@ -3,6 +3,15 @@
  * SPDX-License-Identifier: LGPL-2.1-only
  */
 
+/**
+ * @ingroup sys_universal_address
+ * @{
+ * @file
+ * @brief   Functions to manage universal address container
+ * @author  Martin Landsmann <Martin.Landsmann@HAW-Hamburg.de>
+ * @}
+ */
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
