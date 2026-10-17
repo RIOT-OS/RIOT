@@ -1,1 +1,4 @@
 cpu/arm7tdmi_gba/cartridge_header.s
+pkg/esp8266_sdk/bootloader/sdkconfig_default.h
+tests/pkg/utensor/external_modules/models/deep_mlp.cpp
+tests/pkg/emlearn/model.h
