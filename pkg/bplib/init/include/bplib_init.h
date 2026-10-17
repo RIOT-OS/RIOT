@@ -21,8 +21,9 @@
  *
  * @note This module also initializes bplib's time module. When using the
  *       provided @ref pkg_bplib_fwp, the walltime is expected to be correct
- *       during the whole lifetime of bplib, as soon as the init call is made.
- *       If you can determine when a clock value is invalid and when it is valid,
+ *       during the whole lifetime of bplib, as soon as the init call is made,
+ *       when the `bplib_walltime_available` module is used.
+ *       If the clock is invalid for certain times only,
  *       you can use a custom FWP and change the BPA_TIMEP_GetHostClockState
  *       return value accordingly.
  *
@@ -35,6 +36,8 @@
  */
 
 #include "bplib.h"
+
+#include "thread_config.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -78,6 +81,33 @@ extern "C" {
 #endif
 
 /**
+ * @brief Stack size of the bplib maintenance thread.
+ *
+ * This worker thread calls the storage extraction and cleanup functions and
+ * this may need a larger stack size.
+ */
+#ifndef CONFIG_BPLIB_MAINTENANCE_STACK_SIZE
+#  define CONFIG_BPLIB_MAINTENANCE_STACK_SIZE THREAD_STACKSIZE_LARGE
+#endif
+
+/**
+ * @brief Interval [ms] at which maintenance activities take place.
+ *
+ * These activities also include pulling bundles from storage. A value in the
+ * area of multiple seconds is probably a good place to start.
+ */
+#ifndef CONFIG_BPLIB_MAINTENANCE_INTERVAL
+#  define CONFIG_BPLIB_MAINTENANCE_INTERVAL 10000
+#endif
+
+/**
+ * @brief Maximum number of bundles to egress from storage per contact / channel
+ */
+#ifndef CONFIG_BPLIB_MAINTENANCE_MAX_BUNDLES
+#  define CONFIG_BPLIB_MAINTENANCE_MAX_BUNDLES 8
+#endif
+
+/**
  * @brief State of the bplib instance.
  */
 typedef struct {
@@ -99,12 +129,14 @@ extern bplib_instance_data_t bplib_instance_data;
  * @brief Initializes bplib, with all of its modules.
  *
  * Before calling this init function, if walltime is available, it should
- * be set correctly.
+ * be set correctly. If bplib initialization fails, no worker thread will be
+ * started.
  *
- * @return 0 on success, values 1-7 for failure in init of the modules
- *         [FWP, EM, TIME, NC, MEM, QM, thread creation] respectively
+ * @retval BPLIB_SUCCESS on success
+ * @retval BPLIB_ERROR if the thread creation failed
+ * @return other error values from BPLib_NC_Init
  */
-int bplib_init(void);
+BPLib_Status_t bplib_init(void);
 
 /**
  * @brief Terminates bplib.
