@@ -16,6 +16,7 @@
  * @author          Dylan Laduranty <dylan.laduranty@mesotic.com>
  */
 
+#include "macros/units.h"
 #include "periph_cpu_common.h"
 
 #ifdef __cplusplus
@@ -38,6 +39,26 @@ enum {
     SAM0_GCLK_32KHZ,                    /**< 32 kHz clock           */
 };
 /** @} */
+
+/**
+ * @brief   Minimal allowed ADC clock frequency
+ */
+#define SAM0_ADC_CLOCK_FREQ_MIN KHZ(160)
+
+/**
+ * @brief   Maximal allowed ADC clock frequency
+ */
+#define SAM0_ADC_CLOCK_FREQ_MAX MHZ(16)
+
+/**
+ * @brief   ADC Input channel source resistance in Ω
+ */
+#define SAM0_ADC_R_SAMPLE       1715
+
+/**
+ * @brief   ADC Sampling capacitance in F
+ */
+#define SAM0_ADC_C_SAMPLE       2.8E-12
 
 /**
  * @brief   Pins that can be used for ADC input
