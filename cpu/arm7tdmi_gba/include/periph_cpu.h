@@ -26,13 +26,18 @@ extern "C" {
  */
 #define CLOCK_CORECLOCK     (16780000U) /* 16.78MHz */
 
-#define TIMER_NUMOF         (4U)
-#define TIMER_CHANNEL_NUMOF (1U)
-
 /**
- * @brief   A low-level timer_set() implementation is provided
+ * @name Timer API defines
+ * @{
  */
-#define PERIPH_TIMER_PROVIDES_SET
+#define TIMER_NUMOF         (4U) /**< Number of timers */
+#define TIMER_CHANNEL_NUMOF (1U) /**< Number of channels */
+#define TIMER_0_MAX_VALUE   (0xffff) /**< max value */
+#define TIMER_1_MAX_VALUE   (0xffff) /**< max value */
+#define TIMER_2_MAX_VALUE   (0xffff) /**< max value */
+#define TIMER_3_MAX_VALUE   (0xffff) /**< max value */
+#define PERIPH_TIMER_PROVIDES_SET /**< A low-level timer_set() implementation is provided */
+/** @} */
 
 #ifdef __cplusplus
 }
