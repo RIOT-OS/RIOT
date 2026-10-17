@@ -51,11 +51,15 @@ FILES=$(FILEREGEX='\.([sSch]|cpp)$' changed_files)
 # categorize files
 for FILE in ${FILES}; do
     EXCLUDED=0
-    for EXCLUDED_FILE in $(cat "${SCRIPTREALDIR}/excluded_files"); do
+    while IFS= read -r EXCLUDED_FILE; do
+        # ignore comment lines
+        if [[ "${EXCLUDED_FILE}" =~ ^\s*"#" ]]; then
+            continue
+        fi
         if [ "${FILE}" = "${EXCLUDED_FILE}" ]; then
             EXCLUDED=1
         fi
-    done
+    done < "${SCRIPTREALDIR}/excluded_files"
     if [ "${EXCLUDED}" -eq 1 ]; then
         continue
     fi
