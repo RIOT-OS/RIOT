@@ -2,6 +2,7 @@
 # SPDX-License-Identifier: LGPL-2.1-only
 
 import os.path
+
 import riotctrl.ctrl
 
 import riotctrl_ctrl.native

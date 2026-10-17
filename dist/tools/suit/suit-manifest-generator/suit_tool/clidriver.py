@@ -6,6 +6,7 @@
 
 import logging
 import sys
+
 from suit_tool.argparser import MainArgumentParser
 from suit_tool import create, sign, parse, get_pubkey, keygen, sever  # , verify, cert, init
 

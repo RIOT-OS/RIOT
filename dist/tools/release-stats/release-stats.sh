@@ -3,6 +3,9 @@
 # SPDX-FileCopyrightText: 2017 Martine Lenders <mail@martine-lenders.eu>
 # SPDX-License-Identifier: LGPL-2.1-only
 
+# This script is intended to help release managers to collect statistics about
+# a release for https://github.com/RIOT-OS/RIOT/wiki/release-statistics
+
 RIOTBASE="$(realpath "$( cd "$(dirname "${0}")" && pwd )/../../..")"
 RELEASE="${1}"
 

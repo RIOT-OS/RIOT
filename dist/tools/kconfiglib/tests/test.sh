@@ -6,6 +6,11 @@
 # SPDX-FileCopyrightText: 2020 Freie Universität Berlin
 # SPDX-License-Identifier: LGPL-2.1-only
 
+# This script performs some tests on the genconfig.py script. It uses as main
+# Kconfig tree file 'Kconfig.test'. It runs the script under different
+# conditions by injecting different configuration files and checking the return
+# values.
+
 KCONFIGLIB_DIR="$(readlink -f "$(dirname "$0")/..")"
 TESTS_DIR=${KCONFIGLIB_DIR}/tests
 GENCONFIG=${KCONFIGLIB_DIR}/genconfig.py

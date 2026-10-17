@@ -2,6 +2,8 @@
  * SPDX-FileCopyrightText: 2001 Adam Dunkels
  * SPDX-FileCopyrightText: 2009, 2010 Joakim Eriksson, Niclas Finne, Dogan Yazar
  * SPDX-License-Identifier: BSD-3-Clause
+ *
+ * This file is part of the uIP TCP/IP stack.
  */
 
 /* Below define allows importing saved output into Wireshark as "Raw IP" packet type */

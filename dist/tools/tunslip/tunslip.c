@@ -1,6 +1,8 @@
 /*
  * SPDX-FileCopyrightText: 2001 Adam Dunkels
  * SPDX-License-Identifier: BSD-3-Clause
+ *
+ * This file is part of the uIP TCP/IP stack.
  */
 
 /* for cfmakeraw on Linux */

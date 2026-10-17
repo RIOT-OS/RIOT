@@ -2,6 +2,7 @@
 # SPDX-License-Identifier: LGPL-2.1-only
 
 import riotctrl_shell.sys
+
 from .common import init_ctrl
 
 
