@@ -91,10 +91,10 @@ uint32_t pwm_init(pwm_t pwm, pwm_mode_t mode, uint32_t freq, uint16_t res)
 
     DEBUG("[pwm]: div_int:%d, div_frac:%d\n", div_int, div_frac);
     /* Set the slice divider to reach the desired frequency */
-    pwm_slice(slice)->div = ((div_int << PWM_CH0_DIV_INT_Pos) | div_frac);
+    pwm_slice(slice)->div = ((div_int << PWM_CH0_DIV_INT_LSB) | div_frac);
 
     /* Let PWM slice run in free running mode */
-    pwm_slice(slice)->csr = PWM_CH0_CSR_DIVMODE_div;
+    pwm_slice(slice)->csr = PWM_CH0_CSR_DIVMODE_VALUE_DIV;
 
     /* Set PWM slice TOP value */
     pwm_slice(slice)->top = res-1;
@@ -122,13 +122,13 @@ void pwm_set(pwm_t pwm, uint8_t channel, uint16_t value)
     /* Set channel compare value */
     if (channel) {
         io_reg_write_dont_corrupt(&pwm_slice(slice)->cc,
-                                  (value << PWM_CH0_CC_B_Pos),
-                                  PWM_CH0_CC_B_Msk);
+                                  (value << PWM_CH0_CC_B_LSB),
+                                  PWM_CH0_CC_B_BITS);
     }
     else {
         io_reg_write_dont_corrupt(&pwm_slice(slice)->cc,
-                                  (value << PWM_CH0_CC_A_Pos),
-                                  PWM_CH0_CC_A_Msk);
+                                  (value << PWM_CH0_CC_A_LSB),
+                                  PWM_CH0_CC_A_BITS);
     }
 }
 

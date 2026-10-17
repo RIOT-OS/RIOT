@@ -20,7 +20,7 @@
 
 #include "macros/units.h"
 #include "periph_cpu.h"
-#include "vendor/RP2040.h"
+#include "cpu.h"
 #include "io_reg.h"
 
 /**
@@ -41,22 +41,22 @@ static void _pll_start(PLL_SYS_Type *pll, uint8_t ref_div,
     assert(post_div_2 <= PLL_POSTDIV_MAX);
 
     /* program reference clock divider */
-    io_reg_write_dont_corrupt(&pll->CS, ref_div << PLL_SYS_CS_REFDIV_Pos,
-                              PLL_SYS_CS_REFDIV_Msk);
+    io_reg_write_dont_corrupt(&pll->CS, ref_div << PLL_CS_REFDIV_LSB,
+                              PLL_CS_REFDIV_BITS);
     /* program feedback divider */
     io_reg_write_dont_corrupt(&pll->FBDIV_INT,
-                              vco_feedback_scale << PLL_SYS_FBDIV_INT_FBDIV_INT_Pos,
-                              PLL_SYS_FBDIV_INT_FBDIV_INT_Msk);
+                              vco_feedback_scale << PLL_FBDIV_INT_LSB,
+                              PLL_FBDIV_INT_BITS);
     /* turn on the main power */
-    io_reg_atomic_clear(&pll->PWR, (1U << PLL_SYS_PWR_VCOPD_Pos)
-                                     | (1U << PLL_SYS_PWR_DSMPD_Pos)
-                                     | (1U << PLL_SYS_PWR_PD_Pos));
+    io_reg_atomic_clear(&pll->PWR, (1U << PLL_PWR_VCOPD_LSB)
+                                     | (1U << PLL_PWR_DSMPD_LSB)
+                                     | (1U << PLL_PWR_PD_LSB));
     /* wait for VCO to lock (i.e. keep its output stable) */
-    while (!(pll->CS & PLL_SYS_CS_LOCK_Msk)) { }
+    while (!(pll->CS & PLL_CS_LOCK_BITS)) { }
     /* set up post divisors and turn them on */
-    pll->PRIM = (post_div_1 << PLL_SYS_PRIM_POSTDIV1_Pos)
-                  | (post_div_2 << PLL_SYS_PRIM_POSTDIV2_Pos);
-    io_reg_atomic_clear(&pll->PWR, 1U << PLL_SYS_PWR_POSTDIVPD_Pos);
+    pll->PRIM = (post_div_1 << PLL_PRIM_POSTDIV1_LSB)
+                  | (post_div_2 << PLL_PRIM_POSTDIV2_LSB);
+    io_reg_atomic_clear(&pll->PWR, 1U << PLL_PWR_POSTDIVPD_LSB);
 }
 
 /**
@@ -65,10 +65,10 @@ static void _pll_start(PLL_SYS_Type *pll, uint8_t ref_div,
  */
 static void _pll_stop(PLL_SYS_Type *pll)
 {
-    uint32_t reg = (1U << PLL_SYS_PWR_VCOPD_Pos)
-                 | (1U << PLL_SYS_PWR_POSTDIVPD_Pos)
-                 | (1U << PLL_SYS_PWR_DSMPD_Pos)
-                 | (1U << PLL_SYS_PWR_PD_Pos);
+    uint32_t reg = (1U << PLL_PWR_VCOPD_LSB)
+                 | (1U << PLL_PWR_POSTDIVPD_LSB)
+                 | (1U << PLL_PWR_DSMPD_LSB)
+                 | (1U << PLL_PWR_PD_LSB);
     io_reg_atomic_set(&pll->PWR, reg);
 }
 
@@ -101,8 +101,8 @@ void pll_stop_usb(void)
  */
 void pll_reset_sys(void)
 {
-    periph_reset(1U << RESETS_RESET_pll_sys_Pos);
-    periph_reset_done(1U << RESETS_RESET_pll_sys_Pos);
+    periph_reset(1U << RESETS_RESET_PLL_SYS_LSB);
+    periph_reset_done(1U << RESETS_RESET_PLL_SYS_LSB);
 }
 
 /**
@@ -110,6 +110,6 @@ void pll_reset_sys(void)
  */
 void pll_reset_usb(void)
 {
-    periph_reset(1U << RESETS_RESET_pll_usb_Pos);
-    periph_reset_done(1U << RESETS_RESET_pll_usb_Pos);
+    periph_reset(1U << RESETS_RESET_PLL_USB_LSB);
+    periph_reset_done(1U << RESETS_RESET_PLL_USB_LSB);
 }
