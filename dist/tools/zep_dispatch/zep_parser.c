@@ -1,8 +1,6 @@
 /*
- * Copyright (C) 2021 Benjamin Valentin
- *
- * This file is subject to the terms and conditions of the GNU General Public
- * License v2. See the file LICENSE for more details.
+ * SPDX-FileCopyrightText: 2021 Benjamin Valentin
+ * SPDX-License-Identifier: GPL-2.0-only
  */
 
 #include <string.h>

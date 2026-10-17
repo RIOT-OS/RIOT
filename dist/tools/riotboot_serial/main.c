@@ -1,10 +1,6 @@
 /*
- * Copyright (C) 2020 Benjamin Valentin
- *
- * This file is subject to the terms and conditions of the GNU General Public
- * License v2. See the file LICENSE for more details.
- *
- * @author      Benjamin Valentin <benjamin.valentin@ml-pa.com>
+ * SPDX-FileCopyrightText: 2020 Benjamin Valentin
+ * SPDX-License-Identifier: GPL-2.0-only
  */
 
 #include <stdio.h>
