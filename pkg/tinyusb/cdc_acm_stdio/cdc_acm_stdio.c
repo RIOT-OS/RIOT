@@ -30,6 +30,12 @@ static ssize_t _write(const void* buffer, size_t len)
 {
     const char *start = buffer;
 
+    /* if no host is connected, we pretend we have sent everything to avoid
+     * busy-looping forever */
+    if (!tud_cdc_connected()) {
+        return len;
+    }
+
     while (tud_cdc_connected() && len) {
         size_t n = tud_cdc_write(buffer, len);
         buffer = (char *)buffer + n;
