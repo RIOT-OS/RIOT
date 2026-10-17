@@ -27,7 +27,7 @@
 #include "VIC.h"
 
 #ifdef MODULE_PM_LAYERED
-#include "pm_layered.h"
+#  include "pm_layered.h"
 #endif
 
 #define ENABLE_DEBUG 0
