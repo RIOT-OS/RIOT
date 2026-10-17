@@ -229,6 +229,12 @@ export default defineConfig({
                   "build-system/advanced_build_system_tricks",
                   "build-system/debugging_aids",
                   "build-system/static_analysis",
+                  {
+                    label: "Testbed support",
+                    items: [
+                      "build-system/testbed-support/iotlab",
+                    ]
+                  }
                 ],
               },
               {
