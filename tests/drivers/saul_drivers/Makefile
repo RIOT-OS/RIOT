@@ -41,6 +41,9 @@ endif
 ifneq (,$(filter lpsxxx,$(DRIVERS)))
   USEMODULE += lps22hh
 endif
+ifneq (,$(filter max1161x,$(DRIVERS)))
+  USEMODULE += max11612
+endif
 ifneq (,$(filter mcp23x17,$(DRIVERS)))
   USEMODULE += mcp23x17_i2c
 endif
