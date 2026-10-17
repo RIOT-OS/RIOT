@@ -1,58 +1,64 @@
 ---
-title: RIOT integration into IoT-LAB
+title: FIT IoT-LAB
 description: Learn how to control IoT-LAB testbed nodes via the RIOT buildsystem
 ---
 
-Check the Wiki to see how to build and run RIOT on FIT IoT-LAB:
-https://github.com/iot-lab/iot-lab/wiki/Riot-support
+The FIT IoT-LAB lab is a very-large-scale testbed of IoT devices, located for the most part in France.
+IoT-LAB provides some excellent guides how to use the testbed with RIOT on its own pages.
+Check, e.g., its [Wiki][IoT-LAB Wiki] or the
+["Learn" section on its website](https://www.iot-lab.info/learn/).
+This guide provides insights how to use the IoT-LAB with our `make` build system.
 
-## Control IoT-LAB via Make
+## Control IoT-LAB experiments via make
 
 ### Requirements
 
-This feature requires to have a valid account for the FIT IoT-LAB
-(registration there is open for everyone) and the
-[iot-lab/cli-tools](https://github.com/iot-lab/cli-tools) to be installed.
+This feature requires you to have a valid account for the FIT IoT-LAB
+([registration](https://www.iot-lab.info/testbed/signup) there is open for everyone) and the
+[`iotlabcli` tools](https://pypi.org/project/iotlabcli/) to be installed.
 
 ### Description
 
 The folder `dist/testbed-support/` contains a `Makefile.iotlab` that defines
-some targets to control RIOT experiments on IoT-LAB using the GNU Make build
+targets to control RIOT experiments on IoT-LAB using the GNU Make build
 system. In order to use this, one has to include this Makefile at the end of
 the application's Makefile, like this:
 ```
 include $(RIOTBASE)/dist/testbed-support/Makefile.iotlab
 ```
+
+For [boards supported by both the IoT-LAB and RIOT][IoT-LAB Wiki], i.e. unless you are porting a new board, **this is already done automatically**.
+
 ### Variables
 
 This Makefile introduces some additional variables (default values in
 brackets):
- * IOTLAB_NODES (5)
- * IOTLAB_DURATION (30 minutes)
- * IOTLAB_SITE (grenoble.iot-lab.info)
- * IOTLAB_TYPE (m3:at86rf231)
- * IOTLAB_AUTH ($HOME/.iotlabrc)
- * IOTLAB_USER (taken from $IOTLAB_AUTH)
- * IOTLAB_EXP_ID (taken from first experiment in running state)
- * IOTLAB_EXP_NAME (RIOT_EXP)
- * IOTLAB_PHY_NODES
- * IOTLAB_PROFILE
- * IOTLAB_EXCLUDE_NODES
- * IOTLAB_LOGGING
- * IOTLAB_TMUX
+ * `IOTLAB_NODES` (5)
+ * `IOTLAB_DURATION` (30 minutes)
+ * `IOTLAB_SITE` (grenoble.iot-lab.info)
+ * `IOTLAB_TYPE` (m3:at86rf231)
+ * `IOTLAB_AUTH` ($HOME/.iotlabrc)
+ * `IOTLAB_USER` (taken from $IOTLAB_AUTH)
+ * `IOTLAB_EXP_ID` (taken from first experiment in running state)
+ * `IOTLAB_EXP_NAME` (RIOT_EXP)
+ * `IOTLAB_PHY_NODES`
+ * `IOTLAB_PROFILE`
+ * `IOTLAB_EXCLUDE_NODES`
+ * `IOTLAB_LOGGING`
+ * `IOTLAB_TMUX`
 
 ### Format of a Resource ID
 Both variables `IOTLAB_PHY_NODES` and `IOTLAB_EXCLUDE_NODES` use the resource id
 string format as specified in the output of `iotlab-experiment submit --help`.
-An example would be: 1-3+7+10-13
+An example would be: `1-3+7+10-13`
 
 ### Targets
 
 It defines the following targets:
- * iotlab-exp
- * iotlab-flash
- * iotlab-reset
- * iotlab-term
+ * `iotlab-exp`
+ * `iotlab-flash`
+ * `iotlab-reset`
+ * `iotlab-term`
 
 **Please note:** All targets that require an already running experiment will
 use the first experiment of the user that has already entered state "Running"
@@ -67,10 +73,10 @@ for `IOTLAB_DURATION` minutes at site `IOTLAB_SITE` using `IOTLAB_PROFILE`
 for this experiment by using the resource id string format as described above.
 Note that the usage of `IOTLAB_PHY_NODES` ignores `IOTLAB_NODES`. It will also flash the
 binary of the current application to all registered nodes. The name of the
-experiment is set to "RIOT_EXP" or "RIOT_EXP_$(IOTLAB_EXP_NAME)"
+experiment is set to "`RIOT_EXP`" or "`RIOT_EXP_$(IOTLAB_EXP_NAME)`"
 if `IOTLAB_EXP_NAME` is defined.
 If `IOTLAB_LOGGING` is set to `1`, then the output of all nodes will be logged on the server
-into a file called "RIOT_LOG-<EXPNAME>-<EXPID>".
+into a file called "`RIOT_LOG-<EXPNAME>-<EXPID>`".
 
 #### iotlab-flash
 
@@ -93,3 +99,5 @@ If `IOTLAB_LOGGING` is set to `1`, then closing the connection with `CTRL+C/D` w
 the logging process. If you enabled TMUX with `IOTLAB_TMUX`, detach from the
 server-side tmux process with `CTRL+A-D` (or as defined in your server-side
 `.tmux.conf` file)
+
+[IoT-LAB Wiki]: https://github.com/iot-lab/iot-lab/wiki/Riot-support
