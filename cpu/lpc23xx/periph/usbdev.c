@@ -86,7 +86,7 @@ static_assert(USBDEV_NUM_ENDPOINTS > 0 && USBDEV_NUM_ENDPOINTS <= 16,
 static_assert(F_CCO % 48000000 == 0, "USB requires an even multiple of 48 MHz");
 static_assert(CLOCK_CORECLOCK >= 18000000, "USB requires a CPU clock of at least 18 MHz");
 #ifndef XTAL_HZ
-#error "USB requires a crystal clock source"
+#  error "USB requires a crystal clock source"
 #endif
 
 typedef struct {
