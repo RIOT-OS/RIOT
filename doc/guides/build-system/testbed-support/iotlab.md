@@ -1,4 +1,7 @@
-# RIOT integration into IoT-LAB
+---
+title: RIOT integration into IoT-LAB
+description: Learn how to control IoT-LAB testbed nodes via the RIOT buildsystem
+---
 
 Check the Wiki to see how to build and run RIOT on FIT IoT-LAB:
 https://github.com/iot-lab/iot-lab/wiki/Riot-support
