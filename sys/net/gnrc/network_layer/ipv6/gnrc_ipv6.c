@@ -455,6 +455,17 @@ static bool _is_ipv6_hdr(gnrc_pktsnip_t *hdr)
 #endif
 }
 
+static bool _src_addr_is_invalid(gnrc_netif_t *netif, const ipv6_hdr_t *hdr, int *idx)
+{
+    bool invalid_src;
+    gnrc_netif_acquire(netif);
+    invalid_src = ((!ipv6_addr_is_loopback(&hdr->dst)) &&
+                   (*idx = gnrc_netif_ipv6_addr_idx(netif, &hdr->src)) >= 0) &&
+        (gnrc_netif_ipv6_addr_get_state(netif, *idx) != GNRC_NETIF_IPV6_ADDRS_FLAGS_STATE_VALID);
+    gnrc_netif_release(netif);
+    return invalid_src;
+}
+
 static int _fill_ipv6_hdr(gnrc_netif_t *netif, gnrc_pktsnip_t *ipv6)
 {
     int res;
@@ -509,13 +520,23 @@ static int _fill_ipv6_hdr(gnrc_netif_t *netif, gnrc_pktsnip_t *ipv6)
     }
     else {
         bool invalid_src;
-        int idx;
+        int idx = -1;
 
-        gnrc_netif_acquire(netif);
-        invalid_src = ((!ipv6_addr_is_loopback(&hdr->dst)) &&
-                       (idx = gnrc_netif_ipv6_addr_idx(netif, &hdr->src)) >= 0) &&
-            (gnrc_netif_ipv6_addr_get_state(netif, idx) != GNRC_NETIF_IPV6_ADDRS_FLAGS_STATE_VALID);
-        gnrc_netif_release(netif);
+        if (netif != NULL) {
+            invalid_src = _src_addr_is_invalid(netif, hdr, &idx);
+        }
+        else {
+             /* assume it is invalid, i.e., not assigned to any interface,
+              * if destination is not the loopback address in which case we
+              * don't really care about the validity of the source address. */
+            invalid_src = !ipv6_addr_is_loopback(&hdr->dst);
+
+            /* stop either if we found the source address on an interface or if we iterated over
+             * all interfaces */
+            while ((idx < 0) && (netif = gnrc_netif_iter(netif))) {
+                invalid_src = _src_addr_is_invalid(netif, hdr, &idx);
+            }
+        }
         if (invalid_src) {
 #if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_6LN)
             gnrc_pktsnip_t *icmpv6 = gnrc_pktsnip_search_type(ipv6,
