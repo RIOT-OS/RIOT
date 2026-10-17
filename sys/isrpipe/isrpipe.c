@@ -78,3 +78,8 @@ unsigned int isrpipe_available(isrpipe_t *isrpipe)
 {
     return tsrb_avail(&isrpipe->tsrb);
 }
+
+unsigned int isrpipe_free(isrpipe_t *isrpipe)
+{
+    return tsrb_free(&isrpipe->tsrb);
+}

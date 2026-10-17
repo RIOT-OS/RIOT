@@ -119,6 +119,15 @@ void isrpipe_clear(isrpipe_t *isrpipe);
  */
 unsigned int isrpipe_available(isrpipe_t *isrpipe);
 
+/**
+ * @brief   Get the number of bytes that can still be written to the isrpipe
+ *
+ * @param[in]   isrpipe    isrpipe object to operate on
+ *
+ * @returns     number of bytes free in the isrpipe's buffer
+ */
+unsigned int isrpipe_free(isrpipe_t *isrpipe);
+
 #ifdef __cplusplus
 }
 #endif

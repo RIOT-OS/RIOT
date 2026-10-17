@@ -256,6 +256,37 @@ static void test_available(void)
     TEST_ASSERT_EQUAL_INT(1, isrpipe_available(&_pipe));
 }
 
+static void test_free(void)
+{
+    const uint8_t write_buf[] = {1, 2, 3};
+    uint8_t read_buf[2];
+
+    /* freshly initialized pipe is completely free */
+    TEST_ASSERT_EQUAL_INT(ARRAY_SIZE(_buffer), isrpipe_free(&_pipe));
+
+    TEST_ASSERT_EQUAL_INT(ARRAY_SIZE(write_buf),
+                          isrpipe_write(&_pipe, write_buf, ARRAY_SIZE(write_buf)));
+    TEST_ASSERT_EQUAL_INT(ARRAY_SIZE(_buffer) - ARRAY_SIZE(write_buf),
+                          isrpipe_free(&_pipe));
+
+    /* reading increases the free space accordingly */
+    TEST_ASSERT_EQUAL_INT(ARRAY_SIZE(read_buf),
+                          isrpipe_read(&_pipe, read_buf, ARRAY_SIZE(read_buf)));
+    TEST_ASSERT_EQUAL_INT(ARRAY_SIZE(_buffer) - 1, isrpipe_free(&_pipe));
+
+    /* a full pipe has no free space */
+    while (isrpipe_write_one(&_pipe, 0) == 0) {}
+    TEST_ASSERT_EQUAL_INT(0, isrpipe_free(&_pipe));
+
+    /* free and available space always add up to the buffer size */
+    TEST_ASSERT_EQUAL_INT(ARRAY_SIZE(_buffer),
+                          isrpipe_free(&_pipe) + isrpipe_available(&_pipe));
+
+    /* clearing frees the complete pipe again */
+    isrpipe_clear(&_pipe);
+    TEST_ASSERT_EQUAL_INT(ARRAY_SIZE(_buffer), isrpipe_free(&_pipe));
+}
+
 static void test_clear(void)
 {
     const uint8_t write_buf[] = {1, 2, 3};
@@ -289,6 +320,7 @@ Test *tests_isrpipe_tests(void)
         new_TestFixture(test_write_one),
         new_TestFixture(test_read_one),
         new_TestFixture(test_available),
+        new_TestFixture(test_free),
         new_TestFixture(test_clear),
     };
 
