@@ -1,3 +1,11 @@
+/*
+ * SPDX-FileCopyrightText: 2011 Mutsuo Saito
+ * SPDX-FileCopyrightText: 2011 Makoto Matsumoto
+ * SPDX-FileCopyrightText: 2011 Hiroshima University
+ * SPDX-FileCopyrightText: 2011 The University of Tokyo. All rights reserved.
+ * SPDX-License-Identifier: BSD-3-Clause
+ */
+
 /**
  * @file tinymt32.c
  *
@@ -5,13 +13,6 @@
  *
  * @author Mutsuo Saito (Hiroshima University)
  * @author Makoto Matsumoto (The University of Tokyo)
- *
- * Copyright (C) 2011 Mutsuo Saito, Makoto Matsumoto,
- * Hiroshima University and The University of Tokyo.
- * All rights reserved.
- *
- * The 3-clause BSD License is applied to this software, see
- * LICENSE.txt
  */
 #include "tinymt32.h"
 #define MIN_LOOP 8
