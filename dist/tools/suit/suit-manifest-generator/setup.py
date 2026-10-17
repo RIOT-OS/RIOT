@@ -17,8 +17,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 # ----------------------------------------------------------------------------
-import setuptools
-import os
+
+# SPDX-FileCopyrightText: 2020 ARM Limited or its affiliates
+# SPDX-License-Identifier: NONE
+
 import suit_tool
 
 with open('README.md', 'r') as fd:

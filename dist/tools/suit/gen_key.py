@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 
-#
-# Copyright (C) 2020 Kaspar Schleiser <kaspar@schleiser.de>
-#               2020 Inria
-#               2020 Freie Universität Berlin
+# SPDX-FileCopyrightText: 2020 Kaspar Schleiser <kaspar@schleiser.de>
+# SPDX-FileCopyrightText: 2020 Inria
+# SPDX-FileCopyrightText: 2020 Freie Universität Berlin
+# SPDX-License-Identifier: LGPL-2.1-only
 
 #
 # This file is subject to the terms and conditions of the GNU Lesser
