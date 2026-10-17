@@ -178,7 +178,6 @@ typedef struct {
  * @param[in]     params    device configuration
  *
  * @retval 0            on success
- * @retval -ENODEV      if the device did not acknowledge its configuration
  * @retval <0           negative errno code from the I2C bus on communication error
  */
 int max1161x_init(max1161x_t *dev, const max1161x_params_t *params);
