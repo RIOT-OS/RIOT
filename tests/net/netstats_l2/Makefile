@@ -13,9 +13,6 @@ USEMODULE += netstats_l2
 #   open(/dev/net/tun): No such file or directory
 TEST_ON_CI_BLACKLIST += native32 native64
 
-# sometimes fails on esp32, see #14237.
-TEST_ON_CI_BLACKLIST += esp32-wroom-32
-
 # microbit qemu failing currently
 TEST_ON_CI_BLACKLIST += microbit
 
