@@ -55,7 +55,11 @@ static struct netif *setup_netif(lwip_netif_t *netif, netdev_t *state,
     struct netif *_if = netif_add_noaddr(&netif->lwip_netif, state, lwip_netdev_init,
                                          input_fn);
     if (_if) {
-        netif_register(&netif->common_netif);
+#ifdef MODULE_NETIF_REGISTER
+        netif_register(&netif->common_netif, state->type, state->index);
+#else
+        netif_register(&netif->common_netif, NETIF_ANY, 0);
+#endif
     }
     return _if;
 }
