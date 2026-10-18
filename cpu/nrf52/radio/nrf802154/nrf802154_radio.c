@@ -22,7 +22,6 @@
 #include "nrf_clock.h"
 
 #include "net/ieee802154.h"
-#include "periph/timer.h"
 #include "nrf802154.h"
 #include "net/ieee802154/radio.h"
 
@@ -31,9 +30,6 @@
 
 #define ED_RSSISCALE        (4U)    /**< RSSI scale for internal HW value */
 #define ED_RSSIOFFS         (-92)   /**< RSSI offset for internal HW value */
-
-/* Set timer period to 16 us (IEEE 802.15.4 symbol time) */
-#define TIMER_FREQ          (62500UL)
 
 #define TX_POWER_MIN        (-40)                               /* in dBm */
 #define TX_POWER_MAX        ((int)RADIO_TXPOWER_TXPOWER_Max)    /* in dBm */
@@ -60,8 +56,6 @@
                              RADIO_SHORTS_CCABUSY_DISABLE_Msk | \
                              RADIO_SHORTS_TXREADY_START_Msk)
 
-#define MAC_TIMER_CHAN_IFS  (1U)    /**< MAC timer channel for handling IFS logic */
-
 static uint8_t rxbuf[IEEE802154_FRAME_LEN_MAX + 3]; /* len PHR + PSDU + LQI */
 static uint8_t txbuf[IEEE802154_FRAME_LEN_MAX + 3]; /* len PHR + PSDU + LQI */
 
@@ -80,7 +74,6 @@ static uint8_t nrf802154_long_addr[IEEE802154_LONG_ADDRESS_LEN];
 static uint16_t nrf802154_pan_id;
 
 static struct {
-    bool ifs        : 1;    /**< if true, the device is currently inside the IFS period */
     bool cca_send   : 1;    /**< whether the next transmission uses CCA or not */
     bool ack_filter : 1;    /**< whether the ACK filter is activated or not */
     bool promisc    : 1;    /**< whether the device is in promiscuous mode or not */
@@ -207,10 +200,6 @@ static int _request_op(ieee802154_dev_t *dev, ieee802154_hal_op_t op, void *ctx)
 
     switch (op) {
     case IEEE802154_HAL_OP_TRANSMIT:
-        if (cfg.ifs) {
-            goto end;
-        }
-
         if (cfg.cca_send) {
             NRF_RADIO->SHORTS = CCA_SHORTS;
             NRF_RADIO->TASKS_RXEN = 1;
@@ -405,30 +394,6 @@ static void _set_txpower(int16_t txpower)
     }
 }
 
-static void _set_ifs_timer(bool lifs)
-{
-    uint8_t timeout;
-    cfg.ifs = true;
-    if (lifs) {
-        timeout = IEEE802154_LIFS_SYMS;
-    }
-    else {
-        timeout = IEEE802154_SIFS_SYMS;
-    }
-
-    timer_set(NRF802154_TIMER, MAC_TIMER_CHAN_IFS, timeout);
-    timer_start(NRF802154_TIMER);
-}
-
-static void _timer_cb(void *arg, int chan)
-{
-    (void)arg;
-    if (chan == MAC_TIMER_CHAN_IFS) {
-        cfg.ifs = false;
-    }
-    timer_stop(NRF802154_TIMER);
-}
-
 /**
  * @brief   Set radio into DISABLED state
  */
@@ -438,11 +403,6 @@ int nrf802154_init(void)
     /* reset buffer */
     rxbuf[0] = 0;
     txbuf[0] = 0;
-
-    int result = timer_init(NRF802154_TIMER, TIMER_FREQ, _timer_cb, NULL);
-    assert(result >= 0);
-    (void)result;
-    timer_stop(NRF802154_TIMER);
 
     /* power off peripheral (but do not release the HFXO as we never requested
      * it so far) */
@@ -492,7 +452,6 @@ void isr_radio(void)
         case STATE_TX:
             DEBUG("[nrf802154] TX state: %x\n", (uint8_t)NRF_RADIO->STATE);
 
-            _set_ifs_timer(txbuf[0] > IEEE802154_SIFS_MAX_FRAME_SIZE);
             _state = STATE_IDLE;
             dev->cb(dev, IEEE802154_RADIO_CONFIRM_TX_DONE);
             break;

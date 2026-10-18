@@ -63,7 +63,7 @@ typedef struct nrf802154 nrf802154_t;
 /**
  * @brief   IEEE 802.15.4 radio timer configuration
  *
- *          this radio relies on a dedicated hardware timer to maintain IFS
+ *          this radio has a dedicated hardware timer for radio operations.
  *          the default timer may be overwritten in the board configuration
  */
 #ifndef NRF802154_TIMER
