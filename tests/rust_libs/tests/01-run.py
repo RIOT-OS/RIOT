@@ -16,6 +16,7 @@ EXPECTED_CMDS = {
         'echo': 'prints the input command',
         'empty': 'print nothing on command',
         'periodic': 'periodically print command',
+        'burst': 'print lines in quick succession (default: 16)',
         'hello_world': 'Print a greeting',
         'xfa_test1': 'xfa test command 1',
         'xfa_test2': 'xfa test command 2',
