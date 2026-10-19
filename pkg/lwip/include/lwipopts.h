@@ -159,7 +159,9 @@ extern "C" {
 #define NETIF_MAX_HWADDR_LEN    (GNRC_NETIF_HDR_L2ADDR_MAX_LEN)
 
 #ifndef TCPIP_THREAD_STACKSIZE
-#define TCPIP_THREAD_STACKSIZE  (THREAD_STACKSIZE_DEFAULT)
+/* TODO: some more benchmarking needed for a proper value.
+ * this was deduced from reception of UDP packet on closed port, needed 1100 B on ARM Cortex-M */
+#define TCPIP_THREAD_STACKSIZE  (THREAD_STACKSIZE_DEFAULT * 3 / 2)
 #endif
 
 #define MEM_ALIGNMENT           4
