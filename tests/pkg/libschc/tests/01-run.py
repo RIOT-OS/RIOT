@@ -40,6 +40,7 @@ class InputMixin:
             input_hex = input_hex[self.MAX:]
 
     def input_reset(self):
+        self.flush_spawn(expect_timeout=0.1)
         self.spawn.sendline("input reset")
 
     def expect_od_dump_of(self, byts):
