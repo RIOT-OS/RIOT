@@ -2,6 +2,7 @@
 # SPDX-License-Identifier: LGPL-2.1-only
 
 """Utility functions for writing tests."""
+
 import pexpect
 
 
