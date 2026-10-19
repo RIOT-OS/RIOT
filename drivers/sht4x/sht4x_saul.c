@@ -36,14 +36,14 @@ static int _read(unsigned dev)
     int res;
 
     res = sht4x_read(&sht4x_devs[dev], &_temp[dev], &_hum[dev]);
-    if (res != SHT4X_OK) {
+    if (res != 0) {
         return res;
     }
 
     _temp_valid[dev] = true;
     _hum_valid[dev] = true;
 
-    return SHT4X_OK;
+    return 0;
 }
 
 static int read_temp(const void *dev, phydat_t *data)
@@ -53,7 +53,7 @@ static int read_temp(const void *dev, phydat_t *data)
         return -ECANCELED;
     }
 
-    if (_temp_valid[dev_index] || _read(dev_index) == SHT4X_OK) {
+    if (_temp_valid[dev_index] || _read(dev_index) == 0) {
         _temp_valid[dev_index] = false;
         data->val[0] = _temp[dev_index];
         data->unit = UNIT_TEMP_C;
@@ -71,7 +71,7 @@ static int read_hum(const void *dev, phydat_t *data)
         return -ECANCELED;
     }
 
-    if (_hum_valid[dev_index] || _read(dev_index) == SHT4X_OK) {
+    if (_hum_valid[dev_index] || _read(dev_index) == 0) {
         _hum_valid[dev_index] = false;
         data->val[0] = _hum[dev_index];
         data->unit = UNIT_PERCENT;

@@ -33,10 +33,10 @@ static const uint8_t SHT4X_MEASURE_CMD[3] = {
     0xFD  /* high repeatability */
 };
 
-static const uint16_t SHT4X_MEASURE_WAIT_US[3] = {
-    1600,
-    4500,
-    8300
+static const uint16_t SHT4X_MEASURE_WAIT_MS[3] = {
+    2,
+    5,
+    9
 };
 
 static const uint8_t SHT4X_HEATER_CMD[3][2] = {
@@ -45,9 +45,9 @@ static const uint8_t SHT4X_HEATER_CMD[3][2] = {
     { 0x1E, 0x15 }  /* low power long, short */
 };
 
-static const uint32_t SHT4X_HEATER_WAIT_US[2] = {
-    1000000,
-    100000
+static const uint16_t SHT4X_HEATER_WAIT_MS[2] = {
+    1000,
+    100
 };
 
 static inline uint8_t _crc8(const void *buf, size_t len)
@@ -69,10 +69,10 @@ static int _send_command(sht4x_dev_t *dev, uint8_t cmd)
 
     if (res != 0) {
         DEBUG("[sht4x] could not send command 0x%02x, reason=%d\n", cmd, res);
-        return -SHT4X_ERROR_I2C;
+        return -EIO;
     }
 
-    return SHT4X_OK;
+    return 0;
 }
 
 static int _read_sample(sht4x_dev_t *dev, void *buf, size_t len)
@@ -88,10 +88,10 @@ static int _read_sample(sht4x_dev_t *dev, void *buf, size_t len)
 
     if (res != 0) {
         DEBUG("[sht4x] could not read %zu bytes, reason=%d\n", len, res);
-        return -SHT4X_ERROR_I2C;
+        return -EIO;
     }
 
-    return SHT4X_OK;
+    return 0;
 }
 
 /* raw -> centi-units: val = raw * range / 0xFFFF - offset */
@@ -100,29 +100,29 @@ static int16_t _convert(uint16_t raw, int32_t range, int32_t offset)
     return (int32_t)((int64_t)raw * range / 0xFFFF) - offset;
 }
 
-static int _measure(sht4x_dev_t *dev, uint8_t cmd, uint32_t wait_us,
+static int _measure(sht4x_dev_t *dev, uint8_t cmd, uint16_t wait_ms,
                      int16_t *temp, int16_t *hum)
 {
     sht4x_data_t data;
 
-    if (_send_command(dev, cmd) != SHT4X_OK) {
-        return -SHT4X_ERROR_I2C;
+    if (_send_command(dev, cmd) != 0) {
+        return -EIO;
     }
 
-    ztimer_sleep(ZTIMER_USEC, wait_us);
+    ztimer_sleep(ZTIMER_MSEC, wait_ms);
 
-    if (_read_sample(dev, &data, sizeof(data)) != SHT4X_OK) {
-        return -SHT4X_ERROR_I2C;
+    if (_read_sample(dev, &data, sizeof(data)) != 0) {
+        return -EIO;
     }
 
     if (_crc8(&data.temp_raw, sizeof(data.temp_raw)) != data.temp_crc) {
         DEBUG("[sht4x] temperature CRC failed\n");
-        return -SHT4X_ERROR_CRC;
+        return -EBADMSG;
     }
 
     if (_crc8(&data.rh_raw, sizeof(data.rh_raw)) != data.rh_crc) {
         DEBUG("[sht4x] humidity CRC failed\n");
-        return -SHT4X_ERROR_CRC;
+        return -EBADMSG;
     }
 
     if (temp != NULL) {
@@ -136,7 +136,7 @@ static int _measure(sht4x_dev_t *dev, uint8_t cmd, uint32_t wait_us,
         *hum = (rh < 0) ? 0 : (rh > 100) ? 100 : rh;
     }
 
-    return SHT4X_OK;
+    return 0;
 }
 
 int sht4x_init(sht4x_dev_t *dev, const sht4x_params_t *params)
@@ -150,15 +150,15 @@ int sht4x_init(sht4x_dev_t *dev, const sht4x_params_t *params)
     dev->heater_power = SHT4X_HEATER_POWER_HIGH;
     dev->heater_duration = SHT4X_HEATER_DURATION_LONG;
 
-    if (_send_command(dev, SHT4X_CMD_RESET) != SHT4X_OK) {
+    if (_send_command(dev, SHT4X_CMD_RESET) != 0) {
         DEBUG("[sht4x] reset failed\n");
-        return -SHT4X_ERROR_I2C;
+        return -EIO;
     }
 
-    ztimer_sleep(ZTIMER_USEC, 1000);
+    ztimer_sleep(ZTIMER_MSEC, 1);
     DEBUG("[sht4x] sensor initialized\n");
 
-    return SHT4X_OK;
+    return 0;
 }
 
 int sht4x_read(sht4x_dev_t *dev, int16_t *temp, int16_t *hum)
@@ -167,7 +167,7 @@ int sht4x_read(sht4x_dev_t *dev, int16_t *temp, int16_t *hum)
     assert(temp != NULL || hum != NULL);
 
     return _measure(dev, SHT4X_MEASURE_CMD[dev->repeat],
-                     SHT4X_MEASURE_WAIT_US[dev->repeat], temp, hum);
+                     SHT4X_MEASURE_WAIT_MS[dev->repeat], temp, hum);
 }
 
 int sht4x_read_with_heater(sht4x_dev_t *dev, int16_t *temp, int16_t *hum)
@@ -176,7 +176,7 @@ int sht4x_read_with_heater(sht4x_dev_t *dev, int16_t *temp, int16_t *hum)
     assert(temp != NULL || hum != NULL);
 
     return _measure(dev, SHT4X_HEATER_CMD[dev->heater_power][dev->heater_duration],
-                     SHT4X_HEATER_WAIT_US[dev->heater_duration], temp, hum);
+                     SHT4X_HEATER_WAIT_MS[dev->heater_duration], temp, hum);
 }
 
 int sht4x_set_heater_power(sht4x_dev_t *dev, sht4x_heater_power_t power)
@@ -186,7 +186,7 @@ int sht4x_set_heater_power(sht4x_dev_t *dev, sht4x_heater_power_t power)
 
     dev->heater_power = power;
 
-    return SHT4X_OK;
+    return 0;
 }
 
 int sht4x_set_heater_duration(sht4x_dev_t *dev, sht4x_heater_duration_t duration)
@@ -196,5 +196,5 @@ int sht4x_set_heater_duration(sht4x_dev_t *dev, sht4x_heater_duration_t duration
 
     dev->heater_duration = duration;
 
-    return SHT4X_OK;
+    return 0;
 }

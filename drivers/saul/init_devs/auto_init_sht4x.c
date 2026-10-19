@@ -5,6 +5,7 @@
 
 #include <assert.h>
 
+#include "container.h"
 #include "log.h"
 #include "saul.h"
 #include "saul_reg.h"
@@ -24,7 +25,7 @@ void auto_init_sht4x(void)
     assert(SHT4X_INFO_NUM == SHT4X_NUM);
 
     for (unsigned i = 0; i < SHT4X_NUM; i++) {
-        if (sht4x_init(&sht4x_devs[i], &sht4x_params[i]) != SHT4X_OK) {
+        if (sht4x_init(&sht4x_devs[i], &sht4x_params[i]) != 0) {
             LOG_ERROR("[auto_init_saul] error initializing sht4x #%u\n", i);
             continue;
         }
