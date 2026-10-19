@@ -11,6 +11,8 @@ from riotctrl.ctrl import RIOTCtrl
 from riotctrl.shell import ShellInteraction
 from riotctrl.shell.json import RapidJSONShellInteractionParser
 
+from testrunner.spawn import flush_child
+
 
 class TestTuroBase(unittest.TestCase):
     DEBUG = False
@@ -22,6 +24,7 @@ class TestTuroBase(unittest.TestCase):
         cls.ctrl.start_term()
         if cls.DEBUG:
             cls.ctrl.term.logfile = sys.stdout
+        flush_child(cls.ctrl.term)
         cls.shell = ShellInteraction(cls.ctrl)
         cls.json_parser = RapidJSONShellInteractionParser()
         cls.logger = logging.getLogger(cls.__name__)
