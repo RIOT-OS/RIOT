@@ -128,6 +128,10 @@ ifneq (,$(filter lwip_ethernet lwip_sixlowpan,$(USEMODULE)))
   USEMODULE += lwip_netdev
 endif
 
+ifneq (,$(filter lwip_netdev,$(USEMODULE)))
+  USEMODULE += tiny_strerror
+endif
+
 # Addition of missing modules for boards that do not have physical network
 # module - a dirty hack when lwip_dhcp is used for IPv4 (use of lwip_ipv4 module)
 # on such boards (lack of netdev_eth module)
