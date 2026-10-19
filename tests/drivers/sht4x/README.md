@@ -4,5 +4,6 @@ This is a manual test application for the SHT4x sensor driver. It initializes th
 
 To build this test from the RIOT root:
 
-    make tests/drivers/sht4x BOARD=<board>
-
+```shell
+make tests/drivers/sht4x BOARD=<board>
+```

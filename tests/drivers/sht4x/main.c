@@ -20,13 +20,13 @@ int main(void)
 
     puts("SHT4X test application\n");
 
-    if ((res = sht4x_init(&dev, &sht4x_params[0])) != SHT4X_OK) {
+    if ((res = sht4x_init(&dev, &sht4x_params[0])) != 0) {
         puts("Initialization failed\n");
         return 1;
     }
 
     while (1) {
-        if ((res = sht4x_read(&dev, &temp, &hum)) == SHT4X_OK) {
+        if ((res = sht4x_read(&dev, &temp, &hum)) == 0) {
             printf("Temperature [°C]: %d.%02d\n"
                    "Relative Humidity [%%]: %d\n"
                    "+-------------------------------------+\n",
