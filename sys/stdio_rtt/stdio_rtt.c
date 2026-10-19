@@ -1,6 +1,10 @@
 /*
- * Copyright (C) 2016 Michael Andersen <m.andersen@cs.berkeley.edu>
- *
+ * SPDX-FileCopyrightText: 2014-2016 SEGGER Microcontroller GmbH & Co. KG
+ * SPDX-FileCopyrightText: 2016 Michael Andersen <m.andersen@cs.berkeley.edu>
+ * SPDX-License-Identifier: BSD-3-Clause
+ */
+
+/*
  * This file was based on SEGGER's reference implementation
  * which can be found here: https://www.segger.com/jlink-rtt.html
  * (c) 2014-2016 SEGGER Microcontroller GmbH & Co. KG
