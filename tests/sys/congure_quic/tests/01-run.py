@@ -316,7 +316,7 @@ class TestCongUREQUICDefault(TestCongUREBase):
         self.assertIn('success', res)
         return msg, ack
 
-    def test_on_packet_ack_no_rtt_sample(self, state=None):
+    def _on_packet_ack_no_rtt_sample(self, state=None):
         """
         Test the compliance with RFC9002 Section A.7.
 
@@ -341,6 +341,9 @@ class TestCongUREQUICDefault(TestCongUREBase):
         self.assertGreater(state['first_rtt_sample'], 0)
         return msg, ack
 
+    def test_on_packet_ack_no_rtt_sample(self, state=None):
+        self._on_packet_ack_no_rtt_sample(state=state)
+
     def assertRTTSampleCorrect(self, state, init_min_rtt, init_smoothed_rtt,
                                init_rtt_var, adjusted_rtt):
         # rttvar = 3/4 * rttvar + 1/4 * abs(smoothed_rtt - adjusted_rtt)
@@ -364,7 +367,7 @@ class TestCongUREQUICDefault(TestCongUREBase):
         See: https://www.rfc-editor.org/info/rfc9002/#section-a.7
         """
         # set first RTT sample
-        self.test_on_packet_ack_no_rtt_sample()
+        self._on_packet_ack_no_rtt_sample()
         state = self.cong_state()
         init_min_rtt = state['min_rtt']
         init_smoothed_rtt = state['smoothed_rtt']
@@ -392,7 +395,7 @@ class TestCongUREQUICDefault(TestCongUREBase):
         See: https://www.rfc-editor.org/info/rfc9002/#section-a.7
         """
         # set first RTT sample
-        self.test_on_packet_ack_no_rtt_sample()
+        self._on_packet_ack_no_rtt_sample()
         state = self.cong_state()
         init_min_rtt = state['min_rtt']
         init_smoothed_rtt = state['smoothed_rtt']
@@ -427,7 +430,7 @@ class TestCongUREQUICDefault(TestCongUREBase):
         init_cwnd = state['cwnd']
         # trigger message + ACK and check if UpdateRTT (see A.7) was called
         # correctly
-        msg, ack = self.test_on_packet_ack_no_rtt_sample(state)
+        msg, ack = self._on_packet_ack_no_rtt_sample(state)
         state = self.cong_state()
         # bytes_in_flight -= acked_packet.sent_bytes
         self.assertEqual(state['in_flight_size'], init_in_flight_size)
@@ -452,7 +455,7 @@ class TestCongUREQUICDefault(TestCongUREBase):
         init_in_flight_size = state['in_flight_size']
         # trigger message + ACK and check if UpdateRTT (see A.7) was called
         # correctly
-        msg, ack = self.test_on_packet_ack_no_rtt_sample(state)
+        msg, ack = self._on_packet_ack_no_rtt_sample(state)
         state = self.cong_state()
         # bytes_in_flight -= acked_packet.sent_bytes
         self.assertEqual(state['in_flight_size'], init_in_flight_size)
@@ -481,7 +484,7 @@ class TestCongUREQUICDefault(TestCongUREBase):
         init_cwnd = state['cwnd']
         # trigger message + ACK and check if UpdateRTT (see A.7) was called
         # correctly
-        msg, ack = self.test_on_packet_ack_no_rtt_sample(state)
+        msg, ack = self._on_packet_ack_no_rtt_sample(state)
         state = self.cong_state()
         # bytes_in_flight -= acked_packet.sent_bytes
         self.assertEqual(state['in_flight_size'], init_in_flight_size)
@@ -506,7 +509,7 @@ class TestCongUREQUICDefault(TestCongUREBase):
         init_cwnd = state['cwnd']
         # trigger message + ACK and check if UpdateRTT (see A.7) was called
         # correctly
-        msg, ack = self.test_on_packet_ack_no_rtt_sample(state)
+        msg, ack = self._on_packet_ack_no_rtt_sample(state)
         state = self.cong_state()
         # bytes_in_flight -= acked_packet.sent_bytes
         self.assertEqual(state['in_flight_size'], init_in_flight_size)
@@ -646,7 +649,7 @@ class TestCongUREQUICDefault(TestCongUREBase):
                 {'send_time': 1100, 'size': 134, 'resends': 0}]
         # trigger message + ACK and check if UpdateRTT (see A.7) was called
         # correctly to have an RTT sample
-        msg, ack = self.test_on_packet_ack_no_rtt_sample(self.cong_state())
+        msg, ack = self._on_packet_ack_no_rtt_sample(self.cong_state())
         state = self.cong_state()
         init_in_flight_size = state['in_flight_size']
         init_cwnd = state['cwnd']
@@ -671,7 +674,7 @@ class TestCongUREQUICDefault(TestCongUREBase):
                 {'send_time': 1100, 'size': 134, 'resends': 0}]
         # trigger message + ACK and check if UpdateRTT (see A.7) was called
         # correctly to have an RTT sample
-        msg, ack = self.test_on_packet_ack_no_rtt_sample(self.cong_state())
+        msg, ack = self._on_packet_ack_no_rtt_sample(self.cong_state())
         # enforce new cwnd to be smaller than `min_wnd`
         state = self.cong_state()
         init_cwnd = state['consts']['min_wnd']
@@ -700,7 +703,7 @@ class TestCongUREQUICDefault(TestCongUREBase):
                 {'send_time': 1100, 'size': 134, 'resends': 0}]
         # trigger message + ACK and check if UpdateRTT (see A.7) was called
         # correctly to have an RTT sample
-        msg, ack = self.test_on_packet_ack_no_rtt_sample(self.cong_state())
+        msg, ack = self._on_packet_ack_no_rtt_sample(self.cong_state())
         # enforce recovery mode for given send time = 1100
         self.set_recovery_start(2000)
         state = self.cong_state()
@@ -725,7 +728,7 @@ class TestCongUREQUICDefault(TestCongUREBase):
         """
         # trigger message + ACK and check if UpdateRTT (see A.7) was called
         # correctly to have an RTT sample
-        msg, ack = self.test_on_packet_ack_no_rtt_sample(self.cong_state())
+        msg, ack = self._on_packet_ack_no_rtt_sample(self.cong_state())
         max_ack_delay = 120
         self.set_max_ack_delay(max_ack_delay)
         state = self.cong_state()
@@ -768,7 +771,7 @@ class TestCongUREQUICDefault(TestCongUREBase):
         """
         # trigger message + ACK and check if UpdateRTT (see A.7) was called
         # correctly to have an RTT sample
-        msg, ack = self.test_on_packet_ack_no_rtt_sample(self.cong_state())
+        msg, ack = self._on_packet_ack_no_rtt_sample(self.cong_state())
         # enforce new cwnd to be smaller than `min_wnd`
         state = self.cong_state()
         init_cwnd = state['consts']['min_wnd']
@@ -817,7 +820,7 @@ class TestCongUREQUICDefault(TestCongUREBase):
         """
         # trigger message + ACK and check if UpdateRTT (see A.7) was called
         # correctly to have an RTT sample
-        msg, ack = self.test_on_packet_ack_no_rtt_sample(self.cong_state())
+        msg, ack = self._on_packet_ack_no_rtt_sample(self.cong_state())
         # enforce recovery mode for given send time = 1100
         self.set_recovery_start(2000)
         state = self.cong_state()
