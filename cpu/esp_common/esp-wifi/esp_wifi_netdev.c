@@ -829,6 +829,14 @@ static int _esp_wifi_init(netdev_t *netdev)
 {
     ESP_WIFI_DEBUG("%p", netdev);
 
+#ifdef MODULE_ESP_WIFI_AP
+    /* The SoftAP interface does not generate any link events, so signal
+     * link UP here. Otherwise the network stack would never be notified that
+     * the interface is up and, e.g., GNRC would not configure an IPv6
+     * link-local address. */
+    netdev->event_callback(netdev, NETDEV_EVENT_LINK_UP);
+#endif
+
     return 0;
 }
 
