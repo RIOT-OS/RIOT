@@ -5,7 +5,7 @@
 # directory for more details.
 
 import unittest
-from testrunner import setup_child, teardown_child
+from testrunner import flush_child, setup_child, teardown_child
 
 
 class PexpectTestCase(unittest.TestCase):
@@ -21,3 +21,8 @@ class PexpectTestCase(unittest.TestCase):
     @classmethod
     def tearDownClass(cls):
         teardown_child(cls.spawn)
+
+    @classmethod
+    def flush_spawn(cls, expect_timeout=1):
+        """Flush spawn from garbage that might be sent by device on start."""
+        flush_child(cls.spawn, expect_timeout=expect_timeout)

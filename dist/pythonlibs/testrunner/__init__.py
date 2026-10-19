@@ -13,6 +13,7 @@ from functools import partial
 from traceback import print_tb
 import pexpect
 
+from .spawn import flush_child   # noqa, F401 expose to users
 from .spawn import find_exc_origin, setup_child, teardown_child
 from .unittest import PexpectTestCase   # noqa, F401 expose to users
 from .utils import test_utils_interactive_sync # noqa, F401 expose to users
