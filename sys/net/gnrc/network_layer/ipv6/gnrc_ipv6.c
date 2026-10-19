@@ -507,6 +507,13 @@ static int _fill_ipv6_hdr(gnrc_netif_t *netif, gnrc_pktsnip_t *ipv6)
             /* Otherwise leave unspecified */
         }
     }
+    /* TODO: This can be removed when `memcmp()` on `native` has become thread-safe.
+     * This is the only way `netif` can become `NULL` here while `hdr->dst` is
+     * not loopback. */
+    else if ((netif == NULL) && !ipv6_addr_is_loopback(&hdr->dst)) {
+        DEBUG("ipv6: no interface provided for non-loopback destination\n");
+        return -EADDRNOTAVAIL;
+    }
     else {
         bool invalid_src;
         int idx;
