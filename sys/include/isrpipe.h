@@ -108,7 +108,10 @@ uint8_t isrpipe_read_one(isrpipe_t *isrpipe);
  *          blocking read after this call will consume that pending wakeup
  *          before blocking normally.
  */
-void isrpipe_clear(isrpipe_t *isrpipe);
+static inline void isrpipe_clear(isrpipe_t *isrpipe)
+{
+    tsrb_clear(&isrpipe->tsrb);
+}
 
 /**
  * @brief   Get the number of bytes available for reading from the isrpipe
@@ -117,7 +120,22 @@ void isrpipe_clear(isrpipe_t *isrpipe);
  *
  * @returns     number of bytes available in the isrpipe's buffer
  */
-unsigned int isrpipe_available(isrpipe_t *isrpipe);
+static inline unsigned int isrpipe_available(isrpipe_t *isrpipe)
+{
+    return tsrb_avail(&isrpipe->tsrb);
+}
+
+/**
+ * @brief   Get the number of bytes that can still be written to the isrpipe
+ *
+ * @param[in]   isrpipe    isrpipe object to operate on
+ *
+ * @returns     number of bytes free in the isrpipe's buffer
+ */
+static inline unsigned int isrpipe_get_free(isrpipe_t *isrpipe)
+{
+    return tsrb_free(&isrpipe->tsrb);
+}
 
 #ifdef __cplusplus
 }
