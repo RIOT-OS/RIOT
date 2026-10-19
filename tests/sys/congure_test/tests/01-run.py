@@ -15,7 +15,7 @@ from riotctrl.shell.json import RapidJSONShellInteractionParser, rapidjson
 
 from riotctrl_shell.congure_test import CongureTest
 
-from testrunner.spawn import MAKE_TERM_CONNECT_DELAY
+from testrunner.spawn import flush_child, MAKE_TERM_CONNECT_DELAY
 
 
 class TestCongUREBase(unittest.TestCase):
@@ -29,6 +29,7 @@ class TestCongUREBase(unittest.TestCase):
         cls.ctrl.start_term()
         if cls.DEBUG:
             cls.ctrl.term.logfile = sys.stdout
+        flush_child(cls.ctrl.term)
         cls.shell = ShellInteraction(cls.ctrl)
         cls.json_parser = RapidJSONShellInteractionParser()
         cls.json_parser.set_parser_args(
