@@ -34,6 +34,19 @@
 
 #define MTD_FLASHPAGE_END_ADDR     ((uintptr_t) CPU_FLASH_BASE + (FLASHPAGE_NUMOF * FLASHPAGE_SIZE))
 
+/* Size of the buffer for unaligned writes. It starts at an address aligned to
+ * FLASHPAGE_WRITE_BLOCK_ALIGNMENT and must cover at least one full
+ * write block, so it has to be the larger of both values. */
+#define MTD_FLASHPAGE_UNALIGNED_BUF_SIZE    MAX(FLASHPAGE_WRITE_BLOCK_SIZE, \
+                                                FLASHPAGE_WRITE_BLOCK_ALIGNMENT)
+
+static_assert(MTD_FLASHPAGE_UNALIGNED_BUF_SIZE % FLASHPAGE_WRITE_BLOCK_SIZE == 0,
+              "MTD_FLASHPAGE_UNALIGNED_BUF_SIZE must be a multiple of "
+              "FLASHPAGE_WRITE_BLOCK_SIZE");
+static_assert(MTD_FLASHPAGE_UNALIGNED_BUF_SIZE % FLASHPAGE_WRITE_BLOCK_ALIGNMENT == 0,
+              "MTD_FLASHPAGE_UNALIGNED_BUF_SIZE must be a multiple of "
+              "FLASHPAGE_WRITE_BLOCK_ALIGNMENT");
+
 static int _init(mtd_dev_t *dev)
 {
     mtd_flashpage_t *super = container_of(dev, mtd_flashpage_t, base);
@@ -42,9 +55,9 @@ static int _init(mtd_dev_t *dev)
     assert(!(super->offset % dev->pages_per_sector));
 
     /* Use separate variable to avoid '>= 0 is always true' warning */
-    #ifndef NDEBUG
+#ifndef NDEBUG
     static const uintptr_t cpu_flash_base = CPU_FLASH_BASE;
-    #endif
+#endif
     assert((uintptr_t)flashpage_addr(super->offset / dev->pages_per_sector) >= cpu_flash_base);
     assert((uintptr_t)flashpage_addr(super->offset / dev->pages_per_sector)
            + dev->pages_per_sector * dev->page_size * dev->sector_count <= MTD_FLASHPAGE_END_ADDR);
@@ -111,11 +124,11 @@ static int _write_page(mtd_dev_t *dev, const void *buf, uint32_t page, uint32_t 
 
     if ((addr % FLASHPAGE_WRITE_BLOCK_ALIGNMENT) || (size < FLASHPAGE_WRITE_BLOCK_SIZE) ||
         ((uintptr_t)buf % FLASHPAGE_WRITE_BLOCK_ALIGNMENT)) {
-        uint8_t tmp[FLASHPAGE_WRITE_BLOCK_SIZE]
+        uint8_t tmp[MTD_FLASHPAGE_UNALIGNED_BUF_SIZE]
                 __attribute__ ((aligned (FLASHPAGE_WRITE_BLOCK_ALIGNMENT)));
 
         offset = addr % FLASHPAGE_WRITE_BLOCK_ALIGNMENT;
-        size = MIN(size, FLASHPAGE_WRITE_BLOCK_SIZE - offset);
+        size = MIN(size, sizeof(tmp) - offset);
 
         DEBUG("flashpage: write %"PRIu32" at %p - ""%"PRIu32"\n", size, (void *)addr, offset);
 
