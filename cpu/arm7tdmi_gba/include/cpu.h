@@ -15,8 +15,6 @@
 extern "C" {
 #endif
 
-extern uintptr_t __stack_start; /**< end of user stack memory space */
-
 /**
  * @brief   The interrupt service routine for the timer interrupts
  */

@@ -24,6 +24,8 @@
 #include "cpu.h"
 #include "log.h"
 
+extern uintptr_t __stack_start; /**< end of user stack memory space */
+
 static inline void _init_data(void)
 {
     /* (linker script ensures that data is 32-bit aligned) */

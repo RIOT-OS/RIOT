@@ -20,8 +20,6 @@
 extern "C" {
 #endif
 
-extern uintptr_t __stack_start;     /**< end of user stack memory space */
-
 /**
  * @brief Initialize the phase lock loop oscillator
  */
