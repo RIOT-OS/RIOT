@@ -429,6 +429,9 @@ LINKFLAGS += -L$(RIOTCPU)/$(CPU)/ld/$(CPU_FAM)/
 LINKFLAGS += -T$(BINDIR)/memory.ld
 LINKFLAGS += -T$(BINDIR)/sections.ld
 
+# the application description has to be linked even if not referenced
+LINKFLAGS += -Wl,-u,esp_app_desc
+
 LINKFLAGS += -T$(ESP32_SDK_DIR)/components/soc/$(CPU_FAM)/ld/$(CPU_FAM).peripherals.ld
 LINKFLAGS += -T$(ESP32_SDK_DIR)/components/esp_rom/$(CPU_FAM)/ld/$(CPU_FAM).rom.ld
 LINKFLAGS += -T$(ESP32_SDK_DIR)/components/esp_rom/$(CPU_FAM)/ld/$(CPU_FAM).rom.api.ld
