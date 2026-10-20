@@ -21,7 +21,6 @@ ifeq (esp32s3,$(CPU_FAM))
   ESP32_SDK_SRC += components/esp_hal_dma/gdma_hal_ahb_v1.c
   ESP32_SDK_SRC += components/esp_hal_dma/gdma_hal_top.c
   ESP32_SDK_SRC += components/esp_hal_dma/$(CPU_FAM)/gdma_periph.c
-  ESP32_SDK_ASMSRC += components/esp_rom/patches/esp_rom_cache_writeback_esp32s3.S
 endif
 
 INCLUDES += -I$(ESP32_SDK_DIR)/components/esp_driver_dma/include

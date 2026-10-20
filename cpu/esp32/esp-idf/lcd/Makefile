@@ -17,7 +17,6 @@ ifeq (esp32s3,$(CPU_FAM))
     ESP32_SDK_SRC += components/esp_hal_dma/gdma_hal_ahb_v1.c
     ESP32_SDK_SRC += components/esp_hal_dma/gdma_hal_top.c
     ESP32_SDK_SRC += components/esp_hal_dma/$(CPU_FAM)/gdma_periph.c
-    ESP32_SDK_ASMSRC += components/esp_rom/patches/esp_rom_cache_writeback_esp32s3.S
   endif
 else ifneq (,$(filter esp32 esp32s2,$(CPU_FAM)))
   ESP32_SDK_SRC += components/esp_driver_i2s/i2s_platform.c
