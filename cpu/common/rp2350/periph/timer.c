@@ -114,18 +114,14 @@ int timer_set(tim_t dev, int channel, unsigned int timeout)
         return -EINVAL;
     }
 
+    unsigned state = irq_disable();
+    _flag_periodic[dev] &= ~(1u << channel);
     if (timeout == 0) {
-        if (ctx_cb[dev]) {
-            ctx_cb[dev](ctx_arg[dev], channel);
-        }
+        timeout = 1;
     }
-    else {
-        unsigned state = irq_disable();
-        _flag_periodic[dev] &= ~(1u << channel);
-        /* An alarm matches on the lower 32 bits */
-        *ALARM(dev, channel) = DEV(dev)->TIMERAWL + timeout;
-        irq_restore(state);
-    }
+    /* An alarm matches on the lower 32 bits */
+    *ALARM(dev, channel) = DEV(dev)->TIMERAWL + timeout;
+    irq_restore(state);
 
     return 0;
 }
