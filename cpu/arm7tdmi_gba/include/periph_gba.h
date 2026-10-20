@@ -132,10 +132,10 @@ extern "C" {
  * @brief    Possible timer frequencies
  * @{
  */
-#define GBA_TIMER_FRQ_16K      (16400u)    /**< F = 16.4kHz */
-#define GBA_TIMER_FRQ_65K      (65500u)    /**< F = 65.5kHz */
-#define GBA_TIMER_FRQ_262K     (262200u)   /**< F = 262.2kHz */
-#define GBA_TIMER_FRQ_16M      (16780000u) /**< F = 16.78MHz */
+#define GBA_TIMER_FRQ_16K      (16400lu)    /**< F = 16.4kHz */
+#define GBA_TIMER_FRQ_65K      (65500lu)    /**< F = 65.5kHz */
+#define GBA_TIMER_FRQ_262K     (262200lu)   /**< F = 262.2kHz */
+#define GBA_TIMER_FRQ_16M      (16780000lu) /**< F = 16.78MHz */
 /** @} */
 
 /**
