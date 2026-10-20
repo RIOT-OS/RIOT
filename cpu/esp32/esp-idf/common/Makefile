@@ -81,8 +81,8 @@ ifneq (,$(filter esp_idf_phy,$(USEMODULE)))
   INCLUDES += -I$(ESP32_SDK_DIR)/components/esp_phy/$(CPU_FAM)/include
   ifneq (,$(filter esp32c6 esp32h2,$(CPU_FAM)))
     # temperature sensor used by phy_override.c (SOC_TEMP_SENSOR_SUPPORTED)
+    # (temperature_sensor_hal.c is always compiled for these SoCs, see below)
     ESP32_SDK_SRC += components/esp_hal_ana_conv/$(CPU_FAM)/temperature_sensor_periph.c
-    ESP32_SDK_SRC += components/esp_hal_ana_conv/temperature_sensor_hal.c
     ESP32_SDK_SRC += components/esp_hw_support/sar_tsens_ctrl.c
   endif
   ifeq (esp32c6,$(CPU_FAM))
