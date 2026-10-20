@@ -447,9 +447,13 @@ ifneq (,$(filter gnrc_pktshark_%,$(USEMODULE)))
 endif
 
 ifneq (,$(filter gnrc_pktshark_default,$(USEMODULE)))
-  USEMODULE += gnrc_pktshark_coap
-  USEMODULE += gnrc_pktshark_icmpv6
   USEMODULE += gnrc_pktshark_4in6
+  ifneq (,$(filter nanocoap,$(USEMODULE)))
+    USEMODULE += gnrc_pktshark_coap
+  endif
+  ifneq (,$(filter gnrc_icmpv6,$(USEMODULE)))
+    USEMODULE += gnrc_pktshark_icmpv6
+  endif
 endif
 
 ifneq (,$(filter shell_cmds_default,$(USEMODULE)))
