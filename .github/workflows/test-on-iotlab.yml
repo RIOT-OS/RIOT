@@ -70,7 +70,7 @@ jobs:
               site: saclay
           - riot: nucleo-wl55jc
             iotlab:
-              archi: nucleo-wl55jc:stm32wl
+              archi: nucleo-wl55jc:sx1262
               site: grenoble
           - riot: samr21-xpro
             iotlab:
