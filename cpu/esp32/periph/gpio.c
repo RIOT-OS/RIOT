@@ -24,10 +24,10 @@
 #include "periph/gpio_ll_arch.h"
 #endif
 
+#include "driver/gpio.h"
 #include "driver/rtc_io.h"
 #include "esp/common_macros.h"
 #include "esp_intr_alloc.h"
-#include "driver/rtc_io.h"
 #include "hal/gpio_hal.h"
 #include "hal/gpio_types.h"
 #include "hal/rtc_io_types.h"
@@ -39,7 +39,7 @@
 #if !CPU_FAM_ESP32H2 && !CPU_FAM_ESP32C6
 #include "soc/rtc_cntl_reg.h"
 #endif
-#include "soc/rtc_io_periph.h"
+#include "hal/rtc_io_periph.h"
 
 #if __xtensa__
 #include "xtensa/xtensa_api.h"
@@ -547,13 +547,13 @@ void gpio_pm_sleep_enter(unsigned mode)
                 printf("\n");
                 assert(false);
             }
-#elif SOC_GPIO_DEEP_SLEEP_WAKE_VALID_GPIO_MASK
-            if (((1ULL << wup_pins[i]) & SOC_GPIO_DEEP_SLEEP_WAKE_VALID_GPIO_MASK) == 0) {
+#elif SOC_GPIO_HP_PERIPH_PD_SLEEP_WAKEABLE_MASK
+            if (((1ULL << wup_pins[i]) & SOC_GPIO_HP_PERIPH_PD_SLEEP_WAKEABLE_MASK) == 0) {
                 LOG_ERROR("GPIO%u is not a valid wake-up source, valid GPIOs are:",
                           wup_pins[i]);
 
-                unsigned valid_num = bitarithm_bits_set(SOC_GPIO_DEEP_SLEEP_WAKE_VALID_GPIO_MASK);
-                uint32_t valid_mask = SOC_GPIO_DEEP_SLEEP_WAKE_VALID_GPIO_MASK;
+                unsigned valid_num = bitarithm_bits_set(SOC_GPIO_HP_PERIPH_PD_SLEEP_WAKEABLE_MASK);
+                uint32_t valid_mask = SOC_GPIO_HP_PERIPH_PD_SLEEP_WAKEABLE_MASK;
                 for (unsigned j = 0; j < valid_num ; j++) {
                     if (valid_mask & 1) {
                         printf(" GPIO%u ", j);
@@ -597,7 +597,7 @@ void gpio_pm_sleep_enter(unsigned mode)
                 gpio_pullup_dis(wup_pins[i]);
                 gpio_pulldown_en(wup_pins[i]);
             }
-#elif SOC_GPIO_SUPPORT_HOLD_IO_IN_DSLP
+#else
             rtc_gpio_hold_en(wup_pins[i]);
 #endif
         }
@@ -606,7 +606,7 @@ void gpio_pm_sleep_enter(unsigned mode)
         esp_sleep_enable_ext1_wakeup_io(wup_pin_mask, ESP_PM_WUP_LEVEL);
 #elif SOC_GPIO_SUPPORT_DEEPSLEEP_WAKEUP && SOC_DEEP_SLEEP_SUPPORTED
         /* ESP_PM_WUP_PINS_ANY_LOW or ESP_PM_WUP_PINS_ANY_HIGH */
-        esp_deep_sleep_enable_gpio_wakeup(wup_pin_mask, ESP_PM_WUP_LEVEL);
+        esp_sleep_enable_gpio_wakeup_on_hp_periph_powerdown(wup_pin_mask, ESP_PM_WUP_LEVEL);
 #else
         #error "ESP32x variant doesn't allow to define GPIOs for wake-up from deep sleep"
 #endif

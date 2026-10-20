@@ -9,11 +9,13 @@ ESP32_SDK_SRC += components/ieee802154/driver/esp_ieee802154_sec.c
 ESP32_SDK_SRC += components/ieee802154/driver/esp_ieee802154_timer.c
 ESP32_SDK_SRC += components/ieee802154/driver/esp_ieee802154_util.c
 ESP32_SDK_SRC += components/ieee802154/esp_ieee802154.c
-ESP32_SDK_SRC += components/soc/$(CPU_FAM)/ieee802154_periph.c
+ESP32_SDK_SRC += components/esp_hal_ieee802154/$(CPU_FAM)/ieee802154_periph.c
 
 INCLUDES += -I$(ESP32_SDK_DIR)/components/esp_coex/include
 INCLUDES += -I$(ESP32_SDK_DIR)/components/esp_phy/include
 INCLUDES += -I$(ESP32_SDK_DIR)/components/esp_phy/$(CPU_FAM)/include
+INCLUDES += -I$(ESP32_SDK_DIR)/components/esp_hal_ieee802154/$(CPU_FAM)/include
+INCLUDES += -I$(ESP32_SDK_DIR)/components/esp_hal_ieee802154/include
 INCLUDES += -I$(ESP32_SDK_DIR)/components/ieee802154/include
 INCLUDES += -I$(ESP32_SDK_DIR)/components/ieee802154/private_include
 
@@ -26,3 +28,6 @@ ESP32_SDK_BIN = $(BINDIR)/$(MODULE)
 
 include ../esp_idf.mk
 include ../esp_idf_cflags.mk
+
+# with CONFIG_IEEE802154_INTERFACE_NUM=1 the interface index is not used
+CFLAGS += -Wno-unused-but-set-parameter

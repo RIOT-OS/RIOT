@@ -3,9 +3,9 @@ MODULE = esp_idf_spi_flash
 # source files to be compiled for this module
 ESP32_SDK_SRC = \
   components/esp_rom/patches/esp_rom_spiflash.c \
-  components/hal/spi_flash_encrypt_hal_iram.c \
-  components/hal/spi_flash_hal.c \
-  components/hal/spi_flash_hal_iram.c \
+  components/esp_hal_mspi/spi_flash_encrypt_hal_iram.c \
+  components/esp_hal_mspi/spi_flash_hal.c \
+  components/esp_hal_mspi/spi_flash_hal_iram.c \
   components/spi_flash/esp_flash_api.c \
   components/spi_flash/esp_flash_spi_init.c \
   components/spi_flash/flash_mmap.c \
@@ -24,17 +24,17 @@ ESP32_SDK_SRC = \
   #
 
 ifneq (,$(filter esp32s2 esp32s3 esp32c3 esp32c6 esp32h2,$(CPU_FAM)))
-  ESP32_SDK_SRC += components/hal/spi_flash_hal_gpspi.c
+  ESP32_SDK_SRC += components/esp_hal_mspi/spi_flash_hal_gpspi.c
 endif
 
 ifeq (,$(filter periph_spi,$(USEMODULE)))
   # no need to compile it here if it is already compiled for periph_spi
-  ESP32_SDK_SRC += components/soc/$(CPU_FAM)/spi_periph.c
+  ESP32_SDK_SRC += components/esp_hal_gpspi/$(CPU_FAM)/spi_periph.c
 endif
 
 # additional include pathes required by this module
 INCLUDES += -I$(ESP32_SDK_DIR)/components/esp_rom/$(CPU_FAM)
-INCLUDES += -I$(ESP32_SDK_DIR)/components/spi_flash/include/spi_flash
+INCLUDES += -I$(ESP32_SDK_DIR)/components/spi_flash/include/esp_flash_chips
 
 ifeq (,$(filter esp_spi_ram,$(USEMODULE)))
   INCLUDES += -I$(ESP32_SDK_DIR)/components/esp_psram/include

@@ -35,7 +35,6 @@ extern "C" {
 #define CONFIG_PARTITION_TABLE_OFFSET 0x8000
 #define CONFIG_PARTITION_TABLE_MD5 1
 
-#define CONFIG_SPI_FLASH_ROM_DRIVER_PATCH 1
 
 #ifdef __cplusplus
 }

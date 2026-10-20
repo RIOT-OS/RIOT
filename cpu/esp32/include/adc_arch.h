@@ -30,8 +30,7 @@ extern "C" {
 #include "periph/adc.h"
 #include "periph/gpio.h"
 
-#include "driver/adc.h"
-#include "driver/adc_types_legacy.h"
+#include "hal/adc_types.h"
 
 /**
  * @brief  Attenuations that can be set for ADC lines
@@ -143,7 +142,8 @@ int adc_line_vref_to_gpio(adc_t line, gpio_t gpio);
 __attribute__((__deprecated__))
 static inline int adc_vref_to_gpio25(void)
 {
-    return adc_vref_to_gpio(ADC_UNIT_2, GPIO25);
+    /* routing Vref to a GPIO is not supported by ESP-IDF any longer */
+    return -1;
 }
 #endif
 #endif /* !DOXYGEN */

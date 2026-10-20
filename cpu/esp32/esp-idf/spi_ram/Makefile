@@ -1,7 +1,8 @@
 MODULE = esp_idf_spi_ram
 
 # source files to be compiled for this module
-ESP32_SDK_SRC += components/esp_psram/esp_psram.c
+ESP32_SDK_SRC += components/esp_psram/system_layer/esp_psram.c
+ESP32_SDK_SRC += components/esp_psram/system_layer/esp_psram_mspi.c
 
 ifeq (esp32,$(CPU_FAM))
   ESP32_SDK_SRC += components/esp_hw_support/port/$(CPU_FAM)/cache_sram_mmu.c
@@ -26,6 +27,8 @@ CFLAGS += -Wno-unused-but-set-variable
 # additional include pathes required by this module
 INCLUDES += -I$(ESP32_SDK_DIR)/components/esp_driver_spi/include
 INCLUDES += -I$(ESP32_SDK_DIR)/components/esp_psram/include
+INCLUDES += -I$(ESP32_SDK_DIR)/components/esp_psram/device/include
+INCLUDES += -I$(ESP32_SDK_DIR)/components/esp_psram/xip_impl/include
 INCLUDES += -I$(ESP32_SDK_DIR)/components/soc/$(CPU_FAM)/include
 
 include $(RIOTBASE)/Makefile.base

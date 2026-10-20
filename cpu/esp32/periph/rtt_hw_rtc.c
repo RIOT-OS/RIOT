@@ -31,8 +31,8 @@
 #include "soc/rtc.h"
 #include "soc/soc_caps.h"
 
-#if SOC_LP_TIMER_SUPPORTED
-#  include "hal/lp_timer_ll.h"
+#if SOC_RTC_TIMER_V2
+#  include "hal/rtc_timer_ll.h"
 #else
 #  include "soc/rtc_cntl_struct.h"
 #endif
@@ -45,7 +45,7 @@
 #define ENABLE_DEBUG 0
 #include "debug.h"
 
-#if SOC_LP_TIMER_SUPPORTED
+#if SOC_RTC_TIMER_V2
 #  define RTC_TIMER_INTR_SOURCE ETS_LP_RTC_TIMER_INTR_SOURCE
 #else
 #  define RTC_TIMER_INTR_SOURCE ETS_RTC_CORE_INTR_SOURCE
@@ -105,7 +105,7 @@ static void _rtc_restore_counter(bool in_init)
     (void)in_init;
 }
 
-#if SOC_LP_TIMER_SUPPORTED
+#if SOC_RTC_TIMER_V2
 
 uint64_t _rtc_get_counter(void)
 {

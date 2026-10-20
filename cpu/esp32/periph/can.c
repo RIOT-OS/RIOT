@@ -27,6 +27,7 @@
 #include "esp_private/periph_ctrl.h"
 #include "esp_rom_gpio.h"
 #include "hal/twai_hal.h"
+#include "hal/twai_ll.h"
 #include "log.h"
 #include "rom/ets_sys.h"
 #include "soc/clk_tree_defs.h"
@@ -38,7 +39,6 @@
 #define CAN     TWAI
 
 #ifdef CPU_FAM_ESP32H2
-#  define PERIPH_TWAI_MODULE    PERIPH_TWAI0_MODULE
 #  define ETS_TWAI_INTR_SOURCE  ETS_TWAI0_INTR_SOURCE
 #endif
 
@@ -201,7 +201,18 @@ static void _esp_can_isr(candev_t *candev)
     }
 }
 
-twai_hal_context_t hw;
+/*
+ * The TWAI HAL requires additional memory directly behind the HAL context
+ * for the errata workarounds, see `twai_hal_get_mem_requirment`.
+ */
+#define ESP_CAN_HAL_ERRATA_MEM  (64)
+
+static union {
+    twai_hal_context_t ctx;
+    uint8_t mem[sizeof(twai_hal_context_t) + ESP_CAN_HAL_ERRATA_MEM];
+} _hw_mem;
+
+static twai_hal_context_t * const _hw = &_hw_mem.ctx;
 
 static int _esp_can_init(candev_t *candev)
 {
@@ -281,7 +292,7 @@ static int _esp_can_send(candev_t *candev, const struct can_frame *frame)
     esp_frame.self_reception = 0;
 
     /* place the frame in TX buffer and trigger the command */
-    twai_hal_set_tx_buffer_and_transmit(&hw, &esp_frame);
+    twai_hal_set_tx_buffer_and_transmit(_hw, &esp_frame, 0);
 
     critical_exit();
 
@@ -333,7 +344,7 @@ static int _esp_can_set(candev_t *candev, canopt_t opt, void *value, size_t valu
                 return -EOVERFLOW;
             }
             _esp_can_stop(dev);
-            twai_ll_set_tec(hw.dev, *((uint16_t*)value));
+            twai_ll_set_tec(_hw->dev, *((uint16_t*)value));
             _esp_can_start(dev);
             res = sizeof(uint16_t);
             break;
@@ -345,7 +356,7 @@ static int _esp_can_set(candev_t *candev, canopt_t opt, void *value, size_t valu
                 return -EOVERFLOW;
             }
             _esp_can_stop(dev);
-            twai_ll_set_rec(hw.dev, *((uint16_t*)value));
+            twai_ll_set_rec(_hw->dev, *((uint16_t*)value));
             _esp_can_start(dev);
             res = sizeof(uint16_t);
             break;
@@ -411,7 +422,7 @@ static int _esp_can_get(candev_t *candev, canopt_t opt, void *value, size_t max_
                 break;
             }
 
-            *((uint16_t *)value) = twai_ll_get_tec(hw.dev);
+            *((uint16_t *)value) = twai_ll_get_tec(_hw->dev);
 
             res = sizeof(uint16_t);
             break;
@@ -423,7 +434,7 @@ static int _esp_can_get(candev_t *candev, canopt_t opt, void *value, size_t max_
                 break;
             }
 
-            *((uint16_t *)value) = twai_ll_get_rec(hw.dev);
+            *((uint16_t *)value) = twai_ll_get_rec(_hw->dev);
 
             res = sizeof(uint16_t);
             break;
@@ -466,7 +477,7 @@ static int _esp_can_abort(candev_t *candev, const struct can_frame *frame)
     assert(frame);
 
     /* abort transmission command */
-    twai_ll_set_cmd_abort_tx(hw.dev);
+    twai_ll_set_cmd_abort_tx(_hw->dev);
 
     /* mark the transmitter as free */
     dev->tx_frame = NULL;
@@ -547,12 +558,14 @@ static void _esp_can_start(can_t *dev)
     /* start the CAN controller in configured mode */
     switch (dev->state) {
     case CANOPT_STATE_LISTEN_ONLY:
-        twai_hal_start(&hw, TWAI_MODE_LISTEN_ONLY);
+        _hw->enable_listen_only = true;
+        twai_hal_start(_hw);
         break;
     case CANOPT_STATE_SLEEP:
         /* sleep mode is not supported, the normal mode is used instead */
     case CANOPT_STATE_ON:
-        twai_hal_start(&hw, TWAI_MODE_NORMAL);
+        _hw->enable_listen_only = false;
+        twai_hal_start(_hw);
         break;
     default:
         break;
@@ -565,7 +578,7 @@ static void _esp_can_stop(can_t *dev)
     assert(dev);
 
     /* stop the CAN controller by entering the reset mode */
-    twai_hal_stop(&hw);
+    twai_hal_stop(_hw);
 }
 
 static void _esp_can_power_up(can_t *dev)
@@ -592,10 +605,17 @@ static void _esp_can_power_up(can_t *dev)
     critical_enter();
 
     /* power up the peripheral */
-    periph_module_reset(PERIPH_TWAI_MODULE);
-    periph_module_enable(PERIPH_TWAI_MODULE);
+    PERIPH_RCC_ATOMIC() {
+        twai_ll_enable_bus_clock(0, true);
+        twai_ll_reset_register(0);
+    }
 
-    twai_hal_config_t config = { .controller_id = 0 };
+    twai_hal_config_t config = {
+        .controller_id = 0,
+        .intr_mask = ESP_CAN_INTR_MASK,
+    };
+
+    assert(twai_hal_get_mem_requirment() <= sizeof(_hw_mem));
 
     esp_clk_tree_src_get_freq_hz((soc_module_clk_t)TWAI_CLK_SRC_DEFAULT,
                                  ESP_CLK_TREE_SRC_FREQ_PRECISION_CACHED,
@@ -605,7 +625,7 @@ static void _esp_can_power_up(can_t *dev)
      * only mode but not yet started, the error counters are reset and
      * pending interrupts cleared */
 
-    if (!twai_hal_init(&hw, &config)) {
+    if (!twai_hal_init(_hw, &config)) {
         assert(false);
     }
 
@@ -613,7 +633,7 @@ static void _esp_can_power_up(can_t *dev)
     _esp_can_set_bittiming(dev);
 
     /* set warning limit */
-    twai_ll_set_err_warn_lim(hw.dev, ESP_CAN_ERROR_WARNING_LIMIT);
+    twai_ll_set_err_warn_lim(_hw->dev, ESP_CAN_ERROR_WARNING_LIMIT);
 
     /* route CAN interrupt source to CPU interrupt and enable it */
     intr_matrix_set(PRO_CPU_NUM, ETS_TWAI_INTR_SOURCE, CPU_INUM_CAN);
@@ -642,11 +662,13 @@ static void _esp_can_power_down(can_t *dev)
     _esp_can_deinit_pins();
 
     /* stop the CAN controller and deinitialize the HAL context */
-    twai_hal_stop(&hw);
-    twai_hal_deinit(&hw);
+    twai_hal_stop(_hw);
+    twai_hal_deinit(_hw);
 
     /* power down the CAN controller */
-    periph_module_disable(PERIPH_TWAI_MODULE);
+    PERIPH_RCC_ATOMIC() {
+        twai_ll_enable_bus_clock(0, false);
+    }
 
     dev->powered_up = false;
 }
@@ -756,7 +778,7 @@ static void IRAM_ATTR _esp_can_intr_handler(void *arg)
 
     critical_enter();
 
-    uint32_t events = twai_hal_get_events(&hw);
+    uint32_t events = twai_hal_get_events(_hw);
 
     DEBUG("%s events=%08"PRIx32"\n", __func__, events);
 
@@ -775,7 +797,7 @@ static void IRAM_ATTR _esp_can_intr_handler(void *arg)
     }
 
     /* ERROR_WARNING state condition, RX/TX error counter are > 96 */
-    if (events & TWAI_HAL_EVENT_ABOVE_EWL) {
+    if (events & TWAI_HAL_EVENT_ERROR_WARNING) {
         DEBUG("%s error warning interrupt\n", __func__);
         /* save the event */
         dev->events |= ESP_CAN_EVENT_ERROR_WARNING;
@@ -784,7 +806,7 @@ static void IRAM_ATTR _esp_can_intr_handler(void *arg)
     /* enter to / return from ERROR_PASSIVE state */
     if (events & TWAI_HAL_EVENT_ERROR_PASSIVE) {
         DEBUG("%s error passive interrupt %"PRIu32" %"PRIu32"\n", __func__,
-              twai_ll_get_tec(hw.dev), twai_ll_get_rec(hw.dev));
+              twai_ll_get_tec(_hw->dev), twai_ll_get_rec(_hw->dev));
         /* save the event */
         dev->events |= ESP_CAN_EVENT_ERROR_PASSIVE;
     }
@@ -800,7 +822,7 @@ static void IRAM_ATTR _esp_can_intr_handler(void *arg)
     }
 
     /* TX buffer becomes free */
-    if (events & TWAI_HAL_EVENT_TX_BUFF_FREE) {
+    if (events & TWAI_HAL_EVENT_TX0_DONE) {
         DEBUG("%s transmit interrupt\n", __func__);
         /* save the event */
         dev->events |= ESP_CAN_EVENT_TX_CONFIRMATION;
@@ -809,13 +831,13 @@ static void IRAM_ATTR _esp_can_intr_handler(void *arg)
     /* RX buffer has one or more frames */
     if (events & TWAI_HAL_EVENT_RX_BUFF_FRAME) {
         /* get the number of messages in receive buffer */
-        uint32_t msg_cnt = twai_hal_get_rx_msg_count(&hw);
+        uint32_t msg_cnt = twai_hal_get_rx_msg_count(_hw);
 
         DEBUG("%s receive interrupt, msg_cnt=%"PRIu32"\n", __func__, msg_cnt);
 
         for (unsigned i = 0; i < msg_cnt; i++) {
             twai_hal_frame_t esp_frame;
-            if (twai_hal_read_rx_buffer_and_clear(&hw, &esp_frame) &&
+            if (twai_hal_read_rx_fifo(_hw, &esp_frame) &&
                 (dev->rx_frames_num < ESP_CAN_MAX_RX_FRAMES)) {
                 /* prepare the CAN frame from ESP32 CAN frame */
                 struct can_frame frame = {};
@@ -913,8 +935,7 @@ static void _esp_can_set_bittiming(can_t *dev)
         .tseg_2 = timing->phase_seg2,
     };
 
-    twai_hal_configure(&hw, &twai_timing, &twai_filter,
-                       ESP_CAN_INTR_MASK, CAN_CLK_OUT_DIV);
+    twai_hal_configure(_hw, &twai_timing, &twai_filter, CAN_CLK_OUT_DIV);
 }
 
 void can_init(can_t *dev, const can_conf_t *conf)

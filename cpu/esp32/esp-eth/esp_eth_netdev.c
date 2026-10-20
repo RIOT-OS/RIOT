@@ -61,16 +61,19 @@
 #define EMAC_PHY_CLOCK_DELAY_MS     (500)
 
 #if defined(EMAC_PHY_DP83848)
+#include "esp_eth_phy_dp83848.h"
 #define esp_eth_phy_new_xxxxx(cfg)  esp_eth_phy_new_dp83848(cfg)
 #elif defined(EMAC_PHY_IP101G)
+#include "esp_eth_phy_ip101.h"
 #define esp_eth_phy_new_xxxxx(cfg)  esp_eth_phy_new_ip101(cfg)
 #elif defined(EMAC_PHY_LAN8720)
+#include "esp_eth_phy_lan87xx.h"
 #define esp_eth_phy_new_xxxxx(cfg)  esp_eth_phy_new_lan87xx(cfg)
-#elif defined(EMAC_PHY_KSZ8041)
-#define esp_eth_phy_new_xxxxx(cfg)  esp_eth_phy_new_ksz8041(cfg)
-#elif defined(EMAC_PHY_KSZ8081)
-#define esp_eth_phy_new_xxxxx(cfg)  esp_eth_phy_new_ksz8081(cfg)
+#elif defined(EMAC_PHY_KSZ8041) || defined(EMAC_PHY_KSZ8081)
+#include "esp_eth_phy_ksz80xx.h"
+#define esp_eth_phy_new_xxxxx(cfg)  esp_eth_phy_new_ksz80xx(cfg)
 #elif defined(EMAC_PHY_RTL8201)
+#include "esp_eth_phy_rtl8201.h"
 #define esp_eth_phy_new_xxxxx(cfg)  esp_eth_phy_new_rtl8201(cfg)
 #elif defined(EMAC_PHY_GENERIC)
 #define esp_eth_phy_new_xxxxx(cfg)  esp_eth_phy_new_generic(cfg)
@@ -181,19 +184,19 @@ static int _esp_eth_init(netdev_t *netdev)
 
     if (EMAC_PHY_CLOCK_MODE == ETH_CLOCK_GPIO0_IN) {
         emac_config.clock_config.rmii.clock_mode = EMAC_CLK_EXT_IN;
-        emac_config.clock_config.rmii.clock_gpio = EMAC_CLK_IN_GPIO;
+        emac_config.clock_config.rmii.clock_gpio = GPIO0;   /* RMII clock input is fixed to GPIO0 */
     }
     else if (EMAC_PHY_CLOCK_MODE == ETH_CLOCK_GPIO0_OUT) {
         emac_config.clock_config.rmii.clock_mode = EMAC_CLK_OUT;
-        emac_config.clock_config.rmii.clock_gpio = EMAC_APPL_CLK_OUT_GPIO;
+        emac_config.clock_config.rmii.clock_gpio = GPIO0;
     }
     else if (EMAC_PHY_CLOCK_MODE == ETH_CLOCK_GPIO16_OUT) {
         emac_config.clock_config.rmii.clock_mode = EMAC_CLK_OUT;
-        emac_config.clock_config.rmii.clock_gpio = EMAC_CLK_OUT_GPIO;
+        emac_config.clock_config.rmii.clock_gpio = GPIO16;
     }
     else if (EMAC_PHY_CLOCK_MODE == ETH_CLOCK_GPIO17_OUT) {
         emac_config.clock_config.rmii.clock_mode = EMAC_CLK_OUT;
-        emac_config.clock_config.rmii.clock_gpio = EMAC_CLK_OUT_180_GPIO;
+        emac_config.clock_config.rmii.clock_gpio = GPIO17;
     }
 
     esp_eth_mac_t *mac = esp_eth_mac_new_esp32(&emac_config, &mac_config);

@@ -23,6 +23,7 @@
 #include "assert.h"
 #include "bitarithm.h"
 #include "container.h"
+#include "irq.h"
 #include "log.h"
 #include "periph/gpio.h"
 #include "syscalls.h"

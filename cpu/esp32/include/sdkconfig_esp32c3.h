@@ -108,6 +108,13 @@ extern "C" {
  * ESP32-C3 BLE driver configuration (DO NOT CHANGE)
  */
 #ifdef MODULE_ESP_BLE
+#  define CONFIG_BT_CTRL_BLE_ADV                            1
+#  define CONFIG_BT_CTRL_BLE_MASTER                         1
+#  define CONFIG_BT_CTRL_BLE_MIN_CONN_INTERVAL_ENABLE       1
+#  define CONFIG_BT_CTRL_BLE_SCAN                           1
+#  define CONFIG_BT_CTRL_BLE_SECURITY_ENABLE                1
+#  define CONFIG_BT_CTRL_CHECK_CONFIG_EFF                   1
+#  define CONFIG_BT_CTRL_DTM_ENABLE                         1
 #  define CONFIG_BT_ALARM_MAX_NUM                           50
 #  define CONFIG_BT_BLE_CCA_MODE                            0
 #  define CONFIG_BT_BLE_CCA_MODE_NONE                       1

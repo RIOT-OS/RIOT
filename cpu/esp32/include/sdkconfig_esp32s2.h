@@ -106,12 +106,6 @@ extern "C" {
 #define CONFIG_ESP_SLEEP_WAIT_FLASH_READY_EXTRA_DELAY   0
 
 /**
- * ESP32-S2 specific USB configuration
- */
-#ifdef MODULE_ESP_IDF_USB
-#  define CONFIG_USB_OTG_SUPPORTED              1
-#endif
-/**
  * ESP32-S2 specific SPI RAM configuration
  */
 #ifdef  MODULE_ESP_SPI_RAM
@@ -138,8 +132,8 @@ extern "C" {
  * ESP32-S2 specific system configuration
  */
 #define CONFIG_ESP_SYSTEM_MEMPROT_DEPCHECK              1
-#define CONFIG_ESP_SYSTEM_MEMPROT_FEATURE               0   /* default enabled */
-#define CONFIG_ESP_SYSTEM_MEMPROT_FEATURE_LOCK          0   /* default enabled */
+#define CONFIG_ESP_SYSTEM_MEMPROT                       0   /* default enabled */
+#define CONFIG_ESP_SYSTEM_MEMPROT_PMS_LOCK              0   /* default enabled */
 #define CONFIG_ESP_SYSTEM_MEMPROT_CPU_PREFETCH_PAD_SIZE 16
 #define CONFIG_ESP_SYSTEM_MEMPROT_MEM_ALIGN_SIZE        4
 

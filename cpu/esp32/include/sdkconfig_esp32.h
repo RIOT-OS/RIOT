@@ -64,7 +64,9 @@ extern "C" {
 
 #ifdef MODULE_ESP_RTC_TIMER_32K
 #  define CONFIG_RTC_EXT_CRYST_ADDIT_CURRENT_NONE 1
-#  define CONFIG_RTC_XTAL_CAL_RETRY               1
+#  ifndef CONFIG_RTC_XTAL_CAL_RETRY
+#    define CONFIG_RTC_XTAL_CAL_RETRY             1
+#  endif
 #  define CONFIG_ESP_SYSTEM_RTC_EXT_XTAL_BOOTSTRAP_CYCLES 5
 #endif
 
@@ -94,6 +96,7 @@ extern "C" {
 #define CONFIG_ESP_BROWNOUT_DET                 1
 #define CONFIG_ESP_BROWNOUT_DET_LVL             0
 #define CONFIG_ESP_CONSOLE_MULTIPLE_UART        1
+#define CONFIG_ESP_TIMER_IMPL_TG0_LAC           1
 #define CONFIG_ESP_DEBUG_OCDAWARE               1
 #define CONFIG_ESP_SLEEP_WAIT_FLASH_READY_EXTRA_DELAY    2000
 
@@ -149,9 +152,6 @@ extern "C" {
  */
 #ifdef MODULE_ESP_ETH
 #  define CONFIG_ETH_USE_ESP32_EMAC                     1
-#  define CONFIG_ETH_PHY_INTERFACE_RMII                 1
-#  define CONFIG_ETH_RMII_CLK_INPUT                     1
-#  define CONFIG_ETH_RMII_CLK_IN_GPIO                   0
 #  define CONFIG_ETH_DMA_BUFFER_SIZE                    512
 #  define CONFIG_ETH_DMA_RX_BUFFER_NUM                  10
 #  define CONFIG_ETH_DMA_TX_BUFFER_NUM                  10
@@ -161,6 +161,7 @@ extern "C" {
  * ESP32 specific BLE driver configuration (DO NOT CHANGE)
  */
 #ifdef MODULE_ESP_BLE
+#  define CONFIG_BTDM_CTRL_BR_EDR_MIN_ENC_KEY_SZ_DFT_EFF 0
 #  define CONFIG_BT_ALARM_MAX_NUM                        50
 #  define CONFIG_BTDM_BLE_ADV_REPORT_DISCARD_THRSHOLD    20
 #  define CONFIG_BTDM_BLE_ADV_REPORT_FLOW_CTRL_NUM       100
@@ -173,7 +174,6 @@ extern "C" {
 #  define CONFIG_BTDM_CTRL_BLE_MAX_CONN                  3
 #  define CONFIG_BTDM_CTRL_BLE_MAX_CONN_EFF              3
 #  define CONFIG_BTDM_CTRL_BR_EDR_MAX_ACL_CONN_EFF       0
-#  define CONFIG_BTDM_CTRL_BR_EDR_MAX_SYNC_CONN_EFF      0
 #  define CONFIG_BTDM_CTRL_BR_EDR_SCO_DATA_PATH_EFF      0
 #  define CONFIG_BTDM_CTRL_FULL_SCAN_SUPPORTED           1
 #  define CONFIG_BTDM_CTRL_HCI_MODE_VHCI                 1

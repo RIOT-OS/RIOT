@@ -191,6 +191,9 @@ SECTIONS
     _iram_text_start = ABSOLUTE(.);
 
     *(.iram1 .iram1.*)
+    /* BLE controller code placed in IRAM (linker_esp_ble_controller.lf) */
+    *(.high_perf_code_iram1 .high_perf_code_iram1.*)
+    *(.iram_single_sleep .iram_single_sleep.*)
 
     /* parts of RIOT that should run in IRAM */
     *core/*(.literal .text .literal.* .text.*)
@@ -535,6 +538,10 @@ SECTIONS
     _text_start = ABSOLUTE(.);
 
     *(.literal .literal.* .text .text.*)
+    /* BLE controller code placed in flash (linker_esp_ble_controller.lf) */
+    *(.adv_fast_execute_code_iram1 .adv_fast_execute_code_iram1.*)
+    *(.iram_sleep .iram_sleep.* .iram_btslp .iram_btslp.*)
+    *(.iram_sleep_adv .iram_sleep_adv.* .iram_sleep_conn .iram_sleep_conn.*)
 
     *(.stub)
     *(.gnu.linkonce.t.*)

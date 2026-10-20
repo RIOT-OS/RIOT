@@ -20,7 +20,8 @@
 extern "C" {
 #endif
 
-#include "driver/adc_types_legacy.h"
+#include "hal/adc_types.h"
+#include "soc/adc_channel.h"
 #include "periph/gpio.h"
 #include "soc/soc_caps.h"
 

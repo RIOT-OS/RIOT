@@ -718,6 +718,7 @@ SECTIONS
     *(.wifirxiram .wifirxiram.*)
     *(.wifislpiram .wifislpiram.*)
     *(.wifislprxiram .wifislprxiram.*)
+    *(.phyiram .phyiram.*)
 
     *(.stub)
     *(.gnu.warning)

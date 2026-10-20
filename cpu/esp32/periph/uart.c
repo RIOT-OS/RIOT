@@ -19,15 +19,15 @@
 #include "periph/uart.h"
 
 #include "esp_err.h"
-#include "esp_private/uart_share_hw_ctrl.h"
+#include "esp_private/periph_ctrl.h"
 #include "hal/uart_ll.h"
 
 void uart_set_wakeup_threshold(uart_t uart, uint32_t threshold)
 {
     assert(uart < SOC_UART_NUM);
 
-    HP_UART_PAD_CLK_ATOMIC() {
-        uart_ll_set_wakeup_thrd(UART_LL_GET_HW(uart), threshold);
+    uart_ll_set_wakeup_edge_thrd(UART_LL_GET_HW(uart), threshold);
+    PERIPH_RCC_ATOMIC() {
         uart_ll_enable_pad_sleep_clock(UART_LL_GET_HW(uart), true);
     }
 }
