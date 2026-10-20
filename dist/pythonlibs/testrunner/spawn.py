@@ -138,6 +138,7 @@ def sync_child(child, env):
                                                     TEST_INTERACTIVE_RETRIES,
                                                     TEST_INTERACTIVE_DELAY)
             flush_child(child, expect_timeout=0.1)
+            child.sendline("")   # restore next prompt in case the app expects it
         else:
             flush_child(child, expect_timeout=0.1)
             utils.test_utils_interactive_sync(child,
