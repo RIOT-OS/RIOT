@@ -45,6 +45,7 @@ class TestCongUREBase(unittest.TestCase):
 
     def setUp(self):
         self.shell.clear()
+        flush_child(self.ctrl.term)
 
     def tearDown(self):
         self.shell.msgs_reset()
@@ -812,6 +813,7 @@ class TestCongURERenoDefault(TestCongUREBase):
 class TestCongURERenoCustomIncDec(TestCongUREBase):
     def setUp(self):
         self.shell.clear()
+        flush_child(self.ctrl.term)
         res = self.shell.setup(1)
         self.assertIn('success', res)
         res = self.cong_init()
