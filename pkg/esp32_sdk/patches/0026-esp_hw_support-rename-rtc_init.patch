@@ -1,7 +1,7 @@
-From a9b8142108e1d9aa88c7d5b2bc968fbe9a0e4433 Mon Sep 17 00:00:00 2001
+From dfc1dcece9a99c39b1347aeb8b6105eb14590342 Mon Sep 17 00:00:00 2001
 From: Gunar Schorcht <gunar@schorcht.net>
 Date: Sat, 1 Mar 2025 17:17:13 +0100
-Subject: [PATCH 26/28] esp_hw_support: rename rtc_init
+Subject: [PATCH 26/51] esp_hw_support: rename rtc_init
 
 Rename `rtc_init` to `rtc_init_module` due to name conflicts with RIOT `periph/rtc` module.
 ---
@@ -23,10 +23,10 @@ Rename `rtc_init` to `rtc_init_module` due to name conflicts with RIOT `periph/r
  15 files changed, 15 insertions(+), 15 deletions(-)
 
 diff --git a/components/esp_hw_support/port/esp32/include/soc/rtc.h b/components/esp_hw_support/port/esp32/include/soc/rtc.h
-index 22f7cfe157..1f0f9f2e77 100644
+index ee13f754a0..9cc44222b0 100644
 --- a/components/esp_hw_support/port/esp32/include/soc/rtc.h
 +++ b/components/esp_hw_support/port/esp32/include/soc/rtc.h
-@@ -666,7 +666,7 @@ typedef struct rtc_config_s {
+@@ -682,7 +682,7 @@ typedef struct rtc_config_s {
   * Initialize RTC clock and power control related functions
   * @param cfg configuration options as rtc_config_t
   */
@@ -36,7 +36,7 @@ index 22f7cfe157..1f0f9f2e77 100644
  #define RTC_VDDSDIO_TIEH_1_8V 0 //!< TIEH field value for 1.8V VDDSDIO
  #define RTC_VDDSDIO_TIEH_3_3V 1 //!< TIEH field value for 3.3V VDDSDIO
 diff --git a/components/esp_hw_support/port/esp32/rtc_init.c b/components/esp_hw_support/port/esp32/rtc_init.c
-index 087824c279..9eecbef376 100644
+index d11d2b776b..ceb3676411 100644
 --- a/components/esp_hw_support/port/esp32/rtc_init.c
 +++ b/components/esp_hw_support/port/esp32/rtc_init.c
 @@ -17,7 +17,7 @@
@@ -49,10 +49,10 @@ index 087824c279..9eecbef376 100644
      /**
       * When run rtc_init, it maybe deep sleep reset. Since we power down modem in deep sleep, after wakeup
 diff --git a/components/esp_hw_support/port/esp32c2/include/soc/rtc.h b/components/esp_hw_support/port/esp32c2/include/soc/rtc.h
-index 9f8d412f59..3d2ae50f99 100644
+index cfa31e5b26..bc7cc0d9dc 100644
 --- a/components/esp_hw_support/port/esp32c2/include/soc/rtc.h
 +++ b/components/esp_hw_support/port/esp32c2/include/soc/rtc.h
-@@ -690,7 +690,7 @@ typedef struct {
+@@ -686,7 +686,7 @@ typedef struct {
   * Initialize RTC clock and power control related functions
   * @param cfg configuration options as rtc_config_t
   */
@@ -62,7 +62,7 @@ index 9f8d412f59..3d2ae50f99 100644
  // -------------------------- CLOCK TREE DEFS ALIAS ----------------------------
  // **WARNING**: The following are only for backwards compatibility.
 diff --git a/components/esp_hw_support/port/esp32c2/rtc_init.c b/components/esp_hw_support/port/esp32c2/rtc_init.c
-index abb5370c67..32549d5376 100644
+index d876077e34..5f87551e32 100644
 --- a/components/esp_hw_support/port/esp32c2/rtc_init.c
 +++ b/components/esp_hw_support/port/esp32c2/rtc_init.c
 @@ -29,7 +29,7 @@ static void set_ocode_by_efuse(int ocode_scheme_ver);
@@ -75,10 +75,10 @@ index abb5370c67..32549d5376 100644
      REGI2C_WRITE_MASK(I2C_DIG_REG, I2C_DIG_REG_XPD_DIG_REG, 0);
      REGI2C_WRITE_MASK(I2C_DIG_REG, I2C_DIG_REG_XPD_RTC_REG, 0);
 diff --git a/components/esp_hw_support/port/esp32c3/include/soc/rtc.h b/components/esp_hw_support/port/esp32c3/include/soc/rtc.h
-index 58a26dd41e..bae3de4931 100644
+index 0e2851e72c..4528d01de0 100644
 --- a/components/esp_hw_support/port/esp32c3/include/soc/rtc.h
 +++ b/components/esp_hw_support/port/esp32c3/include/soc/rtc.h
-@@ -759,7 +759,7 @@ typedef struct {
+@@ -766,7 +766,7 @@ typedef struct {
   * Initialize RTC clock and power control related functions
   * @param cfg configuration options as rtc_config_t
   */
@@ -88,7 +88,7 @@ index 58a26dd41e..bae3de4931 100644
  // -------------------------- CLOCK TREE DEFS ALIAS ----------------------------
  // **WARNING**: The following are only for backwards compatibility.
 diff --git a/components/esp_hw_support/port/esp32c3/rtc_init.c b/components/esp_hw_support/port/esp32c3/rtc_init.c
-index c7a1eb55f0..ed62540c6e 100644
+index 24f4cc2b9e..fc2bc8f3b1 100644
 --- a/components/esp_hw_support/port/esp32c3/rtc_init.c
 +++ b/components/esp_hw_support/port/esp32c3/rtc_init.c
 @@ -29,7 +29,7 @@ static void set_ocode_by_efuse(int calib_version);
@@ -101,10 +101,10 @@ index c7a1eb55f0..ed62540c6e 100644
      /**
       * When run rtc_init, it maybe deep sleep reset. Since we power down modem in deep sleep, after wakeup
 diff --git a/components/esp_hw_support/port/esp32s2/include/soc/rtc.h b/components/esp_hw_support/port/esp32s2/include/soc/rtc.h
-index 5a3dda4844..109e956af2 100644
+index 1d5d847ef5..33060f9265 100644
 --- a/components/esp_hw_support/port/esp32s2/include/soc/rtc.h
 +++ b/components/esp_hw_support/port/esp32s2/include/soc/rtc.h
-@@ -799,7 +799,7 @@ typedef struct {
+@@ -809,7 +809,7 @@ typedef struct {
   * Initialize RTC clock and power control related functions
   * @param cfg configuration options as rtc_config_t
   */
@@ -114,10 +114,10 @@ index 5a3dda4844..109e956af2 100644
  /**
   * Structure describing vddsdio configuration
 diff --git a/components/esp_hw_support/port/esp32s2/rtc_init.c b/components/esp_hw_support/port/esp32s2/rtc_init.c
-index 549cdffd43..0f1111c758 100644
+index b04e192413..3228a24f48 100644
 --- a/components/esp_hw_support/port/esp32s2/rtc_init.c
 +++ b/components/esp_hw_support/port/esp32s2/rtc_init.c
-@@ -26,7 +26,7 @@ __attribute__((unused)) static const char *TAG = "rtc_init";
+@@ -26,7 +26,7 @@ ESP_HW_LOG_ATTR_TAG(TAG, "rtc_init");
  static void set_ocode_by_efuse(int calib_version);
  static void calibrate_ocode(void);
  
@@ -127,10 +127,10 @@ index 549cdffd43..0f1111c758 100644
      /**
       * When run rtc_init, it maybe deep sleep reset. Since we power down modem in deep sleep, after wakeup
 diff --git a/components/esp_hw_support/port/esp32s3/include/soc/rtc.h b/components/esp_hw_support/port/esp32s3/include/soc/rtc.h
-index 27a4845f5f..f4c37716e5 100644
+index 481ad6ebab..3582dd949a 100644
 --- a/components/esp_hw_support/port/esp32s3/include/soc/rtc.h
 +++ b/components/esp_hw_support/port/esp32s3/include/soc/rtc.h
-@@ -786,7 +786,7 @@ typedef struct {
+@@ -796,7 +796,7 @@ typedef struct {
   * Initialize RTC clock and power control related functions
   * @param cfg configuration options as rtc_config_t
   */
@@ -140,7 +140,7 @@ index 27a4845f5f..f4c37716e5 100644
  /**
   * Structure describing vddsdio configuration
 diff --git a/components/esp_hw_support/port/esp32s3/rtc_init.c b/components/esp_hw_support/port/esp32s3/rtc_init.c
-index bbdf99ee89..3e28058c87 100644
+index e5cbd037e3..e4e699ba88 100644
 --- a/components/esp_hw_support/port/esp32s3/rtc_init.c
 +++ b/components/esp_hw_support/port/esp32s3/rtc_init.c
 @@ -43,7 +43,7 @@ uint32_t g_rtc_dbias_pvt_240m = 28;
@@ -153,10 +153,10 @@ index bbdf99ee89..3e28058c87 100644
      /**
       * When run rtc_init, it maybe deep sleep reset. Since we power down modem in deep sleep, after wakeup
 diff --git a/components/esp_system/port/soc/esp32/clk.c b/components/esp_system/port/soc/esp32/clk.c
-index 88f72ff947..197a17b5e1 100644
+index 0592181219..243124e104 100644
 --- a/components/esp_system/port/soc/esp32/clk.c
 +++ b/components/esp_system/port/soc/esp32/clk.c
-@@ -109,7 +109,7 @@ static void select_rtc_slow_clk(slow_clk_sel_t slow_clk)
+@@ -118,7 +118,7 @@ static void select_rtc_slow_clk(slow_clk_sel_t slow_clk)
  void esp_rtc_init(void)
  {
      rtc_config_t cfg = RTC_CONFIG_DEFAULT();
@@ -166,10 +166,10 @@ index 88f72ff947..197a17b5e1 100644
  
  __attribute__((weak)) void esp_clk_init(void)
 diff --git a/components/esp_system/port/soc/esp32c2/clk.c b/components/esp_system/port/soc/esp32c2/clk.c
-index 6cc267ea6c..5c8fc6c2f4 100644
+index 04fcdc051f..7699fe5448 100644
 --- a/components/esp_system/port/soc/esp32c2/clk.c
 +++ b/components/esp_system/port/soc/esp32c2/clk.c
-@@ -70,7 +70,7 @@ void esp_rtc_init(void)
+@@ -72,7 +72,7 @@ void esp_rtc_init(void)
      if (rst_reas == RESET_REASON_CHIP_POWER_ON) {
          cfg.cali_ocode = 1;
      }
@@ -179,10 +179,10 @@ index 6cc267ea6c..5c8fc6c2f4 100644
  }
  
 diff --git a/components/esp_system/port/soc/esp32c3/clk.c b/components/esp_system/port/soc/esp32c3/clk.c
-index ecb5d08385..bc4687bbd6 100644
+index b35b9e2d21..78bfd78471 100644
 --- a/components/esp_system/port/soc/esp32c3/clk.c
 +++ b/components/esp_system/port/soc/esp32c3/clk.c
-@@ -69,7 +69,7 @@ void esp_rtc_init(void)
+@@ -71,7 +71,7 @@ void esp_rtc_init(void)
         ) {
          cfg.cali_ocode = 1;
      }
@@ -192,10 +192,10 @@ index ecb5d08385..bc4687bbd6 100644
  
  __attribute__((weak)) void esp_clk_init(void)
 diff --git a/components/esp_system/port/soc/esp32s2/clk.c b/components/esp_system/port/soc/esp32s2/clk.c
-index 2b786b62f9..26d86af6c3 100644
+index 83b412324e..e405b1373f 100644
 --- a/components/esp_system/port/soc/esp32s2/clk.c
 +++ b/components/esp_system/port/soc/esp32s2/clk.c
-@@ -72,7 +72,7 @@ void esp_rtc_init(void)
+@@ -74,7 +74,7 @@ void esp_rtc_init(void)
              esp_rom_output_tx_wait_idle(CONFIG_ESP_CONSOLE_ROM_SERIAL_PORT_NUM);
          }
      }
@@ -205,10 +205,10 @@ index 2b786b62f9..26d86af6c3 100644
  
  __attribute__((weak)) void esp_clk_init(void)
 diff --git a/components/esp_system/port/soc/esp32s3/clk.c b/components/esp_system/port/soc/esp32s3/clk.c
-index fac148fb41..fe6f9bee6d 100644
+index acbfa9cc8e..85773aa673 100644
 --- a/components/esp_system/port/soc/esp32s3/clk.c
 +++ b/components/esp_system/port/soc/esp32s3/clk.c
-@@ -71,7 +71,7 @@ void esp_rtc_init(void)
+@@ -74,7 +74,7 @@ void esp_rtc_init(void)
      if (rst_reas == RESET_REASON_CHIP_POWER_ON) {
          cfg.cali_ocode = 1;
      }
@@ -218,5 +218,5 @@ index fac148fb41..fe6f9bee6d 100644
  
  __attribute__((weak)) void esp_clk_init(void)
 -- 
-2.34.1
+2.43.0
 

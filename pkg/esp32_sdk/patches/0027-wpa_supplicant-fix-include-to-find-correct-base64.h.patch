@@ -1,7 +1,7 @@
-From d52016bf6f16eac0c3a4b895707368ee8a3babea Mon Sep 17 00:00:00 2001
+From ab2043a966015555115ed70f6d85620d6470b841 Mon Sep 17 00:00:00 2001
 From: Gunar Schorcht <gunar@schorcht.net>
 Date: Sun, 2 Mar 2025 17:15:03 +0100
-Subject: [PATCH 27/28] wpa_supplicant: fix include to find correct base64.h
+Subject: [PATCH 27/51] wpa_supplicant: fix include to find correct base64.h
 
 ---
  components/wpa_supplicant/src/tls/tlsv1_cred.c | 2 +-
@@ -21,5 +21,5 @@ index 0cee09749d..4d5d9d0b29 100644
  #include "crypto/sha1.h"
  #include "pkcs5.h"
 -- 
-2.34.1
+2.43.0
 
