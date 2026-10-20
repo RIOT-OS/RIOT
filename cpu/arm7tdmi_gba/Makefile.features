@@ -10,3 +10,4 @@ FEATURES_PROVIDED += newlib
 FEATURES_PROVIDED += picolibc
 FEATURES_PROVIDED += periph_timer
 FEATURES_PROVIDED += periph_timer_query_freqs
+FEATURES_PROVIDED += periph_uart
