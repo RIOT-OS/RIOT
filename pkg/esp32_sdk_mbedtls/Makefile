@@ -1,5 +1,6 @@
 PKG_NAME=esp32_sdk_mbedtls
 PKG_URL=https://github.com/espressif/mbedtls.git
+# v4.1.0
 PKG_VERSION=a2b32072ea898afc1ed5b6caf6931e36028c91d6
 PKG_LICENSE=Apache-2.0
 
