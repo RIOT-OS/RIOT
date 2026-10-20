@@ -71,10 +71,8 @@
 #define ESP_CMD_SELF_RX_REQ         0x10    /* Self Reception Request */
 #define ESP_CMD_SELF_RX_SINGLE_SHOT 0x12    /* Single Shot Self Reception */
 
-/**
- * Frame format definition as it is expected/received in the TX/RX buffer
- * of ESP32.
- */
+/* Frame format definition as it is expected/received in the TX/RX buffer
+ * of ESP32. */
 #define ESP_CAN_SFF_ID_LEN    2     /* two byte (11 bit) in SFF ID format */
 #define ESP_CAN_EFF_ID_LEN    4     /* two byte (29 bit) in EFF ID format */
 #define ESP_CAN_MAX_DATA_LEN  8     /* 8 data bytes at maximum */
@@ -201,10 +199,8 @@ static void _esp_can_isr(candev_t *candev)
     }
 }
 
-/*
- * The TWAI HAL requires additional memory directly behind the HAL context
- * for the errata workarounds, see `twai_hal_get_mem_requirment`.
- */
+/* The TWAI HAL requires additional memory directly behind the HAL context
+ * for the errata workarounds, see `twai_hal_get_mem_requirment`. */
 #define ESP_CAN_HAL_ERRATA_MEM  (64)
 
 static union {

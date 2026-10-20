@@ -305,7 +305,7 @@ void esp_ble_nimble_init(void)
 #include "os/os_mempool.h"
 
 #ifndef ESP_BLE_EXT_MEMPOOL_GET_CB_NUMOF
-#define ESP_BLE_EXT_MEMPOOL_GET_CB_NUMOF   8
+#  define ESP_BLE_EXT_MEMPOOL_GET_CB_NUMOF 8
 #endif
 
 typedef void *_os_mempool_get_fn(struct os_mempool_ext *ome, void *arg);

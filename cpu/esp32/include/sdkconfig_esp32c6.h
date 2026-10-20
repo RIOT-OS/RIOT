@@ -74,9 +74,6 @@ extern "C" {
 #  endif
 #endif
 
-#ifdef MODULE_ESP_RTC_TIMER_32K
-#endif
-
 /**
  * ESP32-C6 specific EFUSE configuration
  */
@@ -94,8 +91,8 @@ extern "C" {
  * ESP32-C6 specific WiFi configuration
  */
 #ifdef MODULE_ESP_WIFI_ANY
-#define CONFIG_ESP_WIFI_BSS_MAX_IDLE_SUPPORT    1
-#define CONFIG_ESP_WIFI_TX_HETB_QUEUE_NUM       3
+#  define CONFIG_ESP_WIFI_BSS_MAX_IDLE_SUPPORT  1
+#  define CONFIG_ESP_WIFI_TX_HETB_QUEUE_NUM     3
 #endif
 #define CONFIG_ESP_MAC_ADDR_UNIVERSE_BT         1
 #define CONFIG_ESP_MAC_ADDR_UNIVERSE_IEEE802154 1

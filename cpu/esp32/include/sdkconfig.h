@@ -137,7 +137,7 @@
 #  define CONFIG_SPIRAM_SPEED                       40
 #  define CONFIG_SPIRAM_BOOT_HW_INIT                1   /* ESP32: no flash reconfig after PSRAM init */
 #  define CONFIG_SPIRAM_BOOT_INIT                   1
-#  define CONFIG_SPIRAM_USE_MALLOC                 1   /* using malloc requires QStaticQueue */
+#  define CONFIG_SPIRAM_USE_MALLOC                  1   /* using malloc requires QStaticQueue */
 #  define CONFIG_SPIRAM_USE_CAPS_ALLOC              0   /* using cap instead of malloc */
 #  define CONFIG_SPIRAM_MEMTEST                     1
 #  define CONFIG_SPIRAM_MALLOC_ALWAYSINTERNAL       16384
@@ -155,10 +155,8 @@
 #define CONFIG_SPI_FLASH_ERASE_YIELD_TICKS          1
 #define CONFIG_SPI_FLASH_WRITE_CHUNK_SIZE           8192
 
-/*
- * Flash chip drivers as enabled by default in ESP-IDF for the respective SoC,
- * has to be consistent with the drivers compiled in esp-idf/spi_flash/Makefile
- */
+/* Flash chip drivers as enabled by default in ESP-IDF for the respective SoC,
+ * has to be consistent with the drivers compiled in esp-idf/spi_flash/Makefile */
 #define CONFIG_SPI_FLASH_SUPPORT_GD_CHIP            1
 #if defined(CPU_FAM_ESP32) || defined(CPU_FAM_ESP32S2) || \
     defined(CPU_FAM_ESP32S3) || defined(CPU_FAM_ESP32C3)
@@ -361,10 +359,8 @@
 #define CONFIG_ESP_DEBUG_OCDAWARE                   1
 
 
-/*
- * Placement of ESP-IDF functions in IRAM (ESP-IDF v6.x defaults). Functions
- * that may be called while the flash cache is disabled have to be in IRAM.
- */
+/* Placement of ESP-IDF functions in IRAM (ESP-IDF v6.x defaults). Functions
+ * that may be called while the flash cache is disabled have to be in IRAM. */
 #define CONFIG_ESP_HW_SUPPORT_FUNC_IN_IRAM          1
 #define CONFIG_ESP_INTR_IN_IRAM                     1
 #define CONFIG_ESP_PERIPH_CTRL_FUNC_IN_IRAM         1
@@ -382,7 +378,7 @@
 #define CONFIG_HAL_GPIO_USE_ROM_IMPL                1
 #define CONFIG_HEAP_POISONING_DISABLED              1
 #if !CONFIG_ESP_SYSTEM_MEMPROT
-#define CONFIG_HEAP_HAS_EXEC_HEAP                   1
+#  define CONFIG_HEAP_HAS_EXEC_HEAP                 1
 #endif
 #define CONFIG_HEAP_TRACING_OFF                     1
 #define CONFIG_LOG_TAG_LEVEL_CACHE_BINARY_MIN_HEAP  1
@@ -433,10 +429,8 @@
 #define PROJECT_NAME "RIOT-OS Application"
 
 
-/**
- * SoC capabilities used by ESP-IDF as Kconfig symbols. In ESP-IDF, these
- * symbols are generated from the SoC capabilities by the build system.
- */
+/* SoC capabilities used by ESP-IDF as Kconfig symbols. In ESP-IDF, these
+ * symbols are generated from the SoC capabilities by the build system. */
 #if defined(SOC_ADC_DMA_SUPPORTED) && !defined(CONFIG_SOC_ADC_DMA_SUPPORTED)
 #  define CONFIG_SOC_ADC_DMA_SUPPORTED                   SOC_ADC_DMA_SUPPORTED
 #endif
@@ -449,7 +443,8 @@
 #if defined(SOC_AES_SUPPORT_GCM) && !defined(CONFIG_SOC_AES_SUPPORT_GCM)
 #  define CONFIG_SOC_AES_SUPPORT_GCM                     SOC_AES_SUPPORT_GCM
 #endif
-#if defined(SOC_CACHE_INTERNAL_MEM_VIA_L1CACHE) && !defined(CONFIG_SOC_CACHE_INTERNAL_MEM_VIA_L1CACHE)
+#if defined(SOC_CACHE_INTERNAL_MEM_VIA_L1CACHE) && \
+    !defined(CONFIG_SOC_CACHE_INTERNAL_MEM_VIA_L1CACHE)
 #  define CONFIG_SOC_CACHE_INTERNAL_MEM_VIA_L1CACHE      SOC_CACHE_INTERNAL_MEM_VIA_L1CACHE
 #endif
 #if defined(SOC_CLK_TREE_SUPPORTED) && !defined(CONFIG_SOC_CLK_TREE_SUPPORTED)
@@ -458,8 +453,10 @@
 #if defined(SOC_CPU_CORES_NUM) && !defined(CONFIG_SOC_CPU_CORES_NUM)
 #  define CONFIG_SOC_CPU_CORES_NUM                       SOC_CPU_CORES_NUM
 #endif
-#if defined(SOC_CPU_MISALIGNED_ACCESS_ON_PMP_MISMATCH_ISSUE) && !defined(CONFIG_SOC_CPU_MISALIGNED_ACCESS_ON_PMP_MISMATCH_ISSUE)
-#  define CONFIG_SOC_CPU_MISALIGNED_ACCESS_ON_PMP_MISMATCH_ISSUE SOC_CPU_MISALIGNED_ACCESS_ON_PMP_MISMATCH_ISSUE
+#if defined(SOC_CPU_MISALIGNED_ACCESS_ON_PMP_MISMATCH_ISSUE) && \
+    !defined(CONFIG_SOC_CPU_MISALIGNED_ACCESS_ON_PMP_MISMATCH_ISSUE)
+#  define CONFIG_SOC_CPU_MISALIGNED_ACCESS_ON_PMP_MISMATCH_ISSUE \
+            SOC_CPU_MISALIGNED_ACCESS_ON_PMP_MISMATCH_ISSUE
 #endif
 #if defined(SOC_DIG_SIGN_SUPPORTED) && !defined(CONFIG_SOC_DIG_SIGN_SUPPORTED)
 #  define CONFIG_SOC_DIG_SIGN_SUPPORTED                  SOC_DIG_SIGN_SUPPORTED
@@ -470,14 +467,17 @@
 #if defined(SOC_ECDSA_SUPPORTED) && !defined(CONFIG_SOC_ECDSA_SUPPORTED)
 #  define CONFIG_SOC_ECDSA_SUPPORTED                     SOC_ECDSA_SUPPORTED
 #endif
-#if defined(SOC_EFUSE_CONSISTS_OF_ONE_KEY_BLOCK) && !defined(CONFIG_SOC_EFUSE_CONSISTS_OF_ONE_KEY_BLOCK)
+#if defined(SOC_EFUSE_CONSISTS_OF_ONE_KEY_BLOCK) && \
+    !defined(CONFIG_SOC_EFUSE_CONSISTS_OF_ONE_KEY_BLOCK)
 #  define CONFIG_SOC_EFUSE_CONSISTS_OF_ONE_KEY_BLOCK     SOC_EFUSE_CONSISTS_OF_ONE_KEY_BLOCK
 #endif
 #if defined(SOC_FLASH_ENCRYPTION_XTS_AES) && !defined(CONFIG_SOC_FLASH_ENCRYPTION_XTS_AES)
 #  define CONFIG_SOC_FLASH_ENCRYPTION_XTS_AES            SOC_FLASH_ENCRYPTION_XTS_AES
 #endif
-#if defined(SOC_FLASH_ENCRYPTION_XTS_AES_128_DERIVED) && !defined(CONFIG_SOC_FLASH_ENCRYPTION_XTS_AES_128_DERIVED)
-#  define CONFIG_SOC_FLASH_ENCRYPTION_XTS_AES_128_DERIVED SOC_FLASH_ENCRYPTION_XTS_AES_128_DERIVED
+#if defined(SOC_FLASH_ENCRYPTION_XTS_AES_128_DERIVED) && \
+    !defined(CONFIG_SOC_FLASH_ENCRYPTION_XTS_AES_128_DERIVED)
+#  define CONFIG_SOC_FLASH_ENCRYPTION_XTS_AES_128_DERIVED \
+            SOC_FLASH_ENCRYPTION_XTS_AES_128_DERIVED
 #endif
 #if defined(SOC_HMAC_SUPPORTED) && !defined(CONFIG_SOC_HMAC_SUPPORTED)
 #  define CONFIG_SOC_HMAC_SUPPORTED                      SOC_HMAC_SUPPORTED

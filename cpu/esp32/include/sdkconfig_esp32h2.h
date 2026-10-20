@@ -74,9 +74,6 @@ extern "C" {
 #  endif
 #endif
 
-#ifdef MODULE_ESP_RTC_TIMER_32K
-#endif
-
 /**
  * ESP32-H2 specific EFUSE configuration
  */

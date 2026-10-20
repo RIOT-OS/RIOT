@@ -93,10 +93,8 @@ extern "C" {
 #define ESP_DRAM_LOGD(tag, format, ...) ESP_DRAM_LOG_LEVEL(LOG_DEBUG  , D, tag, format "\n", ##__VA_ARGS__)
 #define ESP_DRAM_LOGV(tag, format, ...) ESP_DRAM_LOG_LEVEL(LOG_ALL    , V, tag, format "\n", ##__VA_ARGS__)
 
-/*
- * The ESP-IDF log buffer functions are not available in RIOT, the output
- * of log buffers is therefore suppressed.
- */
+/* The ESP-IDF log buffer functions are not available in RIOT, the output
+ * of log buffers is therefore suppressed. */
 #define ESP_LOG_BUFFER_HEX_LEVEL(tag, buffer, buff_len, level) \
             do { (void)(tag); (void)(buffer); (void)(buff_len); (void)(level); } while (0)
 #define ESP_LOG_BUFFER_CHAR_LEVEL(tag, buffer, buff_len, level) \

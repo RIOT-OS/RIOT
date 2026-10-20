@@ -627,7 +627,7 @@ void gpio_pm_sleep_enter(unsigned mode)
         /* ESP_PM_WUP_PINS_ANY_LOW or ESP_PM_WUP_PINS_ANY_HIGH */
         esp_sleep_enable_gpio_wakeup_on_hp_periph_powerdown(wup_pin_mask, ESP_PM_WUP_LEVEL);
 #else
-        #error "ESP32x variant doesn't allow to define GPIOs for wake-up from deep sleep"
+#  error "ESP32x variant doesn't allow to define GPIOs for wake-up from deep sleep"
 #endif
 #endif /* ESP_PM_WUP_PINS */
     }
