@@ -1,0 +1,25 @@
+From db350fb9218e54aca5ad5547f9e7b5a3b882ce03 Mon Sep 17 00:00:00 2001
+From: Gunar Schorcht <gunar@schorcht.net>
+Date: Thu, 8 Oct 2026 18:53:32 +0200
+Subject: [PATCH 48/51] esp_driver_sdmmc/sd_host_sdmmc: fix format string
+
+---
+ components/esp_driver_sdmmc/src/sd_host_sdmmc.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/components/esp_driver_sdmmc/src/sd_host_sdmmc.c b/components/esp_driver_sdmmc/src/sd_host_sdmmc.c
+index f3b0fb4b21..8029fafdec 100644
+--- a/components/esp_driver_sdmmc/src/sd_host_sdmmc.c
++++ b/components/esp_driver_sdmmc/src/sd_host_sdmmc.c
+@@ -582,7 +582,7 @@ esp_err_t sd_host_slot_set_card_clk(sd_host_sdmmc_slot_t *slot)
+ 
+     int real_freq_khz = sd_host_calc_freq(clk_src, host_div, card_div);
+     slot->freq.real_freq_hz = real_freq_khz * 1000;
+-    ESP_LOGD(TAG, "slot_id=%d clk_src=%d host_div=%d card_div=%d freq=%dkHz (max %" PRIu32 "kHz)", slot->slot_id, clk_src, host_div, card_div, real_freq_khz, freq_khz);
++    ESP_LOGD(TAG, "slot_id=%d clk_src=%d host_div=%d card_div=%d freq=%dkHz (max %dkHz)", slot->slot_id, clk_src, host_div, card_div, real_freq_khz, freq_khz);
+ 
+     // Program card clock settings, send them to the CIU
+     sdmmc_ll_set_card_clock_div(slot->ctlr->hal.dev, slot->slot_id, card_div);
+-- 
+2.43.0
+

@@ -1,7 +1,7 @@
-From 9bb7d4820132d756a37aab8a4a4ea5228d6bf134 Mon Sep 17 00:00:00 2001
+From b6d5ce6f87b678b47c70d31fde17c41af3a0a861 Mon Sep 17 00:00:00 2001
 From: Gunar Schorcht <gunar@schorcht.net>
 Date: Sun, 2 Mar 2025 10:27:20 +0100
-Subject: [PATCH 22/28] esp_system: conditional define of
+Subject: [PATCH 22/51] esp_system: conditional define of
  esp_get_free_heap_size
 
 Define the function `esp_get_free_heap_size` in ESP-IDF only if the heap implementation of ESP-IDF is used, that is if module `esp_idf_heap` is enabled. Otherwise, this function is defined in `cpu/esp_common/syscalls.c`.
@@ -10,10 +10,10 @@ Define the function `esp_get_free_heap_size` in ESP-IDF only if the heap impleme
  1 file changed, 2 insertions(+)
 
 diff --git a/components/esp_system/port/esp_system_chip.c b/components/esp_system/port/esp_system_chip.c
-index 864c2e4c23..dff4a1bd83 100644
+index 3304d31207..647efd509d 100644
 --- a/components/esp_system/port/esp_system_chip.c
 +++ b/components/esp_system/port/esp_system_chip.c
-@@ -67,6 +67,7 @@ void IRAM_ATTR esp_restart_noos_dig(void)
+@@ -62,6 +62,7 @@ void esp_restart_noos_dig(void)
  }
  #endif
  
@@ -21,7 +21,7 @@ index 864c2e4c23..dff4a1bd83 100644
  uint32_t esp_get_free_heap_size(void)
  {
      return heap_caps_get_free_size(MALLOC_CAP_DEFAULT);
-@@ -76,6 +77,7 @@ uint32_t esp_get_free_internal_heap_size(void)
+@@ -71,6 +72,7 @@ uint32_t esp_get_free_internal_heap_size(void)
  {
      return heap_caps_get_free_size(MALLOC_CAP_8BIT | MALLOC_CAP_DMA | MALLOC_CAP_INTERNAL);
  }
@@ -30,5 +30,5 @@ index 864c2e4c23..dff4a1bd83 100644
  uint32_t esp_get_minimum_free_heap_size(void)
  {
 -- 
-2.34.1
+2.43.0
 

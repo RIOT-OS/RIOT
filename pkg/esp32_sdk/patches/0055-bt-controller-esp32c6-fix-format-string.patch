@@ -1,0 +1,33 @@
+From e74bbcf3f0ff62d337a0b62118929fe395ae0862 Mon Sep 17 00:00:00 2001
+From: Gunar Schorcht <gunar@schorcht.net>
+Date: Fri, 9 Oct 2026 00:27:44 +0200
+Subject: [PATCH 51/51] bt/controller/esp32c6: fix format string
+
+---
+ components/bt/controller/esp32c6/bt.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/components/bt/controller/esp32c6/bt.c b/components/bt/controller/esp32c6/bt.c
+index 56f38faf54..d02897bddb 100644
+--- a/components/bt/controller/esp32c6/bt.c
++++ b/components/bt/controller/esp32c6/bt.c
+@@ -6,6 +6,7 @@
+ #include <stddef.h>
+ #include <stdlib.h>
+ #include <stdio.h>
++#include <inttypes.h>
+ #include <string.h>
+ 
+ #include "esp_random.h"
+@@ -654,7 +655,7 @@ void esp_bt_rtc_slow_clk_select(uint8_t slow_clk_src)
+         case MODEM_CLOCK_LPCLK_SRC_MAIN_XTAL:
+ #if SOC_BLE_USE_WIFI_PWR_CLK_WORKAROUND
+             uint32_t chip_version = efuse_hal_chip_revision();
+-            ESP_LOGI(NIMBLE_PORT_LOG_TAG, "Using main XTAL as clock source, chip ver: %d", chip_version);
++            ESP_LOGI(NIMBLE_PORT_LOG_TAG, "Using main XTAL as clock source, chip ver: %" PRIu32, chip_version);
+             if (chip_version == 0) {
+                 modem_clock_select_lp_clock_source(PERIPH_BT_MODULE, slow_clk_src, (MAIN_XTAL_FREQ_HZ/s_bt_lpclk_freq - 1));
+             } else{
+-- 
+2.43.0
+

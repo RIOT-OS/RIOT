@@ -1,0 +1,25 @@
+From 154a2c071fea8395fcea3ceb1df1134f5924259a Mon Sep 17 00:00:00 2001
+From: Gunar Schorcht <gunar@schorcht.net>
+Date: Thu, 8 Oct 2026 23:58:08 +0200
+Subject: [PATCH 49/51] bootloader_support: fix function prototype
+
+---
+ components/bootloader_support/include/esp_secure_boot.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/components/bootloader_support/include/esp_secure_boot.h b/components/bootloader_support/include/esp_secure_boot.h
+index 3994e2c523..7afd6b2262 100644
+--- a/components/bootloader_support/include/esp_secure_boot.h
++++ b/components/bootloader_support/include/esp_secure_boot.h
+@@ -236,7 +236,7 @@ typedef struct {
+  *
+  * @return Size of the secure boot signature block in bytes
+  */
+-static inline uint32_t esp_secure_boot_sig_block_size()
++static inline uint32_t esp_secure_boot_sig_block_size(void)
+ {
+ #if CONFIG_SECURE_SIGNED_APPS_RSA_SCHEME || CONFIG_SECURE_SIGNED_APPS_ECDSA_V2_SCHEME
+     return sizeof(ets_secure_boot_signature_t);
+-- 
+2.43.0
+

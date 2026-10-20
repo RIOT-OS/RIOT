@@ -1,6 +1,6 @@
-From b668dbb014752261500f8fcb0703295fba20b5d8 Mon Sep 17 00:00:00 2001
+From 2547886870a009057de6fc194381f8b6b978451b Mon Sep 17 00:00:00 2001
 From: Gunar Schorcht <gunar@schorcht.net>
-Date: Tue, 11 Mar 2025 02:10:23 +0100
+Date: Thu, 8 Oct 2026 19:03:37 +0200
 Subject: [PATCH 2/2] add prefix esp_ to file names to avoid conflicts with
  tlsf package
 
@@ -19,13 +19,13 @@ diff --git a/tlsf.c b/esp_tlsf.c
 similarity index 96%
 rename from tlsf.c
 rename to esp_tlsf.c
-index 1866a61..0793373 100644
+index ecdff15..7de32a2 100644
 --- a/tlsf.c
 +++ b/esp_tlsf.c
-@@ -7,9 +7,9 @@
- #include <string.h>
+@@ -8,9 +8,9 @@
  #include <limits.h>
  #include <stdio.h>
+ #include <stdint.h>
 -#include "tlsf.h"
 -#include "tlsf_block_functions.h"
 -#include "tlsf_control_functions.h"
@@ -60,5 +60,5 @@ similarity index 100%
 rename from include/tlsf.h
 rename to include/esp_tlsf.h
 -- 
-2.34.1
+2.43.0
 

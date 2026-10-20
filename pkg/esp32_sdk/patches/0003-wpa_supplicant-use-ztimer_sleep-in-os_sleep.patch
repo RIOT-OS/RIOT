@@ -1,7 +1,7 @@
-From 76a15bfad81c3cd6b31222f8afdc050a69276170 Mon Sep 17 00:00:00 2001
+From abac8d93ae878ba22ec38b92361fbdd15a9ebf73 Mon Sep 17 00:00:00 2001
 From: Gunar Schorcht <gunar@schorcht.net>
 Date: Sat, 1 Mar 2025 17:32:12 +0100
-Subject: [PATCH 03/28] wpa_supplicant: use ztimer_sleep in os_sleep
+Subject: [PATCH 03/51] wpa_supplicant: use ztimer_sleep in os_sleep
 
 ---
  components/wpa_supplicant/port/os_xtensa.c | 6 ++++--
@@ -34,5 +34,5 @@ index 7a2309e8b5..57e16ddc6a 100644
  }
  
 -- 
-2.34.1
+2.43.0
 

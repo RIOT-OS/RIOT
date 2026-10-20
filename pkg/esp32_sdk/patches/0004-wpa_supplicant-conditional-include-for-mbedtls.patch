@@ -1,7 +1,7 @@
-From cd2cadff0a0a1fcb4cfdbd802989934d3b15a22e Mon Sep 17 00:00:00 2001
+From 499831baad80d1e8837e9d4b68c1ad1e9f668196 Mon Sep 17 00:00:00 2001
 From: Gunar Schorcht <gunar@schorcht.net>
 Date: Sat, 1 Mar 2025 17:33:00 +0100
-Subject: [PATCH 04/28] wpa_supplicant: conditional include for mbedtls
+Subject: [PATCH 04/51] wpa_supplicant: conditional include for mbedtls
 
 ---
  components/wpa_supplicant/port/os_xtensa.c | 2 ++
@@ -22,5 +22,5 @@ index 57e16ddc6a..7e5d78bd70 100644
  #include "ztimer.h"
  
 -- 
-2.34.1
+2.43.0
 
