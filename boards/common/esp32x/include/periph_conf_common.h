@@ -139,7 +139,6 @@ static const gpio_t dac_channels[] = DAC_GPIOS;
 static const i2c_conf_t i2c_config[] = {
 #if defined(I2C0_SCL) && defined(I2C0_SDA) && defined(I2C0_SPEED)
     {
-        .module = PERIPH_I2C0_MODULE,
         .speed = I2C0_SPEED,
         .scl = I2C0_SCL,
         .sda = I2C0_SDA,
@@ -149,7 +148,6 @@ static const i2c_conf_t i2c_config[] = {
 #endif
 #if (SOC_I2C_NUM > 1) && defined(I2C1_SCL) && defined(I2C1_SDA) && defined(I2C1_SPEED)
     {
-        .module = PERIPH_I2C1_MODULE,
         .speed = I2C1_SPEED,
         .scl = I2C1_SCL,
         .sda = I2C1_SDA,
