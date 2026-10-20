@@ -426,6 +426,8 @@ static int _xfer_execute(sdmmc_dev_t *sdmmc_dev, sdmmc_xfer_desc_t *xfer,
         .arg = xfer->arg,
         .data = xfer->write ? (void *)data_wr : data_rd,
         .datalen = xfer->block_num * xfer->block_size,
+        /* buflen is required by ESP-IDF v6.x to check the buffer alignment */
+        .buflen = xfer->block_num * xfer->block_size,
         .blklen = xfer->block_size,
         .timeout_ms = xfer->write ? 2500 : 1000, /* TODO */
     };
