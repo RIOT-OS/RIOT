@@ -698,8 +698,8 @@ static ieee802154_submac_fsm_return_t _fsm_state_wait_for_ack(ieee802154_submac_
     switch (ev) {
     case IEEE802154_FSM_EV_RX_DONE:
         assert(!ieee802154_radio_has_irq_ack_timeout(&submac->dev));
-        if (ieee802154_radio_read(&submac->dev, ack, 3, NULL) &&
-            ack[0] & IEEE802154_FCF_TYPE_ACK) {
+        if ((ieee802154_radio_read(&submac->dev, ack, sizeof(ack), NULL) == (int)sizeof(ack)) &&
+            (ack[0] & IEEE802154_FCF_TYPE_MASK) == IEEE802154_FCF_TYPE_ACK) {
             ieee802154_submac_ack_timer_cancel(submac);
             ieee802154_tx_info_t tx_info;
             tx_info.retrans = _get_retrans(submac);
