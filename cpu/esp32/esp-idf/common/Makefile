@@ -243,6 +243,7 @@ else ifeq (esp32s3,$(CPU_FAM))
   ESP32_SDK_SRC += components/esp_hw_support/sleep_console.c
   ESP32_SDK_SRC += components/esp_rom/patches/esp_rom_cache_esp32s2_esp32s3.c
   ESP32_SDK_SRC += components/esp_rom/patches/esp_rom_efuse.c
+  ESP32_SDK_ASMSRC += components/esp_rom/patches/esp_rom_cache_writeback_esp32s3.S
   ESP32_SDK_SRC += components/esp_timer/src/esp_timer_impl_systimer.c
   ESP32_SDK_SRC += components/esp_hal_touch_sens/$(CPU_FAM)/touch_sensor_legacy_hal.c
   ESP32_SDK_SRC += components/hal/cache_hal.c
