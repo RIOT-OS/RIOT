@@ -39,6 +39,7 @@ NOTE: The Xtensa architecture requires stack pointer alignment to 16 bytes.
 
 #ifdef __ASSEMBLER__
 #include    <xtensa/coreasm.h>
+#include    "xtensa_specreg_compat.h"
 #endif
 
 #include    <xtensa/config/tie.h>
