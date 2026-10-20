@@ -929,6 +929,18 @@ typedef struct {
  * @{
  */
 
+#if !defined(DOXYGEN)
+/* Number of timer groups and number of timers per timer group. ESP-IDF v6.x
+ * doesn't define them as SoC capabilities any longer (`hal/timg_ll.h`). */
+#  if defined(CPU_FAM_ESP32) || defined(CPU_FAM_ESP32S2) || defined(CPU_FAM_ESP32S3)
+#    define TIMER_GROUP_NUMOF           (2)
+#    define TIMER_GROUP_TIMERS_NUMOF    (2)
+#  else
+#    define TIMER_GROUP_NUMOF           (2)
+#    define TIMER_GROUP_TIMERS_NUMOF    (1)
+#  endif
+#endif
+
 #ifndef MODULE_ESP_HW_COUNTER
 /**
  * @brief Hardware timer modules are used for timer implementation (default)
@@ -936,7 +948,7 @@ typedef struct {
  * Since one timer is used for the system time, there is one timer less than
  * the total number of timers.
  */
-#  define TIMER_NUMOF           (SOC_TIMER_GROUP_TOTAL_TIMERS - 1)
+#  define TIMER_NUMOF           (TIMER_GROUP_NUMOF * TIMER_GROUP_TIMERS_NUMOF - 1)
 #  define TIMER_CHANNEL_NUMOF   (1)
 #endif
 

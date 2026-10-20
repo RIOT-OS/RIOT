@@ -30,6 +30,7 @@
 #include "hal/clk_tree_ll.h"
 #include "hal/timer_hal.h"
 #include "hal/timer_ll.h"
+#include "hal/timg_ll.h"
 #include "rom/ets_sys.h"
 #include "soc/periph_defs.h"
 #include "soc/rtc.h"
@@ -47,6 +48,11 @@
 
 #define ENABLE_DEBUG 0
 #include "debug.h"
+
+_Static_assert(TIMER_GROUP_NUMOF == TIMG_LL_INST_NUM,
+               "TIMER_GROUP_NUMOF doesn't match TIMG_LL_INST_NUM");
+_Static_assert(TIMER_GROUP_TIMERS_NUMOF == TIMG_LL_GPTIMERS_PER_INST,
+               "TIMER_GROUP_TIMERS_NUMOF doesn't match TIMG_LL_GPTIMERS_PER_INST");
 
 #define RTC_PLL_480M    480 /* PLL with 480 MHz at maximum */
 #define RTC_PLL_320M    320 /* PLL with 320 MHz at maximum */
@@ -124,7 +130,7 @@ struct _hw_timer_desc_t {
 
 static const struct _hw_timer_desc_t _timers_desc[] =
 {
-#if SOC_TIMER_GROUP_TIMERS_PER_GROUP > 1
+#if TIMER_GROUP_TIMERS_NUMOF > 1
     {
         .module = PERIPH_TIMG0_MODULE,
         .group = TIMER_GROUP_0,
@@ -132,14 +138,14 @@ static const struct _hw_timer_desc_t _timers_desc[] =
         .int_src  = ETS_TG0_T1_LEVEL_INTR_SOURCE,
     },
 #endif
-#if SOC_TIMER_GROUPS > 1
+#if TIMER_GROUP_NUMOF > 1
     {
         .module = PERIPH_TIMG1_MODULE,
         .group = TIMER_GROUP_1,
         .index = TIMER_0,
         .int_src  = ETS_TG1_T0_LEVEL_INTR_SOURCE,
     },
-#  if SOC_TIMER_GROUP_TIMERS_PER_GROUP > 1
+#  if TIMER_GROUP_TIMERS_NUMOF > 1
     {
         .module = PERIPH_TIMG1_MODULE,
         .group = TIMER_GROUP_1,
@@ -234,8 +240,8 @@ int timer_init(tim_t dev, uint32_t freq, timer_cb_t cb, void *arg)
     periph_module_enable(_timers_desc[dev].module);
 
     /* hardware timer configuration */
-    timer_ll_set_clock_source(_timers[dev].group, _timers[dev].index, GPTIMER_CLK_SRC_DEFAULT);
-    timer_ll_enable_clock(_timers[dev].group, _timers[dev].index, true);
+    timer_ll_set_clock_source(_timers_desc[dev].group, _timers[dev].index, GPTIMER_CLK_SRC_DEFAULT);
+    timer_ll_enable_clock(_timers_desc[dev].group, _timers[dev].index, true);
 
     timer_ll_enable_counter(_timers[dev].group, _timers[dev].index, false);
     timer_ll_set_count_direction(_timers[dev].group, _timers[dev].index, GPTIMER_COUNT_UP);
