@@ -149,13 +149,25 @@
 #define CONFIG_SPI_FLASH_ERASE_YIELD_DURATION_MS    20
 #define CONFIG_SPI_FLASH_ERASE_YIELD_TICKS          1
 #define CONFIG_SPI_FLASH_WRITE_CHUNK_SIZE           8192
-#define CONFIG_SPI_FLASH_SUPPORT_ISSI_CHIP          1
-#define CONFIG_SPI_FLASH_SUPPORT_MXIC_CHIP          1
+
+/*
+ * Flash chip drivers as enabled by default in ESP-IDF for the respective SoC,
+ * has to be consistent with the drivers compiled in esp-idf/spi_flash/Makefile
+ */
 #define CONFIG_SPI_FLASH_SUPPORT_GD_CHIP            1
-#define CONFIG_SPI_FLASH_SUPPORT_WINBOND_CHIP       1
-#define CONFIG_SPI_FLASH_SUPPORT_BOYA_CHIP          1
-#define CONFIG_SPI_FLASH_SUPPORT_TH_CHIP            1
-#define CONFIG_SPI_FLASH_SUPPORT_MXIC_OPI_CHIP      1
+#if defined(CPU_FAM_ESP32) || defined(CPU_FAM_ESP32S2) || \
+    defined(CPU_FAM_ESP32S3) || defined(CPU_FAM_ESP32C3)
+#  define CONFIG_SPI_FLASH_SUPPORT_ISSI_CHIP        1
+#  define CONFIG_SPI_FLASH_SUPPORT_MXIC_CHIP        1
+#  define CONFIG_SPI_FLASH_SUPPORT_WINBOND_CHIP     1
+#endif
+#if defined(CPU_FAM_ESP32S2) || defined(CPU_FAM_ESP32S3) || defined(CPU_FAM_ESP32C3)
+#  define CONFIG_SPI_FLASH_SUPPORT_BOYA_CHIP        1
+#  define CONFIG_SPI_FLASH_SUPPORT_TH_CHIP          1
+#endif
+#if defined(CPU_FAM_ESP32S3)
+#  define CONFIG_SPI_FLASH_SUPPORT_MXIC_OPI_CHIP    1
+#endif
 
 /**
  * RTC Clock configuration
