@@ -1,6 +1,6 @@
 /*
  * SPDX-FileCopyrightText: 2002 Kai Germaschewski <kai.germaschewski@gmx.de>
- * SPDX-License-Identifier: GPL-3.0-or-later
+ * SPDX-License-Identifier: GPL-2.0-or-later
  */
 
 /*
