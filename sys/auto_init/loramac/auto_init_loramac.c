@@ -17,15 +17,15 @@
 #include "kernel_defines.h"
 
 #if IS_USED(MODULE_SX127X)
-#include "sx127x.h"
-#include "sx127x_netdev.h"
-#include "sx127x_params.h"
+#  include "sx127x.h"
+#  include "sx127x_netdev.h"
+#  include "sx127x_params.h"
 #endif
 
 #if IS_USED(MODULE_SX126X)
-#include "sx126x.h"
-#include "sx126x_netdev.h"
-#include "sx126x_params.h"
+#  include "sx126x.h"
+#  include "sx126x_netdev.h"
+#  include "sx126x_params.h"
 #endif
 
 #include "semtech_loramac.h"
@@ -54,6 +54,8 @@ void auto_init_loramac(void)
     loramac.netdev->driver = &sx126x_driver;
 #endif
 
-    semtech_loramac_init(&loramac);
+    if (semtech_loramac_init(&loramac) < 0) {
+        LOG_ERROR("[auto_init_loramac] error initializing loramac\n");
+    }
 }
 /** @} */

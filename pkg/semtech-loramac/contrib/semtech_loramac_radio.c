@@ -42,12 +42,9 @@ extern netdev_t *loramac_netdev_ptr;
 void SX127XInit(RadioEvents_t *events)
 {
     (void) events;
-    assert(loramac_netdev_ptr);
-    if (loramac_netdev_ptr->driver->init(loramac_netdev_ptr) < 0) {
-        DEBUG("[semtech-loramac] radio: failed to initialize radio\n");
-    }
 
-    DEBUG("[semtech-loramac] radio: initialization successful\n");
+    /* Radio initialization in semtech_loramac_init() to catch potential
+     * errors and return them. */
 }
 
 RadioState_t SX127XGetStatus(void)
