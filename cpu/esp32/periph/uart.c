@@ -22,7 +22,7 @@
 #include "esp_private/periph_ctrl.h"
 #include "hal/uart_ll.h"
 
-void uart_set_wakeup_threshold(uart_t uart, uint32_t threshold)
+void esp_uart_set_wakeup_threshold(uart_t uart, uint32_t threshold)
 {
     assert(uart < SOC_UART_NUM);
 

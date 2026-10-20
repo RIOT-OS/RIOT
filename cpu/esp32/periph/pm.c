@@ -43,6 +43,8 @@
 #include "debug.h"
 
 extern void rtt_save_counter(void);
+/* replaces the deprecated ESP-IDF function uart_set_wakeup_threshold */
+extern void esp_uart_set_wakeup_threshold(uart_t uart, uint32_t threshold);
 extern void rtt_restore_counter(void);
 
 static esp_sleep_wakeup_cause_t pm_get_wakeup_cause(void)
@@ -209,7 +211,7 @@ void pm_set(unsigned mode)
     const uart_periph_sig_t *sig = &uart_periph_signal[UART_DEV(0)].pins[SOC_UART_PERIPH_SIGNAL_RX];
     gpio_iomux_input(UART0_RXD, sig->iomux_func, sig->signal);
 #endif
-    uart_set_wakeup_threshold(UART_DEV(0), ESP_PM_WUP_UART0);
+    esp_uart_set_wakeup_threshold(UART_DEV(0), ESP_PM_WUP_UART0);
     esp_sleep_enable_uart_wakeup(0);
 #endif
 #if (ESP_PM_WUP_UART1 > 2)
@@ -219,7 +221,7 @@ void pm_set(unsigned mode)
     const uart_periph_sig_t *sig = &uart_periph_signal[UART_DEV(1)].pins[SOC_UART_PERIPH_SIGNAL_RX];
     gpio_iomux_input(UART1_RXD, sig->iomux_func, sig->signal);
 #endif
-    uart_set_wakeup_threshold(UART_DEV(1), ESP_PM_WUP_UART1);
+    esp_uart_set_wakeup_threshold(UART_DEV(1), ESP_PM_WUP_UART1);
     esp_sleep_enable_uart_wakeup(1);
 #endif
 #if MODULE_STDIO_UART
