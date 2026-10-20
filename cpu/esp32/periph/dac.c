@@ -21,7 +21,7 @@
 
 #include "esp_common.h"
 #include "hal/dac_ll.h"
-#include "soc/dac_periph.h"
+#include "hal/dac_periph.h"
 
 #define ENABLE_DEBUG 0
 #include "debug.h"
