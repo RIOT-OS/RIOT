@@ -61,12 +61,7 @@ extern "C" {
  * ESP32-S2 specific RTC clock configuration
  */
 #ifndef CONFIG_RTC_CLK_CAL_CYCLES
-#  if MODULE_ESP_RTC_TIMER_32K
-/* the 32 kHz crystal requires more cycles for calibration (ESP-IDF default) */
-#    define CONFIG_RTC_CLK_CAL_CYCLES           3000
-#  else
-#    define CONFIG_RTC_CLK_CAL_CYCLES           576
-#  endif
+#  define CONFIG_RTC_CLK_CAL_CYCLES             576
 #endif
 
 #ifdef MODULE_ESP_RTC_TIMER_32K
