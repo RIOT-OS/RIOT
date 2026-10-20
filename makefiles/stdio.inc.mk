@@ -94,7 +94,7 @@ endif
 
 ifneq (,$(filter stdio_native,$(USEMODULE)))
   ifneq (,$(filter stdin,$(USEMODULE)))
-    DEFAULT_MODULE += stdio_resume
+    DEFAULT_MODULE += stdio_stdin_resume
   endif
 endif
 
