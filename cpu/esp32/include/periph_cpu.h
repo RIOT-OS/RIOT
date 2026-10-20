@@ -399,7 +399,7 @@ union gpio_conf_esp32 {
  * @brief  Number of DAC channels that could be used at maximum.
  */
 #if defined(SOC_DAC_SUPPORTED) || DOXYGEN
-#  define DAC_NUMOF_MAX (SOC_DAC_PERIPH_NUM)
+#  define DAC_NUMOF_MAX (SOC_DAC_CHAN_NUM)
 #endif
 
 /** @} */
