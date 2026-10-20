@@ -356,12 +356,16 @@ static int _set_clock_rate(sdmmc_dev_t *sdmmc_dev, sdmmc_clock_rate_t rate)
     }
 
 #if SOC_SDMMC_USE_GPIO_MATRIX
-    /* phase has to be modified to get it working for MMCs if
-     * SOC_SDMMC_USE_GPIO_MATRIX is used */
-    uint32_t reg = *((uint32_t *)SDMMC_CLOCK_REG);
-    reg &= ~SDMMC_CLOCK_REG_CCLKIN_EDGE_SAM_SEL_M;
-    reg |= (6 << SDMMC_CLOCK_REG_CCLKIN_EDGE_SAM_SEL_S);
-    *((uint32_t *)SDMMC_CLOCK_REG) = reg;
+    /* Phase of the input clock has to be modified to get it working for MMCs
+     * if SOC_SDMMC_USE_GPIO_MATRIX is used. Since ESP-IDF v6.x, the clock
+     * configuration is applied with the next transaction which also resets
+     * the input clock phase. Therefore the phase has to be configured instead
+     * of writing it directly into the CLOCK register. SDMMC_DELAY_PHASE_3
+     * corresponds to the value 6 of CCLKIN_EDGE_SAM_SEL (270 degrees). */
+    res = sdmmc_host_set_input_delay(dev->config->slot, SDMMC_DELAY_PHASE_3);
+    if (res) {
+        return _esp_err_to_sdmmc_err_code(res);
+    }
 #endif
 
     return 0;
