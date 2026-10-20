@@ -3,7 +3,7 @@
 
 import sys
 import pexpect
-from testrunner import run
+from testrunner import run, flush_child
 
 
 def _shellping(child, timeout=1):
@@ -64,6 +64,8 @@ def testfunc(child):
     * getting some test output without other messages
     * sending empty lines
     """
+    flush_child(child)
+
     _wait_shell_ready(child)
 
     # Verify there is no local and remote echo as it is disabled
