@@ -45,12 +45,12 @@
  * Cards produce response errors on ESP32-S3, so that 0 degrees as in ESP-IDF
  * is used for them. MMCs require 270 degrees.
  */
-#ifndef CONFIG_SDMMC_INPUT_DELAY_PHASE_SD
-#define CONFIG_SDMMC_INPUT_DELAY_PHASE_SD   SDMMC_DELAY_PHASE_0
-#endif
-#ifndef CONFIG_SDMMC_INPUT_DELAY_PHASE_MMC
-#define CONFIG_SDMMC_INPUT_DELAY_PHASE_MMC  SDMMC_DELAY_PHASE_3
-#endif
+#  ifndef CONFIG_SDMMC_INPUT_DELAY_PHASE_SD
+#    define CONFIG_SDMMC_INPUT_DELAY_PHASE_SD   SDMMC_DELAY_PHASE_0
+#  endif
+#  ifndef CONFIG_SDMMC_INPUT_DELAY_PHASE_MMC
+#    define CONFIG_SDMMC_INPUT_DELAY_PHASE_MMC  SDMMC_DELAY_PHASE_3
+#  endif
 #endif
 
 /* we have to redefine it here since we can't include "gpio_types.h" due to
