@@ -135,8 +135,9 @@
 #  define CONFIG_SPIRAM_SIZE                        -1
 #  define CONFIG_SPIRAM_SPEED_40M                   1
 #  define CONFIG_SPIRAM_SPEED                       40
+#  define CONFIG_SPIRAM_BOOT_HW_INIT                1   /* ESP32: no flash reconfig after PSRAM init */
 #  define CONFIG_SPIRAM_BOOT_INIT                   1
-#  define CONFIG_SPIRAM_USE_MALLOC                  1   /* using malloc requires QStaticQueue */
+#  define CONFIG_SPIRAM_USE_MALLOC                 1   /* using malloc requires QStaticQueue */
 #  define CONFIG_SPIRAM_USE_CAPS_ALLOC              0   /* using cap instead of malloc */
 #  define CONFIG_SPIRAM_MEMTEST                     1
 #  define CONFIG_SPIRAM_MALLOC_ALWAYSINTERNAL       16384
