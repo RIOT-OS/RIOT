@@ -43,7 +43,7 @@
 #include "esp_attr.h"
 #include "esp_clk_tree.h"
 #include "esp_cpu.h"
-#include "esp_driver_i2c/i2c_private.h"
+#include "esp_private/periph_ctrl.h"
 #include "esp_rom_gpio.h"
 #include "esp_rom_sys.h"
 #include "hal/i2c_hal.h"
@@ -664,12 +664,17 @@ static void _i2c_reset_and_configure(i2c_t dev)
 {
     i2c_ll_enable_controller_clock(_i2c_hw[dev].dev, true);
 
-    I2C_RCC_ATOMIC() {
+    PERIPH_RCC_ATOMIC() {
         i2c_ll_enable_bus_clock(dev, true);
         i2c_ll_reset_register(dev);
     }
 
-    i2c_ll_master_init(_i2c_hw[dev].dev);
+    /* i2c_ll_master_init was removed in ESP-IDF v6.x, the configuration is
+     * done as in i2c_hal_master_init */
+    i2c_ll_set_mode(_i2c_hw[dev].dev, I2C_BUS_MODE_MASTER);
+    i2c_ll_enable_pins_open_drain(_i2c_hw[dev].dev, true);
+    i2c_ll_enable_arbitration(_i2c_hw[dev].dev, false);
+    i2c_ll_master_rx_full_ack_level(_i2c_hw[dev].dev, false);
     i2c_ll_set_data_mode(_i2c_hw[dev].dev, I2C_DATA_MODE_MSB_FIRST, I2C_DATA_MODE_MSB_FIRST);
     i2c_ll_txfifo_rst(_i2c_hw[dev].dev);
     i2c_ll_rxfifo_rst(_i2c_hw[dev].dev);
