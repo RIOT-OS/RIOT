@@ -59,8 +59,11 @@ static const struct intr_handle_data_t _irq_data_table[] = {
     { ETS_TG1_T1_LEVEL_INTR_SOURCE, CPU_INUM_TIMER, 2 },
 #  endif /* TIMER_GROUP_TIMERS_NUMOF > 1 */
 #endif /* TIMER_GROUP_NUMOF > 1 */
-#if CPU_FAM_ESP32 || CPU_FAM_ESP32S2
+#if CPU_FAM_ESP32
     { ETS_TG0_LACT_LEVEL_INTR_SOURCE, CPU_INUM_SYSTIMER, 2 },
+#elif CPU_FAM_ESP32S2
+    /* ESP-IDF v6.x uses the system timer for esp_timer on ESP32-S2 */
+    { ETS_SYSTIMER_TARGET2_INTR_SOURCE, CPU_INUM_SYSTIMER, 1 },
 #elif CPU_FAM_ESP32S3 || \
       CPU_FAM_ESP32C3 || CPU_FAM_ESP32C6 || CPU_FAM_ESP32H2
     { ETS_SYSTIMER_TARGET2_INTR_SOURCE, CPU_INUM_SYSTIMER, 2 },
