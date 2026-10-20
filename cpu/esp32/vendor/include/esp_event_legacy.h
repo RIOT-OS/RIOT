@@ -102,7 +102,7 @@ typedef wifi_event_ap_probe_req_rx_t system_event_ap_probe_req_rx_t;
 typedef wifi_event_ftm_report_t system_event_ftm_report_t;
 
 /** Argument structure of  event */
-typedef ip_event_ap_staipassigned_t system_event_ap_staipassigned_t;
+typedef ip_event_assigned_ip_to_client_t system_event_ap_staipassigned_t;
 
 /** Argument structure of  event */
 typedef ip_event_got_ip_t system_event_sta_got_ip_t;
