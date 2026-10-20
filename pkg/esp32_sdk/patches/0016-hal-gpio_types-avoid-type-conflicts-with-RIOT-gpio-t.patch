@@ -1,20 +1,20 @@
-From 9220ae3c3d5bf30804f6741c43b753317d3486ef Mon Sep 17 00:00:00 2001
+From 89a7801933f68c6134e0d5751830d419d57915f8 Mon Sep 17 00:00:00 2001
 From: Gunar Schorcht <gunar@schorcht.net>
 Date: Sat, 1 Mar 2025 18:04:05 +0100
-Subject: [PATCH 16/28] hal/gpio_types: avoid type conflicts with RIOT gpio
+Subject: [PATCH 16/51] hal/gpio_types: avoid type conflicts with RIOT gpio
  types
 
 ---
- components/hal/include/hal/gpio_types.h | 6 ++++++
+ components/esp_hal_gpio/include/hal/gpio_types.h | 6 ++++++
  1 file changed, 6 insertions(+)
 
-diff --git a/components/hal/include/hal/gpio_types.h b/components/hal/include/hal/gpio_types.h
-index d785ec491a..1a60a4181c 100644
---- a/components/hal/include/hal/gpio_types.h
-+++ b/components/hal/include/hal/gpio_types.h
-@@ -14,10 +14,12 @@
- extern "C" {
- #endif
+diff --git a/components/esp_hal_gpio/include/hal/gpio_types.h b/components/esp_hal_gpio/include/hal/gpio_types.h
+index 0b9495e98b..24072b5aef 100644
+--- a/components/esp_hal_gpio/include/hal/gpio_types.h
++++ b/components/esp_hal_gpio/include/hal/gpio_types.h
+@@ -27,10 +27,12 @@ extern "C" {
+ #define GPIO_IS_VALID_DIGITAL_IO_PAD(gpio_num)  ((gpio_num >= 0) && (gpio_num < SOC_GPIO_PIN_COUNT) && \
+                                                  (((1ULL << (gpio_num)) & SOC_GPIO_VALID_DIGITAL_IO_PAD_MASK) != 0))
  
 +#ifndef HAVE_GPIO_PORT_T
  typedef enum {
@@ -25,7 +25,7 @@ index d785ec491a..1a60a4181c 100644
  
  #define GPIO_PIN_REG_0          IO_MUX_GPIO0_REG
  #define GPIO_PIN_REG_1          IO_MUX_GPIO1_REG
-@@ -92,6 +94,7 @@ typedef enum {
+@@ -105,6 +107,7 @@ typedef enum {
  #define GPIO_MODE_DEF_OD              (BIT2)    ///< bit mask for OD mode
  /** @endcond */
  
@@ -33,7 +33,7 @@ index d785ec491a..1a60a4181c 100644
  typedef enum {
      GPIO_MODE_DISABLE = GPIO_MODE_DEF_DISABLE,                                                         /*!< GPIO mode : disable input and output             */
      GPIO_MODE_INPUT = GPIO_MODE_DEF_INPUT,                                                             /*!< GPIO mode : input only                           */
-@@ -100,6 +103,7 @@ typedef enum {
+@@ -113,6 +116,7 @@ typedef enum {
      GPIO_MODE_INPUT_OUTPUT_OD = ((GPIO_MODE_DEF_INPUT) | (GPIO_MODE_DEF_OUTPUT) | (GPIO_MODE_DEF_OD)), /*!< GPIO mode : output and input with open-drain mode*/
      GPIO_MODE_INPUT_OUTPUT = ((GPIO_MODE_DEF_INPUT) | (GPIO_MODE_DEF_OUTPUT)),                         /*!< GPIO mode : output and input mode                */
  } gpio_mode_t;
@@ -41,7 +41,7 @@ index d785ec491a..1a60a4181c 100644
  
  typedef enum {
      GPIO_PULLUP_DISABLE = 0x0,     /*!< Disable GPIO pull-up resistor */
-@@ -111,12 +115,14 @@ typedef enum {
+@@ -124,12 +128,14 @@ typedef enum {
      GPIO_PULLDOWN_ENABLE = 0x1,    /*!< Enable GPIO pull-down resistor  */
  } gpio_pulldown_t;
  
@@ -57,5 +57,5 @@ index d785ec491a..1a60a4181c 100644
  typedef enum {
      GPIO_DRIVE_CAP_0       = 0,    /*!< Pad drive capability: weak          */
 -- 
-2.34.1
+2.43.0
 

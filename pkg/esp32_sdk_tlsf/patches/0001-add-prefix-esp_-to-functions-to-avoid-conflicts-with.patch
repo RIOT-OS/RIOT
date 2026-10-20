@@ -1,18 +1,18 @@
-From e49e678b04d7557142fcabadbab0b24502f5076c Mon Sep 17 00:00:00 2001
+From 81facfe7a6c1bec9ba84626e33dc50cb09360c96 Mon Sep 17 00:00:00 2001
 From: Gunar Schorcht <gunar@schorcht.net>
 Date: Tue, 11 Mar 2025 02:08:56 +0100
 Subject: [PATCH 1/2] add prefix esp_ to functions to avoid conflicts with tlsf
  package
 
 ---
- include/tlsf.h           |  48 ++++-----
- tlsf.c                   | 226 +++++++++++++++++++--------------------
+ include/tlsf.h           |  50 ++++-----
+ tlsf.c                   | 222 +++++++++++++++++++--------------------
  tlsf_block_functions.h   |  36 +++----
  tlsf_control_functions.h | 162 ++++++++++++++--------------
- 4 files changed, 236 insertions(+), 236 deletions(-)
+ 4 files changed, 235 insertions(+), 235 deletions(-)
 
 diff --git a/include/tlsf.h b/include/tlsf.h
-index 94bd67a..f4dfc08 100644
+index aa912d7..19f7a68 100644
 --- a/include/tlsf.h
 +++ b/include/tlsf.h
 @@ -15,36 +15,36 @@
@@ -89,8 +89,17 @@ index 94bd67a..f4dfc08 100644
 +int esp_tlsf_check_pool(pool_t pool);
  
  /**
+  * @brief Find the block containing the pointer passed as parameter
+@@ -70,7 +70,7 @@ int tlsf_check_pool(pool_t pool);
+  * @param ptr The pointer we want to find the containing block of
+  * @return void* The pointer to the containing block if found, NULL if not.
+  */
+-void* tlsf_find_containing_block(pool_t pool, void *ptr);
++void* esp_tlsf_find_containing_block(pool_t pool, void *ptr);
+ 
+ /**
   * @brief Weak function called on every free block of memory allowing the user to implement
-@@ -74,7 +74,7 @@ int tlsf_check_pool(pool_t pool);
+@@ -83,7 +83,7 @@ void* tlsf_find_containing_block(pool_t pool, void *ptr);
   * @return true The checks found no inconsistency in the memory
   * @return false The checks in the function highlighted an inconsistency in the memory
   */
@@ -100,21 +109,16 @@ index 94bd67a..f4dfc08 100644
  #if defined(__cplusplus)
  };
 diff --git a/tlsf.c b/tlsf.c
-index 23c5aa3..1866a61 100644
+index 394fb94..ecdff15 100644
 --- a/tlsf.c
 +++ b/tlsf.c
-@@ -15,15 +15,15 @@
- ** Static assertion mechanism.
- */
+@@ -18,13 +18,13 @@
  
--#define _tlsf_glue2(x, y) x ## y
--#define _tlsf_glue(x, y) _tlsf_glue2(x, y)
+ #define _tlsf_glue2(x, y) x ## y
+ #define _tlsf_glue(x, y) _tlsf_glue2(x, y)
 -#define tlsf_static_assert(exp) \
--	typedef char _tlsf_glue(static_assert, __LINE__) [(exp) ? 1 : -1]
-+#define _esp_tlsf_glue2(x, y) x ## y
-+#define _esp_tlsf_glue(x, y) _esp_tlsf_glue2(x, y)
 +#define esp_tlsf_static_assert(exp) \
-+	typedef char _esp_tlsf_glue(static_assert, __LINE__) [(exp) ? 1 : -1]
+ 	typedef char _tlsf_glue(static_assert, __LINE__) [(exp) ? 1 : -1]
  
  /* This code has been tested on 32- and 64-bit (LP/LLP) architectures. */
 -tlsf_static_assert(sizeof(int) * CHAR_BIT == 32);
@@ -126,7 +130,7 @@ index 23c5aa3..1866a61 100644
  
  /* Clear structure and point all empty lists at the null block. */
  static control_t* control_construct(control_t* control, size_t bytes)
-@@ -71,11 +71,11 @@ static control_t* control_construct(control_t* control, size_t bytes)
+@@ -72,11 +72,11 @@ static control_t* control_construct(control_t* control, size_t bytes)
  
  
  	/* SL_INDEX_COUNT must be <= number of bits in sl_bitmap's storage type. */
@@ -140,7 +144,7 @@ index 23c5aa3..1866a61 100644
  
  	for (int i = 0; i < control->fl_index_count; ++i)
  	{
-@@ -99,21 +99,21 @@ typedef struct integrity_t
+@@ -100,21 +100,21 @@ typedef struct integrity_t
  	int status;
  } integrity_t;
  
@@ -167,7 +171,7 @@ index 23c5aa3..1866a61 100644
  	{
  		/* block_size(block) returns the size of the usable memory when the block is allocated.
  		 * As the block under test is free, we need to subtract to the block size the next_free
-@@ -128,7 +128,7 @@ static bool integrity_walker(void* ptr, size_t size, int used, void* user)
+@@ -129,7 +129,7 @@ static bool integrity_walker(void* ptr, size_t size, int used, void* user)
  		void* ptr_block = used ? (void*)block + block_start_offset :
  								 (void*)block + sizeof(block_header_t);
  
@@ -176,7 +180,7 @@ index 23c5aa3..1866a61 100644
  	}
  
  	integ->prev_status = this_status;
-@@ -138,11 +138,11 @@ static bool integrity_walker(void* ptr, size_t size, int used, void* user)
+@@ -139,11 +139,11 @@ static bool integrity_walker(void* ptr, size_t size, int used, void* user)
  }
  
  
@@ -190,7 +194,7 @@ index 23c5aa3..1866a61 100644
  	int status = 0;
  
  	/* Check that the free lists and bitmaps are accurate. */
-@@ -158,31 +158,31 @@ int tlsf_check(tlsf_t tlsf)
+@@ -159,31 +159,31 @@ int tlsf_check(tlsf_t tlsf)
  			/* Check that first- and second-level lists agree. */
  			if (!fl_map)
  			{
@@ -232,7 +236,7 @@ index 23c5aa3..1866a61 100644
  
  				block = block->next_free;
  			}
-@@ -192,7 +192,7 @@ int tlsf_check(tlsf_t tlsf)
+@@ -193,7 +193,7 @@ int tlsf_check(tlsf_t tlsf)
  	return status;
  }
  
@@ -241,7 +245,7 @@ index 23c5aa3..1866a61 100644
  
  static bool default_walker(void* ptr, size_t size, int used, void* user)
  {
-@@ -201,9 +201,9 @@ static bool default_walker(void* ptr, size_t size, int used, void* user)
+@@ -202,9 +202,9 @@ static bool default_walker(void* ptr, size_t size, int used, void* user)
  	return true;
  }
  
@@ -253,7 +257,7 @@ index 23c5aa3..1866a61 100644
  	block_header_t* block =
  		offset_to_block(pool, -(int)block_header_overhead);
  
-@@ -222,7 +222,7 @@ void tlsf_walk_pool(pool_t pool, tlsf_walker walker, void* user)
+@@ -223,7 +223,7 @@ void tlsf_walk_pool(pool_t pool, tlsf_walker walker, void* user)
  	}
  }
  
@@ -262,7 +266,7 @@ index 23c5aa3..1866a61 100644
  {
  	size_t size = 0;
  	if (ptr)
-@@ -233,22 +233,22 @@ size_t tlsf_block_size(void* ptr)
+@@ -234,22 +234,22 @@ size_t tlsf_block_size(void* ptr)
  	return size;
  }
  
@@ -289,7 +293,7 @@ index 23c5aa3..1866a61 100644
  	if (size < control->small_block_size) {
  		return adjust_request_size(tlsf, size, ALIGN_SIZE);
  	}
-@@ -261,58 +261,58 @@ size_t tlsf_fit_size(tlsf_t tlsf, size_t size)
+@@ -262,58 +262,58 @@ size_t tlsf_fit_size(tlsf_t tlsf, size_t size)
  
  /*
  ** Size of the TLSF structures in a given memory block passed to
@@ -362,7 +366,7 @@ index 23c5aa3..1866a61 100644
  #endif
  		return 0;
  	}
-@@ -326,7 +326,7 @@ pool_t tlsf_add_pool(tlsf_t tlsf, void* mem, size_t bytes)
+@@ -327,7 +327,7 @@ pool_t tlsf_add_pool(tlsf_t tlsf, void* mem, size_t bytes)
  	block_set_size(block, pool_bytes);
  	block_set_free(block);
  	block_set_prev_used(block);
@@ -371,7 +375,7 @@ index 23c5aa3..1866a61 100644
  
  	/* Split the block to create a zero-size sentinel block. */
  	next = block_link_next(block);
-@@ -337,16 +337,16 @@ pool_t tlsf_add_pool(tlsf_t tlsf, void* mem, size_t bytes)
+@@ -338,16 +338,16 @@ pool_t tlsf_add_pool(tlsf_t tlsf, void* mem, size_t bytes)
  	return mem;
  }
  
@@ -393,7 +397,7 @@ index 23c5aa3..1866a61 100644
  
  	mapping_insert(control, block_size(block), &fl, &sl);
  	remove_free_block(control, block, fl, sl);
-@@ -361,19 +361,19 @@ int test_ffs_fls()
+@@ -362,19 +362,19 @@ int test_ffs_fls()
  {
  	/* Verify ffs/fls work properly. */
  	int rv = 0;
@@ -424,7 +428,7 @@ index 23c5aa3..1866a61 100644
  #endif
  
  	if (rv)
-@@ -384,7 +384,7 @@ int test_ffs_fls()
+@@ -385,7 +385,7 @@ int test_ffs_fls()
  }
  #endif
  
@@ -433,7 +437,7 @@ index 23c5aa3..1866a61 100644
  {
  #if _DEBUG
  	if (test_ffs_fls())
-@@ -400,39 +400,39 @@ tlsf_t tlsf_create(void* mem, size_t max_bytes)
+@@ -401,39 +401,39 @@ tlsf_t tlsf_create(void* mem, size_t max_bytes)
  
  	if (((tlsfptr_t)mem % ALIGN_SIZE) != 0)
  	{
@@ -484,7 +488,7 @@ index 23c5aa3..1866a61 100644
  	size_t adjust = adjust_request_size(tlsf, size, ALIGN_SIZE);
  	// Returned size is 0 when the requested size is larger than the max block
  	// size.
-@@ -453,27 +453,27 @@ void* tlsf_malloc(tlsf_t tlsf, size_t size)
+@@ -454,27 +454,27 @@ void* tlsf_malloc(tlsf_t tlsf, size_t size)
   *
   * @return pointer to free memory or NULL in case of incapacity to perform the malloc
   */
@@ -495,13 +499,13 @@ index 23c5aa3..1866a61 100644
 +	control_t* control = esp_tlsf_cast(control_t*, tlsf);
  
  	/* adjust the address to be ALIGN_SIZE bytes aligned. */
--	const unsigned int addr_adjusted = align_down(tlsf_cast(unsigned int, address), ALIGN_SIZE);
-+	const unsigned int addr_adjusted = align_down(esp_tlsf_cast(unsigned int, address), ALIGN_SIZE);
+-	const uintptr_t addr_adjusted = align_down(tlsf_cast(uintptr_t, address), ALIGN_SIZE);
++	const uintptr_t addr_adjusted = align_down(esp_tlsf_cast(uintptr_t, address), ALIGN_SIZE);
  
  	/* adjust the size to be ALIGN_SIZE bytes aligned. Add to the size the difference
  	 * between the requested address and the address_adjusted. */
--	size_t size_adjusted = align_up(size + (tlsf_cast(unsigned int, address) - addr_adjusted), ALIGN_SIZE);
-+	size_t size_adjusted = align_up(size + (esp_tlsf_cast(unsigned int, address) - addr_adjusted), ALIGN_SIZE);
+-	size_t size_adjusted = align_up(size + (tlsf_cast(uintptr_t, address) - addr_adjusted), ALIGN_SIZE);
++	size_t size_adjusted = align_up(size + (esp_tlsf_cast(uintptr_t, address) - addr_adjusted), ALIGN_SIZE);
  
  	/* find the free block that starts before the address in the pool and is big enough
  	 * to support the size of allocation at the given address */
@@ -520,16 +524,16 @@ index 23c5aa3..1866a61 100644
  		if (block_start <= alloc_start && block_end > alloc_start) {
  			/* A: block_end >= alloc_end. B: block is free */
  			if (block_end < alloc_end || !block_is_free(block)) {
-@@ -502,7 +502,7 @@ void* tlsf_malloc_addr(tlsf_t tlsf, size_t size, void *address)
+@@ -503,7 +503,7 @@ void* tlsf_malloc_addr(tlsf_t tlsf, size_t size, void *address)
  
  	/* trim any leading space or add the leading space to the overall requested size
  	 * if the leading space is not big enough to store a block of minimum size */
--	const size_t space_before_addr_adjusted = addr_adjusted - tlsf_cast(unsigned int, block_to_ptr(block));
-+	const size_t space_before_addr_adjusted = addr_adjusted - esp_tlsf_cast(unsigned int, block_to_ptr(block));
+-	const size_t space_before_addr_adjusted = addr_adjusted - tlsf_cast(uintptr_t, block_to_ptr(block));
++	const size_t space_before_addr_adjusted = addr_adjusted - esp_tlsf_cast(uintptr_t, block_to_ptr(block));
  	block_header_t *return_block = block;
  	if (space_before_addr_adjusted >= block_size_min) {
  		return_block = block_trim_free_leading(control, block, space_before_addr_adjusted);
-@@ -538,9 +538,9 @@ void* tlsf_malloc_addr(tlsf_t tlsf, size_t size, void *address)
+@@ -539,9 +539,9 @@ void* tlsf_malloc_addr(tlsf_t tlsf, size_t size, void *address)
   *
   * @return pointer to free memory.
   */
@@ -541,7 +545,7 @@ index 23c5aa3..1866a61 100644
  	const size_t adjust = adjust_request_size(tlsf, size, ALIGN_SIZE);
  	const size_t off_adjust = align_up(data_offset, ALIGN_SIZE);
  
-@@ -564,21 +564,21 @@ void* tlsf_memalign_offs(tlsf_t tlsf, size_t align, size_t size, size_t data_off
+@@ -565,21 +565,21 @@ void* tlsf_memalign_offs(tlsf_t tlsf, size_t align, size_t size, size_t data_off
  	** to store next blocks' metadata. Plus, all pointers allocated will all be
  	** aligned on a 4-byte bound, so ptr + data_offset will also have this
  	** alignment constraint. Thus, the gap is not required.
@@ -567,7 +571,7 @@ index 23c5aa3..1866a61 100644
  
  	   /*
  		** If gap size is too small or if there is no gap but we need one,
-@@ -589,18 +589,18 @@ void* tlsf_memalign_offs(tlsf_t tlsf, size_t align, size_t size, size_t data_off
+@@ -590,18 +590,18 @@ void* tlsf_memalign_offs(tlsf_t tlsf, size_t align, size_t size, size_t data_off
  		if ((gap && gap < gap_minimum) || (!gap && off_adjust && align > ALIGN_SIZE))
  		{
  			const size_t gap_remain = gap_minimum - gap;
@@ -592,7 +596,7 @@ index 23c5aa3..1866a61 100644
  			block = block_trim_free_leading(control, block, gap - off_adjust);
  		}
  	}
-@@ -610,23 +610,23 @@ void* tlsf_memalign_offs(tlsf_t tlsf, size_t align, size_t size, size_t data_off
+@@ -611,23 +611,23 @@ void* tlsf_memalign_offs(tlsf_t tlsf, size_t align, size_t size, size_t data_off
  }
  
  /**
@@ -622,7 +626,7 @@ index 23c5aa3..1866a61 100644
  		block_mark_as_free(block);
  		block = block_merge_prev(control, block);
  		block = block_merge_next(control, block);
-@@ -647,20 +647,20 @@ void tlsf_free(tlsf_t tlsf, void* ptr)
+@@ -648,20 +648,20 @@ void tlsf_free(tlsf_t tlsf, void* ptr)
  ** - an extended buffer size will leave the newly-allocated area with
  **   contents undefined
  */
@@ -647,7 +651,7 @@ index 23c5aa3..1866a61 100644
  	}
  	else
  	{
-@@ -677,7 +677,7 @@ void* tlsf_realloc(tlsf_t tlsf, void* ptr, size_t size)
+@@ -678,7 +678,7 @@ void* tlsf_realloc(tlsf_t tlsf, void* ptr, size_t size)
  			return p;
  		}
  
@@ -656,7 +660,7 @@ index 23c5aa3..1866a61 100644
  
  		/*
  		** If the next block is used, or when combined with the current
-@@ -685,12 +685,12 @@ void* tlsf_realloc(tlsf_t tlsf, void* ptr, size_t size)
+@@ -686,12 +686,12 @@ void* tlsf_realloc(tlsf_t tlsf, void* ptr, size_t size)
  		*/
  		if (adjust > cursize && (!block_is_free(next) || adjust > combined))
  		{
@@ -672,6 +676,15 @@ index 23c5aa3..1866a61 100644
  			}
  		}
  		else
+@@ -712,7 +712,7 @@ void* tlsf_realloc(tlsf_t tlsf, void* ptr, size_t size)
+ 	return p;
+ }
+ 
+-void* tlsf_find_containing_block(pool_t pool, void *ptr)
++void* esp_tlsf_find_containing_block(pool_t pool, void *ptr)
+ {
+     block_header_t* block = offset_to_block(pool, -(int)block_header_overhead);
+ 
 diff --git a/tlsf_block_functions.h b/tlsf_block_functions.h
 index d801442..8b3cc18 100644
 --- a/tlsf_block_functions.h
@@ -1283,5 +1296,5 @@ index 1ed3443..ff2ad90 100644
  #if defined(__cplusplus)
  };
 -- 
-2.34.1
+2.43.0
 

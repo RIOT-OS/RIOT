@@ -1,0 +1,24 @@
+From b3ca0e1cd780e351f7893511e7107a1ce78be7f6 Mon Sep 17 00:00:00 2001
+From: Gunar Schorcht <gunar@schorcht.net>
+Date: Thu, 8 Oct 2026 18:10:42 +0200
+Subject: [PATCH 44/51] esp_hw_support/periph_ctrl: add missing include
+
+---
+ components/esp_hw_support/include/esp_private/periph_ctrl.h | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/components/esp_hw_support/include/esp_private/periph_ctrl.h b/components/esp_hw_support/include/esp_private/periph_ctrl.h
+index 84058b24aa..3ef9f0eb62 100644
+--- a/components/esp_hw_support/include/esp_private/periph_ctrl.h
++++ b/components/esp_hw_support/include/esp_private/periph_ctrl.h
+@@ -5,6 +5,7 @@
+  */
+ #pragma once
+ 
++#include <stdbool.h>
+ #include <stdint.h>
+ #include "sdkconfig.h"
+ #include "soc/periph_defs.h"
+-- 
+2.43.0
+

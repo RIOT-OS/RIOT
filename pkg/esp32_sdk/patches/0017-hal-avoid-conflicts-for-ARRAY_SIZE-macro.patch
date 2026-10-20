@@ -1,19 +1,19 @@
-From d1d459905d7152eb1ff065ea80dd73e384c7ff7b Mon Sep 17 00:00:00 2001
+From 5257dd08a532cdf757b3222ad5302d3c6c44885c Mon Sep 17 00:00:00 2001
 From: Gunar Schorcht <gunar@schorcht.net>
 Date: Sat, 1 Mar 2025 18:04:52 +0100
-Subject: [PATCH 17/28] hal: avoid conflicts for ARRAY_SIZE macro
+Subject: [PATCH 17/51] hal: avoid conflicts for ARRAY_SIZE macro
 
 ---
- components/hal/esp32s3/include/hal/mspi_timing_tuning_ll.h | 3 +++
+ components/esp_hal_mspi/esp32s3/include/hal/mspi_ll.h | 3 +++
  1 file changed, 3 insertions(+)
 
-diff --git a/components/hal/esp32s3/include/hal/mspi_timing_tuning_ll.h b/components/hal/esp32s3/include/hal/mspi_timing_tuning_ll.h
-index 9ba2778472..c740e8d0cf 100644
---- a/components/hal/esp32s3/include/hal/mspi_timing_tuning_ll.h
-+++ b/components/hal/esp32s3/include/hal/mspi_timing_tuning_ll.h
-@@ -25,7 +25,10 @@
- extern "C" {
- #endif
+diff --git a/components/esp_hal_mspi/esp32s3/include/hal/mspi_ll.h b/components/esp_hal_mspi/esp32s3/include/hal/mspi_ll.h
+index 8bf9a62c0d..8ebacc821a 100644
+--- a/components/esp_hal_mspi/esp32s3/include/hal/mspi_ll.h
++++ b/components/esp_hal_mspi/esp32s3/include/hal/mspi_ll.h
+@@ -42,7 +42,10 @@ extern "C" {
+ #define MSPI_TIMING_LL_MSPI_ID_0                      0
+ #define MSPI_TIMING_LL_MSPI_ID_1                      1
  
 +#ifndef ARRAY_SIZE
  #define ARRAY_SIZE(arr) (sizeof((arr))/sizeof(*(arr)))
@@ -23,5 +23,5 @@ index 9ba2778472..c740e8d0cf 100644
  #define MSPI_TIMING_LL_FLASH_QUAD_MASK                (SPI_MEM_FASTRD_MODE | SPI_MEM_FREAD_DUAL | SPI_MEM_FREAD_DIO | SPI_MEM_FREAD_QUAD | SPI_MEM_FREAD_QIO)
  #define MSPI_TIMING_LL_FLASH_QIO_MODE_MASK            (SPI_MEM_FREAD_QIO | SPI_MEM_FASTRD_MODE)
 -- 
-2.34.1
+2.43.0
 
