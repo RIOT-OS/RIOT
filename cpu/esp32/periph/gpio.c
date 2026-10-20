@@ -589,6 +589,12 @@ void gpio_pm_sleep_enter(unsigned mode)
 #endif
             }
 #elif SOC_GPIO_SUPPORT_DEEPSLEEP_WAKEUP && SOC_DEEP_SLEEP_SUPPORTED
+            /* The wake-up level is read from the digital input of the pad,
+             * which is held during deep sleep. If the pin has not been
+             * initialized as input before, the input is disabled and always
+             * read as LOW, so that the system would wake up immediately with
+             * ESP_PM_WUP_PINS_ANY_LOW. Therefore the input has to be enabled. */
+            gpio_input_enable(wup_pins[i]);
             if (_gpio_pin_pu[wup_pins[i]]) {
                 gpio_pullup_en(wup_pins[i]);
                 gpio_pulldown_dis(wup_pins[i]);
