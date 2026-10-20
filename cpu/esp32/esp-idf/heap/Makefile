@@ -2,7 +2,7 @@ MODULE = esp_idf_heap
 
 # source files to be compiled for this module
 ESP32_SDK_SRC = \
-  components/esp_mm/heap_align_hw.c \
+  components/esp_hw_support/heap_align_hw.c \
   components/heap/heap_caps.c \
   components/heap/heap_caps_base.c \
   components/heap/heap_caps_init.c \
@@ -21,6 +21,7 @@ ESP32_SDK_SRC = \
 # additional include pathes required by this module
 INCLUDES += -I$(ESP32_SDK_DIR)/components/esp_rom/include
 INCLUDES += -I$(ESP32_SDK_DIR)/components/esp_system/include
+INCLUDES += -I$(ESP32_SDK_DIR)/components/heap/private_include
 INCLUDES += -I$(ESP32_SDK_DIR)/components/heap/tlsf
 
 include $(RIOTBASE)/Makefile.base
