@@ -103,6 +103,16 @@ extern gpio_pin_usage_t _gpio_pin_usage[GPIO_PIN_NUMOF];
 _Static_assert(ARRAY_SIZE(_gpio_pin_usage) == SOC_GPIO_PIN_COUNT,
                "size of _gpio_pin_usage does not match SOC_GPIO_PIN_COUNT");
 
+#if IS_USED(MODULE_ESP_IDF_GPIO_HAL)
+/*
+ * Since the input of a pin is not enabled in output mode, the value of an
+ * output can't be read back from the pin. Therefore, the input enable state
+ * of each pin is stored in a bitfield to decide in `gpio_read` whether the
+ * pin level or the last value written to the output has to be returned.
+ */
+static BITFIELD(_input, GPIO_PIN_NUMOF);
+#endif
+
 #if !IS_USED(MODULE_ESP_IDF_GPIO_HAL)
 extern const uint32_t _gpio_to_iomux_reg[GPIO_PIN_NUMOF];
 
@@ -270,6 +280,15 @@ int gpio_init(gpio_t pin, gpio_mode_t mode)
 #endif
 #endif
 
+#if IS_USED(MODULE_ESP_IDF_GPIO_HAL)
+    if (cfg.mode & GPIO_MODE_DEF_INPUT) {
+        bf_set(_input, pin);
+    }
+    else {
+        bf_unset(_input, pin);
+    }
+#endif
+
     return (gpio_config(&cfg) == ESP_OK) ? 0 : -1;
 }
 
@@ -373,10 +392,10 @@ bool gpio_read(gpio_t pin)
 {
     assert(pin < GPIO_PIN_NUMOF);
 
-    /* if the pin is not an input, it always returns 0 */
-    /* TODO: not really clear whether it should return the last written value
-     *       in this case. */
-    int value = gpio_hal_get_level(&_gpio_hal_ctx, pin);
+    /* if the pin is an input, read the pin level, otherwise return the last
+     * value written to the output */
+    int value = bf_isset(_input, pin) ? gpio_hal_get_level(&_gpio_hal_ctx, pin)
+                                      : bf_isset(_output, pin);
 
     DEBUG("%s gpio=%u val=%d\n", __func__, pin, value);
     return value;
