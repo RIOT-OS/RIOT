@@ -12,6 +12,7 @@
 #include <stdbool.h>
 
 #include "async_read.h"
+#include "irq.h"
 #include "kernel_defines.h"
 #include "macros/utils.h"
 #include "native_internal.h"
@@ -32,10 +33,17 @@ static void _resume(void *arg)
 {
     (void)arg;
 
-    if (_rx_paused && (stdio_rx_free() >= RESUME_THRESHOLD)) {
+    /* this runs in the context of any thread that reads from stdin, so signals
+     * are blocked to make the check-and-clear of the pause state atomic, and
+     * to prevent a context switch while signalling the async read child */
+    unsigned irqstate = irq_disable();
+
+    if (_rx_paused && (stdio_stdin_get_free() >= RESUME_THRESHOLD)) {
         _rx_paused = false;
         native_async_read_continue(STDIN_FILENO);
     }
+
+    irq_restore(irqstate);
 }
 
 static void _async_read_wrapper(int fd, void *arg)
@@ -46,8 +54,8 @@ static void _async_read_wrapper(int fd, void *arg)
     size_t len = sizeof(buf);
 
     /* only read into stdin what fits, the rest will be buffered by the host */
-    if (IS_USED(MODULE_STDIO_RESUME)) {
-        len = stdio_rx_free();
+    if (IS_USED(MODULE_STDIO_STDIN_RESUME)) {
+        len = MIN(len, stdio_stdin_get_free());
     }
 
     if (len > 0) {
@@ -58,7 +66,7 @@ static void _async_read_wrapper(int fd, void *arg)
     }
 
     /* reading is paused if stdin is full */
-    if (IS_USED(MODULE_STDIO_RESUME) && (stdio_rx_free() == 0)) {
+    if (IS_USED(MODULE_STDIO_STDIN_RESUME) && (stdio_stdin_get_free() == 0)) {
         _rx_paused = true;
         return;
     }
@@ -72,8 +80,8 @@ static void _init(void)
 {
     native_async_read_setup();
     if (IS_USED(MODULE_STDIN)) {
-        if (IS_USED(MODULE_STDIO_RESUME)) {
-            stdio_set_resume(_resume, NULL);
+        if (IS_USED(MODULE_STDIO_STDIN_RESUME)) {
+            stdio_stdin_resume_set(_resume, NULL);
         }
         native_async_read_add_int_handler(STDIN_FILENO, NULL,
                                           _async_read_wrapper);
