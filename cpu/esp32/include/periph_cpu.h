@@ -472,7 +472,6 @@ typedef enum {
  * @brief   I2C configuration structure type
  */
 typedef struct {
-    uint8_t module;         /**< I2C module identifier */
     i2c_speed_t speed;      /**< I2C bus speed */
     gpio_t scl;             /**< GPIO used as SCL pin */
     gpio_t sda;             /**< GPIO used as SDA pin */
