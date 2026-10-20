@@ -248,6 +248,7 @@ else ifeq (esp32s3,$(CPU_FAM))
   ESP32_SDK_SRC += components/hal/cache_hal.c
   ESP32_SDK_SRC += components/esp_hal_systimer/systimer_hal.c
   ESP32_SDK_SRC += components/spi_flash/$(CPU_FAM)/spi_flash_oct_flash_init.c
+  ESP32_SDK_ASMSRC += components/esp_rom/patches/esp_rom_cache_writeback_esp32s3.S
 else
   $(error Missing configuration for ESP32x SoC variant (family): $(CPU_FAM))
 endif
