@@ -27,19 +27,11 @@
 static uint8_t _rx_buf_mem[STDIO_RX_BUFSIZE];
 isrpipe_t stdin_isrpipe = ISRPIPE_INIT(_rx_buf_mem);
 
-#if IS_USED(MODULE_STDIO_RESUME)
-static stdio_resume_cb_t _resume_cb;
+#if IS_USED(MODULE_STDIO_STDIN_RESUME)
+static stdio_stdin_resume_cb_t _resume_cb;
 static void *_resume_arg;
 
-unsigned stdio_rx_free(void)
-{
-    if (!IS_USED(MODULE_STDIN)) {
-        return 0;
-    }
-    return isrpipe_free(&stdin_isrpipe);
-}
-
-void stdio_set_resume(stdio_resume_cb_t cb, void *arg)
+void stdio_stdin_resume_set(stdio_stdin_resume_cb_t cb, void *arg)
 {
     unsigned irqstate = irq_disable();
 
@@ -132,7 +124,7 @@ ssize_t stdio_read(void* buffer, size_t len)
 
     ssize_t res = isrpipe_read(&stdin_isrpipe, buffer, len);
 
-#if IS_USED(MODULE_STDIO_RESUME)
+#if IS_USED(MODULE_STDIO_STDIN_RESUME)
     if (_resume_cb) {
         _resume_cb(_resume_arg);
     }
@@ -152,12 +144,20 @@ int stdio_available(void)
 }
 #endif
 
+unsigned int stdio_stdin_get_free(void)
+{
+    if (!IS_USED(MODULE_STDIN)) {
+        return 0;
+    }
+    return isrpipe_get_free(&stdin_isrpipe);
+}
+
 void stdio_clear_stdin(void)
 {
     if (IS_USED(MODULE_STDIN)) {
         isrpipe_clear(&stdin_isrpipe);
 
-#if IS_USED(MODULE_STDIO_RESUME)
+#if IS_USED(MODULE_STDIO_STDIN_RESUME)
         if (_resume_cb) {
             _resume_cb(_resume_arg);
         }

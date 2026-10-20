@@ -136,15 +136,6 @@ static inline int stdio_rx_write(const uint8_t *buf, size_t len)
 #endif
 
 /**
- * @brief   Get the number of bytes that can still be pushed into stdin
- *
- * @note    Only available with the `stdio_resume` module.
- *
- * @return  free space in the stdin buffer, in bytes
- */
-unsigned stdio_rx_free(void);
-
-/**
  * @brief   Definition of a stdio resume callback
  *
  * Invoked after @ref stdio_read or @ref stdio_clear_stdin freed space in the
@@ -153,7 +144,7 @@ unsigned stdio_rx_free(void);
  *
  * @param[in]   arg     argument registered with the callback
  */
-typedef void (*stdio_resume_cb_t)(void *arg);
+typedef void (*stdio_stdin_resume_cb_t)(void *arg);
 
 /**
  * @brief   Register a callback fired when space is freed in stdin
@@ -165,12 +156,12 @@ typedef void (*stdio_resume_cb_t)(void *arg);
  *
  * There can only be one resume callback registered at a time.
  *
- * @note    Only available with the `stdio_resume` module.
+ * @note    Only available with the `stdio_stdin_resume` module.
  *
  * @param[in]   cb      callback to invoke, or `NULL` to disable
  * @param[in]   arg     argument passed to @p cb
  */
-void stdio_set_resume(stdio_resume_cb_t cb, void *arg);
+void stdio_stdin_resume_set(stdio_stdin_resume_cb_t cb, void *arg);
 
 #if IS_USED(MODULE_STDIO_NOTIFY) || DOXYGEN
 /**
@@ -218,6 +209,13 @@ void stdio_init(void);
  */
 int stdio_available(void);
 #endif
+
+/**
+ * @brief   Get the number of bytes that can still be written into stdin
+ *
+ * @return  free space in the stdin buffer, in bytes
+ */
+unsigned int stdio_stdin_get_free(void);
 
 /**
  * @brief   Clear the input buffer

@@ -107,7 +107,7 @@ ifneq (,$(filter stdio_notify,$(USEMODULE)))
   USEMODULE += stdin
 endif
 
-ifneq (,$(filter stdio_resume,$(USEMODULE)))
+ifneq (,$(filter stdio_stdin_resume,$(USEMODULE)))
   USEMODULE += stdin
 endif
 

@@ -84,20 +84,11 @@ The pseudomodule `stdio_available` exists to mark that the selected STDIO
 backend supports @ref stdio_available, the function used to query how many
 bytes are currently buffered for reading.
 
-### stdio_notify
+### stdio_stdin_resume
 
-The pseudomodule `stdio_notify` allows a consumer to be notified when data is
-pushed into stdin. It provides @ref stdio_set_notify, which registers a
-callback that is invoked by @ref stdio_rx_write and @ref stdio_rx_write_one in
-the (ISR) context of the STDIO backend. This allows a consumer to be woken by
-means other than a blocking @ref stdio_read (e.g. thread flags), so it can also
-react to other events. Selecting this module pulls in `stdin`.
-
-### stdio_resume
-
-The pseudomodule `stdio_resume` enables flow control on stdin. It provides
-@ref stdio_rx_free and @ref stdio_set_resume, which allow a STDIO backend
-that can hold back input to stop feeding stdin while the stdin buffer is full,
-and to resume once the consumer has made room. Backends that support this, such
-as `stdio_native`, will no longer drop input when the stdin buffer overflows.
-Selecting this module pulls in `stdin`.
+The pseudomodule `stdio_stdin_resume` enables flow control on stdin. It
+provides @ref stdio_stdin_resume_set, which allows a STDIO backend that can
+hold back input to stop feeding stdin while the stdin buffer is full, and to
+resume once the consumer has made room. Backends that support this, such as
+`stdio_native`, will no longer drop input when the stdin buffer overflows.
+This module has the `stdin` module as a dependency.
