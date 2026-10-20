@@ -628,7 +628,11 @@ typedef struct {
  *
  * The number of configured channels must be less or equal.
  */
-#define RMT_CH_NUMOF_MAX    (SOC_RMT_CHANNELS_PER_GROUP)
+#if defined(CPU_FAM_ESP32) || defined(CPU_FAM_ESP32S3)
+#  define RMT_CH_NUMOF_MAX  (8)
+#else
+#  define RMT_CH_NUMOF_MAX  (4)
+#endif
 
 /** @} */
 
