@@ -17,12 +17,13 @@
  */
 
 #include "periph/uart.h"
+#include "uart_arch.h"
 
 #include "esp_err.h"
 #include "esp_private/uart_share_hw_ctrl.h"
 #include "hal/uart_ll.h"
 
-void uart_set_wakeup_threshold(uart_t uart, uint32_t threshold)
+void esp_uart_set_wakeup_threshold(uart_t uart, uint32_t threshold)
 {
     assert(uart < SOC_UART_NUM);
 
