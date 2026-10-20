@@ -30,8 +30,7 @@ extern "C" {
 #include "periph/adc.h"
 #include "periph/gpio.h"
 
-#include "driver/adc.h"
-#include "driver/adc_types_legacy.h"
+#include "hal/adc_types.h"
 
 /**
  * @brief  Attenuations that can be set for ADC lines
