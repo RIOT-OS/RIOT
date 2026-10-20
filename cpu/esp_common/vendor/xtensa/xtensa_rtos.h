@@ -44,6 +44,7 @@ Should be included by all Xtensa generic and RTOS port-specific sources.
 
 #ifdef __ASSEMBLER__
 #include    <xtensa/coreasm.h>
+#include    "xtensa_specreg_compat.h"
 #else
 #include    <xtensa/config/core.h>
 #endif
