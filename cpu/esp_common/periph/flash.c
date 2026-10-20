@@ -31,7 +31,7 @@
 #ifndef CPU_ESP8266
 
 #include "esp_flash.h"
-#include "esp_flash_internal.h"
+#include "esp_private/esp_flash_internal.h"
 #include "esp_flash_partitions.h"
 #include "rom/cache.h"
 #include "esp_rom_spiflash.h"
