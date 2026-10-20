@@ -566,12 +566,12 @@ void pio_sm_clear_fifos(pio_t pio, pio_sm_t sm)
     io_reg_atomic_xor(&ctrl->shiftctrl, (1u << PIO_SM0_SHIFTCTRL_FJOIN_RX_LSB));
 }
 
-void pio_irq_enable(pio_t pio, pio_irq_line_t irq, pio_irq_source_t irq_mask)
+void pio_irq_enable(pio_t pio, pio_irq_line_t irq, uint32_t irq_mask)
 {
     assert(pio <= PIO_NUMOF);
     assert((unsigned)irq < PIO_IRQ_LINE_NUMOF);
 
-    uint32_t val = irq_mask & PIO_IRQ_ALL;
+    uint32_t val = irq_mask & PIO_IRQ0_INTE_BITS;
     PIO0_Type *dev = pio_config[pio].dev;
     if (irq == PIO_IRQ_LINE_0) {
         io_reg_atomic_set(&dev->IRQ0_INTE, val);
@@ -581,12 +581,12 @@ void pio_irq_enable(pio_t pio, pio_irq_line_t irq, pio_irq_source_t irq_mask)
     }
 }
 
-void pio_irq_disable(pio_t pio, pio_irq_line_t irq, pio_irq_source_t irq_mask)
+void pio_irq_disable(pio_t pio, pio_irq_line_t irq, uint32_t irq_mask)
 {
     assert(pio <= PIO_NUMOF);
     assert((unsigned)irq < PIO_IRQ_LINE_NUMOF);
 
-    uint32_t val = irq_mask & PIO_IRQ_ALL;
+    uint32_t val = irq_mask & PIO_IRQ0_INTE_BITS;
     PIO0_Type *dev = pio_config[pio].dev;
     if (irq == PIO_IRQ_LINE_0) {
         io_reg_atomic_clear(&dev->IRQ0_INTE, val);
@@ -710,10 +710,10 @@ int pio_sm_init_common(pio_t pio, pio_sm_t sm,
     pio_set_isr_vec(pio, sm, NULL);
     /* cannot disable SM interrupts because they are globally used per PIO and
        some program might be using it */
-    pio_irq_disable(pio, PIO_IRQ_LINE_0, (PIO_IRQ_RXNEMPTY_SM0 << sm) |
-                                         (PIO_IRQ_TXNFULL_SM0 << sm));
-    pio_irq_disable(pio, PIO_IRQ_LINE_1, (PIO_IRQ_RXNEMPTY_SM0 << sm) |
-                                         (PIO_IRQ_TXNFULL_SM0 << sm));
+    pio_irq_disable(pio, PIO_IRQ_LINE_0, (PIO_INTR_SM0_RXNEMPTY_BITS << sm) |
+                                         (PIO_INTR_SM0_TXNFULL_BITS << sm));
+    pio_irq_disable(pio, PIO_IRQ_LINE_1, (PIO_INTR_SM0_RXNEMPTY_BITS << sm) |
+                                         (PIO_INTR_SM0_TXNFULL_BITS << sm));
     pio_sm_exec(pio, sm, pio_inst_jmp(PIO_INST_JMP_COND_NONE, (prog->location + conf->pc_start)));
     return 0;
 }

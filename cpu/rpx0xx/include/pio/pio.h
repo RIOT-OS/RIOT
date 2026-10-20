@@ -662,6 +662,11 @@ static inline unsigned pio_irq_rel_sm(unsigned irq_abs, unsigned irq_rel) {
 
 /**
  * @brief   PIO IRQ flags
+ *
+ * @deprecated  Use the `PIO_INTR_*_BITS` definitions from the Pico SDK
+ *              instead, e.g. `PIO_INTR_SM0_BITS` for @ref PIO_IRQ_SM_0 and
+ *              `PIO_IRQ0_INTE_BITS` for @ref PIO_IRQ_ALL.
+ *              Will be removed after the 2027.10 release.
  */
 typedef enum {
     /* lower 4 hardware IRQs which are issued with 'irq <0-3> [rel]' and are routed to NVIC */
@@ -1033,18 +1038,24 @@ void pio_sm_clear_fifos(pio_t pio, pio_sm_t sm);
  *
  * @param[in]       pio         PIO index
  * @param[in]       irq         PIO IRQ line to use
- * @param[in]       irq_mask    IRQ flags to enable
+ * @param[in]       irq_mask    IRQ flags to enable, a combination of
+ *                              `PIO_INTR_SMx_BITS` (state machine IRQ x),
+ *                              `PIO_INTR_SMx_TXNFULL_BITS` (TX FIFO of SM x not full)
+ *                              and `PIO_INTR_SMx_RXNEMPTY_BITS` (RX FIFO of SM x not empty)
  */
-void pio_irq_enable(pio_t pio, pio_irq_line_t irq, pio_irq_source_t irq_mask);
+void pio_irq_enable(pio_t pio, pio_irq_line_t irq, uint32_t irq_mask);
 
 /**
  * @brief   Disable PIO<pio>_IRQ<irq> interrupts
  *
  * @param[in]       pio         PIO index
  * @param[in]       irq         PIO IRQ line to use
- * @param[in]       irq_mask    IRQ flags to disable
+ * @param[in]       irq_mask    IRQ flags to disable, a combination of
+ *                              `PIO_INTR_SMx_BITS` (state machine IRQ x),
+ *                              `PIO_INTR_SMx_TXNFULL_BITS` (TX FIFO of SM x not full)
+ *                              and `PIO_INTR_SMx_RXNEMPTY_BITS` (RX FIFO of SM x not empty)
  */
-void pio_irq_disable(pio_t pio, pio_irq_line_t irq, pio_irq_source_t irq_mask);
+void pio_irq_disable(pio_t pio, pio_irq_line_t irq, uint32_t irq_mask);
 
 /**
  * @brief   Send one word to a state machine

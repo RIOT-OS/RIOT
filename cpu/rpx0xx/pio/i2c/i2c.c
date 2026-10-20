@@ -284,11 +284,11 @@ int pio_i2c_init(pio_i2c_bus_t *bus,
     pio_i2c_init_pins(pio, sm, sda, scl);
     pio_irq_clear(pio, pio_irq_rel_index(I2C_PIO_IRQN, sm));
     /* Given the absolute interrupt index I2C_PIO_IRQN
-       and the relative interrupt instruction in the PIO program,
-       sm will raise the interrupt flag pio_irq_rel_index(I2C_PIO_IRQN, sm)
-       in the IRQ register. */
+     * and the relative interrupt instruction in the PIO program,
+     * sm will raise the interrupt flag pio_irq_rel_index(I2C_PIO_IRQN, sm)
+     * in the IRQ register. */
     pio_set_isr_sm_vec(pio, pio_irq_rel_index(I2C_PIO_IRQN, sm), &_vec);
-    pio_irq_enable(pio, irq, PIO_IRQ_SM_0 << pio_irq_rel_index(I2C_PIO_IRQN, sm));
+    pio_irq_enable(pio, irq, PIO_INTR_SM0_BITS << pio_irq_rel_index(I2C_PIO_IRQN, sm));
     pio_sm_clear_fifos(pio, sm);
     pio_sm_restart(pio, sm);
     return 0;
