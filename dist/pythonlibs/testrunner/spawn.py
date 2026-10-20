@@ -50,7 +50,7 @@ TESTRUNNER_RESET_BOARD_ON_STARTUP = \
 MAKE = os.environ.get('MAKE', 'make')
 
 
-def flush_child(child, expect_timeout=1):
+def flush_child(child, expect_timeout=0.1):
     """Flush the child from garbage that might be sent by device on start."""
     while True:
         try:
@@ -137,10 +137,10 @@ def sync_child(child, env):
             utils.test_utils_interactive_sync_shell(child,
                                                     TEST_INTERACTIVE_RETRIES,
                                                     TEST_INTERACTIVE_DELAY)
-            flush_child(child, expect_timeout=0.1)
+            flush_child(child)
             child.sendline("")   # restore next prompt in case the app expects it
         else:
-            flush_child(child, expect_timeout=0.1)
+            flush_child(child)
             utils.test_utils_interactive_sync(child,
                                               TEST_INTERACTIVE_RETRIES,
                                               TEST_INTERACTIVE_DELAY)

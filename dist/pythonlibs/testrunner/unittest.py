@@ -23,6 +23,6 @@ class PexpectTestCase(unittest.TestCase):
         teardown_child(cls.spawn)
 
     @classmethod
-    def flush_spawn(cls, expect_timeout=1):
+    def flush_spawn(cls, expect_timeout=0.1):
         """Flush spawn from garbage that might be sent by device on start."""
         flush_child(cls.spawn, expect_timeout=expect_timeout)
