@@ -40,7 +40,9 @@ static void _resume(void *arg)
 
     if (_rx_paused && (stdio_stdin_get_free() >= RESUME_THRESHOLD)) {
         _rx_paused = false;
+        _native_pending_syscalls_up();
         native_async_read_continue(STDIN_FILENO);
+        _native_pending_syscalls_down
     }
 
     irq_restore(irqstate);
