@@ -1,0 +1,32 @@
+From 066da582628c19f2e408abe0d62a3969ce160db3 Mon Sep 17 00:00:00 2001
+From: Gunar Schorcht <gunar@schorcht.net>
+Date: Fri, 16 Oct 2026 12:58:45 +0200
+Subject: [PATCH] fix(sdmmc): store the configured bus width of the slot
+
+sd_host_slot_sdmmc_configure only marked the bus width as configured but
+did not store the new width. The bus width used for the following
+transactions was therefore always the maximum width of the slot as given
+at slot initialization, even if a smaller width, e.g. 1-bit during card
+initialization, was configured.
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+Claude-Session: https://claude.ai/code/session_01C48pwkJmnU6tPunyo2S4N8
+---
+ components/esp_driver_sdmmc/src/sd_host_sdmmc.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/components/esp_driver_sdmmc/src/sd_host_sdmmc.c b/components/esp_driver_sdmmc/src/sd_host_sdmmc.c
+index f3e02b8652..4cfc55c999 100644
+--- a/components/esp_driver_sdmmc/src/sd_host_sdmmc.c
++++ b/components/esp_driver_sdmmc/src/sd_host_sdmmc.c
+@@ -264,6 +264,7 @@ static esp_err_t sd_host_slot_sdmmc_configure(sd_host_slot_handle_t slot, const
+         slot_ctx->freq.freq_state = SD_HOST_SLOT_STATE_READY;
+     }
+     if (config->width != 0) {
++        slot_ctx->width.width = config->width;
+         slot_ctx->width.width_state = SD_HOST_SLOT_STATE_READY;
+     }
+     if (config->sampling_mode != 0) {
+-- 
+2.43.0
+
