@@ -134,6 +134,23 @@ extern "C" {
 
 #define CONFIG_LOG_TAG_LEVEL_IMPL_CACHE_AND_LINKED_LIST 1
 
+/*
+ * If the external 32 kHz crystal is used as RTC slow clock source, it is
+ * already started by the bootloader as in ESP-IDF. On ESP32, it is
+ * additionally bootstrapped with a 32 kHz square wave for a number of cycles
+ * to help it to start up (ESP-IDF default).
+ */
+#if MODULE_ESP_RTC_TIMER_32K
+#  define CONFIG_ESP_SYSTEM_RTC_EXT_XTAL    1
+#  ifndef CONFIG_ESP_SYSTEM_RTC_EXT_XTAL_BOOTSTRAP_CYCLES
+#    if defined(CPU_FAM_ESP32)
+#      define CONFIG_ESP_SYSTEM_RTC_EXT_XTAL_BOOTSTRAP_CYCLES   5
+#    else
+#      define CONFIG_ESP_SYSTEM_RTC_EXT_XTAL_BOOTSTRAP_CYCLES   0
+#    endif
+#  endif
+#endif
+
 #ifdef __cplusplus
 }
 #endif
