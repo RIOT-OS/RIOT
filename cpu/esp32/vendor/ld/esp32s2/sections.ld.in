@@ -233,8 +233,9 @@ SECTIONS
     *xtensa/*(.literal .text .literal.* .text.*)
 
     /* parts of RIOT that should run in IRAM */
-    *core/*(.literal .text .literal.* .text.*)
-    *core_lib/*(.literal .text .literal.* .text.*)
+    */core/*(.literal .text .literal.* .text.*)
+    */core_lib/*(.literal .text .literal.* .text.*)
+    */ztimer_core/*(.literal .text .literal.* .text.*)
     *esp_common_periph/flash.*(.literal .text .literal.* .text.*)
     *esp_common/thread_arch.*(.literal .text .literal.* .text.*)
     *esp_freertos_common/*(.literal .text .literal.* .text.*)
