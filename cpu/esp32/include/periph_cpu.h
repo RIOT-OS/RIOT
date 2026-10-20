@@ -1068,7 +1068,7 @@ typedef enum {
 /**
  * @brief   Maximum number of USB OTG FS interfaces
  */
-#define USBDEV_NUMOF_MAX    (SOC_USB_PERIPH_NUM)
+#define USBDEV_NUMOF_MAX    (SOC_USB_OTG_PERIPH_NUM)
 /** @} */
 
 #ifdef __cplusplus
