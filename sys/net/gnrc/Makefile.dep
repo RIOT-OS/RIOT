@@ -446,6 +446,12 @@ ifneq (,$(filter gnrc_pktshark_%,$(USEMODULE)))
   USEMODULE += gnrc_pktshark
 endif
 
+ifneq (,$(filter gnrc_pktshark_all,$(USEMODULE)))
+  USEMODULE += gnrc_pktshark_4in6
+  USEMODULE += gnrc_pktshark_coap
+  USEMODULE += gnrc_pktshark_icmpv6
+endif
+
 ifneq (,$(filter gnrc_pktshark_default,$(USEMODULE)))
   USEMODULE += gnrc_pktshark_4in6
   ifneq (,$(filter nanocoap,$(USEMODULE)))
