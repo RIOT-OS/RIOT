@@ -36,6 +36,23 @@ extern "C" {
 #define STDIO_UART_DEV  CONFIG_ESP_CONSOLE_UART_NUM
 
 /**
+ * @brief   Time in microseconds to wait for the host to fetch data from
+ *          the TX FIFO before further output is dropped
+ *
+ * If no terminal is connected, the host does not fetch any data and the TX
+ * FIFO stays full. In this case, writing to stdio must not block forever.
+ *
+ * The data that is already in the TX FIFO (at most one packet of 64 bytes)
+ * can't be discarded, it is fetched by the host as soon as a terminal is
+ * connected again. All output written in the meantime is lost.
+ *
+ * Only used by the `stdio_usb_serial_jtag` module.
+ */
+#ifndef CONFIG_STDIO_USB_SERIAL_JTAG_TX_TIMEOUT_US
+#  define CONFIG_STDIO_USB_SERIAL_JTAG_TX_TIMEOUT_US (50 * US_PER_MS)
+#endif
+
+/**
  * @name    Power management configuration
  * @{
  */

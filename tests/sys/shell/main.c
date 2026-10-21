@@ -6,13 +6,12 @@
 
 /**
  * @file
- * @brief       shows how to set up own and use the system shell commands.
+ * @brief       Shows how to set up own and use the system shell commands.
  *              By typing help in the serial console, all the supported commands
  *              are listed.
  *
  * @author      Kaspar Schleiser <kaspar@schleiser.de>
  * @author      Zakaria Kasmi <zkasmi@inf.fu-berlin.de>
- *
  */
 
 #include <stdio.h>
@@ -98,6 +97,26 @@ static int print_empty(int argc, char **argv)
     return 0;
 }
 
+/* Print long lines (more than 64 bytes) in quick succession, which is a lot
+ * faster than the output can be transmitted. Each line is passed to
+ * stdio_write() at once by puts(). This checks that the stdio implementation
+ * does not drop output if its buffer is full. */
+#define BURST_PATTERN   "0123456789abcdefghijklmnopqrstuvwxyz"
+
+static int print_burst(int argc, char **argv)
+{
+    unsigned lines = (argc > 1) ? (unsigned)atoi(argv[1]) : 16;
+    char line[sizeof("burst 00: ") + 3 * (sizeof(BURST_PATTERN) - 1)];
+
+    for (unsigned i = 0; i < lines; i++) {
+        snprintf(line, sizeof(line), "burst %02u: %s%s%s", i % 100,
+                 BURST_PATTERN, BURST_PATTERN, BURST_PATTERN);
+        puts(line);
+    }
+
+    return 0;
+}
+
 static char _stack[THREAD_STACKSIZE_SMALL];
 static struct {
     uint16_t period_ms;
@@ -121,7 +140,8 @@ static int print_periodic(int argc, char **argv)
 {
     if (argc > 1) {
         _periodic_ctx.reps = atoi(argv[1]);
-    } else {
+    }
+    else {
         _periodic_ctx.reps = 5;
     }
 
@@ -140,6 +160,7 @@ static const shell_command_t shell_commands[] = {
     { "echo", "prints the input command", print_echo },
     { "empty", "print nothing on command", print_empty },
     { "periodic", "periodically print command", print_periodic },
+    { "burst", "print lines in quick succession (default: 16)", print_burst },
     { NULL, NULL, NULL }
 };
 
