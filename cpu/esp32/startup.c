@@ -42,6 +42,7 @@
 /* ESP-IDF headers */
 #include "esp_attr.h"
 #include "esp_clk_internal.h"
+#include "esp_clk_tree.h"
 #include "esp_heap_caps_init.h"
 #if IS_ACTIVE(CONFIG_ESP_COEX_SW_COEXIST_ENABLE)
 #  include "private/esp_coexist_internal.h"
@@ -272,13 +273,18 @@ static NORETURN void IRAM system_init (void)
 #endif
 
     /* print some infos */
-    LOG_STARTUP("Used clocks in Hz: CPU=%d APB=%d XTAL=%d FAST=%d SLOW=%d\n",
+    uint32_t rtc_fast_freq = 0;
+    esp_clk_tree_src_get_freq_hz(SOC_MOD_CLK_RTC_FAST,
+                                 ESP_CLK_TREE_SRC_FREQ_PRECISION_CACHED,
+                                 &rtc_fast_freq);
+    LOG_STARTUP("Used clocks in Hz: CPU=%d APB=%d XTAL=%d FAST=%"PRIu32" SLOW=%"PRIu32"\n",
                 esp_clk_cpu_freq(),
                 esp_clk_apb_freq(), esp_clk_xtal_freq(),
-                rtc_clk_fast_freq_get() == RTC_FAST_FREQ_8M ? 8 * MHZ
-                                                            : esp_clk_xtal_freq()/4,
+                rtc_fast_freq,
                 rtc_clk_slow_freq_get_hz());
-    LOG_STARTUP("RTC Slow Clock calibration value: %d\n", esp_clk_slowclk_cal_get());
+    (void)rtc_fast_freq;
+    LOG_STARTUP("RTC Slow Clock calibration value: %"PRIu32"\n",
+                esp_clk_slowclk_cal_get());
     LOG_STARTUP("Heap free: %u bytes\n", get_free_heap_size());
 
     /* initialize architecture specific interrupt handling */
