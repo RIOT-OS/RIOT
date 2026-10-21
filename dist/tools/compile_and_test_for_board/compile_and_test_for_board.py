@@ -54,7 +54,7 @@ positional arguments:
   board                 Board to test
   result_directory      Result directory (default: results)
 
-optional arguments:
+options:
   -h, --help            show this help message and exit
   --applications APPLICATIONS
                         List of applications to test, overwrites default
@@ -71,8 +71,8 @@ optional arguments:
                         False)
   --loglevel {debug,info,warning,error,fatal,critical}
                         Python logger log level (default: info)
-  --incremental         Do not rerun successful compilation and tests (default:
-                        False)
+  --incremental         Do not rerun successful compilation and tests
+                        (default: False)
   --clean-after         Clean after running each test (default: False)
   --compile-targets COMPILE_TARGETS
                         List of make targets to compile (default: clean all)
@@ -85,7 +85,7 @@ optional arguments:
                         (default: test/available)
   --report-xml          Output results to report.xml in the result_directory
                         (default: False)
-  --jobs JOBS, -j JOBS  Parallel building (0 means not limit, like '--jobs')
+  --jobs, -j JOBS       Parallel building (0 means not limit, like '--jobs')
                         (default: None)
   --only-if-changed, -c
                         Only test if the application has changed since last
@@ -396,6 +396,7 @@ class RIOTApplication:
         only_if_changed=False,
     ):
         # pylint:disable=too-many-arguments
+        # pylint:disable=too-many-positional-arguments
         # pylint:disable=too-many-nested-blocks
         # pylint:disable=too-many-branches
         """
