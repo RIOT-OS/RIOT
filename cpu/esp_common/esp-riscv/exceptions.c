@@ -63,8 +63,10 @@ void panic_arch(void)
 {
     if (_frame) {
         /* TODO */
-        ets_printf("Exception @0x%08"PRIx32", cause %s\n",
-                   _frame->mepc, exceptions[_frame->mcause]);
+        ets_printf("Exception @0x%08"PRIx32", cause %s, mtval 0x%08"PRIx32
+                   ", ra 0x%08"PRIx32", sp 0x%08"PRIx32"\n",
+                   _frame->mepc, exceptions[_frame->mcause], _frame->mtval,
+                   _frame->ra, _frame->sp);
     }
 #if defined(DEVELHELP)
     heap_stats();
