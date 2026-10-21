@@ -45,6 +45,7 @@ class TestCongUREBase(unittest.TestCase):
 
     def setUp(self):
         self.shell.clear()
+        flush_child(self.ctrl.term)
 
     def tearDown(self):
         self.shell.msgs_reset()

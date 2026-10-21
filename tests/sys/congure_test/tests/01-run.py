@@ -45,6 +45,7 @@ class TestCongUREBase(unittest.TestCase):
 
     def setUp(self):
         self.shell.cmd('cong_clear')
+        flush_child(self.ctrl.term)
 
     def exec_cmd(self, cmd, timeout=-1, async_=False):
         res = self.shell.cmd(cmd, timeout, async_)
