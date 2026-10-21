@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!/usr/bin/env -S pipx run
 
 # Copyright (C) 2018 Freie Universitat Berlin
 # Copyright (C) 2018 Inria
@@ -8,6 +8,16 @@
 # directory for more details.
 #
 # @author   Koen Zandberg <koen@bergzand.net>
+
+# /// script
+# requires-python = ">=3.10"
+# dependencies = [
+#   "agithub==2.1",
+#   "gitdb2==2.0.3",
+#   "GitPython==2.1.9",
+#   "smmap2==2.0.3",
+# ]
+# ///
 
 """Script used to backport PRs."""
 
