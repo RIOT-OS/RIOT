@@ -199,8 +199,17 @@ esp_err_t esp_intr_alloc(int source, int flags, intr_handler_t handler,
     esp_cpu_intr_set_handler(_irq_data_table[i].intr, handler, arg);
 
 #ifdef SOC_CPU_HAS_FLEXIBLE_INTC
-    /* set interrupt level given by flags */
-    esp_cpu_intr_set_priority(_irq_data_table[i].intr, esp_intr_flags_to_level(flags));
+    /*
+     * Set the interrupt level given by flags. If no level is given by flags,
+     * the default level from the interrupt allocation table is used, as
+     * ESP-IDF allocates a low or medium level interrupt in this case. Level 0
+     * must not be used, since an interrupt with level 0 is never taken
+     * on SoCs with CLIC (e.g. ESP32-C5), where the interrupt level must be
+     * greater than the interrupt level threshold.
+     */
+    int level = esp_intr_flags_to_level(flags);
+    esp_cpu_intr_set_priority(_irq_data_table[i].intr,
+                              level ? level : _irq_data_table[i].level);
     esp_cpu_intr_set_type(_irq_data_table[i].intr,
                           flags & ESP_INTR_FLAG_EDGE ? ESP_CPU_INTR_TYPE_EDGE
                                                      : ESP_CPU_INTR_TYPE_LEVEL);
