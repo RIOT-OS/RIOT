@@ -78,8 +78,9 @@ void periph_init(void)
         extern void button_init(void);
         button_init();
     }
-    /* initialize configured I2C devices */
-#ifdef MODULE_PERIPH_INIT_I2C
+    /* initialize configured I2C devices, PIO I2C devices are initialized
+     * after the PIO peripheral below */
+#if defined(MODULE_PERIPH_INIT_I2C) && !defined(MODULE_PIO_I2C)
     for (unsigned i = 0; i < I2C_NUMOF; i++) {
         i2c_init(I2C_DEV(i));
     }
@@ -132,9 +133,9 @@ void periph_init(void)
     for (int i = 0; i < (int)PIO_NUMOF; i++) {
         pio_init(PIO_DEV(i));
     }
-#if defined(MODULE_PERIPH_INIT_I2C) && defined(PIO_I2C_NUMOF)
-    for (unsigned i = 0; i < PIO_I2C_NUMOF; i++) {
-        i2c_init(I2C_DEV(I2C_NUMOF + i));
+#if defined(MODULE_PERIPH_INIT_I2C) && defined(MODULE_PIO_I2C)
+    for (unsigned i = 0; i < I2C_NUMOF; i++) {
+        i2c_init(I2C_DEV(i));
     }
 #endif
     pio_start_programs();
