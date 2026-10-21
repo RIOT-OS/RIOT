@@ -21,7 +21,9 @@
 #include "periph/pm.h"
 
 #include "esp_attr.h"
+#include "riscv/csr.h"
 #include "riscv/rvruntime-frames.h"
+#include "soc/soc_caps.h"
 #include "rom/ets_sys.h"
 
 static const char *exceptions[] = {
@@ -59,6 +61,33 @@ void IRAM_ATTR panicHandler(RvExcFrame *frame)
 
 extern void heap_stats(void);
 
+#if defined(DEVELHELP)
+#define _PMP_PRINT(n) \
+    ets_printf("pmp%02d: cfg 0x%02"PRIx32" addr 0x%08"PRIx32"\n", n, \
+               (uint32_t)PMP_ENTRY_CFG_READ(n), \
+               (uint32_t)RV_READ_CSR(CSR_PMPADDR0 + n))
+
+#if SOC_CPU_HAS_PMA
+#define _PMA_PRINT(n) \
+    ets_printf("pma%02d: cfg 0x%08"PRIx32" addr 0x%08"PRIx32"\n", n, \
+               (uint32_t)RV_READ_CSR(CSR_PMACFG0 + n), \
+               (uint32_t)RV_READ_CSR(CSR_PMAADDR0 + n))
+#else
+#define _PMA_PRINT(n)
+#endif
+
+#define _PROT_PRINT(n) do { _PMP_PRINT(n); _PMA_PRINT(n); } while (0)
+
+/* print the PMP and PMA configuration to analyze access faults */
+static void _print_memory_protection(void)
+{
+    _PROT_PRINT(0);  _PROT_PRINT(1);  _PROT_PRINT(2);  _PROT_PRINT(3);
+    _PROT_PRINT(4);  _PROT_PRINT(5);  _PROT_PRINT(6);  _PROT_PRINT(7);
+    _PROT_PRINT(8);  _PROT_PRINT(9);  _PROT_PRINT(10); _PROT_PRINT(11);
+    _PROT_PRINT(12); _PROT_PRINT(13); _PROT_PRINT(14); _PROT_PRINT(15);
+}
+#endif /* defined(DEVELHELP) */
+
 void panic_arch(void)
 {
     if (_frame) {
@@ -67,6 +96,13 @@ void panic_arch(void)
                    ", ra 0x%08"PRIx32", sp 0x%08"PRIx32"\n",
                    _frame->mepc, exceptions[_frame->mcause], _frame->mtval,
                    _frame->ra, _frame->sp);
+#if defined(DEVELHELP)
+        /* instruction, load or store access fault */
+        if ((_frame->mcause == 1) || (_frame->mcause == 5) ||
+            (_frame->mcause == 7)) {
+            _print_memory_protection();
+        }
+#endif
     }
 #if defined(DEVELHELP)
     heap_stats();
