@@ -12,10 +12,8 @@
 # /// script
 # requires-python = ">=3.10"
 # dependencies = [
-#   "agithub==2.1",
-#   "gitdb2==2.0.3",
-#   "GitPython==2.1.9",
-#   "smmap2==2.0.3",
+#   "agithub==2.2.2",
+#   "GitPython==3.2.1",
 # ]
 # ///
 
@@ -147,19 +145,20 @@ def main():
         "-c",
         "--comment",
         action="store_true",
-        help="Put a comment with a reference under" "the original PR",
+        help="Put a comment with a reference under the original PR",
     )
     parser.add_argument(
         "-n",
         "--noop",
         action="store_true",
-        help="Limited noop mode, creates branch, but doesn't" "push and create the PR",
+        help="Limited no-op mode. Creates the branch, but does not push and "
+        "create the PR",
     )
     parser.add_argument(
         "-r",
         "--release-branch",
         type=str,
-        help="Base the backport on this branch, " "default is the latest",
+        help="Base the backport on this branch, default is the latest",
     )
     parser.add_argument(
         "--backport-branch-fmt",
