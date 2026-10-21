@@ -30,10 +30,29 @@ extern "C" {
 
 /**
  * @brief   Length of the temporary copying buffer for receival.
- * @note    It should be as long as the maximum packet length of all the netdev you use.
+ *
+ * @note    It should be as long as the maximum packet length of all the netdev
+ *          you use.
  */
 #ifndef LWIP_NETDEV_BUFLEN
-#define LWIP_NETDEV_BUFLEN      (ETHERNET_MAX_LEN)
+#  define LWIP_NETDEV_BUFLEN        (ETHERNET_MAX_LEN)
+#endif
+
+/**
+ * @brief   Name of the netdev adapter thread.
+ */
+#define LWIP_NETDEV_NAME            "lwip_netdev_mux"
+
+/**
+ * @brief   Priority of the netdev adapter thread.
+ */
+#define LWIP_NETDEV_PRIO            (THREAD_PRIORITY_MAIN - 4)
+
+/**
+ * @brief   Stack size of the netdev adapter thread.
+ */
+#ifndef LWIP_NETDEV_STACKSIZE
+#  define LWIP_NETDEV_STACKSIZE     (THREAD_STACKSIZE_DEFAULT)
 #endif
 
 /**
