@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 
+import os
 import sys
 from testrunner import run
 
@@ -22,9 +23,14 @@ def testfunc(child):
 
     child.sendline('print("Done")')
 
+    if os.environ.get("BOARD") in ["native", "native32", "native64"]:
+        slack = 0.0
+    else:
+        slack = 0.5
+
     # the timer fires first, then the time.sleep() finishes.
-    child.expect_exact('Fired!', timeout=2.5)
-    child.expect_exact('Done', timeout=5)
+    child.expect_exact('Fired!', timeout=2.5 + slack)
+    child.expect_exact('Done', timeout=5.0 + slack)
 
     child.expect_exact('>>>')
 
