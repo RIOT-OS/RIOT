@@ -3,5 +3,8 @@
 MODULE = cpus
 
 # SORT THIS ALPHABETICALLY BY COMMON CPU MODULE NAME!
+ifneq (,$(filter cpu_common_rp2350,$(USEMODULE)))
+  DIRS += $(RIOTCPU)/common/rp2350
+endif
 
 include $(RIOTBASE)/Makefile.base

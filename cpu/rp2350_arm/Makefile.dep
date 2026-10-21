@@ -1,4 +1,4 @@
 USEMODULE += cortexm_common
+USEMODULE += cpu_common_rp2350
 
-include $(RIOTCPU)/rp2350_common/Makefile.dep
 include $(RIOTCPU)/cortexm_common/Makefile.dep

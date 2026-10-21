@@ -1,0 +1,2 @@
+USEMODULE += periph
+USEPKG += picosdk
