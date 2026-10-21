@@ -1,10 +1,8 @@
 /*
- * Copyright (C) 2021 Google LLC
- *               2024 Krzysztof Cabaj <kcabaj@gmail.com>
- *
- * This file is subject to the terms and conditions of the GNU Lesser
- * General Public License v2.1. See the file LICENSE in the top level
- * directory for more details.
+ * SPDX-FileCopyrightText: 2021 Google LLC
+ * SPDX-FileCopyrightText: 2024 Krzysztof Cabaj <kcabaj@gmail.com>
+ * SPDX-FileCopyrightText: 2026 TU Dresden
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
 
 /**
@@ -17,6 +15,7 @@
  *
  * @author      Erik Ekman <eekman@google.com>
  *              Krzysztof Cabaj <kcabaj@gmail.com>
+ *              Mikolai Gütschow <mikolai.guetschow@tu-dresden.de>
  *
  * @}
  */
@@ -117,13 +116,16 @@ static void _netif_list(struct netif *netif)
 #endif
 }
 
-#ifdef MODULE_LWIP_IPV4
 static void _usage_add4(char *cmd)
 {
+    if (!IS_USED(MODULE_LWIP_IPV4)) {
+        return;
+    }
     printf("usage: %s add <interface> <IPv4>/<prefix>\n", cmd);
     printf("usage: %s add <interface> <IPv4>/<prefix> gw <IPv4>\n", cmd);
 }
 
+#ifdef MODULE_LWIP_IPV4
 static void _lwip_prefix_to_subnet(int prefix, ip4_addr_t *subnet)
 {
     uint32_t value = 0;
@@ -177,7 +179,7 @@ static int _lwip_netif_add4(int argc, char **argv)
     }
 
     if (inet_pton(AF_INET, ip_ptr, &ip.addr) != 1) {
-        printf("error:invalid IPv4 address\n");
+        printf("error: invalid IPv4 address\n");
         sys_unlock_tcpip_core();
         return 1;
     }
@@ -185,7 +187,7 @@ static int _lwip_netif_add4(int argc, char **argv)
     prefix = atoi(prefix_ptr);
 
     if (prefix < 0 || prefix > 32) {
-        printf("error:invalid prefix, should be in range <0, 32>\n");
+        printf("error: invalid prefix, should be in range <0, 32>\n");
         sys_unlock_tcpip_core();
         return 1;
     }
@@ -214,34 +216,76 @@ static int _lwip_netif_add4(int argc, char **argv)
     sys_unlock_tcpip_core();
     return 0;
 }
+#else /* MODULE_LWIP_IPV4 */
+static int _lwip_netif_add4(int argc, char **argv)
+{
+    (void)argc;
+    (void)argv;
+    return 1;
+}
 #endif
 
-#ifdef MODULE_LWIP_IPV6
 static void _usage_add6(char *cmd)
 {
-    printf("usage: %s add for LWIP IPv6 currently not implemented\n", cmd);
+    if (!IS_USED(MODULE_LWIP_IPV6)) {
+        return;
+    }
+    printf("usage: %s add <interface> <IPv6> (prefix not supported)\n", cmd);
 }
 
+#ifdef MODULE_LWIP_IPV6
+static int _lwip_netif_add6(int argc, char **argv)
+{
+    struct netif *iface;
+    ip6_addr_t ip;
+
+    if (argc != 4) {
+        printf("error: invalid number of parameters\n");
+        _usage_add6(argv[0]);
+        return 1;
+    }
+
+    sys_lock_tcpip_core();
+    iface = netif_find(argv[2]);
+
+    if (iface == NULL) {
+        printf("error: invalid interface name (names are case sensitive)\n");
+        sys_unlock_tcpip_core();
+        return 1;
+    }
+
+    if (inet_pton(AF_INET6, argv[3], &ip.addr) != 1) {
+        printf("error: invalid IPv6 address\n");
+        sys_unlock_tcpip_core();
+        return 1;
+    }
+
+    netif_add_ip6_address(iface, &ip, NULL);
+
+    sys_unlock_tcpip_core();
+
+    return 0;
+}
+#else /* MODULE_LWIP_IPV6 */
 static int _lwip_netif_add6(int argc, char **argv)
 {
     (void)argc;
     (void)argv;
-    printf("error: LWIP IPv6 configuration currently not implemented\n");
-
-    return 0;
+    return 1;
 }
 #endif
+
+static void _usage_add(char *cmd)
+{
+    _usage_add4(cmd);
+    _usage_add6(cmd);
+}
 
 static void _lwip_netif_help(char *cmd)
 {
     printf("usage: %s\n", cmd);
     printf("usage: %s help\n", cmd);
-#ifdef MODULE_LWIP_IPV4
-    _usage_add4(cmd);
-#endif
-#ifdef MODULE_LWIP_IPV6
-    _usage_add6(cmd);
-#endif
+    _usage_add(cmd);
 }
 
 static int _lwip_netif_config(int argc, char **argv)
@@ -267,48 +311,22 @@ static int _lwip_netif_config(int argc, char **argv)
         if (strcmp("help", argv[1]) == 0) {
             _lwip_netif_help(argv[0]);
         }
-#if defined(MODULE_LWIP_IPV4) || defined(MODULE_LWIP_IPV6)
         else if (strcmp("add", argv[1]) == 0) {
             if (argc != 4 && argc != 6) {
                 printf("error: invalid number of parameters\n");
-#ifdef MODULE_LWIP_IPV4
-                _usage_add4(argv[0]);
-#endif
-#ifdef MODULE_LWIP_IPV6
-                _usage_add6(argv[0]);
-#endif
+                _usage_add(argv[0]);
                 return 0;
             }
 
-            char *prefix_ptr = strchr(argv[3], '/');
-
-            if (prefix_ptr == NULL) {
-                printf("error: provide IP address with prefix\n");
-                return 0;
+            if (IS_USED(MODULE_LWIP_IPV4) && strchr(argv[3], '.') != NULL) {
+                return _lwip_netif_add4(argc, argv);
             }
-
-            *prefix_ptr = 0;
-
-#ifdef MODULE_LWIP_IPV4
-            ipv4_addr_t ip4;
-
-            if (ipv4_addr_from_buf(&ip4, argv[3], strlen(argv[3])) != NULL) {
-                *prefix_ptr = '/';
-                _lwip_netif_add4(argc, argv);
-                return 1;
+            if (IS_USED(MODULE_LWIP_IPV6) && strchr(argv[3], ':') != NULL) {
+                return _lwip_netif_add6(argc, argv);
             }
-#endif
-#ifdef MODULE_LWIP_IPV6
-            ipv6_addr_t ip6;
-            if (ipv6_addr_from_buf(&ip6, argv[3], strlen(argv[3])) != NULL) {
-                *prefix_ptr = '/';
-                _lwip_netif_add6(argc, argv);
-                return 1;
-            }
-#endif
             printf("error: use proper IPv4 or IPv6 address\n");
+            _usage_add(argv[0]);
         }
-#endif
         else {
             printf("error: invalid subcommand - use help\n");
         }
