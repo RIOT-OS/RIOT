@@ -256,6 +256,16 @@
 #  if CONFIG_ESP_WIFI_ENABLED && CONFIG_BT_ENABLED
 #    define CONFIG_ESP_COEX_SW_COEXIST_ENABLE           1
 #  endif
+#  if CONFIG_ESP_WIFI_ENABLED && CONFIG_IEEE802154_ENABLED
+   /*
+    * Software coexistence is required for WiFi and IEEE 802.15.4, since
+    * the IEEE 802.15.4 radio blocks the RF in receive mode otherwise.
+    * CONFIG_SW_COEXIST_ENABLE is the deprecated name still used by ESP-IDF
+    * code, e.g. for calling coex_init in esp_wifi_init.
+    */
+#    define CONFIG_ESP_COEX_SW_COEXIST_ENABLE           1
+#    define CONFIG_SW_COEXIST_ENABLE                    1
+#  endif
 #  if 0
    /* TODO:
     * CONFIG_SW_COEXIST_ENABLE is deprecated but still used in code.
