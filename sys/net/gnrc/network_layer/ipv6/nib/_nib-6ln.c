@@ -23,6 +23,15 @@
 #define ENABLE_DEBUG 0
 #include "debug.h"
 
+#if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_6LN) && !IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_6LR) && \
+    !IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_6LBR) && !IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_ARSM)
+#  pragma message \
+    "\nWarning: You are using pure RFC6775-compatible Neighbor Discovery.\n" \
+    "Some other network stacks (Linux, lwip) do not implement RFC6775 and\n" \
+    "might encounter problems reaching this node.\n" \
+    "You can enable compatibility with such stacks with CONFIG_GNRC_IPV6_NIB_ARSM."
+#endif
+
 #if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_6LN)
 
 static char addr_str[IPV6_ADDR_MAX_STR_LEN];
