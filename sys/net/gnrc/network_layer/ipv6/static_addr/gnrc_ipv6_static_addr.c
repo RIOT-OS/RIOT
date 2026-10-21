@@ -139,6 +139,30 @@ void auto_init_gnrc_ipv6_static_addr(void)
                 downstream = netif;
             }
         }
+
+        /* If there is no wired interface, e.g. with a WiFi uplink and an
+         * IEEE 802.15.4 downlink, use the first interface without 6LoWPAN
+         * as upstream and the first 6LoWPAN interface as downstream. */
+        if (!upstream) {
+            gnrc_netif_t *up = NULL;
+            gnrc_netif_t *down = NULL;
+
+            netif = NULL;
+            while ((netif = gnrc_netif_iter(netif))) {
+                if (!up && !gnrc_netif_is_6lo(netif)) {
+                    up = netif;
+                } else if (!down && gnrc_netif_is_6lo(netif)) {
+                    down = netif;
+                }
+            }
+
+            if (up && down) {
+                upstream = up;
+                if (!CONFIG_GNRC_IPV6_STATIC_ADDR_DOWNSTREAM) {
+                    downstream = down;
+                }
+            }
+        }
     }
 
     if (upstream) {
