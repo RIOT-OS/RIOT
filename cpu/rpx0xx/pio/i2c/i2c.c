@@ -105,8 +105,8 @@ static void pio_i2c_resume_after_error(pio_t pio, pio_sm_t sm)
 {
     PIO0_Type *dev = pio_config[pio].dev;
     pio_sm_ctrl_regs_t *ctrl = &PIO_SM_CTRL_BASE(dev)[sm];
-    uint32_t jmp_addr = (ctrl->execctrl & PIO0_SM0_EXECCTRL_WRAP_BOTTOM_Msk)
-                         >> PIO0_SM0_EXECCTRL_WRAP_BOTTOM_Pos;
+    uint32_t jmp_addr = (ctrl->execctrl & PIO_SM0_EXECCTRL_WRAP_BOTTOM_BITS)
+                         >> PIO_SM0_EXECCTRL_WRAP_BOTTOM_LSB;
     pio_sm_exec(pio, sm, pio_inst_jmp(PIO_INST_JMP_COND_NONE, jmp_addr));
 }
 
@@ -114,8 +114,8 @@ static inline bool pio_i2c_check_idle(pio_t pio, pio_sm_t sm)
 {
     PIO0_Type *dev = pio_config[pio].dev;
     pio_sm_ctrl_regs_t *ctrl = &PIO_SM_CTRL_BASE(dev)[sm];
-    uint32_t idle = (ctrl->execctrl & PIO0_SM0_EXECCTRL_WRAP_BOTTOM_Msk)
-                    >> PIO0_SM0_EXECCTRL_WRAP_BOTTOM_Pos;
+    uint32_t idle = (ctrl->execctrl & PIO_SM0_EXECCTRL_WRAP_BOTTOM_BITS)
+                    >> PIO_SM0_EXECCTRL_WRAP_BOTTOM_LSB;
     return ctrl->addr == idle;
 }
 
@@ -284,11 +284,11 @@ int pio_i2c_init(pio_i2c_bus_t *bus,
     pio_i2c_init_pins(pio, sm, sda, scl);
     pio_irq_clear(pio, pio_irq_rel_index(I2C_PIO_IRQN, sm));
     /* Given the absolute interrupt index I2C_PIO_IRQN
-       and the relative interrupt instruction in the PIO program,
-       sm will raise the interrupt flag pio_irq_rel_index(I2C_PIO_IRQN, sm)
-       in the IRQ register. */
+     * and the relative interrupt instruction in the PIO program,
+     * sm will raise the interrupt flag pio_irq_rel_index(I2C_PIO_IRQN, sm)
+     * in the IRQ register. */
     pio_set_isr_sm_vec(pio, pio_irq_rel_index(I2C_PIO_IRQN, sm), &_vec);
-    pio_irq_enable(pio, irq, PIO_IRQ_SM_0 << pio_irq_rel_index(I2C_PIO_IRQN, sm));
+    pio_irq_enable(pio, irq, PIO_INTR_SM0_BITS << pio_irq_rel_index(I2C_PIO_IRQN, sm));
     pio_sm_clear_fifos(pio, sm);
     pio_sm_restart(pio, sm);
     return 0;

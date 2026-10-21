@@ -49,7 +49,7 @@ static _uart_backup_t _backup[UART_NUMOF];
 void _irq_enable(uart_t uart)
 {
     UART0_Type *dev = uart_config[uart].dev;
-    dev->UARTIMSC = UART0_UARTIMSC_RXIM_Msk;
+    dev->UARTIMSC = UART_UARTIMSC_RXIM_BITS;
     NVIC_EnableIRQ(uart_config[uart].irqn);
 }
 
@@ -84,7 +84,7 @@ int uart_mode(uart_t uart, uart_data_bits_t data_bits, uart_parity_t uart_parity
     UART0_Type *dev = uart_config[uart].dev;
 
     io_reg_atomic_clear(&dev->UARTCR,
-                        UART0_UARTCR_UARTEN_Msk | UART0_UARTCR_TXE_Msk | UART0_UARTCR_RXE_Msk);
+                        UART_UARTCR_UARTEN_BITS | UART_UARTCR_TXE_BITS | UART_UARTCR_RXE_BITS);
 
     /* Beware of strange hardware bug: If the configuration bitmask is prepared in register and
      * transferred with a single 32 bit write (updating both parity and number of data bits at the
@@ -92,27 +92,27 @@ int uart_mode(uart_t uart, uart_data_bits_t data_bits, uart_parity_t uart_parity
      * next char send out. If the configuration is updated in multiple bus accesses, it will apply
      * directly to the next char. So: Double check e.g. with tests/periph/uart_mode after touching
      * the initialization code here */
-    dev->UARTLCR_H = (uint32_t)data_bits << UART0_UARTLCR_H_WLEN_Pos;
+    dev->UARTLCR_H = (uint32_t)data_bits << UART_UARTLCR_H_WLEN_LSB;
 
     if (stop_bits == UART_STOP_BITS_2) {
-        io_reg_atomic_set(&dev->UARTLCR_H, UART0_UARTLCR_H_STP2_Msk);
+        io_reg_atomic_set(&dev->UARTLCR_H, UART_UARTLCR_H_STP2_BITS);
     }
 
     switch (uart_parity) {
     case UART_PARITY_NONE:
         break;
     case UART_PARITY_EVEN:
-        io_reg_atomic_set(&dev->UARTLCR_H, UART0_UARTLCR_H_EPS_Msk | UART0_UARTLCR_H_PEN_Msk);
+        io_reg_atomic_set(&dev->UARTLCR_H, UART_UARTLCR_H_EPS_BITS | UART_UARTLCR_H_PEN_BITS);
         break;
     case UART_PARITY_ODD:
-        io_reg_atomic_set(&dev->UARTLCR_H, UART0_UARTLCR_H_PEN_Msk);
+        io_reg_atomic_set(&dev->UARTLCR_H, UART_UARTLCR_H_PEN_BITS);
         break;
     default:
         return UART_NOMODE;
     }
 
     io_reg_atomic_set(&dev->UARTCR,
-                      UART0_UARTCR_UARTEN_Msk | UART0_UARTCR_TXE_Msk | UART0_UARTCR_RXE_Msk);
+                      UART_UARTCR_UARTEN_BITS | UART_UARTCR_TXE_BITS | UART_UARTCR_RXE_BITS);
 
     return UART_OK;
 }
@@ -157,7 +157,7 @@ void uart_deinit_pins(uart_t uart)
 
 static void _poweron(uart_t uart)
 {
-    uint32_t reset_bit_mask = (uart) ? RESETS_RESET_uart1_Msk : RESETS_RESET_uart0_Msk;
+    uint32_t reset_bit_mask = (uart) ? RESETS_RESET_UART1_BITS : RESETS_RESET_UART0_BITS;
     periph_reset(reset_bit_mask);
     periph_reset_done(reset_bit_mask);
 }
@@ -190,7 +190,7 @@ void uart_poweroff(uart_t uart)
     _backup[uart].uartcr = dev->UARTCR;
     /* disconnect GPIOs and power off peripheral */
     uart_deinit_pins(uart);
-    periph_reset((uart) ? RESETS_RESET_uart1_Msk : RESETS_RESET_uart0_Msk);
+    periph_reset((uart) ? RESETS_RESET_UART1_BITS : RESETS_RESET_UART0_BITS);
 }
 
 int uart_init(uart_t uart, uint32_t baud, uart_rx_cb_t rx_cb, void *arg)
@@ -221,7 +221,7 @@ int uart_init(uart_t uart, uint32_t baud, uart_rx_cb_t rx_cb, void *arg)
         uint32_t status = dev->UARTRIS;
         dev->UARTICR = status;
         (void)dev->UARTDR;
-        io_reg_atomic_set(&dev->UARTCR, UART0_UARTCR_RXE_Msk);
+        io_reg_atomic_set(&dev->UARTCR, UART_UARTCR_RXE_BITS);
     }
 
     return UART_OK;
@@ -234,11 +234,11 @@ void uart_write(uart_t uart, const uint8_t *data, size_t len)
 
     for (size_t i = 0; i < len; i++) {
         /* wait while the TX FIFO is full (TXFF) before writing the next byte */
-        while (dev->UARTFR & UART0_UARTFR_TXFF_Msk) { }
+        while (dev->UARTFR & UART_UARTFR_TXFF_BITS) { }
         dev->UARTDR = data[i];
     }
     /* wait for the TX FIFO and shift register to drain (BUSY cleared) */
-    while (dev->UARTFR & UART0_UARTFR_BUSY_Msk) { }
+    while (dev->UARTFR & UART_UARTFR_BUSY_BITS) { }
 }
 
 gpio_t uart_pin_rx(uart_t uart)
@@ -260,9 +260,9 @@ void isr_handler(uint8_t num)
     uint32_t status = dev->UARTMIS;
     dev->UARTICR = status;
 
-    if (status & UART0_UARTMIS_RXMIS_Msk) {
+    if (status & UART_UARTMIS_RXMIS_BITS) {
         uint32_t data = dev->UARTDR;
-        if (data & (UART0_UARTDR_BE_Msk | UART0_UARTDR_PE_Msk | UART0_UARTDR_FE_Msk)) {
+        if (data & (UART_UARTDR_BE_BITS | UART_UARTDR_PE_BITS | UART_UARTDR_FE_BITS)) {
             DEBUG_PUTS("[rpx0xx] uart RX error (parity, break, or framing error");
         }
         else {

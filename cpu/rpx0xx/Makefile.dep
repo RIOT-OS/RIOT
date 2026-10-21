@@ -7,4 +7,6 @@ ifneq (,$(filter pio_i2c periph_i2c,$(FEATURES_USED)))
   USEMODULE += pio_i2c
 endif
 
+USEPKG += picosdk
+
 include $(RIOTCPU)/cortexm_common/Makefile.dep
