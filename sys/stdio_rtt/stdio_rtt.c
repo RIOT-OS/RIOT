@@ -344,6 +344,10 @@ static ssize_t _write(const void* in, size_t len) {
         }
     }
 
+    /* buffer full; drop bytes but report success so caller doesn't spin */
+    if (!blocking_stdout && written == 0) {
+        return (ssize_t)len;
+    }
     return (ssize_t)written;
 }
 
