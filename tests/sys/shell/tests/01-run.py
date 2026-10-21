@@ -19,6 +19,7 @@ EXPECTED_CMDS = {
     'echo': 'prints the input command',
     'empty': 'print nothing on command',
     'periodic': 'periodically print command',
+    'burst': 'print lines in quick succession (default: 16)',
     'app_metadata': 'Returns application metadata',
     'pm': 'interact with layered PM subsystem',
     'ps': 'Prints information about running threads.',
@@ -269,6 +270,17 @@ def check_preempt(child):
     child.sendline('')
 
 
+def check_burst(child):
+    """
+    Check that output written faster than it can be transmitted is not lost.
+    """
+    pattern = '0123456789abcdefghijklmnopqrstuvwxyz' * 3
+    child.expect(PROMPT)
+    child.sendline('burst')
+    for i in range(16):
+        child.expect_exact(f'burst {i:02}: {pattern}\r\n')
+
+
 def testfunc(child):
     # avoid sending an extra empty line on native.
     if BOARD in ['native', 'native32', 'native64']:
@@ -303,6 +315,8 @@ def testfunc(child):
             check_cmd(child, cmd, expected)
     else:
         print("skipping cleanterm tests")
+
+    check_burst(child)
 
 
 if __name__ == "__main__":
