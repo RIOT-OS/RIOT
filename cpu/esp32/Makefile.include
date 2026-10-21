@@ -239,6 +239,12 @@ ifneq (,$(filter esp_wifi_enterprise,$(USEMODULE)))
   INCLUDES += -I$(ESP32_SDK_DIR)/components/wpa_supplicant/esp_supplicant/include
 endif
 
+# software coexistence is enabled if at least two of the radio modules are used
+# (see CONFIG_ESP_COEX_SW_COEXIST_ENABLE in sdkconfig.h)
+ifneq (,$(word 2,$(filter esp_wifi_any esp_ble esp_ieee802154,$(USEMODULE))))
+  INCLUDES += -I$(ESP32_SDK_DIR)/components/esp_coex/include
+endif
+
 ifneq (,$(filter esp_eth,$(USEMODULE)))
   INCLUDES += -I$(RIOTCPU)/$(CPU)/esp-eth
   INCLUDES += -I$(ESP32_SDK_DIR)/components/esp_eth/include

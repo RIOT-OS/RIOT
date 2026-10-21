@@ -43,6 +43,9 @@
 #include "esp_attr.h"
 #include "esp_clk_internal.h"
 #include "esp_heap_caps_init.h"
+#if IS_ACTIVE(CONFIG_ESP_COEX_SW_COEXIST_ENABLE)
+#  include "private/esp_coexist_internal.h"
+#endif
 #include "esp_log.h"
 #include "esp_private/startup_internal.h"
 #include "esp_private/esp_clk.h"
@@ -250,6 +253,15 @@ static NORETURN void IRAM system_init (void)
 
     /* init random number generator */
     srand(hwrand());
+
+#if IS_ACTIVE(CONFIG_ESP_COEX_SW_COEXIST_ENABLE)
+    /* Pre-initialize the software coexistence of the radio modules before
+     * any of them is initialized. This is done by the ESP-IDF system init
+     * function `init_coexist` in ESP-IDF, which is not used by RIOT. */
+    extern coex_adapter_funcs_t g_coex_adapter_funcs;
+    esp_coex_adapter_register(&g_coex_adapter_funcs);
+    coex_pre_init();
+#endif
 
     /* add SPI RAM to heap if enabled */
 #if CONFIG_SPIRAM && CONFIG_SPIRAM_BOOT_INIT

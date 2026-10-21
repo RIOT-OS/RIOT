@@ -535,6 +535,8 @@ SECTIONS
     _text_start = ABSOLUTE(.);
 
     *(.literal .literal.* .text .text.*)
+    *(.coexiram .coexiram.*)
+    *(.coexsleepiram .coexsleepiram.*)
 
     *(.stub)
     *(.gnu.linkonce.t.*)

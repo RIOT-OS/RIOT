@@ -103,6 +103,10 @@
 
 #endif /* CPU_ESP8266 */
 
+#if IS_USED(MODULE_ESP_IEEE802154) && IS_ACTIVE(CONFIG_ESP_COEX_SW_COEXIST_ENABLE)
+#  include "esp_coexist.h"
+#endif
+
 #define ENABLE_DEBUG_HEXDUMP    0
 #define ENABLE_DEBUG            0
 #include "debug.h"
@@ -1041,6 +1045,11 @@ void esp_wifi_setup (esp_wifi_netdev_t* dev)
         ESP_WIFI_LOG_ERROR("esp_wifi_start failed with return value %d", (int)result);
         return;
     }
+
+#if IS_USED(MODULE_ESP_IEEE802154) && IS_ACTIVE(CONFIG_ESP_COEX_SW_COEXIST_ENABLE)
+    /* enable the coexistence of WiFi and IEEE 802.15.4 */
+    esp_coex_wifi_i154_enable();
+#endif
 
     /* set the netdev driver */
     dev->netdev.driver = &_esp_wifi_driver;
