@@ -3,6 +3,9 @@
 MODULE = cpus
 
 # SORT THIS ALPHABETICALLY BY COMMON CPU MODULE NAME!
+ifneq (,$(filter cpu_common_rp2,$(USEMODULE)))
+  DIRS += $(RIOTCPU)/common/rp2
+endif
 ifneq (,$(filter cpu_common_rp2350,$(USEMODULE)))
   DIRS += $(RIOTCPU)/common/rp2350
 endif

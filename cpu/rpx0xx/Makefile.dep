@@ -9,4 +9,7 @@ endif
 
 USEPKG += picosdk
 
+# code shared with the RP2350
+USEMODULE += cpu_common_rp2
+
 include $(RIOTCPU)/cortexm_common/Makefile.dep

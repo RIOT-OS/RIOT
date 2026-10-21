@@ -1,2 +1,4 @@
 USEMODULE += periph
+# code shared with the RP2040
+USEMODULE += cpu_common_rp2
 USEPKG += picosdk
