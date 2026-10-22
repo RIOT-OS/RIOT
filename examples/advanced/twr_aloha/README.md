@@ -69,8 +69,8 @@ $ iotlab-experiment stop
 board, prefix with IOTLAB_NODE if using IoT-LAB
 
 ```shell
-$ make -C examples/twr_aloha/ flash term -j
-$ make -C examples/twr_aloha/ flash term -j
+$ make -C examples/advanced/twr_aloha/ flash term -j
+$ make -C examples/advanced/twr_aloha/ flash term -j
 ```
 
 1. On at least one node enable listening and get its short address
@@ -141,7 +141,7 @@ Pre-Requisites:
 A basic automatic test for the provided shell is included, run with:
 
 ```shell
-$ make -C examples/twr_aloha flash test-with-config
+$ make -C examples/advanced/twr_aloha flash test-with-config
 ```
 
 The application provides a `ShellInteraction` that can be used for
