@@ -994,8 +994,9 @@ endif
 help:
 	@LC_ALL=C $(MAKE) -pRrq -f $(firstword $(MAKEFILE_LIST)) : 2>/dev/null | sed -ne 's/\(^[a-z][a-z_-]*\|generate-Makefile.ci\):.*/\1/p' | sort -u
 
-ifeq (iotlab-m3,$(BOARD))
-  ifneq (,$(filter iotlab-%,$(MAKECMDGOALS)))
+ifneq (,$(filter iotlab-%,$(MAKECMDGOALS)))
+  include $(RIOTBASE)/dist/testbed-support/makefile.iotlab.archi.inc.mk
+  ifneq (,$(IOTLAB_ARCHI_$(BOARD)))
     include $(RIOTBASE)/dist/testbed-support/Makefile.iotlab
   endif
 endif

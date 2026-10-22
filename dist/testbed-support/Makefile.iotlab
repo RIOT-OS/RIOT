@@ -1,5 +1,7 @@
 .PHONY: iotlab-exp iotlab-flash iotlab-reset iotlab-term iotlab-check-exp
 
+include $(RIOTBASE)/dist/testbed-support/makefile.iotlab.archi.inc.mk
+
 # There are several deprecated features used here and introduced between
 # versions 2 and 3 of the IoT-LAB cli tools.
 # For backward compatibility, we manage these changes here.
@@ -16,7 +18,7 @@ endif
 
 IOTLAB_NODES        ?= 5
 IOTLAB_DURATION     ?= 30
-IOTLAB_TYPE         ?= m3:at86rf231
+IOTLAB_TYPE         ?= $(IOTLAB_ARCHI)
 IOTLAB_AUTH         ?= $(HOME)/.iotlabrc
 IOTLAB_USER         ?= $(shell cut -f1 -d: $(IOTLAB_AUTH))
 IOTLAB_EXP_ID       ?= $(shell iotlab-experiment get -l --state Running | grep -m 1 '"id"' | grep -Eo '[[:digit:]]+')
@@ -33,10 +35,21 @@ ifeq (,$(filter iotlab-exp,$(MAKECMDGOALS)))
                              get $(_NODES_ID_LIST_OPTION) -i $(IOTLAB_EXP_ID))
 endif
 
-ifneq (,$(findstring m3,$(IOTLAB_TYPE)))
-  BINARY := $(ELFFILE)
+_CLI_TOOLS_MAJOR_VERSION ?= $(shell iotlab-experiment --version | cut -f1 -d.)
+ifeq (2,$(_CLI_TOOLS_MAJOR_VERSION))
+  BINARY = $(FLASHFILE)
 else
-  BINARY := $(HEXFILE)
+  ifeq (,$(filter firefly zigduino,$(BOARD)))
+    # All boards in IoT-LAB except firefly and zigduino can be flashed using $(BINFILE).
+    # On IoT-LAB, firefly only accepts $(ELFFILE) and WSN320 boards only accept $(HEXFILE).
+    # Both are assigned to $(FLASHFILE) in their respective board definitions.
+    # Using $(BINFILE) for the other boards speeds up the firmware upload since the file is much
+    # smaller than an elffile.
+    # This feature is only available in cli-tools version >= 3.
+    BINARY = $(BINFILE)
+  else
+    BINARY = $(FLASHFILE)
+  endif
 endif
 
 ifdef IOTLAB_PHY_NODES
