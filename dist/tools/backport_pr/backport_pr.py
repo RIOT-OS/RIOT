@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!/usr/bin/env -S pipx run
 
 # Copyright (C) 2018 Freie Universitat Berlin
 # Copyright (C) 2018 Inria
@@ -8,6 +8,14 @@
 # directory for more details.
 #
 # @author   Koen Zandberg <koen@bergzand.net>
+
+# /// script
+# requires-python = ">=3.10"
+# dependencies = [
+#   "agithub==2.2.2",
+#   "GitPython==3.2.1",
+# ]
+# ///
 
 """Script used to backport PRs."""
 
@@ -137,19 +145,20 @@ def main():
         "-c",
         "--comment",
         action="store_true",
-        help="Put a comment with a reference under" "the original PR",
+        help="Put a comment with a reference under the original PR",
     )
     parser.add_argument(
         "-n",
         "--noop",
         action="store_true",
-        help="Limited noop mode, creates branch, but doesn't" "push and create the PR",
+        help="Limited no-op mode. Creates the branch, but does not push and "
+        "create the PR",
     )
     parser.add_argument(
         "-r",
         "--release-branch",
         type=str,
-        help="Base the backport on this branch, " "default is the latest",
+        help="Base the backport on this branch, default is the latest",
     )
     parser.add_argument(
         "--backport-branch-fmt",
