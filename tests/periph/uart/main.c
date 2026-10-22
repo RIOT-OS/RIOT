@@ -24,6 +24,7 @@
 #include "msg.h"
 #include "periph/uart.h"
 #include "ringbuffer.h"
+#include "time_units.h"
 #include "shell.h"
 #include "thread.h"
 #include "ztimer.h"
@@ -159,8 +160,14 @@ static int _self_test(uart_t dev, unsigned baud)
     }
 
     uart_write(dev, (uint8_t*)test_string, sizeof(test_string));
-    /* wait 1ms for rx callback to be triggered by HW */
-    _delay_ms(1);
+    /* wait for the rx callback to be triggered by HW
+     * timeout = transmission time (10 bits per byte in 8N1) + 20% tolerance + 10ms for platform specific latency latency */
+    uint32_t timeout_ms = ((sizeof(test_string) * 10 * MS_PER_SEC * 12 / 10 + baud - 1) / baud) + 10;
+
+    while ((ctx[dev].rx_buf.avail < sizeof(test_string)) && timeout_ms--) {
+        _delay_ms(1);
+    }
+
     for (unsigned i = 0; i < sizeof(test_string); ++i) {
         int c = ringbuffer_get_one(&ctx[dev].rx_buf);
         if (c == -1) {
