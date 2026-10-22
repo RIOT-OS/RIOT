@@ -48,7 +48,7 @@ jobs:
     needs: [check-secret]
     if: needs.check-secret.outputs.secret-configured == 'true'
     strategy:
-      max-parallel: 8
+      max-parallel: 12
       fail-fast: false
       matrix:
         boards:
@@ -88,6 +88,14 @@ jobs:
             iotlab:
               archi: st-iotnode:multi
               site: saclay
+          - riot: rpi-pico-w
+            iotlab:
+              archi: rpi-pico:multi
+              site: saclay
+          - riot: zigduino
+            iotlab:
+              archi: zigduino:atmega128rfa1
+              site: strasbourg
     runs-on: ubuntu-latest
     name: ${{ matrix.boards.riot }}
     env:
