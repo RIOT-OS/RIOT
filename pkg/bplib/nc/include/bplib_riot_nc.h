@@ -90,7 +90,8 @@ typedef enum {
     BPLIB_BUNDLE_AGE_BLOCK = 1,
     BPLIB_HOP_COUNT_BLOCK = 2,
     BPLIB_PAYLOAD_BLOCK = 3,
-    BPLIB_CUSTODY_TRANSFER_BLOCK = 4
+    BPLIB_CUSTODY_TRANSFER_BLOCK = 4,
+    BPLIB_INVALID_BLOCK
 } bplib_nc_canonical_block_t;
 
 /**
@@ -205,6 +206,17 @@ BPLib_Status_t bplib_channel_set_dest_eid(
  */
 BPLib_Status_t bplib_channel_set_report_to_eid(
             uint32_t channel, BPLib_EID_t report_eid);
+
+/**
+ * @brief Get the per-block config of a channel
+ *
+ * @param channel Index of the channel
+ * @param block Selector of a canonical block
+ *
+ * @return Pointer to per-block config, or NULL if channel or block is invalid
+ */
+BPLib_PI_CanBlkConfig_t* bplib_channel_map_block(uint32_t channel,
+            bplib_nc_canonical_block_t block);
 
 /**
  * @brief Set if a block should be part of the bundle.
@@ -445,6 +457,17 @@ BPLib_Status_t bplib_channel_set_state(uint32_t channel, BPLib_NC_ApplicationSta
  * @return other bplib errors of the CLA state functions
  */
 BPLib_Status_t bplib_contact_set_state(uint32_t contact, BPLib_CLA_ContactRunState_t state);
+
+/**
+ * @brief Updates the local EID
+ *
+ * Note that DTN format EIDs are NOT supported, only IPN.
+ *
+ * @param eid_new The new local EID of the executing node
+ * @retval BPLIB_SUCCESS on success
+ * @retval BPLIB_INVALID_CONFIG_ERR if the EID is invalid. This includes DTN format EIDs.
+ */
+BPLib_Status_t bplib_config_set_local_eid(BPLib_EID_t* eid_new);
 
 #ifdef __cplusplus
 }
