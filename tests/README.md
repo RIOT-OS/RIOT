@@ -196,7 +196,8 @@ provides an interaction without adding extra text output or input handling.
 It can currently be expected to have unmodified line based interaction with the
 board.
 
-The expected behavior is verified with the test in `tests/build_system/test_tools`.
+The expected behavior is verified with the test in
+`tests/build_system/test_tools`.
 
 Tests cannot rely on having on all boards and terminal programs:
 * unbuffered input
