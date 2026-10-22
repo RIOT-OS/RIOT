@@ -28,7 +28,7 @@ etc.) was used, the binaries should match.
 
 Step-by-step:
 
-    $ cd <riot-checkout>/examples/bindist
+    $ cd <riot-checkout>/examples/advanced/bindist
     $ make all
     $ make bindist
     $ cd bindist
