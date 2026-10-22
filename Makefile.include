@@ -364,12 +364,13 @@ include $(RIOTMAKE)/boot/riotboot_dfu-util.mk
 
 # Include Board and CPU configuration
 INCLUDES += $(addprefix -I,$(wildcard $(BOARDDIR)/include))
-include $(BOARDDIR)/Makefile.include
 INCLUDES += -I$(RIOTCPU)/$(CPU)/include
-include $(RIOTCPU)/$(CPU)/Makefile.include
 
-# include global Makefile.include for `boards` modules
+# Include the Makefile.include for common boards after the individual board
+# but before the CPU Makefile.include.
+include $(BOARDDIR)/Makefile.include
 include $(RIOTBASE)/boards/Makefile.include
+include $(RIOTCPU)/$(CPU)/Makefile.include
 
 # Include common programmer logic if available
 -include $(RIOTMAKE)/tools/$(PROGRAMMER).inc.mk
