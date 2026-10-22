@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 # SPDX-FileCopyrightText: 2021 ML!PA Consulting GmbH
-# SPDX-License-Identifier: NONE
+# SPDX-License-Identifier: LGPL-2.1-only
 
 import sys
 import os
