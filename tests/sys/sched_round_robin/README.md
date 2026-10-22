@@ -14,7 +14,7 @@ Usage
 
 By default `sched_round_robin` is included:
 
-`make tests/sys_sched_round_robin flash term`
+`make tests/sys/sched_round_robin flash term`
 
 ```
 ...Board Initialisation...
@@ -35,7 +35,7 @@ unlock mutex
 It can be excluded from the build by setting the command-line argument `NORR=1`:
 
 
-`NORR=1 make tests/sys_sched_round_robin flash term`
+`NORR=1 make tests/sys/sched_round_robin flash term`
 
 ```
 ...Board Initialisation...
