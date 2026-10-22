@@ -80,6 +80,7 @@ export CCASEXFLAGS           # Additional flags that should be passed to CCAS.
 export AS                    # The assembler.
 export ASFLAGS               # Flags for the assembler.
 export LINK                  # The command used to link the files. Must take the same parameters as GCC, i.e. "ld" won't work.
+export LINKTEST              # A fully working minimal linker command compiling and linking to /dev/null to check if a given flag is supported, or if a given warning is produced.
 export NM                    # The command used to list symbols from objet files
 export RANLIB                # The command used to generate an index to the contents of an archive
 # LINKFLAGS                  # Flags to supply in the linking step.
