@@ -141,7 +141,7 @@ When using the `shell` module, `test_utils_interactive_sync` will use the shell
 itself to synchronize, and will not use `test_utils_interactive_sync();` function
 to synchronize. Some times you will want to synchronize before the start of the
 script and use `test_utils_interactive_sync();` function (e.g.:
-[tests/ps_schedstatistics](tests/ps_schedstatistics/main.c)). For these cases
+[tests/sys/ps_schedstatistics](sys/ps_schedstatistics/main.c)). For these cases
 you can disable `test_utils_interactive_sync_shell` module in the application
 `Makefile`: `DISABLE_MODULE += test_utils_interactive_sync_shell`.
 
@@ -196,7 +196,8 @@ provides an interaction without adding extra text output or input handling.
 It can currently be expected to have unmodified line based interaction with the
 board.
 
-The expected behavior is verified with the test in `tests/test_tools`.
+The expected behavior is verified with the test in
+`tests/build_system/test_tools`.
 
 Tests cannot rely on having on all boards and terminal programs:
 * unbuffered input
