@@ -2,10 +2,22 @@
  * SPDX-FileCopyrightText: 2026 Technische Universität Hamburg
  * SPDX-License-Identifier: LGPL-2.1-only
  */
+
+/**
+ * @ingroup     tests
+ * @{
+ *
+ * @file
+ * @brief       Tests UWB CLA of bplib
+ *
+ * @author      Simon Grund <mail@simongrund.de>
+ *
+ * @}
+ */
+
 #include "bplib_init.h"
 #include "bplib.h"
 #include "bplib_riot_nc.h"
-
 #include "bplib_cla_uwb.h"
 
 #include "fmt.h"

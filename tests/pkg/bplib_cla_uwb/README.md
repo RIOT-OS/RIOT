@@ -28,8 +28,7 @@ be selected using the `ROLE` flag, so either `make all ROLE=client` or
 `make all ROLE=server`.
 
 When both devices are running, bundles can be exchanged by using the `bp` shell
-command. Use `bp bench 0 ...` to test bundles of larger sizes and multiple
-ingressed at once.
+command.
 
 In this version no storage is used (`bplib_stor_void`) and bundles that cannot be
 delivered immediately will be dropped.

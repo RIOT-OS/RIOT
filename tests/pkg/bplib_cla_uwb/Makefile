@@ -27,7 +27,6 @@ ROLE ?= server
 
 ifeq (,$(filter client server,$(ROLE)))
   $(error Unknown ROLE for example '$(ROLE)'. Should be 'client' or 'server'.)
-  ROLE := server
 endif
 
 ifneq (,$(filter client,$(ROLE)))
