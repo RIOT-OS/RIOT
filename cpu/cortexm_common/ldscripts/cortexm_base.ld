@@ -44,6 +44,14 @@ MEMORY
     rom_aux  (rx)   : ORIGIN = _rom_start_addr + _slot_aux_offset, LENGTH = _slot_aux_len
 }
 
+PHDRS
+{
+    text PT_LOAD FLAGS(5);    /* R|X */
+    data PT_LOAD FLAGS(6);    /* R|W */
+    bss  PT_LOAD FLAGS(6);    /* R|W */
+    tls  PT_TLS  FLAGS(4);    /* R   */
+}
+
 /* Section Definitions */
 SECTIONS
 {
@@ -97,7 +105,7 @@ SECTIONS
 
         . = ALIGN(4);
         _efixed = .;            /* End of text section */
-    } > rom
+    } > rom :text
 
     /*
      * TLS relocations are offsets relative to the address
@@ -116,7 +124,7 @@ SECTIONS
          __tdata_start = .;
         *(.tdata .tdata.* .gnu.linkonce.td.*)
         __tdata_end = .;
-    } > rom
+    } > rom :text :tls
     __tdata_source = LOADADDR(.tdata);
     __tdata_size = SIZEOF(.tdata);
 
@@ -131,7 +139,7 @@ SECTIONS
         *(.tbss .tbss.* .gnu.linkonce.tb.*)
         *(.tcommon)
         __tbss_end = .;
-    } > rom
+    } > rom :tls
     __tls_size = __tbss_end - __tdata_start;
     __tbss_size = __tls_size - __tdata_size;
     PROVIDE( __tbss_offset = ADDR(.tbss) - ADDR(.tdata) );
@@ -152,7 +160,7 @@ SECTIONS
     .eh_frame :
     {
         KEEP (*(.eh_frame))
-    } > rom
+    } > rom :text
 
     . = ALIGN(4);
     _etext = .;
@@ -178,7 +186,7 @@ SECTIONS
         KEEP (*(.openocd .openocd.*))
         . = ALIGN(4);
         _erelocate = .;
-    } > ram AT> rom
+    } > ram AT> rom :data
 
     /* .bss section which is used for uninitialized data */
     .bss (NOLOAD) :
