@@ -30,6 +30,12 @@ This can be disabled with the `bplib_no_vfs` module.
 Also a CLA implementation (see below) should be used as well, otherwise only
 local message deliveries are possible.
 
+@note Whatever combination of VFS, CLA you choose, be aware that bplib needs a
+      lot of memory (because it is also not optimized for embedded use).
+      If your program crashes on sending or receiving, it is likely a stack
+      overflow. See the configuration options for the macros to change the stack
+      size of the generic worker threads and the CLA threads.
+
 ### Non automated things
 To ensure the bundle storage does not fill up infinitely, you want to also call
 `BPLib_STOR_GarbageCollect()` more or less regularly, or when the storage
@@ -83,10 +89,11 @@ CONFIG_BPLIB_STOR_BASE | File path prefix of the folder where the bundles will b
 CONFIG_BPLIB_EGRESS_CACHE_LEN | Number of bundle references stored in the caches / queues per channel and contact. Larger means the storage is searched less, at the price of more used memory. | `bplib_stor_vfs_*`
 CONFIG_BPLIB_STOR_MAX_DUPLICATE_CHECKS | Used to upper bound the linear search for a filename which is not yet used. This applies only for the ordered storage, so when DTN time is known there should not be many bundles with the same expiration timestamp. Max 255. | `bplib_stor_vfs_ordered`
 
-@note The configuration options of each CLA are not listed here can be found in
-their respective subdirectory.
+@note The configuration options of each CLA are not listed here, but can be found in
+      their respective subdirectory.
 
-Also the generic bplib config options from [bplib]/inc/bplib_cfg.h. These are
+In addition to these configuration options of the glue for RIOT, the usual bplib
+config options in [bplib]/inc/bplib_cfg.h also play a role. These are
 currently not prefixed by CONFIG_.
 
 The defaults, i.e. not using `bplib_include_nc_telemetry` and

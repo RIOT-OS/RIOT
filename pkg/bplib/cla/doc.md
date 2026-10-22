@@ -45,4 +45,4 @@ It uses a two byte control header but otherwise sends bundles directly after in
 802.15.4 frames. It also supports basic fragmentation of bundles larger than a
 single frame.
 
-@note This is an experimental implementation
+@note This is an experimental implementation!

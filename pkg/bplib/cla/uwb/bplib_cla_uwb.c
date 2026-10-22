@@ -120,7 +120,7 @@ static bplib_cla_uwb_t _cla;
 
 static inline bool _rx_enable(void)
 {
-    if (_cla.radio_state == STATE_TX || _cla.radio_state == STATE_TX_AWAITING_ACK) {
+    if ((_cla.radio_state == STATE_TX) || (_cla.radio_state == STATE_TX_AWAITING_ACK)) {
         return false;
     }
 
@@ -190,7 +190,7 @@ static tx_result_t _send_tx(uint8_t* buf, uint16_t len)
         }
         fragment_size = MIN(fragment_data_size, fragment_size_remaining);
 
-        /* Fill frame buffer once. Retransmissions DONT need this again. */
+        /* Fill frame buffer once. Retransmissions DON'T need this again. */
         dwt_writetxdata(hdr_len, mhr, 0);
         dwt_writetxdata(CLA_HEADER_LEN, cla_hdr, hdr_len);
         dwt_writetxdata(fragment_size, buf + fragment_offset, hdr_len + CLA_HEADER_LEN);

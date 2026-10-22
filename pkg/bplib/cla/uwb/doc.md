@@ -51,11 +51,11 @@ the physical size of the send and receive buffers.
 ### Potential issues
 
 - This design may lead to duplicate reception of fragments when the ACK is lost,
-since no fragment number is used. In most cases the CBOR will become invalid and
-no bundle is ingressed. Using CRCs for all bundle blocks is still recommended.
+  since no fragment number is used. In most cases the CBOR will become invalid and
+  no bundle is ingressed. Using CRCs for all bundle blocks is still recommended.
 
   Prefer reducing the bundles size itself (or increasing frame size), so that
-fragmentation is not needed.
+  fragmentation is not needed.
 
 ### Visual
 ```
@@ -80,16 +80,16 @@ fragmentation is not needed.
 
 - VRS: Version
 
-    Included because why not, maybe someone wants to use and update this
-    protocol in the future (and there are bits left).
-    Currently only 0 is valid here and corresponds to this document.
+  Included because why not, maybe someone wants to use and update this
+  protocol in the future (and there are bits left).
+  Currently only 0 is valid here and corresponds to this document.
 
 - FRG: Is Fragment
 
-    Set IFF the transmission is a fragment and requires reassmebly
+  Set IFF the transmission is a fragment and requires reassmebly
 
 - FED: Fragment End
 
-    Set to indicate the end of a fragmented transmission
+  Set to indicate the end of a fragmented transmission
 
 Bits not mentioned here are unused.

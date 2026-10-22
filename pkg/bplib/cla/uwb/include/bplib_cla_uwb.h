@@ -12,19 +12,25 @@
  *
  * ## Usage
  *
- * To use this, call bplib_cla_uwb_start(). The decadriver UWB module should
- * already be in a started state and decive configuration should already have
- * happened (with dwt_configure()). The other settings, like auto ACKs will be
- * enabled during the initialization of the CLA.
+ * To use this, first initialize the DW3000 and configure the transmission
+ * settings with dwt_configure().
+ * Then call bplib_cla_uwb_start(). Features like the auto ACKs will be enabled
+ * during the initialization of the CLA. During initialization NC tables will be
+ * read for the desination, which can be configured with the following functions:
  *
- * The remote short address will be taken from the @ref pkg_bplib_nc tables, so
- * bplib_contact_set_out_addr() needs to be configured before. The remote PAN is
- * set as the port. The local address and PAN is set with the corresponding
- * bplib_contact_set_in_addr() function.
+ * | UWB address component | Configuration function       | Encoding                         |
+ * | --------------------- | ---------------------------- | -------------------------------- |
+ * | Dest. Short Address   | bplib_contact_set_out_addr() | addr: hex, zero padded, 4 digits |
+ * | Dest. PAN             | bplib_contact_set_out_addr() | port: uint16_t                   |
+ * | Dest. Long Address    | Not Supported                | N/A                              |
+ * | Local Short Address   | bplib_contact_set_in_addr()  | addr: hex, zero padded, 4 digits |
+ * | Local PAN             | bplib_contact_set_in_addr()  | port: uint16_t                   |
+ * | Local Long Address    | Not Supported                | N/A                              |
+ *
  * Any incoming transmissions are accepted currently.
  *
  * The contact state is not managed by the CLA currently and needs to also be
- * set externally via BPLib_CLA_ContactStart() and related functions.
+ * set externally via bplib_contact_set_state().
  *
  * @{
  *
@@ -103,7 +109,7 @@ extern "C" {
  * Needs to be sufficiently large for the bplib egress processing
  */
 #ifndef BPLIB_CLA_UWB_TX_STACK_SIZE
-#  define BPLIB_CLA_UWB_TX_STACK_SIZE       (THREAD_STACKSIZE_MEDIUM)
+#  define BPLIB_CLA_UWB_TX_STACK_SIZE       (THREAD_STACKSIZE_LARGE)
 #endif
 
 /**
