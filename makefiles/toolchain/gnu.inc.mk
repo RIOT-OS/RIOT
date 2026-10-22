@@ -51,7 +51,7 @@ ifneq (,$(filter $(GCC_VERSION),12 13))
   CFLAGS += --param=min-pagesize=0
 endif
 
-# Provide a minimal standale compiler + linker invocation for testing flags
+# Provide a minimal standalone compiler + linker invocation for testing flags
 LINKTEST = LC_ALL=C $(LINK) $(RIOTTOOLS)/testprogs/minimal_linkable.c -o /dev/null -lc
 ifneq (,$(filter picolibc,$(FEATURES_USED)))
   LINKTEST += -specs=picolibc.specs
