@@ -19,5 +19,6 @@ FEATURES_PROVIDED += periph_freqm
 FEATURES_PROVIDED += periph_can
 
 # Put other features for this board (in alphabetical order)
+FEATURES_PROVIDED += emulator_renode
 FEATURES_PROVIDED += riotboot
 FEATURES_PROVIDED += tinyusb_device
