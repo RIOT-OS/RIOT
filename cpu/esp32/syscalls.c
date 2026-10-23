@@ -317,6 +317,7 @@ static rmutex_t s_shared_rmutex = RMUTEX_INIT;
 /* definition of locks required by the newlib if retargetable locking is used */
 extern struct __lock __attribute__((alias("s_shared_rmutex"))) __lock___sinit_recursive_mutex;
 extern struct __lock __attribute__((alias("s_shared_rmutex"))) __lock___sfp_recursive_mutex;
+__attribute__((used)) /* fixes linker errors when building with LTO */
 extern struct __lock __attribute__((alias("s_shared_rmutex"))) __lock___atexit_recursive_mutex;
 extern struct __lock __attribute__((alias("s_shared_rmutex"))) __lock___malloc_recursive_mutex;
 extern struct __lock __attribute__((alias("s_shared_rmutex"))) __lock___env_recursive_mutex;
