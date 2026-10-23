@@ -52,7 +52,7 @@ instance:
 - Build and run the `filesystem` example application on the `native` target:
 
 ```
-make -C examples/filesystem all term
+make -C examples/basic/filesystem all term
 [...]
 main(): This is RIOT! (Version: 2018.04-devel-/examples/filesystem)
 constfs mounted successfully
@@ -84,7 +84,7 @@ Hello RIOT!
 - Build and flash `filesystem` example application of the `nrf52840dk` target
 
 ```
-make BOARD=nrf52840dk -C examples/filesystem all flash
+make BOARD=nrf52840dk -C examples/basic/filesystem all flash
 [...]
 ```
 

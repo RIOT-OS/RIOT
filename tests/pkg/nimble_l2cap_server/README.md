@@ -3,7 +3,7 @@
 This application acts as a L2CAP echo server for testing and benchmarking raw
 L2CAP connection oriented channel (COC) connections using NimBLE on RIOT. This
 server application works in conjunction with the `nimble_l2cap` client test
-application in `tests/nimble_l2cap`.
+application in `tests/pkg/nimble_l2cap`.
 
 Next to the actual L2CAP server implementation, this folder also holds some
 shared configuration for both the server and the client test applications.
