@@ -9,4 +9,7 @@ endif
 
 USEPKG += picosdk
 
+# peripheral drivers shared with the RP2350
+USEMODULE += rpx0xx_periph_common
+
 include $(RIOTCPU)/cortexm_common/Makefile.dep
