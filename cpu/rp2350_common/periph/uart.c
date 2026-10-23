@@ -16,10 +16,9 @@
 
 #include "board.h"
 #include "compat_layer.h"
-#include "periph_cpu.h"
-
-#include "regs/uart.h"
 #include "periph/uart.h"
+#include "periph_cpu.h"
+#include "regs/uart.h"
 
 #define ENABLE_DEBUG 0
 #include "debug.h"
@@ -76,8 +75,8 @@ int uart_mode(uart_t uart, uart_data_bits_t data_bits, uart_parity_t parity,
     UART0_Type *dev = uart_config[uart].dev;
 
     /* Disable the UART before changing the mode */
-    atomic_clear(&dev->UARTCR, UART_UARTCR_UARTEN_BITS | UART_UARTCR_RXE_BITS |
-                                   UART_UARTCR_TXE_BITS | 1 << 7);
+    atomic_clear(&dev->UARTCR,
+                 UART_UARTCR_UARTEN_BITS | UART_UARTCR_RXE_BITS | UART_UARTCR_TXE_BITS | 1 << 7);
 
     /* Beware of strange hardware bug: If the configuration bitmask is prepared in register and
      * transferred with a single 32 bit write (updating both parity and number of data bits at the
@@ -105,8 +104,7 @@ int uart_mode(uart_t uart, uart_data_bits_t data_bits, uart_parity_t parity,
         return UART_NOMODE;
     }
 
-    atomic_set(&dev->UARTCR, UART_UARTCR_TXE_BITS | UART_UARTCR_RXE_BITS |
-                             UART_UARTCR_UARTEN_BITS);
+    atomic_set(&dev->UARTCR, UART_UARTCR_TXE_BITS | UART_UARTCR_RXE_BITS | UART_UARTCR_UARTEN_BITS);
 
     return UART_OK;
 }
@@ -138,17 +136,12 @@ void uart_init_pins(uart_t uart)
     *calculate_gpio_io_ctrl_register_addr(uart_config[uart].tx_pin) = FUNCTION_SELECT_UART;
     *calculate_gpio_io_ctrl_register_addr(uart_config[uart].rx_pin) = FUNCTION_SELECT_UART;
     /* Clear the ISO bits */
-    atomic_clear(
-        calculate_gpio_pad_register_addr(uart_config[uart].tx_pin),
-        PADS_BANK0_ISO_BITS);
-    atomic_clear(
-        calculate_gpio_pad_register_addr(uart_config[uart].rx_pin),
-        PADS_BANK0_ISO_BITS);
+    atomic_clear(calculate_gpio_pad_register_addr(uart_config[uart].tx_pin), PADS_BANK0_ISO_BITS);
+    atomic_clear(calculate_gpio_pad_register_addr(uart_config[uart].rx_pin), PADS_BANK0_ISO_BITS);
 
     /* Set Input Enable Flag */
-    atomic_set(
-        calculate_gpio_pad_register_addr(uart_config[uart].rx_pin),
-        PADS_BANK0_GPIO0_IE_BITS);
+    atomic_set(calculate_gpio_pad_register_addr(uart_config[uart].rx_pin),
+               PADS_BANK0_GPIO0_IE_BITS);
 }
 
 int uart_init(uart_t uart, uint32_t baud, uart_rx_cb_t rx_cb, void *arg)
@@ -190,7 +183,7 @@ void uart_write(uart_t uart, const uint8_t *data, size_t len)
     for (size_t i = 0; i < len; i++) {
         dev->UARTDR = data[i];
         /* Wait until the TX FIFO is empty before sending the next byte */
-        while (!(dev->UARTRIS & UART0_UARTRIS_TXRIS_Msk)) { }
+        while (!(dev->UARTRIS & UART0_UARTRIS_TXRIS_Msk)) {}
     }
 }
 

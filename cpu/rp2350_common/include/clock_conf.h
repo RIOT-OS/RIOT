@@ -17,6 +17,7 @@
  */
 
 #include <stdint.h>
+
 #include "macros/units.h"
 
 /** 1-15 MHz range
@@ -95,7 +96,7 @@
 #define CLOCK_CORECLOCK MHZ(12u)
 
 #if (PLL_VCO_FEEDBACK_SCALE_MIN < PLL_VCO_FEEDBACK_SCALE_MIN) || \
-(PLL_VCO_FEEDBACK_SCALE_MAX > PLL_VCO_FEEDBACK_SCALE_MAX)
+    (PLL_VCO_FEEDBACK_SCALE_MAX > PLL_VCO_FEEDBACK_SCALE_MAX)
 #  error "Value for PLL_VCO_FEEDBACK_SCALE out of range, check config"
 #endif
 #if (PLL_REF_DIV_MIN < PLL_REF_DIV_MIN) || (PLL_REF_DIV_MAX > PLL_REF_DIV_MAX)
@@ -111,7 +112,7 @@
 /** Post divider for the PLL, calculated based on the post divider values */
 #define PDIV ((PLL_PD1 << PLL_PRIM_POSTDIV1_LSB) | (PLL_PD2 << PLL_PRIM_POSTDIV2_LSB))
 /** Feedback divider for the PLL, calculated based on the VCO frequency and
-* reference clock frequency */
+ * reference clock frequency */
 #define FBDIV ((PLL_VCO_FREQ / XOSC_HZ) / PLL_REF_DIV)
 
 #ifdef __cplusplus

@@ -14,13 +14,12 @@
  * @author          Tom Hert <git@annsann.eu>
  */
 
-#include "periph/gpio.h"
-
-#include "gpio_conf.h"
 #include <errno.h>
 
 #include "board.h"
+#include "gpio_conf.h"
 #include "irq.h"
+#include "periph/gpio.h"
 #include "periph_conf.h"
 #include "periph_cpu.h"
 
@@ -39,19 +38,16 @@ int gpio_init(gpio_t pin, gpio_mode_t mode)
 
     switch (mode) {
     case GPIO_OUT:
-        *calculate_gpio_io_ctrl_register_addr(pin) =
-            FUNCTION_SELECT_SIO;
+        *calculate_gpio_io_ctrl_register_addr(pin) = FUNCTION_SELECT_SIO;
         break;
 
     case GPIO_PIO0:
         /* Set the pin function to PIO0 */
-        *calculate_gpio_io_ctrl_register_addr(pin) =
-            FUNCTION_SELECT_PIO0;
+        *calculate_gpio_io_ctrl_register_addr(pin) = FUNCTION_SELECT_PIO0;
         break;
     case GPIO_PIO1:
         /* Set the pin function to PIO1 */
-        *calculate_gpio_io_ctrl_register_addr(pin) =
-            FUNCTION_SELECT_PIO1;
+        *calculate_gpio_io_ctrl_register_addr(pin) = FUNCTION_SELECT_PIO1;
         break;
     default:
         /* Unsupported mode */

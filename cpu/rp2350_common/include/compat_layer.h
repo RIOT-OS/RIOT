@@ -16,18 +16,19 @@
  * @author          Tom Hert <git@annsann.eu>
  */
 
-#include "periph_cpu.h"
 #include <stdint.h>
 
+#include "periph_cpu.h"
+
 #ifdef RP2350_USE_RISCV
-#   include "xh3irq.h"
-    /** See RP2350 Datasheet 3.8.6.3.1 */
-#   define __h3_block() __asm__("slt x0, x0, x0")
-    /** See RP2350 Datasheet 3.8.6.3.2 */
-#   define __h3_unblock() __asm__("slt x0, x0, x1")
+#  include "xh3irq.h"
+/** See RP2350 Datasheet 3.8.6.3.1 */
+#  define __h3_block() __asm__("slt x0, x0, x0")
+/** See RP2350 Datasheet 3.8.6.3.2 */
+#  define __h3_unblock() __asm__("slt x0, x0, x1")
 #else
-    /** Defined in the linker script */
-    extern uint32_t _isr_vectors;
+/** Defined in the linker script */
+extern uint32_t _isr_vectors;
 #endif
 
 #ifdef __cplusplus
@@ -110,10 +111,10 @@ static inline void rp_unblock_core(void)
  * @brief   Get a pointer to the CPU specific interrupt vector table
  * @return  Pointer to the CPU specific interrupt vector table
  */
-static inline uint32_t* rp_get_vector_poiner(void)
+static inline uint32_t *rp_get_vector_poiner(void)
 {
 #ifdef RP2350_USE_RISCV
-    return (uint32_t*)vector_cpu;
+    return (uint32_t *)vector_cpu;
 #else
     return &_isr_vectors;
 #endif
