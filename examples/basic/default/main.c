@@ -27,8 +27,6 @@
 
 #include "shell.h"
 
-#include "/usr/lib/gcc/arm-none-eabi/16.2.0/include/stdint.h"
-
 #include "net/gnrc/pktdump.h"
 #include "net/gnrc.h"
 
