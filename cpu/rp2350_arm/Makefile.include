@@ -10,9 +10,7 @@ LINKFLAGS += -Wl,--start-group -lc -lm -Wl,--end-group
 
 # Vector table configuration
 VECTORS_O       ?= $(BINDIR)/cpu/vectors.o
-VECTORS_FILE    := $(RIOTCPU)/rp2350_common/vectors.c
-
-include $(RIOTCPU)/rp2350_common/Makefile.include
+VECTORS_FILE    := $(RIOTCPU)/common/rp2350/vectors.c
 
 # Include the base Cortex-M makefile
 include $(RIOTMAKE)/arch/cortexm.inc.mk
