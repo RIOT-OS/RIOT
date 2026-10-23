@@ -9,7 +9,10 @@
 
 @warning    This module has **NO GUARANTEES** regarding to robustness against
             side channel attacks (such as differential power analysis or timing
-            attacks).
+            attacks). You might want to check the @ref sys_psa_crypto which,
+            on supported platforms, will expose available hardware AES
+            implementation that usually are optimized to be robust against
+            side channel attacks.
 
 @note       This module is implemented in portable C code. The C standard is
             defined in terms of an abstract machine, which does not model
