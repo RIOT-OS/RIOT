@@ -101,11 +101,11 @@ import logging
 import argparse
 import subprocess
 import collections
+import time
 
 try:
     import junit_xml
     import io
-    import time
 except ImportError:
     junit_xml = None
 
@@ -116,6 +116,7 @@ LOG_HANDLER.setFormatter(logging.Formatter(logging.BASIC_FORMAT))
 LOG_LEVELS = ("debug", "info", "warning", "error", "fatal", "critical")
 
 MAKE = os.environ.get("MAKE", "make")
+RERUN_DELAY = os.environ.get("RERUN_DELAY", 5)
 
 
 class ErrorInTest(Exception):
@@ -394,6 +395,7 @@ class RIOTApplication:
         jobs=False,
         with_test_only=False,
         only_if_changed=False,
+        test_reruns=0,
     ):
         # pylint:disable=too-many-arguments
         # pylint:disable=too-many-positional-arguments
@@ -476,7 +478,11 @@ class RIOTApplication:
                         self._make_handle_error(self.TEST_INPUT_HASH[0], err)
                 setuptasks = collections.OrderedDict([("flash", self.FLASH_TARGETS)])
                 self.make_with_outfile(
-                    "test", self.TEST_TARGETS, save_output=True, setuptasks=setuptasks
+                    "test",
+                    self.TEST_TARGETS,
+                    save_output=True,
+                    setuptasks=setuptasks,
+                    reruns=test_reruns,
                 )
                 if clean_after:
                     self.clean()
@@ -513,7 +519,14 @@ class RIOTApplication:
             raise err
         return out
 
-    def make_with_outfile(self, name, args, save_output=False, setuptasks=None):
+    def make_with_outfile(
+        self,
+        name,
+        args,
+        save_output=False,
+        setuptasks=None,
+        reruns=0,
+    ):
         """
         Run make but save result in an outfile.
 
@@ -538,21 +551,24 @@ class RIOTApplication:
         for taskname, taskargs in setuptasks.items():
             taskname = f"{name}.{taskname}"
             self.logger.info("Run %s", taskname)
-            try:
-                self.make(taskargs)
-            except subprocess.CalledProcessError as err:
-                self._make_handle_error(taskname, err)
+            for rerun in range(reruns + 1):
+                try:
+                    self.make(taskargs)
+                except subprocess.CalledProcessError as err:
+                    self._make_handle_rerun_error(taskname, err, rerun, reruns)
 
         # Run make command
-        try:
-            output = self.make(args)
-            if not save_output:
-                output = ""
-            if self.testcase:
-                self.testcase.stdout += output + "\n"
-            self._write_resultfile(name, "success", output)
-        except subprocess.CalledProcessError as err:
-            self._make_handle_error(name, err)
+        for rerun in range(reruns + 1):
+            try:
+                output = self.make(args)
+                if not save_output:
+                    output = ""
+                if self.testcase:
+                    self.testcase.stdout += output + "\n"
+                self._write_resultfile(name, "success", output, remove=(rerun == 0))
+                break
+            except subprocess.CalledProcessError as err:
+                self._make_handle_rerun_error(name, err, rerun, reruns)
 
     def _make_get_previous_output(self, name):
         """
@@ -568,12 +584,28 @@ class RIOTApplication:
             pass
         return None
 
-    def _make_handle_error(self, name, err):
+    def _make_handle_rerun_error(self, name, err, rerun, total_reruns):
+        try:
+            self._make_handle_error(name, err, rerun=rerun)
+        except ErrorInTest as err:
+            if rerun < total_reruns:
+                self.logger.error("Failed during: %s", err)
+                self.logger.info("Rerun %d of %s", rerun + 1, name)
+                time.sleep(RERUN_DELAY)
+            else:
+                raise
+
+    def _make_handle_error(self, name, err, rerun=0):
         """Handle exception during make step `name`."""
         output = " ".join(err.cmd) + "\n"
         output += err.output + "\n"
         output += f"Return value: {err.returncode}\n"
-        outfile = self._write_resultfile(name, "failed", output)
+        outfile = self._write_resultfile(
+            name,
+            "failed" if rerun == 0 else f"failed_rerun{rerun}",
+            output,
+            remove=(rerun == 0)
+        )
 
         self.logger.warning(output)
         self.logger.error("Error during %s, writing to %s", name, outfile)
@@ -585,19 +617,20 @@ class RIOTApplication:
                 self.testcase.add_error_info(f"{err.cmd} had an error", err.output)
         raise ErrorInTest(name, self, outfile)
 
-    def _write_resultfile(self, name, status, body=""):
+    def _write_resultfile(self, name, status, body="", remove=True):
         """
         Write `body` to result file `name.status`.
 
         It also deletes other `name.*` files before.
         """
-        # Delete previous status files
-        resultfiles = glob.glob(self._outfile(f"{name}.*"))
-        for resultfile in resultfiles:
-            try:
-                os.remove(resultfile)
-            except OSError:
-                pass
+        if remove:
+            # Delete previous status files
+            resultfiles = glob.glob(self._outfile(f"{name}.*"))
+            for resultfile in resultfiles:
+                try:
+                    os.remove(resultfile)
+                except OSError:
+                    pass
 
         # Create new file
         filename = f"{name}.{status}"
@@ -782,6 +815,13 @@ PARSER.add_argument(
     help="List of make targets to know if a test is present",
 )
 PARSER.add_argument(
+    "--test-reruns",
+    "-r",
+    type=int,
+    default=0,
+    help="Number of reruns in case a test or flashing fails",
+)
+PARSER.add_argument(
     "--report-xml",
     action="store_true",
     default=False,
@@ -861,6 +901,7 @@ def main(args):
             jobs=args.jobs,
             with_test_only=args.with_test_only,
             only_if_changed=args.only_if_changed,
+            test_reruns=args.test_reruns,
         )
         for app in applications
     ]
