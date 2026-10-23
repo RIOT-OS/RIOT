@@ -41,10 +41,20 @@ The network must provide a DHCPv6 server that supports prefix delegation (IA_PD)
 Use `WIFI_SSID="SSID" WIFI_PASS="password"` in your `make` command to set your WiFi's
 credentials. You can alternatively edit the `Makefile`.
 
-Currently, `wifi` requires an esp8266, esp32, esp32s2, esp32s3, esp32c3 or esp32c6
-for the border router and will default to using `esp_now` for the downlink interface.
+Currently, `wifi` requires an esp8266, esp32, esp32s2, esp32s3, esp32c3 or
+esp32c6 for the border router and will default to using `esp_now` for the downlink
+interface.
 Note: The channel used for the `esp_now` downlink must be the same as the channel
 used for the `wifi` uplink. Use `ESP_NOW_CHANNEL` in `CFLAGS` to define it.
+
+On ESP32-C6, the integrated IEEE 802.15.4 radio can be used as
+downlink interface instead of `esp_now` by setting `DOWNLINK=ieee802154`, for
+example:
+
+    BOARD=esp32c6-devkit UPLINK=wifi DOWNLINK=ieee802154 \
+    WIFI_SSID="SSID" WIFI_PASS="password" make -C examples/networking/gnrc/border_router flash term
+
+The WiFi uplink and the IEEE 802.15.4 downlink then share the radio of the SoC.
 
 ### Connection sharing with host
 

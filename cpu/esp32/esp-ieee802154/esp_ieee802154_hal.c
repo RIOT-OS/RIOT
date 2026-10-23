@@ -7,8 +7,11 @@
 
 #include "esp_ieee802154_hal.h"
 #include "iolist.h"
+#include "irq.h"
 #include "log.h"
 #include "net/ieee802154/radio.h"
+#include "sdkconfig.h"
+#include "ztimer.h"
 
 #define ENABLE_DEBUG 0
 #include "debug.h"
@@ -29,15 +32,42 @@ _Static_assert((3456 % 16 == 0), "ACK frame timeout should be a multiple of 16")
 #define _USE_SET_RX     1
 #define _USE_SET_IDLE   1
 
+/* Timeout in microseconds after which a transmission is considered as failed
+ * if the ESP-IDF driver did not report its completion. This may happen, for
+ * example, if the coexistence with WiFi or BLE does not grant the radio. */
+#ifndef ESP_IEEE802154_TX_TIMEOUT_US
+#define ESP_IEEE802154_TX_TIMEOUT_US    (100U * US_PER_MS)
+#endif
+
+/* Number of received frames that can be pending for the upper layer. The
+ * ESP-IDF driver keeps each frame in one of its RX buffers until the frame
+ * is released by `esp_ieee802154_receive_handle_done`. */
+#define _RX_QUEUE_SIZE  (CONFIG_IEEE802154_RX_BUFFER_SIZE)
+
 static const ieee802154_radio_ops_t esp_ieee802154_driver;
 static ieee802154_dev_t *esp_ieee802154_dev;
 
 static uint8_t  _tx_frame[IEEE802154_FRAME_LEN_MAX + 1]; /* additional byte 0 is used for length */
-static uint8_t *_rx_frame;
 static const uint8_t *_ack_frame;
 
-static esp_ieee802154_frame_info_t *_rx_frame_info;
 static esp_ieee802154_frame_info_t *_ack_frame_info;
+
+/*
+ * Queue of received frames that were not yet read by the upper layer. Since
+ * the RX_DONE indication is only a flag in the SubMAC, multiple received
+ * frames would otherwise be reported only once, and the RX buffers of
+ * frames that are never read would never be released. Once all RX buffers
+ * of the ESP-IDF driver are in use, it drops all received frames.
+ */
+static struct {
+    uint8_t *frame;
+    esp_ieee802154_frame_info_t *info;
+} _rx_queue[_RX_QUEUE_SIZE];
+static unsigned _rx_queue_head;
+static unsigned _rx_queue_num;
+
+static volatile bool _tx_pending;   /* transmission in progress */
+static ztimer_t _tx_timer;
 
 static bool _channel_clear;
 
@@ -75,7 +105,12 @@ static int _len(ieee802154_dev_t *dev)
 {
     (void)dev;
     DEBUG("[esp_ieee802154] %s\n", __func__);
-    return _rx_frame[0] - IEEE802154_FCS_LEN;
+
+    unsigned state = irq_disable();
+    uint8_t *frame = _rx_queue_num ? _rx_queue[_rx_queue_head].frame : NULL;
+    irq_restore(state);
+
+    return frame ? (frame[0] - IEEE802154_FCS_LEN) : 0;
 }
 
 static int _read(ieee802154_dev_t *dev, void *buf, size_t size, ieee802154_rx_info_t *info)
@@ -85,7 +120,17 @@ static int _read(ieee802154_dev_t *dev, void *buf, size_t size, ieee802154_rx_in
     DEBUG("[esp_ieee802154] %s: buf=%p size=%u info=%p\n",
           __func__, buf, size, info);
 
-    unsigned len = _rx_frame[0] - IEEE802154_FCS_LEN;
+    unsigned state = irq_disable();
+    if (_rx_queue_num == 0) {
+        irq_restore(state);
+        DEBUG("[esp_ieee802154] %s: no frame pending\n", __func__);
+        return 0;
+    }
+    uint8_t *frame = _rx_queue[_rx_queue_head].frame;
+    esp_ieee802154_frame_info_t *frame_info = _rx_queue[_rx_queue_head].info;
+    irq_restore(state);
+
+    unsigned len = frame[0] - IEEE802154_FCS_LEN;
     int res = 0;
 
     if (size < len) {
@@ -96,16 +141,44 @@ static int _read(ieee802154_dev_t *dev, void *buf, size_t size, ieee802154_rx_in
     else if (buf) {
         DEBUG("[esp_ieee802154] %s: read packet of length %d\n", __func__, len);
         if (info) {
-            info->rssi = ieee802154_dbm_to_rssi(_rx_frame_info->rssi);
-            info->lqi = _rx_frame_info->lqi;
+            info->rssi = ieee802154_dbm_to_rssi(frame_info->rssi);
+            info->lqi = frame_info->lqi;
         }
-        memcpy(buf, &_rx_frame[1], len);
+        memcpy(buf, &frame[1], len);
         res = len;
     }
 
-    esp_ieee802154_receive_handle_done(_rx_frame);
+    esp_ieee802154_receive_handle_done(frame);
+
+    state = irq_disable();
+    _rx_queue_head = (_rx_queue_head + 1) % _RX_QUEUE_SIZE;
+    _rx_queue_num--;
+    bool more = _rx_queue_num > 0;
+    irq_restore(state);
+
+    if (more) {
+        /* indicate the next pending frame */
+        esp_ieee802154_dev->cb(esp_ieee802154_dev, IEEE802154_RADIO_INDICATION_RX_DONE);
+    }
 
     return res;
+}
+
+static void _tx_timeout(void *arg)
+{
+    (void)arg;
+
+    if (!_tx_pending) {
+        return;
+    }
+
+    LOG_WARNING("[esp_ieee802154] TX timeout in state %d, transmission aborted\n",
+                esp_ieee802154_get_state());
+
+    _tx_pending = false;
+    _tx_error = ESP_IEEE802154_TX_ERR_ABORT;
+
+    esp_ieee802154_dev->cb(esp_ieee802154_dev, IEEE802154_RADIO_CONFIRM_TX_DONE);
 }
 
 static int _off(ieee802154_dev_t *dev)
@@ -142,7 +215,14 @@ static int _request_op(ieee802154_dev_t *dev, ieee802154_hal_op_t op, void *ctx)
         _tx_error = ESP_IEEE802154_TX_ERR_NONE;
         _ack_frame = NULL;
         _ack_frame_info = NULL;
-        return esp_ieee802154_transmit(_tx_frame, true) ? -EIO : 0;
+        _tx_pending = true;
+        ztimer_set(ZTIMER_USEC, &_tx_timer, ESP_IEEE802154_TX_TIMEOUT_US);
+        if (esp_ieee802154_transmit(_tx_frame, true)) {
+            ztimer_remove(ZTIMER_USEC, &_tx_timer);
+            _tx_pending = false;
+            return -EIO;
+        }
+        return 0;
     case IEEE802154_HAL_OP_SET_RX:
         DEBUG("[esp_ieee802154] %s: IEEE802154_HAL_OP_SET_RX\n", __func__);
         return (IS_ACTIVE(_USE_SET_RX) && esp_ieee802154_receive()) ? -EIO : 0;
@@ -184,13 +264,25 @@ static int _confirm_op(ieee802154_dev_t *dev, ieee802154_hal_op_t op, void *ctx)
                 info->status = TX_STATUS_MEDIUM_BUSY;
                 break;
             case ESP_IEEE802154_TX_ERR_NO_ACK:
+            case ESP_IEEE802154_TX_ERR_INVALID_ACK:
                 info->status = TX_STATUS_NO_ACK;
                 break;
             default:
+                /* ESP_IEEE802154_TX_ERR_ABORT, ESP_IEEE802154_TX_ERR_COEXIST,
+                 * ...: the frame was not sent, the upper layer may retry */
+                info->status = TX_STATUS_MEDIUM_BUSY;
                 break;
             }
         }
-        esp_ieee802154_receive_handle_done(_ack_frame);
+        if (_ack_frame) {
+            esp_ieee802154_receive_handle_done(_ack_frame);
+            _ack_frame = NULL;
+        }
+        if (_tx_error == ESP_IEEE802154_TX_ERR_ABORT) {
+            /* bring the radio back to receive state after an aborted
+             * transmission */
+            esp_ieee802154_receive();
+        }
         return 0;
     case IEEE802154_HAL_OP_SET_RX:
         DEBUG("[esp_ieee802154] %s: IEEE802154_HAL_OP_SET_RX\n", __func__);
@@ -366,10 +458,25 @@ void esp_ieee802154_receive_done(uint8_t *frame, esp_ieee802154_frame_info_t *fr
     DEBUG("[esp_ieee802154] %s: frame=%p frame_info=%p\n",
           __func__, frame, frame_info);
 
-    _rx_frame = frame;
-    _rx_frame_info = frame_info;
+    unsigned state = irq_disable();
+    if (_rx_queue_num == _RX_QUEUE_SIZE) {
+        irq_restore(state);
+        /* should not happen since the queue is as large as the number of
+         * RX buffers, drop the frame to release its RX buffer */
+        esp_ieee802154_receive_handle_done(frame);
+        return;
+    }
+    unsigned tail = (_rx_queue_head + _rx_queue_num) % _RX_QUEUE_SIZE;
+    _rx_queue[tail].frame = frame;
+    _rx_queue[tail].info = frame_info;
+    bool first = (_rx_queue_num++ == 0);
+    irq_restore(state);
 
-    esp_ieee802154_dev->cb(esp_ieee802154_dev, IEEE802154_RADIO_INDICATION_RX_DONE);
+    /* RX_DONE is indicated for the first pending frame, further frames are
+     * indicated one after the other when the previous one has been read */
+    if (first) {
+        esp_ieee802154_dev->cb(esp_ieee802154_dev, IEEE802154_RADIO_INDICATION_RX_DONE);
+    }
 }
 
 void esp_ieee802154_transmit_sfd_done(uint8_t *frame)
@@ -386,6 +493,16 @@ void esp_ieee802154_transmit_done(const uint8_t *frame, const uint8_t *ack,
     DEBUG("[esp_ieee802154] %s: frame=%p ack_frame=%p ack_frame_info=%p\n",
           __func__, frame, ack, ack_frame_info);
 
+    if (!_tx_pending) {
+        /* late completion of an already aborted transmission */
+        if (ack) {
+            esp_ieee802154_receive_handle_done(ack);
+        }
+        return;
+    }
+    _tx_pending = false;
+    ztimer_remove(ZTIMER_USEC, &_tx_timer);
+
     _ack_frame = ack;
     _ack_frame_info = ack_frame_info;
 
@@ -395,6 +512,13 @@ void esp_ieee802154_transmit_done(const uint8_t *frame, const uint8_t *ack,
 void esp_ieee802154_transmit_failed(const uint8_t *frame, esp_ieee802154_tx_error_t error)
 {
     DEBUG("[esp_ieee802154] %s: frame=%p error=%u\n", __func__, frame, error);
+
+    if (!_tx_pending) {
+        /* late completion of an already aborted transmission */
+        return;
+    }
+    _tx_pending = false;
+    ztimer_remove(ZTIMER_USEC, &_tx_timer);
 
     _tx_error = error;
 
@@ -414,6 +538,9 @@ void esp_ieee802154_setup(ieee802154_dev_t *dev)
 
     dev->driver = &esp_ieee802154_driver;
     esp_ieee802154_dev = dev;
+
+    _tx_timer.callback = _tx_timeout;
+    _tx_timer.arg = NULL;
 }
 
 int esp_ieee802154_init(void)
