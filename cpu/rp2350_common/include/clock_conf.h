@@ -91,6 +91,17 @@
 /** Selected field value for the system clock control register
  * to select the peripheral clock */
 #define CLK_SYS_SELECTED_PERI_FIELD_VALUE 2u
+/** SRC field value of the reference clock control register that selects the
+ * crystal oscillator */
+#define CLK_REF_CTRL_SRC_XOSC_VALUE 2u
+/** Selected field value of the reference clock, one decoded bit per source
+ * just like CLK_SYS_SELECTED */
+#define CLK_REF_SELECTED_XOSC_FIELD_VALUE (1u << CLK_REF_CTRL_SRC_XOSC_VALUE)
+/** LSB of the integer divider in the reference clock divider register */
+#define CLK_REF_DIV_INT_LSB 16u
+/** Integer divider for the reference clock, the tick generators expects an
+ * undivided crystal */
+#define CLK_REF_DIV_INT_VALUE 1u
 /** RIOT core clock frequency defined as the CPU frequency */
 #define CLOCK_CORECLOCK MHZ(12u)
 
