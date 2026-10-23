@@ -1,0 +1,19 @@
+# Memory layout of the NOEL-ARTYA7 example designs: 256 MB of SDRAM mapped at
+# the start of the address space. Code and rodata go into DDR (loaded by GRMON
+# via JTAG)
+ROM_START_ADDR = 0x00000000
+ROM_LEN        = 0x00800000    # 8 MB for code
+RAM_START_ADDR = 0x00800000
+RAM_LEN        = 0x0F800000    # 248 MB for data/stack/heap
+
+# GRMON4 is used for flashing and debugging via JTAG
+# grmon loads ELF files directly, no conversion needed
+PROGRAMMER ?= grmon
+FLASHFILE  ?= $(ELFFILE)
+
+# Tell RIOT's build system the load address
+FLASH_ADDR = $(ROM_START_ADDR)
+
+# The on-board FT2232HQ exposes JTAG on the first USB serial interface and
+# the UART console on the second one
+PORT_LINUX ?= /dev/ttyUSB1
