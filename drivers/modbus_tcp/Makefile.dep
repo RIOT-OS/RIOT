@@ -1,0 +1,2 @@
+USEMODULE += modbus
+USEMODULE += sock_tcp
