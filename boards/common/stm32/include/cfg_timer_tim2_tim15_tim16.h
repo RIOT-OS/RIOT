@@ -28,10 +28,14 @@ extern "C" {
  * @name   Timer configuration
  * @{
  */
+#define TIMER_0_MAX_VALUE     (0xffffffff) /**< max value */
+#define TIMER_1_MAX_VALUE     (0x0000ffff) /**< max value */
+#define TIMER_2_MAX_VALUE     (0x0000ffff) /**< max value */
+
 static const timer_conf_t timer_config[] = {
     {
         .dev            = TIM2,
-        .max            = 0xffffffff,
+        .max            = TIMER_0_MAX_VALUE,
 #if defined(RCC_APB1ENR_TIM2EN)
         .rcc_mask       = RCC_APB1ENR_TIM2EN,
 #else
@@ -42,7 +46,7 @@ static const timer_conf_t timer_config[] = {
     },
     {
         .dev            = TIM15,
-        .max            = 0x0000ffff,
+        .max            = TIMER_1_MAX_VALUE,
         .rcc_mask       = RCC_APB2ENR_TIM15EN,
         .bus            = APB2,
         .irqn           = TIM1_BRK_TIM15_IRQn,
@@ -50,7 +54,7 @@ static const timer_conf_t timer_config[] = {
     },
     {
         .dev            = TIM16,
-        .max            = 0x0000ffff,
+        .max            = TIMER_2_MAX_VALUE,
         .rcc_mask       = RCC_APB2ENR_TIM16EN,
         .bus            = APB2,
         .irqn           = TIM1_UP_TIM16_IRQn,
