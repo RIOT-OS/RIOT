@@ -227,7 +227,6 @@ bool irq_is_enabled(void)
 
 bool irq_is_in(void)
 {
-    DEBUG_IRQ("irq_is_in: %i\n", _native_in_isr);
     return _native_in_isr;
 }
 

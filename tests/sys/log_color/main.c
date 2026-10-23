@@ -13,7 +13,11 @@
 
 #include <inttypes.h>
 
+#define LOG_UNIT "this.test"
 #include "log.h"
+
+#define ENABLE_DEBUG 0
+#include "debug.h"
 
 #define format "Logging value '%d' and string '%s'\n"
 
@@ -26,6 +30,7 @@ int main(void)
     LOG_WARNING(format, value, string);
     LOG_INFO(format, value, string);
     LOG_DEBUG(format, value, string);
+    DEBUG(format, value, string);
 
     return 0;
 }
