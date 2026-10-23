@@ -7,8 +7,10 @@
 
 #include "esp_ieee802154_hal.h"
 #include "iolist.h"
+#include "irq.h"
 #include "log.h"
 #include "net/ieee802154/radio.h"
+#include "ztimer.h"
 
 #define ENABLE_DEBUG 0
 #include "debug.h"
@@ -29,11 +31,29 @@ _Static_assert((3456 % 16 == 0), "ACK frame timeout should be a multiple of 16")
 #define _USE_SET_RX     1
 #define _USE_SET_IDLE   1
 
+/*
+ * Timeout in microseconds after which a transmission is aborted if the
+ * ESP-IDF driver did not report its completion at all.
+ *
+ * This is only a safety net against a driver that never completes a
+ * transmission, in which case the upper layer would wait forever for the
+ * TX_DONE confirmation and the interface would stop sending. It is not meant
+ * to treat long waiting times as failure:
+ * Interruptions by the coexistence with WiFi or BLE are reported by the
+ * ESP-IDF driver itself, but waiting for the radio to be granted, e.g. during
+ * a WiFi scan, can take a long time. The timeout therefore has to be much
+ * larger than such waiting times and than the 200 ms software timeout that
+ * the ESP-IDF driver itself uses while waiting for an ACK frame.
+ */
+#ifndef ESP_IEEE802154_TX_TIMEOUT_US
+#  define ESP_IEEE802154_TX_TIMEOUT_US    (1000U * US_PER_MS)
+#endif
+
 static const ieee802154_radio_ops_t esp_ieee802154_driver;
 static ieee802154_dev_t *esp_ieee802154_dev;
 
 static uint8_t  _tx_frame[IEEE802154_FRAME_LEN_MAX + 1]; /* additional byte 0 is used for length */
-static uint8_t *_rx_frame;
+static const uint8_t *_rx_frame;
 static const uint8_t *_ack_frame;
 
 static esp_ieee802154_frame_info_t *_rx_frame_info;
@@ -43,6 +63,53 @@ static bool _channel_clear;
 
 static esp_ieee802154_tx_error_t _tx_error;     /* error on last transmit */
 static bool _cca_send_on = true;
+
+static bool _tx_pending;    /* transmission in progress */
+static ztimer_t _tx_timer;  /* timer in case the driver never completes the transmission */
+
+/*
+ * `_rx_frame` and `_rx_frame_info` describe the frame of the pending
+ * reception, if any. The ESP-IDF driver keeps each received frame in one of
+ * its RX buffers until it is released by `esp_ieee802154_receive_handle_done`.
+ * Once all RX buffers are in use, the ESP-IDF driver drops all received
+ * frames.
+ *
+ * According to the radio HAL, RX_DONE opens a reception which is closed by
+ * exactly one call of `read`, new frame receptions may be blocked while a
+ * reception is pending, and the radio doesn't receive while it is not in RX
+ * state. Therefore, a frame that is received while a reception is pending or
+ * while the radio was not requested to be in RX state (`_rx_on`) is dropped
+ * and its RX buffer is released immediately.
+ */
+static bool _rx_on;         /* radio was requested to be in RX state */
+
+/* release a frame received by the ESP-IDF driver, if any */
+static inline void _release_frame(const uint8_t **frame)
+{
+    if (*frame) {
+        esp_ieee802154_receive_handle_done(*frame);
+        *frame = NULL;
+    }
+}
+
+/*
+ * End the pending transmission, i.e. clear `_tx_pending` and stop the TX
+ * timeout. Returns false if no transmission was pending, e.g. on a late
+ * completion of a transmission that was already aborted by the timeout.
+ */
+static inline bool _tx_end(void)
+{
+    unsigned state = irq_disable();
+    if (!_tx_pending) {
+        irq_restore(state);
+        return false;
+    }
+    _tx_pending = false;
+    ztimer_remove(ZTIMER_USEC, &_tx_timer);
+    irq_restore(state);
+
+    return true;
+}
 
 static int _write(ieee802154_dev_t *dev, const iolist_t *psdu)
 {
@@ -76,7 +143,7 @@ static int _len(ieee802154_dev_t *dev)
 {
     (void)dev;
     DEBUG("[esp_ieee802154] %s\n", __func__);
-    return _rx_frame[0] - IEEE802154_FCS_LEN;
+    return _rx_frame ? (_rx_frame[0] - IEEE802154_FCS_LEN) : 0;
 }
 
 static int _read(ieee802154_dev_t *dev, void *buf, size_t size, ieee802154_rx_info_t *info)
@@ -85,6 +152,13 @@ static int _read(ieee802154_dev_t *dev, void *buf, size_t size, ieee802154_rx_in
 
     DEBUG("[esp_ieee802154] %s: buf=%p size=%u info=%p\n",
           __func__, buf, size, info);
+
+    /* `_rx_frame` and `_rx_frame_info` are not changed by the ESP-IDF driver
+     * callbacks while a reception is pending */
+    if (_rx_frame == NULL) {
+        DEBUG("[esp_ieee802154] %s: no frame pending\n", __func__);
+        return 0;
+    }
 
     unsigned len = _rx_frame[0] - IEEE802154_FCS_LEN;
     int res = 0;
@@ -104,16 +178,37 @@ static int _read(ieee802154_dev_t *dev, void *buf, size_t size, ieee802154_rx_in
         res = len;
     }
 
-    esp_ieee802154_receive_handle_done(_rx_frame);
+    /* close the reception */
+    _release_frame(&_rx_frame);
 
     return res;
+}
+
+static void _tx_timeout(void *arg)
+{
+    (void)arg;
+
+    /* the completion of the transmission may be reported concurrently */
+    if (!_tx_end()) {
+        return;
+    }
+    _tx_error = ESP_IEEE802154_TX_ERR_ABORT;
+
+    LOG_WARNING("[esp_ieee802154] TX timeout in state %d, transmission aborted\n",
+                esp_ieee802154_get_state());
+
+    esp_ieee802154_dev->cb(esp_ieee802154_dev, IEEE802154_RADIO_CONFIRM_TX_DONE);
 }
 
 static int _off(ieee802154_dev_t *dev)
 {
     (void)dev;
     DEBUG("[esp_ieee802154] %s\n", __func__);
+    _rx_on = false;
     esp_ieee802154_disable();
+    /* close a pending reception and release the RX buffer of its frame,
+     * the ESP-IDF driver is disabled and doesn't report frames anymore */
+    _release_frame(&_rx_frame);
     return 0;
 }
 
@@ -139,16 +234,31 @@ static int _request_op(ieee802154_dev_t *dev, ieee802154_hal_op_t op, void *ctx)
     (void)dev;
     (void)ctx;
 
+    /* any operation except IEEE802154_HAL_OP_SET_RX ends the RX state */
+    _rx_on = false;
+
     switch (op) {
     case IEEE802154_HAL_OP_TRANSMIT:
         DEBUG("[esp_ieee802154] %s: IEEE802154_HAL_OP_TRANSMIT\n", __func__);
         _tx_error = ESP_IEEE802154_TX_ERR_NONE;
         _ack_frame = NULL;
         _ack_frame_info = NULL;
-        return esp_ieee802154_transmit(_tx_frame, _cca_send_on) ? -EIO : 0;
+        _tx_pending = true;
+        ztimer_set(ZTIMER_USEC, &_tx_timer, ESP_IEEE802154_TX_TIMEOUT_US);
+        if (esp_ieee802154_transmit(_tx_frame, _cca_send_on)) {
+            _tx_end();
+            return -EIO;
+        }
+        return 0;
     case IEEE802154_HAL_OP_SET_RX:
         DEBUG("[esp_ieee802154] %s: IEEE802154_HAL_OP_SET_RX\n", __func__);
-        return (IS_ACTIVE(_USE_SET_RX) && esp_ieee802154_receive()) ? -EIO : 0;
+        /* set before enabling the receiver, frames are dropped otherwise */
+        _rx_on = true;
+        if (IS_ACTIVE(_USE_SET_RX) && esp_ieee802154_receive()) {
+            _rx_on = false;
+            return -EIO;
+        }
+        return 0;
     case IEEE802154_HAL_OP_SET_IDLE:
         /* TODO: ctx = (bool *force) */
         DEBUG("[esp_ieee802154] %s: IEEE802154_HAL_OP_SET_IDLE\n", __func__);
@@ -186,13 +296,25 @@ static int _confirm_op(ieee802154_dev_t *dev, ieee802154_hal_op_t op, void *ctx)
                 info->status = TX_STATUS_MEDIUM_BUSY;
                 break;
             case ESP_IEEE802154_TX_ERR_NO_ACK:
+            case ESP_IEEE802154_TX_ERR_INVALID_ACK:
                 info->status = TX_STATUS_NO_ACK;
                 break;
             default:
+                /* ESP_IEEE802154_TX_ERR_ABORT, ESP_IEEE802154_TX_ERR_COEXIST,
+                 * ...: the frame was not sent, the upper layer may retry */
+                info->status = TX_STATUS_MEDIUM_BUSY;
                 break;
             }
         }
-        esp_ieee802154_receive_handle_done(_ack_frame);
+        _release_frame(&_ack_frame);
+        if (_tx_error == ESP_IEEE802154_TX_ERR_ABORT) {
+            /* After an aborted transmission, e.g. by the TX timeout, the
+             * operation may still be in progress in the ESP-IDF driver.
+             * Stop it so that its completion can't be reported for a later
+             * transmission. The radio is left in IDLE state and not set
+             * back to RX, the upper layer decides about the next state. */
+            esp_ieee802154_sleep();
+        }
         return 0;
     case IEEE802154_HAL_OP_SET_RX:
         DEBUG("[esp_ieee802154] %s: IEEE802154_HAL_OP_SET_RX\n", __func__);
@@ -384,8 +506,19 @@ void esp_ieee802154_receive_done(uint8_t *frame, esp_ieee802154_frame_info_t *fr
     DEBUG("[esp_ieee802154] %s: frame=%p frame_info=%p\n",
           __func__, frame, frame_info);
 
+    unsigned state = irq_disable();
+    if (!_rx_on || _rx_frame) {
+        irq_restore(state);
+        /* The radio is not in RX state or a reception is still pending.
+         * Drop the frame and release its RX buffer, otherwise the RX buffers
+         * of the ESP-IDF driver would get exhausted. */
+        DEBUG("[esp_ieee802154] %s: frame dropped\n", __func__);
+        esp_ieee802154_receive_handle_done(frame);
+        return;
+    }
     _rx_frame = frame;
     _rx_frame_info = frame_info;
+    irq_restore(state);
 
     esp_ieee802154_dev->cb(esp_ieee802154_dev, IEEE802154_RADIO_INDICATION_RX_DONE);
 }
@@ -404,6 +537,12 @@ void esp_ieee802154_transmit_done(const uint8_t *frame, const uint8_t *ack,
     DEBUG("[esp_ieee802154] %s: frame=%p ack_frame=%p ack_frame_info=%p\n",
           __func__, frame, ack, ack_frame_info);
 
+    if (!_tx_end()) {
+        /* late completion of an already aborted transmission */
+        _release_frame(&ack);
+        return;
+    }
+
     _ack_frame = ack;
     _ack_frame_info = ack_frame_info;
 
@@ -413,6 +552,11 @@ void esp_ieee802154_transmit_done(const uint8_t *frame, const uint8_t *ack,
 void esp_ieee802154_transmit_failed(const uint8_t *frame, esp_ieee802154_tx_error_t error)
 {
     DEBUG("[esp_ieee802154] %s: frame=%p error=%u\n", __func__, frame, error);
+
+    if (!_tx_end()) {
+        /* late completion of an already aborted transmission */
+        return;
+    }
 
     _tx_error = error;
 
@@ -432,6 +576,9 @@ void esp_ieee802154_setup(ieee802154_dev_t *dev)
 
     dev->driver = &esp_ieee802154_driver;
     esp_ieee802154_dev = dev;
+
+    _tx_timer.callback = _tx_timeout;
+    _tx_timer.arg = NULL;
 }
 
 int esp_ieee802154_init(void)
