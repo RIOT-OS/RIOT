@@ -240,16 +240,34 @@ PSEUDOMODULES += gnrc_nettype_udp
 ## @}
 ## @}
 
-## @addtogroup	net_gnrc_pktshark
+## @defgroup  net_gnrc_pktshark           GNRC Packetshark
+## @ingroup   net_gnrc
+## @brief Parse and dump received packets.
 ## @{
-## @brief	Enable parsing of IPv6 encapsulated IPv4 packets
+
+## @defgroup  net_gnrc_pktshark_4in6      gnrc_pktshark_4in6
+## @brief Enable parsing of IPv6 encapsulated IPv4 packets
 PSEUDOMODULES += gnrc_pktshark_4in6
-## @brief	Enable parsing of CoAP messages
+
+## @defgroup  net_gnrc_pktshark_all       gnrc_pktshark_all
+## @brief Enable parsing of all supported protocols
+#
+# These are currently @ref net_gnrc_pktshark_4in6, @ref net_gnrc_pktshark_coap,
+# and @ref net_gnrc_pktshark_icmpv6
+PSEUDOMODULES += gnrc_pktshark_all
+
+## @defgroup  net_gnrc_pktshark_coap      gnrc_pktshark_coap
+## @brief Enable parsing of CoAP messages
 PSEUDOMODULES += gnrc_pktshark_coap
-## @brief	Enable parsing of default protocols
+
+## @defgroup  net_gnrc_pktshark_default   gnrc_pktshark_default
+## @brief Enable parsing of protocols supported in this build
 PSEUDOMODULES += gnrc_pktshark_default
-## @brief	Enable parsing of ICMPv6 messages
+
+## @defgroup  net_gnrc_pktshark_icmpv6    gnrc_pktshark_icmpv6
+## @brief Enable parsing of ICMPv6 messages
 PSEUDOMODULES += gnrc_pktshark_icmpv6
+
 ## @}
 
 PSEUDOMODULES += gnrc_sixloenc
