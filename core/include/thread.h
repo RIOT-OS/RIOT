@@ -192,7 +192,8 @@ struct _thread {
                                          to this thread's message queue */
 #endif
 #if defined(DEVELHELP) || IS_ACTIVE(SCHED_TEST_STACK) \
-    || defined(MODULE_MPU_STACK_GUARD) || defined(DOXYGEN)
+    || defined(MODULE_MPU_STACK_GUARD) || defined(MODULE_CORTEXM_STACK_LIMIT) \
+    || defined(DOXYGEN)
     char *stack_start;              /**< thread's stack start address   */
 #endif
 #if defined(CONFIG_THREAD_NAMES) || defined(DOXYGEN)
@@ -232,7 +233,8 @@ struct _thread {
 /**
  * @brief Never write markers into the thread's stack to measure stack usage
  *
- * This flag is ignored when DEVELHELP or SCHED_TEST_STACK is not enabled
+ * This flag is ignored if `SCHED_TEST_STACK` is 0 or not defined.
+ * `SCHED_TEST_STACK` defaults to 1 with `DEVELHELP=1`.
  */
 #define THREAD_CREATE_NO_STACKTEST      (8)
 /** @} */
@@ -495,19 +497,25 @@ static inline const char *thread_getname(kernel_pid_t pid)
 #endif
 
 /**
- * @brief       Measures the stack usage of a stack
+ * @brief       Measure the stack usage of a stack
  * @internal    Should not be used externally
  *
  * Only works if the stack is filled with canaries
  * (`*((uintptr_t *)ptr) == (uintptr_t)ptr` for naturally aligned `ptr` within
  * the stack).
- * This is enabled if `DEVELHELP` or `SCHED_TEST_STACK` is set.
+ * This is done by thread_create() if `SCHED_TEST_STACK` is 1 (the default
+ * with `DEVELHELP=1`), unless the thread is created with
+ * @ref THREAD_CREATE_NO_STACKTEST.
  *
- * @param[in] stack     the stack you want to measure. Try
- *                      `thread_get_stackstart(thread_get_active())`
- * @param[in] size      size of @p stack in bytes
+ * @param[in] stack     The stack you want to measure, must be aligned to
+ *                      `alignof(void *)`. Try
+ *                      `thread_get_stackstart(thread_get_active())`, which
+ *                      is aligned by thread_create(), but is `NULL` if the
+ *                      stack start is not stored for the thread.
+ * @param[in] size      Size of @p stack in bytes.
  *
- * @return              the amount of unused space of the thread's stack
+ * @return              The amount of unused space of the thread's stack.
+ * @retval              0 if @p stack is `NULL`.
  */
 ACCESS(read_only, 1, 2)
 uintptr_t measure_stack_free_internal(const char *stack, size_t size);
@@ -611,7 +619,7 @@ const char *thread_state_to_string(thread_status_t state);
 static inline void *thread_get_stackstart(const thread_t *thread)
 {
 #if defined(DEVELHELP) || IS_ACTIVE(SCHED_TEST_STACK) \
-    || defined(MODULE_MPU_STACK_GUARD)
+    || defined(MODULE_MPU_STACK_GUARD) || defined(MODULE_CORTEXM_STACK_LIMIT)
     return thread->stack_start;
 #else
     (void)thread;
