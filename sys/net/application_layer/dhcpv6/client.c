@@ -1011,12 +1011,19 @@ static bool _parse_ia_na_option(dhcpv6_opt_ia_na_t *ia_na)
         for (dhcpv6_opt_t *ia_na_opt = (dhcpv6_opt_t *)(ia_na + 1);
              ia_na_len > 0;
              ia_na_len -= _opt_len(ia_na_opt),
-             ia_na_opt = _opt_next(ia_na_opt)) {
+             ia_na_opt = _opt_next(ia_na_opt))
+        {
             if (ia_na_len > ia_na_orig_len) {
                 DEBUG("DHCPv6 client: IA_NA options overflow option "
                       "boundaries\n");
                 return false;
             }
+
+            if (ia_na_len < sizeof(dhcpv6_opt_t)) {
+                DEBUG("DHCPv6 client: IN NA option has inclomplete header\n");
+                return false;
+            }
+
             switch (byteorder_ntohs(ia_na_opt->type)) {
                 case DHCPV6_OPT_STATUS: {
                     if (!_check_status_opt((dhcpv6_opt_status_t *)ia_na_opt)) {
@@ -1025,6 +1032,10 @@ static bool _parse_ia_na_option(dhcpv6_opt_ia_na_t *ia_na)
                     break;
                 }
                 case DHCPV6_OPT_IAADDR: {
+                    if (_opt_len(ia_na_opt) < sizeof(dhcpv6_opt_iaaddr_t)) {
+                        DEBUG("DHCPv6 client: IAADDR option underflows minimum size\n");
+                        return false;
+                    }
                     dhcpv6_opt_iaaddr_t *this_iaaddr = (dhcpv6_opt_iaaddr_t *)ia_na_opt;
                     if ((!lease->leased) ||
                         (iaaddr == NULL)) {
