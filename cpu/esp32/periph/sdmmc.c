@@ -23,6 +23,7 @@
 #include "assert.h"
 #include "bitarithm.h"
 #include "container.h"
+#include "irq.h"
 #include "log.h"
 #include "periph/gpio.h"
 #include "syscalls.h"
@@ -37,9 +38,20 @@
 #define ENABLE_DEBUG 0
 #include "debug.h"
 
-/* CLK_EDGE_SEL - clock phase selection register */
-#define SDMMC_CLOCK_REG_CCLKIN_EDGE_SAM_SEL_S   (3)
-#define SDMMC_CLOCK_REG_CCLKIN_EDGE_SAM_SEL_M   (0x7 << SDMMC_CLOCK_REG_CCLKIN_EDGE_SAM_SEL_S)
+#if SOC_SDMMC_USE_GPIO_MATRIX
+/**
+ * Phase of the input clock used for sampling (SDMMC_DELAY_PHASE_0 ... 3
+ * correspond to 0, 90, 180 and 270 degrees). With 270 degrees, SD Memory
+ * Cards produce response errors on ESP32-S3, so that 0 degrees as in ESP-IDF
+ * is used for them. MMCs require 270 degrees.
+ */
+#  ifndef CONFIG_SDMMC_INPUT_DELAY_PHASE_SD
+#    define CONFIG_SDMMC_INPUT_DELAY_PHASE_SD   SDMMC_DELAY_PHASE_0
+#  endif
+#  ifndef CONFIG_SDMMC_INPUT_DELAY_PHASE_MMC
+#    define CONFIG_SDMMC_INPUT_DELAY_PHASE_MMC  SDMMC_DELAY_PHASE_3
+#  endif
+#endif
 
 /* we have to redefine it here since we can't include "gpio_types.h" due to
  * naming conflicts */
@@ -356,12 +368,20 @@ static int _set_clock_rate(sdmmc_dev_t *sdmmc_dev, sdmmc_clock_rate_t rate)
     }
 
 #if SOC_SDMMC_USE_GPIO_MATRIX
-    /* phase has to be modified to get it working for MMCs if
-     * SOC_SDMMC_USE_GPIO_MATRIX is used */
-    uint32_t reg = *((uint32_t *)SDMMC_CLOCK_REG);
-    reg &= ~SDMMC_CLOCK_REG_CCLKIN_EDGE_SAM_SEL_M;
-    reg |= (6 << SDMMC_CLOCK_REG_CCLKIN_EDGE_SAM_SEL_S);
-    *((uint32_t *)SDMMC_CLOCK_REG) = reg;
+    /* Phase of the input clock has to be modified to get it working for MMCs
+     * if SOC_SDMMC_USE_GPIO_MATRIX is used, while SD Memory Cards work with
+     * the default phase. Since ESP-IDF v6.x, the clock configuration is
+     * applied with the next transaction which also resets the input clock
+     * phase. Therefore the phase has to be configured using the ESP-IDF API
+     * instead of writing it directly into the CLOCK register. The card type
+     * is still unknown when the clock rate is set for card identification. */
+    res = sdmmc_host_set_input_delay(dev->config->slot,
+                                     (sdmmc_dev->type & SDMMC_CARD_TYPE_MMC)
+                                     ? CONFIG_SDMMC_INPUT_DELAY_PHASE_MMC
+                                     : CONFIG_SDMMC_INPUT_DELAY_PHASE_SD);
+    if (res) {
+        return _esp_err_to_sdmmc_err_code(res);
+    }
 #endif
 
     return 0;
@@ -405,6 +425,8 @@ static int _xfer_execute(sdmmc_dev_t *sdmmc_dev, sdmmc_xfer_desc_t *xfer,
         .arg = xfer->arg,
         .data = xfer->write ? (void *)data_wr : data_rd,
         .datalen = xfer->block_num * xfer->block_size,
+        /* buflen is required by ESP-IDF v6.x to check the buffer alignment */
+        .buflen = xfer->block_num * xfer->block_size,
         .blklen = xfer->block_size,
         .timeout_ms = xfer->write ? 2500 : 1000, /* TODO */
     };

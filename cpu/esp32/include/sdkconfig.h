@@ -63,12 +63,15 @@
 #  define CONFIG_LOG_DEFAULT_LEVEL              LOG_LEVEL
 #endif
 #define CONFIG_LOG_MAXIMUM_LEVEL                LOG_LEVEL
+#define CONFIG_LOG_VERSION                      1
+#define CONFIG_LOG_VERSION_1                    1
 
 /**
  * System specific configuration (DO NOT CHANGE)
  */
+#define CONFIG_LIBC_NEWLIB                      1
 #if MODULE_NEWLIB_NANO
-#  define CONFIG_NEWLIB_NANO_FORMAT             1
+#  define CONFIG_LIBC_NEWLIB_NANO_FORMAT        1
 #endif
 
 #define CONFIG_ESP_SYSTEM_CHECK_INT_LEVEL_4     1
@@ -117,8 +120,10 @@
 #  define CONFIG_IEEE802154_CCA_ED              1
 #  define CONFIG_IEEE802154_CCA_MODE            1
 #  define CONFIG_IEEE802154_CCA_THRESHOLD       -60
+#  define CONFIG_IEEE802154_INTERFACE_NUM       1
 #  define CONFIG_IEEE802154_PENDING_TABLE_SIZE  20
 #  define CONFIG_IEEE802154_RX_BUFFER_SIZE      20
+#  define CONFIG_IEEE802154_TIMING_OPTIMIZATION 1
 #endif
 
 /**
@@ -130,6 +135,7 @@
 #  define CONFIG_SPIRAM_SIZE                        -1
 #  define CONFIG_SPIRAM_SPEED_40M                   1
 #  define CONFIG_SPIRAM_SPEED                       40
+#  define CONFIG_SPIRAM_BOOT_HW_INIT                1   /* ESP32: no flash reconfig after PSRAM init */
 #  define CONFIG_SPIRAM_BOOT_INIT                   1
 #  define CONFIG_SPIRAM_USE_MALLOC                  1   /* using malloc requires QStaticQueue */
 #  define CONFIG_SPIRAM_USE_CAPS_ALLOC              0   /* using cap instead of malloc */
@@ -143,25 +149,35 @@
 /**
  * SPI Flash driver configuration (DO NOT CHANGE)
  */
-#define CONFIG_SPI_FLASH_ROM_DRIVER_PATCH           1
-#define CONFIG_SPI_FLASH_DANGEROUS_WRITE_ABORTS     1
+#define CONFIG_SPI_FLASH_WRITING_DANGEROUS_REGIONS_ABORTS 1
 #define CONFIG_SPI_FLASH_YIELD_DURING_ERASE         1
 #define CONFIG_SPI_FLASH_ERASE_YIELD_DURATION_MS    20
 #define CONFIG_SPI_FLASH_ERASE_YIELD_TICKS          1
 #define CONFIG_SPI_FLASH_WRITE_CHUNK_SIZE           8192
-#define CONFIG_SPI_FLASH_SUPPORT_ISSI_CHIP          1
-#define CONFIG_SPI_FLASH_SUPPORT_MXIC_CHIP          1
+
+/* Flash chip drivers as enabled by default in ESP-IDF for the respective SoC,
+ * has to be consistent with the drivers compiled in esp-idf/spi_flash/Makefile */
 #define CONFIG_SPI_FLASH_SUPPORT_GD_CHIP            1
-#define CONFIG_SPI_FLASH_SUPPORT_WINBOND_CHIP       1
-#define CONFIG_SPI_FLASH_SUPPORT_BOYA_CHIP          1
-#define CONFIG_SPI_FLASH_SUPPORT_TH_CHIP            1
-#define CONFIG_SPI_FLASH_SUPPORT_MXIC_OPI_CHIP      1
+#if defined(CPU_FAM_ESP32) || defined(CPU_FAM_ESP32S2) || \
+    defined(CPU_FAM_ESP32S3) || defined(CPU_FAM_ESP32C3)
+#  define CONFIG_SPI_FLASH_SUPPORT_ISSI_CHIP        1
+#  define CONFIG_SPI_FLASH_SUPPORT_MXIC_CHIP        1
+#  define CONFIG_SPI_FLASH_SUPPORT_WINBOND_CHIP     1
+#endif
+#if defined(CPU_FAM_ESP32S2) || defined(CPU_FAM_ESP32S3) || defined(CPU_FAM_ESP32C3)
+#  define CONFIG_SPI_FLASH_SUPPORT_BOYA_CHIP        1
+#  define CONFIG_SPI_FLASH_SUPPORT_TH_CHIP          1
+#endif
+#if defined(CPU_FAM_ESP32S3)
+#  define CONFIG_SPI_FLASH_SUPPORT_MXIC_OPI_CHIP    1
+#endif
 
 /**
  * RTC Clock configuration
  */
 #if MODULE_ESP_RTC_TIMER_32K
 #  define CONFIG_RTC_CLK_SRC_EXT_CRYS               1
+#  define CONFIG_ESP_SYSTEM_RTC_EXT_XTAL            1
 #else
 #  define CONFIG_RTC_CLK_SRC_INT_RC                 1
 #endif
@@ -181,6 +197,16 @@
     !defined(CONFIG_FLASHMODE_QOUT) && \
     !defined(CONFIG_FLASHMODE_QIO)
 #  error "Flash mode not configured"
+#endif
+
+#if defined(CONFIG_ESPTOOLPY_FLASHMODE_QIO)
+#  define CONFIG_ESPTOOLPY_FLASHMODE_VAL        1
+#elif defined(CONFIG_ESPTOOLPY_FLASHMODE_QOUT)
+#  define CONFIG_ESPTOOLPY_FLASHMODE_VAL        2
+#elif defined(CONFIG_ESPTOOLPY_FLASHMODE_DIO)
+#  define CONFIG_ESPTOOLPY_FLASHMODE_VAL        3
+#elif defined(CONFIG_ESPTOOLPY_FLASHMODE_DOUT)
+#  define CONFIG_ESPTOOLPY_FLASHMODE_VAL        4
 #endif
 
 /**
@@ -243,6 +269,7 @@
 #  define CONFIG_ESP_PHY_MAX_TX_POWER                   20
 #  define CONFIG_ESP_PHY_MAX_WIFI_TX_POWER              20
 #  define CONFIG_ESP_PHY_RF_CAL_PARTIAL                 1
+#  define CONFIG_ESP_PHY_PLL_TRACK_PERIOD_MS            1000
 #  if MODULE_ESP_IDF_NVS_FLASH
 #    define CONFIG_ESP_PHY_CALIBRATION_AND_DATA_STORAGE 1
 #  endif
@@ -331,9 +358,28 @@
 
 #define CONFIG_ESP_DEBUG_OCDAWARE                   1
 
-#define CONFIG_ADC_SUPPRESS_DEPRECATE_WARN          1
 
+/* Placement of ESP-IDF functions in IRAM (ESP-IDF v6.x defaults). Functions
+ * that may be called while the flash cache is disabled have to be in IRAM. */
+#define CONFIG_ESP_HW_SUPPORT_FUNC_IN_IRAM          1
+#define CONFIG_ESP_INTR_IN_IRAM                     1
+#define CONFIG_ESP_PERIPH_CTRL_FUNC_IN_IRAM         1
+#define CONFIG_ESP_REGI2C_CTRL_FUNC_IN_IRAM         1
+#define CONFIG_ESP_ROM_PRINT_IN_IRAM                1
+#define CONFIG_ESP_SYSTEM_IN_IRAM                   1
+#define CONFIG_ESP_TIMER_IN_IRAM                    1
+#define CONFIG_LIBC_LOCKS_PLACE_IN_IRAM             1
+#define CONFIG_LIBC_MISC_IN_IRAM                    1
+#define CONFIG_LOG_IN_IRAM                          1
+#define CONFIG_RTC_CLK_FUNC_IN_IRAM                 1
+#define CONFIG_RTC_TIME_FUNC_IN_IRAM                1
+#define CONFIG_SPI_FLASH_PLACE_FUNCTIONS_IN_IRAM    1
+
+#define CONFIG_HAL_GPIO_USE_ROM_IMPL                1
 #define CONFIG_HEAP_POISONING_DISABLED              1
+#if !CONFIG_ESP_SYSTEM_MEMPROT
+#  define CONFIG_HEAP_HAS_EXEC_HEAP                 1
+#endif
 #define CONFIG_HEAP_TRACING_OFF                     1
 #define CONFIG_LOG_TAG_LEVEL_CACHE_BINARY_MIN_HEAP  1
 
@@ -356,7 +402,6 @@
 #  define CONFIG_SOC_SDMMC_HOST_SUPPORTED           SOC_SDMMC_HOST_SUPPORTED
 #  define CONFIG_SOC_SDMMC_DELAY_PHASE_NUM          SOC_SDMMC_DELAY_PHASE_NUM
 #  define CONFIG_SOC_SDMMC_NUM_SLOTS                SOC_SDMMC_NUM_SLOTS
-#  define CONFIG_SOC_SDMMC_SUPPORT_XTAL_CLOCK       SOC_SDMMC_SUPPORT_XTAL_CLOCK
 #  define CONFIG_SOC_SDMMC_USE_GPIO_MATRIX          SOC_SDMMC_USE_GPIO_MATRIX
 #  define CONFIG_SOC_SDMMC_USE_IOMUX                SOC_SDMMC_USE_IOMUX
 #endif /* SOC_SDMMC_HOST_SUPPORTED */
@@ -382,6 +427,112 @@
 
 /* should be RIOT_APPLICATION but PROJECT_NAME must be less than 24 characters */
 #define PROJECT_NAME "RIOT-OS Application"
+
+
+/* SoC capabilities used by ESP-IDF as Kconfig symbols. In ESP-IDF, these
+ * symbols are generated from the SoC capabilities by the build system. */
+#if defined(SOC_ADC_DMA_SUPPORTED) && !defined(CONFIG_SOC_ADC_DMA_SUPPORTED)
+#  define CONFIG_SOC_ADC_DMA_SUPPORTED                   SOC_ADC_DMA_SUPPORTED
+#endif
+#if defined(SOC_ADC_PERIPH_NUM) && !defined(CONFIG_SOC_ADC_PERIPH_NUM)
+#  define CONFIG_SOC_ADC_PERIPH_NUM                      SOC_ADC_PERIPH_NUM
+#endif
+#if defined(SOC_AES_SUPPORTED) && !defined(CONFIG_SOC_AES_SUPPORTED)
+#  define CONFIG_SOC_AES_SUPPORTED                       SOC_AES_SUPPORTED
+#endif
+#if defined(SOC_AES_SUPPORT_GCM) && !defined(CONFIG_SOC_AES_SUPPORT_GCM)
+#  define CONFIG_SOC_AES_SUPPORT_GCM                     SOC_AES_SUPPORT_GCM
+#endif
+#if defined(SOC_CACHE_INTERNAL_MEM_VIA_L1CACHE) && \
+    !defined(CONFIG_SOC_CACHE_INTERNAL_MEM_VIA_L1CACHE)
+#  define CONFIG_SOC_CACHE_INTERNAL_MEM_VIA_L1CACHE      SOC_CACHE_INTERNAL_MEM_VIA_L1CACHE
+#endif
+#if defined(SOC_CLK_TREE_SUPPORTED) && !defined(CONFIG_SOC_CLK_TREE_SUPPORTED)
+#  define CONFIG_SOC_CLK_TREE_SUPPORTED                  SOC_CLK_TREE_SUPPORTED
+#endif
+#if defined(SOC_CPU_CORES_NUM) && !defined(CONFIG_SOC_CPU_CORES_NUM)
+#  define CONFIG_SOC_CPU_CORES_NUM                       SOC_CPU_CORES_NUM
+#endif
+#if defined(SOC_CPU_MISALIGNED_ACCESS_ON_PMP_MISMATCH_ISSUE) && \
+    !defined(CONFIG_SOC_CPU_MISALIGNED_ACCESS_ON_PMP_MISMATCH_ISSUE)
+#  define CONFIG_SOC_CPU_MISALIGNED_ACCESS_ON_PMP_MISMATCH_ISSUE \
+            SOC_CPU_MISALIGNED_ACCESS_ON_PMP_MISMATCH_ISSUE
+#endif
+#if defined(SOC_DIG_SIGN_SUPPORTED) && !defined(CONFIG_SOC_DIG_SIGN_SUPPORTED)
+#  define CONFIG_SOC_DIG_SIGN_SUPPORTED                  SOC_DIG_SIGN_SUPPORTED
+#endif
+#if defined(SOC_ECC_SUPPORTED) && !defined(CONFIG_SOC_ECC_SUPPORTED)
+#  define CONFIG_SOC_ECC_SUPPORTED                       SOC_ECC_SUPPORTED
+#endif
+#if defined(SOC_ECDSA_SUPPORTED) && !defined(CONFIG_SOC_ECDSA_SUPPORTED)
+#  define CONFIG_SOC_ECDSA_SUPPORTED                     SOC_ECDSA_SUPPORTED
+#endif
+#if defined(SOC_EFUSE_CONSISTS_OF_ONE_KEY_BLOCK) && \
+    !defined(CONFIG_SOC_EFUSE_CONSISTS_OF_ONE_KEY_BLOCK)
+#  define CONFIG_SOC_EFUSE_CONSISTS_OF_ONE_KEY_BLOCK     SOC_EFUSE_CONSISTS_OF_ONE_KEY_BLOCK
+#endif
+#if defined(SOC_FLASH_ENCRYPTION_XTS_AES) && !defined(CONFIG_SOC_FLASH_ENCRYPTION_XTS_AES)
+#  define CONFIG_SOC_FLASH_ENCRYPTION_XTS_AES            SOC_FLASH_ENCRYPTION_XTS_AES
+#endif
+#if defined(SOC_FLASH_ENCRYPTION_XTS_AES_128_DERIVED) && \
+    !defined(CONFIG_SOC_FLASH_ENCRYPTION_XTS_AES_128_DERIVED)
+#  define CONFIG_SOC_FLASH_ENCRYPTION_XTS_AES_128_DERIVED \
+            SOC_FLASH_ENCRYPTION_XTS_AES_128_DERIVED
+#endif
+#if defined(SOC_HMAC_SUPPORTED) && !defined(CONFIG_SOC_HMAC_SUPPORTED)
+#  define CONFIG_SOC_HMAC_SUPPORTED                      SOC_HMAC_SUPPORTED
+#endif
+#if defined(SOC_IEEE802154_SUPPORTED) && !defined(CONFIG_SOC_IEEE802154_SUPPORTED)
+#  define CONFIG_SOC_IEEE802154_SUPPORTED                SOC_IEEE802154_SUPPORTED
+#endif
+#if defined(SOC_LIGHT_SLEEP_SUPPORTED) && !defined(CONFIG_SOC_LIGHT_SLEEP_SUPPORTED)
+#  define CONFIG_SOC_LIGHT_SLEEP_SUPPORTED               SOC_LIGHT_SLEEP_SUPPORTED
+#endif
+#if defined(SOC_MPI_SUPPORTED) && !defined(CONFIG_SOC_MPI_SUPPORTED)
+#  define CONFIG_SOC_MPI_SUPPORTED                       SOC_MPI_SUPPORTED
+#endif
+#if defined(SOC_PM_SUPPORT_TAGMEM_PD) && !defined(CONFIG_SOC_PM_SUPPORT_TAGMEM_PD)
+#  define CONFIG_SOC_PM_SUPPORT_TAGMEM_PD                SOC_PM_SUPPORT_TAGMEM_PD
+#endif
+#if defined(SOC_RNG_SUPPORTED) && !defined(CONFIG_SOC_RNG_SUPPORTED)
+#  define CONFIG_SOC_RNG_SUPPORTED                       SOC_RNG_SUPPORTED
+#endif
+#if defined(SOC_RTC_FAST_MEM_SUPPORTED) && !defined(CONFIG_SOC_RTC_FAST_MEM_SUPPORTED)
+#  define CONFIG_SOC_RTC_FAST_MEM_SUPPORTED              SOC_RTC_FAST_MEM_SUPPORTED
+#endif
+#if defined(SOC_RTC_SLOW_MEM_SUPPORTED) && !defined(CONFIG_SOC_RTC_SLOW_MEM_SUPPORTED)
+#  define CONFIG_SOC_RTC_SLOW_MEM_SUPPORTED              SOC_RTC_SLOW_MEM_SUPPORTED
+#endif
+#if defined(SOC_SDMMC_HOST_SUPPORTED) && !defined(CONFIG_SOC_SDMMC_HOST_SUPPORTED)
+#  define CONFIG_SOC_SDMMC_HOST_SUPPORTED                SOC_SDMMC_HOST_SUPPORTED
+#endif
+#if defined(SOC_SHA_SUPPORTED) && !defined(CONFIG_SOC_SHA_SUPPORTED)
+#  define CONFIG_SOC_SHA_SUPPORTED                       SOC_SHA_SUPPORTED
+#endif
+#if defined(SOC_SHA_SUPPORT_PARALLEL_ENG) && !defined(CONFIG_SOC_SHA_SUPPORT_PARALLEL_ENG)
+#  define CONFIG_SOC_SHA_SUPPORT_PARALLEL_ENG            SOC_SHA_SUPPORT_PARALLEL_ENG
+#endif
+#if defined(SOC_SUPPORTS_SECURE_DL_MODE) && !defined(CONFIG_SOC_SUPPORTS_SECURE_DL_MODE)
+#  define CONFIG_SOC_SUPPORTS_SECURE_DL_MODE             SOC_SUPPORTS_SECURE_DL_MODE
+#endif
+#if defined(SOC_TEMP_SENSOR_SUPPORTED) && !defined(CONFIG_SOC_TEMP_SENSOR_SUPPORTED)
+#  define CONFIG_SOC_TEMP_SENSOR_SUPPORTED               SOC_TEMP_SENSOR_SUPPORTED
+#endif
+#if defined(SOC_WIFI_HE_SUPPORT) && !defined(CONFIG_SOC_WIFI_HE_SUPPORT)
+#  define CONFIG_SOC_WIFI_HE_SUPPORT                     SOC_WIFI_HE_SUPPORT
+#endif
+#if defined(SOC_WIFI_MAC_VERSION_NUM) && !defined(CONFIG_SOC_WIFI_MAC_VERSION_NUM)
+#  define CONFIG_SOC_WIFI_MAC_VERSION_NUM                SOC_WIFI_MAC_VERSION_NUM
+#endif
+#if defined(SOC_WIFI_NAN_SUPPORT) && !defined(CONFIG_SOC_WIFI_NAN_SUPPORT)
+#  define CONFIG_SOC_WIFI_NAN_SUPPORT                    SOC_WIFI_NAN_SUPPORT
+#endif
+#if defined(SOC_WIFI_SUPPORTED) && !defined(CONFIG_SOC_WIFI_SUPPORTED)
+#  define CONFIG_SOC_WIFI_SUPPORTED                      SOC_WIFI_SUPPORTED
+#endif
+#if defined(SOC_WIFI_SUPPORT_5G) && !defined(CONFIG_SOC_WIFI_SUPPORT_5G)
+#  define CONFIG_SOC_WIFI_SUPPORT_5G                     SOC_WIFI_SUPPORT_5G
+#endif
 
 #endif /* DOXYGEN */
 

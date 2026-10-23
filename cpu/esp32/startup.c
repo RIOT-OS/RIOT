@@ -22,6 +22,7 @@
 #include <sys/reent.h>
 
 /* RIOT headers have to be included before ESP-IDF headers! */
+#include "auto_init_utils.h"
 #include "board.h"
 #include "esp/common_macros.h"
 #include "exceptions.h"
@@ -46,7 +47,7 @@
 #include "esp_log.h"
 #include "esp_private/startup_internal.h"
 #include "esp_private/esp_clk.h"
-#include "esp_rom_uart.h"
+#include "esp_rom_serial_output.h"
 #include "esp_sleep.h"
 #include "esp_timer.h"
 #include "rom/cache.h"
@@ -70,7 +71,7 @@
 
 #if IS_USED(MODULE_ESP_IDF_SPI_FLASH)
 #include "esp_private/spi_flash_os.h"
-#include "esp_flash_internal.h"
+#include "esp_private/esp_flash_internal.h"
 #endif
 
 #if IS_USED(MODULE_ESP_SPI_RAM)
@@ -128,6 +129,22 @@ esp_err_t esp_timer_impl_early_init(void)
 }
 #endif
 
+#if IS_USED(MODULE_ESP_IDF_HEAP) && IS_USED(MODULE_AUTO_INIT)
+/*
+ * The memory region of the ROM stack is used as stack during the startup
+ * before the RIOT kernel is started. It must therefore not be added to the
+ * heap before the first thread is running. Otherwise, memory allocated
+ * during the startup, e.g. for thread stacks, may overlap with the stack
+ * that is still in use.
+ */
+static void _heap_add_startup_stack(void)
+{
+    heap_caps_enable_nonos_stack_heaps();
+}
+
+AUTO_INIT(_heap_add_startup_stack, 1000);
+#endif
+
 /**
  * @brief   System startup function
  *
@@ -151,7 +168,6 @@ static NORETURN void IRAM system_startup_cpu0(void)
 #if IS_USED(MODULE_ESP_IDF_HEAP)
     /* init heap */
     heap_caps_init();
-    heap_caps_enable_nonos_stack_heaps();
     if (IS_ACTIVE(ENABLE_DEBUG)) {
         ets_printf("Heap free: %u byte\n", get_free_heap_size());
     }
@@ -192,9 +208,10 @@ static NORETURN void IRAM system_startup_cpu0(void)
 
     if (reset_reason == DEEPSLEEP_RESET) {
         /* the cause has to be read to clear it */
-        esp_sleep_wakeup_cause_t cause = esp_sleep_get_wakeup_cause();
-        (void)cause;
-        LOG_STARTUP("Restart after deep sleep, wake-up cause: %d\n", cause);
+        uint32_t causes = esp_sleep_get_wakeup_causes();
+        (void)causes;
+        LOG_STARTUP("Restart after deep sleep, wake-up causes: 0x%08" PRIx32 "\n",
+                    causes);
     }
 
     LOG_STARTUP("Current clocks in Hz: CPU=%d APB=%d XTAL=%d SLOW=%d\n",

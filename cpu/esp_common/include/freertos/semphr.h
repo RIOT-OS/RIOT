@@ -81,6 +81,19 @@ void vPortCPUReleaseMutex (portMUX_TYPE *mux);
 #define uxSemaphoreGetCount( xSemaphore ) \
         uxQueueMessagesWaiting( ( QueueHandle_t ) ( xSemaphore ) )
 
+/* memory capabilities are ignored in RIOT, all objects are allocated from
+ * the RIOT heap */
+#define xSemaphoreCreateBinaryWithCaps( uxMemoryCaps ) \
+        xSemaphoreCreateBinary()
+#define xSemaphoreCreateCountingWithCaps( uxMaxCount, uxInitialCount, uxMemoryCaps ) \
+        xSemaphoreCreateCounting( ( uxMaxCount ), ( uxInitialCount ) )
+#define xSemaphoreCreateMutexWithCaps( uxMemoryCaps ) \
+        xSemaphoreCreateMutex()
+#define xSemaphoreCreateRecursiveMutexWithCaps( uxMemoryCaps ) \
+        xSemaphoreCreateRecursiveMutex()
+#define vSemaphoreDeleteWithCaps( xSemaphore ) \
+        vSemaphoreDelete( xSemaphore )
+
 #ifdef __cplusplus
 }
 #endif

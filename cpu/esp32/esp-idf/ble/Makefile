@@ -6,6 +6,7 @@ ifeq (esp32,$(CPU_FAM))
   ESP32_SDK_SRC += components/esp_system/esp_system.c
 else ifneq (,$(filter esp32c6 esp32h2,$(CPU_FAM)))
   # source files to be compiled for this module for ESP32H2
+  ESP32_SDK_SRC += components/bt/controller/$(CPU_FAM)/ble.c
   ESP32_SDK_SRC += components/bt/controller/$(CPU_FAM)/bt.c
   ESP32_SDK_SRC += components/bt/porting/mem/bt_osi_mem.c
   ESP32_SDK_SRC += components/bt/porting/mem/os_msys_init.c

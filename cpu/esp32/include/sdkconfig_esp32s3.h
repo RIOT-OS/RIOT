@@ -60,7 +60,14 @@ extern "C" {
 /**
  * ESP32-S3 specific RTC clock configuration
  */
-#define CONFIG_RTC_CLK_CAL_CYCLES               1024
+#ifndef CONFIG_RTC_CLK_CAL_CYCLES
+#  if MODULE_ESP_RTC_TIMER_32K
+/* the 32 kHz crystal requires more cycles for calibration (ESP-IDF default) */
+#    define CONFIG_RTC_CLK_CAL_CYCLES             3000
+#  else
+#    define CONFIG_RTC_CLK_CAL_CYCLES             1024
+#  endif
+#endif
 
 /**
  * ESP32-S3 specific EFUSE configuration
@@ -109,9 +116,6 @@ extern "C" {
  * ESP32-S3 specific USB configuration
  */
 #define CONFIG_ESP_PHY_ENABLE_USB               1
-#ifdef MODULE_ESP_IDF_USB
-#  define CONFIG_USB_OTG_SUPPORTED              1
-#endif
 
 /**
  * ESP32-S3 specific SPI RAM configuration
@@ -146,6 +150,13 @@ extern "C" {
  * ESP32-S3 BLE driver configuration (DO NOT CHANGE)
  */
 #ifdef MODULE_ESP_BLE
+#  define CONFIG_BT_CTRL_BLE_ADV                            1
+#  define CONFIG_BT_CTRL_BLE_MASTER                         1
+#  define CONFIG_BT_CTRL_BLE_MIN_CONN_INTERVAL_ENABLE       1
+#  define CONFIG_BT_CTRL_BLE_SCAN                           1
+#  define CONFIG_BT_CTRL_BLE_SECURITY_ENABLE                1
+#  define CONFIG_BT_CTRL_CHECK_CONFIG_EFF                   1
+#  define CONFIG_BT_CTRL_DTM_ENABLE                         1
 #  define CONFIG_BT_ALARM_MAX_NUM                           50
 #  define CONFIG_BT_BLE_CCA_MODE                            0
 #  define CONFIG_BT_BLE_CCA_MODE_NONE                       1

@@ -1,0 +1,5 @@
+INCLUDES += -I$(PKGDIRBASE)/esp32_sdk_eth_phy/dp83848/include
+INCLUDES += -I$(PKGDIRBASE)/esp32_sdk_eth_phy/ip101/include
+INCLUDES += -I$(PKGDIRBASE)/esp32_sdk_eth_phy/ksz80xx/include
+INCLUDES += -I$(PKGDIRBASE)/esp32_sdk_eth_phy/lan87xx/include
+INCLUDES += -I$(PKGDIRBASE)/esp32_sdk_eth_phy/rtl8201/include

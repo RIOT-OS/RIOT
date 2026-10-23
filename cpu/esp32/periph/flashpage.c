@@ -26,7 +26,7 @@
 
 #include "esp_private/cache_utils.h"
 #include "esp_flash.h"
-#include "esp_flash_internal.h"
+#include "esp_private/esp_flash_internal.h"
 #include "hal/cache_hal.h"
 #include "hal/mmu_hal.h"
 #include "rom/cache.h"

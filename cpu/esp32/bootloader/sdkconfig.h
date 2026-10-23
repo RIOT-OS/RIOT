@@ -52,6 +52,17 @@ extern "C" {
 #endif
 
 #define CONFIG_BOOTLOADER_PROJECT_VER   1
+#define CONFIG_LIBC_NEWLIB              1
+#define CONFIG_BOOTLOADER_LOG_VERSION   1
+#define CONFIG_BOOTLOADER_LOG_VERSION_1 1
+#define CONFIG_BOOTLOADER_LOG_MODE_TEXT 1
+#define CONFIG_BOOTLOADER_LOG_MODE_TEXT_EN 1
+
+#if defined(CPU_FAM_ESP32H2)
+#  define CONFIG_BOOTLOADER_CPU_CLK_FREQ_MHZ    64
+#else
+#  define CONFIG_BOOTLOADER_CPU_CLK_FREQ_MHZ    80
+#endif
 
 #if MODULE_ESP_LOG_COLORED
 #  define CONFIG_BOOTLOADER_LOG_COLORS  1
@@ -85,6 +96,16 @@ extern "C" {
 #  error "Flash mode not configured"
 #endif
 
+#if defined(CONFIG_ESPTOOLPY_FLASHMODE_QIO)
+#  define CONFIG_ESPTOOLPY_FLASHMODE_VAL        1
+#elif defined(CONFIG_ESPTOOLPY_FLASHMODE_QOUT)
+#  define CONFIG_ESPTOOLPY_FLASHMODE_VAL        2
+#elif defined(CONFIG_ESPTOOLPY_FLASHMODE_DIO)
+#  define CONFIG_ESPTOOLPY_FLASHMODE_VAL        3
+#elif defined(CONFIG_ESPTOOLPY_FLASHMODE_DOUT)
+#  define CONFIG_ESPTOOLPY_FLASHMODE_VAL        4
+#endif
+
 /*
  * Bootloader output baudrate, defined by the app settings as BAUD or
  * BOOTLOADER_BAUD.
@@ -112,6 +133,23 @@ extern "C" {
 #define CONFIG_ESP_CONSOLE_ROM_SERIAL_PORT_NUM CONFIG_ESP_CONSOLE_UART_NUM
 
 #define CONFIG_LOG_TAG_LEVEL_IMPL_CACHE_AND_LINKED_LIST 1
+
+/*
+ * If the external 32 kHz crystal is used as RTC slow clock source, it is
+ * already started by the bootloader as in ESP-IDF. On ESP32, it is
+ * additionally bootstrapped with a 32 kHz square wave for a number of cycles
+ * to help it to start up (ESP-IDF default).
+ */
+#if MODULE_ESP_RTC_TIMER_32K
+#  define CONFIG_ESP_SYSTEM_RTC_EXT_XTAL    1
+#  ifndef CONFIG_ESP_SYSTEM_RTC_EXT_XTAL_BOOTSTRAP_CYCLES
+#    if defined(CPU_FAM_ESP32)
+#      define CONFIG_ESP_SYSTEM_RTC_EXT_XTAL_BOOTSTRAP_CYCLES   5
+#    else
+#      define CONFIG_ESP_SYSTEM_RTC_EXT_XTAL_BOOTSTRAP_CYCLES   0
+#    endif
+#  endif
+#endif
 
 #ifdef __cplusplus
 }

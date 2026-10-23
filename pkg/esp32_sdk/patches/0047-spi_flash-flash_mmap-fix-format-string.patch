@@ -1,0 +1,33 @@
+From 886f9dd953ccc16fe58ca3d29d19d76be30a2e25 Mon Sep 17 00:00:00 2001
+From: Gunar Schorcht <gunar@schorcht.net>
+Date: Thu, 8 Oct 2026 18:49:13 +0200
+Subject: [PATCH 47/51] spi_flash/flash_mmap: fix format string
+
+---
+ components/spi_flash/flash_mmap.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/components/spi_flash/flash_mmap.c b/components/spi_flash/flash_mmap.c
+index 3ac89b5dde..e798d9ff34 100644
+--- a/components/spi_flash/flash_mmap.c
++++ b/components/spi_flash/flash_mmap.c
+@@ -8,6 +8,7 @@
+ #include <assert.h>
+ #include <string.h>
+ #include <stdio.h>
++#include <inttypes.h>
+ #include <freertos/FreeRTOS.h>
+ #include <freertos/semphr.h>
+ #include "sdkconfig.h"
+@@ -394,7 +395,7 @@ esp_err_t spi_flash_mmap_pages(const int *pages, size_t page_count, spi_flash_mm
+     for (size_t i = 0; i < page_count; i++) {
+         uint32_t phys = (uint32_t)pages[i] * CONFIG_MMU_PAGE_SIZE;
+         if (phys >= FLASH_MMAP_ADDR_24BIT_MAX) {
+-            ESP_LOGE("flash_mmap", "Page %d (addr 0x%08x) is out of range for 24bit flash mapping", pages[i], phys);
++            ESP_LOGE("flash_mmap", "Page %d (addr 0x%08" PRIx32 ") is out of range for 24bit flash mapping", pages[i], phys);
+             return ESP_ERR_INVALID_ARG;
+         }
+     }
+-- 
+2.43.0
+

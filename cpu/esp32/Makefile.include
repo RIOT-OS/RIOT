@@ -140,7 +140,7 @@ INCLUDES += -I$(RIOTCPU)/$(CPU)/vendor/include
 
 INCLUDES += -I$(ESP32_SDK_DIR)/components
 INCLUDES += -I$(ESP32_SDK_DIR)/components/bootloader_support/include
-INCLUDES += -I$(ESP32_SDK_DIR)/components/driver/deprecated
+INCLUDES += -I$(ESP32_SDK_DIR)/components/esp_blockdev/include
 INCLUDES += -I$(ESP32_SDK_DIR)/components/esp_adc/include
 INCLUDES += -I$(ESP32_SDK_DIR)/components/esp_adc/$(CPU_FAM)/include
 INCLUDES += -I$(ESP32_SDK_DIR)/components/esp_common/include
@@ -149,24 +149,84 @@ INCLUDES += -I$(ESP32_SDK_DIR)/components/esp_driver_uart/include
 INCLUDES += -I$(ESP32_SDK_DIR)/components/esp_hw_support/include
 INCLUDES += -I$(ESP32_SDK_DIR)/components/esp_hw_support/include/soc
 INCLUDES += -I$(ESP32_SDK_DIR)/components/esp_hw_support/port/$(CPU_FAM)/include
+INCLUDES += -I$(ESP32_SDK_DIR)/components/esp_hw_support/power_supply/include
+INCLUDES += -I$(ESP32_SDK_DIR)/components/esp_hw_support/debug_probe/include
+INCLUDES += -I$(ESP32_SDK_DIR)/components/esp_hw_support/etm/include
+INCLUDES += -I$(ESP32_SDK_DIR)/components/esp_hw_support/modem/include
+INCLUDES += -I$(ESP32_SDK_DIR)/components/esp_hw_support/mspi/mspi_intr/include
+INCLUDES += -I$(ESP32_SDK_DIR)/components/esp_hw_support/mspi/mspi_timing_tuning/include
+INCLUDES += -I$(ESP32_SDK_DIR)/components/esp_hw_support/mspi/mspi_timing_tuning/tuning_scheme_impl/include
+ifeq (esp32s3,$(CPU_FAM))
+  INCLUDES += -I$(ESP32_SDK_DIR)/components/esp_hw_support/mspi/mspi_timing_tuning/port/$(CPU_FAM)
+endif
 INCLUDES += -I$(ESP32_SDK_DIR)/components/esp_rom/$(CPU_FAM)
 INCLUDES += -I$(ESP32_SDK_DIR)/components/esp_rom/include
 INCLUDES += -I$(ESP32_SDK_DIR)/components/esp_rom/$(CPU_FAM)/include
 INCLUDES += -I$(ESP32_SDK_DIR)/components/esp_rom/$(CPU_FAM)/include/$(CPU_FAM)
+INCLUDES += -I$(ESP32_SDK_DIR)/components/esp_security/include
+INCLUDES += -I$(ESP32_SDK_DIR)/components/esp_stdio/include
 INCLUDES += -I$(ESP32_SDK_DIR)/components/esp_system/include
 INCLUDES += -I$(ESP32_SDK_DIR)/components/esp_system/port/include
 INCLUDES += -I$(ESP32_SDK_DIR)/components/esp_timer/include
 INCLUDES += -I$(ESP32_SDK_DIR)/components/hal/$(CPU_FAM)/include
 INCLUDES += -I$(ESP32_SDK_DIR)/components/hal/include
 INCLUDES += -I$(ESP32_SDK_DIR)/components/hal/platform_port/include
+INCLUDES += -I$(ESP32_SDK_DIR)/components/esp_hal_ana_conv/$(CPU_FAM)/include
+INCLUDES += -I$(ESP32_SDK_DIR)/components/esp_hal_ana_conv/include
+INCLUDES += -I$(ESP32_SDK_DIR)/components/esp_hal_clock/$(CPU_FAM)/include
+INCLUDES += -I$(ESP32_SDK_DIR)/components/esp_hal_clock/include
+ifeq (,$(filter esp32,$(CPU_FAM)))
+  INCLUDES += -I$(ESP32_SDK_DIR)/components/esp_hal_dma/$(CPU_FAM)/include
+endif
+INCLUDES += -I$(ESP32_SDK_DIR)/components/esp_hal_dma/include
+INCLUDES += -I$(ESP32_SDK_DIR)/components/esp_hal_gpio/$(CPU_FAM)/include
+INCLUDES += -I$(ESP32_SDK_DIR)/components/esp_hal_gpio/include
+INCLUDES += -I$(ESP32_SDK_DIR)/components/esp_hal_gpspi/$(CPU_FAM)/include
+INCLUDES += -I$(ESP32_SDK_DIR)/components/esp_hal_gpspi/include
+INCLUDES += -I$(ESP32_SDK_DIR)/components/esp_hal_i2c/$(CPU_FAM)/include
+INCLUDES += -I$(ESP32_SDK_DIR)/components/esp_hal_i2c/include
+INCLUDES += -I$(ESP32_SDK_DIR)/components/esp_hal_i2s/$(CPU_FAM)/include
+INCLUDES += -I$(ESP32_SDK_DIR)/components/esp_hal_i2s/include
+INCLUDES += -I$(ESP32_SDK_DIR)/components/esp_hal_ledc/$(CPU_FAM)/include
+INCLUDES += -I$(ESP32_SDK_DIR)/components/esp_hal_ledc/include
+INCLUDES += -I$(ESP32_SDK_DIR)/components/esp_hal_mspi/$(CPU_FAM)/include
+INCLUDES += -I$(ESP32_SDK_DIR)/components/esp_hal_mspi/include
+INCLUDES += -I$(ESP32_SDK_DIR)/components/esp_hal_pmu/$(CPU_FAM)/include
+INCLUDES += -I$(ESP32_SDK_DIR)/components/esp_hal_pmu/include
+INCLUDES += -I$(ESP32_SDK_DIR)/components/esp_hal_regi2c/$(CPU_FAM)/include
+INCLUDES += -I$(ESP32_SDK_DIR)/components/esp_hal_regi2c/include
+INCLUDES += -I$(ESP32_SDK_DIR)/components/esp_hal_rmt/$(CPU_FAM)/include
+INCLUDES += -I$(ESP32_SDK_DIR)/components/esp_hal_rmt/include
+INCLUDES += -I$(ESP32_SDK_DIR)/components/esp_hal_rtc_timer/$(CPU_FAM)/include
+INCLUDES += -I$(ESP32_SDK_DIR)/components/esp_hal_rtc_timer/include
+INCLUDES += -I$(ESP32_SDK_DIR)/components/esp_hal_security/$(CPU_FAM)/include
+INCLUDES += -I$(ESP32_SDK_DIR)/components/esp_hal_security/include
+ifeq (,$(filter esp32,$(CPU_FAM)))
+  INCLUDES += -I$(ESP32_SDK_DIR)/components/esp_hal_systimer/$(CPU_FAM)/include
+endif
+INCLUDES += -I$(ESP32_SDK_DIR)/components/esp_hal_systimer/include
+INCLUDES += -I$(ESP32_SDK_DIR)/components/esp_hal_timg/$(CPU_FAM)/include
+INCLUDES += -I$(ESP32_SDK_DIR)/components/esp_hal_timg/include
+ifeq (,$(filter esp32c3 esp32c6 esp32h2,$(CPU_FAM)))
+  INCLUDES += -I$(ESP32_SDK_DIR)/components/esp_hal_touch_sens/$(CPU_FAM)/include
+endif
+INCLUDES += -I$(ESP32_SDK_DIR)/components/esp_hal_touch_sens/include
+INCLUDES += -I$(ESP32_SDK_DIR)/components/esp_hal_uart/$(CPU_FAM)/include
+INCLUDES += -I$(ESP32_SDK_DIR)/components/esp_hal_uart/include
+ifeq (,$(filter esp32,$(CPU_FAM)))
+  INCLUDES += -I$(ESP32_SDK_DIR)/components/esp_hal_usb/$(CPU_FAM)/include
+endif
+INCLUDES += -I$(ESP32_SDK_DIR)/components/esp_hal_usb/include
+INCLUDES += -I$(ESP32_SDK_DIR)/components/esp_hal_wdt/$(CPU_FAM)/include
+INCLUDES += -I$(ESP32_SDK_DIR)/components/esp_hal_wdt/include
 INCLUDES += -I$(ESP32_SDK_DIR)/components/heap/include
 INCLUDES += -I$(ESP32_SDK_DIR)/components/log/include
-INCLUDES += -I$(ESP32_SDK_DIR)/components/newlib/platform_include
+INCLUDES += -I$(ESP32_SDK_DIR)/components/esp_libc/platform_include
 INCLUDES += -I$(ESP32_SDK_DIR)/components/soc/include
 INCLUDES += -I$(ESP32_SDK_DIR)/components/soc/$(CPU_FAM)/include
 INCLUDES += -I$(ESP32_SDK_DIR)/components/soc/$(CPU_FAM)/register
 INCLUDES += -I$(ESP32_SDK_DIR)/components/spi_flash/include
-INCLUDES += -I$(ESP32_SDK_DIR)/components/spi_flash/include/spi_flash
+INCLUDES += -I$(ESP32_SDK_DIR)/components/spi_flash/include/esp_flash_chips
 
 ifneq (,$(filter riscv32%,$(TARGET_ARCH)))
   INCLUDES += -I$(ESP32_SDK_DIR)/components/riscv/include
@@ -175,6 +235,7 @@ endif
 ifneq (,$(filter xtensa%,$(TARGET_ARCH)))
   INCLUDES += -I$(ESP32_SDK_DIR)/components/xtensa/include
   INCLUDES += -I$(ESP32_SDK_DIR)/components/xtensa/$(CPU_FAM)/include
+  INCLUDES += -I$(ESP32_SDK_DIR)/components/xtensa/deprecated_include
 endif
 
 ifneq (,$(filter esp_ble,$(USEMODULE)))
@@ -203,11 +264,28 @@ endif
 
 ifneq (,$(filter esp_spi_ram,$(USEMODULE)))
   INCLUDES += -I$(ESP32_SDK_DIR)/components/esp_psram/include
+  INCLUDES += -I$(ESP32_SDK_DIR)/components/esp_psram/xip_impl/include
+  ifeq (esp32,$(CPU_FAM))
+    # Workaround for the SPI RAM cache bug of ESP32 revisions < 3
+    # (CONFIG_SPIRAM_CACHE_WORKAROUND): The compiler avoids the vulnerable
+    # instruction sequences, and the linker uses the multilib variants of
+    # libc and libgcc that are compiled with this workaround.
+    PSRAM_WORKAROUND_FLAGS = -mfix-esp32-psram-cache-issue
+    PSRAM_WORKAROUND_FLAGS += -mfix-esp32-psram-cache-strategy=memw
+    CFLAGS += $(PSRAM_WORKAROUND_FLAGS)
+    LINKFLAGS += $(PSRAM_WORKAROUND_FLAGS)
+  endif
 endif
 
 ifneq (,$(filter esp_idf_lcd,$(USEMODULE)))
   INCLUDES += -I$(ESP32_SDK_DIR)/components/esp_driver_i2c/include
   INCLUDES += -I$(ESP32_SDK_DIR)/components/esp_driver_spi/include
+  INCLUDES += -I$(ESP32_SDK_DIR)/components/esp_driver_parlio/include
+  INCLUDES += -I$(ESP32_SDK_DIR)/components/esp_hal_parlio/include
+  ifeq (esp32s3,$(CPU_FAM))
+    INCLUDES += -I$(ESP32_SDK_DIR)/components/esp_hal_lcd/$(CPU_FAM)/include
+  endif
+  INCLUDES += -I$(ESP32_SDK_DIR)/components/esp_hal_lcd/include
   INCLUDES += -I$(ESP32_SDK_DIR)/components/esp_lcd/include
   INCLUDES += -I$(ESP32_SDK_DIR)/components/esp_lcd/priv_include
 endif
@@ -223,12 +301,13 @@ ifneq (,$(filter esp_idf_spi_flash,$(USEMODULE)))
 endif
 
 ifneq (,$(filter esp_idf_usb,$(USEMODULE)))
-  INCLUDES += -I$(ESP32_SDK_DIR)/components/usb/include
+  INCLUDES += -I$(ESP32_SDK_DIR)/components/esp_hw_support/include
 endif
 
 ifneq (,$(filter esp_wifi_any,$(USEMODULE)))
   INCLUDES += -I$(ESP32_SDK_DIR)/components/bootloader_support/include
   INCLUDES += -I$(ESP32_SDK_DIR)/components/esp_eth/include
+  INCLUDES += -I$(ESP32_SDK_DIR)/components/esp_hal_emac/include
   INCLUDES += -I$(ESP32_SDK_DIR)/components/esp_event/include
   INCLUDES += -I$(ESP32_SDK_DIR)/components/esp_netif/include
   INCLUDES += -I$(ESP32_SDK_DIR)/components/esp_wifi/include
@@ -242,6 +321,8 @@ endif
 ifneq (,$(filter esp_eth,$(USEMODULE)))
   INCLUDES += -I$(RIOTCPU)/$(CPU)/esp-eth
   INCLUDES += -I$(ESP32_SDK_DIR)/components/esp_eth/include
+  INCLUDES += -I$(ESP32_SDK_DIR)/components/esp_hal_emac/$(CPU_FAM)/include
+  INCLUDES += -I$(ESP32_SDK_DIR)/components/esp_hal_emac/include
   INCLUDES += -I$(ESP32_SDK_DIR)/components/esp_event/include
   INCLUDES += -I$(ESP32_SDK_DIR)/components/esp_netif/include
   INCLUDES += -I$(ESP32_SDK_DIR)/components/esp_wifi/include
@@ -253,10 +334,19 @@ ifneq (,$(filter esp_ieee802154,$(USEMODULE)))
   INCLUDES += -I$(ESP32_SDK_DIR)/components/esp_coex/include
 endif
 
+ifneq (,$(filter periph_can,$(USEMODULE)))
+  INCLUDES += -I$(ESP32_SDK_DIR)/components/esp_hal_twai/$(CPU_FAM)/include
+  INCLUDES += -I$(ESP32_SDK_DIR)/components/esp_hal_twai/include
+endif
+
 ifneq (,$(filter periph_sdmmc,$(USEMODULE)))
+  INCLUDES += -I$(ESP32_SDK_DIR)/components/esp_driver_sd_intf/include
   INCLUDES += -I$(ESP32_SDK_DIR)/components/esp_driver_sdmmc/include
+  INCLUDES += -I$(ESP32_SDK_DIR)/components/esp_driver_sdmmc/legacy/include
+  INCLUDES += -I$(ESP32_SDK_DIR)/components/esp_hal_sd/$(CPU_FAM)/include
+  INCLUDES += -I$(ESP32_SDK_DIR)/components/esp_hal_sd/include
   INCLUDES += -I$(ESP32_SDK_DIR)/components/sdmmc/include
-  INCLUDES += -I$(ESP32_SDK_DIR)/components/esp_hw_support/dma/include
+  INCLUDES += -I$(ESP32_SDK_DIR)/components/esp_driver_dma/include
 endif
 
 ifneq (,$(filter ws281x_esp32_hw,$(USEMODULE)))
@@ -349,6 +439,9 @@ LINKFLAGS += -L$(RIOTCPU)/$(CPU)/ld/$(CPU_FAM)/
 LINKFLAGS += -T$(BINDIR)/memory.ld
 LINKFLAGS += -T$(BINDIR)/sections.ld
 
+# the application description has to be linked even if not referenced
+LINKFLAGS += -Wl,-u,esp_app_desc
+
 LINKFLAGS += -T$(ESP32_SDK_DIR)/components/soc/$(CPU_FAM)/ld/$(CPU_FAM).peripherals.ld
 LINKFLAGS += -T$(ESP32_SDK_DIR)/components/esp_rom/$(CPU_FAM)/ld/$(CPU_FAM).rom.ld
 LINKFLAGS += -T$(ESP32_SDK_DIR)/components/esp_rom/$(CPU_FAM)/ld/$(CPU_FAM).rom.api.ld
@@ -367,22 +460,40 @@ else ifeq (esp32s3,$(CPU_FAM))
   LINKFLAGS += -T$(ESP32_SDK_DIR)/components/esp_rom/$(CPU_FAM)/ld/$(CPU_FAM).rom.ble_cca.ld
   LINKFLAGS += -T$(ESP32_SDK_DIR)/components/esp_rom/$(CPU_FAM)/ld/$(CPU_FAM).rom.bt_funcs.ld
   LINKFLAGS += -T$(ESP32_SDK_DIR)/components/esp_rom/$(CPU_FAM)/ld/$(CPU_FAM).rom.newlib.ld
+  LINKFLAGS += -T$(ESP32_SDK_DIR)/components/esp_rom/$(CPU_FAM)/ld/$(CPU_FAM).rom.libc.ld
 else ifeq (esp32c3,$(CPU_FAM))
   LINKFLAGS += -T$(ESP32_SDK_DIR)/components/esp_rom/$(CPU_FAM)/ld/$(CPU_FAM).rom.ble_cca.ld
   LINKFLAGS += -T$(ESP32_SDK_DIR)/components/esp_rom/$(CPU_FAM)/ld/$(CPU_FAM).rom.bt_funcs.ld
   LINKFLAGS += -T$(ESP32_SDK_DIR)/components/esp_rom/$(CPU_FAM)/ld/$(CPU_FAM).rom.newlib.ld
+  LINKFLAGS += -T$(ESP32_SDK_DIR)/components/esp_rom/$(CPU_FAM)/ld/$(CPU_FAM).rom.libc.ld
+  LINKFLAGS += -T$(ESP32_SDK_DIR)/components/esp_rom/$(CPU_FAM)/ld/$(CPU_FAM).rom.libc-suboptimal_for_misaligned_mem.ld
   LINKFLAGS += -T$(ESP32_SDK_DIR)/components/esp_rom/$(CPU_FAM)/ld/$(CPU_FAM).rom.eco3.ld
   LINKFLAGS += -T$(ESP32_SDK_DIR)/components/esp_rom/$(CPU_FAM)/ld/$(CPU_FAM).rom.eco3_bt_funcs.ld
 else ifeq (esp32c6,$(CPU_FAM))
   LINKFLAGS += -T$(ESP32_SDK_DIR)/components/esp_rom/$(CPU_FAM)/ld/$(CPU_FAM).rom.coexist.ld
   LINKFLAGS += -T$(ESP32_SDK_DIR)/components/esp_rom/$(CPU_FAM)/ld/$(CPU_FAM).rom.newlib.ld
+  LINKFLAGS += -T$(ESP32_SDK_DIR)/components/esp_rom/$(CPU_FAM)/ld/$(CPU_FAM).rom.libc.ld
+  LINKFLAGS += -T$(ESP32_SDK_DIR)/components/esp_rom/$(CPU_FAM)/ld/$(CPU_FAM).rom.libc-suboptimal_for_misaligned_mem.ld
   LINKFLAGS += -T$(ESP32_SDK_DIR)/components/esp_rom/$(CPU_FAM)/ld/$(CPU_FAM).rom.pp.ld
   LINKFLAGS += -T$(ESP32_SDK_DIR)/components/esp_rom/$(CPU_FAM)/ld/$(CPU_FAM).rom.phy.ld
   LINKFLAGS += -T$(ESP32_SDK_DIR)/components/esp_rom/$(CPU_FAM)/ld/$(CPU_FAM).rom.net80211.ld
 else ifeq (esp32h2,$(CPU_FAM))
   LINKFLAGS += -T$(ESP32_SDK_DIR)/components/esp_rom/$(CPU_FAM)/ld/$(CPU_FAM).rom.newlib.ld
+  LINKFLAGS += -T$(ESP32_SDK_DIR)/components/esp_rom/$(CPU_FAM)/ld/$(CPU_FAM).rom.libc.ld
+  LINKFLAGS += -T$(ESP32_SDK_DIR)/components/esp_rom/$(CPU_FAM)/ld/$(CPU_FAM).rom.libc-suboptimal_for_misaligned_mem.ld
 else
   $(error Missing LINKFLAGS for ESP32x SoC variant (family): $(CPU_FAM))
+endif
+
+# ROM implementations of HAL functions
+ifneq (,$(filter esp32 esp32s3 esp32c3,$(CPU_FAM)))
+  LINKFLAGS += -T$(ESP32_SDK_DIR)/components/esp_hal_regi2c/$(CPU_FAM)/rom.regi2c.ld
+endif
+ifneq (,$(filter esp32s3 esp32c6 esp32h2,$(CPU_FAM)))
+  LINKFLAGS += -T$(ESP32_SDK_DIR)/components/esp_hal_wdt/$(CPU_FAM)/rom.wdt.ld
+endif
+ifneq (,$(filter esp32c6 esp32h2,$(CPU_FAM)))
+  LINKFLAGS += -T$(ESP32_SDK_DIR)/components/esp_hal_systimer/$(CPU_FAM)/rom.systimer.ld
 endif
 
 LINKFLAGS += -nostdlib -lgcc -Wl,-gc-sections
@@ -398,7 +509,7 @@ ifneq (,$(filter esp_wifi_any,$(USEMODULE)))
   LINKFLAGS += -L$(ESP32_SDK_LIB_WIFI_DIR)/$(CPU_FAM)
   LINKFLAGS += -L$(ESP32_SDK_LIB_PHY_DIR)/$(CPU_FAM)
   LINKFLAGS += -L$(ESP32_SDK_LIB_COEXIST_DIR)/$(CPU_FAM)
-  ARCHIVES += -lcoexist -lcore -lmesh -lnet80211 -lpp
+  ARCHIVES += -lcoexist -lcore -lespnow -lmesh -lnet80211 -lpp
   ARCHIVES += -lphy -lstdc++
   ifeq (esp32,$(CPU_FAM))
     ARCHIVES += -lrtc
@@ -414,13 +525,14 @@ endif
 ifneq (,$(filter esp_ble,$(USEMODULE)))
   LINKFLAGS += -L$(ESP32_SDK_LIB_PHY_DIR)/$(CPU_FAM)
   ARCHIVES += -lphy -lstdc++
+  LINKFLAGS += -L$(ESP32_SDK_LIB_BT_DIR)/$(CPU_FAM)
   ifneq (,$(filter esp32 esp32c3 esp32s3,$(CPU_FAM)))
-    LINKFLAGS += -L$(ESP32_SDK_LIB_BT_DIR)/$(CPU_FAM)
     ARCHIVES += -lbtdm_app
   else ifneq (,$(filter esp32c6 esp32h2,$(CPU_FAM)))
     LINKFLAGS += -L$(ESP32_SDK_LIB_COEXIST_DIR)/$(CPU_FAM)
-    LINKFLAGS += -L$(ESP32_SDK_LIB_BT_DIR)
     ARCHIVES += -lble_app -lcoexist
+    # get callbacks of extended memory pools, see esp_ble_nimble.c
+    LINKFLAGS += -Wl,--wrap=os_memblock_get
   endif
   ifeq (esp32,$(CPU_FAM))
     ARCHIVES += -lrtc
@@ -432,7 +544,6 @@ endif
 ifneq (,$(filter esp_ieee802154,$(USEMODULE)))
   ifneq (,$(filter esp32c6 esp32h2,$(CPU_FAM)))
     LINKFLAGS += -L$(ESP32_SDK_LIB_PHY_DIR)/$(CPU_FAM)
-    LINKFLAGS += -L$(ESP32_SDK_LIB_BT_DIR)
     ARCHIVES += -lbtbb
     ARCHIVES += -lphy
   endif
