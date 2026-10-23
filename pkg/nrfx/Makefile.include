@@ -26,3 +26,6 @@ endif
 INCLUDES += -I$(PKGDIRBASE)/nrfx
 INCLUDES += -I$(PKGDIRBASE)/nrfx/mdk
 INCLUDES += -I$(RIOTPKG)/nrfx/include
+
+PSEUDOMODULES += nrfx_full
+PSEUDOMODULES += nrfx_headers_only
