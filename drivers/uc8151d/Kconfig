@@ -1,0 +1,11 @@
+# Copyright (c) 2023 Koen Zandberg
+#
+# This file is subject to the terms and conditions of the GNU Lesser
+# General Public License v2.1. See the file LICENSE in the top level
+# directory for more details.
+
+config MODULE_UC8151D
+    bool "uc8151d"
+    depends on TEST_KCONFIG
+    depends on HAS_PERIPH_SPI PERIPH_GPIO
+    select MODULE_PERIPH_SPI PERIPH_GPIO
