@@ -17,16 +17,9 @@
 
 #include <stdio.h>
 
-#include "shell.h"
-
 int main(void)
 {
     puts("RIOT UDP stress-test application");
 
-    /* start shell */
-    char line_buf[SHELL_DEFAULT_BUFSIZE];
-    shell_run(NULL, line_buf, sizeof(line_buf));
-
-    /* should be never reached */
     return 0;
 }
