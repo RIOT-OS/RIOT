@@ -1,9 +1,7 @@
 /*
- * Copyright (C) 2017 Kaspar Schleiser <kaspar@schleiser.de>
- *               2018 Inria
- *
- * This file is subject to the terms and conditions of the GNU General Public
- * License v2. See the file LICENSE for more details.
+ * SPDX-FileCopyrightText: 2017 Kaspar Schleiser <kaspar@schleiser.de>
+ * SPDX-FileCopyrightText: 2018 Inria
+ * SPDX-License-Identifier: GPL-2.0-only
  */
 
 /**
