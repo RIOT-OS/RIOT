@@ -29,6 +29,8 @@
 #include <stdint.h>
 #include <stdlib.h>
 
+#include "compiler_hints.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -53,6 +55,7 @@ extern "C" {
  *
  * @note    The return value is not the complement of the sum but the sum itself
  */
+ACCESS(read_only, 1, 2)
 uint16_t ucrc16_calc_be(const uint8_t *buf, size_t len, uint16_t poly,
                         uint16_t seed);
 
@@ -68,6 +71,7 @@ uint16_t ucrc16_calc_be(const uint8_t *buf, size_t len, uint16_t poly,
  *
  * @note    The return value is not the complement of the sum but the sum itself
  */
+ACCESS(read_only, 1, 2)
 uint16_t ucrc16_calc_le(const uint8_t *buf, size_t len, uint16_t poly,
                         uint16_t seed);
 
