@@ -322,10 +322,19 @@ DOCKER_VOLUMES_AND_ENV += $(call docker_volume_and_env,RIOTCPU,,riotcpu)
 DOCKER_VOLUMES_AND_ENV += $(call docker_volume_and_env,RIOTBOARD,,riotboard)
 DOCKER_VOLUMES_AND_ENV += $(call docker_volume_and_env,RIOTMAKE,,riotmake)
 
-# Add GIT_CACHE_DIR if the directory exists
+# GIT_CACHE_DIR is created before going into docker if the directory does not
+# exists. It needs to be mounted at the *exact same absolute path* as it is
+# located on the host system, as git (not git-cache-rs) is adding fully resolved
+# absolute paths into the checkouts to the cache dir. If we stick with the
+# default dir (~/.gitcache or /data/riotbuild/.gitcache in case of docker),
+# building on host can (if switching between branches with different versions
+# of packages) fail with errors such as:
+#
+#   error: unable to normalize alternate object path: /data/riotbuild/.gitcache/github.com/mpaland/printf.git/objects
 GIT_CACHE_DIR ?= $(HOME)/.gitcache
-DOCKER_VOLUMES_AND_ENV += $(if $(wildcard $(GIT_CACHE_DIR)),$(call docker_volume,$(GIT_CACHE_DIR),$(DOCKER_BUILD_ROOT)/gitcache))
-DOCKER_VOLUMES_AND_ENV += $(if $(wildcard $(GIT_CACHE_DIR)),-e 'GIT_CACHE_DIR=$(DOCKER_BUILD_ROOT)/gitcache')
+GIT_CACHE_DIR := $(abspath $(GIT_CACHE_DIR))
+DOCKER_VOLUMES_AND_ENV += $(call docker_volume,$(GIT_CACHE_DIR),$(GIT_CACHE_DIR))
+DOCKER_VOLUMES_AND_ENV += -e 'GIT_CACHE_DIR=$(GIT_CACHE_DIR)'
 
 # Remap external module directories.
 #
@@ -386,11 +395,15 @@ docker_run_make = \
 # because the .cargo inside is as ephemeral as the build container.
 DEPS_FOR_RUNNING_DOCKER += $(HOME)/.cargo/git
 DEPS_FOR_RUNNING_DOCKER += $(HOME)/.cargo/registry
+DEPS_FOR_RUNNING_DOCKER += $(GIT_CACHE_DIR)
 
 $(HOME)/.cargo/git:
 	$(Q)mkdir -p $@
 
 $(HOME)/.cargo/registry:
+	$(Q)mkdir -p $@
+
+$(GIT_CACHE_DIR):
 	$(Q)mkdir -p $@
 
 # This will execute `make $(DOCKER_MAKECMDGOALS)` inside a Docker container.
