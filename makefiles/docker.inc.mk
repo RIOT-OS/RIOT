@@ -323,7 +323,7 @@ DOCKER_VOLUMES_AND_ENV += $(call docker_volume_and_env,RIOTBOARD,,riotboard)
 DOCKER_VOLUMES_AND_ENV += $(call docker_volume_and_env,RIOTMAKE,,riotmake)
 
 # GIT_CACHE_DIR is created before going into docker if the directory does not
-# exists. It needs to be mounted at the *exact same absolute path* as it is
+# exist. It needs to be mounted at the *exact same absolute path* as it is
 # located on the host system, as git (not git-cache-rs) is adding fully resolved
 # absolute paths into the checkouts to the cache dir. If we stick with the
 # default dir (~/.gitcache or /data/riotbuild/.gitcache in case of docker),
