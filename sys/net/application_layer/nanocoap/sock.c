@@ -776,16 +776,23 @@ ssize_t nanocoap_request(coap_pkt_t *pkt, const sock_udp_ep_t *local,
 static int _block_cb(void *arg, coap_pkt_t *pkt)
 {
     _block_ctx_t *ctx = arg;
-    coap_block1_t block2;
+    coap_block2_t block2;
 
     int res = _get_error(pkt);
     if (res) {
         return res;
     }
 
-    /* response was not block-wise */
-    if (!coap_get_block2(pkt, &block2)) {
-        block2 = (coap_block1_t){ .offset = 0 };
+    res = coap_get_block2(pkt, &block2);
+    if (res < 0) {
+        return res;
+    }
+
+    if (res == 0) {
+        DEBUG("nanocoap: Server replied without Block2 Option to a request "
+              "with a Block2 Option.\n");
+        /* Ensure the `block2.szx > ctx->blocksize` isn't failing. */
+        block2.szx = ctx->blocksize;
     }
 
     DEBUG("nanocoap: got block %"PRIu32" (offset %u)\n",
