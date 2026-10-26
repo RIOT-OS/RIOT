@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 
+# SPDX-FileCopyrightText: 2026 Tom Hert <git@annsann.eu>
 # SPDX-FileCopyrightText: 2020 Kaspar Schleiser <kaspar@schleiser.de>
 # SPDX-FileCopyrightText: 2020 Inria
 # SPDX-FileCopyrightText: 2020 Freie Universität Berlin
