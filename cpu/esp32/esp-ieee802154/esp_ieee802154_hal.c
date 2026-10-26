@@ -305,14 +305,17 @@ static int _config_addr_filter(ieee802154_dev_t *dev, ieee802154_af_cmd_t cmd, c
 
     switch (cmd) {
     case IEEE802154_AF_SHORT_ADDR:
+        const network_uint16_t *short_addr = value;
         DEBUG("[esp_ieee802154] %s: set IEEE802154_AF_SHORT_ADDR %02x:%02x\n",
               __func__, addr[0], addr[1]);
-        return esp_ieee802154_set_short_address(*((const uint16_t *)value)) ? -EIO : 0;
+        return esp_ieee802154_set_short_address(byteorder_ntohs(*short_addr)) ? -EIO : 0;
     case IEEE802154_AF_EXT_ADDR:
         DEBUG("[esp_ieee802154] %s: set IEEE802154_AF_EXT_ADDR "
               "%02x:%02x:%02x:%02x:%02x:%02x:%02x:%02x\n", __func__,
               addr[0], addr[1], addr[2], addr[3], addr[4], addr[5], addr[6], addr[7]);
-        return esp_ieee802154_set_extended_address(addr) ? -EIO : 0;
+        const eui64_t *ext_addr = value;
+        uint64_t le_addr = byteorder_swapll(ext_addr->uint64.u64);
+        return esp_ieee802154_set_extended_address((const uint8_t *)&le_addr) ? -EIO : 0;
     case IEEE802154_AF_PANID:
         DEBUG("[esp_ieee802154] %s: set IEEE802154_AF_PANID %02x:%02x\n",
               __func__, addr[1], addr[0]);
