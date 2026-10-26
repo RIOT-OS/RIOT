@@ -129,15 +129,41 @@ void auto_init_gnrc_ipv6_static_addr(void)
             downstream = gnrc_netif_get_by_pid(CONFIG_GNRC_IPV6_STATIC_ADDR_DOWNSTREAM);
         }
 
+        gnrc_netif_t *netif_wired = NULL;
+        gnrc_netif_t *netif_wireless = NULL;
+        gnrc_netif_t *netif_6lo = NULL;
         gnrc_netif_t *netif = NULL;
         while ((netif = gnrc_netif_iter(netif))) {
             bool is_wired = gnrc_netapi_get(netif->pid, NETOPT_IS_WIRED, 0, NULL, 0) == 1;
+            bool is_6lo   = gnrc_netif_is_6lo(netif);
 
-            if (!upstream && is_wired) {
-                upstream = netif;
-            } else if (!downstream && !is_wired) {
-                downstream = netif;
+            if (is_wired) {
+                netif_wired = netif;
             }
+            else if (is_6lo) {
+                netif_6lo = netif;
+            }
+            else {
+                netif_wireless = netif;
+            }
+        }
+
+        /* try to guess uplink */
+        if (netif_wired) {
+            upstream = netif_wired;
+        }
+        else if (netif_wireless) {
+            upstream = netif_wireless;
+            /* prevent using the same interface for uplink and downlink */
+            netif_wireless = NULL;
+        }
+
+        /* try to guess downlink */
+        if (netif_6lo) {
+            downstream = netif_6lo;
+        }
+        else if (netif_wireless) {
+            downstream = netif_wireless;
         }
     }
 
