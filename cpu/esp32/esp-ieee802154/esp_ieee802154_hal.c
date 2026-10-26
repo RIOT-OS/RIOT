@@ -256,13 +256,6 @@ static int _config_phy(ieee802154_dev_t *dev, const ieee802154_phy_conf_t *conf)
     return 0;
 }
 
-static int _set_frame_retrans(ieee802154_dev_t *dev, uint8_t retrans)
-{
-    (void)dev;
-    DEBUG("[esp_ieee802154] %s\n", __func__);
-    return -ENOTSUP;
-}
-
 static int _set_csma_params(ieee802154_dev_t *dev, const ieee802154_csma_be_t *bd,
                             int8_t retries)
 {
@@ -468,5 +461,4 @@ static const ieee802154_radio_ops_t esp_ieee802154_driver = {
     .config_addr_filter = _config_addr_filter,
     .config_src_addr_match = _config_src_addr_match,
     .set_frame_filter_mode = _set_frame_filter_mode,
-    .set_frame_retrans = _set_frame_retrans,
 };
