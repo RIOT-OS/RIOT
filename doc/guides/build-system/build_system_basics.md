@@ -36,7 +36,7 @@ For a `FEATURE` to be provided by a `board` it must meet 2 criteria, and for
   - e.g.: `stm32l152re` has an SPI peripheral
     `riotboot` needs to be able to link and flash at an offset
 - Needs support in RIOT, an implementation of an api to interact with the _hw_
-  - e.g.: `cpu/stm32_common/periph/spi.c` is implemented for `stm32l1`
+  - e.g.: `cpu/stm32/periph/spi.c` is implemented for `stm32l1`
     `riotboot` needs an implementation of `cpu_jump_to_image`
 - Wiring between the _cpu/soc_(system on a chip) a _bus_ and other _cpu_/_hw_ components.
   - e.g.: `nucleo-l152re/include/periph_conf.h` specified wiring between `PORT_Ax`

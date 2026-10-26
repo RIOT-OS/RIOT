@@ -1610,7 +1610,7 @@ If this start address is set to 0, as in the default board configuration,
 the first possible multiple of 0x100000 (1 MiB) will be used in the free
 SPI flash memory determined from the partition table.
 
-Please refer file `$RIOTBASE/tests/unittests/test-spiffs/tests-spiffs.c` for
+Please refer file `$RIOTBASE/tests/pkg/spiffs/main.c` for
 more information on how to use SPIFFS and VFS together with a MTD device `mtd0`
 alias `MTD_0`.
 

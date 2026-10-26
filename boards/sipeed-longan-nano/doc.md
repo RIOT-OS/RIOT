@@ -204,7 +204,7 @@ To use the display of the Sipeed Longan Nano board version with TFT display,
 the `sipeed_longan_nano_tft` board definition has to be used, for example:
 
 ```shell
-BOARD=sipeed-longan-nano-tft make -C tests/drivers/st7735 flash
+BOARD=sipeed-longan-nano-tft make -C tests/drivers/st77xx flash
 ```
 
 ## Accessing STDIO
