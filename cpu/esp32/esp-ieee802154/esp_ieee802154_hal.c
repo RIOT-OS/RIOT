@@ -121,6 +121,8 @@ static int _request_on(ieee802154_dev_t *dev)
     (void)dev;
     DEBUG("[esp_ieee802154] %s\n", __func__);
     esp_ieee802154_enable();
+    /* esp_ieee802154_enable resets promiscuous to true; make sure it's not on */
+    esp_ieee802154_set_promiscuous(false);
     return 0;
 }
 
@@ -274,8 +276,23 @@ static int _set_csma_params(ieee802154_dev_t *dev, const ieee802154_csma_be_t *b
 static int _set_frame_filter_mode(ieee802154_dev_t *dev, ieee802154_filter_mode_t mode)
 {
     (void)dev;
-    DEBUG("[esp_ieee802154] %s\n", __func__);
-    return -ENOTSUP;
+
+    switch (mode) {
+    case IEEE802154_FILTER_ACCEPT:
+        DEBUG("[esp_ieee802154] %s: set IEEE802154_FILTER_ACCEPT\n", __func__);
+        esp_ieee802154_set_promiscuous(false);
+        return 0;
+    case IEEE802154_FILTER_PROMISC:
+        DEBUG("[esp_ieee802154] %s: set IEEE802154_FILTER_PROMISC\n", __func__);
+        esp_ieee802154_set_promiscuous(true);
+        return 0;
+    case IEEE802154_FILTER_ACK_ONLY:
+    case IEEE802154_FILTER_SNIFFER:
+        DEBUG("[esp_ieee802154] %s: filter mode %d not supported\n", __func__, (int)mode);
+        /* fall through */
+    default:
+        return -ENOTSUP;
+    }
 }
 
 static int _config_addr_filter(ieee802154_dev_t *dev, ieee802154_af_cmd_t cmd, const void *value)
