@@ -62,12 +62,21 @@ set_result() {
     fi
 }
 
+function _is_ci {
+    [ -n "${CI}" ] || [ -n "${GITHUB_RUN_ID}" ] || [ -n "${CI_BASE_COMMIT}" ]
+}
+
 function run {
     for dep in ${DEPS["$1"]}; do
         if ! command -v "${dep}" &>/dev/null; then
-            echo -n "Required command '${dep}' for '$*' not found in PATH "
+            echo -n "Required command '${dep}' for '$*' not found in PATH"
+            if _is_ci; then
+                set_result 1
+            else
+                echo -n ", skipping. Install it to run this test."
+            fi
+            echo -n " "
             print_warning
-            set_result 1
             return 1
         fi
     done
