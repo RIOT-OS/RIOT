@@ -85,56 +85,37 @@ All relevant information around contributing to RIOT can also be found in our
 
 RIOT provides features including, but not limited to:
 
-- Platforms Supported
-  - 200+ boards based on AVR, MSP430, ESP8266, ESP32, RISC-V, ARM7, and ARM Cortex-M
-  - The native port allows to run RIOT as-is on Linux and BSD.
-    Multiple instances of RIOT running on a single machine can also be
-    interconnected via a simple virtual Ethernet bridge or via a simulated
-    IEEE 802.15.4 network (ZEP).
-- Programming Environment
-  - Write native code in C, C++, or Rust
-  - Rely upon POSIX APIs, user friendly hardware abstractions and standard embedded Rust interfaces
-  - Integrate dynamic runtimes such as MicroPython, elm (JavaScript) and WASM
-- Network Features and Protocols
-  - IPv6
-  - IPv4 via lwIP
-  - 6LoWPAN (RFC4944, RFC6282, RFC6775 and RFC7668)
-  - UDP
-  - TCP
-  - RPL (storing mode, P2P mode)
-  - CoAP
-  - MQTT via paho-mqtt and MQTT-SN
-  - LwM2M
-  - Bluetooth (BLE) via [NimBLE][nimble]
-  - LoRaWAN
-  - UWB
-  - CAN
-  - CNN-Lite
-  - LwIP
-  - IEEE 802.15.4
-  - Ethernet (also via USB)
-  - SLIP (or ethos networking via Serial)
-  - Dose (single pair ethernet like networking on serial interface UART)
-- System Features
-  - a preemptive, tickless scheduler with priorities, optional periodic round robin within priorities
-  - flexible memory management
-  - high resolution, long-term timers
-  - MTD abstraction layer for memory devices
-  - File System integration
-- Security Features
-  - OTA updates via SUIT
-  - PSA Cryptographic API
-  - DTLS, EDHOC
-- Device Drivers
-  - SPI, I2C, UART, USB, CAN
-  - RTC, PWM, Timer
-  - ADC, DAC
-  - Various sensors: Environmental sensors, IMUs, magnetometers, particulate matter sensors
-  - Various actuators: Servos, motors, dimmers, switches, RGB LEDs
-  - Displays and touchscreens
-  - GNSS
+- **Platforms:** [300+ boards][boards] based on 8/16/32-bit AVR, MSP430, ARM7,
+  ARM Cortex-M, RISC-V, ESP8266, ESP32 MCUs and more. Multiple native development
+  instances can be interconnected via a virtual Ethernet bridge
+  or a simulated IEEE 802.15.4 network (ZEP).
+- **Programming environment:** Write native code in C, C++, or Rust, relying
+  on POSIX APIs, uniform hardware abstractions, and standard embedded Rust
+  interfaces. Dynamic runtimes include MicroPython, JavaScript, Lua,
+  and WebAssembly (WAMR).
+- **Packages:** A large third-party package ecosystem covering GUIs (LVGL),
+  USB (TinyUSB), machine learning (TensorFlow Lite Micro, emlearn),
+  serialization (Nanopb, FlatBuffers), an embedded database (FlashDB), the
+  Embedded Template Library (ETL), Arduino API compatibility, and
+  compression and parsing (heatshrink, LZ4, jsmn, mjson).
+- **Networking and protocols:** IPv6 and IPv4 (lwIP), 6LoWPAN, IEEE 802.15.4,
+  Ethernet (also via USB), SLIP/ethos, and DOSE (Differentially Operated
+  Serial Ethernet), TCP and UDP, RPL, CoAP, MQTT and MQTT-SN, LwM2M, DNS,
+  DHCPv6, and SNTP, CCN-Lite, and SCHC.
+- **Wireless:** Bluetooth Low Energy via NimBLE, Thread via OpenThread,
+  LoRaWAN, and UWB.
+- **System:** A preemptive, tickless scheduler with priorities and optional
+  round-robin, flexible memory management, high-resolution and long-term
+  timers, an MTD abstraction, file systems, a shell,
+  and the SAUL sensor/actuator registry.
+- **Security:** SUIT OTA updates, the PSA Crypto API, DTLS/TLS (tinyDTLS,
+  Mbed TLS, wolfSSL), EDHOC, OSCORE, and FIDO2.
+- **Device drivers:** SPI, I2C, UART, USB, CAN, RTC, PWM, timers, ADC
+  and DAC, environmental, IMU, magnetometer, particulate matter, and GNSS
+  sensors, servos, motors, dimmers, switches, RGB LEDs, displays, and
+  touchscreens.
 
-[nimble]: https://github.com/apache/mynewt-nimble
+[boards]: https://doc.riot-os.org/boards/
 
 ## Community
 
