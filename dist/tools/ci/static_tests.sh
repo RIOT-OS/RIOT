@@ -136,4 +136,22 @@ should_run any_c_files ./dist/tools/uncrustify/uncrustify.sh
 ERROR_EXIT_CODE=0 should_run any_c_files ./dist/tools/clang_format/check.sh
 ERROR_EXIT_CODE=0 should_run any_shell_files ./dist/tools/shellcheck/check.sh
 
+# Build tests for host tools.
+should_run benchmark_udp make -C dist/tools/benchmark_udp
+should_run bossa-1.8 make -C dist/tools/bossa-1.8
+should_run bossa-1.9 make -C dist/tools/bossa-1.9
+should_run bossa-nrf52 make -C dist/tools/bossa-nrf52
+should_run calc_spi_scalers make -C cpu/kinetis/dist/calc_spi_scalers
+should_run clk_conf make -C cpu/stm32/dist/clk_conf
+should_run edbg make -C dist/tools/edbg
+should_run ethos make -C dist/tools/ethos
+should_run fixdep make -C dist/tools/fixdep
+should_run flatc make -C dist/tools/flatc
+should_run lpc2k_pgm make -C dist/tools/lpc2k_pgm
+should_run mosquitto_rsmb make -C dist/tools/mosquitto_rsmb
+should_run riotboot_serial make -C dist/tools/riotboot_serial
+should_run setsid make -C dist/tools/setsid
+should_run uhcpd make -C dist/tools/uhcpd
+should_run zep_dispatch make -C dist/tools/zep_dispatch
+
 exit "$RESULT"
