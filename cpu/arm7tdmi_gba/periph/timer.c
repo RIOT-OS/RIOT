@@ -47,8 +47,6 @@ void gba_timer_isr(uint16_t interrupt_flags_timer)
             if (dev->irq_enable) {
                 /* turn off the timer to apply a new value later on */
                 dev->run = 0;
-                /* call the call back */
-                isr_ctx[timer_num].cb(isr_ctx[timer_num].arg, 0);
                 /* disable this one shot timer. Since we need the timer itself running
                  * to continue to track the time, we need to prevent the next overflow
                  * from doing stuff during the IRQ / ISR */
@@ -60,6 +58,10 @@ void gba_timer_isr(uint16_t interrupt_flags_timer)
                 dev->current_value = 0;
                 /* Enable the timer, this will apply the new timer value we just set */
                 dev->run = 1;
+                /* The callback might query the timer value. To ensure the value returned
+                 * by timer_read() is valid, we first reset the timer (the lines above)
+                 * before calling the callback. */
+                isr_ctx[timer_num].cb(isr_ctx[timer_num].arg, 0);
             }
         }
         timer_num++;
