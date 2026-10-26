@@ -127,9 +127,9 @@
  * platforms.
  *
  * ```makefile
- * cd <path-to>/RIOT/tests/pkg/wolfssl-test
+ * cd <path-to>/RIOT/tests/pkg/wolfssl
  * make
- * ./bin/native/wolfssl-test.elf # execute native port
+ * ./bin/native64/tests_wolfssl.elf # execute native port
  * ```
  *
  * ED25519 signature verification demo
