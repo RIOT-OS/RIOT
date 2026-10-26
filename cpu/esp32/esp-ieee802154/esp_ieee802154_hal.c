@@ -205,7 +205,11 @@ static int _off(ieee802154_dev_t *dev)
     (void)dev;
     DEBUG("[esp_ieee802154] %s\n", __func__);
     _rx_on = false;
-    esp_ieee802154_disable();
+
+    /* don't allow multiple disable */
+    if (esp_ieee802154_get_state() != ESP_IEEE802154_RADIO_DISABLE) {
+        esp_ieee802154_disable();
+    }
     /* close a pending reception and release the RX buffer of its frame,
      * the ESP-IDF driver is disabled and doesn't report frames anymore */
     _release_frame(&_rx_frame);
@@ -216,9 +220,24 @@ static int _request_on(ieee802154_dev_t *dev)
 {
     (void)dev;
     DEBUG("[esp_ieee802154] %s\n", __func__);
-    esp_ieee802154_enable();
-    /* esp_ieee802154_enable resets promiscuous to true; make sure it's not on */
+
+    /* don't allow multiple enabling to prevent the module clock from
+       continuing to run after a single disabling. */
+    if ((esp_ieee802154_get_state() == ESP_IEEE802154_RADIO_DISABLE) &&
+        (esp_ieee802154_enable() != ESP_OK)) {
+        return -EIO;
+    }
+
+    /* Enabling the ESP-IDF driver initializes the MAC hardware and resets
+     * the whole configuration (PIB) to the ESP-IDF defaults, including the
+     * promiscuous mode, which is enabled by default. Therefore, the radio is
+     * configured each time it is switched on. */
+    esp_ieee802154_reset_pending_table(true);
+    esp_ieee802154_reset_pending_table(false);
+    esp_ieee802154_set_cca_mode(ESP_IEEE802154_CCA_MODE_ED);
+    esp_ieee802154_set_ack_timeout(ESP_IEEE802154_ACK_TIMEOUT_US);
     esp_ieee802154_set_promiscuous(false);
+
     return 0;
 }
 
@@ -585,14 +604,8 @@ int esp_ieee802154_init(void)
 {
     DEBUG("[esp_ieee802154] %s\n", __func__);
 
-    esp_ieee802154_enable();
-    esp_ieee802154_reset_pending_table(true);
-    esp_ieee802154_reset_pending_table(false);
-    esp_ieee802154_set_rx_when_idle(true);
-    esp_ieee802154_receive();
-    esp_ieee802154_set_cca_mode(ESP_IEEE802154_CCA_MODE_ED);
-    esp_ieee802154_set_ack_timeout(ESP_IEEE802154_ACK_TIMEOUT_US);
-    esp_ieee802154_set_promiscuous(false);
+    /* The radio is enabled and configured when it is switched on by the
+     * upper layer, see _request_on. */
 
     return 0;
 }
