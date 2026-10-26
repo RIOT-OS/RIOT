@@ -58,6 +58,29 @@ LGPL code.
 [riot-course]: https://github.com/RIOT-OS/riot-course
 [api-docs]: https://api.riot-os.org/
 
+## Contributing
+
+RIOT is developed by its community, and contributions of all kinds are welcome:
+code, documentation, bug reports, and reviews. If this is your first time
+with RIOT consider first following our [Getting Started Guides][getting-started].
+
+- **Start here:** Our [contributing document][contributing] explains the
+  workflow, commit conventions, and review process.
+- **Follow the style:** Make sure your changes comply with our
+  [coding conventions][coding-conventions]. You can run `make static-test` to
+  check them before opening a pull request.
+- **Declare AI tool usage:** All pull requests require a declaration of
+  AI/LLM usage. If you use AI tools, please also read our
+  [AI Policy][ai-policy].
+
+All relevant information around contributing to RIOT can also be found in our
+[Developing RIOT Guides][developing-guide].
+
+[contributing]: CONTRIBUTING.md
+[coding-conventions]: CODING_CONVENTIONS.md
+[ai-policy]: https://doc.riot-os.org/general/ai_policy
+[developing-guide]: https://doc.riot-os.org/general/contributing/
+
 ## Features
 
 RIOT provides features including, but not limited to:
@@ -129,15 +152,6 @@ feature requests to our [GitHub issue tracker][issues]
 For how our community is structured and governed,
 please see our [governance document][governance].
 
-### How to Ask
-
-Please include as much detail as you can that is relevant to your question, not
-only "this isn't working". These details include:
-
-1. What you want to achieve.
-2. What have you tried so far (for example the commands you typed).
-3. What happened so far.
-
 ### Collaboration
 
 RIOT closely collaborates with and inspires other open source projects,
@@ -152,47 +166,6 @@ We are more than happy to collaborate with those who share our
 [governance]: https://guide.riot-os.org/general/governance/
 [ariel]: https://ariel-os.org/
 [vision]: https://guide.riot-os.org/general/vision/
-
-## Getting RIOT
-
-The most convenient way to get RIOT is to clone it via Git
-
-```console
-git clone https://github.com/RIOT-OS/RIOT
-```
-
-this will ensure that you get all the newest features and bug fixes with the
-caveat of an ever changing work environment.
-
-If you prefer things more stable, you can download the source code of one of our
-quarter annual releases [via Github][releases]
-as ZIP file or tarball. You can also checkout a release in
-a cloned Git repository using
-
-```console
-git pull --tags
-git checkout <YYYY.MM>
-```
-
-For more details on our release cycle, check our
-[documentation][release-cycle].
-
-[releases]: https://github.com/RIOT-OS/RIOT/releases
-[release-cycle]: https://guide.riot-os.org/misc/release_cycle/
-
-## Contribute
-
-To contribute something to RIOT, please refer to our
-[contributing document][contributing].
-
-[contributing]: CONTRIBUTING.md
-
-## Mailing Lists
-
-- Github notifications:
-[notifications@riot-os.org][notifications]
-
-[notifications]: https://lists.riot-os.org/postorius/lists/notifications.lists.riot-os.org/
 
 ## License
 
