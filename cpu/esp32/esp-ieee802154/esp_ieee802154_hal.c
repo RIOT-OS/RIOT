@@ -267,7 +267,7 @@ static int _set_csma_params(ieee802154_dev_t *dev, const ieee802154_csma_be_t *b
                             int8_t retries)
 {
     (void)dev;
-    DEBUG("[esp_ieee802154] %s\n", __func__);
+    DEBUG("[esp_ieee802154] %s %p %d\n", __func__, bd, retries);
     return -ENOTSUP;
 }
 
@@ -436,7 +436,6 @@ static const ieee802154_radio_ops_t esp_ieee802154_driver = {
     .caps = IEEE802154_CAP_24_GHZ
           | IEEE802154_CAP_PHY_OQPSK
           | IEEE802154_CAP_AUTO_ACK
-          | IEEE802154_CAP_AUTO_CSMA
           | IEEE802154_CAP_SRC_ADDR_MATCH
 #if _USE_CCA_DONE
           | IEEE802154_CAP_IRQ_CCA_DONE
