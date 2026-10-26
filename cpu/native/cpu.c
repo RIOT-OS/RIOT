@@ -61,6 +61,14 @@ extern netdev_tap_t netdev_tap;
 #include "debug.h"
 #define DEBUG_CPU(...) DEBUG("[native] CPU: " __VA_ARGS__)
 
+#if defined(__SANITIZE_ADDRESS__)
+#define NATIVE_ASAN 1
+#elif defined(__clang__)
+#define NATIVE_ASAN __has_feature(address_sanitizer)
+#else
+#define NATIVE_ASAN 0
+#endif
+
 /**
  * @brief   Host thread backing a RIOT thread
  *
@@ -349,10 +357,12 @@ void native_cpu_init(void)
     for (unsigned i = 0; i < ARRAY_SIZE(lookups); i++) {
         void *fn = NULL;
 
-#if defined(__i386__) && defined(__GLIBC__)
+#if !NATIVE_ASAN && defined(__i386__) && defined(__GLIBC__)
         /* i386 glibc still provides the GLIBC_2.0 compat versions of
          * pthread_create() and pthread_attr_init() with an older, smaller
-         * pthread_attr_t, and dlsym() may return those */
+         * pthread_attr_t, and dlsym() may return those.
+         * Don't do this in the ASAN case as we want to use it's wrappers.
+         */
         fn = dlvsym(RTLD_NEXT, lookups[i].name, "GLIBC_2.1");
 #endif
         if (fn == NULL) {
