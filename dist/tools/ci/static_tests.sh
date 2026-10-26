@@ -83,7 +83,7 @@ function run {
     done
 
     if [ -n "${GITHUB_RUN_ID}" ]; then
-        echo -n "::group::$1 "
+        echo -n "::group::$* "
     else
         echo -n "Running \"$*\" "
     fi
