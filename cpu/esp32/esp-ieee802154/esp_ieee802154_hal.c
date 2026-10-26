@@ -42,6 +42,7 @@ static esp_ieee802154_frame_info_t *_ack_frame_info;
 static bool _channel_clear;
 
 static esp_ieee802154_tx_error_t _tx_error;     /* error on last transmit */
+static bool _cca_send_on = true;
 
 static int _write(ieee802154_dev_t *dev, const iolist_t *psdu)
 {
@@ -142,7 +143,7 @@ static int _request_op(ieee802154_dev_t *dev, ieee802154_hal_op_t op, void *ctx)
         _tx_error = ESP_IEEE802154_TX_ERR_NONE;
         _ack_frame = NULL;
         _ack_frame_info = NULL;
-        return esp_ieee802154_transmit(_tx_frame, true) ? -EIO : 0;
+        return esp_ieee802154_transmit(_tx_frame, _cca_send_on) ? -EIO : 0;
     case IEEE802154_HAL_OP_SET_RX:
         DEBUG("[esp_ieee802154] %s: IEEE802154_HAL_OP_SET_RX\n", __func__);
         return (IS_ACTIVE(_USE_SET_RX) && esp_ieee802154_receive()) ? -EIO : 0;
@@ -150,7 +151,6 @@ static int _request_op(ieee802154_dev_t *dev, ieee802154_hal_op_t op, void *ctx)
         /* TODO: ctx = (bool *force) */
         DEBUG("[esp_ieee802154] %s: IEEE802154_HAL_OP_SET_IDLE\n", __func__);
         return (IS_ACTIVE(_USE_SET_IDLE) && esp_ieee802154_sleep()) ? -EIO : 0;
-        return 0;
     case IEEE802154_HAL_OP_CCA:
         extern esp_err_t esp_ieee802154_cca(void);
         DEBUG("[esp_ieee802154] %s: IEEE802154_HAL_OP_CCA\n", __func__);
@@ -256,19 +256,17 @@ static int _config_phy(ieee802154_dev_t *dev, const ieee802154_phy_conf_t *conf)
     return 0;
 }
 
-static int _set_frame_retrans(ieee802154_dev_t *dev, uint8_t retrans)
-{
-    (void)dev;
-    DEBUG("[esp_ieee802154] %s\n", __func__);
-    return -ENOTSUP;
-}
-
 static int _set_csma_params(ieee802154_dev_t *dev, const ieee802154_csma_be_t *bd,
                             int8_t retries)
 {
     (void)dev;
     DEBUG("[esp_ieee802154] %s %p %d\n", __func__, bd, retries);
-    return -ENOTSUP;
+    if (retries > 0) {
+        return -EINVAL;
+    }
+
+    _cca_send_on = retries == 0;
+    return 0;
 }
 
 static int _set_frame_filter_mode(ieee802154_dev_t *dev, ieee802154_filter_mode_t mode)
@@ -463,5 +461,4 @@ static const ieee802154_radio_ops_t esp_ieee802154_driver = {
     .config_addr_filter = _config_addr_filter,
     .config_src_addr_match = _config_src_addr_match,
     .set_frame_filter_mode = _set_frame_filter_mode,
-    .set_frame_retrans = _set_frame_retrans,
 };
