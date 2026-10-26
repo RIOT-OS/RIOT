@@ -657,7 +657,7 @@ The size of the SPIFF then results from:
 flash_size - 5 * 4096 - 512 kByte
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Please refer file `$RIOTBASE/tests/unittests/test-spiffs/tests-spiffs.c`
+Please refer file `$RIOTBASE/tests/pkg/spiffs/main.c`
 for more information on how to use SPIFFS and VFS together with a MTD
 device `#mtd0` alias `MTD_0`.
 
