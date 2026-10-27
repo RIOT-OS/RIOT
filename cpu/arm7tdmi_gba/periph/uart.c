@@ -45,16 +45,18 @@ int uart_init(uart_t uart, uint32_t baud, uart_rx_cb_t rx_cb, void *arg)
 {
     (void)uart;
 
-    GBA_UART->baud = _baud_to_flag(baud);
-    GBA_UART->cts = 0;       /* disable / always send */
-    GBA_UART->parity = 0;    /* even */
-    GBA_UART->data_bits = 1; /* 8 bits */
-    GBA_UART->fifo_enable = 1;
-    GBA_UART->parity_enable = 0;
-    GBA_UART->send_enable = 1;
-    GBA_UART->receive_enable = 1;
-    GBA_UART->must_be_1_for_uart = 3;
-    GBA_UART->irq_enable = 1;
+    gba_uart_t uart_settings;
+    uart_settings.baud = _baud_to_flag(baud);
+    uart_settings.cts = 0;       /* disable / always send */
+    uart_settings.parity = 0;    /* even */
+    uart_settings.data_bits = 1; /* 8 bits */
+    uart_settings.fifo_enable = 1;
+    uart_settings.parity_enable = 0;
+    uart_settings.send_enable = 1;
+    uart_settings.receive_enable = 1;
+    uart_settings.must_be_1_for_uart = 3;
+    uart_settings.irq_enable = 1;
+    *GBA_UART = uart_settings;
 
     uart_cb = rx_cb;
     uart_cb_arg = arg;
@@ -94,7 +96,7 @@ void uart_write(uart_t uart, const uint8_t *data, size_t len)
     while (len > 0) {
         /* wait for hardware to get ready */
         while (GBA_UART->send_data_full) {}
-        GBA_UART->data = data[i++];
+        GBA_SIO_DATA8 = data[i++];
         len--;
     }
 }
