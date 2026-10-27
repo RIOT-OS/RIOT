@@ -122,6 +122,8 @@ static int _request_on(ieee802154_dev_t *dev)
     (void)dev;
     DEBUG("[esp_ieee802154] %s\n", __func__);
     esp_ieee802154_enable();
+    /* esp_ieee802154_enable resets promiscuous to true; make sure it's not on */
+    esp_ieee802154_set_promiscuous(false);
     return 0;
 }
 
@@ -272,8 +274,23 @@ static int _set_csma_params(ieee802154_dev_t *dev, const ieee802154_csma_be_t *b
 static int _set_frame_filter_mode(ieee802154_dev_t *dev, ieee802154_filter_mode_t mode)
 {
     (void)dev;
-    DEBUG("[esp_ieee802154] %s\n", __func__);
-    return -ENOTSUP;
+
+    switch (mode) {
+    case IEEE802154_FILTER_ACCEPT:
+        DEBUG("[esp_ieee802154] %s: set IEEE802154_FILTER_ACCEPT\n", __func__);
+        esp_ieee802154_set_promiscuous(false);
+        return 0;
+    case IEEE802154_FILTER_PROMISC:
+        DEBUG("[esp_ieee802154] %s: set IEEE802154_FILTER_PROMISC\n", __func__);
+        esp_ieee802154_set_promiscuous(true);
+        return 0;
+    case IEEE802154_FILTER_ACK_ONLY:
+    case IEEE802154_FILTER_SNIFFER:
+        DEBUG("[esp_ieee802154] %s: filter mode %d not supported\n", __func__, (int)mode);
+        /* fall through */
+    default:
+        return -ENOTSUP;
+    }
 }
 
 static int _config_addr_filter(ieee802154_dev_t *dev, ieee802154_af_cmd_t cmd, const void *value)
@@ -286,14 +303,17 @@ static int _config_addr_filter(ieee802154_dev_t *dev, ieee802154_af_cmd_t cmd, c
 
     switch (cmd) {
     case IEEE802154_AF_SHORT_ADDR:
+        const network_uint16_t *short_addr = value;
         DEBUG("[esp_ieee802154] %s: set IEEE802154_AF_SHORT_ADDR %02x:%02x\n",
               __func__, addr[0], addr[1]);
-        return esp_ieee802154_set_short_address(*((const uint16_t *)value)) ? -EIO : 0;
+        return esp_ieee802154_set_short_address(byteorder_ntohs(*short_addr)) ? -EIO : 0;
     case IEEE802154_AF_EXT_ADDR:
         DEBUG("[esp_ieee802154] %s: set IEEE802154_AF_EXT_ADDR "
               "%02x:%02x:%02x:%02x:%02x:%02x:%02x:%02x\n", __func__,
               addr[0], addr[1], addr[2], addr[3], addr[4], addr[5], addr[6], addr[7]);
-        return esp_ieee802154_set_extended_address(addr) ? -EIO : 0;
+        const eui64_t *ext_addr = value;
+        uint64_t le_addr = byteorder_swapll(ext_addr->uint64.u64);
+        return esp_ieee802154_set_extended_address((const uint8_t *)&le_addr) ? -EIO : 0;
     case IEEE802154_AF_PANID:
         DEBUG("[esp_ieee802154] %s: set IEEE802154_AF_PANID %02x:%02x\n",
               __func__, addr[1], addr[0]);
