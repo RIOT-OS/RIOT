@@ -27,9 +27,9 @@
 #include <stdbool.h>
 #include <stdint.h>
 
-#include "periph/spi.h"
-#include "periph/gpio.h"
 #include "net/netdev.h"
+#include "periph/gpio.h"
+#include "periph/spi.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -39,22 +39,29 @@ extern "C" {
  * @brief   Struct containing the peripheral configuration for the device
  */
 typedef struct {
-    spi_t spi;              /**< SPI bus the device is connected to */
-    spi_clk_t clk;          /**< clock speed used on the selected SPI bus */
-    gpio_t cs;              /**< pin connected to the chip select line */
-    gpio_t irq;             /**< pin connected to the interrupt line */
-    gpio_t reset;           /**< pin connected to the reset line, may be
-                              *  @ref GPIO_UNDEF if not wired up */
+    spi_t spi;     /**< SPI bus the device is connected to */
+    spi_clk_t clk; /**< clock speed used on the selected SPI bus */
+    gpio_t cs;     /**< pin connected to the chip select line */
+    gpio_t irq;    /**< pin connected to the interrupt line */
+    gpio_t reset;  /**< pin connected to the reset line, may be
+                    *  @ref GPIO_UNDEF if not wired up */
 } ksz8851_params_t;
+
+/**
+ * @brief   Number of bins in the multicast address hash table
+ */
+#define KSZ8851_MCAST_HASH_BINS     (64)
 
 /**
  * @brief   KSZ8851SNL device descriptor
  */
 typedef struct {
-    netdev_t netdev;        /**< extends the netdev structure */
-    ksz8851_params_t p;     /**< peripheral configuration */
-    bool link_up;           /**< used to only emit a LINK event on change */
-    uint8_t frame_id;       /**< running TX frame ID, used for QMU bookkeeping */
+    netdev_t netdev;    /**< extends the netdev structure */
+    ksz8851_params_t p; /**< peripheral configuration */
+    bool link_up;       /**< used to only emit a LINK event on change */
+    uint8_t frame_id;   /**< running TX frame ID, used for QMU bookkeeping */
+    /** number of joined multicast groups per hash table bin */
+    uint8_t mcast_refs[KSZ8851_MCAST_HASH_BINS];
 } ksz8851_t;
 
 /**

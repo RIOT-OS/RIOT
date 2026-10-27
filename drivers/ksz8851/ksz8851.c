@@ -18,15 +18,15 @@
 #include <errno.h>
 #include <string.h>
 
+#include "checksum/crc32.h"
 #include "iolist.h"
+#include "ksz8851.h"
+#include "ksz8851_regs.h"
 #include "net/ethernet.h"
 #include "net/eui_provider.h"
 #include "net/netdev/eth.h"
 #include "time_units.h"
 #include "ztimer.h"
-
-#include "ksz8851.h"
-#include "ksz8851_regs.h"
 
 #define ENABLE_DEBUG        0
 #include "debug.h"
@@ -103,8 +103,7 @@ static void rx_flush(ksz8851_t *dev)
     reg_set_bits(dev, REG_RXCR1, RXCR1_RXE);
 }
 
-static int fifo_read(ksz8851_t *dev, uint8_t *data, size_t len, size_t skip,
-                     size_t trailer)
+static int fifo_read(ksz8851_t *dev, uint8_t *data, size_t len, size_t skip, size_t trailer)
 {
     spi_transfer_byte(SPI_BUS, CS_PIN, true, CMD_FIFO_READ);
     while (skip--) {
@@ -147,6 +146,70 @@ static void chip_reset(ksz8851_t *dev)
     reg_write(dev, REG_GRR, 0);
 }
 
+/* The chip indexes its 64 bit hash table with the upper 6 bits of the
+ * big-endian Ethernet CRC32 of the destination address. crc32() yields the
+ * bit-reversed form of that CRC with the final inversion applied, so the
+ * wanted bits are the 6 lowest bits of ~crc32(), in reverse order. */
+static uint8_t mcast_hash(const uint8_t *addr)
+{
+    uint32_t crc = ~crc32(addr, ETHERNET_ADDR_LEN);
+    uint8_t hash = 0;
+
+    for (unsigned i = 0; i < 6; i++, crc >>= 1) {
+        hash = (hash << 1) | (crc & 1);
+    }
+
+    return hash;
+}
+
+static void write_mcast_table(ksz8851_t *dev)
+{
+    uint16_t table[4] = { 0 };
+
+    for (unsigned i = 0; i < KSZ8851_MCAST_HASH_BINS; i++) {
+        if (dev->mcast_refs[i]) {
+            table[i / 16] |= 1U << (i % 16);
+        }
+    }
+
+    for (unsigned i = 0; i < ARRAY_SIZE(table); i++) {
+        reg_write(dev, REG_MAHTR0 + 2 * i, table[i]);
+    }
+}
+
+static int mcast_update(ksz8851_t *dev, const uint8_t *addr, bool join)
+{
+    uint8_t hash = mcast_hash(addr);
+
+    if (join) {
+        if (dev->mcast_refs[hash] == UINT8_MAX) {
+            return -ENOMEM;
+        }
+        if (dev->mcast_refs[hash]++) {
+            /* bin already set */
+            return 0;
+        }
+    }
+    else {
+        if (dev->mcast_refs[hash] == 0) {
+            return -EINVAL;
+        }
+        if (--dev->mcast_refs[hash]) {
+            /* bin still in use */
+            return 0;
+        }
+    }
+
+    spi_acquire(dev->p.spi, dev->p.cs, SPI_MODE, dev->p.clk);
+    /* the hash table may only be modified while RX is stopped */
+    reg_clear_bits(dev, REG_RXCR1, RXCR1_RXE);
+    write_mcast_table(dev);
+    reg_set_bits(dev, REG_RXCR1, RXCR1_RXE);
+    spi_release(dev->p.spi);
+
+    return 0;
+}
+
 static void irq_handler(void *arg)
 {
     ksz8851_t *dev = arg;
@@ -160,6 +223,7 @@ void ksz8851_setup(ksz8851_t *dev, const ksz8851_params_t *params, uint8_t index
     dev->p = *params;
     dev->link_up = false;
     dev->frame_id = 0;
+    memset(dev->mcast_refs, 0, sizeof(dev->mcast_refs));
 
     spi_init_cs(dev->p.spi, dev->p.cs);
 
@@ -209,12 +273,14 @@ static int _init(netdev_t *netdev)
     reg_write(dev, REG_TXCR, TXCR_TXFCE | TXCR_TXPE | TXCR_TXCE);
 
     reg_write(dev, REG_RXFDPR, RXFDPR_RXFPAI);
+    /* Hash perfect filtering: unicast must match the MAC address,
+     * multicast must match the hash table */
+    write_mcast_table(dev);
     reg_write(dev, REG_RXCR1,
-              RXCR1_RXUDPFCC | RXCR1_RXTCPFCC | RXCR1_RXIPFCC |
-              RXCR1_RXPAFMA | RXCR1_RXFCE | RXCR1_RXBE | RXCR1_RXUE);
+              RXCR1_RXUDPFCC | RXCR1_RXTCPFCC | RXCR1_RXIPFCC | RXCR1_RXPAFMA | RXCR1_RXFCE |
+                  RXCR1_RXBE | RXCR1_RXME | RXCR1_RXUE);
     reg_write(dev, REG_RXCR2,
-              RXCR2_SRDBL2 | RXCR2_IUFFP | RXCR2_RXIUFCEZ |
-              RXCR2_UDPLFE | RXCR2_RXICMPFCC);
+              RXCR2_SRDBL2 | RXCR2_IUFFP | RXCR2_RXIUFCEZ | RXCR2_UDPLFE | RXCR2_RXICMPFCC);
     reg_write(dev, REG_RXQCR, RXQCR_RXFCTE | RXQCR_ADRFE);
 
     /* Generate a RX interrupt as soon as a single frame is received */
@@ -338,8 +404,7 @@ static int _recv(netdev_t *netdev, void *buf, size_t max_len, void *info)
 
     rx_frame_pointer_reset(dev);
     reg_set_bits(dev, REG_RXQCR, RXQCR_SDA);
-    ret = fifo_read(dev, buf, frame_len, FIFO_RX_HEADER_LEN,
-                    ((rxfhbcr + 3) & ~3) - frame_len);
+    ret = fifo_read(dev, buf, frame_len, FIFO_RX_HEADER_LEN, ((rxfhbcr + 3) & ~3) - frame_len);
     reg_clear_bits(dev, REG_RXQCR, RXQCR_SDA);
 
     spi_release(dev->p.spi);
@@ -361,8 +426,7 @@ static void update_link_status(ksz8851_t *dev)
 
     dev->link_up = link_up;
     dev->netdev.event_callback(&dev->netdev,
-                                link_up ? NETDEV_EVENT_LINK_UP
-                                        : NETDEV_EVENT_LINK_DOWN);
+                               link_up ? NETDEV_EVENT_LINK_UP : NETDEV_EVENT_LINK_DOWN);
 }
 
 static void _isr(netdev_t *netdev)
@@ -441,6 +505,7 @@ static int _get(netdev_t *netdev, netopt_t opt, void *value, size_t max_len)
 static int _set(netdev_t *netdev, netopt_t opt, const void *value, size_t value_len)
 {
     ksz8851_t *dev = (ksz8851_t *)netdev;
+    int res;
 
     switch (opt) {
     case NETOPT_ADDRESS:
@@ -451,6 +516,13 @@ static int _set(netdev_t *netdev, netopt_t opt, const void *value, size_t value_
         set_macaddr(dev, value);
         spi_release(dev->p.spi);
         return ETHERNET_ADDR_LEN;
+    case NETOPT_L2_GROUP:
+    case NETOPT_L2_GROUP_LEAVE:
+        if (value_len != ETHERNET_ADDR_LEN) {
+            return -EINVAL;
+        }
+        res = mcast_update(dev, value, opt == NETOPT_L2_GROUP);
+        return (res < 0) ? res : ETHERNET_ADDR_LEN;
     default:
         return netdev_eth_set(netdev, opt, value, value_len);
     }

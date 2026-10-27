@@ -77,6 +77,10 @@ extern "C" {
 #define REG_IER                 (0x90)              /**< Interrupt Enable Register */
 #define REG_ISR                 (0x92)              /**< Interrupt Status Register */
 #define REG_RXFCTR              (0x9C)              /**< RX Frame Count & Threshold Register */
+#define REG_MAHTR0              (0xA0)              /**< MAC Address Hash Table Register 0 */
+#define REG_MAHTR1              (0xA2)              /**< MAC Address Hash Table Register 1 */
+#define REG_MAHTR2              (0xA4)              /**< MAC Address Hash Table Register 2 */
+#define REG_MAHTR3              (0xA6)              /**< MAC Address Hash Table Register 3 */
 #define REG_FCLWR               (0xB0)              /**< Flow Control Low Watermark Register */
 #define REG_FCHWR               (0xB2)              /**< Flow Control High Watermark Register */
 #define REG_CIDER               (0xC0)              /**< Chip ID and Enable Register */
