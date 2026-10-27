@@ -47,7 +47,7 @@ void gba_timer_init(void)
     GBA_TM3_CNT_H = 0;
 
     if (IS_USED(MODULE_PERIPH_TIMER)) {
-        GBA_IE = GBA_IE_TIMERS; /* enable timer interrupt */
+        GBA_IE |= GBA_IE_TIMERS; /* enable timer interrupt */
     }
     else {
         GBA_IE &= ~GBA_IE_TIMERS; /* disable timer interrupt */
@@ -63,10 +63,10 @@ void gba_uart_init(void)
     GBA_SIO_SCNT |= (0b11 << 12);
 
     if (IS_USED(MODULE_PERIPH_UART)) {
-        GBA_IE = GBA_IE_UART; /* enable timer interrupt */
+        GBA_IE |= GBA_IE_UART; /* enable uart interrupt */
     }
     else {
-        GBA_IE &= ~GBA_IE_UART; /* disable timer interrupt */
+        GBA_IE &= ~GBA_IE_UART; /* disable uart interrupt */
     }
 }
 
