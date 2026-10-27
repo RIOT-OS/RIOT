@@ -188,6 +188,17 @@ static inline bool _does_handle_csma(ieee802154_dev_t *dev)
            ieee802154_radio_has_auto_csma(dev);
 }
 
+/**
+ * @brief   Enable/disable CCA before the next transmission.
+ */
+static inline void _set_cca_before_tx(ieee802154_dev_t *dev, bool enable)
+{
+    if (!_does_handle_csma(dev)) {
+        /* retries == 0: single CCA, retries < 0: no CCA (see set_csma_params) */
+        ieee802154_radio_set_csma_params(dev, NULL, enable ? 0 : -1);
+    }
+}
+
 static inline void _set_csma_backoff_period(ieee802154_submac_t *submac,
                                             uint16_t period_us)
 {
@@ -571,6 +582,7 @@ static ieee802154_submac_fsm_return_t _fsm_state_prepare(ieee802154_submac_t *su
         else if (submac->tx_ftype == IEEE802154_FCF_TYPE_ACK && !_does_send_ack(dev)) {
             /* no backoff for ACK frames but wait for SIFSPeriod */
             ztimer_sleep(ZTIMER_USEC, SIFS_PERIOD_US);
+            _set_cca_before_tx(dev, false);
             tx_state = _fsm_state_tx_ack;
         }
         while (ieee802154_radio_request_transmit(dev) == -EBUSY) {}
@@ -747,6 +759,7 @@ static ieee802154_submac_fsm_return_t _fsm_state_tx_ack(ieee802154_submac_t *sub
             DEBUG("IEEE802154 submac: ACK sent, status %d\n", (int)info.status);
             res = ieee802154_radio_set_idle(dev, true);
             assert(res >= 0);
+            _set_cca_before_tx(dev, true);
             submac->cb->rx_done(submac);
             return _state_transition(&submac->fsm, _fsm_state_idle);
         }
