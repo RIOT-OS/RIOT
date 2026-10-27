@@ -230,13 +230,14 @@ static void _usage_add6(char *cmd)
     if (!IS_USED(MODULE_LWIP_IPV6)) {
         return;
     }
-    printf("usage: %s add <interface> <IPv6> (prefix not supported)\n", cmd);
+    printf("usage: %s add <interface> <IPv6>[/<prefix>]\n", cmd);
 }
 
 #ifdef MODULE_LWIP_IPV6
 static int _lwip_netif_add6(int argc, char **argv)
 {
     struct netif *iface;
+    char *ip_ptr, *prefix_ptr = NULL;
     ip6_addr_t ip;
 
     if (argc != 4) {
@@ -254,7 +255,28 @@ static int _lwip_netif_add6(int argc, char **argv)
         return 1;
     }
 
-    if (inet_pton(AF_INET6, argv[3], &ip.addr) != 1) {
+    ip_ptr = argv[3];
+    while ((*ip_ptr) != 0) {
+        if ((*ip_ptr) == '/') {
+            *ip_ptr = 0;
+            prefix_ptr = ip_ptr + 1;
+        }
+
+        ip_ptr++;
+    }
+    ip_ptr = argv[3];
+
+    if (prefix_ptr != NULL) {
+        int prefix = atoi(prefix_ptr);
+
+        if (prefix != 64) {
+            printf("error: invalid prefix, lwip only supports /64\n");
+            sys_unlock_tcpip_core();
+            return 1;
+        }
+    }
+
+    if (inet_pton(AF_INET6, ip_ptr, &ip.addr) != 1) {
         printf("error: invalid IPv6 address\n");
         sys_unlock_tcpip_core();
         return 1;
