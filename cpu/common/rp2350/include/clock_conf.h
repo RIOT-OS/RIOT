@@ -97,8 +97,9 @@
 #define PLL_USB_PD1 5u
 /** Post divider 2 of the USB PLL: 240 MHz / 5 = 48 MHz */
 #define PLL_USB_PD2 5u
-/** RIOT core clock frequency defined as the CPU frequency */
-#define CLOCK_CORECLOCK MHZ(12u)
+/** RIOT core clock frequency, CLK_SYS is fed by PLL_SYS:
+ *  12 MHz * 125 = 1500 MHz VCO frequency, 1500 MHz / 6 / 2 = 125 MHz */
+#define CLOCK_CORECLOCK ((XOSC_HZ * PLL_FEEDBACK_DIVIDER_VALUE) / (PLL_PD1 * PLL_PD2))
 
 #if (PLL_VCO_FEEDBACK_SCALE_MIN < PLL_VCO_FEEDBACK_SCALE_MIN) || \
 (PLL_VCO_FEEDBACK_SCALE_MAX > PLL_VCO_FEEDBACK_SCALE_MAX)
