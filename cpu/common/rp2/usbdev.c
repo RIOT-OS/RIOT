@@ -89,6 +89,15 @@
 #define BUF_CTRL_LENGTH         USB_DEVICE_DPRAM_EP0_IN_BUFFER_CONTROL_LENGTH_0_BITS
 
 /**
+ * @brief   Number of NOPs between writing the buffer control register and
+ *          setting its AVAILABLE bit
+ *
+ * At least 3 clk_usb cycles are required. With clk_usb at 48 MHz and the CPU
+ * running at up to 150 MHz, this corresponds to 10 CPU cycles.
+ */
+#define BUF_CTRL_AVAILABLE_DELAY    (12U)
+
+/**
  * @brief   Interrupts handled on device level
  */
 #define DEV_IRQS                (USB_INTS_BUS_RESET_BITS | \
@@ -162,9 +171,13 @@ static void _buf_arm(_rpx0xx_ep_t *hw_ep, size_t len)
     /* The AVAILABLE bit must be set separately after the rest of the buffer
      * control register has been written. The controller runs at 48 MHz while
      * the CPU runs faster, so wait at least 3 clk_usb cycles in between
-     * (see RP2040 datasheet, section 4.1.2.5.1) */
+     * (see RP2040 datasheet, section 4.1.2.5.1).
+     * An explicit NOP loop is used, as busy_wait() with a small constant
+     * count may be optimized away completely. */
     *reg = val;
-    busy_wait(4);
+    for (unsigned i = 0; i < BUF_CTRL_AVAILABLE_DELAY; i++) {
+        __asm__ volatile ("nop");
+    }
     *reg = val | BUF_CTRL_AVAILABLE;
 }
 
