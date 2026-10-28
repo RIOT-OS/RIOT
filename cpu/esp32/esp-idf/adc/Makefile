@@ -6,16 +6,15 @@ ESP32_SDK_SRC = \
   components/esp_adc/adc_common.c \
   components/esp_adc/adc_oneshot.c \
   components/esp_hw_support/adc_share_hw_ctrl.c \
-  components/hal/adc_hal_common.c \
-  components/hal/adc_oneshot_hal.c \
-  components/soc/$(CPU_FAM)/adc_periph.c \
+  components/esp_hal_ana_conv/adc_oneshot_hal.c \
+  components/esp_hal_ana_conv/$(CPU_FAM)/adc_periph.c \
   #
 
 ifeq (,$(filter esp_idf_gpio,$(USEMODULE)))
-  ESP32_SDK_SRC += components/hal/rtc_io_hal.c
+  ESP32_SDK_SRC += components/esp_hal_gpio/rtc_io_hal.c
 endif
 
-ifneq (esp32,$(CPU_FAM))
+ifneq (,$(filter-out esp32 esp32s2,$(CPU_FAM)))
   ESP32_SDK_SRC += components/efuse/$(CPU_FAM)/esp_efuse_rtc_calib.c
 endif
 

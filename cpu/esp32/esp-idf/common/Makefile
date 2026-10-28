@@ -9,25 +9,35 @@ ESP32_SDK_SRC = \
   components/bootloader_support/src/bootloader_mem.c \
   components/bootloader_support/src/bootloader_random_$(CPU_FAM).c \
   components/esp_app_format/esp_app_desc.c \
+  components/esp_driver_dma/src/esp_dma_utils.c \
+  components/esp_driver_dma/src/gdma_link.c \
   components/esp_hw_support/clk_ctrl_os.c \
+  components/esp_hw_support/clk_utils.c \
   components/esp_hw_support/esp_clk.c \
   components/esp_hw_support/esp_gpio_reserve.c \
+  components/esp_hw_support/esp_memory_utils.c \
+  components/esp_hw_support/mspi/mspi_timing_tuning/mspi_timing_tuning.c \
   components/esp_hw_support/periph_ctrl.c \
   components/esp_hw_support/port/$(CPU_FAM)/esp_clk_tree.c \
+  components/esp_hw_support/port/$(CPU_FAM)/io_mux.c \
   components/esp_hw_support/port/$(CPU_FAM)/rtc_clk.c \
   components/esp_hw_support/port/$(CPU_FAM)/rtc_time.c \
   components/esp_hw_support/port/$(CPU_FAM)/sar_periph_ctrl.c \
   components/esp_hw_support/port/esp_clk_tree_common.c \
   components/esp_hw_support/regi2c_ctrl.c \
+  components/esp_hw_support/sar_periph_ctrl_common.c \
+  components/esp_hw_support/sleep_cache.c \
   components/esp_hw_support/sleep_gpio.c \
   components/esp_hw_support/sleep_event.c \
   components/esp_hw_support/sleep_modes.c \
   components/esp_hw_support/sleep_modem.c \
-  components/esp_mm/esp_cache.c \
+  components/esp_hw_support/sleep_uart.c \
+  components/esp_mm/esp_cache_msync.c \
+  components/esp_mm/esp_cache_utils.c \
   components/esp_mm/esp_mmu_map.c \
   components/esp_mm/port/$(CPU_FAM)/ext_mem_layout.c \
   components/esp_rom/patches/esp_rom_sys.c \
-  components/esp_rom/patches/esp_rom_uart.c \
+  components/esp_rom/patches/esp_rom_serial_output.c \
   components/esp_system/esp_err.c \
   components/esp_system/port/cpu_start.c \
   components/esp_system/port/soc/$(CPU_FAM)/cache_err_int.c \
@@ -39,11 +49,12 @@ ESP32_SDK_SRC = \
   components/esp_timer/src/system_time.c \
   components/hal/efuse_hal.c \
   components/hal/mmu_hal.c \
-  components/hal/$(CPU_FAM)/clk_tree_hal.c \
+  components/esp_hal_ana_conv/adc_hal_common.c \
+  components/esp_hal_clock/$(CPU_FAM)/clk_tree_hal.c \
   components/hal/$(CPU_FAM)/efuse_hal.c \
-  components/hal/uart_hal.c \
-  components/hal/wdt_hal_iram.c \
-  components/newlib/port/esp_time_impl.c \
+  components/esp_hal_uart/uart_hal.c \
+  components/esp_hal_wdt/wdt_hal_iram.c \
+  components/esp_libc/src/port/esp_time_impl.c \
   components/spi_flash/cache_utils.c \
   components/spi_flash/flash_ops.c \
   #
@@ -60,6 +71,7 @@ endif
 
 ifneq (,$(filter esp_spi_ram,$(USEMODULE)))
   INCLUDES += -I$(ESP32_SDK_DIR)/components/esp_psram/include
+  INCLUDES += -I$(ESP32_SDK_DIR)/components/esp_psram/xip_impl/include
 endif
 
 # TODO separate module
@@ -67,6 +79,12 @@ ifneq (,$(filter esp_idf_phy,$(USEMODULE)))
   ESP32_SDK_SRC += components/esp_phy/src/phy_common.c
   INCLUDES += -I$(ESP32_SDK_DIR)/components/esp_phy/include
   INCLUDES += -I$(ESP32_SDK_DIR)/components/esp_phy/$(CPU_FAM)/include
+  ifneq (,$(filter esp32c6 esp32h2,$(CPU_FAM)))
+    # temperature sensor used by phy_override.c (SOC_TEMP_SENSOR_SUPPORTED)
+    # (temperature_sensor_hal.c is always compiled for these SoCs, see below)
+    ESP32_SDK_SRC += components/esp_hal_ana_conv/$(CPU_FAM)/temperature_sensor_periph.c
+    ESP32_SDK_SRC += components/esp_hw_support/sar_tsens_ctrl.c
+  endif
   ifeq (esp32c6,$(CPU_FAM))
     ESP32_SDK_SRC += components/esp_phy/$(CPU_FAM)/phy_init_data.c
     ESP32_SDK_SRC += components/esp_phy/src/btbb_init.c
@@ -97,13 +115,13 @@ endif
 
 # TODO separate module
 ifneq (,$(filter periph_can,$(USEMODULE)))
-  ESP32_SDK_SRC += components/hal/twai_hal.c
-  ESP32_SDK_SRC += components/hal/twai_hal_iram.c
+  ESP32_SDK_SRC += components/esp_hal_twai/twai_hal_v1.c
+  ESP32_SDK_SRC += components/esp_hal_twai/$(CPU_FAM)/twai_periph.c
 endif
 
 # TODO separate module
 ifneq (,$(filter periph_dac,$(USEMODULE)))
-  ESP32_SDK_SRC += components/soc/$(CPU_FAM)/dac_periph.c
+  ESP32_SDK_SRC += components/esp_hal_ana_conv/$(CPU_FAM)/dac_periph.c
 endif
 
 # TODO separate module
@@ -113,34 +131,36 @@ endif
 
 # TODO separate module
 ifneq (,$(filter periph_i2c%,$(USEMODULE)))
-  ESP32_SDK_SRC += components/hal/i2c_hal.c
-  ESP32_SDK_SRC += components/soc/$(CPU_FAM)/i2c_periph.c
+  ESP32_SDK_SRC += components/esp_hal_i2c/i2c_hal.c
+  ESP32_SDK_SRC += components/esp_hal_i2c/$(CPU_FAM)/i2c_periph.c
 endif
 
 # TODO separate module
 ifneq (,$(filter periph_pwm%,$(USEMODULE)))
-  ESP32_SDK_SRC += components/hal/ledc_hal.c
-  ESP32_SDK_SRC += components/hal/ledc_hal_iram.c
-  ESP32_SDK_SRC += components/soc/$(CPU_FAM)/ledc_periph.c
+  ESP32_SDK_SRC += components/esp_hal_ledc/ledc_hal.c
+  ESP32_SDK_SRC += components/esp_hal_ledc/ledc_hal_iram.c
+  ESP32_SDK_SRC += components/esp_hal_ledc/$(CPU_FAM)/ledc_periph.c
 endif
 
 # TODO separate module
 ifneq (,$(filter periph_spi,$(USEMODULE)))
-  ESP32_SDK_SRC += components/soc/$(CPU_FAM)/spi_periph.c
+  ESP32_SDK_SRC += components/esp_hal_gpspi/$(CPU_FAM)/spi_periph.c
 endif
 
 # TODO separate module
 ifneq (,$(filter periph_uart,$(USEMODULE)))
-  ESP32_SDK_SRC += components/soc/$(CPU_FAM)/uart_periph.c
+  ESP32_SDK_SRC += components/esp_hal_uart/$(CPU_FAM)/uart_periph.c
 endif
 
 ifneq (,$(filter xtensa%,$(TARGET_ARCH)))
-  ESP32_SDK_SRC += components/soc/$(CPU_FAM)/rtc_io_periph.c
+  ESP32_SDK_SRC += components/esp_hal_gpio/$(CPU_FAM)/rtc_io_periph.c
+  ESP32_SDK_SRC += components/esp_hal_touch_sens/touch_sens_hal.c
 endif
 
 ifneq (,$(filter riscv%,$(TARGET_ARCH)))
   ESP32_SDK_SRC += components/riscv/interrupt.c
   ESP32_SDK_SRC += components/riscv/interrupt_intc.c
+  ESP32_SDK_SRC += components/riscv/rv_utils.c
   ESP32_SDK_ASMSRC += components/freertos/FreeRTOS-Kernel/portable/riscv/portasm.S
   ESP32_SDK_ASMSRC += components/riscv/vectors.S
   ESP32_SDK_ASMSRC += components/riscv/vectors_intc.S
@@ -151,15 +171,17 @@ ifneq (,$(filter esp32 esp32s2 esp32s3 esp32c3,$(CPU_FAM)))
   ESP32_SDK_SRC += components/esp_hw_support/port/$(CPU_FAM)/rtc_sleep.c
 else ifneq (,$(filter esp32h2 esp32c5 esp32c6 esp32c61,$(CPU_FAM)))
   ESP32_SDK_SRC += components/esp_hw_support/lowpower/port/$(CPU_FAM)/sleep_clock.c
-  ESP32_SDK_SRC += components/esp_hw_support/port/$(CPU_FAM)/io_mux.c
+  ESP32_SDK_SRC += components/esp_hw_support/modem/port/$(CPU_FAM)/modem_clock_impl.c
+  ESP32_SDK_SRC += components/esp_hw_support/port/$(CPU_FAM)/peripheral_domain_pd.c
+  ESP32_SDK_SRC += components/esp_hal_ana_conv/temperature_sensor_hal.c
   ESP32_SDK_SRC += components/esp_hw_support/port/$(CPU_FAM)/pmu_init.c
   ESP32_SDK_SRC += components/esp_hw_support/port/$(CPU_FAM)/pmu_param.c
   ESP32_SDK_SRC += components/esp_hw_support/port/$(CPU_FAM)/pmu_sleep.c
   ESP32_SDK_SRC += components/esp_hw_support/sleep_retention.c
   ESP32_SDK_SRC += components/esp_hw_support/sleep_system_peripheral.c
   ESP32_SDK_SRC += components/hal/$(CPU_FAM)/modem_clock_hal.c
-  ESP32_SDK_SRC += components/hal/$(CPU_FAM)/pmu_hal.c
-  ESP32_SDK_SRC += components/soc/$(CPU_FAM)/rtc_io_periph.c
+  ESP32_SDK_SRC += components/esp_hal_pmu/$(CPU_FAM)/pmu_hal.c
+  ESP32_SDK_SRC += components/esp_hal_gpio/$(CPU_FAM)/rtc_io_periph.c
 endif
 
 ifeq (esp32,$(CPU_FAM))
@@ -171,13 +193,13 @@ else ifeq (esp32c3,$(CPU_FAM))
   ESP32_SDK_SRC += components/esp_hw_support/port/$(CPU_FAM)/systimer.c
   ESP32_SDK_SRC += components/esp_hw_support/sleep_console.c
   ESP32_SDK_SRC += components/esp_timer/src/esp_timer_impl_systimer.c
-  ESP32_SDK_SRC += components/hal/$(CPU_FAM)/rtc_cntl_hal.c
+  ESP32_SDK_SRC += components/esp_hal_pmu/$(CPU_FAM)/rtc_cntl_hal.c
   ESP32_SDK_SRC += components/hal/cache_hal.c
-  ESP32_SDK_SRC += components/hal/systimer_hal.c
+  ESP32_SDK_SRC += components/esp_hal_systimer/systimer_hal.c
 else ifeq (esp32c6,$(CPU_FAM))
-  ESP32_SDK_SRC += components/esp_rom/patches/esp_rom_hp_regi2c_$(CPU_FAM).c
+  ESP32_SDK_SRC += components/esp_hal_regi2c/$(CPU_FAM)/regi2c_impl.c
   ESP32_SDK_SRC += components/esp_hw_support/lowpower/port/$(CPU_FAM)/sleep_cpu.c
-  ESP32_SDK_SRC += components/esp_hw_support/modem_clock.c
+  ESP32_SDK_SRC += components/esp_hw_support/modem/modem_clock.c
   ESP32_SDK_SRC += components/esp_hw_support/port/$(CPU_FAM)/ocode_init.c
   ESP32_SDK_SRC += components/esp_hw_support/port/$(CPU_FAM)/systimer.c
   ESP32_SDK_SRC += components/esp_hw_support/port/pau_regdma.c
@@ -185,52 +207,54 @@ else ifeq (esp32c6,$(CPU_FAM))
   ESP32_SDK_SRC += components/esp_hw_support/sleep_console.c
   ESP32_SDK_SRC += components/esp_pm/pm_impl.c
   ESP32_SDK_SRC += components/esp_timer/src/esp_timer_impl_systimer.c
-  ESP32_SDK_SRC += components/hal/$(CPU_FAM)/pau_hal.c
-  ESP32_SDK_SRC += components/hal/apm_hal.c
+  ESP32_SDK_SRC += components/esp_hal_pmu/$(CPU_FAM)/pau_hal.c
+  ESP32_SDK_SRC += components/esp_hal_security/apm_hal.c
   ESP32_SDK_SRC += components/hal/cache_hal.c
-  ESP32_SDK_SRC += components/hal/lp_timer_hal.c
-  ESP32_SDK_SRC += components/hal/systimer_hal.c
+  ESP32_SDK_SRC += components/esp_hal_systimer/systimer_hal.c
   ESP32_SDK_ASMSRC += components/esp_hw_support/lowpower/port/$(CPU_FAM)/sleep_cpu_asm.S
 else ifeq (esp32h2,$(CPU_FAM))
-  ESP32_SDK_SRC += components/esp_rom/patches/esp_rom_regi2c_$(CPU_FAM).c
+  ESP32_SDK_SRC += components/esp_hal_regi2c/$(CPU_FAM)/regi2c_impl.c
   ESP32_SDK_SRC += components/esp_hw_support/lowpower/port/$(CPU_FAM)/sleep_cpu.c
-  ESP32_SDK_SRC += components/esp_hw_support/modem_clock.c
+  ESP32_SDK_SRC += components/esp_hw_support/modem/modem_clock.c
   ESP32_SDK_SRC += components/esp_hw_support/port/$(CPU_FAM)/systimer.c
+  ESP32_SDK_SRC += components/esp_hw_support/power_supply/vbat.c
   ESP32_SDK_SRC += components/esp_hw_support/port/pau_regdma.c
   ESP32_SDK_SRC += components/esp_hw_support/port/regdma_link.c
   ESP32_SDK_SRC += components/esp_hw_support/sleep_console.c
   ESP32_SDK_SRC += components/esp_timer/src/esp_timer_impl_systimer.c
-  ESP32_SDK_SRC += components/hal/$(CPU_FAM)/pau_hal.c
-  ESP32_SDK_SRC += components/hal/apm_hal.c
+  ESP32_SDK_SRC += components/esp_hal_pmu/$(CPU_FAM)/pau_hal.c
+  ESP32_SDK_SRC += components/esp_hal_security/apm_hal.c
   ESP32_SDK_SRC += components/hal/cache_hal.c
-  ESP32_SDK_SRC += components/hal/lp_timer_hal.c
-  ESP32_SDK_SRC += components/hal/systimer_hal.c
+  ESP32_SDK_SRC += components/esp_hal_systimer/systimer_hal.c
   ESP32_SDK_ASMSRC += components/esp_hw_support/lowpower/port/$(CPU_FAM)/sleep_cpu_asm.S
 else ifeq (esp32s2,$(CPU_FAM))
-  ESP32_SDK_SRC += components/esp_rom/patches/esp_rom_regi2c_$(CPU_FAM).c
+  ESP32_SDK_SRC += components/esp_hal_regi2c/$(CPU_FAM)/regi2c_impl.c
   ESP32_SDK_SRC += components/esp_hw_support/port/$(CPU_FAM)/systimer.c
   ESP32_SDK_SRC += components/esp_hw_support/port/$(CPU_FAM)/memprot.c
-  ESP32_SDK_SRC += components/esp_system/port/brownout.c
-  ESP32_SDK_SRC += components/esp_timer/src/esp_timer_impl_lac.c
-  ESP32_SDK_SRC += components/hal/$(CPU_FAM)/touch_sensor_hal.c
-  ESP32_SDK_SRC += components/hal/brownout_hal.c
+  ESP32_SDK_SRC += components/esp_hw_support/power_supply/brownout.c
+  ESP32_SDK_SRC += components/esp_timer/src/esp_timer_impl_systimer.c
+  ESP32_SDK_SRC += components/esp_hal_touch_sens/$(CPU_FAM)/touch_sensor_legacy_hal.c
+  ESP32_SDK_SRC += components/esp_hal_pmu/brownout_hal.c
   ESP32_SDK_SRC += components/hal/cache_hal.c
-  ESP32_SDK_SRC += components/hal/systimer_hal.c
+  ESP32_SDK_SRC += components/esp_hal_systimer/systimer_hal.c
 else ifeq (esp32s3,$(CPU_FAM))
-  ESP32_SDK_SRC += components/esp_hw_support/mspi_timing_tuning.c
-  ESP32_SDK_SRC += components/esp_hw_support/port/$(CPU_FAM)/mspi_timing_config.c
+  ESP32_SDK_SRC += components/esp_hw_support/mspi/mspi_timing_tuning/port/$(CPU_FAM)/mspi_timing_config.c
   ESP32_SDK_SRC += components/esp_hw_support/port/$(CPU_FAM)/systimer.c
   ESP32_SDK_SRC += components/esp_hw_support/sleep_console.c
   ESP32_SDK_SRC += components/esp_rom/patches/esp_rom_cache_esp32s2_esp32s3.c
   ESP32_SDK_SRC += components/esp_rom/patches/esp_rom_efuse.c
+  ESP32_SDK_ASMSRC += components/esp_rom/patches/esp_rom_cache_writeback_esp32s3.S
   ESP32_SDK_SRC += components/esp_timer/src/esp_timer_impl_systimer.c
-  ESP32_SDK_SRC += components/hal/$(CPU_FAM)/touch_sensor_hal.c
+  ESP32_SDK_SRC += components/esp_hal_touch_sens/$(CPU_FAM)/touch_sensor_legacy_hal.c
   ESP32_SDK_SRC += components/hal/cache_hal.c
-  ESP32_SDK_SRC += components/hal/systimer_hal.c
+  ESP32_SDK_SRC += components/esp_hal_systimer/systimer_hal.c
   ESP32_SDK_SRC += components/spi_flash/$(CPU_FAM)/spi_flash_oct_flash_init.c
 else
   $(error Missing configuration for ESP32x SoC variant (family): $(CPU_FAM))
 endif
+
+# required by esp_dma_utils.c and gdma_link.c
+INCLUDES += -I$(ESP32_SDK_DIR)/components/esp_driver_dma/include
 
 include $(RIOTBASE)/Makefile.base
 

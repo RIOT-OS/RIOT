@@ -406,7 +406,7 @@ union gpio_conf_esp32 {
  * @brief  Number of DAC channels that could be used at maximum.
  */
 #if defined(SOC_DAC_SUPPORTED) || DOXYGEN
-#  define DAC_NUMOF_MAX (SOC_DAC_PERIPH_NUM)
+#  define DAC_NUMOF_MAX (SOC_DAC_CHAN_NUM)
 #endif
 
 /** @} */
@@ -479,7 +479,6 @@ typedef enum {
  * @brief   I2C configuration structure type
  */
 typedef struct {
-    uint8_t module;         /**< I2C module identifier */
     i2c_speed_t speed;      /**< I2C bus speed */
     gpio_t scl;             /**< GPIO used as SCL pin */
     gpio_t sda;             /**< GPIO used as SDA pin */
@@ -588,7 +587,6 @@ typedef struct {
  * device corresponds to the number of GPIOs assigned to this PWM device.
  */
 typedef struct {
-    uint8_t module;         /**< LEDC module identifier */
     ledc_mode_t group;      /**< LEDC channel group used (low/high speed) */
     ledc_timer_t timer;     /**< LEDC timer used by this device */
     uint8_t ch_numof;       /**< Number of channels used by this device */
@@ -637,7 +635,11 @@ typedef struct {
  *
  * The number of configured channels must be less or equal.
  */
-#define RMT_CH_NUMOF_MAX    (SOC_RMT_CHANNELS_PER_GROUP)
+#if defined(CPU_FAM_ESP32) || defined(CPU_FAM_ESP32S3)
+#  define RMT_CH_NUMOF_MAX  (8)
+#else
+#  define RMT_CH_NUMOF_MAX  (4)
+#endif
 
 /** @} */
 
@@ -922,6 +924,18 @@ typedef struct {
  * @{
  */
 
+#if !defined(DOXYGEN)
+/* Number of timer groups and number of timers per timer group. ESP-IDF v6.x
+ * doesn't define them as SoC capabilities any longer (`hal/timg_ll.h`). */
+#  if defined(CPU_FAM_ESP32) || defined(CPU_FAM_ESP32S2) || defined(CPU_FAM_ESP32S3)
+#    define TIMER_GROUP_NUMOF           (2)
+#    define TIMER_GROUP_TIMERS_NUMOF    (2)
+#  else
+#    define TIMER_GROUP_NUMOF           (2)
+#    define TIMER_GROUP_TIMERS_NUMOF    (1)
+#  endif
+#endif
+
 #ifndef MODULE_ESP_HW_COUNTER
 /**
  * @brief Hardware timer modules are used for timer implementation (default)
@@ -929,7 +943,7 @@ typedef struct {
  * Since one timer is used for the system time, there is one timer less than
  * the total number of timers.
  */
-#  define TIMER_NUMOF           (SOC_TIMER_GROUP_TOTAL_TIMERS - 1)
+#  define TIMER_NUMOF           (TIMER_GROUP_NUMOF * TIMER_GROUP_TIMERS_NUMOF - 1)
 #  define TIMER_CHANNEL_NUMOF   (1)
 #endif
 
@@ -1049,7 +1063,7 @@ typedef enum {
 /**
  * @brief   Maximum number of USB OTG FS interfaces
  */
-#define USBDEV_NUMOF_MAX    (SOC_USB_PERIPH_NUM)
+#define USBDEV_NUMOF_MAX    (SOC_USB_OTG_PERIPH_NUM)
 /** @} */
 
 #ifdef __cplusplus

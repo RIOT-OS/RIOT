@@ -17,6 +17,7 @@
 
 #include "irq_arch.h"
 #include "log.h"
+#include "periph_cpu.h"
 
 #include "esp_attr.h"
 #include "esp_bit_defs.h"
@@ -49,17 +50,20 @@ static const struct intr_handle_data_t _irq_data_table[] = {
 #endif
     { ETS_TG0_WDT_LEVEL_INTR_SOURCE, CPU_INUM_WDT, 1 },
     { ETS_TG0_T0_LEVEL_INTR_SOURCE, CPU_INUM_RTT, 1 },
-#if SOC_TIMER_GROUP_TIMERS_PER_GROUP > 1
+#if TIMER_GROUP_TIMERS_NUMOF > 1
     { ETS_TG0_T1_LEVEL_INTR_SOURCE, CPU_INUM_TIMER, 2 },
 #endif
-#if SOC_TIMER_GROUPS > 1
+#if TIMER_GROUP_NUMOF > 1
     { ETS_TG1_T0_LEVEL_INTR_SOURCE, CPU_INUM_TIMER, 2 },
-#  if SOC_TIMER_GROUP_TIMERS_PER_GROUP > 1
+#  if TIMER_GROUP_TIMERS_NUMOF > 1
     { ETS_TG1_T1_LEVEL_INTR_SOURCE, CPU_INUM_TIMER, 2 },
-#  endif /* SOC_TIMER_GROUP_TIMERS_PER_GROUP > 1 */
-#endif /* SOC_TIMER_GROUPS > 1 */
-#if CPU_FAM_ESP32 || CPU_FAM_ESP32S2
+#  endif /* TIMER_GROUP_TIMERS_NUMOF > 1 */
+#endif /* TIMER_GROUP_NUMOF > 1 */
+#if CPU_FAM_ESP32
     { ETS_TG0_LACT_LEVEL_INTR_SOURCE, CPU_INUM_SYSTIMER, 2 },
+#elif CPU_FAM_ESP32S2
+    /* ESP-IDF v6.x uses the system timer for esp_timer on ESP32-S2 */
+    { ETS_SYSTIMER_TARGET2_INTR_SOURCE, CPU_INUM_SYSTIMER, 1 },
 #elif CPU_FAM_ESP32S3 || \
       CPU_FAM_ESP32C3 || CPU_FAM_ESP32C6 || CPU_FAM_ESP32H2
     { ETS_SYSTIMER_TARGET2_INTR_SOURCE, CPU_INUM_SYSTIMER, 2 },
@@ -237,6 +241,16 @@ esp_err_t esp_intr_alloc_intrstatus(int source, int flags,
     (void)reg;
     (void)mask;
     return esp_intr_alloc(source, flags, handler, arg, ret_handle);
+}
+
+esp_err_t esp_intr_alloc_info(const esp_intr_alloc_info_t *info,
+                              intr_handle_t *ret_handle)
+{
+    assert(info);
+    /* TODO status register and status mask handling for shared interrupts,
+     * binding to another interrupt given by `bind_by` is not supported */
+    return esp_intr_alloc(info->source, info->flags, info->handler, info->arg,
+                          ret_handle);
 }
 
 esp_err_t esp_intr_free(intr_handle_t handle)

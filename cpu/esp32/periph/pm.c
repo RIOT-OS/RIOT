@@ -28,6 +28,8 @@
 
 /* ESP-IDF headers */
 #include "driver/gpio.h"
+#include "esp_private/gpio.h"
+#include "hal/uart_periph.h"
 #include "driver/uart.h"
 #include "esp_sleep.h"
 #include "rom/rtc.h"
@@ -41,11 +43,48 @@
 #include "debug.h"
 
 extern void rtt_save_counter(void);
+/* replaces the deprecated ESP-IDF function uart_set_wakeup_threshold */
+extern void esp_uart_set_wakeup_threshold(uart_t uart, uint32_t threshold);
 extern void rtt_restore_counter(void);
 
-static inline esp_sleep_wakeup_cause_t pm_get_wakeup_cause(void)
+static esp_sleep_wakeup_cause_t pm_get_wakeup_cause(void)
 {
-    return esp_sleep_get_wakeup_cause();
+    /* ESP-IDF returns a bitmap of all wakeup causes. Return the wakeup cause
+     * with the highest priority, i.e. in the same order as the deprecated
+     * function esp_sleep_get_wakeup_cause did */
+    static const esp_sleep_wakeup_cause_t _prio[] = {
+        ESP_SLEEP_WAKEUP_TIMER,
+        ESP_SLEEP_WAKEUP_GPIO,
+        ESP_SLEEP_WAKEUP_UART0,
+        ESP_SLEEP_WAKEUP_UART1,
+#if (SOC_UART_HP_NUM > 2) && !SOC_PM_RTC_NOT_SUPPORT_UART2_WAKEUP
+        ESP_SLEEP_WAKEUP_UART2,
+#endif
+        ESP_SLEEP_WAKEUP_EXT0,
+        ESP_SLEEP_WAKEUP_EXT1,
+        ESP_SLEEP_WAKEUP_TOUCHPAD,
+        ESP_SLEEP_WAKEUP_ULP,
+        ESP_SLEEP_WAKEUP_WIFI,
+        ESP_SLEEP_WAKEUP_BT,
+    };
+
+    uint32_t causes = esp_sleep_get_wakeup_causes();
+
+    for (unsigned i = 0; i < ARRAY_SIZE(_prio); i++) {
+        if (causes & BIT(_prio[i])) {
+            switch (_prio[i]) {
+            /* map all UART wakeup causes to ESP_SLEEP_WAKEUP_UART */
+            case ESP_SLEEP_WAKEUP_UART1:
+#if (SOC_UART_HP_NUM > 2) && !SOC_PM_RTC_NOT_SUPPORT_UART2_WAKEUP
+            case ESP_SLEEP_WAKEUP_UART2:
+#endif
+                return ESP_SLEEP_WAKEUP_UART;
+            default:
+                return _prio[i];
+            }
+        }
+    }
+    return ESP_SLEEP_WAKEUP_UNDEFINED;
 }
 
 /* function that is required by pm_set if esp_now and esp_wifi are not used */
@@ -169,22 +208,20 @@ void pm_set(unsigned mode)
     _Static_assert(UART_NUMOF > 0, "UART_DEV(0) is not defined");
 #if CPU_FAM_ESP32
     /* For ESP32, UART RxD has to be configured for direct IO using IOMUX */
-    const uart_periph_sig_t *sig = &uart_periph_signal[UART_DEV(0)].pins[SOC_UART_RX_PIN_IDX];
-    gpio_iomux_out(UART0_RXD, sig->iomux_func, false);
-    gpio_iomux_in(UART0_RXD, sig->signal);
+    const uart_periph_sig_t *sig = &uart_periph_signal[UART_DEV(0)].pins[SOC_UART_PERIPH_SIGNAL_RX];
+    gpio_iomux_input(UART0_RXD, sig->iomux_func, sig->signal);
 #endif
-    uart_set_wakeup_threshold(UART_DEV(0), ESP_PM_WUP_UART0);
+    esp_uart_set_wakeup_threshold(UART_DEV(0), ESP_PM_WUP_UART0);
     esp_sleep_enable_uart_wakeup(0);
 #endif
 #if (ESP_PM_WUP_UART1 > 2)
     _Static_assert(UART_NUMOF > 1, "UART_DEV(1) is not defined");
 #if CPU_FAM_ESP32
     /* For ESP32, UART RxD has to be configured for direct IO using IOMUX */
-    const uart_periph_sig_t *sig = &uart_periph_signal[UART_DEV(0)].pins[SOC_UART_RX_PIN_IDX];
-    gpio_iomux_out(UART1_RXD, sig->iomux_func, false);
-    gpio_iomux_in(UART1_RXD, sig->signal);
+    const uart_periph_sig_t *sig = &uart_periph_signal[UART_DEV(1)].pins[SOC_UART_PERIPH_SIGNAL_RX];
+    gpio_iomux_input(UART1_RXD, sig->iomux_func, sig->signal);
 #endif
-    uart_set_wakeup_threshold(UART_DEV(1), ESP_PM_WUP_UART1);
+    esp_uart_set_wakeup_threshold(UART_DEV(1), ESP_PM_WUP_UART1);
     esp_sleep_enable_uart_wakeup(1);
 #endif
 #if MODULE_STDIO_UART

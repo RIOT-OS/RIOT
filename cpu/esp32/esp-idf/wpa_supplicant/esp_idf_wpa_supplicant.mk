@@ -1,4 +1,5 @@
 # additional include pathes required by this module
+INCLUDES += -I$(ESP32_SDK_DIR)/components/esp_wifi/wifi_apps/roaming_app/include
 INCLUDES += -I$(ESP32_SDK_DIR)/components/wpa_supplicant/esp_supplicant/include
 INCLUDES += -I$(ESP32_SDK_DIR)/components/wpa_supplicant/esp_supplicant/src
 INCLUDES += -I$(ESP32_SDK_DIR)/components/wpa_supplicant/include

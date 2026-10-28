@@ -1,0 +1,33 @@
+From d7a2d1e47f25832d8d4efc8d6032e0f537ca71c8 Mon Sep 17 00:00:00 2001
+From: Gunar Schorcht <gunar@schorcht.net>
+Date: Fri, 16 Oct 2026 12:26:03 +0200
+Subject: [PATCH 52/52] fix(sdmmc): initialize clock source of the slot
+
+If the card clock frequency is configured before the first transaction,
+the slot state is already ready at the first transaction and the real
+frequency is calculated with an uninitialized clock source, which fails
+with an assertion. The clock source of a slot is therefore initialized
+with the default clock source when the slot is created.
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+Claude-Session: https://claude.ai/code/session_01C48pwkJmnU6tPunyo2S4N8
+---
+ components/esp_driver_sdmmc/src/sd_host_sdmmc.c | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/components/esp_driver_sdmmc/src/sd_host_sdmmc.c b/components/esp_driver_sdmmc/src/sd_host_sdmmc.c
+index 8029fafdec..f3e02b8652 100644
+--- a/components/esp_driver_sdmmc/src/sd_host_sdmmc.c
++++ b/components/esp_driver_sdmmc/src/sd_host_sdmmc.c
+@@ -169,6 +169,8 @@ esp_err_t sd_host_sdmmc_controller_add_slot(sd_host_ctlr_handle_t ctlr, const sd
+     slot->sd_mode = config->sd_mode;
+     slot->freq.freq_hz = 400 * 1000;
+     slot->freq.freq_state = SD_HOST_SLOT_STATE_INIT;
++    /* clock source has to be valid before the first call of sd_host_calc_freq */
++    slot->clk_src = SDMMC_CLK_SRC_DEFAULT;
+     slot->ctlr = ctlr_ctx;
+     ctlr_ctx->registered_slot_nums = ctlr_ctx->registered_slot_nums + 1;
+ 
+-- 
+2.43.0
+

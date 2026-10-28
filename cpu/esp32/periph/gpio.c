@@ -24,10 +24,10 @@
 #include "periph/gpio_ll_arch.h"
 #endif
 
+#include "driver/gpio.h"
 #include "driver/rtc_io.h"
 #include "esp/common_macros.h"
 #include "esp_intr_alloc.h"
-#include "driver/rtc_io.h"
 #include "hal/gpio_hal.h"
 #include "hal/gpio_types.h"
 #include "hal/rtc_io_types.h"
@@ -39,7 +39,7 @@
 #if !CPU_FAM_ESP32H2 && !CPU_FAM_ESP32C6
 #include "soc/rtc_cntl_reg.h"
 #endif
-#include "soc/rtc_io_periph.h"
+#include "hal/rtc_io_periph.h"
 
 #if __xtensa__
 #include "xtensa/xtensa_api.h"
@@ -102,6 +102,16 @@ extern gpio_pin_usage_t _gpio_pin_usage[GPIO_PIN_NUMOF];
 
 _Static_assert(ARRAY_SIZE(_gpio_pin_usage) == SOC_GPIO_PIN_COUNT,
                "size of _gpio_pin_usage does not match SOC_GPIO_PIN_COUNT");
+
+#if IS_USED(MODULE_ESP_IDF_GPIO_HAL)
+/*
+ * Since the input of a pin is not enabled in output mode, the value of an
+ * output can't be read back from the pin. Therefore, the input enable state
+ * of each pin is stored in a bitfield to decide in `gpio_read` whether the
+ * pin level or the last value written to the output has to be returned.
+ */
+static BITFIELD(_input, GPIO_PIN_NUMOF);
+#endif
 
 #if !IS_USED(MODULE_ESP_IDF_GPIO_HAL)
 extern const uint32_t _gpio_to_iomux_reg[GPIO_PIN_NUMOF];
@@ -270,6 +280,15 @@ int gpio_init(gpio_t pin, gpio_mode_t mode)
 #endif
 #endif
 
+#if IS_USED(MODULE_ESP_IDF_GPIO_HAL)
+    if (cfg.mode & GPIO_MODE_DEF_INPUT) {
+        bf_set(_input, pin);
+    }
+    else {
+        bf_unset(_input, pin);
+    }
+#endif
+
     return (gpio_config(&cfg) == ESP_OK) ? 0 : -1;
 }
 
@@ -373,10 +392,10 @@ bool gpio_read(gpio_t pin)
 {
     assert(pin < GPIO_PIN_NUMOF);
 
-    /* if the pin is not an input, it always returns 0 */
-    /* TODO: not really clear whether it should return the last written value
-     *       in this case. */
-    int value = gpio_hal_get_level(&_gpio_hal_ctx, pin);
+    /* if the pin is an input, read the pin level, otherwise return the last
+     * value written to the output */
+    int value = bf_isset(_input, pin) ? gpio_hal_get_level(&_gpio_hal_ctx, pin)
+                                      : bf_isset(_output, pin);
 
     DEBUG("%s gpio=%u val=%d\n", __func__, pin, value);
     return value;
@@ -547,13 +566,13 @@ void gpio_pm_sleep_enter(unsigned mode)
                 printf("\n");
                 assert(false);
             }
-#elif SOC_GPIO_DEEP_SLEEP_WAKE_VALID_GPIO_MASK
-            if (((1ULL << wup_pins[i]) & SOC_GPIO_DEEP_SLEEP_WAKE_VALID_GPIO_MASK) == 0) {
+#elif SOC_GPIO_HP_PERIPH_PD_SLEEP_WAKEABLE_MASK
+            if (((1ULL << wup_pins[i]) & SOC_GPIO_HP_PERIPH_PD_SLEEP_WAKEABLE_MASK) == 0) {
                 LOG_ERROR("GPIO%u is not a valid wake-up source, valid GPIOs are:",
                           wup_pins[i]);
 
-                unsigned valid_num = bitarithm_bits_set(SOC_GPIO_DEEP_SLEEP_WAKE_VALID_GPIO_MASK);
-                uint32_t valid_mask = SOC_GPIO_DEEP_SLEEP_WAKE_VALID_GPIO_MASK;
+                unsigned valid_num = bitarithm_bits_set(SOC_GPIO_HP_PERIPH_PD_SLEEP_WAKEABLE_MASK);
+                uint32_t valid_mask = SOC_GPIO_HP_PERIPH_PD_SLEEP_WAKEABLE_MASK;
                 for (unsigned j = 0; j < valid_num ; j++) {
                     if (valid_mask & 1) {
                         printf(" GPIO%u ", j);
@@ -589,6 +608,12 @@ void gpio_pm_sleep_enter(unsigned mode)
 #endif
             }
 #elif SOC_GPIO_SUPPORT_DEEPSLEEP_WAKEUP && SOC_DEEP_SLEEP_SUPPORTED
+            /* The wake-up level is read from the digital input of the pad,
+             * which is held during deep sleep. If the pin has not been
+             * initialized as input before, the input is disabled and always
+             * read as LOW, so that the system would wake up immediately with
+             * ESP_PM_WUP_PINS_ANY_LOW. Therefore the input has to be enabled. */
+            gpio_input_enable(wup_pins[i]);
             if (_gpio_pin_pu[wup_pins[i]]) {
                 gpio_pullup_en(wup_pins[i]);
                 gpio_pulldown_dis(wup_pins[i]);
@@ -597,7 +622,7 @@ void gpio_pm_sleep_enter(unsigned mode)
                 gpio_pullup_dis(wup_pins[i]);
                 gpio_pulldown_en(wup_pins[i]);
             }
-#elif SOC_GPIO_SUPPORT_HOLD_IO_IN_DSLP
+#else
             rtc_gpio_hold_en(wup_pins[i]);
 #endif
         }
@@ -606,9 +631,9 @@ void gpio_pm_sleep_enter(unsigned mode)
         esp_sleep_enable_ext1_wakeup_io(wup_pin_mask, ESP_PM_WUP_LEVEL);
 #elif SOC_GPIO_SUPPORT_DEEPSLEEP_WAKEUP && SOC_DEEP_SLEEP_SUPPORTED
         /* ESP_PM_WUP_PINS_ANY_LOW or ESP_PM_WUP_PINS_ANY_HIGH */
-        esp_deep_sleep_enable_gpio_wakeup(wup_pin_mask, ESP_PM_WUP_LEVEL);
+        esp_sleep_enable_gpio_wakeup_on_hp_periph_powerdown(wup_pin_mask, ESP_PM_WUP_LEVEL);
 #else
-        #error "ESP32x variant doesn't allow to define GPIOs for wake-up from deep sleep"
+#  error "ESP32x variant doesn't allow to define GPIOs for wake-up from deep sleep"
 #endif
 #endif /* ESP_PM_WUP_PINS */
     }

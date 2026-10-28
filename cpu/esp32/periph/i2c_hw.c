@@ -43,10 +43,11 @@
 #include "esp_attr.h"
 #include "esp_clk_tree.h"
 #include "esp_cpu.h"
-#include "esp_driver_i2c/i2c_private.h"
+#include "esp_private/periph_ctrl.h"
 #include "esp_rom_gpio.h"
 #include "esp_rom_sys.h"
 #include "hal/i2c_hal.h"
+#include "hal/i2c_ll.h"
 #include "rom/ets_sys.h"
 #include "soc/clk_tree_defs.h"
 #include "soc/i2c_reg.h"
@@ -244,14 +245,14 @@ int i2c_read_bytes(i2c_t dev, uint16_t addr, void *data, size_t len, uint8_t fla
         }
     }
 
-    /* read data bytes in blocks of SOC_I2C_FIFO_LEN bytes */
+    /* read data bytes in blocks of I2C_LL_FIFO_LEN bytes */
     uint32_t off = 0;
 
-    /* if len > SOC_I2C_FIFO_LEN read SOC_I2C_FIFO_LEN bytes at a time */
-    while (len > SOC_I2C_FIFO_LEN) {
+    /* if len > I2C_LL_FIFO_LEN read I2C_LL_FIFO_LEN bytes at a time */
+    while (len > I2C_LL_FIFO_LEN) {
         /* read one block of data bytes command */
-        _i2c_bus[dev].len = SOC_I2C_FIFO_LEN;
-        _i2c_read_cmd(dev, SOC_I2C_FIFO_LEN, false);
+        _i2c_bus[dev].len = I2C_LL_FIFO_LEN;
+        _i2c_read_cmd(dev, I2C_LL_FIFO_LEN, false);
         _i2c_end_cmd(dev);
         _i2c_transfer(dev);
 
@@ -266,8 +267,8 @@ int i2c_read_bytes(i2c_t dev, uint16_t addr, void *data, size_t len, uint8_t fla
         /* reset RX FIFO queue */
         i2c_ll_rxfifo_rst(_i2c_hw[dev].dev);
 
-        len -= SOC_I2C_FIFO_LEN;
-        off += SOC_I2C_FIFO_LEN;
+        len -= I2C_LL_FIFO_LEN;
+        off += I2C_LL_FIFO_LEN;
     }
 
     /* read remaining data bytes command with a final NAK */
@@ -337,7 +338,7 @@ int i2c_write_bytes(i2c_t dev, uint16_t addr, const void *data, size_t len, uint
         }
     }
 
-    /* send data bytes in blocks of SOC_I2C_FIFO_LEN bytes */
+    /* send data bytes in blocks of I2C_LL_FIFO_LEN bytes */
 
     uint32_t off = 0;
     uint32_t tx_fifo_free;
@@ -345,7 +346,7 @@ int i2c_write_bytes(i2c_t dev, uint16_t addr, const void *data, size_t len, uint
     /* get available TX FIFO space */
     i2c_ll_get_txfifo_len(_i2c_hw[dev].dev, &tx_fifo_free);
 
-    /* if len > SOC_I2C_FIFO_LEN write SOC_I2C_FIFO_LEN bytes at a time */
+    /* if len > I2C_LL_FIFO_LEN write I2C_LL_FIFO_LEN bytes at a time */
     while (len > tx_fifo_free) {
         /* send one block of data bytes */
         _i2c_bus[dev].len = tx_fifo_free;
@@ -425,7 +426,7 @@ static int _i2c_status_to_errno(i2c_t dev)
             uint32_t cnt;
 
             i2c_ll_get_txfifo_len(_i2c_hw[dev].dev, &cnt);
-            return ((SOC_I2C_FIFO_LEN - cnt) >= _i2c_bus[dev].len) ? -ENXIO : -EIO;
+            return ((I2C_LL_FIFO_LEN - cnt) >= _i2c_bus[dev].len) ? -ENXIO : -EIO;
         }
         else {
             /*
@@ -487,7 +488,7 @@ static void _i2c_write_cmd(i2c_t dev, const uint8_t* data, uint8_t len)
 {
     DEBUG ("%s dev=%u data=%p len=%d\n", __func__, dev, data, len);
 
-    if (len > SOC_I2C_FIFO_LEN) {
+    if (len > I2C_LL_FIFO_LEN) {
         LOG_TAG_ERROR("i2c", "Maximum number of bytes (32 bytes) that can be "
                       "sent with on transfer reached\n");
         return;
@@ -512,7 +513,7 @@ static void _i2c_read_cmd(i2c_t dev, uint8_t len, bool last)
 {
     DEBUG ("%s dev=%u len=%d\n", __func__, dev, len);
 
-    if (len < 1 || len > SOC_I2C_FIFO_LEN) {
+    if (len < 1 || len > I2C_LL_FIFO_LEN) {
         /* at least one byte has to be read */
         LOG_TAG_ERROR("i2c", "At least one byte has to be read\n");
         return;
@@ -663,12 +664,17 @@ static void _i2c_reset_and_configure(i2c_t dev)
 {
     i2c_ll_enable_controller_clock(_i2c_hw[dev].dev, true);
 
-    I2C_RCC_ATOMIC() {
+    PERIPH_RCC_ATOMIC() {
         i2c_ll_enable_bus_clock(dev, true);
         i2c_ll_reset_register(dev);
     }
 
-    i2c_ll_master_init(_i2c_hw[dev].dev);
+    /* i2c_ll_master_init was removed in ESP-IDF v6.x, the configuration is
+     * done as in i2c_hal_master_init */
+    i2c_ll_set_mode(_i2c_hw[dev].dev, I2C_BUS_MODE_MASTER);
+    i2c_ll_enable_pins_open_drain(_i2c_hw[dev].dev, true);
+    i2c_ll_enable_arbitration(_i2c_hw[dev].dev, false);
+    i2c_ll_master_rx_full_ack_level(_i2c_hw[dev].dev, false);
     i2c_ll_set_data_mode(_i2c_hw[dev].dev, I2C_DATA_MODE_MSB_FIRST, I2C_DATA_MODE_MSB_FIRST);
     i2c_ll_txfifo_rst(_i2c_hw[dev].dev);
     i2c_ll_rxfifo_rst(_i2c_hw[dev].dev);
@@ -692,7 +698,7 @@ static void _i2c_reset_and_configure(i2c_t dev)
 
 static void _i2c_reset_fsm(i2c_t dev)
 {
-#if SOC_I2C_SUPPORT_HW_FSM_RST
+#if I2C_LL_SUPPORT_HW_FSM_RST
     i2c_ll_master_fsm_rst(_i2c_hw[dev].dev);
     _i2c_clear_bus(dev);
 #else
@@ -703,7 +709,7 @@ static void _i2c_reset_fsm(i2c_t dev)
 
 static void _i2c_clear_bus(i2c_t dev)
 {
-#if SOC_I2C_SUPPORT_HW_CLR_BUS
+#if I2C_LL_SUPPORT_HW_CLR_BUS
     i2c_ll_master_clr_bus(_i2c_hw[dev].dev, I2C_LL_RESET_SLV_SCL_PULSE_NUM_DEFAULT, true);
 
     uint32_t timeout = system_get_time_ms() + I2C_CLR_BUS_TIMEOUT_MS;

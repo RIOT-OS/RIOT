@@ -1,0 +1,29 @@
+From b56f7a5719d0541f4f345e3796f05abf9acf094b Mon Sep 17 00:00:00 2001
+From: Gunar Schorcht <gunar@schorcht.net>
+Date: Thu, 8 Oct 2026 23:58:08 +0200
+Subject: [PATCH 50/51] nvs_flash: use mbedtls/aes.h in RIOT
+
+---
+ components/nvs_flash/private_include/nvs_xts_aes.h | 6 ++++++
+ 1 file changed, 6 insertions(+)
+
+diff --git a/components/nvs_flash/private_include/nvs_xts_aes.h b/components/nvs_flash/private_include/nvs_xts_aes.h
+index fbdb057127..9124dbd562 100644
+--- a/components/nvs_flash/private_include/nvs_xts_aes.h
++++ b/components/nvs_flash/private_include/nvs_xts_aes.h
+@@ -17,6 +17,12 @@
+ #define XTS_FUNC(func) esp_aes_##func
+ #define XTS_MODE(mode) ESP_AES_##mode
+ #define XTS_CONTEXT esp_aes_xts_context
++#elif defined(RIOT_VERSION)
++/* RIOT uses its own mbed TLS package with the AES header at the old place */
++#include "mbedtls/aes.h"
++#define XTS_FUNC(func) mbedtls_aes_##func
++#define XTS_MODE(mode) MBEDTLS_AES_##mode
++#define XTS_CONTEXT mbedtls_aes_xts_context
+ #else
+ #define MBEDTLS_DECLARE_PRIVATE_IDENTIFIERS
+ #include "mbedtls/private/aes.h"
+-- 
+2.43.0
+

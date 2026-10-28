@@ -1,7 +1,7 @@
 PKG_NAME=esp32_sdk
 PKG_URL=https://github.com/espressif/esp-idf
-# v5.4
-PKG_VERSION=c8bb53292d08d6449a09823cf554e62ac839cd8c
+# v6.1
+PKG_VERSION=fff9895c82d744c7237be8847347bdd1b07c6643
 PKG_LICENSE=Apache-2.0
 
 # Only check out the components that are actually used by RIOT. The full
@@ -17,16 +17,22 @@ PKG_SPARSE_PATHS += components/driver
 PKG_SPARSE_PATHS += components/efuse
 PKG_SPARSE_PATHS += components/esp_adc
 PKG_SPARSE_PATHS += components/esp_app_format
+PKG_SPARSE_PATHS += components/esp_blockdev
 PKG_SPARSE_PATHS += components/esp_bootloader_format
 PKG_SPARSE_PATHS += components/esp_coex
 PKG_SPARSE_PATHS += components/esp_common
+PKG_SPARSE_PATHS += components/esp_driver_dma
 PKG_SPARSE_PATHS += components/esp_driver_gpio
 PKG_SPARSE_PATHS += components/esp_driver_i2c
+PKG_SPARSE_PATHS += components/esp_driver_i2s
+PKG_SPARSE_PATHS += components/esp_driver_parlio
 PKG_SPARSE_PATHS += components/esp_driver_rmt
+PKG_SPARSE_PATHS += components/esp_driver_sd_intf
 PKG_SPARSE_PATHS += components/esp_driver_sdmmc
 PKG_SPARSE_PATHS += components/esp_driver_spi
 PKG_SPARSE_PATHS += components/esp_driver_uart
 PKG_SPARSE_PATHS += components/esp_eth
+PKG_SPARSE_PATHS += components/esp_hal_*
 PKG_SPARSE_PATHS += components/esp_event
 PKG_SPARSE_PATHS += components/esp_hw_support
 PKG_SPARSE_PATHS += components/esp_lcd
@@ -37,6 +43,8 @@ PKG_SPARSE_PATHS += components/esp_phy
 PKG_SPARSE_PATHS += components/esp_pm
 PKG_SPARSE_PATHS += components/esp_psram
 PKG_SPARSE_PATHS += components/esp_rom
+PKG_SPARSE_PATHS += components/esp_security
+PKG_SPARSE_PATHS += components/esp_stdio
 PKG_SPARSE_PATHS += components/esp_system
 PKG_SPARSE_PATHS += components/esp_timer
 PKG_SPARSE_PATHS += components/esp_wifi
@@ -45,7 +53,7 @@ PKG_SPARSE_PATHS += components/hal
 PKG_SPARSE_PATHS += components/heap
 PKG_SPARSE_PATHS += components/ieee802154
 PKG_SPARSE_PATHS += components/log
-PKG_SPARSE_PATHS += components/newlib
+PKG_SPARSE_PATHS += components/esp_libc
 PKG_SPARSE_PATHS += components/nvs_flash
 PKG_SPARSE_PATHS += components/riscv
 PKG_SPARSE_PATHS += components/sdmmc

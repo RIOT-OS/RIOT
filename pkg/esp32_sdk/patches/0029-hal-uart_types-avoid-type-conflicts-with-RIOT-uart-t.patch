@@ -1,17 +1,17 @@
-From 4b83c7a4d753d57ab44964be762068ab8a6560fd Mon Sep 17 00:00:00 2001
+From 0be2e6bf058c7cfef1bd58a872b089cff8b1d084 Mon Sep 17 00:00:00 2001
 From: Gunar Schorcht <gunar@schorcht.net>
 Date: Tue, 25 Mar 2025 14:12:40 +0100
-Subject: [PATCH 29/29] hal/uart_types: avoid type conflicts with RIOT uart
+Subject: [PATCH 29/51] hal/uart_types: avoid type conflicts with RIOT uart
  types
 
 ---
- components/hal/include/hal/uart_types.h | 4 ++++
+ components/esp_hal_uart/include/hal/uart_types.h | 4 ++++
  1 file changed, 4 insertions(+)
 
-diff --git a/components/hal/include/hal/uart_types.h b/components/hal/include/hal/uart_types.h
-index b97944abea..7f14ea6f9d 100644
---- a/components/hal/include/hal/uart_types.h
-+++ b/components/hal/include/hal/uart_types.h
+diff --git a/components/esp_hal_uart/include/hal/uart_types.h b/components/esp_hal_uart/include/hal/uart_types.h
+index 953d1ab04e..69fb20d43b 100644
+--- a/components/esp_hal_uart/include/hal/uart_types.h
++++ b/components/esp_hal_uart/include/hal/uart_types.h
 @@ -61,6 +61,7 @@ typedef enum {
      UART_DATA_BITS_MAX = 0x4,
  } uart_word_length_t;
@@ -39,5 +39,5 @@ index b97944abea..7f14ea6f9d 100644
  /**
   * @brief UART hardware flow control modes
 -- 
-2.34.1
+2.43.0
 
