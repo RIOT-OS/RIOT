@@ -15,6 +15,8 @@
  */
 
 #include "periph_cpu.h"
+#include "regs/clocks.h"
+#include "regs/resets.h"
 
 void clock_reset(void) {
     /* Reset the clock system */
@@ -66,6 +68,32 @@ void cpu_clock_init(void) {
 
     /* AUXSRC = 0x0 -> CLK_SYS Indirectly through lower line */
     CLOCKS->CLK_PERI_CTRL = CLK_PERI_CTRL_ENABLE_BIT;
+}
+
+void clock_usb_init(void)
+{
+    /* take the USB PLL out of reset */
+    atomic_set(&RESETS->RESET, RESETS_RESET_PLL_USB_BITS);
+    reset_component(RESETS_RESET_PLL_USB_BITS, RESETS_RESET_PLL_USB_BITS);
+
+    /* power up the VCO and wait for the PLL to lock */
+    PLL_USB->FBDIV_INT = PLL_USB_FEEDBACK_DIVIDER_VALUE;
+    atomic_clear(&PLL_USB->PWR, PLL_PWR_PD_BITS | PLL_PWR_VCOPD_BITS);
+    while (!(PLL_USB->CS & PLL_CS_LOCK_BITS)) {
+        /* Wait for the PLL to lock */
+    }
+
+    /* set up the post dividers and power them up */
+    PLL_USB->PRIM = (PLL_USB_PD1 << PLL_PRIM_POSTDIV1_LSB) |
+                    (PLL_USB_PD2 << PLL_PRIM_POSTDIV2_LSB);
+    atomic_clear(&PLL_USB->PWR, PLL_PWR_POSTDIVPD_BITS);
+
+    /* CLK_USB = PLL_USB / 1 */
+    atomic_clear(&CLOCKS->CLK_USB_CTRL, CLOCKS_CLK_USB_CTRL_ENABLE_BITS);
+    CLOCKS->CLK_USB_DIV = 1u << CLOCKS_CLK_USB_DIV_INT_LSB;
+    CLOCKS->CLK_USB_CTRL = (CLOCKS_CLK_USB_CTRL_AUXSRC_VALUE_CLKSRC_PLL_USB <<
+                            CLOCKS_CLK_USB_CTRL_AUXSRC_LSB) |
+                           CLOCKS_CLK_USB_CTRL_ENABLE_BITS;
 }
 
 /** @} */

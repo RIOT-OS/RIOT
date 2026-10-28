@@ -1,4 +1,7 @@
 # SORT THIS ALPHABETICALLY BY COMMON CPU MODULE NAME!
+ifneq (,$(filter cpu_common_rp2,$(USEMODULE)))
+  include $(RIOTCPU)/common/rp2/Makefile.dep
+endif
 ifneq (,$(filter cpu_common_rp2350,$(USEMODULE)))
   include $(RIOTCPU)/common/rp2350/Makefile.dep
 endif
