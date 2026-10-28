@@ -1,9 +1,0 @@
-# Define the CPU family so we can differentiate between them in the code
-CFLAGS += -DCPU_FAM_$(call uppercase_and_underscore,$(CPU_FAM))
-
-# this CPU implementation doesn't use CMSIS initialization
-CFLAGS += -DDONT_USE_CMSIS_INIT
-
-LINKER_SCRIPT ?= cortexm.ld
-
-INCLUDES += -I$(RIOTCPU)/sam_common/include
