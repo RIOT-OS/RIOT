@@ -225,7 +225,7 @@ struct gba_uart {
 typedef struct gba_uart gba_uart_t;
 
 /**
- * @brief The GBA uart (its the SIO_SCNT register type casted)
+ * @brief The GBA uart (it's the SIO_SCNT register type casted)
  */
 #define GBA_UART ((volatile gba_uart_t *) 0x4000128)
 

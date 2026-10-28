@@ -26,7 +26,7 @@ void gba_timer_isr(uint16_t args)
 #endif
 
 /* Stub implementation used when uart is not used.
- * Actual implementation is in periph/timer.c */
+ * Actual implementation is in periph/uart.c */
 #ifndef MODULE_PERIPH_UART
 void gba_uart_isr(void)
 {

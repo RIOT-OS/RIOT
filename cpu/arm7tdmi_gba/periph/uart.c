@@ -3,6 +3,19 @@
  * SPDX-License-Identifier: LGPL-2.1-only
  */
 
+/**
+ * @ingroup     cpu_arm7tdmi_gba
+ * @ingroup     drivers_periph_uart
+ * @{
+ *
+ * @file
+ * @brief       GBA periph/uart driver
+ *
+ * @author      Bennet Hattesen <bennet.hattesen@haw-hamburg.de>
+ *
+ * @}
+ */
+
 #include "periph/uart.h"
 #include "periph_gba.h"
 
@@ -26,7 +39,7 @@ void gba_uart_isr(void)
     }
 }
 
-static inline uint16_t _baud_to_flag(uint32_t baud)
+static inline int _baud_to_flag(uint32_t baud)
 {
     switch (baud) {
     case 9600:
@@ -36,17 +49,22 @@ static inline uint16_t _baud_to_flag(uint32_t baud)
     case 57600:
         return 2;
     case 115200:
-    default:
         return 3;
+    default:
+        return UART_NOBAUD;
     }
 }
 
 int uart_init(uart_t uart, uint32_t baud, uart_rx_cb_t rx_cb, void *arg)
 {
     (void)uart;
+    int baud = _baud_to_flag(baud);
+    if (baud < 0) {
+        return baud;
+    }
 
     gba_uart_t uart_settings;
-    uart_settings.baud = _baud_to_flag(baud);
+    uart_settings.baud = baud;
     uart_settings.cts = 0;       /* disable / always send */
     uart_settings.parity = 0;    /* even */
     uart_settings.data_bits = 1; /* 8 bits */
