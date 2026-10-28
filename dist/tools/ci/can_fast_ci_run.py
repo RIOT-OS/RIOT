@@ -22,7 +22,7 @@ REGEX_GIT_DIFF_SINGLE_FILE = re.compile(r"^[0-9-]+\s+[0-9-]+\s+(.*)$")
 OTHER_CLASSIFIERS = [
     [re.compile(r"^(Makefile.*|sys\/Makefile.*|drivers\/Makefile.*|makefiles\/.*)$"), "build-system"],
     [re.compile(r"^(drivers\/include\/.*|sys\/include\/.*)$"), "public-headers"],
-    [re.compile(r"^(Kconfig|kconfigs\/.*|pkg\/Kconfig|sys\/Kconfig|drivers\/Kconfig)$"), "kconfig"],
+    [re.compile(r"^(Kconfig|boards\/Kconfig|kconfigs\/.*|pkg\/Kconfig|sys\/Kconfig|drivers\/Kconfig)$"), "kconfig"],
     [re.compile(r"^(.*\.cff|doc\/.*|.*\.md|.*\.txt|VERSION)$"), "doc"],
     [re.compile(r"^(CODEOWNERS|\.mailmap|\.gitignore|\.gitattributes)$"), "git"],
     [re.compile(r"^\.github/.*$"), "github"],
