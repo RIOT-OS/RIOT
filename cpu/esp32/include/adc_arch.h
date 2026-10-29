@@ -104,50 +104,6 @@ int adc_set_attenuation(adc_t line, adc_atten_t atten);
  */
 int adc_raw_to_voltage(adc_t line, int sample, int *voltage);
 
-#if !DOXYGEN
-/**
- * @brief   Output reference voltage of a ADC line to a GPIO pin
- *
- * The Vref of the ADC unit for the given ADC line is routed to a GPIO pin.
- * This allows to measure the Vref used by the ADC unit to adjusted the
- * results of the conversions accordingly.
- *
- * @warning The function is not supported any longer, use
- *          @ref adc_raw_to_voltage to get the voltage for a sample value.
- *
- * @note
- * - The given GPIO must be a valid ADC channel of ADC2 unit.
- * - For ESP32, only the internal reference voltage of ADC2 is given.
- *
- * @param [in] line    ADC line for which Vref of its ADC unit is routed to the GPIO
- * @param [in] gpio    GPIO to which Vref is routed (ADC2 channel GPIOs only)
- *
- * @retval  0       on success
- * @retval  -1      on error
- */
-__attribute__((__deprecated__))
-int adc_line_vref_to_gpio(adc_t line, gpio_t gpio);
-
-#if defined(CPU_FAM_ESP32)
-/**
- * @brief   Output ADC reference voltage to GPIO25
- *
- * This function is deprecated and will be removed in future versions.
- *
- * @warning The function is not supported any longer, use
- *          @ref adc_raw_to_voltage to get the voltage for a sample value.
- *
- * @retval  0 on success
- * @retval  -1 on invalid ADC line
- */
-__attribute__((__deprecated__))
-static inline int adc_vref_to_gpio25(void)
-{
-    return adc_vref_to_gpio(ADC_UNIT_2, GPIO25);
-}
-#endif
-#endif /* !DOXYGEN */
-
 #ifdef __cplusplus
 }
 #endif
