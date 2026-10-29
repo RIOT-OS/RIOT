@@ -23,21 +23,14 @@
 #include "esp_mac.h"
 
 /*
- * ESP32x SoCs don't have a real chip id. The factory-programmed default MAC
- * address from EFUSE is used instead.
+ * ESP32x SoCs don't have a real chip id. The factory-programmed MAC address
+ * from eFuse is used instead. It always has 6 bytes, also on SoCs with
+ * IEEE 802.15.4 radio where esp_efuse_mac_get_default would return the
+ * 8 byte EUI-64 address.
  */
 
 void cpuid_get(void *id)
 {
-#if defined(CPU_FAM_ESP32H2) && defined(CONFIG_IEEE802154_ENABLED)
-    /* ESP32H2 has IEEE802.15.4 radio which has an EUI64 address. Function
-     * esp_efuse_mac_get_default will return this 8 byte address if
-     * CONFIG_IEEE802154_ENABLED */
-    _Static_assert(CPUID_LEN == 8,
-                  "CPUID_LEN hast to be 8 if IEEE 802.15.4 interface enabled");
-#else
-    _Static_assert(CPUID_LEN == 6, "CPU_ID_LEN hast to be 6");
-#endif
-
-    esp_efuse_mac_get_default(id);
+    _Static_assert(CPUID_LEN == 6, "CPUID_LEN has to be 6");
+    esp_read_mac(id, ESP_MAC_EFUSE_FACTORY);
 }
