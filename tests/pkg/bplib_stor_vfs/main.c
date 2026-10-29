@@ -16,6 +16,7 @@
  */
 
 #include <stdio.h>
+#include <stdlib.h>
 
 #include "bplib.h"
 
@@ -25,87 +26,31 @@
 #include "thread_flags.h"
 #include "fmt.h"
 #include "shell.h"
+#include "test_utils/interactive_sync.h"
 
 #define TEST_PAYLOAD        "Hello World!"
-#define TEST_PAYLOAD_LEN    (sizeof(TEST_PAYLOAD) - 1)
 
-#define THREAD_FLAG_CONTINUE        0x01
+#define MOCK_CLA_EGRESS_TIMEOUT     10000
+#define MOCK_CLA_RETRANSMIT_TIME    5000
 
-#define MOCK_CLA_EGRESS_TIMEOUT     20000
-
-char _shell_thread_stack[THREAD_STACKSIZE_MAIN];
-
-static thread_t* _main_thread;
-
-static void _print_bundle_storage_info(void)
-{
-    printf("bundles in storage: %"PRIi32", bytes used: %zu, limit: %zu\n",
-        bplib_instance_data.BPLibInst.BundleStorage.BundleCountStored,
-        bplib_instance_data.BPLibInst.BundleStorage.BytesStorageInUse,
-        (size_t) BPLIB_MAX_STORED_BUNDLE_BYTES);
-}
-
-/**
- * Source: This node
- * Destination: Other node
- * Custody Transfer: no
- */
-static void _test_this_node_to_other_node(void)
+static int _cmd_mock_egress(int argc, char **argv)
 {
     BPLib_Status_t rv;
     char bundle_buf[256];
     size_t out_size;
+    int timeout;
+    int c;
 
-    /* TODO all of this might be doable directly in the shell once it is merged */
+    if (argc < 3) {
+        puts("Usage: mock_egress contact timeout");
+        return 1;
+    }
 
-    /* Note: The success of the NC helper functions is not tested here, but their
-     * failure likely leads to a failure in this test */
+    c = atoi(argv[1]);
+    timeout = atoi(argv[2]);
 
-    bplib_channel_set_state(0, BPLIB_NC_APP_STATE_REMOVED);
-    bplib_contact_set_state(0, BPLIB_CLA_TORNDOWN);
-
-    /* TODO set this node no to something else, currently a compile time macro */
-    bplib_channel_set_service_no(0, 100);
-
-    BPLib_EID_t dest = {
-       .Scheme = BPLIB_EID_SCHEME_IPN,
-       .IpnSspFormat = BPLIB_EID_IPN_SSP_FORMAT_TWO_DIGIT,
-       .Allocator = 0,
-       .Node = 400,
-       .Service = 1234
-    };
-    bplib_channel_set_dest_eid(0, dest);
-    bplib_channel_set_block_include(0, BPLIB_CUSTODY_TRANSFER_BLOCK, false);
-    bplib_channel_set_lifetime(0, 1000 * 30);
-
-    /* The contact can reach everything but is not started, so everything should
-     * go to storage until it is started */
-    BPLib_EID_Pattern_t reachable_eids = {
-        .Scheme       = BPLIB_EID_SCHEME_IPN,
-        .IpnSspFormat = BPLIB_EID_IPN_SSP_FORMAT_TWO_DIGIT,
-        .MaxAllocator = 0,
-        .MinAllocator = 0,
-        .MaxNode      = 0xffffffffffffffff,
-        .MinNode      = 0,
-        .MaxService   = 0xffffffffffffffff,
-        .MinService   = 0
-    };
-    bplib_contact_set_destinations(0, 0, reachable_eids);
-
-    bplib_channel_set_state(0, BPLIB_NC_APP_STATE_STARTED);
-
-    rv = BPLib_PI_Ingress(&bplib_instance_data.BPLibInst, 0, TEST_PAYLOAD, TEST_PAYLOAD_LEN);
-    printf("bplib ingress %s\n", rv == BPLIB_SUCCESS ? "SUCCESS" : "ERROR");
-
-    /* Now the bundle is in storage. Check if the metadata increased as expected */
-    _print_bundle_storage_info();
-
-    /* Tell bplib the contact is now ready, it should now egress the bundle into
-     * this "CLA" which just prints it to stdout */
-    bplib_contact_set_state(0, BPLIB_CLA_STARTED);
-    rv = BPLib_CLA_Egress(&bplib_instance_data.BPLibInst, 0, bundle_buf,
-                          &out_size, sizeof(bundle_buf), MOCK_CLA_EGRESS_TIMEOUT);
-
+    rv = BPLib_CLA_Egress(&bplib_instance_data.BPLibInst, c, bundle_buf,
+                          &out_size, sizeof(bundle_buf), timeout);
     if (rv != BPLIB_SUCCESS) {
         printf("bplib egress ERROR: %"PRIi32"\n", rv);
     }
@@ -114,29 +59,58 @@ static void _test_this_node_to_other_node(void)
         print_bytes_hex(bundle_buf, out_size);
         printf("\n");
     }
-
-    /* The bundle should have now been deleted from storage */
-    _print_bundle_storage_info();
+    return 0;
 }
 
-void *_shell_thread(void *arg)
+static int _cmd_mock_ingress(int argc, char **argv)
 {
-    (void) arg;
+    BPLib_Status_t rv;
+    char bundle_buf[256];
+    int c;
+    ssize_t bytes;
 
-    char line_buf[SHELL_DEFAULT_BUFSIZE];
-    shell_run(NULL, line_buf, SHELL_DEFAULT_BUFSIZE);
+    if (argc < 3) {
+        puts("Usage: mock_ingress contact hex_bundle");
+        return 1;
+    }
 
-    return NULL;
+    c = atoi(argv[1]);
+    bytes = scn_buf_hex(bundle_buf, sizeof(bundle_buf), argv[2], strlen(argv[2]));
+
+    if (bytes <= 0) {
+        printf("bplib ingress ERROR: %zi\n", bytes);
+        return 1;
+    }
+
+    rv = BPLib_CLA_Ingress(&bplib_instance_data.BPLibInst, c,
+                                          bundle_buf, bytes, 0);
+    if (rv != BPLIB_SUCCESS) {
+        printf("bplib ingress ERROR: %"PRIi32"\n", rv);
+    }
+    else {
+        printf("bplib ingress SUCCESS\n");
+    }
+    return 0;
 }
+
+static int _cmd_restart_bplib(int argc, char **argv)
+{
+    (void) argc;
+    (void) argv;
+
+    /* This function could terminate and restart bplib but this is bugged.
+     * So just reset the required values. */
+    bplib_instance_data.BPLibInst.Ct.LastSeqCounterId = 0;
+
+    return 0;
+}
+
+SHELL_COMMAND(mock_egress, "Egress bundles into stdout", _cmd_mock_egress);
+SHELL_COMMAND(mock_ingress, "Ingress bundles from stdin", _cmd_mock_ingress);
+SHELL_COMMAND(restart_bplib, "Restart bplib", _cmd_restart_bplib);
 
 int main(void)
 {
-    _main_thread = thread_get_active();
-
-    thread_create(_shell_thread_stack, sizeof(_shell_thread_stack),
-                  THREAD_PRIORITY_MAIN - 1, 0, _shell_thread, NULL,
-                  "shell");
-
     /* Remove everything in the storage dir before bplib is started */
     char cmd[] = "vfs rm -r /nvm0/bp";
     shell_handle_input_line(NULL, cmd);
@@ -147,10 +121,25 @@ int main(void)
         return 1;
     }
 
+    /* As long as contacts are not configurable through the shell, have one
+     * contact that can reach everything */
+    BPLib_EID_Pattern_t reachable_eids = {
+        .Scheme       = BPLIB_EID_SCHEME_IPN,
+        .IpnSspFormat = BPLIB_EID_IPN_SSP_FORMAT_TWO_DIGIT,
+        .MaxAllocator = 0,
+        .MinAllocator = 0,
+        .MaxNode      = BPLIB_EID_PATTERN_MAX_NODE,
+        .MinNode      = 0,
+        .MaxService   = BPLIB_EID_PATTERN_MAX_SERVICE,
+        .MinService   = 0
+    };
+    bplib_contact_set_destinations(0, 0, reachable_eids);
+    bplib_contact_set_cs_retransmit_time(0, MOCK_CLA_RETRANSMIT_TIME);
+
     puts("bplib init SUCCESS");
 
-    /* Test case 1: Bundle from this node to external target is stored, and later egressed */
-    _test_this_node_to_other_node();
+    char line_buf[256];
+    shell_run(NULL, line_buf, sizeof(line_buf));
 
     return 0;
 }
