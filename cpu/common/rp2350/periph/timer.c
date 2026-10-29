@@ -66,6 +66,8 @@ static void _timer_isr(tim_t dev, int channel)
 
 int timer_init(tim_t dev, uint32_t freq, timer_cb_t cb, void *arg)
 {
+    (void)freq;
+    
     if (dev >= TIMER_NUMOF) {
         return -ENODEV;
     }
