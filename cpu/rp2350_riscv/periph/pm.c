@@ -20,10 +20,12 @@
 #include "regs/psm.h"
 #include "regs/watchdog.h"
 
+#ifndef MODULE_PM_LAYERED
 void pm_set_lowest(void)
 {
     __asm__ volatile ("wfi");
 }
+#endif
 
 void pm_reboot(void)
 {
