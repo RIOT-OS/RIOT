@@ -181,6 +181,14 @@ typedef enum {
      * e.g. for software handling of the ACK reply.
      */
     IEEE802154_CAP_FRAME_RETENTION      = BIT21,
+    /**
+     * @brief the device supports timed transmission
+     *
+     * A device that declares this capability provides a free running radio
+     * time (see @ref ieee802154_radio_ops::get_time) and is able to transmit frames at a absolute
+     * time (see @ref ieee802154_radio_request_transmit_at).
+     */
+    IEEE802154_CAP_TIMED_TX             = BIT22,
 } ieee802154_rf_caps_t;
 
 /**
@@ -914,6 +922,23 @@ struct ieee802154_radio_ops {
      * May be NULL if the radio does not support crypto acceleration.
      */
     const struct ieee802154_radio_cipher_ops *cipher_ops;
+
+    /**
+     * @brief Get the current radio time
+     *
+     * The radio time is a free running counter in microseconds that wraps
+     * around at 2^32. It is only valid while the device is on. Time values
+     *
+     * This function MAY be NULL if the radio doesn't support timed transmissions
+     * @ref IEEE802154_CAP_TIMED_TX
+     *
+     * @pre the device is on
+     *
+     * @param[in] dev IEEE802.15.4 device descriptor
+     *
+     * @return current radio time in microseconds
+     */
+    uint32_t (*get_time)(ieee802154_dev_t *dev);
 };
 
 /**
@@ -979,6 +1004,40 @@ static inline int ieee802154_radio_write(ieee802154_dev_t *dev, const iolist_t *
 static inline int ieee802154_radio_request_transmit(ieee802154_dev_t *dev)
 {
     return dev->driver->request_op(dev, IEEE802154_HAL_OP_TRANSMIT, NULL);
+}
+
+/**
+ * @brief Transmit a preloaded frame at a given point in time
+ *
+ * This function calls ieee802154_radio_ops::request_op with @ref
+ * IEEE802154_HAL_OP_TRANSMIT and a pointer to @p time_us as context.
+ *
+ * @p time_us refers to the radio time (see @ref ieee802154_radio_get_time)
+ * at which the transmission of the frame (preamble) starts. The device starts
+ * the transmission procedure earlier to compensate the ramp-up and, if
+ * enabled, the CCA before the transmission. If that start already passed,
+ * the transmission procedure starts immediately and the frame is sent late.
+ *
+ * @pre The upper layer should have set the transceiver to IDLE (see
+ * @ref ieee802154_radio_set_idle) and the frame is already in the framebuffer
+ * (@ref ieee802154_radio_ops_t::write).
+ * @pre The device is on
+ * @pre The device supports @ref IEEE802154_CAP_TIMED_TX
+ *
+ * @note @ref ieee802154_radio_confirm_transmit MUST be used to
+ * finish the transmission.
+ *
+ * @param[in] dev IEEE802.15.4 device descriptor
+ * @param[in] time_us radio time in microseconds to start the transmission
+ *
+ * @return result of @ref ieee802154_radio_request_transmit
+ *
+ * @retval 0 on success
+ * @retval negative errno on error
+ */
+static inline int ieee802154_radio_request_transmit_at(ieee802154_dev_t *dev, uint32_t time_us)
+{
+    return dev->driver->request_op(dev, IEEE802154_HAL_OP_TRANSMIT, &time_us);
 }
 
 /**
@@ -1123,6 +1182,21 @@ static inline int ieee802154_radio_config_src_address_match(ieee802154_dev_t *de
                                                             const void *value)
 {
     return dev->driver->config_src_addr_match(dev, cmd, value);
+}
+
+/**
+ * @brief Shortcut to @ref ieee802154_radio_ops::get_time
+ *
+ * @pre The device is on
+ * @pre The device supports @ref IEEE802154_CAP_TIMED_TX
+ *
+ * @param[in] dev IEEE802.15.4 device descriptor
+ *
+ * @return current radio time in microseconds
+ */
+static inline uint32_t ieee802154_radio_get_time(ieee802154_dev_t *dev)
+{
+    return dev->driver->get_time(dev);
 }
 
 /**
@@ -1504,6 +1578,22 @@ static inline const struct ieee802154_radio_cipher_ops *ieee802154_radio_get_cip
 static inline bool ieee802154_radio_has_irq_ack_timeout(ieee802154_dev_t *dev)
 {
     return (dev->driver->caps & IEEE802154_CAP_IRQ_ACK_TIMEOUT);
+}
+
+/**
+ * @brief Check if the device supports delayed (timed) transmission
+ *
+ * Internally this function reads ieee802154_radio_ops::caps and checks for
+ * @ref IEEE802154_CAP_TIMED_TX.
+ *
+ * @param[in] dev IEEE802.15.4 device descriptor
+ *
+ * @return true if the device has support
+ * @return false otherwise
+ */
+static inline bool ieee802154_radio_has_timed_tx(ieee802154_dev_t *dev)
+{
+    return (dev->driver->caps & IEEE802154_CAP_TIMED_TX);
 }
 
 /**

@@ -191,7 +191,8 @@ static inline void kw41zrf_abort_sequence(kw41zrf_t *dev)
     /* Writing IDLE to XCVSEQ aborts any ongoing sequence */
     ZLL->PHY_CTRL = (ZLL->PHY_CTRL &
         ~(ZLL_PHY_CTRL_XCVSEQ_MASK |
-        ZLL_PHY_CTRL_TC3TMOUT_MASK | ZLL_PHY_CTRL_TMRTRIGEN_MASK)) |
+        ZLL_PHY_CTRL_TC3TMOUT_MASK | ZLL_PHY_CTRL_TMRTRIGEN_MASK |
+        ZLL_PHY_CTRL_TMR2CMP_EN_MASK)) |
         ZLL_PHY_CTRL_XCVSEQ(XCVSEQ_IDLE) | ZLL_PHY_CTRL_SEQMSK_MASK;
     /* Spin until the sequence manager has acknowledged the sequence abort, this
      * should not take many cycles */
@@ -262,6 +263,20 @@ static inline void kw41zrf_timer_set(kw41zrf_t *dev, volatile uint32_t *cmp_reg,
     uint32_t now = kw41zrf_timer_get(dev);
 
     *cmp_reg = now + timeout;
+}
+
+/**
+ * @brief Set an absolute value for the given compare register of the Event Timer
+ *
+ * @param[in]  dev       kw41zrf device descriptor
+ * @param[out] cmp_reg   pointer to timer compare register, &ZLL->TxCMP
+ * @param[in]  ticks     absolute timer value, truncated to 24 bit
+ */
+static inline void kw41zrf_timer_set_abs(kw41zrf_t *dev, volatile uint32_t *cmp_reg, uint32_t ticks)
+{
+    (void) dev;
+    /* all compare registers T1CMP..T4CMP are 24 bit wide */
+    *cmp_reg = ticks & ZLL_T1CMP_T1CMP_MASK;
 }
 
 /**
