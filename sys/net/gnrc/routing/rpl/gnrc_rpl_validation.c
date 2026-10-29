@@ -48,6 +48,12 @@ bool gnrc_rpl_validation_options(int msg_type, gnrc_rpl_instance_t *inst,
                            opt->length, GNRC_RPL_OPT_DODAG_CONF_LEN);
                     return false;
                 }
+
+                if (byteorder_ntohs(
+                        ((gnrc_rpl_opt_dodag_conf_t *)opt)->min_hop_rank_inc) == 0) {
+                    DEBUG("RPL: invalid DODAG CONF min_hop_rank_inc 0\n");
+                    return false;
+                }
                 break;
 
             case (GNRC_RPL_OPT_PREFIX_INFO):
