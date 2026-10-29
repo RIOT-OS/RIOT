@@ -6,6 +6,7 @@
 #include "esp_ieee802154.h"
 
 #include "esp_ieee802154_hal.h"
+#include "esp_timer.h"
 #include "iolist.h"
 #include "log.h"
 #include "net/ieee802154/radio.h"
@@ -109,6 +110,12 @@ static int _read(ieee802154_dev_t *dev, void *buf, size_t size, ieee802154_rx_in
     return res;
 }
 
+static uint32_t _get_time(ieee802154_dev_t *dev)
+{
+    (void)dev;
+    return (uint32_t)esp_timer_get_time();
+}
+
 static int _off(ieee802154_dev_t *dev)
 {
     (void)dev;
@@ -145,6 +152,10 @@ static int _request_op(ieee802154_dev_t *dev, ieee802154_hal_op_t op, void *ctx)
         _tx_error = ESP_IEEE802154_TX_ERR_NONE;
         _ack_frame = NULL;
         _ack_frame_info = NULL;
+        if (ctx) {
+            uint32_t target_us = *(const uint32_t *)ctx;
+            return esp_ieee802154_transmit_at(_tx_frame, _cca_send_on, target_us) ? -EIO : 0;
+        }
         return esp_ieee802154_transmit(_tx_frame, _cca_send_on) ? -EIO : 0;
     case IEEE802154_HAL_OP_SET_RX:
         DEBUG("[esp_ieee802154] %s: IEEE802154_HAL_OP_SET_RX\n", __func__);
@@ -465,7 +476,8 @@ static const ieee802154_radio_ops_t esp_ieee802154_driver = {
           | IEEE802154_CAP_IRQ_TX_START
 #endif
           | IEEE802154_CAP_IRQ_TX_DONE
-          | IEEE802154_CAP_IRQ_ACK_TIMEOUT,
+          | IEEE802154_CAP_IRQ_ACK_TIMEOUT
+          | IEEE802154_CAP_TIMED_TX,
     .write = _write,
     .read = _read,
     .request_on = _request_on,
@@ -480,5 +492,6 @@ static const ieee802154_radio_ops_t esp_ieee802154_driver = {
     .set_csma_params = _set_csma_params,
     .config_addr_filter = _config_addr_filter,
     .config_src_addr_match = _config_src_addr_match,
+    .get_time = _get_time,
     .set_frame_filter_mode = _set_frame_filter_mode,
 };
