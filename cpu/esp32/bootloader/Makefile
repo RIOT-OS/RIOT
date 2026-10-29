@@ -452,24 +452,34 @@ OBJ_DEPS += $(CURDIR)/sdkconfig.h
 
 $(ESP_SDK_BOOTLOADER_OBJS): \
 $(ESP_SDK_BOOTLOADER_DIR)/%.o: $(ESP32_SDK_DIR)/%.c $(OBJ_DEPS)
-	$(Q)mkdir -p $(dir $@)
 	$(Q)$(CCACHE) $(CC) \
 	  $(CFLAGS) $(INCLUDES) -MMD -MP -c $(abspath $<) -o $@
 
 $(ESP_SDK_BOOTLOADER_ASMOBJS): \
 $(ESP_SDK_BOOTLOADER_DIR)/%.o: $(ESP32_SDK_DIR)/%.S
-	$(Q)mkdir -p $(dir $@)
 	$(Q)$(CCACHE) $(CC) \
 	  $(CFLAGS) $(INCLUDES) -MMD -MP -c $(abspath $<) -o $@
 
 $(ESP_SDK_BOOTLOADER_ADDOBJS): \
 $(ESP_SDK_BOOTLOADER_DIR)/%.o: $(CURDIR)/stub.c $(OBJ_DEPS)
-	$(Q)mkdir -p $(dir $@)
 	$(Q)$(CCACHE) $(CC) \
 	  $(CFLAGS) $(INCLUDES) -MMD -MP -c $(abspath $<) -o $@
 
 $(ESP_SDK_BOOTLOADER_DIR):
 	mkdir -p $@
+
+# The object files are placed in a directory tree that mirrors the ESP-IDF
+# source tree. Create each directory only once instead of calling `mkdir` for
+# every single object file.
+ESP_SDK_BOOTLOADER_OBJ_DIRS := $(sort $(dir $(ESP_SDK_BOOTLOADER_OBJS) \
+                                            $(ESP_SDK_BOOTLOADER_ASMOBJS) \
+                                            $(ESP_SDK_BOOTLOADER_ADDOBJS)))
+
+$(ESP_SDK_BOOTLOADER_OBJS) $(ESP_SDK_BOOTLOADER_ASMOBJS) \
+$(ESP_SDK_BOOTLOADER_ADDOBJS): | $(ESP_SDK_BOOTLOADER_OBJ_DIRS)
+
+$(filter-out $(BINDIR)/$(MODULE)/ $(SUBDIRS),$(ESP_SDK_BOOTLOADER_OBJ_DIRS)):
+	$(Q)mkdir -p $@
 
 $(ESP_SDK_BOOTLOADER_ELF): \
     $(ESP_SDK_BOOTLOADER_OBJS) $(ESP_SDK_BOOTLOADER_ASMOBJS) \
