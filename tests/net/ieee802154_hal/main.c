@@ -213,7 +213,7 @@ static event_t _tx_finish_ev = {
     .handler = _tx_finish_handler,
 };
 
-static void _send(iolist_t *pkt)
+static void _send(iolist_t *pkt, const uint32_t *time_us)
 {
     /* Request a state change to IDLE */
     if (ieee802154_radio_request_set_idle(&_radio, false) < 0) {
@@ -236,7 +236,12 @@ static void _send(iolist_t *pkt)
      * This won't be necessary anymore when the upper layers take care
      * of the IFS.
      */
-    while (ieee802154_radio_request_transmit(&_radio) == -EBUSY) {}
+    if (time_us) {
+        while (ieee802154_radio_request_transmit_at(&_radio, *time_us) == -EBUSY) {}
+    }
+    else {
+        while (ieee802154_radio_request_transmit(&_radio) == -EBUSY) {}
+    }
     mutex_lock(&lock);
 
     event_post(EVENT_PRIO_HIGHEST, &_tx_finish_ev);
@@ -347,8 +352,8 @@ static int _init(void)
 uint8_t payload[] = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. "
                     "Etiam ornare lacinia mi elementum interdum ligula.";
 
-static int send(uint8_t *dst, size_t dst_len,
-                size_t len, bool ack_req)
+static int send(uint8_t *dst, size_t dst_len, size_t len, bool ack_req,
+                const uint32_t *time_us)
 {
     uint8_t flags;
     uint8_t mhr[IEEE802154_MAX_HDR_LEN];
@@ -383,7 +388,7 @@ static int send(uint8_t *dst, size_t dst_len,
         .iol_len = mhr_len,
     };
 
-    _send(&iol_hdr);
+    _send(&iol_hdr, time_us);
     return 0;
 }
 
@@ -473,7 +478,77 @@ int txtsnd(int argc, char **argv)
     if (argc == 4) {
         ack_req = true;
     }
-    return send(addr, res, len, ack_req);
+    return send(addr, res, len, ack_req, NULL);
+}
+
+static int _txtsnd_timed(int argc, char **argv, bool relative)
+{
+    const char *usage = relative ?
+        "Usage: txtsnd_after <long_addr> <len> <delay_ms> [ackreq]" :
+        "Usage: txtsnd_at <long_addr> <len> <time_us> [ackreq]";
+    uint8_t addr[IEEE802154_LONG_ADDRESS_LEN];
+    size_t len;
+    size_t res;
+    uint32_t time_us;
+    bool ack_req = false;
+
+    if (argc != 4 && !(argc == 5 && strcmp(argv[4], "ackreq") == 0)) {
+        puts(usage);
+        if (relative) {
+            puts("       <delay_ms> is the delay from the current radio time");
+        }
+        else {
+            puts("       <time_us> is the radio time (see radio_time)");
+        }
+        return 1;
+    }
+
+    if (!ieee802154_radio_has_timed_tx(&_radio)) {
+        puts("Radio does not support timed transmission");
+        return 1;
+    }
+
+    res = l2util_addr_from_str(argv[1], addr);
+    if (res == 0) {
+        puts(usage);
+        return 1;
+    }
+    len = atoi(argv[2]);
+    time_us = strtoul(argv[3], NULL, 10);
+
+    if (relative) {
+        time_us = ieee802154_radio_get_time(&_radio) + time_us * US_PER_MS;
+        printf("Sending at radio time %" PRIu32 "\n", time_us);
+    }
+
+    if (argc == 5) {
+        ack_req = true;
+    }
+    return send(addr, res, len, ack_req, &time_us);
+}
+
+int txtsnd_at(int argc, char **argv)
+{
+    return _txtsnd_timed(argc, argv, false);
+}
+
+int txtsnd_after(int argc, char **argv)
+{
+    return _txtsnd_timed(argc, argv, true);
+}
+
+static int radio_time(int argc, char **argv)
+{
+    (void)argc;
+    (void)argv;
+
+    if (!ieee802154_radio_has_timed_tx(&_radio)) {
+        puts("Radio does not support timed transmission");
+        return 1;
+    }
+
+    printf("%" PRIu32 "\n", ieee802154_radio_get_time(&_radio));
+    return 0;
 }
 
 static int promisc(int argc, char **argv)
@@ -742,6 +817,9 @@ static const shell_command_t shell_commands[] = {
     { "config_phy", "Set channel and TX power", config_phy},
     { "print_addr", "Print IEEE802.15.4 addresses", print_addr},
     { "txtsnd", "Send IEEE 802.15.4 packet", txtsnd },
+    { "txtsnd_at", "Send IEEE 802.15.4 packet at a given radio time", txtsnd_at },
+    { "txtsnd_after", "Send IEEE 802.15.4 packet after a delay in ms", txtsnd_after },
+    { "radio_time", "Print the current radio time in us", radio_time },
     { "test_states", "Test state changes", _test_states },
     { "cca", "Perform CCA", _cca },
     { "config_cca", "Config CCA parameters", _config_cca_cmd },
