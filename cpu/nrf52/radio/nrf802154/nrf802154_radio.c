@@ -22,6 +22,8 @@
 #include "nrf_clock.h"
 
 #include "net/ieee802154.h"
+#include "irq.h"
+#include "periph/timer.h"
 #include "nrf802154.h"
 #include "net/ieee802154/radio.h"
 
@@ -30,6 +32,9 @@
 
 #define ED_RSSISCALE        (4U)    /**< RSSI scale for internal HW value */
 #define ED_RSSIOFFS         (-92)   /**< RSSI offset for internal HW value */
+
+/* The MAC timer provides the radio time in us */
+#define TIMER_FREQ          (1000000UL)
 
 #define TX_POWER_MIN        (-40)                               /* in dBm */
 #define TX_POWER_MAX        ((int)RADIO_TXPOWER_TXPOWER_Max)    /* in dBm */
@@ -55,6 +60,44 @@
                              RADIO_SHORTS_CCAIDLE_TXEN_Msk | \
                              RADIO_SHORTS_CCABUSY_DISABLE_Msk | \
                              RADIO_SHORTS_TXREADY_START_Msk)
+
+#define MAC_TIMER_CHAN_TX   (0U)    /**< MAC timer channel for timed transmission */
+
+/**
+ * @brief PPI channel connecting the MAC timer compare event of
+ *        @ref MAC_TIMER_CHAN_TX to the TX task of the radio.
+ */
+#ifndef NRF802154_PPI_CH_TX
+#  define NRF802154_PPI_CH_TX (19U)
+#endif
+
+/**
+ * @brief Minimum lead time in us for a timed transmission
+ *
+ * A timed transmission closer than this to the current radio time starts
+ * immediately, as the timer compare event might be missed otherwise.
+ */
+#ifndef NRF802154_TIMED_TX_MIN_LEAD_US
+#  define NRF802154_TIMED_TX_MIN_LEAD_US (2U)
+#endif
+
+/**
+ * @brief Time in us from TXEN to the start of the transmission
+ *
+ * The radio uses the fast ramp-up mode.
+ */
+#ifndef NRF802154_FAST_RAMPUP_US
+#  define NRF802154_FAST_RAMPUP_US (40U)
+#endif
+
+/**
+ * @brief Time in us from RXEN to the start of the transmission with CCA
+ *
+ * Fast RX ramp-up + CCA (8 symbols x 16us per Symbol) + fast TX ramp-up.
+ */
+#ifndef NRF802154_CCA_TX_RAMPUP_US
+#  define NRF802154_CCA_TX_RAMPUP_US ((2 * NRF802154_FAST_RAMPUP_US) + 128U)
+#endif
 
 static uint8_t rxbuf[IEEE802154_FRAME_LEN_MAX + 3]; /* len PHR + PSDU + LQI */
 static uint8_t txbuf[IEEE802154_FRAME_LEN_MAX + 3]; /* len PHR + PSDU + LQI */
@@ -85,6 +128,33 @@ static struct {
 
 static const ieee802154_radio_ops_t nrf802154_ops;
 static ieee802154_dev_t *nrf802154_hal_dev;
+
+static void _cancel_timed_tx(void)
+{
+    timer_clear(NRF802154_TIMER, MAC_TIMER_CHAN_TX);
+    NRF_PPI->CHENCLR = (1UL << NRF802154_PPI_CH_TX);
+}
+
+static void _start_tx_at(uint32_t time_us, volatile uint32_t *start_task)
+{
+    /* no interruption between reading the time and arming the timer, so
+     * the compare event can't be missed */
+    unsigned irq_state = irq_disable();
+
+    if ((int32_t)(time_us - timer_read(NRF802154_TIMER)) < (int32_t)NRF802154_TIMED_TX_MIN_LEAD_US){
+        /* already passed or too close, start immediately */
+        *start_task = 1;
+    }
+    else {
+        NRF_PPI->CH[NRF802154_PPI_CH_TX].EEP =
+            (uint32_t)&timer_config[NRF802154_TIMER].dev->EVENTS_COMPARE[MAC_TIMER_CHAN_TX];
+        NRF_PPI->CH[NRF802154_PPI_CH_TX].TEP = (uint32_t)start_task;
+        NRF_PPI->CHENSET = (1UL << NRF802154_PPI_CH_TX);
+        timer_set_absolute(NRF802154_TIMER, MAC_TIMER_CHAN_TX, time_us);
+    }
+
+    irq_restore(irq_state);
+}
 
 static void _power_on(void)
 {
@@ -200,14 +270,26 @@ static int _request_op(ieee802154_dev_t *dev, ieee802154_hal_op_t op, void *ctx)
 
     switch (op) {
     case IEEE802154_HAL_OP_TRANSMIT:
+        volatile uint32_t *start_task;
+
         if (cfg.cca_send) {
             NRF_RADIO->SHORTS = CCA_SHORTS;
-            NRF_RADIO->TASKS_RXEN = 1;
+            start_task = &NRF_RADIO->TASKS_RXEN;
         }
         else {
             NRF_RADIO->SHORTS = DEFAULT_SHORTS;
-            NRF_RADIO->TASKS_TXEN = 1;
+            start_task = &NRF_RADIO->TASKS_TXEN;
         }
+
+        if (ctx) {
+            uint32_t rampup_us = cfg.cca_send ?
+                   NRF802154_CCA_TX_RAMPUP_US : NRF802154_FAST_RAMPUP_US;
+            _start_tx_at(*(const uint32_t *)ctx - rampup_us, start_task);
+        }
+        else {
+            *start_task = 1;
+        }
+
         state = STATE_TX;
         break;
     case IEEE802154_HAL_OP_SET_RX:
@@ -226,6 +308,8 @@ static int _request_op(ieee802154_dev_t *dev, ieee802154_hal_op_t op, void *ctx)
         if (!force && _state != STATE_IDLE && _state != STATE_RX) {
             goto end;
         }
+        /* a forced SET_IDLE also aborts a pending timed transmission */
+        _cancel_timed_tx();
         _disable_blocking();
         NRF_RADIO->SHORTS = DEFAULT_SHORTS;
         NRF_RADIO->PACKETPTR = (uint32_t) txbuf;
@@ -394,6 +478,21 @@ static void _set_txpower(int16_t txpower)
     }
 }
 
+static void _timer_cb(void *arg, int chan)
+{
+    (void)arg;
+    if (chan == MAC_TIMER_CHAN_TX) {
+        /* TXEN/RXEN was already triggered via PPI, just clear */
+        NRF_PPI->CHENCLR = (1UL << NRF802154_PPI_CH_TX);
+    }
+}
+
+static uint32_t _get_time(ieee802154_dev_t *dev)
+{
+    (void)dev;
+    return timer_read(NRF802154_TIMER);
+}
+
 /**
  * @brief   Set radio into DISABLED state
  */
@@ -403,6 +502,11 @@ int nrf802154_init(void)
     /* reset buffer */
     rxbuf[0] = 0;
     txbuf[0] = 0;
+
+    int result = timer_init(NRF802154_TIMER, TIMER_FREQ, _timer_cb, NULL);
+    assert(result >= 0);
+    (void)result;
+    timer_stop(NRF802154_TIMER);
 
     /* power off peripheral (but do not release the HFXO as we never requested
      * it so far) */
@@ -511,6 +615,7 @@ static int _request_on(ieee802154_dev_t *dev)
     _state = STATE_IDLE;
     DEBUG("[nrf802154]: Request to turn on\n");
     _power_on();
+    timer_start(NRF802154_TIMER);
     /* make sure the radio is disabled/stopped */
     _disable();
     /* we configure it to run in IEEE802.15.4 mode */
@@ -531,7 +636,7 @@ static int _request_on(ieee802154_dev_t *dev)
     NRF_RADIO->CRCPOLY = 0x011021;
     NRF_RADIO->CRCINIT = 0;
 
-    /* Disable the hardware IFS handling  */
+    /* Enable the fast ramp-up mode */
     NRF_RADIO->MODECNF0 |= RADIO_MODECNF0_RU_Msk;
 
     NRF_RADIO->SHORTS = DEFAULT_SHORTS;
@@ -575,7 +680,9 @@ static int _off(ieee802154_dev_t *dev)
 {
     (void)dev;
     DEBUG("[nrf802154] Turning off the radio\n");
+    _cancel_timed_tx();
     _power_off();
+    timer_stop(NRF802154_TIMER);
     return 0;
 }
 
@@ -746,7 +853,8 @@ static const ieee802154_radio_ops_t nrf802154_ops = {
           | IEEE802154_CAP_IRQ_TX_DONE
           | IEEE802154_CAP_IRQ_CCA_DONE
           | IEEE802154_CAP_PHY_OQPSK
-          | IEEE802154_CAP_FRAME_RETENTION,
+          | IEEE802154_CAP_FRAME_RETENTION
+          | IEEE802154_CAP_TIMED_TX,
 
     .write = _write,
     .read = _read,
@@ -763,6 +871,7 @@ static const ieee802154_radio_ops_t nrf802154_ops = {
     .set_csma_params = _set_csma_params,
     .config_addr_filter = _config_addr_filter,
     .config_src_addr_match = _config_src_addr_match,
+    .get_time = _get_time,
     .set_frame_filter_mode = _set_frame_filter_mode,
     .get_frame_filter_mode = _get_frame_filter_mode,
 };
