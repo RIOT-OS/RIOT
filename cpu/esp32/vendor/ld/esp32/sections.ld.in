@@ -355,6 +355,9 @@ SECTIONS
     *components/log/*/log_timestamp.*(.literal.esp_log_timestamp .text.esp_log_timestamp)
     *components/log/*/log_write.*(.literal.esp_log_write .text.esp_log_write)
 
+    *libcoexist.a:(.coexiram .coexiram.*)
+    *libcoexist.a:(.coexsleepiram .coexsleepiram.*)
+
     *libnet80211.a:(.wifi0iram .wifi0iram.*)
     *libnet80211.a:(.wifirxiram .wifirxiram.*)
     *libnet80211.a:(.wifislprxiram .wifislprxiram.*)

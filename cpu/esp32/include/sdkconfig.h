@@ -253,14 +253,26 @@
  */
 #if !SOC_WIRELESS_HOST_SUPPORTED
 #  define CONFIG_ESP_COEX_ENABLED                       1
-#  if CONFIG_ESP_WIFI_ENABLED && CONFIG_BT_ENABLED
+   /*
+    * As in ESP-IDF, the software coexistence is enabled if at least two
+    * of the radio modules WiFi, BT and IEEE 802.15.4 are used. For WiFi
+    * and IEEE 802.15.4 it is even required, since the IEEE 802.15.4 radio
+    * blocks the RF in receive mode otherwise.
+    */
+#  if (CONFIG_ESP_WIFI_ENABLED && CONFIG_BT_ENABLED) || \
+      (CONFIG_ESP_WIFI_ENABLED && CONFIG_IEEE802154_ENABLED) || \
+      (CONFIG_IEEE802154_ENABLED && CONFIG_BT_ENABLED)
 #    define CONFIG_ESP_COEX_SW_COEXIST_ENABLE           1
-#  endif
-#  if 0
-   /* TODO:
-    * CONFIG_SW_COEXIST_ENABLE is deprecated but still used in code.
-    * It is not defined in IDF sdkconfigs and does not work if defined. */
-#    define CONFIG_SW_COEXIST_ENABLE                    1
+     /*
+      * CONFIG_SW_COEXIST_ENABLE is the deprecated name of this option,
+      * which is still used by ESP-IDF code. As in the sdkconfig.h generated
+      * by ESP-IDF, it is defined as alias.
+      */
+#    define CONFIG_SW_COEXIST_ENABLE                    CONFIG_ESP_COEX_SW_COEXIST_ENABLE
+#    if CONFIG_IEEE802154_ENABLED
+       /* required for the declaration of the IEEE 802.15.4 coexistence API */
+#      define CONFIG_SOC_IEEE802154_SUPPORTED           SOC_IEEE802154_SUPPORTED
+#    endif
 #  endif
 #endif /* !SOC_WIRELESS_HOST_SUPPORTED */
 
