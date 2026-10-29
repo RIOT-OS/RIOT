@@ -29,10 +29,9 @@ static int _send(gnrc_netif_t *netif, gnrc_pktsnip_t *pkt)
     uint8_t bcast[2] = { 0xFF, 0xFF };
     uint8_t *addr;
 
-    pkt = gnrc_pktbuf_start_write(pkt);
     gnrc_netif_hdr_t *hdr = (gnrc_netif_hdr_t *)pkt->data;
 
-    if (hdr->flags &= GNRC_NETIF_HDR_FLAGS_MULTICAST) {
+    if (hdr->flags & GNRC_NETIF_HDR_FLAGS_MULTICAST) {
         addr = static_cast<uint8_t *>(&bcast[0]);
     }
     else if (hdr->dst_l2addr_len == IEEE802154_LONG_ADDRESS_LEN) {
@@ -44,16 +43,30 @@ static int _send(gnrc_netif_t *netif, gnrc_pktsnip_t *pkt)
         addr = gnrc_netif_hdr_get_dst_addr(hdr);
     }
     else {
-        gnrc_pktbuf_release(pkt);
         return -EBADMSG;
     }
 
     uint16_t _addr = byteorder_ntohs(*((network_uint16_t *)addr));
+    gnrc_pktsnip_t *payload = pkt->next;
 
-    pkt = gnrc_pktbuf_remove_snip(pkt, pkt);
-    m_dsme.sendFrame(_addr, (iolist_t *)pkt);
+    if (!m_dsme.isAssociated()) {
+        return -ENOTCONN;
+    }
+    if (payload == NULL) {
+        return -ENODATA;
+    }
 
-    return 0;
+    int len = (int)gnrc_pkt_len(payload);
+
+    /* openDSME releases its own reference to the payload once the MAC confirmed the frame.
+     * There is no confirm_send() as there is no netdev for opendsme towards gnrc_netif,
+     * so report the frame as handed over right away.
+     * (Kind of ugly hack)
+     */
+    gnrc_pktbuf_hold(payload, 1);
+    m_dsme.sendFrame(_addr, (iolist_t *)payload);
+
+    return (len > 0) ? len : 1;
 }
 
 static gnrc_pktsnip_t *_recv(gnrc_netif_t *netif)
