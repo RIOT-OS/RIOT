@@ -26,14 +26,17 @@
 #include "kw41zrf_intern.h"
 #include "kw41zrf_getset.h"
 #include "vendor/MKW41Z4.h"
+#include "vendor/XCVR/MKW41Z4/fsl_xcvr.h"
 
 #include "bit.h"
+#include "irq.h"
 #include "log.h"
 #include "iolist.h"
 #include "byteorder.h"
 #include "net/eui64.h"
 #include "net/ieee802154.h"
 #include "net/ieee802154/radio.h"
+#include "macros/math.h"
 
 #ifdef MODULE_OD
 #  include "od.h"
@@ -53,9 +56,78 @@
 /* IRQ mask: RF (0-6), WAKE (8), TMR_IRQ (16-19), TMR_MSK (20-23) */
 #define KW41ZRF_IRQS    (0x00ff017fUL)
 
+/**
+ * @brief   Duration of one event timer tick in us
+ *
+ * The event timer runs with the IEEE 802.15.4 symbol rate (62.5 kHz),
+ * see IEEE802154_ACK_TIMEOUT_SYMS used with T3CMP.
+ */
+#define US_PER_TIMER_TICK           (16U)
+
+/**
+ * @brief   Minimum lead time in us for a timed transmission
+ *
+ * A timed transmission closer than this to the current radio time starts
+ * immediately, as the timer compare might be missed otherwise.
+ */
+#ifndef KW41ZRF_TIMED_TX_MIN_LEAD_US
+#  define KW41ZRF_TIMED_TX_MIN_LEAD_US  (2 * US_PER_TIMER_TICK)
+#endif
+
+/**
+ * @brief   Time in us from the start of a TX sequence to the start of the
+ *          transmission
+ *
+ * TX warm-up of the transceiver sequence manager (TSM).
+ */
+#ifndef KW41ZRF_TX_RAMPUP_US
+#  define KW41ZRF_TX_RAMPUP_US          (END_OF_TX_WU)
+#endif
+
+/**
+ * @brief   Time in us from the start of a TX sequence with CCA to the start
+ *          of the transmission
+ *
+ * RX warm-up + CCA (8 symbols x 16us per symbol) + TX warm-up of the TSM.
+ */
+#ifndef KW41ZRF_CCA_TX_RAMPUP_US
+#  define KW41ZRF_CCA_TX_RAMPUP_US      (END_OF_RX_WU + 128U + END_OF_TX_WU)
+#endif
+
 static kw41zrf_t intern_dev;
+/* number of event timer (24 bit) overflows, extends the radio time to 32 bit */
+static uint32_t _timer_ovf;
+static uint32_t _ramp_up_us;
 static const ieee802154_radio_ops_t kw41zrf_ops;
 static ieee802154_dev_t *_kw41zrf_hal_dev;
+
+static uint32_t _get_time(ieee802154_dev_t *dev)
+{
+    (void)dev;
+    unsigned irq_state = irq_disable();
+    uint32_t ticks = kw41zrf_timer_get(&intern_dev);
+    uint32_t ovf = _timer_ovf;
+
+    /* the overflow happened, but the IRQ was not handled yet */
+    if ((ZLL->IRQSTS & ZLL_IRQSTS_TMR1IRQ_MASK) && ticks < (ZLL_T1CMP_T1CMP_MASK >> 1)) {
+        ovf++;
+    }
+    irq_restore(irq_state);
+
+    return ((ovf << 24) | ticks) * US_PER_TIMER_TICK;
+}
+
+static void _timer_ovf_init(void)
+{
+    _timer_ovf = 0;
+    /* T1 matches on every overflow of the event timer */
+    ZLL->T1CMP = 0;
+    ZLL->PHY_CTRL |= ZLL_PHY_CTRL_TMR1CMP_EN_MASK;
+    /* unmask TMR1 IRQ and clear a pending one, keep the other timer masks */
+    ZLL->IRQSTS = (ZLL->IRQSTS & (ZLL_IRQSTS_TMR2MSK_MASK | ZLL_IRQSTS_TMR3MSK_MASK |
+                                  ZLL_IRQSTS_TMR4MSK_MASK)) |
+                  ZLL_IRQSTS_TMR1IRQ_MASK;
+}
 
 static int _request_on(ieee802154_dev_t *dev)
 {
@@ -176,12 +248,29 @@ static int _request_op(ieee802154_dev_t *hal, ieee802154_hal_op_t op, void *ctx)
             return -EBUSY;
         }
 
+        uint32_t seq;
         if (kw41zrf_ack_requested(&intern_dev)) {
-            kw41zrf_set_sequence(&intern_dev, XCVSEQ_TX_RX | ZLL_PHY_CTRL_TC3TMOUT_MASK);
+            seq = XCVSEQ_TX_RX | ZLL_PHY_CTRL_TC3TMOUT_MASK;
         }
         else {
-            kw41zrf_set_sequence(&intern_dev, XCVSEQ_TRANSMIT);
+            seq = XCVSEQ_TRANSMIT;
         }
+
+        if (ctx) {
+            uint32_t start_us = *(const uint32_t *)ctx - _ramp_up_us;
+            unsigned irq_state = irq_disable();
+
+            if ((int32_t)(start_us - _get_time(hal)) >= (int32_t)KW41ZRF_TIMED_TX_MIN_LEAD_US) {
+                kw41zrf_timer_set_abs(&intern_dev, &ZLL->T2CMP,
+                                      DIV_ROUND_UP(start_us, US_PER_TIMER_TICK));
+                seq |= (ZLL_PHY_CTRL_TMR2CMP_EN_MASK | ZLL_PHY_CTRL_TMRTRIGEN_MASK);
+                kw41zrf_set_sequence(&intern_dev, seq);
+                irq_restore(irq_state);
+                return 0;
+            }
+            irq_restore(irq_state);
+        }
+        kw41zrf_set_sequence(&intern_dev, seq);
         return 0;
     case IEEE802154_HAL_OP_SET_RX:
         DEBUG("[kw41zrf] request_op RX\n");
@@ -327,10 +416,12 @@ int _set_csma_params(ieee802154_dev_t *dev, const ieee802154_csma_be_t *bd, int8
 
     if (retries < 0) {
         bit_clear32(&ZLL->PHY_CTRL, ZLL_PHY_CTRL_CCABFRTX_SHIFT);
+        _ramp_up_us = KW41ZRF_TX_RAMPUP_US;
         return 0;
     }
     else if (retries == 0) {
         bit_set32(&ZLL->PHY_CTRL, ZLL_PHY_CTRL_CCABFRTX_SHIFT);
+        _ramp_up_us = KW41ZRF_CCA_TX_RAMPUP_US;
         return 0;
     }
 
@@ -761,6 +852,20 @@ static void kw41zrf_radio_hal_irq_handler(void *dev)
     bool indicate_hal_event = false;
     ieee802154_trx_ev_t hal_event;
 
+    if (irqsts & ZLL_IRQSTS_TMR1IRQ_MASK) {
+        /* event timer overflow */
+        _timer_ovf++;
+        handled_irqs |= ZLL_IRQSTS_TMR1IRQ_MASK;
+    }
+
+    if (irqsts & ZLL_IRQSTS_TMR2IRQ_MASK) {
+        /* the timed sequence was triggered */
+        if (!(ZLL->SEQ_CTRL_STS & ZLL_SEQ_CTRL_STS_TMR2_SEQ_TRIG_ARMED_MASK)) {
+            ZLL->PHY_CTRL &= ~(ZLL_PHY_CTRL_TMRTRIGEN_MASK | ZLL_PHY_CTRL_TMR2CMP_EN_MASK);
+        }
+        handled_irqs |= ZLL_IRQSTS_TMR2IRQ_MASK;
+    }
+
     uint8_t seq = kw41zrf_get_sequence(&intern_dev);
 
     switch (seq) {
@@ -844,6 +949,7 @@ int kw41zrf_reset(void)
     for (int retries = 0; ; retries++) {
         int res = kw41zrf_reset_hardware(&intern_dev);
         if (!res) {
+            _timer_ovf_init();
             break;
         }
         if (retries == KW41ZRF_MAX_BOOT_RETRIES) {
@@ -910,7 +1016,8 @@ static const ieee802154_radio_ops_t kw41zrf_ops = {
             | IEEE802154_CAP_IRQ_CCA_DONE
             | IEEE802154_CAP_IRQ_ACK_TIMEOUT
             | IEEE802154_CAP_AUTO_ACK
-            | IEEE802154_CAP_SRC_ADDR_MATCH,
+            | IEEE802154_CAP_SRC_ADDR_MATCH
+            | IEEE802154_CAP_TIMED_TX,
     .write = _write,
     .read = _read,
     .request_on = _request_on,
@@ -925,6 +1032,7 @@ static const ieee802154_radio_ops_t kw41zrf_ops = {
     .set_csma_params = _set_csma_params,
     .config_addr_filter = _config_addr_filter,
     .config_src_addr_match = _config_src_addr_match,
+    .get_time = _get_time,
     .set_frame_filter_mode = _set_frame_filter_mode,
     .get_frame_filter_mode = _get_frame_filter_mode,
 };
