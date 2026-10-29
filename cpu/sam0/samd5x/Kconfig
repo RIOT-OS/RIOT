@@ -22,7 +22,7 @@ config CPU_FAM
 config CPU
     default "samd5x" if CPU_COMMON_SAMD5X
 
-source "$(RIOTCPU)/samd5x/Kconfig.samd51"
-source "$(RIOTCPU)/samd5x/Kconfig.same54"
+source "$(RIOTCPU)/sam0/samd5x/Kconfig.samd51"
+source "$(RIOTCPU)/sam0/samd5x/Kconfig.same54"
 
 source "$(RIOTCPU)/sam0/common/Kconfig"

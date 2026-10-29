@@ -27,8 +27,8 @@ config CPU_FAM
 config CPU
     default "saml21" if CPU_COMMON_SAML21
 
-source "$(RIOTCPU)/saml21/Kconfig.saml21"
-source "$(RIOTCPU)/saml21/Kconfig.samr30"
-source "$(RIOTCPU)/saml21/Kconfig.samr34"
+source "$(RIOTCPU)/sam0/saml21/Kconfig.saml21"
+source "$(RIOTCPU)/sam0/saml21/Kconfig.samr30"
+source "$(RIOTCPU)/sam0/saml21/Kconfig.samr34"
 
 source "$(RIOTCPU)/sam0/common/Kconfig"

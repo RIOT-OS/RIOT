@@ -22,7 +22,7 @@ config CPU_FAM
 config CPU
     default "saml1x" if CPU_COMMON_SAML1X
 
-source "$(RIOTCPU)/saml1x/Kconfig.saml10"
-source "$(RIOTCPU)/saml1x/Kconfig.saml11"
+source "$(RIOTCPU)/sam0/saml1x/Kconfig.saml10"
+source "$(RIOTCPU)/sam0/saml1x/Kconfig.saml11"
 
 source "$(RIOTCPU)/sam0/common/Kconfig"
