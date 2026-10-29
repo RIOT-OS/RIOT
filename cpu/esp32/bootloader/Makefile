@@ -261,6 +261,12 @@ CFLAGS = -include '$(RIOTBUILD_CONFIG_HEADER_C)' \
 CFLAGS += -Wno-error=format=
 CFLAGS += -Wno-format
 
+# Don't include absolute paths in __FILE__ and debug info, same as for the
+# rest of RIOT (see makefiles/cflags.inc.mk). Since CFLAGS is overridden above,
+# this has to be added explicitly. Allows ccache to reuse objects.
+CFLAGS += -fmacro-prefix-map=$(RIOTBASE)/=
+CFLAGS += -fdebug-prefix-map=$(RIOTBASE)/=
+
 ifneq (,$(filter riscv32%,$(TARGET_ARCH)))
   INCLUDES += -I$(ESP32_SDK_DIR)/components/riscv/include
   CFLAGS += -DCONFIG_IDF_TARGET_ARCH_RISCV
