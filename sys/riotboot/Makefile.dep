@@ -22,12 +22,25 @@ ifneq (,$(filter riotboot_hdr, $(USEMODULE)))
   USEMODULE += checksum
 endif
 
+ifneq (,$(filter riotboot_hdr_v2,$(USEMODULE)))
+  ifneq (,$(filter periph_wdt,$(FEATURES_PROVIDED)))
+    DEFAULT_MODULE += riotboot_wdt
+  endif
+  # should be explicitly disabled
+  DEFAULT_MODULE += riotboot_hdr_auto_activate
+  DEFAULT_MODULE += riotboot_hdr_auto_confirm
+endif
+
 ifneq (,$(filter riotboot_usb_dfu, $(USEMODULE)))
   USEMODULE += usbus_dfu
   USEMODULE += riotboot_flashwrite
   USEMODULE += ztimer_sec
   FEATURES_REQUIRED += no_idle_thread
   FEATURES_REQUIRED += periph_pm
+endif
+
+ifneq (,$(filter riotboot_wdt,$(USEMODULE)))
+  FEATURES_REQUIRED += periph_wdt
 endif
 
 ifneq (,$(filter riotboot_tinyusb_dfu, $(USEMODULE)))
