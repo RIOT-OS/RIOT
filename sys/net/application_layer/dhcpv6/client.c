@@ -668,6 +668,10 @@ static int _preparse_advertise(uint8_t *adv, size_t len, uint8_t **buf)
     len -= sizeof(dhcpv6_msg_t);
     for (dhcpv6_opt_t *opt = (dhcpv6_opt_t *)(&adv[sizeof(dhcpv6_msg_t)]);
          len > 0; len -= _opt_len(opt), opt = _opt_next(opt)) {
+        if (len < sizeof(dhcpv6_opt_t)) {
+            DEBUG("DHCPv6 client: ADVERTISE options truncated\n");
+            return -1;
+        }
         if (len > orig_len) {
             DEBUG("DHCPv6 client: ADVERTISE options overflow packet boundaries\n");
             return -1;
@@ -1063,6 +1067,10 @@ static bool _parse_reply(uint8_t *rep, size_t len, uint8_t request_type)
     len = orig_len - sizeof(dhcpv6_msg_t);
     for (dhcpv6_opt_t *opt = (dhcpv6_opt_t *)(&rep[sizeof(dhcpv6_msg_t)]);
          len > 0; len -= _opt_len(opt), opt = _opt_next(opt)) {
+        if (len < sizeof(dhcpv6_opt_t)) {
+            DEBUG("DHCPv6 client: REPLY options truncated\n");
+            return false;
+        }
         if (len > orig_len) {
             DEBUG("DHCPv6 client: ADVERTISE options overflow packet boundaries\n");
             return false;
