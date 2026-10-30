@@ -52,6 +52,10 @@ ifneq (,$(filter ccs811_%,$(USEMODULE)))
   USEMODULE += ccs811
 endif
 
+ifneq (,$(filter epson_escpos_%,$(USEMODULE)))
+  USEMODULE += epson_escpos
+endif
+
 ifneq (,$(filter ethos_%,$(USEMODULE)))
   USEMODULE += ethos
 endif
