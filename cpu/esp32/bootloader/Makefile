@@ -261,6 +261,12 @@ CFLAGS = -include '$(RIOTBUILD_CONFIG_HEADER_C)' \
 CFLAGS += -Wno-error=format=
 CFLAGS += -Wno-format
 
+# Don't include absolute paths in __FILE__ and debug info, same as for the
+# rest of RIOT (see makefiles/cflags.inc.mk). Since CFLAGS is overridden above,
+# this has to be added explicitly. Allows ccache to reuse objects.
+CFLAGS += -fmacro-prefix-map=$(RIOTBASE)/=
+CFLAGS += -fdebug-prefix-map=$(RIOTBASE)/=
+
 ifneq (,$(filter riscv32%,$(TARGET_ARCH)))
   INCLUDES += -I$(ESP32_SDK_DIR)/components/riscv/include
   CFLAGS += -DCONFIG_IDF_TARGET_ARCH_RISCV
@@ -452,24 +458,34 @@ OBJ_DEPS += $(CURDIR)/sdkconfig.h
 
 $(ESP_SDK_BOOTLOADER_OBJS): \
 $(ESP_SDK_BOOTLOADER_DIR)/%.o: $(ESP32_SDK_DIR)/%.c $(OBJ_DEPS)
-	$(Q)mkdir -p $(dir $@)
 	$(Q)$(CCACHE) $(CC) \
 	  $(CFLAGS) $(INCLUDES) -MMD -MP -c $(abspath $<) -o $@
 
 $(ESP_SDK_BOOTLOADER_ASMOBJS): \
 $(ESP_SDK_BOOTLOADER_DIR)/%.o: $(ESP32_SDK_DIR)/%.S
-	$(Q)mkdir -p $(dir $@)
 	$(Q)$(CCACHE) $(CC) \
 	  $(CFLAGS) $(INCLUDES) -MMD -MP -c $(abspath $<) -o $@
 
 $(ESP_SDK_BOOTLOADER_ADDOBJS): \
 $(ESP_SDK_BOOTLOADER_DIR)/%.o: $(CURDIR)/stub.c $(OBJ_DEPS)
-	$(Q)mkdir -p $(dir $@)
 	$(Q)$(CCACHE) $(CC) \
 	  $(CFLAGS) $(INCLUDES) -MMD -MP -c $(abspath $<) -o $@
 
 $(ESP_SDK_BOOTLOADER_DIR):
 	mkdir -p $@
+
+# The object files are placed in a directory tree that mirrors the ESP-IDF
+# source tree. Create each directory only once instead of calling `mkdir` for
+# every single object file.
+ESP_SDK_BOOTLOADER_OBJ_DIRS := $(sort $(dir $(ESP_SDK_BOOTLOADER_OBJS) \
+                                            $(ESP_SDK_BOOTLOADER_ASMOBJS) \
+                                            $(ESP_SDK_BOOTLOADER_ADDOBJS)))
+
+$(ESP_SDK_BOOTLOADER_OBJS) $(ESP_SDK_BOOTLOADER_ASMOBJS) \
+$(ESP_SDK_BOOTLOADER_ADDOBJS): | $(ESP_SDK_BOOTLOADER_OBJ_DIRS)
+
+$(filter-out $(BINDIR)/$(MODULE)/ $(SUBDIRS),$(ESP_SDK_BOOTLOADER_OBJ_DIRS)):
+	$(Q)mkdir -p $@
 
 $(ESP_SDK_BOOTLOADER_ELF): \
     $(ESP_SDK_BOOTLOADER_OBJS) $(ESP_SDK_BOOTLOADER_ASMOBJS) \
