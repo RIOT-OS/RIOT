@@ -4,9 +4,13 @@ MODULE = esp_idf_lcd
 ESP32_SDK_SRC = \
   components/esp_lcd/src/esp_lcd_common.c \
   components/esp_lcd/src/esp_lcd_panel_io.c \
-  components/esp_pm/pm_locks.c \
   components/soc/$(CPU_FAM)/lcd_periph.c \
   #
+
+ifeq (,$(filter esp_idf_rmt,$(USEMODULE)))
+  # this file is already compiled in `esp_idf_rmt`
+  ESP32_SDK_SRC += components/esp_pm/pm_locks.c
+endif
 
 ifeq (esp32s3,$(CPU_FAM))
   INCLUDES += -I$(ESP32_SDK_DIR)/components/esp_hw_support/dma/include
