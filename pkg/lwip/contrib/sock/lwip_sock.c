@@ -696,7 +696,10 @@ ssize_t lwip_sock_sendv(struct netconn *conn, const iolist_t *snips,
     }
 #if LWIP_TCP
     else if (tmp->type & NETCONN_TCP) {
-        err = netconn_write_partly(tmp, buf->p->payload, buf->p->len, 0, (size_t *)(&res));
+        /* buf is deleted below, but lwIP may still need the data for
+         * (re)transmission, so it has to copy it */
+        err = netconn_write_partly(tmp, buf->p->payload, buf->p->len,
+                                   NETCONN_COPY, (size_t *)(&res));
     }
 #endif /* LWIP_TCP */
     else {
