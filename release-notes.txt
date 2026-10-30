@@ -38,7 +38,7 @@ The 2026.10 release includes:
 - Two new boards have been added: STM32 Nucleo-G491RE (#22458) and the
   Seeed Studio Xiao ESP32C6 (#22400); while two boards have been deprecated:
   TelosB and Zolertia Z1 (#22716). We also got support for the mGBA emulator
-  of the GameBoy Advanced (#22776), which facilitated several improvements on
+  of the Game Boy Advanced (#22776), which facilitated several improvements on
   this little fun device (#22776, #22908)
 
 - The Docker container used for BUILD_IN_DOCKER=1 got a version update to
@@ -351,7 +351,7 @@ Bug fixes (119)
   full (#22929)
 * cpu/esp32: fix release of recursive lock (#22829)
 * cpu/esp8266/vendor: wait for flash cache to be enabled (#22864)
-* cpu/esp_common/esp_now: fix flakyness and various small fixes (#22919)
+* cpu/esp_common/esp_now: fix flakiness and various small fixes (#22919)
 * cpu/esp_common: erase block/sector-wise to leave interrupt time (#22945)
 * cpu/gba: Make stdio_{fb, mgba} available to the stdio dispatcher (#22889)
 * cpu/native/mtd_native: correct bound checks (#22646)
@@ -407,7 +407,7 @@ Bug fixes (119)
 * posix/sockets: Prevent potentially long wait with multiple posix TCP
   sockets (#21784)
 * stm32/candev: change candev_stm32_isr flags to uint8_t (#22650)
-* sys/cyrpto/ocb: use use of secure helpers: (#22797)
+* sys/crypto/ocb: use use of secure helpers: (#22797)
 * sys/event: fix thread safety issue (#22648)
 * sys/nanocoap: fix handling blockwise transfer (#22518)
 * sys/net/dhcpv6: reject truncated option headers (#23018)
@@ -436,7 +436,7 @@ Bug fixes (119)
 * tests/sys/ssp: fix IoT-Lab hang for samr38-xpro (#22958)
 * tests/unicoap: correct order of exp and act in TEST_ASSERT_* (#22595)
 * tests/unittests: prevent ASAN false positive with native32 (#22823)
-* tests: fix syncronization issues where necessary (#22951)
+* tests: fix synchronization issues where necessary (#22951)
 * treewide: fix copy-paste related mistakes (#22800)
 * treewide: fix GCC string termination warnings (#22881)
 * treewide: fix missing $(shell) in commands (#22765)
@@ -497,7 +497,7 @@ Network related issues (55)
 * gnrc_rpl: takes unusually long time to start routing packets (#19147)
 * gnrc_sock_udp: Possible Race condition on copy in application buffer (#10389)
 * gnrc_tcp: gnrc_tcp_recv() never generates -ECONNABORTED (#17896)
-* ieee802154/kw2x: radio gets stucked (#22614)
+* ieee802154/kw2x: radio gets stuck (#22614)
 * ieee802154_submac: IPv6 fragmentation broken (#16998)
 * LoRaWan node ISR stack overflowed (#14962)
 * lwip_sock_tcp / sock_async: received events before calling
