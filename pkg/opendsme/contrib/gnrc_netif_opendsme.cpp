@@ -60,9 +60,7 @@ static int _send(gnrc_netif_t *netif, gnrc_pktsnip_t *pkt)
 
     /* openDSME releases its own reference to the payload once the MAC confirmed the frame.
      * There is no confirm_send() as there is no netdev for opendsme towards gnrc_netif,
-     * so report the frame as handed over right away.
-     * (Kind of ugly hack)
-     */
+     * so report the frame as handed over right away. (Kind of an ugly hack). */
     gnrc_pktbuf_hold(payload, 1);
     m_dsme.sendFrame(_addr, (iolist_t *)payload);
 
