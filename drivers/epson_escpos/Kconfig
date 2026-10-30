@@ -1,0 +1,33 @@
+# SPDX-FileCopyrightText: 2026 Christopher Büchse
+# SPDX-License-Identifier: LGPL-2.1-only
+
+menu "Epson ESC/POS receipt printer driver"
+    depends on USEMODULE_EPSON_ESCPOS
+
+config EPSON_ESCPOS_BUF_SIZE
+    int "Size of the transmit buffer in bytes"
+    range 8 65535
+    default 64
+    help
+        Commands are collected in this buffer and sent to the printer when the
+        buffer is full or when epson_escpos_flush() is called.
+
+config EPSON_ESCPOS_READ_TIMEOUT_MS
+    int "Timeout for reading the printer status in milliseconds"
+    default 3000
+    help
+        Some network interfaces are slow to respond, e.g. a TM-T88III takes
+        about 900 ms to answer a status query.
+
+config EPSON_ESCPOS_TCP_PORT
+    int "Default TCP port of the printer"
+    range 1 65535
+    default 9100
+
+config EPSON_ESCPOS_UART_RX_BUF_SIZE
+    int "Size of the receive buffer of the UART transport in bytes"
+    default 16
+    help
+        Must be a power of two.
+
+endmenu # Epson ESC/POS receipt printer driver
