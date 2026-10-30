@@ -8,7 +8,10 @@ ifeq (,$(filter native native32 native64,$(BOARD)))
   else ifeq (wifi,$(UPLINK))
     ifneq (,$(filter esp32 esp32s* esp32c* esp8266,$(CPU)))
       USEMODULE += esp_wifi
-      ifneq (ble, $(DOWNLINK))
+      ifeq (ieee802154, $(DOWNLINK))
+        # use the IEEE 802.15.4 interface of ESP32-C6 as downlink
+        USEMODULE += esp_ieee802154
+      else ifneq (ble, $(DOWNLINK))
         USEMODULE += esp_now
       endif
     endif
