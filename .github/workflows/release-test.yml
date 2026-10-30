@@ -59,6 +59,11 @@ jobs:
           else
             echo "defined=false" >> $GITHUB_OUTPUT;
           fi
+      - name: Print workflow_dispatch inputs
+        uses: shayki5/print-workflow-dispatch-inputs@v1
+        with:
+          print_env_vars: 'false'
+          add_to_summary: 'true'
 
   tasks:
     runs-on: ubuntu-26.04
