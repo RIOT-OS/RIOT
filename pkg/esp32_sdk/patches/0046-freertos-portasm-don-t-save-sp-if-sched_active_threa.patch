@@ -1,0 +1,41 @@
+From e03bf9772ba45a482380d8447dc6551a304ef954 Mon Sep 17 00:00:00 2001
+From: Gunar Schorcht <gunar@schorcht.net>
+Date: Tue, 20 Oct 2026 21:09:16 +0200
+Subject: [PATCH 46/46] freertos/portasm: don't save sp if sched_active_thread
+ is NULL
+
+In RIOT, `sched_active_thread` is still NULL when the first context
+switch is triggered by a software interrupt in `cpu_switch_context_exit`.
+`rtos_int_enter` then stored the sp at address 0, which was silently
+ignored on most ESP32x SoCs but causes a PMP store access fault on the
+ESP32-C5 where the address range below the CPU subsystem is protected
+by a PMA entry. In this case, the sp must not be saved and the current
+stack is used for the ISR.
+
+Assisted-by: Claude Code Opus 5.5
+---
+ .../freertos/FreeRTOS-Kernel/portable/riscv/portasm.S     | 8 ++++++++
+ 1 file changed, 8 insertions(+)
+
+diff --git a/components/freertos/FreeRTOS-Kernel/portable/riscv/portasm.S b/components/freertos/FreeRTOS-Kernel/portable/riscv/portasm.S
+index 573145cd13..ee55a153f7 100644
+--- a/components/freertos/FreeRTOS-Kernel/portable/riscv/portasm.S
++++ b/components/freertos/FreeRTOS-Kernel/portable/riscv/portasm.S
+@@ -536,6 +536,14 @@ rtos_int_enter:
+     lw      sp, (a1)                        /* sp = xIsrStackTop[coreID] */
+ #else
+     lw      a0, pxCurrentTCBs               /* a0 = pxCurrentTCBs */
++#ifdef RIOT_OS
++    /* In RIOT, sched_active_thread is still NULL when the first context
++     * switch is triggered in cpu_switch_context_exit. In this case, the
++     * current stack is still used and the sp must not be saved. Otherwise
++     * address 0 would be written, which causes a PMP store access fault on
++     * SoCs like the ESP32-C5 where this address range is protected. */
++    beqz    a0, rtos_int_enter_end          /* a0 = 0 is the correct return value */
++#endif
+     sw      sp, 0(a0)                       /* pxCurrentTCBs[0] = sp */
+     lw      sp, xIsrStackTop                /* sp = xIsrStackTop */
+ #endif /* ( configNUM_CORES > 1 ) */
+-- 
+2.43.0
+
