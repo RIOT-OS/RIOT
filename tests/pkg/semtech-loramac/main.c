@@ -21,7 +21,6 @@
 #include "msg.h"
 #endif
 
-#include "shell.h"
 #include "semtech_loramac.h"
 
 extern semtech_loramac_t loramac;
@@ -79,7 +78,5 @@ int main(void)
                   THREAD_PRIORITY_MAIN - 1, 0, _wait_recv, NULL, "recv thread");
 #endif
 
-    puts("All up, running the shell now");
-    char line_buf[SHELL_DEFAULT_BUFSIZE];
-    shell_run(NULL, line_buf, SHELL_DEFAULT_BUFSIZE);
+    return 0;
 }
