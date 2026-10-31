@@ -135,6 +135,39 @@ ifneq (,$(filter psa_aead_aes_256_ccm,$(USEMODULE)))
   endif
 endif
 
+PSEUDOMODULES += psa_aead_aes_128_gcm
+PSEUDOMODULES += psa_aead_aes_128_gcm_backend_cifra
+PSEUDOMODULES += psa_aead_aes_128_gcm_custom_backend
+
+# check that one and only one backend has been selected
+ifneq (,$(filter psa_aead_aes_128_gcm,$(USEMODULE)))
+  ifneq (1,$(call backends,psa_aead_aes_128_gcm))
+    $(error "One (and only one) backend should be selected for psa_aead_aes_256_ccm")
+  endif
+endif
+
+PSEUDOMODULES += psa_aead_aes_192_gcm
+PSEUDOMODULES += psa_aead_aes_192_gcm_backend_cifra
+PSEUDOMODULES += psa_aead_aes_192_gcm_custom_backend
+
+# check that one and only one backend has been selected
+ifneq (,$(filter psa_aead_aes_192_gcm,$(USEMODULE)))
+  ifneq (1,$(call backends,psa_aead_aes_192_gcm))
+    $(error "One (and only one) backend should be selected for psa_aead_aes_256_ccm")
+  endif
+endif
+
+PSEUDOMODULES += psa_aead_aes_256_gcm
+PSEUDOMODULES += psa_aead_aes_256_gcm_backend_cifra
+PSEUDOMODULES += psa_aead_aes_256_gcm_custom_backend
+
+# check that one and only one backend has been selected
+ifneq (,$(filter psa_aead_aes_256_gcm,$(USEMODULE)))
+  ifneq (1,$(call backends,psa_aead_aes_256_gcm))
+    $(error "One (and only one) backend should be selected for psa_aead_aes_256_ccm")
+  endif
+endif
+
 ## Hash
 PSEUDOMODULES += psa_hash
 PSEUDOMODULES += psa_hash_md5

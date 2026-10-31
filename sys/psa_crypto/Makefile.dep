@@ -217,6 +217,33 @@ ifneq (,$(filter psa_aead_aes_%_ccm_backend_cifra,$(USEMODULE)))
   USEMODULE += psa_cifra_aes_ccm
 endif
 
+## AES-128-GCM
+ifneq (,$(filter psa_aead_aes_128_gcm,$(USEMODULE)))
+  ifeq (,$(filter psa_aead_aes_128_gcm_custom_backend,$(USEMODULE)))
+    USEMODULE += psa_aead_aes_128_gcm_backend_cifra
+  endif
+endif
+
+## AES-192-GCM
+ifneq (,$(filter psa_aead_aes_192_gcm,$(USEMODULE)))
+  ifeq (,$(filter psa_aead_aes_192_gcm_custom_backend,$(USEMODULE)))
+    USEMODULE += psa_aead_aes_192_gcm_backend_cifra
+  endif
+endif
+
+## AES-256-GCM
+ifneq (,$(filter psa_aead_aes_256_gcm,$(USEMODULE)))
+  ifeq (,$(filter psa_aead_aes_256_gcm_custom_backend,$(USEMODULE)))
+    USEMODULE += psa_aead_aes_256_gcm_backend_cifra
+  endif
+endif
+
+## Cifra supports all of them
+ifneq (,$(filter psa_aead_aes_%_gcm_backend_cifra,$(USEMODULE)))
+  USEPKG += cifra
+  USEMODULE += psa_cifra
+  USEMODULE += psa_cifra_aes_gcm
+endif
 
 ## ChaCha20
 ifneq (,$(filter psa_cipher_chacha20,$(USEMODULE)))
