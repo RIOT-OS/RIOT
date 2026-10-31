@@ -9,14 +9,14 @@ if [ "$(basename -- "${ZSH_ARGZERO:-$0}")" = "export.sh" ]; then
     return 1
 fi
 
-ESP32_GCC_RELEASE="esp-14.2.0_20241119"
+ESP32_GCC_RELEASE="esp-15.2.0_20251204"
 ESP8266_GCC_RELEASE="esp-5.2.0_20191018"
 
-ESP32_OPENOCD_VERSION="v0.12.0-esp32-20241016"
+ESP32_OPENOCD_VERSION="v0.12.0-esp32-20260703"
 
-ESP32_QEMU_VERSION="esp-develop-9.0.0-20240606"
+ESP32_QEMU_VERSION="esp-develop-9.2.2-20260417"
 
-GDB_VERSION="14.2_20240403"
+GDB_VERSION="17.1_20260402"
 
 if [ -z "${IDF_TOOLS_PATH}" ]; then
     IDF_TOOLS_PATH="${HOME}/.espressif"
@@ -174,7 +174,8 @@ if [ -z "$1" ]; then
     echo "         esp8266 | esp32 | esp32c3 | esp32c6 | esp32h2 | esp32s2 | esp32s3"
     echo "<platform> = xtensa | riscv"
 elif [ "$1" = "all" ]; then
-    for arch in esp8266 esp32 esp32c3 esp32c6 esp32h2 esp32s2 esp32s3; do
+    # only one representative per architecture is required for target "all"
+    for arch in esp8266 esp32 esp32c3; do
         export_arch "$arch"
     done
     export_gdb xtensa

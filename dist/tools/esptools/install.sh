@@ -1,17 +1,17 @@
 #!/bin/sh
 
-ESP32_GCC_RELEASE="esp-14.2.0_20241119"
-ESP32_GCC_VERSION_DOWNLOAD="14.2.0_20241119"
+ESP32_GCC_RELEASE="esp-15.2.0_20251204"
+ESP32_GCC_VERSION_DOWNLOAD="15.2.0_20251204"
 
 ESP8266_GCC_RELEASE="esp-5.2.0_20191018"
 
-ESP32_OPENOCD_VERSION="v0.12.0-esp32-20241016"
-ESP32_OPENOCD_VERSION_TGZ="0.12.0-esp32-20241016"
+ESP32_OPENOCD_VERSION="v0.12.0-esp32-20260703"
+ESP32_OPENOCD_VERSION_TGZ="0.12.0-esp32-20260703"
 
-ESP32_QEMU_VERSION="esp-develop-9.0.0-20240606"
-ESP32_QEMU_VERSION_DOWNLOAD="esp_develop_9.0.0_20240606"
+ESP32_QEMU_VERSION="esp-develop-9.2.2-20260417"
+ESP32_QEMU_VERSION_DOWNLOAD="esp_develop_9.2.2_20260417"
 
-GDB_VERSION="14.2_20240403"
+GDB_VERSION="17.1_20260402"
 
 # set the tool path to the default if not already set
 if [ -z "${IDF_TOOLS_PATH}" ]; then
@@ -240,7 +240,8 @@ if [ -z "$1" ]; then
     echo "<platform> = xtensa | riscv"
     exit 1
 elif [ "$1" = "all" ]; then
-    ARCH_ALL="esp8266 esp32 esp32c3 esp32c6 esp32h2 esp32s2 esp32s3"
+    # only one representative per architecture is required for target "all"
+    ARCH_ALL="esp8266 esp32 esp32c3"
     for arch in ${ARCH_ALL}; do
         install_arch "$arch"
     done
