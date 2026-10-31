@@ -3,7 +3,7 @@
 
 # SPDX-FileCopyrightText: 2019 Gunar Schorcht <gunar@schorcht.net>
 # SPDX-FileCopyrightText: 2014 Oliver Hahm <oliver.hahm@inria.fr>
-# SPDX-License-Identifier: LGPL-2.1-only
+# SPDX-License-Identifier: LGPL-2.1-or-later
 
 try:
     import configparser

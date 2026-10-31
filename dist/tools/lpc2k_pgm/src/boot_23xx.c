@@ -1,4 +1,5 @@
 /*
+ * LPC 2000 Loader, http://www.pjrc.com/arm/lpc2k_pgm
  * SPDX-FileCopyrightText: 2004 PJRC.COM, LLC, <paul@pjrc.com>
  * SPDX-License-Identifier: GPL-2.0-only
  */
