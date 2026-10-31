@@ -1,0 +1,82 @@
+# SPDX-FileCopyrightText: 2026 Mathis LECRIVAIN <lecrivain.mathis@gmail.com>
+# SPDX-License-Identifier: LGPL-2.1-only
+
+menuconfig MODULE_MAX1161X
+    bool "MAX1161X Analog-to-Digital converter"
+    depends on HAS_PERIPH_I2C
+    depends on TEST_KCONFIG
+    select MODULE_PERIPH_I2C
+
+choice MAX1161X_VARIANT
+    bool "Variants"
+    depends on MODULE_MAX1161X
+    default MODULE_MAX11612 if HAVE_MAX11612
+    default MODULE_MAX11613 if HAVE_MAX11613
+    default MODULE_MAX11614 if HAVE_MAX11614
+    default MODULE_MAX11615 if HAVE_MAX11615
+    default MODULE_MAX11616 if HAVE_MAX11616
+    default MODULE_MAX11617 if HAVE_MAX11617
+    help
+        This driver works with max11612, max11613, max11614, max11615, max11616 and max11617
+        models. Select one.
+
+config MODULE_MAX11612
+    bool "MAX11612"
+
+config MODULE_MAX11613
+    bool "MAX11613"
+
+config MODULE_MAX11614
+    bool "MAX11614"
+
+config MODULE_MAX11615
+    bool "MAX11615"
+
+config MODULE_MAX11616
+    bool "MAX11616"
+
+config MODULE_MAX11617
+    bool "MAX11617"
+
+endchoice
+
+config HAVE_MAX1161X
+    bool
+    help
+        Indicates that a MAX1161X Analog-to-Digital converter is present.
+
+config HAVE_MAX11612
+    bool
+    select HAVE_MAX1161X
+    help
+        Indicates that a MAX11612 Analog-to-Digital converter is present.
+
+config HAVE_MAX11613
+    bool
+    select HAVE_MAX1161X
+    help
+        Indicates that a MAX11613 Analog-to-Digital converter is present.
+
+config HAVE_MAX11614
+    bool
+    select HAVE_MAX1161X
+    help
+        Indicates that a MAX11614 Analog-to-Digital converter is present.
+
+config HAVE_MAX11615
+    bool
+    select HAVE_MAX1161X
+    help
+        Indicates that a MAX11615 Analog-to-Digital converter is present.
+
+config HAVE_MAX11616
+    bool
+    select HAVE_MAX1161X
+    help
+        Indicates that a MAX11616 Analog-to-Digital converter is present.
+
+config HAVE_MAX11617
+    bool
+    select HAVE_MAX1161X
+    help
+        Indicates that a MAX11617 Analog-to-Digital converter is present.
