@@ -41,7 +41,7 @@ BinPackParameters: true
 BitFieldColonSpacing: Both
 BraceWrapping:
   AfterClass: false
-  AfterControlStatement: false
+  AfterControlStatement: MultiLine
   AfterEnum: false
   AfterFunction: true
   AfterNamespace: true
