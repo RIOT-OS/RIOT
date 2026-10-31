@@ -1,0 +1,7 @@
+MODULE = azure-sdk-core
+
+ifeq (llvm,$(TOOLCHAIN))
+  CFLAGS += -Wno-unused-parameter
+endif
+
+include $(RIOTBASE)/Makefile.base
