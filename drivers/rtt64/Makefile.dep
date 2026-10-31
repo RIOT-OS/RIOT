@@ -1,0 +1,3 @@
+FEATURES_REQUIRED += periph_rtt
+FEATURES_REQUIRED += periph_rtt_set_counter
+FEATURES_OPTIONAL += backup_ram
