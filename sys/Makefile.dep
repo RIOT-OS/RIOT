@@ -318,6 +318,10 @@ ifneq (,$(filter log_%,$(USEMODULE)))
   USEMODULE += log
 endif
 
+ifneq (,$(filter log_,$(USEMODULE)))
+  USEMODULE += log
+endif
+
 ifneq (,$(filter netstats_%, $(USEMODULE)))
   USEMODULE += netstats
 endif

@@ -22,23 +22,14 @@
 
 #include <stdio.h>
 
+#include "fmt.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-/**
- * @brief log_write overridden function
- *
- * This example function will only print the log's format string.
- * Use it where printf might be too heavy.
- *
- * @param[in] level (unused)
- * @param[in] format String that the function will print
- */
-static inline void log_write(unsigned level, const char *format, ...) {
-    (void)level;
-    puts(format);
-}
+#define LOG_FORMAT_PRINT_PREFIX
+#define LOG_FORMAT(level, unit, format, ...) format
 
 #ifdef __cplusplus
 }
