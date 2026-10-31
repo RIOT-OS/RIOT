@@ -52,6 +52,54 @@ control.
 make BOARD=<board> ESCPOS_TRANSPORT=uart flash term
 ```
 
+## Printer profiles
+
+The driver uses a printer profile to know the capabilities of the printer,
+e.g. the number of characters per line or the supported cut modes. By default,
+the profile of the TM-T88IV is used, another profile can be selected with
+`EPSON_ESCPOS_PARAM_PROFILE`:
+
+```
+CFLAGS += '-DEPSON_ESCPOS_PARAM_PROFILE=(&epson_escpos_profile_tm_t88iii)'
+```
+
+The profiles are taken from the
+[ESC/POS printer database](https://github.com/receipt-print-hq/escpos-printer-db),
+which is also used by python-escpos. Only the profiles of printers that were
+tested with the driver are included:
+
+| Profile                          | Printer         |
+|----------------------------------|-----------------|
+| `epson_escpos_profile_tm_t88iii` | Epson TM-T88III |
+| `epson_escpos_profile_tm_t88iv`  | Epson TM-T88IV  |
+
+### Adding a profile
+
+1. Copy the profile of the printer from `data/profile/` of the printer
+   database to `drivers/epson_escpos/contrib/`. Keep the file unchanged and
+   only add the SPDX header and the source URL (with the commit of the
+   database) at the top, like in the existing files. If the profile inherits
+   from another profile (`inherits:`), that profile has to be copied as well.
+   `default.yml` is the base of most profiles and defines the features, it is
+   only used for inheritance and is not available as a profile itself.
+2. Run `./gen_profiles.py` in `drivers/epson_escpos/` (requires PyYAML). It
+   resolves the inheritance in the same way as the printer database and
+   regenerates `epson_escpos_profiles.c` and `epson_escpos_profiles.h` in
+   `drivers/epson_escpos/generated/`.
+   Never edit these two files by hand.
+3. Commit the YAML file together with the generated files. The new profile is
+   available as `epson_escpos_profile_<name>`, where `<name>` is the profile
+   name in lower case with all other characters replaced by `_`
+   (e.g. `TM-T88IV` becomes `tm_t88iv`).
+
+If the printer is not in the database, a profile can be written in the same
+format. Consider adding it to the printer database as well, see
+[How to get your printer included in the database](https://github.com/receipt-print-hq/escpos-printer-db/blob/master/doc/add-your-printer.md).
+
+The profiles are licensed under
+[CC BY 4.0](https://creativecommons.org/licenses/by/4.0/) by the contributors
+of the printer database.
+
 ## Example
 
 ```

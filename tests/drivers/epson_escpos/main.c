@@ -22,11 +22,6 @@
 
 #include "epson_escpos.h"
 
-/* the test printer is a TM-T88IV */
-#ifndef EPSON_ESCPOS_PARAM_PROFILE
-#  define EPSON_ESCPOS_PARAM_PROFILE    (&epson_escpos_profile_tm_t88iv)
-#endif
-
 #include "epson_escpos_params.h"
 #include "shell.h"
 
