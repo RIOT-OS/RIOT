@@ -1,0 +1,115 @@
+menu "STM32H753ZI FDCAN Configuration"
+
+config FDCAN_SRAM_MESSAGE_RAM_OFFSET
+    int "Message RAM Offset"
+    range 0 10240
+    default 0
+    help
+      Message RAM start offset (in bytes).
+      Must be between 0 and 10240.
+
+config FDCAN_STD_FILTERS_NUM
+    int "Number of Standard ID Filters"
+    range 0 128
+    default 0
+
+config FDCAN_EXT_FILTERS_NUM
+    int "Number of Extended ID Filters"
+    range 0 64
+    default 0
+
+config FDCAN_RX_FIFO0_ELEMENTS
+    int "RX FIFO0 Elements"
+    range 0 64
+    default 0
+
+config FDCAN_RX_FIFO0_ELEMENT_SIZE
+    int "RX FIFO0 element size"
+    default 0
+    range 0 7
+    help
+      0 = 8 bytes
+      1 = 12 bytes
+      2 = 16 bytes
+      3 = 20 bytes
+      4 = 24 bytes
+      5 = 32 bytes
+      6 = 48 bytes
+      7 = 64 bytes
+
+config FDCAN_RX_FIFO1_ELEMENTS
+    int "RX FIFO1 Elements"
+    range 0 64
+    default 0
+
+config FDCAN_RX_FIFO1_ELEMENT_SIZE
+    int "RX FIFO1 element size"
+    default 0
+    range 0 7
+    help
+      0 = 8 bytes
+      1 = 12 bytes
+      2 = 16 bytes
+      3 = 20 bytes
+      4 = 24 bytes
+      5 = 32 bytes
+      6 = 48 bytes
+      7 = 64 bytes
+
+config FDCAN_RX_BUFFERS_NUM
+    int "Dedicated RX Buffers"
+    range 0 64
+    default 0
+
+config FDCAN_RX_BUFFER_ELEMENT_SIZE
+    int "RX BUFFER element size"
+    default 0
+    range 0 7
+    help
+      0 = 8 bytes
+      1 = 12 bytes
+      2 = 16 bytes
+      3 = 20 bytes
+      4 = 24 bytes
+      5 = 32 bytes
+      6 = 48 bytes
+      7 = 64 bytes
+
+config FDCAN_TX_EVENTS_NUM
+    int "TX Event FIFO Elements"
+    range 0 32
+    default 0
+
+config FDCAN_TX_BUFFERS_NUM
+    int "Dedicated TX Buffers"
+    range 0 32
+    default 0
+
+config FDCAN_TX_FIFO_QUEUE_ELEMENTS
+    int "TX FIFO/Queue Elements"
+    range 0 32
+    default 0
+
+config FDCAN_TX_FIFO_QUEUE_MODE
+    int "TX mode"
+    default 0
+    range 0 1
+    help
+      0 = FIFO Mode
+      1 = QUEUE Mode
+
+config FDCAN_TX_ELEMENT_SIZE
+    int "TX FIFO0 element size"
+    default 0
+    range 0 7
+    help
+      0 = 8 bytes
+      1 = 12 bytes
+      2 = 16 bytes
+      3 = 20 bytes
+      4 = 24 bytes
+      5 = 32 bytes
+      6 = 48 bytes
+      7 = 64 bytes
+
+endmenu
