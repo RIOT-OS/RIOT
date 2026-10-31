@@ -3,12 +3,23 @@
  * SPDX-License-Identifier: LGPL-2.1-only
  */
 
-#include <reent.h>
+#if defined(__has_include)
+#  if !__has_include(<reent.h>)
+#    define NEEDS_NEWLIB_SYSCALLS 0
+#  endif
+#endif
+
+#ifndef NEEDS_NEWLIB_SYSCALLS
+#  define NEEDS_NEWLIB_SYSCALLS 1
+#endif
 
 int main(void)
 {
     return 0;
 }
+
+#if NEEDS_NEWLIB_SYSCALLS
+#  include <reent.h>
 
 void _exit(int n)
 {
@@ -58,3 +69,4 @@ _ssize_t _write_r(struct _reent *r, int fd, const void *data, size_t count)
 
     return 0;
 }
+#endif
