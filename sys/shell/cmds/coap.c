@@ -14,18 +14,22 @@
 #include <assert.h>
 #include <errno.h>
 #include <stdio.h>
+#include <string.h>
 
 #include "net/unicoap.h"
+#include "net/unicoap/client.h"
 #include "od.h"
 #include "shell.h"
 
 static int _print_usage(char** argv)
 {
     printf("usage: %s <get|post|put|delete|fetch|path|ipatch> [-r] <URI> [<UTF-8 payload>]\n", argv[0]);
-    printf("          cancel <refno>\n");
+    printf("          cancel [-o] <refno>\n");
     printf("Options: (default: unreliable)\n");
     printf("    -r   send reliably (send CON instead of NON over RFC7252 over UDP/DTLS)\n");
     printf("    -t   print response as UTF-8 if Content-Format is absent\n");
+    printf("    -o   with <get>:    observe resource\n");
+    printf("         with <cancel>: explicitly send cancellation request\n");
     return 1;
 }
 
@@ -76,6 +80,9 @@ static int _set_flags(char* opt, unicoap_request_flags_t* flags, uint8_t* shell_
     if (strcmp(opt, "-r") == 0) {
         *flags |= UNICOAP_REQUEST_FLAG_RELIABLE;
     }
+    if (strcmp(opt, "-o") == 0) {
+        *flags |= UNICOAP_REQUEST_FLAG_OBSERVE;
+    }
     else if (strcmp(opt, "-t") == 0) {
         *shell_flags |= _SHELL_FLAG_TEXT;
     }
@@ -102,11 +109,13 @@ static int _cli(int argc, char** argv)
     }
 
     if (strcmp(argv[1], "cancel") == 0) {
-        if (argc != 3) {
+        if (!(argc == 3 || (argc == 4 || strcmp(argv[2], "-o") == 0))) {
             printf("error: invalid arguments\n");
             goto help;
         }
-        if ((res = unicoap_cancel_request(atoi(argv[2]))) < 0) {
+        __typeof__(&unicoap_cancel_request) cancel = argc == 4 ? 
+            unicoap_cancel_observation : unicoap_cancel_request;
+        if ((res = cancel(atoi(argv[argc - 1]))) < 0) {
             printf("cancelling request failed (%i, %s)\n", res, strerror(-res));
         }
         return res;

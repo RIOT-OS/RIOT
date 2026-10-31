@@ -152,7 +152,8 @@ static void _dtls_on_event(sock_dtls_t* sock, sock_async_flags_t type, void* arg
             _DTLS_DEBUG("established, telling messaging can resume\n");
             unicoap_endpoint_t remote = { .proto = UNICOAP_PROTO_DTLS };
             sock_dtls_session_get_udp_ep(&session, unicoap_endpoint_get_dtls(&remote));
-            unicoap_packet_t packet = { .remote = &remote, .dtls_session = &session };
+            unicoap_packet_t packet = { .remote = &remote };
+            _packet_set_dtls_session(&packet, &session);
             unicoap_messaging_process_rfc7252(NULL, 0, UNICOAP_MESSAGING_RFC7252_EVENT_SESSION_ESTABLISHED, &packet);
         }
         else if (prev_state == NO_SPACE) {
@@ -187,7 +188,8 @@ static void _dtls_on_event(sock_dtls_t* sock, sock_async_flags_t type, void* arg
         unicoap_endpoint_t remote = { .proto = UNICOAP_PROTO_DTLS };
         sock_dtls_session_get_udp_ep(&session, unicoap_endpoint_get_dtls(&remote));
 
-        unicoap_packet_t packet = { .remote = &remote, .dtls_session = &session };
+        unicoap_packet_t packet = { .remote = &remote };
+        _packet_set_dtls_session(&packet, &session);
 
 /* tinydtls does not support auxiliary data
  * see https://github.com/RIOT-OS/RIOT/issues/16054 */

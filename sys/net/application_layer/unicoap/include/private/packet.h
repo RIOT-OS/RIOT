@@ -64,7 +64,7 @@ typedef struct {
 #endif
 
         /* MARK: unicoap_driver_extension_point */
-    };
+    } sessions;
 
     /**
      * @brief Message, public API, also used by PDU header parser
@@ -99,7 +99,7 @@ static inline unicoap_proto_t unicoap_packet_proto(const unicoap_packet_t* packe
 static inline const void* _packet_get_dtls_session(unicoap_packet_t* packet)
 {
 #if IS_USED(MODULE_UNICOAP_DRIVER_DTLS)
-    return unicoap_packet_proto(packet) == UNICOAP_PROTO_DTLS ? packet->dtls_session : NULL;
+    return unicoap_packet_proto(packet) == UNICOAP_PROTO_DTLS ? packet->sessions.dtls_session : NULL;
 #else
     (void)packet;
     return NULL;
@@ -116,11 +116,21 @@ static inline void _packet_set_dtls_session(unicoap_packet_t* packet,
                                             const unicoap_sock_dtls_session_t* dtls_session)
 {
 #if IS_USED(MODULE_UNICOAP_DRIVER_DTLS)
-    packet->dtls_session = dtls_session;
+    packet->sessions.dtls_session = dtls_session;
 #else
     (void)packet;
     (void)dtls_session;
 #endif
+}
+
+/**
+ * @brief Clears transport sessions of packet
+ *
+ * @param[in,out] packet whose session to clear
+ */
+static inline void _packet_clear_sessions(unicoap_packet_t* packet)
+{
+    _packet_set_dtls_session(packet, NULL);
 }
 
 #ifdef __cplusplus

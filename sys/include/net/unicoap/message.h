@@ -302,18 +302,11 @@ typedef struct {
     uint8_t token_length : UNICOAP_TOKEN_LENGTH_FIXED_WIDTH;
 
     /**
-     * @brief Determines if the corresponding message is considered an `Observe` registration
+     * @brief Determines if the corresponding message has an `Observe` option
      *
-     * This property avoids the need to read the `Observe` option every time this value is needed
+     * This property avoids the need to check the `Observe` option repeatedly
      */
-    bool is_registration : 1;
-
-    /**
-     * @brief Determines if the corresponding message is considered an `Observe` notification
-     *
-     * This property avoids the need to read the `Observe` option every time this value is needed
-     */
-    bool is_notification : 1;
+    bool observe : 1;
 
     /** @brief RFC 7252 only properties */
     struct {

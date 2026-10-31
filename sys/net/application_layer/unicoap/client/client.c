@@ -16,6 +16,7 @@
 
 #include "mutex.h"
 #include "net/netif.h"
+#include "compiler_hints.h"
 
 #if IS_USED(MODULE_DNS)
 #  include "net/dns.h"
@@ -74,7 +75,19 @@ int unicoap_client_process_response(unicoap_packet_t* packet, unicoap_client_mem
     /* TODO: Block-wise */
     res = unicoap_client_callback_success(memo, packet, UNICOAP_BLOCK_OPTION_NONE);
 
-    unicoap_client_memo_free(memo, 0);
+    bool is_observation =
+        IS_USED(MODULE_UNICOAP_CLIENT_OBSERVATION) && memo->flags & UNICOAP_REQUEST_FLAG_OBSERVE;
+
+    if (unlikely(is_observation)) {
+        /* We keep the memo, but can disregard any messaging-layer state. */
+        _CLIENT_DEBUG("not releasing memo, expecting notifications\n");
+#if UNICOAP_HAVE_MESSAGING_STATE
+        unicoap_messaging_notify(memo->super.messaging.state, UNICOAP_LAYER_NOTIFICATION_STATE_RELEASE,
+                                 NULL, packet->remote->proto);
+#endif
+    } else {
+        unicoap_client_memo_free(memo, 0);
+    }
     return res;
 }
 
@@ -118,13 +131,30 @@ int unicoap_client_send_request_body(unicoap_message_t* request,
     unicoap_client_memo_t* memo = NULL;
 
     /* TODO: Block-wise */
-    /* TODO: Observe */
+
+    if (IS_USED(MODULE_UNICOAP_CLIENT_OBSERVATION)) {
+        if (IS_ACTIVE(CONFIG_UNICOAP_ASSIST) && (flags & UNICOAP_REQUEST_FLAG_OBSERVE)) {
+            if (!callback._any) {
+                unicoap_assist(API_MISUSE("OBSERVE flag, but missing callback"));
+            }
+        }
+
+        assert(!(flags & UNICOAP_REQUEST_FLAG_OBSERVE) || callback._any);
+
+        if (flags & UNICOAP_REQUEST_FLAG_OBSERVE) {
+            if ((res = unicoap_options_set_observe(request->options, UNICOAP_OBSERVE_OPTION_REGISTER)) < 0) {
+                _CLIENT_DEBUG("could not set Observe option\n");
+                goto error;
+            }
+        }
+    }
+
     uint8_t token[CONFIG_UNICOAP_GENERATED_TOKEN_LENGTH];
     unicoap_packet_t packet = { .remote = endpoint,
                                 .message = request,
                                 .properties = {
                                     .token = token,
-                                    .token_length = sizeof(token),
+                                    .token_length = sizeof(token)
                                 } };
 
     if (unicoap_callback_is_present(callback)) {
@@ -135,6 +165,22 @@ int unicoap_client_send_request_body(unicoap_message_t* request,
         memo->callback = callback;
         memo->callback_arg = parameters ? parameters->callback_arg : NULL;
         memo->flags = flags;
+
+        if (IS_USED(MODULE_UNICOAP_CLIENT_OBSERVATION) &&
+            IS_USED(MODULE_UNICOAP_CLIENT_CANCELLATION) && 
+            (flags & UNICOAP_REQUEST_FLAG_OBSERVE)
+        ) {
+            /* If we ever need to cancel, we must send same options, but RFC says without ETag. */
+            *unicoap_client_memo_options(memo) = *request->options;
+            if ((res = unicoap_options_swap_storage(unicoap_client_memo_options(memo),
+                                                    unicoap_client_memo_options_storage(memo),
+                                                    CONFIG_UNICOAP_OPTIONS_BUFFER_CLIENT_MEMO_CAPACITY
+            )) < 0) {
+                _CLIENT_DEBUG("could not copy options as per RFC 7641 (%i, %s)\n", res, strerror(-res));
+                return res;
+            }
+            unicoap_options_remove(unicoap_client_memo_options(memo), UNICOAP_OPTION_ETAG);
+        }
 
         unicoap_event_schedule(&memo->super.exchange.timeout, _on_response_timeout,
                                (parameters && parameters->timeout_ms > 0) ?
@@ -374,6 +420,17 @@ int unicoap_send_request_sync_copy(unicoap_message_t* request,
         _CLIENT_DEBUG("Attempted to open request on unicoap thread, not blocking.");
         assert(false);
         return -1;
+    }
+
+    if (IS_USED(MODULE_UNICOAP_CLIENT_OBSERVATION)) {
+        if (IS_ACTIVE(CONFIG_UNICOAP_ASSIST)) {
+            if (flags & UNICOAP_REQUEST_FLAG_OBSERVE) {
+                unicoap_assist(API_MISUSE("cannot receive notifications in sync client mode")
+                               FIXIT("remove remove OBSERVE flag"));
+            }
+        }
+        assert(!(flags & UNICOAP_REQUEST_FLAG_OBSERVE));
+        return -EINVAL;
     }
 
     _sync_copy_args_t args = (_sync_copy_args_t){

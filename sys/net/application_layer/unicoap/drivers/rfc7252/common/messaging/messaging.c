@@ -920,7 +920,7 @@ int unicoap_messaging_send_rfc7252(unicoap_packet_t* packet, unicoap_messaging_f
     uint8_t* carbon_copy = NULL;
     _transmission_t* transmission = NULL;
 
-    if (packet->properties.is_notification) {
+    if (packet->properties.observe) {
         /* notification, always use separate response style */
         _format_separate(packet, flags);
     }
