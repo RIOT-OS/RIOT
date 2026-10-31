@@ -22,3 +22,8 @@ changed_files() {
     # filter out negatives
     echo "${FILES}" | grep -v -E "${EXCLUDE}"
 }
+
+#when run on github ensure Workdir matches the HEAD before every static test
+if [ -n "${GITHUB_RUN_ID}" ]; then
+    git checkout ${RIOTBASE}
+fi
