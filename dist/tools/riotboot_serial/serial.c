@@ -1,5 +1,6 @@
 /*
  * SPDX-FileCopyrightText: 2016 Kaspar Schleiser <kaspar@schleiser.de>
+ * SPDX-FileCopyrightText: 2016 Martine Lenders <m.lenders@fu-berlin.de>
  * SPDX-FileCopyrightText: 2018 Freie Universität Berlin
  * SPDX-License-Identifier: GPL-2.0-only
  */
