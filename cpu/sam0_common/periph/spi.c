@@ -172,9 +172,9 @@ static inline void _init_dma(spi_t bus, const volatile void *reg_rx, volatile vo
               spi_config[bus].rx_trigger, 1, _unlock, NULL);
 
     dma_prepare(_dma_state[bus].rx_dma, DMAC_BTCTRL_BEATSIZE_BYTE_Val,
-                (void*)reg_rx, NULL, 1, 0);
+                (void*)reg_rx, NULL, 1, 0, DMA_BLOCKACT_NONE);
     dma_prepare(_dma_state[bus].tx_dma, DMAC_BTCTRL_BEATSIZE_BYTE_Val,
-                NULL, (void*)reg_tx, 0, 0);
+                NULL, (void*)reg_tx, 0, 0, DMA_BLOCKACT_NONE);
 #else
     (void)reg_rx;
     (void)reg_tx;
