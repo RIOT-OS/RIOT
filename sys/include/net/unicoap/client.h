@@ -56,6 +56,16 @@ typedef enum {
      * **Default**: disabled
      */
     UNICOAP_REQUEST_FLAG_RELIABLE = 0x0001,
+
+    /**
+     * @brief If present on a callback-based function, the callback will be called asynchronously for every
+     * CoAP Observe notification arriving at the client.
+     *
+     * **Default**: disabled.
+     *
+     * @see [Observe (RFC 7641)](https://datatracker.ietf.org/doc/html/rfc7641)
+     */
+    UNICOAP_REQUEST_FLAG_OBSERVE = 0x0100,
 } unicoap_request_flags_t;
 
 /**
@@ -257,6 +267,39 @@ int unicoap_send_request_sync_copy(unicoap_message_t* request,
  * @retval -ENOENT No request with given refno is known
  */
 int unicoap_cancel_request(int refno);
+
+/**
+ * @brief Cancels request and resource observation by reference number
+ * @param refno Reference number
+ * @returns Zero on success, negative error number otherwise
+ * @retval -EINVAL Invalid refno
+ * @retval -ENOENT No request with given refno is known
+ *
+ * Client callback will be called once more with the `GET` response from server.
+ * Sends a CoAP request with token used in notifications and options from original request.
+ *
+ * Use this function to explictly cancel a observation subscription with
+ * the server.
+ */
+int unicoap_cancel_observation(int refno);
+
+/**
+ * @brief Cancels request and resource observation by token and endpoint
+ * @param endpoint Remote server endpoint
+ * @param[in] token Request token used in original registration request
+ * @param token_length Length of @p token
+ * @returns Zero on success, negative error number otherwise
+ * @retval -EINVAL Invalid Token
+ * @retval -ENOENT No request with given token is known
+ *
+ * Sends a CoAP request with token used in notifications and options from original request.
+ * Client callback will be called once more with the `GET` response from server.
+ *
+ * Use this function to explictly cancel a observation subscription with
+ * the server.
+ */
+int unicoap_cancel_observation_by_token(const unicoap_endpoint_t* endpoint,
+                                               const uint8_t* token, size_t token_length);
 
 /** @} */ /* end of section */
 /** @} */ /* end of group */
