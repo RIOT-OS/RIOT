@@ -34,6 +34,11 @@ extern "C" {
 #define REG16(ADDR)            (*(uint16_t volatile(*))(ADDR))
 
 /**
+ * @brief   Type for 8-bit registers
+ */
+#define REG8(ADDR)            (*(uint8_t volatile(*))(ADDR))
+
+/**
  * @brief   Type for 16-bit memory addresses
  */
 #define MEM16(ADDR)            ((uint16_t(*))(ADDR))
@@ -71,6 +76,11 @@ extern "C" {
 #define GBA_IE_TIMERS          (0x0F << 3)
 
 /**
+ * @brief   Bit mask for the uart interrupt enable-flag
+ */
+#define GBA_IE_UART          (1 << 7)
+
+/**
  * @brief   Interrupt flags register
  *
  * Bit   Expl.
@@ -101,6 +111,11 @@ extern "C" {
  * @brief   Bit mask for the timer interrupts has-fired-flag
  */
 #define GBA_IF_TIMERS          (0x0F << 3)
+
+/**
+ * @brief   Bit mask for the uart/serial interrupt has-fired-flag
+ */
+#define GBA_IF_UART          (1 << 7)
 
 /**
  * @brief   Interrupt Master Enable, globally enables / disables interrupts
@@ -168,6 +183,51 @@ typedef volatile gba_timer gba_timer_t;
 #define GBA_TIMER_2          ((gba_timer_t *)0x4000108) /**< A GBA timer */
 #define GBA_TIMER_3          ((gba_timer_t *)0x400010C) /**< A GBA timer */
 /** @} */
+
+/**
+ * @brief Serial IO control register
+ */
+#define GBA_SIO_SCNT REG16(0x4000128)
+
+/**
+ * @brief Serial IO 8bit data in/out
+ */
+#define GBA_SIO_DATA8 REG8(0x400012A)
+
+/**
+ * @brief Serial IO mode selection register
+ */
+#define GBA_SIO_RCNT REG16(0x4000134)
+
+/**
+ * @brief Struct whose members map onto the uart register
+ */
+struct gba_uart {
+    uint16_t baud : 2;               /**< Baud rate, 0:9600, 38400, 57600, 3:115200 */
+    uint16_t cts : 1;                /**< 0: Always Send, 1: Wait for SC=LOW */
+    uint16_t parity : 1;             /**< 0: even, 1: odd */
+    uint16_t send_data_full : 1;     /**< Send FIFO full */
+    uint16_t receive_data_empty : 1; /**< Receive FIFO empty */
+    uint16_t error : 1;              /**< Error occurred */
+    uint16_t data_bits : 1;          /**< 0: 7 bits, 1: 8 bits */
+    uint16_t fifo_enable : 1;        /**< Enable FIFO */
+    uint16_t parity_enable : 1;      /**< Enable parity */
+    uint16_t send_enable : 1;        /**< Enable sending data */
+    uint16_t receive_enable : 1;     /**< Enable receiving data */
+    uint16_t must_be_1_for_uart : 2; /**< Config bits, unrelated to UART configuration */
+    uint16_t irq_enable : 1; /**< Enable IRQ on send_data_full, receive_data_empty and error */
+    uint16_t unused_15 : 1;  /**< Unused */
+};
+
+/**
+ * @brief The type for the GBA uart
+ */
+typedef struct gba_uart gba_uart_t;
+
+/**
+ * @brief The GBA uart (it's the SIO_SCNT register type casted)
+ */
+#define GBA_UART ((volatile gba_uart_t *) 0x4000128)
 
 /**
  * @brief    Screen dimension in pixel
