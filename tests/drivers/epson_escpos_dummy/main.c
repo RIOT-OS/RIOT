@@ -187,8 +187,12 @@ static void test_cut_full_nofeed(void)
 
 static void test_cut_fallback(void)
 {
+    static const uint8_t columns[] = { 42 };
     static const epson_escpos_profile_t full_only = {
-        .name = "full only", .num_fonts = 1, .full_cut = true,
+        .name = "full only",
+        .features = EPSON_ESCPOS_FEATURE_PAPER_FULL_CUT,
+        .num_fonts = 1,
+        .columns = columns,
     };
     static const uint8_t expected[] = { 0x1b, 0x64, 0x06, 0x1d, 0x56, 0x00 };
 
