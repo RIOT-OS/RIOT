@@ -1,0 +1,27 @@
+From 761d350942f84401af4afff904fc001f30246f19 Mon Sep 17 00:00:00 2001
+From: Simon Grund <mail@simongrund.de>
+Date: Tue, 25 Aug 2026 16:40:21 +0200
+Subject: [PATCH 3/9] Fix other compilation issues
+
+General commit to fix all compilation issues that only appear in RIOT
+and not on native.
+---
+ aa/arp/inc/bplib_arp.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/aa/arp/inc/bplib_arp.h b/aa/arp/inc/bplib_arp.h
+index 546cc2f1..c03c102c 100644
+--- a/aa/arp/inc/bplib_arp.h
++++ b/aa/arp/inc/bplib_arp.h
+@@ -125,7 +125,7 @@ typedef struct
+  *  \return Execution status
+  *  \retval BPLIB_SUCCESS Initialization was successful
+  */
+-int BPLib_ARP_Init(void);
++BPLib_Status_t BPLib_ARP_Init(void);
+ 
+ /**
+  * \brief Validate CRS Table Table configurations
+-- 
+2.43.0
+

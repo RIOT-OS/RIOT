@@ -1,0 +1,33 @@
+From 43a41a377c4c9abd5a5f3bec045b755451a6ac69 Mon Sep 17 00:00:00 2001
+From: Simon Grund <mail@simongrund.de>
+Date: Tue, 25 Aug 2026 15:52:06 +0200
+Subject: [PATCH 2/9] Fix invalid CBOR encoding when no CRC is used
+
+Bug reported here https://github.com/nasa/bplib/issues/266.
+---
+ ci/cbor/src/bplib_cbor_encode_payload.c | 7 ++++++-
+ 1 file changed, 6 insertions(+), 1 deletion(-)
+
+diff --git a/ci/cbor/src/bplib_cbor_encode_payload.c b/ci/cbor/src/bplib_cbor_encode_payload.c
+index 899ffafc..619cd71d 100644
+--- a/ci/cbor/src/bplib_cbor_encode_payload.c
++++ b/ci/cbor/src/bplib_cbor_encode_payload.c
+@@ -144,9 +144,14 @@ BPLib_Status_t BPLib_CBOR_EncodePayload(BPLib_Bundle_t* StoredBundle,
+     **  5. Block-Specific Data (ADU)
+     **  6. CRC Value
+     ** 0b100_00110 == 0x86
++    ** For CRC Type "None" no 6th item is needed => 0x85
+     */
+     CurrentOutputBufferAddr = (uintptr_t)(OutputBuffer);
+-    *(uint8_t*)CurrentOutputBufferAddr = 0x86;
++    if (StoredBundle->blocks.PayloadHeader.CrcType == BPLib_CRC_Type_None) {
++        *(uint8_t*)CurrentOutputBufferAddr = 0x85;
++    } else {
++        *(uint8_t*)CurrentOutputBufferAddr = 0x86;
++    }
+     TotalBytesCopied = 1;
+     CurrentOutputBufferAddr++;
+     BytesLeftInOutputBuffer = OutputBufferSize - TotalBytesCopied;
+-- 
+2.43.0
+
