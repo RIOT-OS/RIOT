@@ -102,3 +102,11 @@ OPTIONAL_CFLAGS_BLACKLIST += -Wformat-truncation
 
 # Parse only the major version of LLVM
 LLVM_VERSION := $(firstword $(subst ., ,$(shell command -v $(CC) > /dev/null && $(CC) -dumpversion)))
+
+# Provide a minimal standalone compiler + linker invocation for testing flags
+LINKTEST = LC_ALL=C $(LINK) $(RIOTTOOLS)/testprogs/minimal_linkable.c -o /dev/null -lc
+# Note: Even with LLVM (which does not support -specs=), we still use GCC for linking.
+#       So we provide the specs anyways.
+ifneq (,$(filter picolibc,$(FEATURES_USED)))
+  LINKTEST += -specs=picolibc.specs
+endif
