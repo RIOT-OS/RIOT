@@ -324,7 +324,7 @@ void suit_storage_init_all(void);
  *
  * @param[out]  seq_no  Retrieved sequence number
  *
- * @returns     suit_ok if at least one sequence number is retrieved
+ * @returns     @ref SUIT_OK if at least one sequence number is retrieved
  * @returns     @ref suit_error_t on error
  */
 int suit_storage_get_highest_seq_no(uint32_t *seq_no);
