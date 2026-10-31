@@ -10,7 +10,13 @@
 if nproc > /dev/null 2>&1; then
     MAKE_ARGS="-j$(nproc)"
 fi
-APP_DIR=$(pwd)
+
+
+if [ $# -gt 0 ]; then
+    APP_DIR="$1"
+else
+    APP_DIR="$(pwd)"
+fi
 
 if tput colors > /dev/null 2>&1 && [ "$(tput colors)" -ge 8 ]; then
     COK="\e[1;32m"
