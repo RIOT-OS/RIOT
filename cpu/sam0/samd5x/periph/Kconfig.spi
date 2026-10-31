@@ -1,0 +1,1 @@
+source "$(RIOTCPU)/sam0/common/periph/Kconfig.spi"
