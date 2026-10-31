@@ -1,0 +1,16 @@
+RIOTBASE ?= $(CURDIR)/../../..
+include $(CURDIR)/../../Makefile.tests_common
+
+USEMODULE += shell_cmds_default
+
+.PHONY: warn_release_tests
+
+BUILDDEPS += warn_release_tests
+TERMDEPS += warn_release_tests
+
+include $(RIOTBASE)/Makefile.include
+
+warn_release_tests:
+	@$(COLOR_ECHO) \
+		"${COLOR_RED}IF YOU NEED TO CHANGE ANYTHING IN THIS TEST,${COLOR_RESET}" \
+		"${COLOR_RED}YOU ALSO MIGHT NEED TO CHANGE THE RELEASE TEST FRAMEWORK.${COLOR_RESET}"
