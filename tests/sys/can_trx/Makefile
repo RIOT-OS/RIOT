@@ -24,4 +24,11 @@ ifneq (,$(filter ncv7356,$(TRX_TO_BUILD)))
 	CFLAGS += -DNCV7356_MODE1_PIN=$(NCV7356_MODE1_PIN)
 endif
 
+ifneq (, $(filter at6561, $(TRX_TO_BUILD)))
+	USEMODULE += at6561
+	AT6561_STBY_PIN ?= GPIO_PIN\(0,0\)
+
+	CFLAGS += -DAT6561_STBY_PIN=$(AT6561_STBY_PIN)
+endif
+
 include $(RIOTBASE)/Makefile.include
