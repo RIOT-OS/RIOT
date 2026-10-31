@@ -1,0 +1,124 @@
+# SPDX-FileCopyrightText: escpos-printer-db contributors
+# SPDX-License-Identifier: CC-BY-4.0
+# Source: https://github.com/receipt-print-hq/escpos-printer-db/blob/e5bd45da2ae535d3874f9da94f355b4db4733344/data/profile/default.yml
+---
+default:
+  name: Default
+  vendor: Generic
+  notes: >
+      Default ESC/POS profile, suitable for standards-compliant or
+      Epson-branded printers. This profile allows the use of standard
+      ESC/POS features, and can encode a variety of code pages.
+  features:
+    barcodeA: true
+    barcodeB: true
+    bitImageRaster: true
+    bitImageColumn: true
+    graphics: true
+    starCommands: false
+    qrCode: true
+    pdf417Code: true
+    highDensity: true
+    pulseStandard: true
+    pulseBel: false
+    paperFullCut: true
+    paperPartCut: true
+  colors:
+    0: black
+  fonts:
+    0:
+      name: Font A
+      columns: 42
+    1:
+      name: Font B
+      columns: 56
+  media:
+    width:
+      mm: Unknown
+      pixels: Unknown
+    dpi: Unknown
+  codePages:
+    0: CP437
+    1: CP932
+    2: CP850
+    3: CP860
+    4: CP863
+    5: CP865
+    # Hiragana
+    6: Unknown
+    # One-pass printing Kanji characters
+    7: Unknown
+    # One-pass printing Kanji characters
+    8: Unknown
+    11: CP851
+    12: CP853
+    13: CP857
+    14: CP737
+    15: ISO_8859-7
+    16: CP1252
+    17: CP866
+    18: CP852
+    19: CP858
+    # Thai Character Code 42
+    20: Unknown
+    # Thai Character Code 11
+    21: CP874
+    # Thai Character Code 13
+    22: Unknown
+    # Thai Character Code 14
+    23: Unknown
+    # Thai Character Code 16
+    24: Unknown
+    # Thai Character Code 17
+    25: Unknown
+    # Thai Character Code 18
+    26: Unknown
+    30: TCVN-3-1
+    31: TCVN-3-2
+    32: CP720
+    33: CP775
+    34: CP855
+    35: CP861
+    36: CP862
+    37: CP864
+    38: CP869
+    39: ISO_8859-2
+    40: ISO_8859-15
+    41: CP1098
+    42: CP774
+    43: CP772
+    44: CP1125
+    45: CP1250
+    46: CP1251
+    47: CP1253
+    48: CP1254
+    49: CP1255
+    50: CP1256
+    51: CP1257
+    52: CP1258
+    53: RK1048
+    # Devanagari
+    66: Unknown
+    # Bengali
+    67: Unknown
+    # Tamil
+    68: Unknown
+    # Telugu
+    69: Unknown
+    # Assamese
+    70: Unknown
+    # Oriya
+    71: Unknown
+    # Kannada
+    72: Unknown
+    # Malayalam
+    73: Unknown
+    # Gujarati
+    74: Unknown
+    # Punjabi
+    75: Unknown
+    # Marathi
+    82: Unknown
+    254: Unknown
+    255: Unknown
+...

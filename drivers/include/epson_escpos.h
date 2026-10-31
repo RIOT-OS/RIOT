@@ -188,34 +188,36 @@ typedef struct {
 } epson_escpos_transport_t;
 
 /**
+ * @brief   Code page of a printer profile
+ */
+typedef struct {
+    uint8_t page;               /**< code page number for ESC t */
+    const char *encoding;       /**< name of the encoding (e.g. "CP437"),
+                                     NULL if unknown */
+} epson_escpos_codepage_t;
+
+/**
  * @brief   Printer profile
  *
- * This is a small subset of the
+ * The profiles are generated from the
  * [ESC/POS printer database](https://github.com/receipt-print-hq/escpos-printer-db)
- * used by python-escpos.
+ * that is also used by python-escpos, see `epson_escpos_profiles.h` for the
+ * available profiles and features.
  */
 typedef struct {
     const char *name;           /**< model name */
+    const char *vendor;         /**< vendor name */
+    uint16_t features;          /**< supported features,
+                                     see EPSON_ESCPOS_FEATURE_* */
     uint8_t num_fonts;          /**< number of available fonts */
-    uint8_t columns[2];         /**< characters per line for font A and B */
-    bool full_cut;              /**< printer supports a full cut */
-    bool part_cut;              /**< printer supports a partial cut */
+    const uint8_t *columns;     /**< characters per line for each font */
+    uint16_t width_mm;          /**< paper width in mm, 0 if unknown */
+    uint16_t width_px;          /**< print width in dots, 0 if unknown */
+    uint16_t dpi;               /**< resolution in dpi, 0 if unknown */
+    uint8_t num_codepages;      /**< number of entries in @p codepages */
+    /** supported code pages */
+    const epson_escpos_codepage_t *codepages;
 } epson_escpos_profile_t;
-
-/**
- * @brief   Default profile, used if no profile is given
- */
-extern const epson_escpos_profile_t epson_escpos_profile_default;
-
-/**
- * @brief   Profile of the Epson TM-T88III
- */
-extern const epson_escpos_profile_t epson_escpos_profile_tm_t88iii;
-
-/**
- * @brief   Profile of the Epson TM-T88IV
- */
-extern const epson_escpos_profile_t epson_escpos_profile_tm_t88iv;
 
 /**
  * @brief   Device descriptor
@@ -375,7 +377,7 @@ typedef enum {
  * @param[in]  transport    transport to use
  * @param[in]  ctx          context of the transport (must be set up with the
  *                          corresponding `epson_escpos_*_setup()` function)
- * @param[in]  profile      printer profile, NULL for the default profile
+ * @param[in]  profile      printer profile
  */
 void epson_escpos_init(epson_escpos_t *dev,
                        const epson_escpos_transport_t *transport, void *ctx,
@@ -791,5 +793,8 @@ void epson_escpos_dummy_setup(epson_escpos_dummy_t *dummy, uint8_t *buf,
 #ifdef __cplusplus
 }
 #endif
+
+/* generated profiles, need epson_escpos_profile_t */
+#include "epson_escpos_profiles.h"
 
 /** @} */

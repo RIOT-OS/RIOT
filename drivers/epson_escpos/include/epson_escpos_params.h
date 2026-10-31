@@ -28,7 +28,7 @@ extern "C" {
  */
 #ifndef EPSON_ESCPOS_PARAM_PROFILE
 /** @brief printer profile */
-#  define EPSON_ESCPOS_PARAM_PROFILE        (&epson_escpos_profile_default)
+#  define EPSON_ESCPOS_PARAM_PROFILE        (&epson_escpos_profile_tm_t88iv)
 #endif
 /** @} */
 
