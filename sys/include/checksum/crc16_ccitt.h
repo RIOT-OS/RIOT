@@ -31,6 +31,8 @@
 #include <stdint.h>
 #include <stdlib.h>
 
+#include "compiler_hints.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -47,6 +49,7 @@ extern "C" {
  * @return          Checksum of the specified memory area based on the
  *                  given start value
  */
+ACCESS(read_only, 2, 3)
 uint16_t crc16_ccitt_kermit_update(uint16_t crc, const unsigned char *buf, size_t len);
 
 /**
@@ -66,6 +69,7 @@ uint16_t crc16_ccitt_kermit_update(uint16_t crc, const unsigned char *buf, size_
  *
  * @return          Checksum of the specified memory area
  */
+ACCESS(read_only, 1, 2)
 uint16_t crc16_ccitt_kermit_calc(const unsigned char *buf, size_t len);
 
 /**
@@ -77,6 +81,7 @@ uint16_t crc16_ccitt_kermit_calc(const unsigned char *buf, size_t len);
  * @return          Partial checksum of the specified memory area. To be finalised
  *                  with crc16_ccitt_fcs_finish()
  */
+ACCESS(read_only, 1, 2)
 uint16_t crc16_ccitt_fcs_start(const unsigned char *buf, size_t len);
 
 /**
@@ -91,8 +96,9 @@ uint16_t crc16_ccitt_fcs_start(const unsigned char *buf, size_t len);
  * @return          Partial checksum of the specified memory area based on the
  *                  given start value. To be finalised with crc16_ccitt_fcs_finish()
  */
-static inline uint16_t crc16_ccitt_fcs_update(uint16_t crc, const unsigned char *buf,
-                                                  size_t len)
+ACCESS(read_only, 2, 3)
+static inline uint16_t crc16_ccitt_fcs_update(uint16_t crc,
+                                              const unsigned char *buf, size_t len)
 {
     /* Since CCITT-KERMIT and CCITT-FCS only differ in the starting
      * seed, we wrap around crc16_ccitt_kermit_update() for updating */
@@ -111,6 +117,7 @@ static inline uint16_t crc16_ccitt_fcs_update(uint16_t crc, const unsigned char 
  * @return          Checksum of the specified memory area based on the
  *                  given start value.
  */
+ACCESS(read_only, 2, 3)
 uint16_t crc16_ccitt_fcs_finish(uint16_t crc, const unsigned char *buf, size_t len);
 
 /**
@@ -131,6 +138,7 @@ uint16_t crc16_ccitt_fcs_finish(uint16_t crc, const unsigned char *buf, size_t l
  *
  * @return          Checksum of the specified memory area
  */
+ACCESS(read_only, 1, 2)
 uint16_t crc16_ccitt_fcs_calc(const unsigned char *buf, size_t len);
 
 /**
@@ -145,8 +153,9 @@ uint16_t crc16_ccitt_fcs_calc(const unsigned char *buf, size_t len);
  * @return          Checksum of the specified memory area based on the
  *                  given start value
  */
-static inline uint16_t crc16_ccitt_mcrf4xx_update(uint16_t crc, const unsigned char *buf,
-                                                  size_t len)
+ACCESS(read_only, 2, 3)
+static inline uint16_t crc16_ccitt_mcrf4xx_update(uint16_t crc,
+                                                  const unsigned char *buf, size_t len)
 {
     /* Since CCITT-KERMIT and CCITT-MCRF4XX only differ in the starting
      * seed, we wrap around crc16_ccitt_kermit_update() for updating */
@@ -170,6 +179,7 @@ static inline uint16_t crc16_ccitt_mcrf4xx_update(uint16_t crc, const unsigned c
  *
  * @return          Checksum of the specified memory area
  */
+ACCESS(read_only, 1, 2)
 uint16_t crc16_ccitt_mcrf4xx_calc(const unsigned char *buf, size_t len);
 
 /**
@@ -184,6 +194,7 @@ uint16_t crc16_ccitt_mcrf4xx_calc(const unsigned char *buf, size_t len);
  * @return          Checksum of the specified memory area based on the
  *                  given start value
  */
+ACCESS(read_only, 2, 3)
 uint16_t crc16_ccitt_false_update(uint16_t crc, const unsigned char *buf, size_t len);
 
 /**
@@ -203,6 +214,7 @@ uint16_t crc16_ccitt_false_update(uint16_t crc, const unsigned char *buf, size_t
  *
  * @return          Checksum of the specified memory area
  */
+ACCESS(read_only, 1, 2)
 uint16_t crc16_ccitt_false_calc(const unsigned char *buf, size_t len);
 
 /**
@@ -217,6 +229,7 @@ uint16_t crc16_ccitt_false_calc(const unsigned char *buf, size_t len);
  * @return          Checksum of the specified memory area based on the
  *                  given start value
  */
+ACCESS(read_only, 2, 3)
 static inline uint16_t crc16_ccitt_aug_update(uint16_t crc, const unsigned char *buf, size_t len)
 {
     /* Since CCITT-AUG and CCITT-FALSE only differ in the starting
@@ -241,6 +254,7 @@ static inline uint16_t crc16_ccitt_aug_update(uint16_t crc, const unsigned char 
  *
  * @return          Checksum of the specified memory area
  */
+ACCESS(read_only, 1, 2)
 uint16_t crc16_ccitt_aug_calc(const unsigned char *buf, size_t len);
 
 #ifdef __cplusplus
