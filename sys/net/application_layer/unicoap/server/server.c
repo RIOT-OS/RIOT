@@ -11,9 +11,15 @@
  * @author  Carl <carl.seifert@tu-dresden.de>
  */
 
+#include <alloca.h>
+#include <assert.h>
+#include <stdint.h>
+#include <stdio.h>
 #include <string.h>
+#include <sys/types.h>
 
 #include "compiler_hints.h"
+#include "net/unicoap/options/base.h"
 #include "net/unicoap/server.h"
 #include "thread.h"
 
@@ -118,6 +124,31 @@ int unicoap_server_process_request(unicoap_packet_t* packet, const unicoap_resou
     assert(packet->remote);
     int res = 0;
 
+    unicoap_options_t* options = packet->message->options;
+    if (IS_USED(MODULE_UNICOAP_SERVER_OBSERVATION) &&
+        resource->flags & UNICOAP_RESOURCE_FLAG_OBSERVABLE &&
+        packet->message->method == UNICOAP_METHOD_GET
+    ) {
+        /* handle Observe option */
+        uint32_t observe_value = 0;
+        if (unicoap_options_get_observe(options, &observe_value) >= 0) {
+            _SERVER_DEBUG("Observe instruction in request: %" PRIu32 "\n", observe_value);
+            switch (observe_value) {
+            case UNICOAP_OBSERVE_OPTION_REGISTER:
+                packet->properties.observe = true;
+                unicoap_observation_register(packet->remote, resource, &packet->properties);
+                break;
+            case UNICOAP_OBSERVE_OPTION_DEREGISTER:
+                unicoap_observation_deregister(packet->remote, resource, &packet->properties);
+                break;
+            default:
+                _SERVER_DEBUG("malformed Observe option\n");
+                unicoap_response_init_string(packet->message, UNICOAP_STATUS_BAD_OPTION, "Observe");
+                goto error;
+            }
+        }
+    }
+
     unicoap_request_context_t context = {
         .resource = resource, ._packet = packet
     };
@@ -132,6 +163,12 @@ int unicoap_server_process_request(unicoap_packet_t* packet, const unicoap_resou
     res = resource->handler(packet->message, &aux, &context, resource->handler_arg);
 
     if (res > 0) {
+        if (!context._packet) {
+            /* Handler did not fail but did not send response. */
+            unicoap_assist(API_MISUSE("handler did respond but also returned status code"));
+            assert(false);
+            return -EINVAL;
+        }
         _SERVER_DEBUG("sending response " UNICOAP_CODE_CLASS_DETAIL_FORMAT
                       " from return value\n",
                       unicoap_code_class((uint8_t)res), unicoap_code_detail((uint8_t)res));
@@ -147,6 +184,20 @@ int unicoap_server_process_request(unicoap_packet_t* packet, const unicoap_resou
         }
 
         unicoap_response_init_empty(packet->message, (unicoap_status_t)res);
+
+        /* This should get optimised out if Observation is not imported.
+         * Alternative would be alloca. But this buffer is 4 bytes. */
+        if (IS_USED(MODULE_UNICOAP_SERVER_OBSERVATION) && packet->properties.observe) {
+            uint8_t* storage = alloca(_UNICOAP_OPTIONS_STORAGE_CAPACITY_JUST_GENERATED_OBSERVE);
+            if (!storage) {
+                _SERVER_DEBUG("unable to alloca options storage\n");
+                return -ENOMEM;
+            }
+            _SERVER_DEBUG("initial empty GET response to observable resource, Observe=seqno\n");
+            unicoap_options_init(options, storage, _UNICOAP_OPTIONS_STORAGE_CAPACITY_JUST_GENERATED_OBSERVE);
+            res = unicoap_options_set_observe_generated(options);
+            assert(res >= 0);
+        }
         return unicoap_server_send_response_body(packet, resource);
     }
     else if (context._packet) {
@@ -185,11 +236,12 @@ error:
 /**
  * @brief Common function for @ref unicoap_send_response and @ref unicoap_send_response_deferred
  */
-int unicoap_server_send_response_body(unicoap_packet_t* packet,
-                                      const unicoap_resource_t* resource)
+int unicoap_server_send_body(unicoap_packet_t* packet, const unicoap_resource_t* resource,
+                                      unicoap_messaging_flags_t messaging_flags)
 {
+    (void)resource;
     int res = 0;
-    if ((res = unicoap_messaging_send(packet, _messaging_flags_resource(resource->flags), NULL)) < 0) {
+    if ((res = unicoap_messaging_send(packet, messaging_flags, NULL)) < 0) {
         _SERVER_DEBUG("error: could not send response\n");
         goto error;
     }
@@ -205,6 +257,7 @@ int unicoap_send_response(unicoap_message_t* response, unicoap_request_context_t
     assert(response);
     assert(context);
     assert(context->resource);
+    int res = 0;
 
     if (IS_ACTIVE(CONFIG_UNICOAP_ASSIST)) {
         if (!context->_packet) {
@@ -216,15 +269,47 @@ int unicoap_send_response(unicoap_message_t* response, unicoap_request_context_t
     assert(context->_packet);
     _SERVER_DEBUG("sending immediate response\n");
 
+    /* Observe is only set in process_request if OBSERVABLE flag and Observe option present. */
+    if (IS_USED(MODULE_UNICOAP_SERVER_OBSERVATION) &&
+        ((unicoap_packet_t*)context->_packet)->properties.observe
+    ) {
+        assert(context->resource->flags & UNICOAP_RESOURCE_FLAG_OBSERVABLE);
+        _SERVER_DEBUG("initial empty GET response to observable resource, Observe=seqno\n");
+        if (!response->options) {
+            unicoap_message_t* _response = alloca(sizeof(unicoap_message_t));
+            if (!_response) {
+                _SERVER_DEBUG("failed to alloca message\n");
+                return -ENOMEM;
+            }
+            *_response = *response;
+            response = _response;
+            uint8_t* storage = alloca(_UNICOAP_OPTIONS_STORAGE_CAPACITY_JUST_GENERATED_OBSERVE);
+            if (!storage) {
+                _SERVER_DEBUG("failed to alloca options\n");
+                return -ENOMEM;
+            }
+            unicoap_options_t* options = alloca(sizeof(unicoap_options_t));
+            if (!options) {
+                _SERVER_DEBUG("failed to alloca options\n");
+                return -ENOMEM;
+            }
+            unicoap_options_init(options, storage, _UNICOAP_OPTIONS_STORAGE_CAPACITY_JUST_GENERATED_OBSERVE);
+            response->options = options;
+        }
+        res = unicoap_options_set_observe_generated(response->options);
+
+        printf("%s\n", strerror(-res));
+        assert(res >= 0);
+    }
+
     /* reuse the packet, stack-allocated, we're still inside resource handler */
     ((unicoap_packet_t*)context->_packet)->message = response;
-    int res = unicoap_server_send_response_body((unicoap_packet_t*)context->_packet,
-                                                context->resource);
-
     /* prevent context from being used for sending a response again.
      * If sending response on lower layer fails, then res < 0,
      * and allow calling send_response again to retry. Otherwise prevent calling again. */
-    if (res >= 0) {
+    if ((res = unicoap_server_send_response_body((unicoap_packet_t*)context->_packet,
+                                                 context->resource
+    )) >= 0) {
         context->_packet = NULL;
     }
     return res;

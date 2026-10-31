@@ -19,6 +19,7 @@
 #include "private/state.h"
 #include "private/packet.h"
 #include "private/messaging.h"
+#include "private/features/observation.h"
 
 /**
  * @defgroup net_unicoap_private Private API
@@ -71,6 +72,7 @@ extern "C" {
 #  define _SERVER_DEBUG(...)                    _UNICOAP_PREFIX_DEBUG(".server", __VA_ARGS__)
 #  define _CLIENT_DEBUG(...)                    _UNICOAP_PREFIX_DEBUG(".client", __VA_ARGS__)
 #  define _URI_DEBUG(...)                       _UNICOAP_PREFIX_DEBUG(".uri", __VA_ARGS__)
+#  define _OBSERVATION_DEBUG(...)               _UNICOAP_PREFIX_DEBUG(".obs", __VA_ARGS__)
 #  define API_WARNING(message)                 "WARNING: " message "\n"
 #  define API_ERROR(message)                   "ERROR: " message "\n"
 #  define API_MISUSE(message)                  "API MISUSE: " message "\n"
@@ -155,12 +157,18 @@ typedef struct {
     unicoap_listener_t* listeners;
 #endif
 
+#if IS_USED(MODULE_UNICOAP_SERVER_OBSERVATION)
+    /** @brief Array of clients that are currently registered for notifications */
+    unicoap_endpoint_t observers[CONFIG_UNICOAP_OBSERVATION_UNIQUE_OBSERVER_CAPACITY];
+
+    /** @ref unicoap_observation_registration_t */
+    unicoap_observation_registration_t observation_registrations[CONFIG_UNICOAP_OBSERVATION_REGISTRATION_CAPACITY];
+#endif
+
 #if UNICOAP_HAVE_CLIENT_STATE
     /** @ref unicoap_memo_t */
     unicoap_client_memo_t client_memos[CONFIG_UNICOAP_CLIENT_MEMOS_CAPACITY];
 #endif
-
-    /* TODO: Client and advanced server features: Exchange-layer state objects */
 } unicoap_state_t;
 
 /** @brief Sets listener array on @p state object to @p listeners */

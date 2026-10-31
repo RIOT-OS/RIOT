@@ -80,6 +80,22 @@ void unicoap_state_unlock(void)
     _unlock();
 }
 
+unicoap_observation_registration_t* unicoap_state_observation_registrations(void) {
+#if IS_USED(MODULE_UNICOAP_SERVER_OBSERVATION)
+    return _state.observation_registrations;
+#else
+    return NULL;
+#endif
+}
+
+unicoap_endpoint_t* unicoap_state_observers(void) {
+#if IS_USED(MODULE_UNICOAP_SERVER_OBSERVATION)
+    return _state.observers;
+#else
+    return NULL;
+#endif
+}
+
 static unicoap_client_memo_t* _alloc_client(void)
 {
 #if UNICOAP_HAVE_CLIENT_STATE
