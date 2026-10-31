@@ -34,7 +34,9 @@ static const qdec_conf_t qdec_config[] = {
         .led_pin = GPIO_PIN(0, 13), /* And the first LED */
         .sample_period = QDEC_SAMPLEPER_SAMPLEPER_128us,
         .debounce_filter = true,
-        .led_active_state = false
+        .led_active_state = false,
+        .report_period = QDEC_REPORTPER_REPORTPER_1Smpl,
+        .callback_threshold = 4,
     },
 };
 #define QDEC_NUMOF          ARRAY_SIZE(qdec_config)
