@@ -21,28 +21,30 @@
 
 #include "periph/flashpage.h"
 
-void flashpage_read(unsigned page, void *data)
+void flashpage_read(unsigned page, void *data, size_t offset, size_t len)
 {
     assert(page < FLASHPAGE_NUMOF);
+    assert(offset + len <= flashpage_size(page) && offset + len > offset);
 
 #if defined(CPU_FAM_STM32WB) || (defined(CPU_FAM_STM32WL) && \
                                  !defined(CPU_LINE_STM32WLE5xx))
     assert(page < (FLASH->SFR & FLASH_SFR_SFSA));
 #endif
 
-    memcpy(data, flashpage_addr(page), flashpage_size(page));
+    memcpy(data, (uint8_t *)flashpage_addr(page) + offset, len);
 }
 
-int flashpage_verify(unsigned page, const void *data)
+int flashpage_verify(unsigned page, const void *data, size_t offset, size_t len)
 {
     assert(page < (int)FLASHPAGE_NUMOF);
+    assert(offset + len <= flashpage_size(page) && offset + len > offset);
 
 #if defined(CPU_FAM_STM32WB) || (defined(CPU_FAM_STM32WL) && \
                                  !defined(CPU_LINE_STM32WLE5xx))
     assert(page < (int)(FLASH->SFR & FLASH_SFR_SFSA));
 #endif
 
-    if (memcmp(flashpage_addr(page), data, flashpage_size(page)) == 0) {
+    if (memcmp((uint8_t *)flashpage_addr(page) + offset, data, len) == 0) {
         return FLASHPAGE_OK;
     }
     else {
@@ -53,7 +55,7 @@ int flashpage_verify(unsigned page, const void *data)
 int flashpage_write_and_verify(unsigned page, const void *data)
 {
     flashpage_write_page(page, data);
-    return flashpage_verify(page, data);
+    return flashpage_verify(page, data, 0, flashpage_size(page));
 }
 
 #ifdef FLASHPAGE_SIZE
@@ -70,18 +72,20 @@ void flashpage_write_page(unsigned page, const void *data)
 #endif
 
 #if defined(FLASHPAGE_RWWEE_NUMOF)
-void flashpage_rwwee_read(unsigned page, void *data)
+void flashpage_rwwee_read(unsigned page, void *data, size_t offset, size_t len)
 {
     assert(page < (int)FLASHPAGE_RWWEE_NUMOF);
+    assert(offset + len <= FLASHPAGE_SIZE && offset + len > offset);
 
-    memcpy(data, flashpage_rwwee_addr(page), FLASHPAGE_SIZE);
+    memcpy(data, (uint8_t *)flashpage_rwwee_addr(page) + offset, len);
 }
 
-int flashpage_rwwee_verify(unsigned page, const void *data)
+int flashpage_rwwee_verify(unsigned page, const void *data, size_t offset, size_t len)
 {
     assert(page < (int)FLASHPAGE_RWWEE_NUMOF);
+    assert(offset + len <= FLASHPAGE_SIZE && offset + len > offset);
 
-    if (memcmp(flashpage_rwwee_addr(page), data, FLASHPAGE_SIZE) == 0) {
+    if (memcmp((uint8_t *)flashpage_rwwee_addr(page) + offset, data, len) == 0) {
         return FLASHPAGE_OK;
     }
     else {
@@ -92,7 +96,7 @@ int flashpage_rwwee_verify(unsigned page, const void *data)
 int flashpage_rwwee_write_and_verify(unsigned page, const void *data)
 {
     flashpage_rwwee_write_page(page, data);
-    return flashpage_rwwee_verify(page, data);
+    return flashpage_rwwee_verify(page, data, 0, FLASHPAGE_SIZE);
 }
 #endif /* FLASHPAGE_RWWEE_NUMOF */
 

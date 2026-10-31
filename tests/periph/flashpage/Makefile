@@ -8,6 +8,7 @@ FEATURES_OPTIONAL += periph_flashpage_rwee
 
 USEMODULE += od
 USEMODULE += od_string
+USEMODULE += random
 USEMODULE += shell
 
 # avoid running Kconfig by default
