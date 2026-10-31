@@ -32,9 +32,7 @@
 #include "net/ethernet.h"
 
 #ifdef MODULE_ETHOS_STDIO
-#include "stdio_uart.h"
-#include "isrpipe.h"
-extern isrpipe_t ethos_stdio_isrpipe;
+#include "stdio_base.h"
 #endif
 
 #define ENABLE_DEBUG 0
@@ -86,12 +84,6 @@ static void _fail_frame(ethos_t *dev)
             tsrb_add_one(&dev->inbuf, ETHOS_FRAME_DELIMITER);
             break;
         case ETHOS_FRAME_TYPE_TEXT:
-#ifdef MODULE_ETHOS_STDIO
-            tsrb_clear(&ethos_stdio_isrpipe.tsrb);
-            /* signal to handler thread that frame is at an end (makes handler thread to
-             * truncate frame) */
-            isrpipe_write_one(&ethos_stdio_isrpipe, ETHOS_FRAME_DELIMITER);
-#endif
             break;
         case ETHOS_FRAME_TYPE_ERRORED:
             return;
@@ -113,7 +105,7 @@ static void _handle_char(ethos_t *dev, char c)
             break;
         case ETHOS_FRAME_TYPE_TEXT:
 #ifdef MODULE_ETHOS_STDIO
-            if (isrpipe_write_one(&ethos_stdio_isrpipe, c) < 0) {
+            if (isrpipe_write_one(&stdin_isrpipe, c) < 0) {
                 //puts("lost frame");
                 _fail_frame(dev);
             }
@@ -160,19 +152,42 @@ static void ethos_isr(void *arg, uint8_t c)
             }
             break;
         case IN_FRAME:
-            _handle_char(dev, c);
             if (c == ETHOS_ESC_CHAR) {
                 dev->state = IN_ESCAPE;
+                /* TEXT frames are unescaped in the ISR; for all other frame
+                 * types forward the raw byte so the thread layer can unescape
+                 * it via ethos_unstuff_readbyte() */
+                if (dev->frametype != ETHOS_FRAME_TYPE_TEXT) {
+                    _handle_char(dev, c);
+                }
             }
             else if (c == ETHOS_FRAME_DELIMITER) {
+                /* for TEXT frames unescaping is done in the ISR so we do not
+                 * use FRAME_DELIMITER as an in-band end-of-frame marker */
+                if (dev->frametype != ETHOS_FRAME_TYPE_TEXT) {
+                    _handle_char(dev, c);
+                }
                 _end_of_frame(dev);
+            }
+            else {
+                _handle_char(dev, c);
             }
             break;
         case IN_ESCAPE:
             switch (c) {
                 case (ETHOS_FRAME_DELIMITER ^ 0x20):
+                    if (dev->frametype == ETHOS_FRAME_TYPE_TEXT) {
+                        _handle_char(dev, ETHOS_FRAME_DELIMITER);
+                        dev->state = IN_FRAME;
+                        return;
+                    }
                     break;
                 case (ETHOS_ESC_CHAR ^ 0x20):
+                    if (dev->frametype == ETHOS_FRAME_TYPE_TEXT) {
+                        _handle_char(dev, ETHOS_ESC_CHAR);
+                        dev->state = IN_FRAME;
+                        return;
+                    }
                     break;
                 case (ETHOS_FRAME_TYPE_TEXT ^ 0x20):
                     dev->frametype = ETHOS_FRAME_TYPE_TEXT;
