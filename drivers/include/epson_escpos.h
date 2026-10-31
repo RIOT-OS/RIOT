@@ -208,6 +208,11 @@ typedef struct {
 extern const epson_escpos_profile_t epson_escpos_profile_default;
 
 /**
+ * @brief   Profile of the Epson TM-T88III
+ */
+extern const epson_escpos_profile_t epson_escpos_profile_tm_t88iii;
+
+/**
  * @brief   Profile of the Epson TM-T88IV
  */
 extern const epson_escpos_profile_t epson_escpos_profile_tm_t88iv;
