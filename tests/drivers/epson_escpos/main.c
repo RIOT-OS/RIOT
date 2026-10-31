@@ -31,9 +31,9 @@
 #include "shell.h"
 
 #if defined(MODULE_LWIP_IPV4) && defined(ESCPOS_IPV4_ADDR)
-#include "lwip/ip4_addr.h"
-#include "lwip/netif.h"
-#include "lwip/tcpip.h"
+#  include "lwip/ip4_addr.h"
+#  include "lwip/netif.h"
+#  include "lwip/tcpip.h"
 #endif
 
 static epson_escpos_t _dev;
@@ -85,6 +85,20 @@ static int _cmd_open(int argc, char **argv)
             .host = argv[1],
             .port = CONFIG_EPSON_ESCPOS_TCP_PORT,
         };
+
+        /* split "<host>:<port>" */
+        char *port = strchr(argv[1], ':');
+        if (port) {
+            char *end;
+            unsigned long num = strtoul(port + 1, &end, 10);
+            if ((*end != '\0') || (num == 0) || (num > UINT16_MAX)) {
+                printf("error: invalid port: %s\n", port + 1);
+                return 1;
+            }
+            *port = '\0';
+            params.port = num;
+        }
+
         if (_check(epson_escpos_tcp_setup(&_tcp, &params))) {
             return 1;
         }
