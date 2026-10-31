@@ -1,0 +1,12 @@
+ifneq (,$(filter epson_escpos_tcp,$(USEMODULE)))
+  USEMODULE += sock_tcp
+  USEMODULE += ipv4_addr
+endif
+
+ifneq (,$(filter epson_escpos_uart,$(USEMODULE)))
+  FEATURES_REQUIRED += periph_uart
+  FEATURES_REQUIRED += periph_gpio
+  USEMODULE += isrpipe
+  USEMODULE += isrpipe_read_timeout
+  USEMODULE += ztimer_msec
+endif
