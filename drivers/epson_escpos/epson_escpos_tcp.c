@@ -17,7 +17,6 @@
 
 #include <assert.h>
 #include <errno.h>
-#include <stdlib.h>
 #include <string.h>
 
 #include "epson_escpos.h"
@@ -32,41 +31,17 @@ int epson_escpos_tcp_setup(epson_escpos_tcp_t *tcp,
 {
     assert(tcp && params && params->host);
 
-    char addr[IPV4_ADDR_MAX_STR_LEN];
-    const char *port = strchr(params->host, ':');
-    size_t addr_len = port ? (size_t)(port - params->host)
-                           : strlen(params->host);
-
-    if (addr_len >= sizeof(addr)) {
-        goto invalid;
-    }
-    memcpy(addr, params->host, addr_len);
-    addr[addr_len] = '\0';
-
     memset(&tcp->remote, 0, sizeof(tcp->remote));
     tcp->remote.family = AF_INET;
     tcp->remote.netif = SOCK_ADDR_ANY_NETIF;
-    if (!ipv4_addr_from_str((ipv4_addr_t *)&tcp->remote.addr.ipv4, addr)) {
-        goto invalid;
-    }
+    tcp->remote.port = params->port;
 
-    if (port) {
-        char *end;
-        unsigned long num = strtoul(port + 1, &end, 10);
-        if ((*end != '\0') || (num == 0) || (num > UINT16_MAX)) {
-            goto invalid;
-        }
-        tcp->remote.port = num;
-    }
-    else {
-        tcp->remote.port = params->port ? params->port
-                                        : CONFIG_EPSON_ESCPOS_TCP_PORT;
+    if (!ipv4_addr_from_str((ipv4_addr_t *)&tcp->remote.addr.ipv4,
+                            params->host)) {
+        DEBUG("[epson_escpos_tcp] invalid host: %s\n", params->host);
+        return -EINVAL;
     }
     return 0;
-
-invalid:
-    DEBUG("[epson_escpos_tcp] invalid host: %s\n", params->host);
-    return -EINVAL;
 }
 
 static int _open(void *ctx)

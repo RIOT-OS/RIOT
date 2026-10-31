@@ -72,16 +72,6 @@ static void _close(void *ctx)
     uart_poweroff(uart->params->uart);
 }
 
-static void _wait_ready(const epson_escpos_uart_params_t *p)
-{
-    if (!gpio_is_valid(p->busy_pin)) {
-        return;
-    }
-    while (!!gpio_read(p->busy_pin) == p->busy_level) {
-        ztimer_sleep(ZTIMER_MSEC, 1);
-    }
-}
-
 static int _write(void *ctx, const void *data, size_t len)
 {
     epson_escpos_uart_t *uart = ctx;
@@ -91,7 +81,12 @@ static int _write(void *ctx, const void *data, size_t len)
     while (len) {
         size_t chunk = gpio_is_valid(p->busy_pin) && (len > BUSY_CHUNK_SIZE)
                      ? BUSY_CHUNK_SIZE : len;
-        _wait_ready(p);
+        if (gpio_is_valid(p->busy_pin)) {
+            /* wait until the printer is ready */
+            while (!!gpio_read(p->busy_pin) == p->busy_level) {
+                ztimer_sleep(ZTIMER_MSEC, 1);
+            }
+        }
         uart_write(p->uart, pos, chunk);
         pos += chunk;
         len -= chunk;

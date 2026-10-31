@@ -24,6 +24,18 @@ config EPSON_ESCPOS_TCP_PORT
     range 1 65535
     default 9100
 
+config EPSON_ESCPOS_TCP_HOST
+    string "Default IPv4 address of the printer for the TCP transport"
+    default "192.168.1.100"
+
+config EPSON_ESCPOS_UART_DEV
+    int "Default UART device index for the UART transport"
+    default 1
+
+config EPSON_ESCPOS_UART_BAUDRATE
+    int "Default baud rate for the UART transport"
+    default 9600
+
 config EPSON_ESCPOS_UART_RX_BUF_SIZE
     int "Size of the receive buffer of the UART transport in bytes"
     default 16

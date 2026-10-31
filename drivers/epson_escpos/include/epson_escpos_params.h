@@ -27,6 +27,7 @@ extern "C" {
  * @{
  */
 #ifndef EPSON_ESCPOS_PARAM_PROFILE
+/** @brief printer profile */
 #  define EPSON_ESCPOS_PARAM_PROFILE        (&epson_escpos_profile_default)
 #endif
 /** @} */
@@ -37,13 +38,16 @@ extern "C" {
  * @{
  */
 #ifndef EPSON_ESCPOS_PARAM_TCP_HOST
-#  define EPSON_ESCPOS_PARAM_TCP_HOST       "192.168.1.100"
+/** @brief IPv4 address of the printer */
+#  define EPSON_ESCPOS_PARAM_TCP_HOST       CONFIG_EPSON_ESCPOS_TCP_HOST
 #endif
 #ifndef EPSON_ESCPOS_PARAM_TCP_PORT
+/** @brief TCP port of the printer */
 #  define EPSON_ESCPOS_PARAM_TCP_PORT       (CONFIG_EPSON_ESCPOS_TCP_PORT)
 #endif
 
 #ifndef EPSON_ESCPOS_TCP_PARAMS
+/** @brief TCP transport parameters */
 #  define EPSON_ESCPOS_TCP_PARAMS   { .host = EPSON_ESCPOS_PARAM_TCP_HOST, \
                                       .port = EPSON_ESCPOS_PARAM_TCP_PORT }
 #endif
@@ -63,19 +67,24 @@ static const epson_escpos_tcp_params_t epson_escpos_tcp_params[] = {
  * @{
  */
 #ifndef EPSON_ESCPOS_PARAM_UART_DEV
-#  define EPSON_ESCPOS_PARAM_UART_DEV       UART_DEV(1)
+/** @brief UART device */
+#  define EPSON_ESCPOS_PARAM_UART_DEV       UART_DEV(CONFIG_EPSON_ESCPOS_UART_DEV)
 #endif
 #ifndef EPSON_ESCPOS_PARAM_UART_BAUDRATE
-#  define EPSON_ESCPOS_PARAM_UART_BAUDRATE  (9600U)
+/** @brief baud rate */
+#  define EPSON_ESCPOS_PARAM_UART_BAUDRATE  (CONFIG_EPSON_ESCPOS_UART_BAUDRATE)
 #endif
 #ifndef EPSON_ESCPOS_PARAM_UART_BUSY_PIN
+/** @brief BUSY input, GPIO_UNDEF if not used */
 #  define EPSON_ESCPOS_PARAM_UART_BUSY_PIN  GPIO_UNDEF
 #endif
 #ifndef EPSON_ESCPOS_PARAM_UART_BUSY_LEVEL
+/** @brief level of the BUSY input while busy */
 #  define EPSON_ESCPOS_PARAM_UART_BUSY_LEVEL    (true)
 #endif
 
 #ifndef EPSON_ESCPOS_UART_PARAMS
+/** @brief UART transport parameters */
 #  define EPSON_ESCPOS_UART_PARAMS  { .uart = EPSON_ESCPOS_PARAM_UART_DEV,      \
                                       .baudrate = EPSON_ESCPOS_PARAM_UART_BAUDRATE, \
                                       .busy_pin = EPSON_ESCPOS_PARAM_UART_BUSY_PIN, \

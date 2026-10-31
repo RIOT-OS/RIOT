@@ -25,8 +25,8 @@
  * | `epson_escpos_uart` | Serial connection via `periph_uart`        |
  * | `epson_escpos_dummy`| Writes into a memory buffer (for testing)  |
  *
- * Most Epson network printers only support IPv4, so the TCP transport is
- * usually used together with `lwip_ipv4`.
+ * The `epson_escpos_tcp` driver uses lwIP4 as a backend, as the printers
+ * available during development only support IPv4.
  *
  * Output is collected in a buffer inside the device descriptor and is only
  * sent to the printer when the buffer is full or when @ref epson_escpos_flush
@@ -68,12 +68,12 @@
 #include <sys/types.h>
 
 #ifdef MODULE_EPSON_ESCPOS_TCP
-#include "net/sock/tcp.h"
+#  include "net/sock/tcp.h"
 #endif
 #ifdef MODULE_EPSON_ESCPOS_UART
-#include "isrpipe.h"
-#include "periph/gpio.h"
-#include "periph/uart.h"
+#  include "isrpipe.h"
+#  include "periph/gpio.h"
+#  include "periph/uart.h"
 #endif
 
 #ifdef __cplusplus
@@ -108,6 +108,27 @@ extern "C" {
 #ifndef CONFIG_EPSON_ESCPOS_TCP_PORT
 #  define CONFIG_EPSON_ESCPOS_TCP_PORT      (9100U)
 #endif
+
+/**
+ * @brief   Default IPv4 address of the printer for the TCP transport
+ */
+#ifndef CONFIG_EPSON_ESCPOS_TCP_HOST
+#  define CONFIG_EPSON_ESCPOS_TCP_HOST      "192.168.1.100"
+#endif
+
+/**
+ * @brief   Default UART device index for the UART transport
+ */
+#ifndef CONFIG_EPSON_ESCPOS_UART_DEV
+#  define CONFIG_EPSON_ESCPOS_UART_DEV      1
+#endif
+
+/**
+ * @brief   Default baud rate for the UART transport
+ */
+#ifndef CONFIG_EPSON_ESCPOS_UART_BAUDRATE
+#  define CONFIG_EPSON_ESCPOS_UART_BAUDRATE 9600
+#endif
 /** @} */
 
 /**
@@ -123,7 +144,8 @@ typedef struct {
      *
      * @param[in] ctx   transport context
      *
-     * @return  0 on success, negative errno on error
+     * @retval  0 on success
+     * @retval  -errno on error
      */
     int (*open)(void *ctx);
 
@@ -143,7 +165,8 @@ typedef struct {
      * @param[in] data  data to write
      * @param[in] len   number of bytes to write
      *
-     * @return  0 on success, negative errno on error
+     * @retval  0 on success
+     * @retval  -errno on error
      */
     int (*write)(void *ctx, const void *data, size_t len);
 
@@ -158,8 +181,8 @@ typedef struct {
      * @param[in]  timeout_ms   timeout in milliseconds
      *
      * @return  number of bytes read on success
-     * @return  -ETIMEDOUT if nothing was received within @p timeout_ms
-     * @return  other negative errno on error
+     * @retval  -ETIMEDOUT if nothing was received within @p timeout_ms
+     * @retval  -errno on error
      */
     ssize_t (*read)(void *ctx, void *data, size_t len, uint32_t timeout_ms);
 } epson_escpos_transport_t;
@@ -248,8 +271,7 @@ typedef enum {
 #define EPSON_ESCPOS_STYLE_FONT         (1U << 1)   /**< apply `font` */
 #define EPSON_ESCPOS_STYLE_BOLD         (1U << 2)   /**< apply `bold` */
 #define EPSON_ESCPOS_STYLE_UNDERLINE    (1U << 3)   /**< apply `underline` */
-#define EPSON_ESCPOS_STYLE_SIZE         (1U << 4)   /**< apply `size`,
-                                                         `width` and `height` */
+#define EPSON_ESCPOS_STYLE_SIZE         (1U << 4)   /**< apply `size`, `width` and `height` */
 #define EPSON_ESCPOS_STYLE_DENSITY      (1U << 5)   /**< apply `density` */
 #define EPSON_ESCPOS_STYLE_INVERT       (1U << 6)   /**< apply `invert` */
 #define EPSON_ESCPOS_STYLE_SMOOTH       (1U << 7)   /**< apply `smooth` */
@@ -265,22 +287,21 @@ typedef enum {
  * python-escpos.
  */
 typedef struct {
-    uint16_t fields;                    /**< fields to apply, see
-                                             EPSON_ESCPOS_STYLE_* */
-    epson_escpos_align_t align;         /**< horizontal alignment */
-    epson_escpos_font_t font;           /**< font */
-    bool bold;                          /**< emphasized text */
+    uint16_t fields;                /**< fields to apply, see EPSON_ESCPOS_STYLE_* */
+    epson_escpos_align_t align;     /**< horizontal alignment */
+    epson_escpos_font_t font;       /**< font */
+    bool bold;                      /**< emphasized text */
     epson_escpos_underline_t underline; /**< underline mode */
-    epson_escpos_size_t size;           /**< text size */
-    uint8_t width;                      /**< width multiplier (1-8) for
-                                             @ref EPSON_ESCPOS_SIZE_CUSTOM */
-    uint8_t height;                     /**< height multiplier (1-8) for
-                                             @ref EPSON_ESCPOS_SIZE_CUSTOM */
-    uint8_t density;                    /**< print density 0-8 (4 is 0%),
-                                             9 leaves it unchanged */
-    bool invert;                        /**< white on black printing */
-    bool smooth;                        /**< smoothing (for large text) */
-    bool flip;                          /**< upside-down printing */
+    epson_escpos_size_t size;       /**< text size */
+    uint8_t width;                  /**< width multiplier (1-8) for
+                                         @ref EPSON_ESCPOS_SIZE_CUSTOM */
+    uint8_t height;                 /**< height multiplier (1-8) for
+                                         @ref EPSON_ESCPOS_SIZE_CUSTOM */
+    uint8_t density;                /**< print density 0-8 (4 is 0%),
+                                         9 leaves it unchanged */
+    bool invert;                    /**< white on black printing */
+    bool smooth;                    /**< smoothing (for large text) */
+    bool flip;                      /**< upside-down printing */
 } epson_escpos_style_t;
 
 /**
@@ -315,7 +336,7 @@ typedef enum {
  * @brief   Hardware operations
  */
 typedef enum {
-    EPSON_ESCPOS_HW_INIT = 0,       /**< clear buffer and reset modes (ESC @) */
+    EPSON_ESCPOS_HW_INIT = 0,       /**< clear buffer and reset modes (ESC \@) */
     EPSON_ESCPOS_HW_SELECT,         /**< select the printer */
     EPSON_ESCPOS_HW_RESET,          /**< reset printer hardware */
 } epson_escpos_hw_t;
@@ -362,7 +383,8 @@ void epson_escpos_init(epson_escpos_t *dev,
  *
  * @param[in] dev   device descriptor
  *
- * @return  0 on success, negative errno on error
+ * @retval  0 on success
+ * @retval  -errno on error
  */
 int epson_escpos_open(epson_escpos_t *dev);
 
@@ -378,7 +400,8 @@ void epson_escpos_close(epson_escpos_t *dev);
  *
  * @param[in] dev   device descriptor
  *
- * @return  0 on success, negative errno on error
+ * @retval  0 on success
+ * @retval  -errno on error
  */
 int epson_escpos_flush(epson_escpos_t *dev);
 
@@ -389,7 +412,8 @@ int epson_escpos_flush(epson_escpos_t *dev);
  * @param[in] data  data to send
  * @param[in] len   length of @p data
  *
- * @return  0 on success, negative errno on error
+ * @retval  0 on success
+ * @retval  -errno on error
  */
 int epson_escpos_raw(epson_escpos_t *dev, const void *data, size_t len);
 
@@ -402,7 +426,8 @@ int epson_escpos_raw(epson_escpos_t *dev, const void *data, size_t len);
  * @param[in] dev   device descriptor
  * @param[in] txt   zero-terminated text
  *
- * @return  0 on success, negative errno on error
+ * @retval  0 on success
+ * @retval  -errno on error
  */
 int epson_escpos_text(epson_escpos_t *dev, const char *txt);
 
@@ -412,7 +437,8 @@ int epson_escpos_text(epson_escpos_t *dev, const char *txt);
  * @param[in] dev   device descriptor
  * @param[in] txt   zero-terminated text
  *
- * @return  0 on success, negative errno on error
+ * @retval  0 on success
+ * @retval  -errno on error
  */
 int epson_escpos_textln(epson_escpos_t *dev, const char *txt);
 
@@ -422,7 +448,8 @@ int epson_escpos_textln(epson_escpos_t *dev, const char *txt);
  * @param[in] dev   device descriptor
  * @param[in] count number of newlines
  *
- * @return  0 on success, negative errno on error
+ * @retval  0 on success
+ * @retval  -errno on error
  */
 int epson_escpos_ln(epson_escpos_t *dev, unsigned count);
 
@@ -439,9 +466,9 @@ int epson_escpos_ln(epson_escpos_t *dev, unsigned count);
  * @param[in] dev   device descriptor
  * @param[in] style text style
  *
- * @return  0 on success
- * @return  -EINVAL if a value is out of range
- * @return  other negative errno on transport errors
+ * @retval  0 on success
+ * @retval  -EINVAL if a value is out of range
+ * @retval  -errno on transport errors
  */
 int epson_escpos_set(epson_escpos_t *dev, const epson_escpos_style_t *style);
 
@@ -450,7 +477,8 @@ int epson_escpos_set(epson_escpos_t *dev, const epson_escpos_style_t *style);
  *
  * @param[in] dev   device descriptor
  *
- * @return  0 on success, negative errno on error
+ * @retval  0 on success
+ * @retval  -errno on error
  */
 int epson_escpos_set_default(epson_escpos_t *dev);
 
@@ -461,7 +489,8 @@ int epson_escpos_set_default(epson_escpos_t *dev);
  * @param[in] page  code page number as documented in the printer manual
  *                  (e.g. 0 for PC437, 19 for PC858)
  *
- * @return  0 on success, negative errno on error
+ * @retval  0 on success
+ * @retval  -errno on error
  */
 int epson_escpos_codepage(epson_escpos_t *dev, uint8_t page);
 
@@ -473,9 +502,9 @@ int epson_escpos_codepage(epson_escpos_t *dev, uint8_t page);
  *                      negative to reset to the default
  * @param[in] divisor   60, 180 or 360
  *
- * @return  0 on success
- * @return  -EINVAL if @p divisor or @p spacing is out of range
- * @return  other negative errno on transport errors
+ * @retval  0 on success
+ * @retval  -EINVAL if @p divisor or @p spacing is out of range
+ * @retval  -errno on transport errors
  */
 int epson_escpos_line_spacing(epson_escpos_t *dev, int spacing,
                               unsigned divisor);
@@ -486,7 +515,8 @@ int epson_escpos_line_spacing(epson_escpos_t *dev, int spacing,
  * @param[in] dev   device descriptor
  * @param[in] n     number of lines
  *
- * @return  0 on success, negative errno on error
+ * @retval  0 on success
+ * @retval  -errno on error
  */
 int epson_escpos_print_and_feed(epson_escpos_t *dev, uint8_t n);
 
@@ -501,7 +531,8 @@ int epson_escpos_print_and_feed(epson_escpos_t *dev, uint8_t n);
  * @param[in] feed  feed six lines before cutting. If false, the paper is
  *                  only fed to the cutting position (GS V 65/66 0).
  *
- * @return  0 on success, negative errno on error
+ * @retval  0 on success
+ * @retval  -errno on error
  */
 int epson_escpos_cut(epson_escpos_t *dev, epson_escpos_cut_t mode, bool feed);
 
@@ -511,7 +542,8 @@ int epson_escpos_cut(epson_escpos_t *dev, epson_escpos_cut_t mode, bool feed);
  * @param[in] dev   device descriptor
  * @param[in] hw    operation
  *
- * @return  0 on success, negative errno on error
+ * @retval  0 on success
+ * @retval  -errno on error
  */
 int epson_escpos_hw(epson_escpos_t *dev, epson_escpos_hw_t hw);
 
@@ -527,9 +559,9 @@ int epson_escpos_hw(epson_escpos_t *dev, epson_escpos_hw_t hw);
  * @param[in] count     number of tab positions + 1 (0-32), only used for HT
  * @param[in] tab_size  tab size in characters (1-255), only used for HT
  *
- * @return  0 on success
- * @return  -EINVAL if @p count or @p tab_size is out of range
- * @return  other negative errno on transport errors
+ * @retval  0 on success
+ * @retval  -EINVAL if @p count or @p tab_size is out of range
+ * @retval  -errno on transport errors
  */
 int epson_escpos_control(epson_escpos_t *dev, epson_escpos_ctl_t ctl,
                          unsigned count, unsigned tab_size);
@@ -540,7 +572,8 @@ int epson_escpos_control(epson_escpos_t *dev, epson_escpos_ctl_t ctl,
  * @param[in] dev       device descriptor
  * @param[in] enable    enable the buttons
  *
- * @return  0 on success, negative errno on error
+ * @retval  0 on success
+ * @retval  -errno on error
  */
 int epson_escpos_panel_buttons(epson_escpos_t *dev, bool enable);
 
@@ -552,9 +585,9 @@ int epson_escpos_panel_buttons(epson_escpos_t *dev, bool enable);
  * @param[in] on_time   on time in units of 2 ms
  * @param[in] off_time  off time in units of 2 ms
  *
- * @return  0 on success
- * @return  -EINVAL if @p pin is invalid
- * @return  other negative errno on transport errors
+ * @retval  0 on success
+ * @retval  -EINVAL if @p pin is invalid
+ * @retval  -errno on transport errors
  */
 int epson_escpos_cashdraw(epson_escpos_t *dev, unsigned pin,
                           uint8_t on_time, uint8_t off_time);
@@ -566,9 +599,9 @@ int epson_escpos_cashdraw(epson_escpos_t *dev, unsigned pin,
  * @param[in] times     number of beeps (1-9)
  * @param[in] duration  duration of a beep (1-9)
  *
- * @return  0 on success
- * @return  -EINVAL if a value is out of range
- * @return  other negative errno on transport errors
+ * @retval  0 on success
+ * @retval  -EINVAL if a value is out of range
+ * @retval  -errno on transport errors
  */
 int epson_escpos_buzzer(epson_escpos_t *dev, unsigned times, unsigned duration);
 
@@ -578,9 +611,9 @@ int epson_escpos_buzzer(epson_escpos_t *dev, unsigned times, unsigned duration);
  * @param[in] dev   device descriptor
  * @param[in] speed print speed (1-17)
  *
- * @return  0 on success
- * @return  -EINVAL if @p speed is out of range
- * @return  other negative errno on transport errors
+ * @retval  0 on success
+ * @retval  -EINVAL if @p speed is out of range
+ * @retval  -errno on transport errors
  */
 int epson_escpos_print_speed(epson_escpos_t *dev, unsigned speed);
 
@@ -594,10 +627,10 @@ int epson_escpos_print_speed(epson_escpos_t *dev, unsigned speed);
  *                      3: error cause, 4: paper sensor)
  * @param[out] status   received status byte
  *
- * @return  0 on success
- * @return  -ENOTSUP if the transport does not support reading
- * @return  -EBADMSG if the response is invalid
- * @return  other negative errno on transport errors or timeouts
+ * @retval  0 on success
+ * @retval  -ENOTSUP if the transport does not support reading
+ * @retval  -EBADMSG if the response is invalid
+ * @retval  -errno on transport errors or timeouts
  */
 int epson_escpos_query_status(epson_escpos_t *dev, uint8_t mode,
                               uint8_t *status);
@@ -607,8 +640,9 @@ int epson_escpos_query_status(epson_escpos_t *dev, uint8_t mode,
  *
  * @param[in] dev   device descriptor
  *
- * @return  1 if the printer is online, 0 if it is offline
- * @return  negative errno if the status could not be read
+ * @retval  1 if the printer is online
+ * @retval  0 if it is offline
+ * @retval  -errno if the status could not be read
  */
 int epson_escpos_is_online(epson_escpos_t *dev);
 
@@ -618,7 +652,7 @@ int epson_escpos_is_online(epson_escpos_t *dev);
  * @param[in] dev   device descriptor
  *
  * @return  paper status (@ref epson_escpos_paper_t) on success
- * @return  negative errno if the status could not be read
+ * @retval  -errno if the status could not be read
  */
 int epson_escpos_paper_status(epson_escpos_t *dev);
 
@@ -631,9 +665,8 @@ int epson_escpos_paper_status(epson_escpos_t *dev);
  * @brief   Parameters of the TCP transport
  */
 typedef struct {
-    const char *host;       /**< IP address of the printer, optionally with
-                                 port ("192.168.1.10" or "192.168.1.10:9100") */
-    uint16_t port;          /**< port, used if @p host contains no port */
+    const char *host;       /**< IPv4 address of the printer */
+    uint16_t port;          /**< TCP port of the printer */
 } epson_escpos_tcp_params_t;
 
 /**
@@ -655,8 +688,8 @@ extern const epson_escpos_transport_t epson_escpos_tcp_transport;
  * @param[out] tcp      transport context
  * @param[in]  params   transport parameters
  *
- * @return  0 on success
- * @return  -EINVAL if the host can not be parsed
+ * @retval  0 on success
+ * @retval  -EINVAL if the host is not a valid IPv4 address
  */
 int epson_escpos_tcp_setup(epson_escpos_tcp_t *tcp,
                            const epson_escpos_tcp_params_t *params);
@@ -707,7 +740,7 @@ extern const epson_escpos_transport_t epson_escpos_uart_transport;
  * @param[out] uart     transport context
  * @param[in]  params   transport parameters, must stay valid
  *
- * @return  0 on success
+ * @retval  0 on success
  */
 int epson_escpos_uart_setup(epson_escpos_uart_t *uart,
                             const epson_escpos_uart_params_t *params);

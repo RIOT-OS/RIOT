@@ -53,7 +53,7 @@ extern "C" {
  * @name    Commands (second byte after ESC, GS, ...)
  * @{
  */
-#define ESCPOS_CMD_HW_INIT      '@'     /**< ESC @: initialize printer */
+#define ESCPOS_CMD_HW_INIT      '@'     /**< ESC \@: initialize printer */
 #define ESCPOS_CMD_HW_SELECT    '='     /**< ESC = 1: select printer */
 #define ESCPOS_CMD_HW_RESET     '?'     /**< ESC ? LF NUL: reset hardware */
 #define ESCPOS_CMD_CASH_DRAWER  'p'     /**< ESC p m t1 t2: drawer kick */
@@ -102,6 +102,7 @@ extern "C" {
  * @name    Print density values (GS | n), index 0-8 = -50% ... +50%
  * @{
  */
+/** @brief GS | n values for density 0-8 */
 #define ESCPOS_DENSITY_VALUES   { 0x00, 0x01, 0x02, 0x03, 0x04, \
                                   0x08, 0x07, 0x06, 0x05 }
 /** @} */
@@ -124,6 +125,7 @@ extern "C" {
  * @name    Print speed (GS ( K 2 0 50 n)
  * @{
  */
+/** @brief GS ( K 2 0 50, followed by the speed */
 #define ESCPOS_SET_PRINT_SPEED  { ESCPOS_GS, '(', 'K', 0x02, 0x00, 0x32 }
 /** @} */
 
