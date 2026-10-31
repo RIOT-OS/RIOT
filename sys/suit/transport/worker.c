@@ -42,6 +42,9 @@
 #ifdef MODULE_SUIT_TRANSPORT_VFS
 #include "vfs_util.h"
 #endif
+#ifdef MODULE_SUIT_TRANSPORT_MOCK
+#include "suit/transport/mock.h"
+#endif
 
 #ifdef MODULE_RIOTBOOT_SLOT
 #include "riotboot/slot.h"
@@ -96,6 +99,12 @@ int suit_handle_url(const char *url)
                                                  CONFIG_SUIT_COAP_BLOCKSIZE,
                                                  _manifest_buf,
                                                  sizeof(_manifest_buf));
+    }
+#endif
+#ifdef MODULE_SUIT_TRANSPORT_MOCK
+    else if (strncmp(url, "test://", 7) == 0) {
+        /* Get mocked manifest from application */
+        size = suit_transport_mock_get_manifest(_manifest_buf, sizeof(_manifest_buf));
     }
 #endif
 #ifdef MODULE_SUIT_TRANSPORT_VFS
