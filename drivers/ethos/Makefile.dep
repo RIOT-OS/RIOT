@@ -4,7 +4,3 @@ USEMODULE += netdev_eth
 USEMODULE += netdev_new_api
 USEMODULE += random
 USEMODULE += tsrb
-
-ifneq (,$(filter ethos_stdio,$(USEMODULE)))
-  USEMODULE += isrpipe
-endif
