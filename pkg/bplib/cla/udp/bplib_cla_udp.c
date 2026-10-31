@@ -1,8 +1,6 @@
 /*
  * SPDX-FileCopyrightText: 2026 Technische Universität Hamburg
  * SPDX-License-Identifier: LGPL-2.1-only
- *
- * Based on bplib's example implementation in [bplib]/app/src/bpcat_cla.c
  */
 
 /**
@@ -11,8 +9,9 @@
  *
  * @file
  * @brief       UDP CLA implementation.
- *
  * @author      Simon Grund <mail@simongrund.de>
+ *
+ * Based loosely on bplib's example implementation in [bplib]/app/src/bpcat_cla.c
  *
  * @}
  */

@@ -1,0 +1,74 @@
+From 1b0c63e50e55080d30808e9a29651c81d230d1df Mon Sep 17 00:00:00 2001
+From: Simon Grund <mail@simongrund.de>
+Date: Wed, 23 Sep 2026 19:17:37 +0200
+Subject: [PATCH 9/9] Prevent giant stack allocation in CBOR encoding
+
+bplib wanted to allocate a buffer of the maximum payload size on the
+stack. This is bad here since stacks are usually rather small. Now
+every thread shares the buffer guarded by a mutex.
+---
+ ci/cbor/src/bplib_cbor_encode_payload.c | 27 ++++++++++++++++++++++---
+ 1 file changed, 24 insertions(+), 3 deletions(-)
+
+diff --git a/ci/cbor/src/bplib_cbor_encode_payload.c b/ci/cbor/src/bplib_cbor_encode_payload.c
+index 619cd71d..a7223bbc 100644
+--- a/ci/cbor/src/bplib_cbor_encode_payload.c
++++ b/ci/cbor/src/bplib_cbor_encode_payload.c
+@@ -20,6 +20,12 @@
+ 
+ #include "bplib_cbor_internal.h"
+ 
++#include "mutex.h"
++
++/* Allocated memory for the UsefulBuf, to prevent bplib from allocating this on stack */
++static uint8_t _useful_buf[BPLIB_MAX_PAYLOAD_SIZE];
++static mutex_t _useful_buf_lock = MUTEX_INIT;
++
+ /**
+  * \brief Add an "open byte string" CBOR head
+  *
+@@ -107,7 +113,7 @@ static size_t BPLib_CBOR_AddByteStringHead(uint64_t DataSize,
+ }
+ 
+ 
+-BPLib_Status_t BPLib_CBOR_EncodePayload(BPLib_Bundle_t* StoredBundle,
++BPLib_Status_t BPLib_CBOR_EncodePayload_Unlocked(BPLib_Bundle_t* StoredBundle,
+                                         void* OutputBuffer,
+                                         size_t OutputBufferSize,
+                                         size_t* NumBytesCopied)
+@@ -124,8 +130,8 @@ BPLib_Status_t BPLib_CBOR_EncodePayload(BPLib_Bundle_t* StoredBundle,
+     size_t ByteStringCborHeadSize;
+     size_t PayloadSize;
+     UsefulBufC EncodedAdminRecord;
+-    
+-    UsefulBuf_MAKE_STACK_UB(  AdminRecordBuffer, BPLIB_MAX_PAYLOAD_SIZE);
++
++    UsefulBuf AdminRecordBuffer = {_useful_buf, sizeof(_useful_buf)};
+ 
+     if ((StoredBundle == NULL) ||
+         (OutputBuffer == NULL) ||
+@@ -311,6 +317,21 @@ BPLib_Status_t BPLib_CBOR_EncodePayload(BPLib_Bundle_t* StoredBundle,
+     return BPLIB_SUCCESS;
+ }
+ 
++BPLib_Status_t BPLib_CBOR_EncodePayload(BPLib_Bundle_t* StoredBundle,
++                                        void* OutputBuffer,
++                                        size_t OutputBufferSize,
++                                        size_t* NumBytesCopied)
++{
++    BPLib_Status_t status;
++
++    mutex_lock(&_useful_buf_lock);
++    status = BPLib_CBOR_EncodePayload_Unlocked(StoredBundle, OutputBuffer,
++                                        OutputBufferSize, NumBytesCopied);
++    mutex_unlock(&_useful_buf_lock);
++
++    return status;
++}
++
+ 
+ BPLib_Status_t BPLib_CBOR_CopyOrEncodePayload(BPLib_Bundle_t* StoredBundle,
+                                               void* OutputBuffer,
+-- 
+2.43.0
+
