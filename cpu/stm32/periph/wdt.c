@@ -6,13 +6,10 @@
 /**
  * @ingroup     cpu_stm32
  * @ingroup     drivers_periph_wdt
- *
- * @brief
- *
  * @{
  *
  * @file        wdt.c
- * @brief       Independent Watchdog timer for STM32L platforms
+ * @brief       Independent Watchdog timer for STM32 platforms
  *
  * @author      Francisco Molina <francois-xavier.molina@inria.fr>
  */
@@ -20,8 +17,10 @@
 #include <stdlib.h>
 #include <assert.h>
 #include <inttypes.h>
+#include <stdbool.h>
 
 #include "cpu.h"
+#include "mutex.h"
 #include "timex.h"
 
 #include "periph_cpu.h"
@@ -30,13 +29,13 @@
 #define ENABLE_DEBUG 0
 #include "debug.h"
 
-#ifdef __cplusplus
-extern "C" {
+#ifdef CPU_FAM_STM32H7
+/* use watchdog 1 for the H7 */
+#  define IWDG IWDG1
 #endif
 
 #define MAX_RELOAD                (4096U)
 #define MAX_PRESCALER             (6U)
-#define IWDG_STEP_MS              ((4U * US_PER_MS * MAX_RELOAD) / CLOCK_LSI)
 
 #define IWDG_KR_KEY_RELOAD        ((uint16_t)0xAAAA)
 #define IWDG_KR_KEY_ENABLE        ((uint16_t)0xCCCC)
@@ -44,122 +43,99 @@ extern "C" {
 #define IWDG_UNLOCK               ((uint16_t)0x5555)
 #define IWDG_LOCK                 ((uint16_t)0x0000)
 
+/* The prescaler and reload values are calculated by wdt_setup_reboot()
+ * and have to be applied by wdt_start(), so they have to be stored.
+ * Initialized with safe default values. */
+static uint8_t _prescaler = 0;
+static uint16_t _reload = IWDG_RLR_RL;
+static bool _started;
+
+/* When the PR, RR or WINR registers are unlocked, nobody else should
+ * try to unlock or lock them. */
+mutex_t _iwdg_unlocked;
+
 static inline uint32_t _wdt_time(uint8_t pre, uint16_t rel)
 {
     /* wdt_time (us) = LSI(us) x 4 x 2^PRE x RELOAD */
-    return (uint32_t)(((uint64_t) US_PER_SEC * 4 * (1 << pre) * rel ) / CLOCK_LSI);
+    return (uint32_t)(((uint64_t)US_PER_SEC * 4 * (1 << pre) * rel) / CLOCK_LSI);
 }
 
-static inline void _iwdt_unlock(void)
+static void _set_config(void)
 {
-#ifdef CPU_FAM_STM32H7
-    IWDG1->KR = IWDG_UNLOCK;
-#else
+    assert(_prescaler <= MAX_PRESCALER);
+    assert(_reload <= IWDG_RLR_RL);
+
+    /* PR and RLR can't be written while an update is ongoing. Updates only
+     * complete while the watchdog is running, so this must not be called
+     * before starting it. */
+    while (IWDG->SR & (IWDG_SR_PVU | IWDG_SR_RVU)) {}
+
+    mutex_lock(&_iwdg_unlocked);
     IWDG->KR = IWDG_UNLOCK;
-#endif
-}
-
-static inline void _iwdt_lock(void)
-{
-
-#ifdef CPU_FAM_STM32H7
-    IWDG1->KR = IWDG_LOCK;
-#else
+    IWDG->PR = _prescaler;
+    IWDG->RLR = _reload;
     IWDG->KR = IWDG_LOCK;
-#endif
+    mutex_unlock(&_iwdg_unlocked);
+
+    /* Wait for the update before reloading the counter with the new value */
+    while (IWDG->SR & (IWDG_SR_PVU | IWDG_SR_RVU)) {}
+    wdt_kick();
 }
 
-static void _set_prescaler(uint8_t prescaler)
+static inline uint32_t _wdt_ticks(uint8_t pre, uint32_t rst_time)
 {
-    assert(prescaler <= MAX_PRESCALER);
-
-    _iwdt_unlock();
-#ifdef CPU_FAM_STM32H7
-    IWDG1->PR = prescaler;
-#else
-    IWDG->PR = prescaler;
-#endif
-    _iwdt_lock();
-}
-
-static void _set_reload(uint16_t reload)
-{
-    assert(reload <= IWDG_RLR_RL);
-
-    _iwdt_unlock();
-#ifdef CPU_FAM_STM32H7
-    IWDG1->RLR = reload;
-#else
-    IWDG->RLR = reload;
-#endif
-    _iwdt_lock();
+    /* ticks = rst_time(ms) x LSI(kHz) / (4 x 2^PRE) */
+    return (rst_time * CLOCK_LSI) / (MS_PER_SEC * (4U << pre));
 }
 
 static uint8_t _find_prescaler(uint32_t rst_time)
 {
-    /* Divide by the range to get power of 2 of the prescaler */
-    uint8_t pre = 32U - __builtin_clz(rst_time / IWDG_STEP_MS);
+    /* Find the smallest prescaler for which the ticks fit the reload value */
+    uint8_t pre = 0;
+    while ((pre < MAX_PRESCALER) && (_wdt_ticks(pre, rst_time) > MAX_RELOAD)) {
+        pre++;
+    }
     DEBUG("[wdt]: prescaler value %d\n", pre);
     return pre;
 }
 
 static uint16_t _find_reload_value(uint8_t pre, uint32_t rst_time)
 {
-    /* Calculate best reload value = rst_time / LSI(ms) x 4 x 2^PRE */
-    uint16_t rel = (uint16_t)((rst_time * CLOCK_LSI) / \
-                             ((uint32_t) (US_PER_MS * 4 * (1 << pre))));
+    /* The watchdog expires after RELOAD + 1 ticks */
+    uint16_t rel = (uint16_t)(_wdt_ticks(pre, rst_time) - 1);
     DEBUG("[wdt]: reload value %d\n", rel);
     return rel;
 }
 
 void wdt_start(void)
 {
-#ifdef CPU_FAM_STM32H7
-    IWDG1->KR = IWDG_KR_KEY_ENABLE;
-#else
     IWDG->KR = IWDG_KR_KEY_ENABLE;
-#endif
+    _started = true;
+    _set_config();
 }
-
-#ifdef CPU_FAM_STM32L4
-void wdt_init(void)
-{
-    FLASH->OPTR |= ~(FLASH_OPTR_IWDG_STOP || FLASH_OPTR_IWDG_STDBY);
-}
-#endif
 
 void wdt_kick(void)
 {
-#ifdef CPU_FAM_STM32H7
-    IWDG1->KR = IWDG_KR_KEY_RELOAD;
-#else
     IWDG->KR = IWDG_KR_KEY_RELOAD;
-#endif
 }
 
 void wdt_setup_reboot(uint32_t min_time, uint32_t max_time)
 {
-    (void) min_time;
+    (void)min_time;
     /* Windowed wdt not supported */
     assert(min_time == 0);
 
     /* Check reset time limit */
-    assert((max_time > NWDT_TIME_LOWER_LIMIT) || \
-           (max_time < NWDT_TIME_UPPER_LIMIT));
+    assert((max_time >= NWDT_TIME_LOWER_LIMIT) && (max_time <= NWDT_TIME_UPPER_LIMIT));
 
-    uint8_t pre = _find_prescaler(max_time);
-    uint16_t rel = _find_reload_value(pre, max_time);
+    _prescaler = _find_prescaler(max_time);
+    _reload = _find_reload_value(_prescaler, max_time);
 
-    /* Set watchdog prescaler and reload value */
-    _set_prescaler(pre);
-    _set_reload(rel);
+    DEBUG("[wdt]: reset time %" PRIu32 " [us]\n", _wdt_time(_prescaler, _reload + 1));
 
-    DEBUG("[wdt]: reset time %" PRIu32 " [us]\n", _wdt_time(pre, rel));
-
-    /* Refresh wdt counter */
-    wdt_kick();
+    /* If the WDT is not already running, the configuration will be applied
+     * when starting the watchdog. */
+    if (_started) {
+        _set_config();
+    }
 }
-
-#ifdef __cplusplus
-}
-#endif
