@@ -24,7 +24,7 @@
 #include "event/thread.h"
 
 #if defined(BOARD_NATIVE64) || defined(BOARD_NATIVE32)
-#  define STACKSIZE_EXPECTED 4096
+#  define STACKSIZE_EXPECTED 17408
 #else
 #  define STACKSIZE_EXPECTED 567
 #endif
