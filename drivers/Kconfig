@@ -52,6 +52,7 @@ rsource "sm_pwm_01c/Kconfig"
 rsource "sps30/Kconfig"
 rsource "tcs37727/Kconfig"
 rsource "tmp00x/Kconfig"
+rsource "vl53l1x/Kconfig"
 rsource "vl6180x/Kconfig"
 endmenu # Sensor Device Drivers
 
