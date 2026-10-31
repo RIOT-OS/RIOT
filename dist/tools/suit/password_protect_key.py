@@ -1,8 +1,7 @@
 #!/usr/bin/env python3
 
-#
-# Copyright (C) 2021_ML!PA Consulting GmbH
-#
+# SPDX-FileCopyrightText: 2021 ML!PA Consulting GmbH
+# SPDX-License-Identifier: LGPL-2.1-only
 
 import sys
 import os
