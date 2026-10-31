@@ -1,0 +1,56 @@
+@prefix skos: <http://www.w3.org/2004/02/skos/core#>.
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#>.
+@prefix dct: <http://purl.org/dc/terms/>.
+@prefix ont: <ontology.ttl#>.
+@prefix : <#>.
+
+:code-topics a skos:ConceptScheme;
+  dct:title "RIOT code topics";
+  rdfs:comment "An organization structure of concepts for different parts of the RIOT-OS code base. Concepts in this structure are often related to particular files or folders of RIOT code. Code topics are often assigned to issues or PRs, but can also be linked to the documentation pages";
+  skos:hasTopConcept :all-code. # It may alternatively be useful to do go for the second-level directly.
+
+:all-code a skos:Concept; skos:prefLabel "RIOT-OS"; skos:inScheme :code-topics.
+
+:board a skos:Concept; skos:prefLabel "Board"; skos:inScheme :code-topics;
+  skos:scopeNote "This encompasses both groups of boards ('boards/common') and individual boards ('boards/*' except common)";
+  ont:doxygroup "boards";
+  skos:broader :all-code.
+
+# Keeping this inbetween rather than having it as a skos:Collection is "clearly not a best practice" (https://www.w3.org/TR/2009/NOTE-skos-primer-20090818/#seccollections), but let's still try for simple.
+:board-implementation a skos:Concept; skos:prefLabel "Named board"; skos:inScheme :code-topics;
+  skos:broader :board.
+
+:board-group a skos:Concept; skos:prefLabel "Common board group"; skos:inScheme :code-topics;
+  skos:broader :board.
+
+# We may manage to automate them from the file structure.
+
+:board-common-atxmega a skos:Concept; skos:prefLabel "ATXmega boards"; skos:inScheme :code-topics;
+  skos:broader :board-group.
+
+# These we should generate from the file structure, maybe even likewise with drivers.
+
+# first one
+:board-6lowpan-clicker a skos:Concept; skos:inScheme :code-topics;
+  skos:broader :board-implementation;
+  ont:glob "boards/6lowpan-clicker".
+
+# fits in the first 
+:board-atxmega-a1-xplained a skos:Concept; skos:inScheme :code-topics;
+  skos:broader :board-implementation;
+  ont:glob "boards/atxmega-a1-xplained";
+  ont:doxygroup "boards_atxmega-a1-xplained"; # Can we get this one automatically? Probably by looking for defgroup in ../../boards/.../doc.txt
+  skos:broader :board-common-atxmega. # Can we get these automatically? Is 'broader' really the right relation here, or would skos:Collection be better?
+
+# part of the runtime-mappings.ttl example
+:board-microbit-v2 a skos:Concept; skos:inScheme :code-topics;
+  skos:broader :board-implementation;
+  ont:glob "boards/microbit-v2";
+  ont:doxygroup "boards_microbit_v2";
+  skos:broader :board-common-microbit.
+
+
+# These are just a few things kept around to memorize that the SKOS terms for this exist
+
+# or even go for skosxl? probably overkill (maybe the below already is)
+:GNRC a skos:Concept; skos:prefLabel "Generic (GNRC) network stack"; skos:altLabel "GNRC"; skos:inScheme :code-topics.
