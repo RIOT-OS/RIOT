@@ -6,4 +6,4 @@ CFLAGS += -DDONT_USE_CMSIS_INIT
 
 LINKER_SCRIPT ?= cortexm.ld
 
-INCLUDES += -I$(RIOTCPU)/sam_common/include
+INCLUDES += -I$(RIOTCPU)/sam/common/include
