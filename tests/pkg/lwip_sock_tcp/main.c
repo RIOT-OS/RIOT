@@ -526,6 +526,38 @@ static void test_tcp_write4__success(void)
     expect(memcmp(exp_data.iov_base, _test_buffer, exp_data.iov_len) == 0);
     ztimer_sleep(ZTIMER_MSEC, 5);            /* wait for server */
 }
+
+/* Regression test: sock_tcp_write() must not return before lwIP has copied
+ * the data, otherwise data still queued by lwIP (e.g. due to Nagle's
+ * algorithm) is overwritten by subsequent writes. */
+static void test_tcp_write4__success_multiple(void)
+{
+    static const sock_tcp_ep_t remote = { .addr = { .ipv4_u32 = _TEST_ADDR4_REMOTE },
+                                          .family = AF_INET,
+                                          .port = _TEST_PORT_REMOTE,
+                                          .netif = SOCK_ADDR_ANY_NETIF };
+    msg_t msg = { .type = _SERVER_MSG_START };
+    static const struct iovec exp_data = { .iov_base = "Hello!World!RIOT!!",
+                                           .iov_len = sizeof("Hello!World!RIOT!!") - 1 };
+
+    _server_addr.family = AF_INET;
+    _server_addr.port = _TEST_PORT_REMOTE;
+    _server_addr.netif = SOCK_ADDR_ANY_NETIF;
+
+    msg_send(&msg, _server);        /* start server on _TEST_PORT_REMOTE */
+    msg.type = _SERVER_MSG_ACCEPT;
+    msg_send(&msg, _server);        /* let server accept */
+
+    expect(0 == sock_tcp_connect(&_sock, &remote, 0, SOCK_FLAGS_REUSE_EP));
+    msg.type = _SERVER_MSG_READ;
+    msg.content.ptr = (void *)&exp_data;
+    msg_send(&msg, _server);        /* read expected data at server */
+    /* write the data in chunks of the same size back to back */
+    expect(6 == sock_tcp_write(&_sock, "Hello!", 6));
+    expect(6 == sock_tcp_write(&_sock, "World!", 6));
+    expect(6 == sock_tcp_write(&_sock, "RIOT!!", 6));
+    ztimer_sleep(ZTIMER_MSEC, 5);            /* wait for server */
+}
 #endif /* MODULE_LWIP_IPV4 */
 
 #ifdef MODULE_LWIP_IPV6
@@ -969,6 +1001,38 @@ static void test_tcp_write6__success(void)
     expect(memcmp(exp_data.iov_base, _test_buffer, exp_data.iov_len) == 0);
     ztimer_sleep(ZTIMER_MSEC, 5);            /* wait for server */
 }
+
+/* Regression test: sock_tcp_write() must not return before lwIP has copied
+ * the data, otherwise data still queued by lwIP (e.g. due to Nagle's
+ * algorithm) is overwritten by subsequent writes. */
+static void test_tcp_write6__success_multiple(void)
+{
+    static const sock_tcp_ep_t remote = { .addr = { .ipv6 = _TEST_ADDR6_REMOTE },
+                                          .family = AF_INET6,
+                                          .port = _TEST_PORT_REMOTE,
+                                          .netif = SOCK_ADDR_ANY_NETIF };
+    msg_t msg = { .type = _SERVER_MSG_START };
+    static const struct iovec exp_data = { .iov_base = "Hello!World!RIOT!!",
+                                           .iov_len = sizeof("Hello!World!RIOT!!") - 1 };
+
+    _server_addr.family = AF_INET6;
+    _server_addr.port = _TEST_PORT_REMOTE;
+    _server_addr.netif = SOCK_ADDR_ANY_NETIF;
+
+    msg_send(&msg, _server);        /* start server on _TEST_PORT_REMOTE */
+    msg.type = _SERVER_MSG_ACCEPT;
+    msg_send(&msg, _server);        /* let server accept */
+
+    expect(0 == sock_tcp_connect(&_sock, &remote, 0, SOCK_FLAGS_REUSE_EP));
+    msg.type = _SERVER_MSG_READ;
+    msg.content.ptr = (void *)&exp_data;
+    msg_send(&msg, _server);        /* read expected data at server */
+    /* write the data in chunks of the same size back to back */
+    expect(6 == sock_tcp_write(&_sock, "Hello!", 6));
+    expect(6 == sock_tcp_write(&_sock, "World!", 6));
+    expect(6 == sock_tcp_write(&_sock, "RIOT!!", 6));
+    ztimer_sleep(ZTIMER_MSEC, 5);            /* wait for server */
+}
 #endif /* MODULE_LWIP_IPV6 */
 
 int main(void)
@@ -1035,6 +1099,7 @@ int main(void)
     /* ENOTCONN not applicable since lwIP always tries to send */
     CALL(test_tcp_write4__ENOTCONN());
     CALL(test_tcp_write4__success());
+    CALL(test_tcp_write4__success_multiple());
 #endif /* MODULE_LWIP_IPV4 */
 #ifdef MODULE_LWIP_IPV6
 #ifdef SO_REUSE
@@ -1078,6 +1143,7 @@ int main(void)
     /* ENOTCONN not applicable since lwIP always tries to send */
     CALL(test_tcp_write6__ENOTCONN());
     CALL(test_tcp_write6__success());
+    CALL(test_tcp_write6__success_multiple());
 #endif /* MODULE_LWIP_IPV6 */
 
     puts("ALL TESTS SUCCESSFUL");
@@ -1116,10 +1182,17 @@ static void *_server_func(void *arg)
             case _SERVER_MSG_READ:
                 if (sock != NULL) {
                     const struct iovec *exp = msg.content.ptr;
+                    size_t len = 0;
 
-                    expect(((ssize_t)exp->iov_len) ==
-                           sock_tcp_read(sock, _server_buf, sizeof(_server_buf),
-                                         SOCK_NO_TIMEOUT));
+                    /* data may arrive in multiple segments */
+                    while (len < exp->iov_len) {
+                        ssize_t res = sock_tcp_read(sock, &_server_buf[len],
+                                                    sizeof(_server_buf) - len,
+                                                    SOCK_NO_TIMEOUT);
+                        expect(res > 0);
+                        len += res;
+                    }
+                    expect(exp->iov_len == len);
                     expect(memcmp(exp->iov_base, _server_buf, exp->iov_len) == 0);
                 }
                 break;

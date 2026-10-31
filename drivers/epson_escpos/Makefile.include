@@ -1,0 +1,7 @@
+PSEUDOMODULES += epson_escpos_dummy
+PSEUDOMODULES += epson_escpos_tcp
+PSEUDOMODULES += epson_escpos_uart
+
+USEMODULE_INCLUDES_epson_escpos := $(LAST_MAKEFILEDIR)/include \
+                                   $(LAST_MAKEFILEDIR)/generated
+USEMODULE_INCLUDES += $(USEMODULE_INCLUDES_epson_escpos)

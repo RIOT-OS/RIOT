@@ -1,0 +1,41 @@
+# SPDX-FileCopyrightText: escpos-printer-db contributors
+# SPDX-License-Identifier: CC-BY-4.0
+# Source: https://github.com/receipt-print-hq/escpos-printer-db/blob/e5bd45da2ae535d3874f9da94f355b4db4733344/data/profile/TM-T88III.yml
+---
+# More info on this printer is posted at
+# https://download.epson-biz.com/modules/pos/index.php?page=single_doc&cid=1352&pcat=3&pid=21&ml_lang=de
+TM-T88III:
+  name: TM-T88III
+  vendor: "Epson"
+  inherits: default
+  notes: >
+      Epson TM-T88III profile. This printer has similar feature support to the
+      TM-T88II. The code page mapping is documented in the
+      "TM-T88II/T88III Technical Reference Guide".
+  media:
+    width:
+      mm: 80
+      pixels: 512
+    # @page 55
+    dpi: 180
+  fonts:
+    0:
+      name: Font A
+      columns: 42
+    1:
+      name: Font B
+      columns: 56
+  codePages:
+    0: CP437
+    1: CP932
+    2: CP850
+    3: CP860
+    4: CP863
+    5: CP865
+    6: CP1251
+    16: CP1252
+    17: CP866
+    18: CP862
+    19: CP858
+    255: Unknown
+...
