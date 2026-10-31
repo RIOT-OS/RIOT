@@ -46,8 +46,10 @@ extern "C" {
  * @name Timer peripheral configuration
  * @{
  */
-#define TIMER_NUMOF            (1U)
-#define TIMER_CHANNEL_NUMOF    (1U)    /**< Number of timer channels */
+#define TIMER_NUMOF         (1U)
+#define TIMER_CHANNEL_NUMOF (1U) /**< Number of timer channels */
+#define TIMER_0_MAX_VALUE   (0xffffffff) /**< max value */
+#define PERIPH_TIMER_PROVIDES_SET /**< A low-level timer_set() implementation is provided */
 /** @} */
 
 /**
