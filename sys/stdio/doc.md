@@ -83,3 +83,12 @@ USEMODULE += stdio_cdc_acm
 The pseudomodule `stdio_available` exists to mark that the selected STDIO
 backend supports @ref stdio_available, the function used to query how many
 bytes are currently buffered for reading.
+
+### stdio_stdin_resume
+
+The pseudomodule `stdio_stdin_resume` enables flow control on stdin. It
+provides @ref stdio_stdin_resume_set, which allows a STDIO backend that can
+hold back input to stop feeding stdin while the stdin buffer is full, and to
+resume once the consumer has made room. Backends that support this, such as
+`stdio_native`, will no longer drop input when the stdin buffer overflows.
+This module has the `stdin` module as a dependency.
