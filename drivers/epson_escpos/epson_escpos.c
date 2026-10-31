@@ -14,7 +14,6 @@
  * Port of `escpos/escpos.py` from python-escpos.
  *
  * @author      Christopher Büchse <christopher.buechse@tuhh.de>
- *
  * @}
  */
 
@@ -23,26 +22,11 @@
 #include <string.h>
 
 #include "epson_escpos.h"
+#include "epson_escpos_profiles.h"
 #include "epson_escpos_constants.h"
 
 #define ENABLE_DEBUG 0
 #include "debug.h"
-
-const epson_escpos_profile_t epson_escpos_profile_default = {
-    .name = "default",
-    .num_fonts = 2,
-    .columns = { 42, 56 },
-    .full_cut = true,
-    .part_cut = true,
-};
-
-const epson_escpos_profile_t epson_escpos_profile_tm_t88iv = {
-    .name = "TM-T88IV",
-    .num_fonts = 2,
-    .columns = { 42, 56 },
-    .full_cut = true,
-    .part_cut = true,
-};
 
 static const uint8_t _density[] = ESCPOS_DENSITY_VALUES;
 
@@ -138,22 +122,10 @@ int epson_escpos_raw(epson_escpos_t *dev, const void *data, size_t len)
 }
 
 /* helpers for short commands */
-static int _cmd1(epson_escpos_t *dev, uint8_t a)
-{
-    return epson_escpos_raw(dev, &a, 1);
-}
-
-static int _cmd2(epson_escpos_t *dev, uint8_t a, uint8_t b)
-{
-    const uint8_t cmd[] = { a, b };
-    return epson_escpos_raw(dev, cmd, sizeof(cmd));
-}
-
-static int _cmd3(epson_escpos_t *dev, uint8_t a, uint8_t b, uint8_t c)
-{
-    const uint8_t cmd[] = { a, b, c };
-    return epson_escpos_raw(dev, cmd, sizeof(cmd));
-}
+/* send a command given as list of bytes */
+#define SEND_CMD(dev, ...) \
+    epson_escpos_raw(dev, (const uint8_t[]){ __VA_ARGS__ }, \
+                     sizeof((const uint8_t[]){ __VA_ARGS__ }))
 
 int epson_escpos_text(epson_escpos_t *dev, const char *txt)
 {
@@ -167,13 +139,13 @@ int epson_escpos_textln(epson_escpos_t *dev, const char *txt)
     if (res < 0) {
         return res;
     }
-    return _cmd1(dev, ESCPOS_CTL_LF);
+    return SEND_CMD(dev, ESCPOS_CTL_LF);
 }
 
 int epson_escpos_ln(epson_escpos_t *dev, unsigned count)
 {
     while (count--) {
-        int res = _cmd1(dev, ESCPOS_CTL_LF);
+        int res = SEND_CMD(dev, ESCPOS_CTL_LF);
         if (res < 0) {
             return res;
         }
@@ -222,12 +194,12 @@ static int _set_size(epson_escpos_t *dev, const epson_escpos_style_t *style)
 
     if (style->size == EPSON_ESCPOS_SIZE_CUSTOM) {
         uint8_t size = ((style->width - 1) << 4) | (style->height - 1);
-        return _cmd3(dev, ESCPOS_GS, ESCPOS_CMD_CHAR_SIZE, size);
+        return SEND_CMD(dev, ESCPOS_GS, ESCPOS_CMD_CHAR_SIZE, size);
     }
 
     /* ESC ! also selects font A, so the cached font is no longer valid */
     dev->font = -1;
-    return _cmd3(dev, ESCPOS_ESC, ESCPOS_CMD_PRINT_MODE, modes[style->size]);
+    return SEND_CMD(dev, ESCPOS_ESC, ESCPOS_CMD_PRINT_MODE, modes[style->size]);
 }
 
 int epson_escpos_set(epson_escpos_t *dev, const epson_escpos_style_t *style)
@@ -246,32 +218,32 @@ int epson_escpos_set(epson_escpos_t *dev, const epson_escpos_style_t *style)
         res = _set_size(dev, style);
     }
     if ((res == 0) && (f & EPSON_ESCPOS_STYLE_FLIP)) {
-        res = _cmd3(dev, ESCPOS_ESC, ESCPOS_CMD_FLIP, style->flip);
+        res = SEND_CMD(dev, ESCPOS_ESC, ESCPOS_CMD_FLIP, style->flip);
     }
     if ((res == 0) && (f & EPSON_ESCPOS_STYLE_SMOOTH)) {
-        res = _cmd3(dev, ESCPOS_GS, ESCPOS_CMD_SMOOTH, style->smooth);
+        res = SEND_CMD(dev, ESCPOS_GS, ESCPOS_CMD_SMOOTH, style->smooth);
     }
     if ((res == 0) && (f & EPSON_ESCPOS_STYLE_BOLD)) {
-        res = _cmd3(dev, ESCPOS_ESC, ESCPOS_CMD_BOLD, style->bold);
+        res = SEND_CMD(dev, ESCPOS_ESC, ESCPOS_CMD_BOLD, style->bold);
     }
     if ((res == 0) && (f & EPSON_ESCPOS_STYLE_UNDERLINE)) {
-        res = _cmd3(dev, ESCPOS_ESC, ESCPOS_CMD_UNDERLINE, style->underline);
+        res = SEND_CMD(dev, ESCPOS_ESC, ESCPOS_CMD_UNDERLINE, style->underline);
     }
     if ((res == 0) && (f & EPSON_ESCPOS_STYLE_FONT) &&
         (dev->font != (int8_t)style->font)) {
-        res = _cmd3(dev, ESCPOS_ESC, ESCPOS_CMD_FONT, style->font);
+        res = SEND_CMD(dev, ESCPOS_ESC, ESCPOS_CMD_FONT, style->font);
         dev->font = style->font;
     }
     if ((res == 0) && (f & EPSON_ESCPOS_STYLE_ALIGN)) {
-        res = _cmd3(dev, ESCPOS_ESC, ESCPOS_CMD_ALIGN, style->align);
+        res = SEND_CMD(dev, ESCPOS_ESC, ESCPOS_CMD_ALIGN, style->align);
     }
     if ((res == 0) && (f & EPSON_ESCPOS_STYLE_DENSITY) &&
         (style->density != 9)) {
-        res = _cmd3(dev, ESCPOS_GS, ESCPOS_CMD_DENSITY,
-                    _density[style->density]);
+        res = SEND_CMD(dev, ESCPOS_GS, ESCPOS_CMD_DENSITY,
+                       _density[style->density]);
     }
     if ((res == 0) && (f & EPSON_ESCPOS_STYLE_INVERT)) {
-        res = _cmd3(dev, ESCPOS_GS, ESCPOS_CMD_INVERT, style->invert);
+        res = SEND_CMD(dev, ESCPOS_GS, ESCPOS_CMD_INVERT, style->invert);
     }
 
     return res;
@@ -285,7 +257,7 @@ int epson_escpos_set_default(epson_escpos_t *dev)
 
 int epson_escpos_codepage(epson_escpos_t *dev, uint8_t page)
 {
-    return _cmd3(dev, ESCPOS_ESC, ESCPOS_CMD_CODEPAGE, page);
+    return SEND_CMD(dev, ESCPOS_ESC, ESCPOS_CMD_CODEPAGE, page);
 }
 
 int epson_escpos_line_spacing(epson_escpos_t *dev, int spacing,
@@ -294,7 +266,7 @@ int epson_escpos_line_spacing(epson_escpos_t *dev, int spacing,
     uint8_t cmd;
 
     if (spacing < 0) {
-        return _cmd2(dev, ESCPOS_ESC, ESCPOS_CMD_SPACING_RESET);
+        return SEND_CMD(dev, ESCPOS_ESC, ESCPOS_CMD_SPACING_RESET);
     }
 
     switch (divisor) {
@@ -317,12 +289,12 @@ int epson_escpos_line_spacing(epson_escpos_t *dev, int spacing,
         return -EINVAL;
     }
 
-    return _cmd3(dev, ESCPOS_ESC, cmd, spacing);
+    return SEND_CMD(dev, ESCPOS_ESC, cmd, spacing);
 }
 
 int epson_escpos_print_and_feed(epson_escpos_t *dev, uint8_t n)
 {
-    return _cmd3(dev, ESCPOS_ESC, ESCPOS_CMD_FEED, n);
+    return SEND_CMD(dev, ESCPOS_ESC, ESCPOS_CMD_FEED, n);
 }
 
 int epson_escpos_cut(epson_escpos_t *dev, epson_escpos_cut_t mode, bool feed)
@@ -352,8 +324,8 @@ int epson_escpos_cut(epson_escpos_t *dev, epson_escpos_cut_t mode, bool feed)
     if (!dev->profile->full_cut && !dev->profile->part_cut) {
         return 0;
     }
-    return _cmd3(dev, ESCPOS_GS, ESCPOS_CMD_CUT,
-                 part ? ESCPOS_CUT_PART : ESCPOS_CUT_FULL);
+    return SEND_CMD(dev, ESCPOS_GS, ESCPOS_CMD_CUT,
+                    part ? ESCPOS_CUT_PART : ESCPOS_CUT_FULL);
 }
 
 int epson_escpos_hw(epson_escpos_t *dev, epson_escpos_hw_t hw)
@@ -362,9 +334,9 @@ int epson_escpos_hw(epson_escpos_t *dev, epson_escpos_hw_t hw)
     case EPSON_ESCPOS_HW_INIT:
         /* ESC @ resets all settings */
         dev->font = -1;
-        return _cmd2(dev, ESCPOS_ESC, ESCPOS_CMD_HW_INIT);
+        return SEND_CMD(dev, ESCPOS_ESC, ESCPOS_CMD_HW_INIT);
     case EPSON_ESCPOS_HW_SELECT:
-        return _cmd3(dev, ESCPOS_ESC, ESCPOS_CMD_HW_SELECT, 0x01);
+        return SEND_CMD(dev, ESCPOS_ESC, ESCPOS_CMD_HW_SELECT, 0x01);
     case EPSON_ESCPOS_HW_RESET: {
         const uint8_t cmd[] = {
             ESCPOS_ESC, ESCPOS_CMD_HW_RESET, ESCPOS_CTL_LF, ESCPOS_NUL
@@ -381,13 +353,13 @@ int epson_escpos_control(epson_escpos_t *dev, epson_escpos_ctl_t ctl,
 {
     switch (ctl) {
     case EPSON_ESCPOS_CTL_LF:
-        return _cmd1(dev, ESCPOS_CTL_LF);
+        return SEND_CMD(dev, ESCPOS_CTL_LF);
     case EPSON_ESCPOS_CTL_FF:
-        return _cmd1(dev, ESCPOS_CTL_FF);
+        return SEND_CMD(dev, ESCPOS_CTL_FF);
     case EPSON_ESCPOS_CTL_CR:
-        return _cmd1(dev, ESCPOS_CTL_CR);
+        return SEND_CMD(dev, ESCPOS_CTL_CR);
     case EPSON_ESCPOS_CTL_VT:
-        return _cmd1(dev, ESCPOS_CTL_VT);
+        return SEND_CMD(dev, ESCPOS_CTL_VT);
     case EPSON_ESCPOS_CTL_HT:
         break;
     default:
@@ -399,12 +371,12 @@ int epson_escpos_control(epson_escpos_t *dev, epson_escpos_ctl_t ctl,
         return -EINVAL;
     }
 
-    int res = _cmd2(dev, ESCPOS_ESC, ESCPOS_CMD_SET_HT);
+    int res = SEND_CMD(dev, ESCPOS_ESC, ESCPOS_CMD_SET_HT);
     for (unsigned i = 1; (res == 0) && (i < count); i++) {
-        res = _cmd1(dev, i * tab_size);
+        res = SEND_CMD(dev, i * tab_size);
     }
     if (res == 0) {
-        res = _cmd1(dev, ESCPOS_NUL);
+        res = SEND_CMD(dev, ESCPOS_NUL);
     }
     return res;
 }
@@ -450,7 +422,7 @@ int epson_escpos_print_speed(epson_escpos_t *dev, unsigned speed)
     if (res < 0) {
         return res;
     }
-    return _cmd1(dev, speed);
+    return SEND_CMD(dev, speed);
 }
 
 /* A status byte has the format 0xx1xx10 */
@@ -468,7 +440,7 @@ int epson_escpos_query_status(epson_escpos_t *dev, uint8_t mode,
         return -ENOTSUP;
     }
 
-    int res = _cmd3(dev, ESCPOS_DLE, ESCPOS_CMD_RT_STATUS, mode);
+    int res = SEND_CMD(dev, ESCPOS_DLE, ESCPOS_CMD_RT_STATUS, mode);
     if (res == 0) {
         res = epson_escpos_flush(dev);
     }
