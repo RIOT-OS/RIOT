@@ -42,6 +42,9 @@
 #ifdef MODULE_SUIT_TRANSPORT_VFS
 #include "vfs_util.h"
 #endif
+#if IS_USED(MODULE_SUIT_TRANSPORT_MOCK) && defined(TESTSUITE_SUIT_CMD_TEST)
+#include "suit_test_vector.h"
+#endif
 
 #ifdef MODULE_RIOTBOOT_SLOT
 #include "riotboot/slot.h"
@@ -96,6 +99,14 @@ int suit_handle_url(const char *url)
                                                  CONFIG_SUIT_COAP_BLOCKSIZE,
                                                  _manifest_buf,
                                                  sizeof(_manifest_buf));
+    }
+#endif
+#ifdef MODULE_SUIT_TRANSPORT_MOCK
+    else if (strncmp(url, "test://", 7) == 0) {
+        size = 0;
+#ifdef TESTSUITE_SUIT_CMD_TEST
+        size = testsuite_suit_manifest_get(_manifest_buf, sizeof(_manifest_buf));
+#endif
     }
 #endif
 #ifdef MODULE_SUIT_TRANSPORT_VFS
