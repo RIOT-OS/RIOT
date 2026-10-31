@@ -126,7 +126,7 @@ extern "C" {
  * @{
  */
 /** @brief GS ( K 2 0 50, followed by the speed */
-#define ESCPOS_SET_PRINT_SPEED  { ESCPOS_GS, '(', 'K', 0x02, 0x00, 0x32 }
+#define ESCPOS_SET_PRINT_SPEED  ESCPOS_GS, '(', 'K', 0x02, 0x00, 0x32
 /** @} */
 
 #ifdef __cplusplus
