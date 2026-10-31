@@ -29,6 +29,25 @@ TEST_PATHS[board_doc]="boards/*"
 TEST_PATHS[codespell]="${TEST_PATHS[any_c_files]} ${TEST_PATHS[any_shell_files]} ${TEST_PATHS[any_python_files]} ${TEST_PATHS[any_text_files]}"
 TEST_PATHS[code_in_guides]="doc/guides/* ${TEST_PATHS[any_example_files]}"
 
+# Build tests for the host tools. Only rebuild a tool if it (or a shared file
+# used to build it) changed.
+TEST_PATHS[benchmark_udp]="dist/tools/benchmark_udp"
+TEST_PATHS[bossa-1.8]="dist/tools/bossa-1.8 makefiles/tools/bossa-build.inc.mk"
+TEST_PATHS[bossa-1.9]="dist/tools/bossa-1.9 makefiles/tools/bossa-build.inc.mk"
+TEST_PATHS[bossa-nrf52]="dist/tools/bossa-nrf52 makefiles/tools/bossa-build.inc.mk"
+TEST_PATHS[calc_spi_scalers]="cpu/kinetis/dist/calc_spi_scalers"
+TEST_PATHS[clk_conf]="cpu/stm32/dist/clk_conf"
+TEST_PATHS[edbg]="dist/tools/edbg"
+TEST_PATHS[ethos]="dist/tools/ethos"
+TEST_PATHS[fixdep]="dist/tools/fixdep"
+TEST_PATHS[flatc]="dist/tools/flatc"
+TEST_PATHS[lpc2k_pgm]="dist/tools/lpc2k_pgm"
+TEST_PATHS[mosquitto_rsmb]="dist/tools/mosquitto_rsmb"
+TEST_PATHS[riotboot_serial]="dist/tools/riotboot_serial"
+TEST_PATHS[setsid]="dist/tools/setsid"
+TEST_PATHS[uhcpd]="dist/tools/uhcpd sys/net/application_layer/uhcp/uhcp.c sys/include/net/uhcp.h"
+TEST_PATHS[zep_dispatch]="dist/tools/zep_dispatch sys/net/link_layer/ieee802154/ieee802154.c sys/fmt/fmt.c sys/net/link_layer/l2util/l2util.c sys/libc/string.c"
+
 # true if any given path changed vs BASE_BRANCH; true if base unknown
 function _is_path_changed {
     local base
