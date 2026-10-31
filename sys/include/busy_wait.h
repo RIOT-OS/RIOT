@@ -32,7 +32,7 @@ extern "C" {
  * for a given wait time.
  */
 #ifndef CPU_CYCLES_PER_LOOP
-#define CPU_CYCLES_PER_LOOP 3
+#  define CPU_CYCLES_PER_LOOP 3
 #endif
 
 /**
@@ -41,17 +41,22 @@ extern "C" {
  * This will not take into account cycles spent on interrupts
  * if they are enabled and occur.
  *
+ * @note The `loops` parameter does not specify the actual number of cycles this
+ *       will wait for! Even with `CPU_CYCLES_PER_LOOP` calibrated, this is a
+ *       rough delay only!
+ *
  * @param loops Number of loop iterations to take
  */
 static inline void busy_wait(unsigned loops)
 {
     while (loops) {
-        /* This empty inline assembly should be enough to convince the
-         * compiler that the loop cannot be optimized out. Tested with
-         * GCC 12.2 and clang 16.0.0 successfully. */
+        /* The empty volatile inline assembly prevents the compiler from
+         * optimizing out the loop. Declaring `loops` as read-write operand
+         * hides its value from the compiler, so the number of iterations
+         * is unknown at compile time and the loop cannot be unrolled. */
         __asm__ __volatile__ (
             ""
-            : /* no outputs */
+            : "+r" (loops) /* no actual output */
             : /* no inputs */
             : /* no clobbers */
         );
