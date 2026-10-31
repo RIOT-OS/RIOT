@@ -1,0 +1,32 @@
+From c7e715a7c4bc76520142416ff744e4a32a90d719 Mon Sep 17 00:00:00 2001
+From: Gunar Schorcht <gunar@schorcht.net>
+Date: Wed, 21 Oct 2026 01:54:38 +0200
+Subject: [PATCH 45/45] freertos/portasm: fix alignment of the ISR stack for
+ RIOT
+
+On RISC-V, the argument of the `.align` directive is the power of two,
+so `.align 16` aligned the ISR stack and thus the `.dram0.data` section
+to 64 KB, which wasted up to 64 KB of DRAM. Use `.balign 16` to align
+the ISR stack to 16 bytes as intended.
+
+Assisted-by: Claude Code Opus 5.5
+---
+ components/freertos/FreeRTOS-Kernel/portable/riscv/portasm.S | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/components/freertos/FreeRTOS-Kernel/portable/riscv/portasm.S b/components/freertos/FreeRTOS-Kernel/portable/riscv/portasm.S
+index 573145cd13..d64f09f3e9 100644
+--- a/components/freertos/FreeRTOS-Kernel/portable/riscv/portasm.S
++++ b/components/freertos/FreeRTOS-Kernel/portable/riscv/portasm.S
+@@ -44,7 +44,7 @@
+ #endif /* CONFIG_ESP_SYSTEM_HW_STACK_GUARD */
+ 
+     .data
+-    .align      16
++    .balign     16
+     .global     port_IntStack
+ port_IntStack:
+     .space      configISR_STACK_SIZE
+-- 
+2.43.0
+
