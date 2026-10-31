@@ -1,0 +1,32 @@
+From 8504797eba059f6d383ab3ffad817853dcf22777 Mon Sep 17 00:00:00 2001
+From: crasbe <crasbe@gmail.com>
+Date: Fri, 25 Sep 2026 14:11:59 +0200
+Subject: [PATCH] RIOT specific changes
+
+---
+ mdk/nrf9160.h | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/mdk/nrf9160.h b/mdk/nrf9160.h
+index 9847ed3..9f34d87 100644
+--- a/mdk/nrf9160.h
++++ b/mdk/nrf9160.h
+@@ -57,6 +57,7 @@ POSSIBILITY OF SUCH DAMAGE.
+ extern "C" {
+ #endif
+
++#include "vendor/nrf91_name_change.h"
+
+ /** @addtogroup Configuration_of_CMSIS
+   * @{
+@@ -139,7 +140,7 @@ typedef enum {
+ /** @} */ /* End of group Configuration_of_CMSIS */
+
+ #include "core_cm33.h"                          /*!< ARM Cortex-M33 processor and core peripherals                             */
+-#include "system_nrf9160.h"                     /*!< nrf9160 System                                                            */
++/*#include "system_nrf9160.h"*/                     /*!< nrf9160 System                                                            */
+
+ #ifndef __IM                                    /*!< Fallback for older CMSIS versions                                         */
+   #define __IM   __I
+--
+2.34.1
