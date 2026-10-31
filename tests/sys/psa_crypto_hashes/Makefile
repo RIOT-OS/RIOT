@@ -19,4 +19,6 @@ USEMODULE += psa_hash_sha_512_256
 
 include $(RIOTBASE)/Makefile.include
 
-CFLAGS += -DTHREAD_STACKSIZE_MAIN=2048
+ifeq (,$(filter native%,$(BOARD)))
+  CFLAGS += -DTHREAD_STACKSIZE_MAIN=2048
+endif

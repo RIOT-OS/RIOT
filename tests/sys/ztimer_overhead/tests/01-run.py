@@ -3,12 +3,18 @@
 # SPDX-FileCopyrightText: 2019 Kaspar Schleiser <kaspar@schleiser.de>
 # SPDX-License-Identifier: LGPL-2.1-only
 
+import os
 import sys
 from testrunner import run
 
 
 ADJUST_SET_MARGIN = 1
 ADJUST_SLEEP_MARGIN = 1
+
+if os.environ.get('BOARD', '').startswith('native'):
+    # native runs on top of a multi-user OS, the wakeup latency of a sleeping
+    # thread varies a lot between measurements
+    ADJUST_SLEEP_MARGIN = 20
 
 
 def testfunc(child):
