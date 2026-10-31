@@ -194,12 +194,27 @@ void IRAM_ATTR thread_yield_higher(void)
     else {
         /* otherwise trigger a software interrupt for context switch */
         WRITE_PERI_REG(SYSTEM_CPU_INTR_FROM_CPU_0_REG, SYSTEM_CPU_INTR_FROM_CPU_0);
-        /* small delay of 3-4 instructions required here before we return */
-        __asm__ volatile ( "nop" );
-        __asm__ volatile ( "nop" );
-        __asm__ volatile ( "nop" );
-        __asm__ volatile ( "nop" );
-        __asm__ volatile ( "nop" );
+        /*
+         * There is a latency between triggering the software interrupt and
+         * the CPU actually taking it, which depends on the SoC (e.g. it is
+         * significantly larger on ESP32-H2 than a few instructions). If we
+         * return before the interrupt is taken, the caller continues with
+         * its own context for some instructions although it has already
+         * been blocked. Therefore, wait until the software interrupt has been
+         * taken, which is indicated by `thread_yield_isr()` clearing the
+         * request. This is only possible if interrupts are enabled!
+         */
+        if (irq_is_enabled()) {
+            while (READ_PERI_REG(SYSTEM_CPU_INTR_FROM_CPU_0_REG) != 0) { }
+        }
+        else {
+            /* small delay of 3-4 instructions required here before we return */
+            __asm__ volatile ( "nop" );
+            __asm__ volatile ( "nop" );
+            __asm__ volatile ( "nop" );
+            __asm__ volatile ( "nop" );
+            __asm__ volatile ( "nop" );
+        }
     }
 }
 
