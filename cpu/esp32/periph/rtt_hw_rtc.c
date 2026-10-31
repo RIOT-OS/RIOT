@@ -59,6 +59,9 @@ typedef struct {
 
 static _rtc_alarm_t _rtc_alarm;
 
+/* minimum difference between the RTC counter and the alarm in RTC ticks */
+#define RTC_ALARM_MIN_DIFF  (3)
+
 /* we can't include soc/rtc.h because of rtc_init declaration conflicts */
 extern uint32_t esp_clk_slowclk_cal_get(void);
 
@@ -121,6 +124,16 @@ static void _rtc_set_alarm(uint32_t alarm, rtt_cb_t cb, void *arg)
     /* compute the time difference for 32.768 kHz as 32-bit value */
     uint64_t rtc_counter = _rtc_get_counter();
     uint32_t rtt_diff = alarm - rtc_counter;
+
+    /* The RTC timer alarm is only triggered if the counter reaches exactly
+     * the alarm value. If the alarm is already in the past, e.g., because the
+     * counter has been incremented in the meantime, or too close to the
+     * current counter value to be set in time, the alarm would be triggered
+     * only after a complete wrap-around of the 48-bit RTC counter. In this
+     * case, the alarm is set to the earliest possible time. */
+    if ((rtt_diff < RTC_ALARM_MIN_DIFF) || (rtt_diff > (UINT32_MAX >> 1))) {
+        rtt_diff = RTC_ALARM_MIN_DIFF;
+    }
 
     /* use computed time difference directly to set the RTC counter alarm */
     uint64_t rtc_alarm = (rtc_counter + rtt_diff) & RTT_HW_COUNTER_MAX;
@@ -223,6 +236,16 @@ static void _rtc_set_alarm(uint32_t alarm, rtt_cb_t cb, void *arg)
     /* compute the time difference for 32.768 kHz as 32-bit value */
     uint64_t rtc_counter = _rtc_get_counter();
     uint32_t rtt_diff = alarm - rtc_counter;
+
+    /* The RTC timer alarm is only triggered if the counter reaches exactly
+     * the alarm value. If the alarm is already in the past, e.g., because the
+     * counter has been incremented in the meantime, or too close to the
+     * current counter value to be set in time, the alarm would be triggered
+     * only after a complete wrap-around of the 48-bit RTC counter. In this
+     * case, the alarm is set to the earliest possible time. */
+    if ((rtt_diff < RTC_ALARM_MIN_DIFF) || (rtt_diff > (UINT32_MAX >> 1))) {
+        rtt_diff = RTC_ALARM_MIN_DIFF;
+    }
 
     /* use computed time difference directly to set the RTC counter alarm */
     uint64_t rtc_alarm = (rtc_counter + rtt_diff) & RTT_HW_COUNTER_MAX;

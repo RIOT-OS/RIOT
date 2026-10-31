@@ -60,11 +60,20 @@ extern "C" {
 /**
  * ESP32 specific RTC clock configuration
  */
-#define CONFIG_RTC_CLK_CAL_CYCLES                 1024
+#ifndef CONFIG_RTC_CLK_CAL_CYCLES
+#  if MODULE_ESP_RTC_TIMER_32K
+/* the 32 kHz crystal requires more cycles for calibration (ESP-IDF default) */
+#    define CONFIG_RTC_CLK_CAL_CYCLES             3000
+#  else
+#    define CONFIG_RTC_CLK_CAL_CYCLES             1024
+#  endif
+#endif
 
 #ifdef MODULE_ESP_RTC_TIMER_32K
 #  define CONFIG_RTC_EXT_CRYST_ADDIT_CURRENT_NONE 1
-#  define CONFIG_RTC_XTAL_CAL_RETRY               1
+#  ifndef CONFIG_RTC_XTAL_CAL_RETRY
+#    define CONFIG_RTC_XTAL_CAL_RETRY             1
+#  endif
 #  define CONFIG_ESP_SYSTEM_RTC_EXT_XTAL_BOOTSTRAP_CYCLES 5
 #endif
 
