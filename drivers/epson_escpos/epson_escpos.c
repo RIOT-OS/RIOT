@@ -23,7 +23,6 @@
 
 #include "container.h"
 #include "epson_escpos.h"
-#include "epson_escpos_profiles.h"
 #include "epson_escpos_constants.h"
 
 #define ENABLE_DEBUG 0
@@ -36,12 +35,12 @@ void epson_escpos_init(epson_escpos_t *dev,
                        const epson_escpos_profile_t *profile)
 {
     assert(dev && transport && transport->open && transport->close &&
-           transport->write);
+           transport->write && profile);
 
     memset(dev, 0, sizeof(*dev));
     dev->transport = transport;
     dev->transport_ctx = ctx;
-    dev->profile = profile ? profile : &epson_escpos_profile_default;
+    dev->profile = profile;
     dev->font = -1;
 }
 
@@ -312,16 +311,24 @@ int epson_escpos_print_and_feed(epson_escpos_t *dev, uint8_t n)
     return epson_escpos_raw(dev, cmd, sizeof(cmd));
 }
 
+/* true if the profile has at least one of the features */
+static bool _has_feature(const epson_escpos_t *dev, uint16_t features)
+{
+    return dev->profile->features & features;
+}
+
 int epson_escpos_cut(epson_escpos_t *dev, epson_escpos_cut_t mode, bool feed)
 {
     bool part;
 
     /* fall back to the other mode if the requested one is not supported */
     if (mode == EPSON_ESCPOS_CUT_PART) {
-        part = dev->profile->part_cut || !dev->profile->full_cut;
+        part = _has_feature(dev, EPSON_ESCPOS_FEATURE_PAPER_PART_CUT) ||
+               !_has_feature(dev, EPSON_ESCPOS_FEATURE_PAPER_FULL_CUT);
     }
     else {
-        part = !dev->profile->full_cut && dev->profile->part_cut;
+        part = !_has_feature(dev, EPSON_ESCPOS_FEATURE_PAPER_FULL_CUT) &&
+               _has_feature(dev, EPSON_ESCPOS_FEATURE_PAPER_PART_CUT);
     }
 
     if (!feed) {
@@ -336,7 +343,8 @@ int epson_escpos_cut(epson_escpos_t *dev, epson_escpos_cut_t mode, bool feed)
     if (res < 0) {
         return res;
     }
-    if (!dev->profile->full_cut && !dev->profile->part_cut) {
+    if (!_has_feature(dev, EPSON_ESCPOS_FEATURE_PAPER_FULL_CUT |
+                      EPSON_ESCPOS_FEATURE_PAPER_PART_CUT)) {
         return 0;
     }
     const uint8_t cmd[] = {
