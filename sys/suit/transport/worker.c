@@ -86,7 +86,7 @@ static kernel_pid_t _worker_pid = KERNEL_PID_UNDEF;
 int suit_handle_url(const char *url)
 {
     ssize_t size;
-    LOG_INFO("suit_worker: downloading \"%s\"\n", url);
+    LOG_DEBUG("suit_worker: downloading \"%s\"\n", url);
 
     if (0) {}
 #ifdef MODULE_SUIT_TRANSPORT_COAP
@@ -104,16 +104,16 @@ int suit_handle_url(const char *url)
     }
 #endif
     else {
-        LOG_WARNING("suit_worker: unsupported URL scheme!\n)");
+        LOG_WARNING("suit_worker: unsupported URL scheme!\n\t%s\n)", url);
         return -ENOTSUP;
     }
 
     if (size < 0) {
-        LOG_INFO("suit_worker: error getting manifest\n");
+        LOG_INFO("suit_worker: error getting manifest from %s\n", url);
         return size;
     }
 
-    LOG_INFO("suit_worker: got manifest with size %" PRIdSIZE "\n", size);
+    LOG_DEBUG("suit_worker: got manifest with size %" PRIdSIZE "\n", size);
 
     return suit_handle_manifest_buf(_manifest_buf, size);
 }
@@ -162,7 +162,7 @@ static void *_suit_worker_thread(void *arg)
 {
     (void)arg;
 
-    LOG_INFO("suit_worker: started.\n");
+    LOG_DEBUG("suit_worker: started.\n");
 
     int res;
     if (_url[0] == '\0') {
