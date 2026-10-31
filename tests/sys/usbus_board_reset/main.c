@@ -14,8 +14,6 @@
 #include <stdio.h>
 #include <string.h>
 
-#include "shell.h"
-
 #include "usb/usbus.h"
 #include "usb/usbus/cdc/acm.h"
 
@@ -23,8 +21,6 @@
 #include "usb/usbus/dfu.h"
 static usbus_dfu_device_t _dfu;
 #endif
-
-static char line_buf[SHELL_DEFAULT_BUFSIZE];
 
 static usbus_t _usbus;
 static char _stack[USBUS_STACKSIZE];
@@ -55,8 +51,6 @@ static void _init(void)
 int main(void)
 {
     _init();
-
-    shell_run(NULL, line_buf, ARRAY_SIZE(line_buf));
 
     return 0;
 }

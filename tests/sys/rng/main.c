@@ -245,8 +245,6 @@ SHELL_COMMAND(speed, "run speed test", cmd_speed);
 int main(void)
 {
     puts("Starting shell...");
-    static char line_buf[SHELL_DEFAULT_BUFSIZE];
-    shell_run(NULL, line_buf, SHELL_DEFAULT_BUFSIZE);
-
+    /* shell starts implicitly after returning */
     return 0;
 }
