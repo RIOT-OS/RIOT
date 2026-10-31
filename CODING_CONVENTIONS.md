@@ -173,6 +173,10 @@ of recognised exceptions where we can (or even must) rely on extensions include:
   `do`-statement, it goes into the same line.
 * Use curly braces even for one-line blocks. This improves debugging and later
   additions.
+* For long multiline conditions in `if-else`-statements, the opening bracket
+  should be placed in the next line to allow for a better distinction between
+  the conditions and the following code inside of the brackets, as they are
+  at the same or similar indentation levels. An example is given below.
 ```c
     /* instead of: */
     if (debug) println("DEBUG");
@@ -184,6 +188,19 @@ of recognised exceptions where we can (or even must) rely on extensions include:
     }
     else {
         println("DEBUG ELSE");
+    }
+
+    /* for multiline conditions: instead of: */
+    if (this_really_long_boolean_expression_it_barely_fits_in_a_single_line &&
+        this_is_another_very_long_expression) {
+        do_something();
+    }
+
+    /* write: */
+    if (this_really_long_boolean_expression_it_barely_fits_in_a_single_line &&
+        this_is_another_very_long_expression)
+    {
+        do_something();
     }
 ```
 * Commas are always followed by a space.
