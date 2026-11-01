@@ -99,15 +99,6 @@ _Static_assert(SPI_NUMOF == ARRAY_SIZE(_spi),
 _Static_assert(SPI_NUMOF <= SPI_NUMOF_MAX,
                "Number of defined SPI devices is greater than the number of supported devices");
 
-#define PERIPH_SPI1_MODULE  PERIPH_SPI_MODULE
-#if defined(CPU_FAM_ESP32)
-#  define PERIPH_SPI2_MODULE  PERIPH_HSPI_MODULE
-#  define PERIPH_SPI3_MODULE  PERIPH_VSPI_MODULE
-#elif defined(CPU_FAM_ESP32S2)
-#  define PERIPH_SPI2_MODULE  PERIPH_FSPI_MODULE
-#  define PERIPH_SPI3_MODULE  PERIPH_HSPI_MODULE
-#endif
-
 void IRAM_ATTR spi_init(spi_t bus)
 {
     DEBUG("%s bus=%u\n", __func__, bus);
@@ -128,21 +119,13 @@ void IRAM_ATTR spi_init(spi_t bus)
     }
 
     /* enable (power on) the according SPI module */
-    if (spi_config[bus].ctrl == SPI1_HOST) {
-        periph_module_enable(PERIPH_SPI1_MODULE);
-    }
-#if SOC_SPI_PERIPH_NUM > 1
-    else if (spi_config[bus].ctrl == SPI2_HOST) {
-        periph_module_enable(PERIPH_SPI2_MODULE);
-    }
-#endif
-#if SOC_SPI_PERIPH_NUM > 2
-    else if (spi_config[bus].ctrl == SPI3_HOST) {
-        periph_module_enable(PERIPH_SPI3_MODULE);
-    }
-#endif
-    else {
-        assert(false);
+    assert(spi_config[bus].ctrl < SOC_SPI_PERIPH_NUM);
+    PERIPH_RCC_ATOMIC() {
+        spi_ll_enable_bus_clock(spi_config[bus].ctrl, true);
+        /* SPI1 is shared with the SPI flash and must not be reset */
+        if (spi_config[bus].ctrl != SPI1_HOST) {
+            spi_ll_reset_register(spi_config[bus].ctrl);
+        }
     }
 
     /* initialize SPI peripheral */

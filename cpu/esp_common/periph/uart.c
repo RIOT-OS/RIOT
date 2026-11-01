@@ -96,7 +96,7 @@ struct uart_hw_t {
     uart_parity_t  parity;  /* used parity bits */
     uart_isr_ctx_t isr_ctx; /* callback functions */
 #if !defined(CPU_ESP8266)
-    uint8_t  mod;           /* peripheral hardware module of the UART interface */
+    uint8_t  port;          /* hardware port number of the UART interface */
     uint8_t  signal_txd;    /* TxD signal from the controller */
     uint8_t  signal_rxd;    /* RxD signal to the controller */
     uint8_t  int_src;       /* peripheral interrupt source used by the UART device */
@@ -113,7 +113,7 @@ static struct uart_hw_t _uarts[] = {
         .stop = UART_STOP_BITS_1,
         .parity = UART_PARITY_NONE,
 #if !defined(CPU_ESP8266)
-        .mod = PERIPH_UART0_MODULE,
+        .port = 0,
         .signal_txd = U0TXD_OUT_IDX,
         .signal_rxd = U0RXD_IN_IDX,
         .int_src = ETS_UART0_INTR_SOURCE
@@ -129,7 +129,7 @@ static struct uart_hw_t _uarts[] = {
         .data = UART_DATA_BITS_8,
         .stop = UART_STOP_BITS_1,
         .parity = UART_PARITY_NONE,
-        .mod = PERIPH_UART1_MODULE,
+        .port = 1,
         .signal_txd = U1TXD_OUT_IDX,
         .signal_rxd = U1RXD_IN_IDX,
         .int_src = ETS_UART1_INTR_SOURCE
@@ -144,7 +144,7 @@ static struct uart_hw_t _uarts[] = {
         .data = UART_DATA_BITS_8,
         .stop = UART_STOP_BITS_1,
         .parity = UART_PARITY_NONE,
-        .mod = PERIPH_UART2_MODULE,
+        .port = 2,
         .signal_txd = U2TXD_OUT_IDX,
         .signal_rxd = U2RXD_IN_IDX,
         .int_src = ETS_UART2_INTR_SOURCE
@@ -234,12 +234,25 @@ void uart_write(uart_t uart, const uint8_t *data, size_t len)
     }
 }
 
+#ifndef CPU_ESP8266
+static void _uart_module_enable(uart_t uart, bool enable)
+{
+    /* enable/disable the bus clock of the UART module and reset it on enable */
+    PERIPH_RCC_ATOMIC() {
+        uart_ll_enable_bus_clock(_uarts[uart].port, enable);
+        if (enable) {
+            uart_ll_reset_register(_uarts[uart].port);
+        }
+    }
+}
+#endif
+
 void uart_poweron(uart_t uart)
 {
     assert(uart < UART_NUMOF);
 
 #ifndef CPU_ESP8266
-    periph_module_enable(_uarts[uart].mod);
+    _uart_module_enable(uart, true);
 #endif
     _uart_config(uart);
 }
@@ -249,7 +262,7 @@ void uart_poweroff(uart_t uart)
     assert(uart < UART_NUMOF);
 
 #ifndef CPU_ESP8266
-    periph_module_disable(_uarts[uart].mod);
+    _uart_module_enable(uart, false);
 #endif
 }
 
