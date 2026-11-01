@@ -23,7 +23,6 @@
  * |---------------------|--------------------------------------------|
  * | `epson_escpos_tcp`  | TCP connection (raw port 9100) via `sock`  |
  * | `epson_escpos_uart` | Serial connection via `periph_uart`        |
- * | `epson_escpos_dummy`| Writes into a memory buffer (for testing)  |
  *
  * The `epson_escpos_tcp` driver uses lwIP4 as a backend, as the printers
  * available during development only support IPv4.
@@ -85,9 +84,7 @@ extern "C" {
  * @ingroup     config_drivers_misc
  * @{
  */
-/**
- * @brief   Size of the transmit buffer in the device descriptor in bytes
- */
+/** @brief   Size of the transmit buffer in the device descriptor in bytes */
 #ifndef CONFIG_EPSON_ESCPOS_BUF_SIZE
 #  define CONFIG_EPSON_ESCPOS_BUF_SIZE      (64U)
 #endif
@@ -102,30 +99,22 @@ extern "C" {
 #  define CONFIG_EPSON_ESCPOS_READ_TIMEOUT_MS   (3000U)
 #endif
 
-/**
- * @brief   Default TCP port of the printer
- */
+/** @brief   Default TCP port of the printer */
 #ifndef CONFIG_EPSON_ESCPOS_TCP_PORT
 #  define CONFIG_EPSON_ESCPOS_TCP_PORT      (9100U)
 #endif
 
-/**
- * @brief   Default IPv4 address of the printer for the TCP transport
- */
+/** @brief   Default IPv4 address of the printer for the TCP transport */
 #ifndef CONFIG_EPSON_ESCPOS_TCP_HOST
 #  define CONFIG_EPSON_ESCPOS_TCP_HOST      "192.168.1.100"
 #endif
 
-/**
- * @brief   Default UART device index for the UART transport
- */
+/** @brief   Default UART device index for the UART transport */
 #ifndef CONFIG_EPSON_ESCPOS_UART_DEV
 #  define CONFIG_EPSON_ESCPOS_UART_DEV      1
 #endif
 
-/**
- * @brief   Default baud rate for the UART transport
- */
+/** @brief   Default baud rate for the UART transport */
 #ifndef CONFIG_EPSON_ESCPOS_UART_BAUDRATE
 #  define CONFIG_EPSON_ESCPOS_UART_BAUDRATE 9600
 #endif
@@ -187,13 +176,10 @@ typedef struct {
     ssize_t (*read)(void *ctx, void *data, size_t len, uint32_t timeout_ms);
 } epson_escpos_transport_t;
 
-/**
- * @brief   Code page of a printer profile
- */
+/** @brief   Code page of a printer profile */
 typedef struct {
-    uint8_t page;               /**< code page number for ESC t */
-    const char *encoding;       /**< name of the encoding (e.g. "CP437"),
-                                     NULL if unknown */
+    uint8_t page;           /**< code page number for ESC t */
+    const char *encoding;   /**< name of the encoding (e.g. "CP437"), NULL if unknown */
 } epson_escpos_codepage_t;
 
 /**
@@ -205,23 +191,20 @@ typedef struct {
  * available profiles and features.
  */
 typedef struct {
-    const char *name;           /**< model name */
-    const char *vendor;         /**< vendor name */
-    uint16_t features;          /**< supported features,
-                                     see EPSON_ESCPOS_FEATURE_* */
-    uint8_t num_fonts;          /**< number of available fonts */
-    const uint8_t *columns;     /**< characters per line for each font */
-    uint16_t width_mm;          /**< paper width in mm, 0 if unknown */
-    uint16_t width_px;          /**< print width in dots, 0 if unknown */
-    uint16_t dpi;               /**< resolution in dpi, 0 if unknown */
-    uint8_t num_codepages;      /**< number of entries in @p codepages */
+    const char *name;       /**< model name */
+    const char *vendor;     /**< vendor name */
+    uint16_t features;      /**< supported features, see EPSON_ESCPOS_FEATURE_* */
+    uint8_t num_fonts;      /**< number of available fonts */
+    const uint8_t *columns; /**< characters per line for each font */
+    uint16_t width_mm;      /**< paper width in mm, 0 if unknown */
+    uint16_t width_px;      /**< print width in dots, 0 if unknown */
+    uint16_t dpi;           /**< resolution in dpi, 0 if unknown */
+    uint8_t num_codepages;  /**< number of entries in @p codepages */
     /** supported code pages */
     const epson_escpos_codepage_t *codepages;
 } epson_escpos_profile_t;
 
-/**
- * @brief   Device descriptor
- */
+/** @brief   Device descriptor */
 typedef struct {
     const epson_escpos_transport_t *transport;  /**< transport */
     void *transport_ctx;                        /**< transport context */
@@ -232,35 +215,27 @@ typedef struct {
     bool is_open;                               /**< connection is open */
 } epson_escpos_t;
 
-/**
- * @brief   Horizontal alignment
- */
+/** @brief   Horizontal alignment */
 typedef enum {
     EPSON_ESCPOS_ALIGN_LEFT = 0,    /**< left justification */
     EPSON_ESCPOS_ALIGN_CENTER,      /**< centering */
     EPSON_ESCPOS_ALIGN_RIGHT,       /**< right justification */
 } epson_escpos_align_t;
 
-/**
- * @brief   Fonts
- */
+/** @brief   Fonts */
 typedef enum {
     EPSON_ESCPOS_FONT_A = 0,        /**< font A */
     EPSON_ESCPOS_FONT_B,            /**< font B */
 } epson_escpos_font_t;
 
-/**
- * @brief   Underline modes
- */
+/** @brief   Underline modes */
 typedef enum {
     EPSON_ESCPOS_UNDERLINE_OFF = 0, /**< underline off */
     EPSON_ESCPOS_UNDERLINE_1DOT,    /**< 1-dot thick underline */
     EPSON_ESCPOS_UNDERLINE_2DOT,    /**< 2-dot thick underline */
 } epson_escpos_underline_t;
 
-/**
- * @brief   Text sizes
- */
+/** @brief   Text sizes */
 typedef enum {
     EPSON_ESCPOS_SIZE_NORMAL = 0,   /**< normal size */
     EPSON_ESCPOS_SIZE_2H,           /**< double height */
@@ -294,21 +269,18 @@ typedef enum {
  * python-escpos.
  */
 typedef struct {
-    uint16_t fields;                /**< fields to apply, see EPSON_ESCPOS_STYLE_* */
-    epson_escpos_align_t align;     /**< horizontal alignment */
-    epson_escpos_font_t font;       /**< font */
-    bool bold;                      /**< emphasized text */
+    uint16_t fields;            /**< fields to apply, see EPSON_ESCPOS_STYLE_* */
+    epson_escpos_align_t align; /**< horizontal alignment */
+    epson_escpos_font_t font;   /**< font */
+    bool bold;                  /**< emphasized text */
     epson_escpos_underline_t underline; /**< underline mode */
-    epson_escpos_size_t size;       /**< text size */
-    uint8_t width;                  /**< width multiplier (1-8) for
-                                         @ref EPSON_ESCPOS_SIZE_CUSTOM */
-    uint8_t height;                 /**< height multiplier (1-8) for
-                                         @ref EPSON_ESCPOS_SIZE_CUSTOM */
-    uint8_t density;                /**< print density 0-8 (4 is 0%),
-                                         9 leaves it unchanged */
-    bool invert;                    /**< white on black printing */
-    bool smooth;                    /**< smoothing (for large text) */
-    bool flip;                      /**< upside-down printing */
+    epson_escpos_size_t size;   /**< text size */
+    uint8_t width;              /**< width multiplier (1-8) for @ref EPSON_ESCPOS_SIZE_CUSTOM */
+    uint8_t height;             /**< height multiplier (1-8) for @ref EPSON_ESCPOS_SIZE_CUSTOM */
+    uint8_t density;            /**< print density 0-8 (4 is 0%), 9 leaves it unchanged */
+    bool invert;                /**< white on black printing */
+    bool smooth;                /**< smoothing (for large text) */
+    bool flip;                  /**< upside-down printing */
 } epson_escpos_style_t;
 
 /**
@@ -331,26 +303,20 @@ typedef struct {
         .flip = false,                              \
     }
 
-/**
- * @brief   Cut modes
- */
+/** @brief   Cut modes */
 typedef enum {
     EPSON_ESCPOS_CUT_FULL = 0,      /**< full cut */
     EPSON_ESCPOS_CUT_PART,          /**< partial cut */
 } epson_escpos_cut_t;
 
-/**
- * @brief   Hardware operations
- */
+/** @brief   Hardware operations */
 typedef enum {
     EPSON_ESCPOS_HW_INIT = 0,       /**< clear buffer and reset modes (ESC \@) */
     EPSON_ESCPOS_HW_SELECT,         /**< select the printer */
     EPSON_ESCPOS_HW_RESET,          /**< reset printer hardware */
 } epson_escpos_hw_t;
 
-/**
- * @brief   Control characters
- */
+/** @brief   Control characters */
 typedef enum {
     EPSON_ESCPOS_CTL_LF = 0,        /**< line feed */
     EPSON_ESCPOS_CTL_FF,            /**< form feed */
@@ -359,9 +325,7 @@ typedef enum {
     EPSON_ESCPOS_CTL_VT,            /**< vertical tab */
 } epson_escpos_ctl_t;
 
-/**
- * @brief   Paper status
- */
+/** @brief   Paper status */
 typedef enum {
     EPSON_ESCPOS_PAPER_EMPTY = 0,   /**< no paper */
     EPSON_ESCPOS_PAPER_NEAR_END,    /**< paper near end */
@@ -668,25 +632,19 @@ int epson_escpos_paper_status(epson_escpos_t *dev);
  * @name    TCP transport
  * @{
  */
-/**
- * @brief   Parameters of the TCP transport
- */
+/** @brief   Parameters of the TCP transport */
 typedef struct {
     const char *host;       /**< IPv4 address of the printer */
     uint16_t port;          /**< TCP port of the printer */
 } epson_escpos_tcp_params_t;
 
-/**
- * @brief   Context of the TCP transport
- */
+/** @brief   Context of the TCP transport */
 typedef struct {
     sock_tcp_t sock;        /**< socket */
     sock_tcp_ep_t remote;   /**< printer address */
 } epson_escpos_tcp_t;
 
-/**
- * @brief   TCP transport
- */
+/** @brief   TCP transport */
 extern const epson_escpos_transport_t epson_escpos_tcp_transport;
 
 /**
@@ -708,37 +666,28 @@ int epson_escpos_tcp_setup(epson_escpos_tcp_t *tcp,
  * @name    UART transport
  * @{
  */
-/**
- * @brief   Size of the receive buffer of the UART transport
- */
-#ifndef CONFIG_EPSON_ESCPOS_UART_RX_BUF_SIZE
-#  define CONFIG_EPSON_ESCPOS_UART_RX_BUF_SIZE  (16U)
-#endif
+/** @brief   Size of the receive buffer of the UART transport */
+#  ifndef CONFIG_EPSON_ESCPOS_UART_RX_BUF_SIZE
+#    define CONFIG_EPSON_ESCPOS_UART_RX_BUF_SIZE  (16U)
+#  endif
 
-/**
- * @brief   Parameters of the UART transport
- */
+/** @brief   Parameters of the UART transport */
 typedef struct {
-    uart_t uart;            /**< UART device */
-    uint32_t baudrate;      /**< baud rate */
-    gpio_t busy_pin;        /**< input connected to the BUSY (DTR/DSR) line of
-                                 the printer, GPIO_UNDEF if not used */
-    bool busy_level;        /**< level of @p busy_pin while the printer
-                                 is busy */
+    uart_t uart;        /**< UART device */
+    uint32_t baudrate;  /**< baud rate */
+    gpio_t busy_pin;    /**< input connected to the BUSY (DTR/DSR) line of
+                             the printer, GPIO_UNDEF if not used */
+    bool busy_level;    /**< level of @p busy_pin while the printer is busy */
 } epson_escpos_uart_params_t;
 
-/**
- * @brief   Context of the UART transport
- */
+/** @brief   Context of the UART transport */
 typedef struct {
     const epson_escpos_uart_params_t *params;             /**< parameters */
     isrpipe_t rx;                                         /**< receive pipe */
     uint8_t rx_buf[CONFIG_EPSON_ESCPOS_UART_RX_BUF_SIZE]; /**< rx buffer */
 } epson_escpos_uart_t;
 
-/**
- * @brief   UART transport
- */
+/** @brief   UART transport */
 extern const epson_escpos_transport_t epson_escpos_uart_transport;
 
 /**
@@ -749,44 +698,7 @@ extern const epson_escpos_transport_t epson_escpos_uart_transport;
  *
  * @retval  0 on success
  */
-int epson_escpos_uart_setup(epson_escpos_uart_t *uart,
-                            const epson_escpos_uart_params_t *params);
-/** @} */
-#endif
-
-#if defined(MODULE_EPSON_ESCPOS_DUMMY) || defined(DOXYGEN)
-/**
- * @name    Dummy transport
- * @{
- */
-/**
- * @brief   Context of the dummy transport
- *
- * All written data is appended to @p buf. Data read from the printer is taken
- * from @p rx.
- */
-typedef struct {
-    uint8_t *buf;           /**< output buffer */
-    size_t size;            /**< size of @p buf */
-    size_t len;             /**< number of bytes in @p buf */
-    const uint8_t *rx;      /**< data returned by read, may be NULL */
-    size_t rx_len;          /**< remaining bytes in @p rx */
-} epson_escpos_dummy_t;
-
-/**
- * @brief   Dummy transport
- */
-extern const epson_escpos_transport_t epson_escpos_dummy_transport;
-
-/**
- * @brief   Set up the context of the dummy transport
- *
- * @param[out] dummy    transport context
- * @param[in]  buf      output buffer
- * @param[in]  size     size of @p buf
- */
-void epson_escpos_dummy_setup(epson_escpos_dummy_t *dummy, uint8_t *buf,
-                              size_t size);
+int epson_escpos_uart_setup(epson_escpos_uart_t *uart, const epson_escpos_uart_params_t *params);
 /** @} */
 #endif
 

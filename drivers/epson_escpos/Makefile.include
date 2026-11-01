@@ -1,4 +1,3 @@
-PSEUDOMODULES += epson_escpos_dummy
 PSEUDOMODULES += epson_escpos_tcp
 PSEUDOMODULES += epson_escpos_uart
 

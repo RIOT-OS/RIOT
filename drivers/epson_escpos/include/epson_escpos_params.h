@@ -26,8 +26,8 @@ extern "C" {
  * @name    Default printer profile
  * @{
  */
-#ifndef EPSON_ESCPOS_PARAM_PROFILE
 /** @brief printer profile */
+#ifndef EPSON_ESCPOS_PARAM_PROFILE
 #  define EPSON_ESCPOS_PARAM_PROFILE        (&epson_escpos_profile_tm_t88iv)
 #endif
 /** @} */
@@ -35,22 +35,16 @@ extern "C" {
 #if defined(MODULE_EPSON_ESCPOS_TCP) || defined(DOXYGEN)
 /**
  * @name    Default parameters of the TCP transport
+ *
+ * The address and port of the printer are configured with
+ * @ref CONFIG_EPSON_ESCPOS_TCP_HOST and @ref CONFIG_EPSON_ESCPOS_TCP_PORT.
  * @{
  */
-#ifndef EPSON_ESCPOS_PARAM_TCP_HOST
-/** @brief IPv4 address of the printer */
-#  define EPSON_ESCPOS_PARAM_TCP_HOST       CONFIG_EPSON_ESCPOS_TCP_HOST
-#endif
-#ifndef EPSON_ESCPOS_PARAM_TCP_PORT
-/** @brief TCP port of the printer */
-#  define EPSON_ESCPOS_PARAM_TCP_PORT       (CONFIG_EPSON_ESCPOS_TCP_PORT)
-#endif
-
-#ifndef EPSON_ESCPOS_TCP_PARAMS
 /** @brief TCP transport parameters */
-#  define EPSON_ESCPOS_TCP_PARAMS   { .host = EPSON_ESCPOS_PARAM_TCP_HOST, \
-                                      .port = EPSON_ESCPOS_PARAM_TCP_PORT }
-#endif
+#  ifndef EPSON_ESCPOS_TCP_PARAMS
+#    define EPSON_ESCPOS_TCP_PARAMS     { .host = CONFIG_EPSON_ESCPOS_TCP_HOST, \
+                                          .port = CONFIG_EPSON_ESCPOS_TCP_PORT }
+#  endif
 /** @} */
 
 /**
@@ -64,32 +58,27 @@ static const epson_escpos_tcp_params_t epson_escpos_tcp_params[] = {
 #if defined(MODULE_EPSON_ESCPOS_UART) || defined(DOXYGEN)
 /**
  * @name    Default parameters of the UART transport
+ *
+ * The UART device and baud rate are configured with
+ * @ref CONFIG_EPSON_ESCPOS_UART_DEV and @ref CONFIG_EPSON_ESCPOS_UART_BAUDRATE.
  * @{
  */
-#ifndef EPSON_ESCPOS_PARAM_UART_DEV
-/** @brief UART device */
-#  define EPSON_ESCPOS_PARAM_UART_DEV       UART_DEV(CONFIG_EPSON_ESCPOS_UART_DEV)
-#endif
-#ifndef EPSON_ESCPOS_PARAM_UART_BAUDRATE
-/** @brief baud rate */
-#  define EPSON_ESCPOS_PARAM_UART_BAUDRATE  (CONFIG_EPSON_ESCPOS_UART_BAUDRATE)
-#endif
-#ifndef EPSON_ESCPOS_PARAM_UART_BUSY_PIN
 /** @brief BUSY input, GPIO_UNDEF if not used */
-#  define EPSON_ESCPOS_PARAM_UART_BUSY_PIN  GPIO_UNDEF
-#endif
-#ifndef EPSON_ESCPOS_PARAM_UART_BUSY_LEVEL
+#  ifndef EPSON_ESCPOS_PARAM_UART_BUSY_PIN
+#    define EPSON_ESCPOS_PARAM_UART_BUSY_PIN    GPIO_UNDEF
+#  endif
 /** @brief level of the BUSY input while busy */
-#  define EPSON_ESCPOS_PARAM_UART_BUSY_LEVEL    (true)
-#endif
+#  ifndef EPSON_ESCPOS_PARAM_UART_BUSY_LEVEL
+#    define EPSON_ESCPOS_PARAM_UART_BUSY_LEVEL  (true)
+#  endif
 
-#ifndef EPSON_ESCPOS_UART_PARAMS
+#  ifndef EPSON_ESCPOS_UART_PARAMS
 /** @brief UART transport parameters */
-#  define EPSON_ESCPOS_UART_PARAMS  { .uart = EPSON_ESCPOS_PARAM_UART_DEV,      \
-                                      .baudrate = EPSON_ESCPOS_PARAM_UART_BAUDRATE, \
-                                      .busy_pin = EPSON_ESCPOS_PARAM_UART_BUSY_PIN, \
-                                      .busy_level = EPSON_ESCPOS_PARAM_UART_BUSY_LEVEL }
-#endif
+#    define EPSON_ESCPOS_UART_PARAMS    { .uart = UART_DEV(CONFIG_EPSON_ESCPOS_UART_DEV), \
+                                          .baudrate = CONFIG_EPSON_ESCPOS_UART_BAUDRATE,  \
+                                          .busy_pin = EPSON_ESCPOS_PARAM_UART_BUSY_PIN,   \
+                                          .busy_level = EPSON_ESCPOS_PARAM_UART_BUSY_LEVEL }
+#  endif
 /** @} */
 
 /**

@@ -36,8 +36,7 @@ int epson_escpos_tcp_setup(epson_escpos_tcp_t *tcp,
     tcp->remote.netif = SOCK_ADDR_ANY_NETIF;
     tcp->remote.port = params->port;
 
-    if (!ipv4_addr_from_str((ipv4_addr_t *)&tcp->remote.addr.ipv4,
-                            params->host)) {
+    if (!ipv4_addr_from_str((ipv4_addr_t *)&tcp->remote.addr.ipv4, params->host)) {
         DEBUG("[epson_escpos_tcp] invalid host: %s\n", params->host);
         return -EINVAL;
     }
