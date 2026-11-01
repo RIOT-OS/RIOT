@@ -1,9 +1,10 @@
 include ../Makefile.drivers_common
 
-# Transport to use: tcp, uart or dummy
+# Transport to use: tcp or uart
 ESCPOS_TRANSPORT ?= tcp
 
 USEMODULE += epson_escpos_$(ESCPOS_TRANSPORT)
+USEMODULE += fmt
 USEMODULE += shell
 USEMODULE += shell_cmds_default
 
@@ -16,7 +17,7 @@ ifeq (tcp,$(ESCPOS_TRANSPORT))
 
   # IP address (and optionally port) of the printer
   ESCPOS_HOST ?= 192.168.178.59
-  CFLAGS += -DEPSON_ESCPOS_PARAM_TCP_HOST=\"$(ESCPOS_HOST)\"
+  CFLAGS += -DCONFIG_EPSON_ESCPOS_TCP_HOST=\"$(ESCPOS_HOST)\"
 
   # Use DHCP if set to 1, otherwise the static address below is configured
   ESCPOS_DHCP ?= 0

@@ -2,7 +2,8 @@
 
 This test compares the output of the Epson ESC/POS driver with the output of
 [python-escpos](https://github.com/python-escpos/python-escpos), from which the
-driver was ported. It uses the dummy transport, so no printer is required.
+driver was ported. It uses a dummy transport writing into a memory buffer, so
+no printer is required.
 
 # Usage
 

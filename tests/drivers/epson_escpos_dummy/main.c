@@ -25,14 +25,75 @@
 
 #include "vectors.h"
 
+/**
+ * @brief   Context of the dummy transport
+ *
+ * All written data is appended to @p buf. Data read from the printer is taken
+ * from @p rx.
+ */
+typedef struct {
+    uint8_t buf[256];       /**< output buffer */
+    size_t len;             /**< number of bytes in @p buf */
+    const uint8_t *rx;      /**< data returned by read, may be NULL */
+    size_t rx_len;          /**< remaining bytes in @p rx */
+} dummy_t;
+
 static epson_escpos_t _dev;
-static epson_escpos_dummy_t _dummy;
-static uint8_t _buf[256];
+static dummy_t _dummy;
+
+static int _dummy_open(void *ctx)
+{
+    (void)ctx;
+    return 0;
+}
+
+static void _dummy_close(void *ctx)
+{
+    (void)ctx;
+}
+
+static int _dummy_write(void *ctx, const void *data, size_t len)
+{
+    dummy_t *dummy = ctx;
+
+    if (len > sizeof(dummy->buf) - dummy->len) {
+        return -ENOBUFS;
+    }
+    memcpy(&dummy->buf[dummy->len], data, len);
+    dummy->len += len;
+    return 0;
+}
+
+static ssize_t _dummy_read(void *ctx, void *data, size_t len,
+                           uint32_t timeout_ms)
+{
+    dummy_t *dummy = ctx;
+    (void)timeout_ms;
+
+    if (dummy->rx_len == 0) {
+        return -ETIMEDOUT;
+    }
+    if (len > dummy->rx_len) {
+        len = dummy->rx_len;
+    }
+    memcpy(data, dummy->rx, len);
+    dummy->rx += len;
+    dummy->rx_len -= len;
+    return len;
+}
+
+/* transport writing into a memory buffer instead of a printer */
+static const epson_escpos_transport_t _dummy_transport = {
+    .open = _dummy_open,
+    .close = _dummy_close,
+    .write = _dummy_write,
+    .read = _dummy_read,
+};
 
 static void _setup(void)
 {
-    epson_escpos_dummy_setup(&_dummy, _buf, sizeof(_buf));
-    epson_escpos_init(&_dev, &epson_escpos_dummy_transport, &_dummy,
+    memset(&_dummy, 0, sizeof(_dummy));
+    epson_escpos_init(&_dev, &_dummy_transport, &_dummy,
                       &epson_escpos_profile_tm_t88iv);
     TEST_ASSERT_EQUAL_INT(0, epson_escpos_open(&_dev));
 }
@@ -41,7 +102,7 @@ static void _check_output(const uint8_t *expected, size_t len)
 {
     TEST_ASSERT_EQUAL_INT(0, epson_escpos_flush(&_dev));
     TEST_ASSERT_EQUAL_INT(len, _dummy.len);
-    TEST_ASSERT(memcmp(expected, _buf, len) == 0);
+    TEST_ASSERT(memcmp(expected, _dummy.buf, len) == 0);
 }
 
 #define CHECK(vec)  _check_output(vec, sizeof(vec))
@@ -305,9 +366,9 @@ static void test_long_text(void)
     TEST_ASSERT_EQUAL_INT(0, epson_escpos_text(&_dev, " <"));
     TEST_ASSERT_EQUAL_INT(0, epson_escpos_flush(&_dev));
     TEST_ASSERT_EQUAL_INT(sizeof(txt) - 1 + 4, _dummy.len);
-    TEST_ASSERT(memcmp(_buf, "> ", 2) == 0);
-    TEST_ASSERT(memcmp(_buf + 2, txt, sizeof(txt) - 1) == 0);
-    TEST_ASSERT(memcmp(_buf + 2 + sizeof(txt) - 1, " <", 2) == 0);
+    TEST_ASSERT(memcmp(_dummy.buf, "> ", 2) == 0);
+    TEST_ASSERT(memcmp(_dummy.buf + 2, txt, sizeof(txt) - 1) == 0);
+    TEST_ASSERT(memcmp(_dummy.buf + 2 + sizeof(txt) - 1, " <", 2) == 0);
 }
 
 static void test_status(void)

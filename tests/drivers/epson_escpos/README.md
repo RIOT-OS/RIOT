@@ -6,8 +6,8 @@ the paper and query the printer status.
 
 # Usage
 
-The transport is selected with `ESCPOS_TRANSPORT` (`tcp`, `uart` or `dummy`,
-default: `tcp`).
+The transport is selected with `ESCPOS_TRANSPORT` (`tcp` or `uart`, default:
+`tcp`).
 
 ## TCP
 
@@ -43,8 +43,8 @@ make BOARD=native ESCPOS_HOST=192.168.178.59 all term
 
 ## UART
 
-The UART device and baud rate are set with `EPSON_ESCPOS_PARAM_UART_DEV` and
-`EPSON_ESCPOS_PARAM_UART_BAUDRATE`. If the BUSY line of the printer is
+The UART device and baud rate are set with `CONFIG_EPSON_ESCPOS_UART_DEV` and
+`CONFIG_EPSON_ESCPOS_UART_BAUDRATE`. If the BUSY line of the printer is
 connected to a GPIO, set `EPSON_ESCPOS_PARAM_UART_BUSY_PIN` to enable flow
 control.
 
