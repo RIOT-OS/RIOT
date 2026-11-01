@@ -110,6 +110,7 @@ ifneq (,$(filter shell_cmds_default,$(USEMODULE)))
   endif
   ifneq (,$(filter semtech-loramac,$(USEPKG)))
     USEMODULE += shell_cmd_semtech-loramac
+    USEMODULE += fmt
   endif
   ifneq (,$(filter sntp,$(USEMODULE)))
     USEMODULE += shell_cmd_sntp
