@@ -53,6 +53,7 @@ def testfunc(child):
         child.expect_exact("Calling test_tcp_read4__success_non_blocking()")
         child.expect_exact("Calling test_tcp_write4__ENOTCONN()")
         child.expect_exact("Calling test_tcp_write4__success()")
+        child.expect_exact("Calling test_tcp_write4__success_multiple()")
     if _ipv6_tests(code):
         if _reuse_tests(code):
             child.expect_exact("Calling test_tcp_connect6__EADDRINUSE()")
@@ -84,6 +85,7 @@ def testfunc(child):
         child.expect_exact("Calling test_tcp_read6__success_non_blocking()")
         child.expect_exact("Calling test_tcp_write6__ENOTCONN()")
         child.expect_exact("Calling test_tcp_write6__success()")
+        child.expect_exact("Calling test_tcp_write6__success_multiple()")
     child.expect_exact(u"ALL TESTS SUCCESSFUL")
 
 
