@@ -343,5 +343,11 @@ void stmclk_init_sysclk(void)
         stmclk_disable_hsi();
     }
 
+#if IS_USED(MODULE_PERIPH_USBDEV) && defined(RCC_CR2_HSI48ON)
+    /* USB is clocked by HSI48 so enable this clock when the peripheral is used */
+    RCC->CR2 |= RCC_CR2_HSI48ON;
+    while (!(RCC->CR2 & RCC_CR2_HSI48RDY)) {}
+#endif
+
     irq_restore(is);
 }
