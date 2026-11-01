@@ -64,6 +64,11 @@ static sock_tcp_queue_t _queue, _server_queue;
 static sock_tcp_ep_t _server_addr;
 static kernel_pid_t _server, _client;
 
+static const struct iovec _exp_data_multiple = {
+    .iov_base = "Hello!World!RIOT!!",
+    .iov_len = sizeof("Hello!World!RIOT!!") - 1
+};
+
 #define CALL(fn)            puts("Calling " # fn); fn; tear_down()
 
 static void *_server_func(void *arg);
@@ -537,8 +542,6 @@ static void test_tcp_write4__success_multiple(void)
                                           .port = _TEST_PORT_REMOTE,
                                           .netif = SOCK_ADDR_ANY_NETIF };
     msg_t msg = { .type = _SERVER_MSG_START };
-    static const struct iovec exp_data = { .iov_base = "Hello!World!RIOT!!",
-                                           .iov_len = sizeof("Hello!World!RIOT!!") - 1 };
 
     _server_addr.family = AF_INET;
     _server_addr.port = _TEST_PORT_REMOTE;
@@ -550,9 +553,10 @@ static void test_tcp_write4__success_multiple(void)
 
     expect(0 == sock_tcp_connect(&_sock, &remote, 0, SOCK_FLAGS_REUSE_EP));
     msg.type = _SERVER_MSG_READ;
-    msg.content.ptr = (void *)&exp_data;
+    msg.content.ptr = (void *)&_exp_data_multiple;
     msg_send(&msg, _server);        /* read expected data at server */
-    /* write the data in chunks of the same size back to back */
+    /* write the data in chunks of the same size back to back to make buffer reuse
+     * by the allocator more likely, making the corruption (more) deterministic */
     expect(6 == sock_tcp_write(&_sock, "Hello!", 6));
     expect(6 == sock_tcp_write(&_sock, "World!", 6));
     expect(6 == sock_tcp_write(&_sock, "RIOT!!", 6));
@@ -1012,8 +1016,6 @@ static void test_tcp_write6__success_multiple(void)
                                           .port = _TEST_PORT_REMOTE,
                                           .netif = SOCK_ADDR_ANY_NETIF };
     msg_t msg = { .type = _SERVER_MSG_START };
-    static const struct iovec exp_data = { .iov_base = "Hello!World!RIOT!!",
-                                           .iov_len = sizeof("Hello!World!RIOT!!") - 1 };
 
     _server_addr.family = AF_INET6;
     _server_addr.port = _TEST_PORT_REMOTE;
@@ -1025,9 +1027,10 @@ static void test_tcp_write6__success_multiple(void)
 
     expect(0 == sock_tcp_connect(&_sock, &remote, 0, SOCK_FLAGS_REUSE_EP));
     msg.type = _SERVER_MSG_READ;
-    msg.content.ptr = (void *)&exp_data;
+    msg.content.ptr = (void *)&_exp_data_multiple;
     msg_send(&msg, _server);        /* read expected data at server */
-    /* write the data in chunks of the same size back to back */
+    /* write the data in chunks of the same size back to back to make buffer reuse
+     * by the allocator more likely, making the corruption (more) deterministic */
     expect(6 == sock_tcp_write(&_sock, "Hello!", 6));
     expect(6 == sock_tcp_write(&_sock, "World!", 6));
     expect(6 == sock_tcp_write(&_sock, "RIOT!!", 6));
