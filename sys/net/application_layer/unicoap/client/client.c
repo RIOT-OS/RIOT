@@ -11,8 +11,11 @@
  * @author  Carl Seifert <carl.seifert@tu-dresden.de>
  */
 
+#include <alloca.h>
+#include <assert.h>
 #include <errno.h>
 #include <string.h>
+#include <sys/errno.h>
 
 #include "mutex.h"
 #include "net/netif.h"
@@ -96,14 +99,26 @@ int unicoap_client_send_request_part(unicoap_packet_t* packet, unicoap_client_me
 {
     int res = 0;
 
-    if (memo) {
-        // Instead of a temporary buffer, it's fine to reference the memo token buffer
-        // as the memo outlives or lives as long as the packet.
-        packet->properties.token = memo->token;
+    if (likely(!packet->properties.token)) {
+        if (CONFIG_UNICOAP_GENERATED_TOKEN_LENGTH > 0) {
+            if (likely(memo)) {
+                packet->properties.token = memo->token;
+            } else {
+                /* This is the slow path: No memo is unlikely: NON and no callback.
+                * So token buffer will most likely every time the one in the memo.
+                * Thus, no reason to always make a stack allocation for the token buffer. */
+                if (!(packet->properties.token = alloca(CONFIG_UNICOAP_GENERATED_TOKEN_LENGTH))) {
+                    _CLIENT_DEBUG("failed to alloca token buf\n");
+                    return -ENOMEM;
+                }
+            }
+            unicoap_generate_token(packet->properties.token);
+            packet->properties.token_length = CONFIG_UNICOAP_GENERATED_TOKEN_LENGTH;
+        } else {
+            packet->properties.token_length = 0;
+        }
     }
-    assert(packet->properties.token);
-    unicoap_generate_token(packet->properties.token);
-    packet->properties.token_length = CONFIG_UNICOAP_GENERATED_TOKEN_LENGTH;
+
     unicoap_messaging_flags_t messaging_flags = _messaging_flags_client(request_flags);
     if (memo) {
         /* State has been allocated, instruct the messaging layer to track success/failures
@@ -149,13 +164,8 @@ int unicoap_client_send_request_body(unicoap_message_t* request,
         }
     }
 
-    uint8_t token[CONFIG_UNICOAP_GENERATED_TOKEN_LENGTH];
     unicoap_packet_t packet = { .remote = endpoint,
-                                .message = request,
-                                .properties = {
-                                    .token = token,
-                                    .token_length = sizeof(token)
-                                } };
+                                .message = request };
 
     if (unicoap_callback_is_present(callback)) {
         _CLIENT_DEBUG("need a memo\n");

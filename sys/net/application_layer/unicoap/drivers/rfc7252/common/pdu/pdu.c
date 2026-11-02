@@ -14,6 +14,7 @@
 #include <errno.h>
 #include <stdint.h>
 
+#include "compiler_hints.h"
 #include "net/unicoap/message.h"
 
 #define ENABLE_DEBUG CONFIG_UNICOAP_DEBUG_LOGGING
@@ -210,7 +211,9 @@ ssize_t unicoap_pdu_build_header_rfc7252(uint8_t* header, size_t capacity,
     _set_token_length(_header, properties->token_length);
     header += sizeof(unicoap_header_rfc7252_t);
 
-    memcpy(header, properties->token, properties->token_length);
+    if (likely(properties->token_length > 0)) {
+        memcpy(header, properties->token, properties->token_length);
+    }
     return sizeof(unicoap_header_rfc7252_t) + properties->token_length;
 }
 

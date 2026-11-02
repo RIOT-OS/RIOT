@@ -24,7 +24,7 @@
 #include "debug.h"
 #include "private.h"
 
-static int _cancel(unicoap_client_memo_t* memo) {
+static int _cancel_and_deregister(unicoap_client_memo_t* memo) {
     int res = 0;
     unicoap_message_t request = {
         .method = UNICOAP_METHOD_GET,
@@ -70,7 +70,7 @@ int unicoap_cancel_observation(int refno) {
             }
             return unicoap_cancel_request(refno);
         }
-        return _cancel(memo);
+        return _cancel_and_deregister(memo);
     } else {
         if (IS_ACTIVE(CONFIG_UNICOAP_ASSIST)) {
             unicoap_assist(API_MISUSE("request cancellation not supported")
@@ -93,5 +93,5 @@ int unicoap_cancel_observation_by_token(const unicoap_endpoint_t* endpoint,
     if (!memo) {
         return -ENOENT;
     }
-    return _cancel(memo);
+    return _cancel_and_deregister(memo);
 }

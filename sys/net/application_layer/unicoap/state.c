@@ -213,7 +213,8 @@ unicoap_client_memo_t* unicoap_client_memo_find_token(const unicoap_endpoint_t* 
 
         if ((!endpoint || unicoap_endpoint_is_equal(&memo->super.endpoint, endpoint)) &&
             token_length == sizeof(memo->token) &&
-            memcmp(memo->token, token, token_length) == 0) {
+            (sizeof(memo->token) == 0 ||
+             memcmp(memo->token, token, token_length) == 0)) {
             return memo;
         }
     }
