@@ -114,7 +114,7 @@ typedef enum {
      *
      * @note `registration` points to a free element in list of registrations.
      */
-    UNICOAP_OBSERVATION_REGISTRATION_AVAILABLE = -2,
+    UNICOAP_OBSERVATION_REGISTRATION_AVAILABLE = 2,
 
     /**
      * @brief Client has not yet registered for this resource, and **cannot** register.

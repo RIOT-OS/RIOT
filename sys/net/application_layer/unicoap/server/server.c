@@ -139,9 +139,8 @@ int unicoap_server_process_request(unicoap_packet_t* packet, const unicoap_resou
             _SERVER_DEBUG("Observe instruction in request: %" PRIu32 "\n", observe_value);
             switch (observe_value) {
             case UNICOAP_OBSERVE_OPTION_REGISTER: {
-                int outcome = unicoap_observation_register(packet->remote, resource, &packet->properties);
-                if (outcome == UNICOAP_OBSERVATION_REGISTRATION_AVAILABLE ||
-                    outcome == UNICOAP_OBSERVATION_REGISTRATION_EXISTS
+                if (unicoap_observation_register(packet->remote, resource,
+                    &packet->properties) > 0
                 ) {
 #if IS_USED(MODULE_UNICOAP_SERVER_OBSERVATION)
                     /* New or existing subscriber, do Observe stuff. */
