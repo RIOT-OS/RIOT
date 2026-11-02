@@ -1,0 +1,9 @@
+# uD3TN requires a comparatively large amount of RAM and flash.
+BOARD_INSUFFICIENT_MEMORY := \
+    airfy-beacon \
+    calliope-mini \
+    microbit \
+    nrf51dk \
+    nrf51dongle \
+    yunjia-nrf51822 \
+    #

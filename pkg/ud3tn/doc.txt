@@ -1,0 +1,14 @@
+/**
+ * @defgroup pkg_ud3tn uD3TN
+ * @ingroup pkg
+ * @brief Micro Delay-Tolerant Networking implementation for RIOT
+ *
+ * This package provides the RIOT platform port of uD3TN. It supports
+ * Bundle Protocol version 6 and version 7 and uses RIOT's socket and
+ * timer APIs.
+ *
+ * Add `USEPKG += ud3tn` to an application's Makefile to use the package.
+ *
+ * The RIOT-specific source is applied to the pinned upstream uD3TN revision
+ * by the patch in `pkg/ud3tn/patches`.
+ */

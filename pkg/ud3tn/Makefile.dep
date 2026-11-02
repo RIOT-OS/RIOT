@@ -1,0 +1,29 @@
+USEMODULE += ud3tn
+#USEMODULE += ud3tn_runtime
+USEMODULE += util
+USEMODULE += aap
+USEMODULE += aap2
+USEMODULE += agents
+USEMODULE += bundle6
+USEMODULE += bundle7
+USEMODULE += cla
+USEMODULE += cla_riot
+USEMODULE += platform
+USEMODULE += spp
+USEMODULE += aap2generated
+
+USEMODULE += ztimer_msec
+USEMODULE += sema
+USEMODULE += sock_ip
+USEMODULE += sock_tcp
+USEMODULE += sock_udp
+USEMODULE += gnrc_ipv6_default
+USEMODULE += netdev_default
+USEMODULE += netstats_l2
+USEMODULE += netstats_rpl
+USEMODULE += netstats_ipv6
+
+USEPKG += nanopb
+USEPKG += tinycbor
+
+
