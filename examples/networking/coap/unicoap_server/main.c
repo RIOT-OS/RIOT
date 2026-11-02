@@ -18,6 +18,7 @@
 #include "net/netif.h"
 
 /* Include timer for resource notifications in this simple example. */
+#include "ztimer.h"
 #include "ztimer/periodic.h"
 
 /*
@@ -55,6 +56,8 @@ static const credman_credential_t credential = {
  * MARK: - Resource definitions
  */
 
+static ztimer_periodic_t timer;
+
 static int handle_hello_request(unicoap_message_t* message, const unicoap_aux_t* aux,
                                 unicoap_request_context_t* ctx, void* arg) {
     (void)aux;
@@ -69,7 +72,17 @@ static int handle_hello_request(unicoap_message_t* message, const unicoap_aux_t*
     unicoap_response_init_string(message, UNICOAP_STATUS_CONTENT, "Hello, World!");
 
     /* Respond. Note that you do not need to return the result of @ref unicoap_send_response. */
-    return unicoap_send_response(message, ctx);
+    int res = unicoap_send_response(message, ctx);
+
+    if (unicoap_observation_requester_observes_resource(ctx)) {
+        puts("app: this client observed hello resource");
+        /* This beauty is presented to you by https://github.com/RIOT-OS/RIOT/issues/23059 */
+        if (!ztimer_is_set(ZTIMER_MSEC, &timer.timer)) {
+            puts("app: starting notification timer");
+            ztimer_periodic_start(&timer);
+        }
+    }
+    return res;
 }
 
 /*
@@ -233,8 +246,12 @@ static unicoap_job_t notify_job = UNICOAP_JOB(notify_clients);
 
 static bool timer_fired(void* arg) {
     (void)arg;
-    unicoap_loop_enqueue(&notify_job);
-    return true;
+    if (unicoap_observation_resource_has_observers(UNICOAP_RESOURCE_NAMED(hello))) {
+        unicoap_loop_enqueue(&notify_job);
+        return true;
+    }
+    ztimer_periodic_stop(&timer);
+    return false;
 }
 
 /*
@@ -339,10 +356,8 @@ int main(void) {
     netifs_print_ipv6(", ");
     printf(" ]\n");
 
-    static ztimer_periodic_t timer;
     ztimer_periodic_init(ZTIMER_MSEC, &timer, timer_fired,
         "notifications", 3 * MS_PER_SEC);
-    ztimer_periodic_start(&timer);
 
     /* By default, unicoap_init() will create a background thread. If you do not want that,
      * set CONFIG_UNICOAP_CREATE_THREAD to 0 and run the processing loop on a thread of your choice.

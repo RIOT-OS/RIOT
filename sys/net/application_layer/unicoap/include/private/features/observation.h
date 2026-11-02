@@ -179,7 +179,6 @@ unicoap_observation_registration_result_t unicoap_observation_find_registration(
  * @param[in] remote Endpoint, does not need to be in the state's client array.
  * @param[in] resource Resource to register @p remote for
  * @param[in] properties Request properties
- * @param[in] profile Profile
  *
  * @returns `0` on success, negative integer on error.
  */

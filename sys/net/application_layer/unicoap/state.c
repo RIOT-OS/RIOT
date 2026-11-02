@@ -47,6 +47,17 @@ static unicoap_listener_t _default_listener = {
 
 #if IS_USED(MODULE_UNICOAP_SERVER_RESOURCE_DECLARATIONS)
 XFA_INIT_CONST(unicoap_resource_t, unicoap_resources_xfa);
+
+unicoap_listener_t* unicoap_listener_for_resource_declarations(void) {
+    /* Currently, unicoap does not differentiate between a 'default' listener
+     * and the listener 'for resource declarations'. This may change, i.e.,
+     * we may have a separate default listener and one exclusively for
+     * declared resources. Hence, this API is not called, e.g.,
+     * unicoap_listener_default(), although we may introduce such an API if
+     * necessary. Until then, we do not expose this 'default listener'
+     * implementation detail on unicoap's public API surface.*/
+    return IS_USED(MODULE_UNICOAP_SERVER_RESOURCE_DECLARATIONS) ? &_default_listener : NULL;
+}
 #endif
 
 static unicoap_state_t _state = {

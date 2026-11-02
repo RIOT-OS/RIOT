@@ -61,6 +61,8 @@ typedef enum {
      * @brief If present on a callback-based function, the callback will be called asynchronously for every
      * CoAP Observe notification arriving at the client.
      *
+     * @ingroup net_unicoap_observation
+     *
      * **Default**: disabled.
      *
      * @see [Observe (RFC 7641)](https://datatracker.ietf.org/doc/html/rfc7641)
@@ -270,7 +272,12 @@ int unicoap_cancel_request(int refno);
 
 /**
  * @brief Cancels request and resource observation by reference number
+ *
+ * @ingroup net_unicoap_client
+ * @ingroup net_unicoap_observation
+ *
  * @param refno Reference number
+ *
  * @returns Zero on success, negative error number otherwise
  * @retval -EINVAL Invalid refno
  * @retval -ENOENT No request with given refno is known
@@ -285,9 +292,14 @@ int unicoap_cancel_observation(int refno);
 
 /**
  * @brief Cancels request and resource observation by token and endpoint
+ *
+ * @ingroup net_unicoap_client
+ * @ingroup net_unicoap_observation
+ *
  * @param endpoint Remote server endpoint
  * @param[in] token Request token used in original registration request
  * @param token_length Length of @p token
+ *
  * @returns Zero on success, negative error number otherwise
  * @retval -EINVAL Invalid Token
  * @retval -ENOENT No request with given token is known
@@ -299,7 +311,7 @@ int unicoap_cancel_observation(int refno);
  * the server.
  */
 int unicoap_cancel_observation_by_token(const unicoap_endpoint_t* endpoint,
-                                               const uint8_t* token, size_t token_length);
+                                        const uint8_t* token, size_t token_length);
 
 /** @} */ /* end of section */
 /** @} */ /* end of group */

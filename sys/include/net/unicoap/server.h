@@ -6,6 +6,7 @@
 
 #pragma once
 
+#include <errno.h>
 #include <stdbool.h>
 #include <stdint.h>
 
@@ -222,6 +223,15 @@ typedef struct {
      * @private
      */
     void* _packet;
+
+
+    /**
+     * @brief Internal
+     *
+     * @warning This is an internal property. Do not access from your application!
+     * @private
+     */
+    bool _subscribed;
 } unicoap_request_context_t;
 
 /**
@@ -245,6 +255,30 @@ typedef struct {
  */
 typedef int (*unicoap_request_handler_t)(unicoap_message_t* request, const unicoap_aux_t* aux,
                                          unicoap_request_context_t* ctx, void* arg);
+
+/**
+ * @brief Checks if the request asks for the client to be registered as an observer of this resource
+ *
+ * @ingroup net_unicoap_server
+ * @ingroup net_unicoap_observation
+ *
+ * @param[in,out] ctx Request context
+ *
+ * @returns A boolean value indicating whether the request has the `Observe` option set
+ *          and has been registerd.
+ *
+ * Requires @ref net_unicoap_observation
+ */
+static inline bool unicoap_observation_requester_observes_resource(unicoap_request_context_t* ctx)
+{
+#if IS_USED(MODULE_UNICOAP_SERVER_OBSERVATION)
+    return ctx->_subscribed;
+#else
+    (void)ctx;
+    return false;
+#endif
+}
+
 
 /**
  * @brief Determines if the client is interested in a response
@@ -294,23 +328,6 @@ int unicoap_send_response(unicoap_message_t* response, unicoap_request_context_t
  * @return Status code
  */
 unicoap_status_t unicoap_response_status_from_errno(int _errno);
-
-/**
- * @brief Sends a notification to registered observed
- *
- * Sends the message to clients that have registered for resource observation notifications from this
- * resource.
- * @pre The given resource must have @ref UNICOAP_RESOURCE_FLAG_OBSERVABLE.
- *
- * Consumes @p response .
- *
- * @param[in,out] response Response message to send
- * @param[in] resource The resource to send the notification from
- *
- * @returns Zero on success.
- * @returns Negative integer on error
- */
-int unicoap_send_notification(unicoap_message_t* response, const unicoap_resource_t* resource);
 /** @} */
 
 /* MARK: - Registering CoAP resources */
@@ -546,6 +563,68 @@ ssize_t unicoap_resource_encode_link(const unicoap_resource_t* resource, char* b
                                      size_t capacity, unicoap_link_encoder_ctx_t* context);
 /** @} */
 
+/** @addtogroup net_unicoap_observation */
+/* MARK: - Checking observation state */
+/**
+ * @name Checking observation state
+ * @{
+ */
+/**
+ * @brief Checks if any observers currently subscribed to resource
+ *
+ * @param[in] resource CoAP resource
+ *
+ * @returns A boolean value indicating if the resource has a nonzero susbcriber count
+ */
+#if IS_USED(MODULE_UNICOAP_SERVER_OBSERVATION) || defined(DOXYGEN)
+bool unicoap_observation_resource_has_observers(const unicoap_resource_t* resource);
+#else
+static inline
+bool unicoap_observation_resource_has_observers(const unicoap_resource_t* resource) {
+    (void)resource;
+    return false;
+}
+#endif
+/** @} */
+
+/* MARK: - Sending notifications */
+/**
+ * @name Sending notifications
+ * @{
+ */
+/**
+ * @brief Sends a notification to registered observed
+ *
+ * Sends the message to clients that have registered for resource observation notifications from this
+ * resource.
+ * @pre The given resource must have @ref UNICOAP_RESOURCE_FLAG_OBSERVABLE.
+ *
+ * Consumes @p response .
+ *
+ * @param[in,out] response Response message to send
+ * @param[in] resource The resource to send the notification from
+ *
+ * @returns Zero on success or negative integer on error
+ * @retval UNICOAP_OBSERVATION_NO_SUBSCRIBERS if no subscribers are registerd for @p resource
+ */
+#if IS_USED(MODULE_UNICOAP_SERVER_OBSERVATION) || defined(DOXYGEN)
+int unicoap_send_notification(unicoap_message_t* response, const unicoap_resource_t* resource);
+#else
+static inline
+int unicoap_send_notification(unicoap_message_t* response, const unicoap_resource_t* resource)
+{
+    (void)response;
+    (void)resource;
+    return -ENOTSUP;
+}
+#endif
+
+/**
+ * @brief Error number indicating no subscribers are available to send notification to
+ */
+#define UNICOAP_OBSERVATION_NO_SUBSCRIBERS (-10000)
+/** @} */
+
 /* MARK: - Matching requests and resources */
 /**
  * @name Matching requests and resources
@@ -557,7 +636,7 @@ ssize_t unicoap_resource_encode_link(const unicoap_resource_t* resource, char* b
 typedef struct unicoap_listener unicoap_listener_t;
 
 /**
- * @brief   Handler function for the request matcher strategy
+ * @brief Handler function for the request matcher strategy
  *
  * @param[in]  listener     Listener
  * @param[out] resource     Matching resource
@@ -571,6 +650,7 @@ typedef int (*unicoap_request_matcher_t)(const unicoap_listener_t* listener,
                                          const unicoap_resource_t** resource,
                                          const unicoap_message_t* request,
                                          const unicoap_endpoint_t* endpoint);
+
 /**
  * @brief A modular collection of resources for a server
  */
@@ -822,6 +902,19 @@ static inline bool unicoap_match_proto(unicoap_proto_set_t protocols, unicoap_pr
 #define UNICOAP_RESOURCE_NAMED(name) \
     ({ extern unicoap_resource_t CONCAT(unicoap_resource_, name); \
        &CONCAT(unicoap_resource_, name); })
+/** @} */
+
+/* MARK: - Accessing the listener */
+/**
+ * @name Accessing the listener
+ * @{
+ */
+/**
+ * @brief Retrieves the listener containing all resources declared at compile time
+ *
+ * @returns @ref unicoap_listener_t
+ */
+unicoap_listener_t* unicoap_listener_for_resource_declarations(void);
 /** @} */
 /** @} */
 

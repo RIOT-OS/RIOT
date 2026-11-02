@@ -124,6 +124,10 @@ int unicoap_server_process_request(unicoap_packet_t* packet, const unicoap_resou
     assert(packet->remote);
     int res = 0;
 
+    unicoap_request_context_t context = {
+        .resource = resource, ._packet = packet
+    };
+
     unicoap_options_t* options = packet->message->options;
     if (IS_USED(MODULE_UNICOAP_SERVER_OBSERVATION) &&
         resource->flags & UNICOAP_RESOURCE_FLAG_OBSERVABLE &&
@@ -134,10 +138,18 @@ int unicoap_server_process_request(unicoap_packet_t* packet, const unicoap_resou
         if (unicoap_options_get_observe(options, &observe_value) >= 0) {
             _SERVER_DEBUG("Observe instruction in request: %" PRIu32 "\n", observe_value);
             switch (observe_value) {
-            case UNICOAP_OBSERVE_OPTION_REGISTER:
-                packet->properties.observe = true;
-                unicoap_observation_register(packet->remote, resource, &packet->properties);
+            case UNICOAP_OBSERVE_OPTION_REGISTER: {
+                int outcome = unicoap_observation_register(packet->remote, resource, &packet->properties);
+                if (outcome == UNICOAP_OBSERVATION_REGISTRATION_AVAILABLE ||
+                    outcome == UNICOAP_OBSERVATION_REGISTRATION_EXISTS
+                ) {
+#if IS_USED(MODULE_UNICOAP_SERVER_OBSERVATION)
+                    /* New or existing subscriber, do Observe stuff. */
+                    context._subscribed = true;
+#endif
+                }
                 break;
+            }
             case UNICOAP_OBSERVE_OPTION_DEREGISTER:
                 unicoap_observation_deregister(packet->remote, resource, &packet->properties);
                 break;
@@ -148,10 +160,6 @@ int unicoap_server_process_request(unicoap_packet_t* packet, const unicoap_resou
             }
         }
     }
-
-    unicoap_request_context_t context = {
-        .resource = resource, ._packet = packet
-    };
 
     unicoap_aux_t aux = {
         .remote = packet->remote,
@@ -187,7 +195,7 @@ int unicoap_server_process_request(unicoap_packet_t* packet, const unicoap_resou
 
         /* This should get optimised out if Observation is not imported.
          * Alternative would be alloca. But this buffer is 4 bytes. */
-        if (IS_USED(MODULE_UNICOAP_SERVER_OBSERVATION) && packet->properties.observe) {
+        if (IS_USED(MODULE_UNICOAP_SERVER_OBSERVATION) && unicoap_observation_requester_observes_resource(&context)) {
             uint8_t* storage = alloca(_UNICOAP_OPTIONS_STORAGE_CAPACITY_JUST_GENERATED_OBSERVE);
             if (!storage) {
                 _SERVER_DEBUG("unable to alloca options storage\n");
@@ -270,8 +278,8 @@ int unicoap_send_response(unicoap_message_t* response, unicoap_request_context_t
     _SERVER_DEBUG("sending immediate response\n");
 
     /* Observe is only set in process_request if OBSERVABLE flag and Observe option present. */
-    if (IS_USED(MODULE_UNICOAP_SERVER_OBSERVATION) &&
-        ((unicoap_packet_t*)context->_packet)->properties.observe
+    if (IS_USED(MODULE_UNICOAP_SERVER_OBSERVATION) && 
+        unicoap_observation_requester_observes_resource(context)
     ) {
         assert(context->resource->flags & UNICOAP_RESOURCE_FLAG_OBSERVABLE);
         _SERVER_DEBUG("initial empty GET response to observable resource, Observe=seqno\n");
