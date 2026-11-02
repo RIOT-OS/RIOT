@@ -31,7 +31,7 @@ static int _send(gnrc_netif_t *netif, gnrc_pktsnip_t *pkt)
 
     gnrc_netif_hdr_t *hdr = (gnrc_netif_hdr_t *)pkt->data;
 
-    if (hdr->flags & GNRC_NETIF_HDR_FLAGS_MULTICAST) {
+    if (hdr->flags & (GNRC_NETIF_HDR_FLAGS_MULTICAST | GNRC_NETIF_HDR_FLAGS_BROADCAST)) {
         addr = static_cast<uint8_t *>(&bcast[0]);
     }
     else if (hdr->dst_l2addr_len == IEEE802154_LONG_ADDRESS_LEN) {
