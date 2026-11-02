@@ -16,6 +16,7 @@
 #include <stdio.h>
 #include <string.h>
 
+#include "modules.h"
 #include "net/unicoap.h"
 #include "net/unicoap/client.h"
 #include "od.h"
@@ -23,7 +24,7 @@
 
 static int _print_usage(char** argv)
 {
-    printf("usage: %s <get|post|put|delete|fetch|path|ipatch> [-r] <URI> [<UTF-8 payload>]\n", argv[0]);
+    printf("usage: %s <get|post|put|delete|fetch|path|ipatch> [-r] [-o] <URI> [<UTF-8 payload>]\n", argv[0]);
     printf("          cancel [-o] <refno>\n");
     printf("Options: (default: unreliable)\n");
     printf("    -r   send reliably (send CON instead of NON over RFC7252 over UDP/DTLS)\n");
@@ -75,12 +76,25 @@ static int _on_response(
     return 0;
 }
 
+static inline bool _check_observation_support(void)
+{
+    if (!IS_USED(MODULE_UNICOAP_CLIENT_OBSERVATION)) {
+        printf("error: resource observation is not supported.\n"
+                "+++ FIXIT: USEMODULE += unicoap_client_observation\n");
+        return false;
+    }
+    return true;
+}
+
 static int _set_flags(char* opt, unicoap_request_flags_t* flags, uint8_t* shell_flags)
 {
     if (strcmp(opt, "-r") == 0) {
         *flags |= UNICOAP_REQUEST_FLAG_RELIABLE;
     }
     if (strcmp(opt, "-o") == 0) {
+        if (!_check_observation_support()) {
+            return -1;
+        }
         *flags |= UNICOAP_REQUEST_FLAG_OBSERVE;
     }
     else if (strcmp(opt, "-t") == 0) {
@@ -113,8 +127,18 @@ static int _cli(int argc, char** argv)
             printf("error: invalid arguments\n");
             goto help;
         }
-        __typeof__(&unicoap_cancel_request) cancel = argc == 4 ? 
-            unicoap_cancel_observation : unicoap_cancel_request;
+        if (!IS_USED(MODULE_UNICOAP_CLIENT_CANCELLATION)) {
+            printf("error: request cancellation is not supported.\n"
+                "+++ FIXIT: USEMODULE += unicoap_client_cancellation\n");
+            return false;
+        }
+        __typeof__(&unicoap_cancel_request) cancel = unicoap_cancel_request;
+        if (argc == 4) {
+            if (!_check_observation_support()) {
+                return -1;
+            }
+            cancel = unicoap_cancel_observation;
+        }
         if ((res = cancel(atoi(argv[argc - 1]))) < 0) {
             printf("cancelling request failed (%i, %s)\n", res, strerror(-res));
         }
@@ -183,7 +207,9 @@ static int _cli(int argc, char** argv)
             printf("sending request failed (error %i, %s)\n", res, strerror(-res));
             return res;
         }
-        printf("request refno=%i\n", res);
+        if (IS_USED(MODULE_UNICOAP_CLIENT_CANCELLATION)) {
+            printf("request refno=%i\n", res);
+        }
         return 0;
     }
 
