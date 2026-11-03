@@ -25,7 +25,7 @@
  */
 #define KSZ8851_MAC_STACKSIZE   (GNRC_NETIF_STACKSIZE_DEFAULT)
 #ifndef KSZ8851_MAC_PRIO
-#  define KSZ8851_MAC_PRIO        (GNRC_NETIF_PRIO)
+#  define KSZ8851_MAC_PRIO      (GNRC_NETIF_PRIO)
 #endif
 /** @} */
 
