@@ -695,6 +695,11 @@ void isr_usbd(void)
                 epdatastatus &= ~(1 << epnum);
             }
         }
+        else if (usbdev->device->EVENTS_EPDATA && (usbdev->device->INTEN & USBD_INTEN_EPDATA_Msk)) {
+            /* EPDATASTATUS already cleared and nothing to dispatch,
+             * just clear the irq. */
+            usbdev->device->EVENTS_EPDATA = 0;
+        }
     }
     cortexm_isr_end();
 }
