@@ -18,7 +18,6 @@
 #include "net/netif.h"
 
 /* Include timer for resource notifications in this simple example. */
-#include "ztimer.h"
 #include "ztimer/periodic.h"
 
 /*
@@ -76,8 +75,7 @@ static int handle_hello_request(unicoap_message_t* message, const unicoap_aux_t*
 
     if (unicoap_observation_requester_observes_resource(ctx)) {
         puts("app: this client observed hello resource");
-        /* This beauty is presented to you by https://github.com/RIOT-OS/RIOT/issues/23059 */
-        if (!ztimer_is_set(ZTIMER_MSEC, &timer.timer)) {
+        if (!ztimer_periodic_is_running(&timer)) {
             puts("app: starting notification timer");
             ztimer_periodic_start(&timer);
         }
