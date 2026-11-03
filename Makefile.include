@@ -659,6 +659,10 @@ compile-commands: $(COMPILE_COMMANDS_PATH)
 	  > $@
 
 ifeq ($(BUILD_IN_DOCKER),1)
+# Goals running outside the container have to wait for the results from inside
+# the container. Therefore, the outside part is run as NOTPARALLEL, the inside
+# is still running parallel.
+.NOTPARALLEL:
 link: ..in-docker-container
 else
 ifeq (,$(RIOTNOLINK))
