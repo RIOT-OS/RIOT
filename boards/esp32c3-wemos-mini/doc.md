@@ -63,7 +63,7 @@ To specify which board version is used, simply add the variable
 definition `USEMODULE=...` to the make command line, for example:
 
 ```shell
-USEMODULE=esp32c3_wemos_mini_v1_0_0 BOARD=esp32c3-wemos-min make ...
+USEMODULE=esp32c3_wemos_mini_v1_0_0 BOARD=esp32c3-wemos-mini make ...
 ```
 
 If the board version is not specified, version v2.1.0 is used by default.

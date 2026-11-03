@@ -114,7 +114,7 @@ Just connect the board to your host computer and type using the programming
 port:
 
 ```shell
-BOARD=esp32s2-liligo-ttgo-t8 make flash ...
+BOARD=esp32s2-lilygo-ttgo-t8 make flash ...
 ```
 
 For detailed information about ESP32-S2 as well as configuring and compiling
@@ -132,7 +132,7 @@ For this purpose, connect the board to your host computer and enter the
 following command using the programming port:
 
 ```shell
-USEMODULE=esp32s2-lilygo-ttgo-t8-usb BOARD=esp32s2-liligo-ttgo-t8 make flash ...
+USEMODULE=esp32s2-lilygo-ttgo-t8-usb BOARD=esp32s2-lilygo-ttgo-t8 make flash ...
 ```
 
 If RIOT is already on the device, it should automatically reset the device

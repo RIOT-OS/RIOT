@@ -108,7 +108,7 @@ connector with to be used for the reset/boot/flash logic. Just connect the
 board to your host computer and run:
 
 ```shell
-BOARD=elecrow-esp32s3-rotary-lcd-128 make flash ...
+BOARD=elecrow-crowpanel-esp32s3-rotary-128 make flash ...
 ```
 
 For detailed information about ESP32-S3 as well as configuring and compiling

@@ -111,7 +111,7 @@ To flash the board via the USB Serial/JTAG interface just connect the board
 with the `USB_DEV` port to your host computer and use the following command:
 
 ```shell
-BOARD=esp32s3_usb_otg make flash ...
+BOARD=esp32s3-usb-otg make flash ...
 ```
 
 Usually the make system resets the board before flashing to enable the
