@@ -14,8 +14,6 @@ UD3TN_COMPONENTS = ud3tn_runtime util aap aap2 agents bundle6 bundle7 cla \
 
 all: $(UD3TN_COMPONENTS)
 
-#ud3tn_runtime:
-#	$(QQ)"$(MAKE)" -C $(CURDIR)/runtime
 
 util:
 	$(QQ)"$(MAKE)" -C $(UD3TN_SRC_DIR)/util/src

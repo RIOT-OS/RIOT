@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: BSD-3-Clause OR Apache-2.0
 #include "ud3tn/cmdline.h"
 #include "ud3tn/init.h"
 #include "ud3tn/agent_manager.h"
@@ -35,27 +36,27 @@ extern struct bundle_agent_interface bundle_agent_interface;
 #define LOCAL_EID "dtn://node-a.dtn/"
 #define PEER_EID "dtn://node-b.dtn/"
 #define PEER_EID_C "dtn://node-c.dtn/"
-#define LOCAL_IP "fd12:dead:beef:1:f461:eeff:fee5:1900"
-#define PEER_IP "fd12:dead:beef:1:180e:79ff:fe3d:49d7"
+#define LOCAL_IP "fd12:dead:beef:1:8c82:41ff:fe6c:4b32"
+#define PEER_IP "fd12:dead:beef:1:fc8b:caff:fee1:111e"
 #define PEER_PORT "4557"
-#define PEER_IP_C "fd12:dead:beef:1:24a6:b6ff:febc:520d"
+#define PEER_IP_C "fd12:dead:beef:1:48bd:97ff:fee0:e4ec"
 #define PEER_PORT_C "4558"
 #endif
 #ifdef NODE_B
 #define LOCAL_EID "dtn://node-b.dtn/"
 #define PEER_EID "dtn://node-a.dtn/"
 #define PEER_EID_C "dtn://node-c.dtn/"
-#define LOCAL_IP "fd12:dead:beef:1:180e:79ff:fe3d:49d7"
+#define LOCAL_IP "fd12:dead:beef:1:fc8b:caff:fee1:111e"
 #define LOCAL_PORT "4557"
-#define PEER_IP "fd12:dead:beef:1:f461:eeff:fee5:1900"
+#define PEER_IP "fd12:dead:beef:1:8c82:41ff:fe6c:4b32"
 #define PEER_PORT "4556"
-#define PEER_IP_C "fd12:dead:beef:1:24a6:b6ff:febc:520d"
+#define PEER_IP_C "fd12:dead:beef:1:48bd:97ff:fee0:e4ec"
 #define PEER_PORT_C "4558"
 #endif
 #ifdef NODE_C
 #define LOCAL_EID "dtn://node-c.dtn/"
 #define PEER_EID "dtn://node-b.dtn/"
-#define LOCAL_IP "fd12:dead:beef:1:24a6:b6ff:febc:520d"
+#define LOCAL_IP "fd12:dead:beef:1:48bd:97ff:fee0:e4ec"
 #define PEER_IP "fd12:dead:beef:1:88f5:d9ff:fe8d:21f"
 #define PEER_PORT "4557"
 #endif
@@ -90,10 +91,11 @@ extern struct bundle_agent_interface bundle_agent_interface;
 
 void send_chat_message(const char *message, const char *peer_eid);
 void advertise_route(const char *peer_ip, const char *peer_port,
-                      const char *peer_sink_id, const char *peer_eid,
-                      const char *advertise_ip, const char *advertise_port,
-                      const char *advertise_sink_id, const char *advertise_eid);
-void add_route( const char *sink_id, const char *peer_ip, const char *peer_port, const char *peer_eid);
+                     const char *peer_sink_id, const char *peer_eid,
+                     const char *advertise_ip, const char *advertise_port,
+                     const char *advertise_sink_id, const char *advertise_eid);
+void add_route( const char *sink_id, const char *peer_ip, const char *peer_port,
+                const char *peer_eid);
 void auto_init_ula(void);
 
 
@@ -102,11 +104,11 @@ static void chat_callback(struct bundle_adu data, void *param, const void *bp_co
 {
     (void)param;
     (void)bp_context;
-    
+
     char msg[data.length + 1];
     memcpy(msg, data.payload, data.length);
     msg[data.length] = '\0';
-    
+
     printf("\n[DTN RECEIVE] Von Node %s: %s\n> ", data.source, msg);
     fflush(stdout);
     bundle_adu_free_members(data);
@@ -115,23 +117,23 @@ static void chat_callback(struct bundle_adu data, void *param, const void *bp_co
 static void dtn_chat_thread(void *arg)
 {
     (void)arg;
-    ztimer_sleep(ZTIMER_MSEC, 2000); 
+    ztimer_sleep(ZTIMER_MSEC, 2000);
 
-   
+
 
     const struct agent chat_agent = {
         .sink_identifier = CHAT_SINK_ID,
         .callback = chat_callback,
         .param = NULL,
     };
-    
+
     bundle_processor_perform_agent_action(
         bundle_agent_interface.bundle_signaling_queue,
         BP_SIGNAL_AGENT_REGISTER, // Register agent
         chat_agent,
         false
-    );
-    #if defined(NODE_A) || defined(NODE_A_ESP32) 
+        );
+    #if defined(NODE_A) || defined(NODE_A_ESP32)
     add_route(CHAT_SINK_ID, PEER_IP, PEER_PORT, PEER_EID);
     #endif
     #if defined(NODE_B) || defined(NODE_B_ESP32)
@@ -147,33 +149,34 @@ static void dtn_chat_thread(void *arg)
         LOCAL_PORT,
         CHAT_SINK_ID,
         PEER_EID_C
-    );
+        );
     #endif
 
-    
-    
+
+
     printf("DTN Chat Thread gestartet.\n");
-    
+
     int counter = 0;
     char payload[128];
-    while(1) {
+    while (1) {
         #if defined(NODE_A) || defined(NODE_A_ESP32)
         if (counter % 2 == 0) {
-            snprintf(payload, sizeof(payload), "Hallo Welt | Counter: %d", ++counter);
+            snprintf(payload, sizeof(payload), "Hello World | Counter: %d", ++counter);
             send_chat_message(payload, PEER_EID);
-        } else {
-            snprintf(payload, sizeof(payload), "Hallo Welt | Counter: %d", ++counter);
+        }
+        else {
+            snprintf(payload, sizeof(payload), "Hello World | Counter: %d", ++counter);
             send_chat_message(payload, PEER_EID_C);
         }
         #endif
         #if defined(NODE_B) || defined(NODE_B_ESP32)
-        snprintf(payload, sizeof(payload), "Hallo Welt | Counter: %d", ++counter);
+        snprintf(payload, sizeof(payload), "Hello World | Counter: %d", ++counter);
         send_chat_message(payload, PEER_EID);
         #endif
         ztimer_sleep(ZTIMER_MSEC, 5000); // send every 5 seconds
 
-        
-        
+
+
     }
 }
 
@@ -181,10 +184,11 @@ void send_chat_message(const char *message, const char *peer_eid)
 {
     char dest_eid[128];
     char payload[128];
+
     snprintf(dest_eid, sizeof(dest_eid), "%schat", peer_eid);
-    snprintf(payload, sizeof(payload), "%s  von %s, an %s", message ,LOCAL_EID, dest_eid);
+    snprintf(payload, sizeof(payload), "%s  SRC: %s, DST: %s", message, LOCAL_EID, dest_eid);
     printf("[DTN SEND] %s\n", payload);
-    
+
     char *p_copy = strdup(payload);
 
     agent_create_forward_bundle(
@@ -194,17 +198,17 @@ void send_chat_message(const char *message, const char *peer_eid)
         dest_eid,
         hal_time_get_timestamp_ms(),
         0,
-        60000, 
-        p_copy, 
+        60000,
+        p_copy,
         strlen(p_copy),
         0
-    );
+        );
 }
 
 void advertise_route(const char *peer_ip, const char *peer_port,
-                      const char *peer_sink_id, const char *peer_eid,
-                      const char *advertise_ip, const char *advertise_port,
-                      const char *advertise_sink_id, const char *advertise_eid)
+                     const char *peer_sink_id, const char *peer_eid,
+                     const char *advertise_ip, const char *advertise_port,
+                     const char *advertise_sink_id, const char *advertise_eid)
 {
     char config_eid[128];
     char dest_eid[128];
@@ -220,8 +224,10 @@ void advertise_route(const char *peer_ip, const char *peer_port,
     /* The route is advertised to the peer's config agent. */
     snprintf(config_eid, sizeof(config_eid), "%s%s", peer_eid, CONFIG_AGENT_ID);
     snprintf(dest_eid, sizeof(dest_eid), "%s%s", peer_eid, peer_sink_id);
-    snprintf(advertise_dest_eid, sizeof(advertise_dest_eid), "%s%s", advertise_eid, advertise_sink_id);
-    snprintf(advertise_cla, sizeof(advertise_cla), "tcpclv3_riot:[%s]:%s", advertise_ip, advertise_port);
+    snprintf(advertise_dest_eid, sizeof(advertise_dest_eid), "%s%s", advertise_eid,
+             advertise_sink_id);
+    snprintf(advertise_cla, sizeof(advertise_cla), "tcpclv3_riot:[%s]:%s", advertise_ip,
+             advertise_port);
 
     /* Example resulting command:
      * (dtn://node-c.dtn/):(tcpclv3_riot:[fd12:dead:beef:1:88f5:d9ff:fe8d:21f]:4557):[(dtn://node-c.dtn/chat)]:[{0,4102444800,100000}];
@@ -254,18 +260,20 @@ void advertise_route(const char *peer_ip, const char *peer_port,
         payload,
         payload_len,
         0
-    );
+        );
 
-    printf("> Route fuer %s via Config-Agent an %s gesendet (%s).\n",
+    printf("> Route for %s sent to %s via the configuration agent (%s).\n",
            advertise_dest_eid, peer_eid, advertise_cla);
 }
 
 
-void add_route( const char *sink_id, const char *peer_ip, const char *peer_port, const char *peer_eid)
+void add_route( const char *sink_id, const char *peer_ip, const char *peer_port,
+                const char *peer_eid)
 {
-    
+
     char dest_eid[128];
     char config_eid[128];
+
     snprintf(dest_eid, sizeof(dest_eid), "%s%s", peer_eid, sink_id);
     snprintf(config_eid, sizeof(config_eid), "%s%s", LOCAL_EID, CONFIG_AGENT_ID);
 
@@ -301,12 +309,12 @@ void add_route( const char *sink_id, const char *peer_ip, const char *peer_port,
                 payload,
                 payload_len,
                 0
-            );
+                );
 
-            printf("> Route fuer %s via Config-Agent angefordert (%s).\n", dest_eid, peer_cla);
+            printf("> Route for %s requested via the configuration agent (%s).\n", dest_eid, peer_cla);
         }
     }
-    
+
 }
 
 void auto_init_ula(void)
@@ -322,17 +330,18 @@ void auto_init_ula(void)
 
     while ((netif = gnrc_netif_iter(netif))) {
         ipv6_addr_t if_addr = addr;
-   
+
         if (gnrc_netif_ipv6_get_iid(netif, &iid) < 0) {
             continue;
         }
-        
+
         ipv6_addr_set_aiid(&if_addr, iid.uint8);
 
-        
+
         if (gnrc_netif_ipv6_addr_add(netif, &if_addr, ULA_PREFIX_LEN, 0) < 0) {
             printf("Error: Failed to add ULA to interface %d\n", netif->pid);
-        } else {
+        }
+        else {
             char addr_str[IPV6_ADDR_MAX_STR_LEN];
             ipv6_addr_to_str(addr_str, &if_addr, sizeof(addr_str));
             printf("Successfully configured ULA %s on interface %d\n", addr_str, netif->pid);
@@ -346,7 +355,7 @@ int main(void)
     auto_init_ula();
     int tlsf_add_global_pool(void *mem, size_t bytes);
     ztimer_sleep(ZTIMER_MSEC, 1000);
-    
+
     int argc = 6;
     char *argv[6];
     argv[0] = "ud3tn";
@@ -359,7 +368,7 @@ int main(void)
 #endif
 #if defined(NODE_B) || defined(NODE_B_ESP32)
     argv[4] = "tcpclv3_riot:*,4557";
-#endif    
+#endif
 
 #if defined(NODE_C) || defined(NODE_C_ESP32)
     argv[4] = "tcpclv3_riot:*,4558";
@@ -377,10 +386,10 @@ int main(void)
     start_tasks(parse_cmdline(argc, argv));
     hal_task_create(dtn_chat_thread, NULL, true, NULL);
 
-    
+
     char line_buf[SHELL_DEFAULT_BUFSIZE];
     msg_init_queue(_main_msg_queue, MAIN_MSG_QUEUE_SIZE);
     shell_run(NULL, line_buf, SHELL_DEFAULT_BUFSIZE);
-    
+
     return start_os();
 }
