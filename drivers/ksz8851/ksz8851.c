@@ -49,7 +49,7 @@
 /** Number of trailing CRC bytes included in the RX byte count */
 #define RX_CRC_LEN              (4)
 /** Frame header (control word + byte count) written ahead of TX payload */
-#define TX_HEADER_LEN            (4)
+#define TX_HEADER_LEN           (4)
 
 #define RESET_DELAY_US          (10000U)
 #define TXQCR_MAX_POLLS         (10000U)
@@ -95,12 +95,9 @@ static void rx_frame_pointer_reset(ksz8851_t *dev)
 }
 
 /* Discard the frame currently at the head of the RXQ */
-static void rx_flush(ksz8851_t *dev)
+static void rx_drop_frame(ksz8851_t *dev)
 {
-    reg_clear_bits(dev, REG_RXCR1, RXCR1_RXE);
-    reg_set_bits(dev, REG_RXCR1, RXCR1_FRXQ);
-    reg_clear_bits(dev, REG_RXCR1, RXCR1_FRXQ);
-    reg_set_bits(dev, REG_RXCR1, RXCR1_RXE);
+    reg_set_bits(dev, REG_RXQCR, RXQCR_RRXEF);
 }
 
 static int fifo_read(ksz8851_t *dev, uint8_t *data, size_t len, size_t skip, size_t trailer)
@@ -146,10 +143,12 @@ static void chip_reset(ksz8851_t *dev)
     reg_write(dev, REG_GRR, 0);
 }
 
-/* The chip indexes its 64 bit hash table with the upper 6 bits of the
+/*
+ * The chip indexes its 64 bit hash table with the upper 6 bits of the
  * big-endian Ethernet CRC32 of the destination address. crc32() yields the
  * bit-reversed form of that CRC with the final inversion applied, so the
- * wanted bits are the 6 lowest bits of ~crc32(), in reverse order. */
+ * wanted bits are the 6 lowest bits of ~crc32(), in reverse order.
+ */
 static uint8_t mcast_hash(const uint8_t *addr)
 {
     uint32_t crc = ~crc32(addr, ETHERNET_ADDR_LEN);
@@ -373,14 +372,14 @@ static int _recv(netdev_t *netdev, void *buf, size_t max_len, void *info)
     rxfhsr = reg_read(dev, REG_RXFHSR);
     if (!(rxfhsr & RXFHSR_RXFV) || (rxfhsr & RXFHSR_RX_ERRORS)) {
         DEBUG("[ksz8851] recv: dropping bad RX frame (RXFHSR=0x%04x)\n", rxfhsr);
-        rx_flush(dev);
+        rx_drop_frame(dev);
         spi_release(dev->p.spi);
         return 0;
     }
 
     rxfhbcr = reg_read(dev, REG_RXFHBCR) & RXFHBCR_RXBC_MASK;
     if (rxfhbcr <= RX_CRC_LEN) {
-        rx_flush(dev);
+        rx_drop_frame(dev);
         spi_release(dev->p.spi);
         return 0;
     }
@@ -390,14 +389,14 @@ static int _recv(netdev_t *netdev, void *buf, size_t max_len, void *info)
     if (buf == NULL) {
         if (max_len > 0) {
             /* caller asked us to drop the pending frame */
-            rx_flush(dev);
+            rx_drop_frame(dev);
         }
         spi_release(dev->p.spi);
         return (int)frame_len;
     }
 
     if (frame_len > max_len) {
-        rx_flush(dev);
+        rx_drop_frame(dev);
         spi_release(dev->p.spi);
         return -ENOBUFS;
     }
