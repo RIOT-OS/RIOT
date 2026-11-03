@@ -695,6 +695,19 @@ void isr_usbd(void)
                 epdatastatus &= ~(1 << epnum);
             }
         }
+        else if (usbdev->device->EVENTS_EPDATA &&
+                 (usbdev->device->INTEN & USBD_INTEN_EPDATA_Msk)) {
+            /*
+             * EPDATA raised, but EPDATASTATUS is already 0: the usbus thread's
+             * _ep_esr() consumed (wrote-1-cleared) the status bit after the
+             * event fired. Nothing to dispatch — but the event is level-
+             * triggered, so it MUST be cleared here, or this ISR re-enters
+             * forever and starves every thread (seen 2026-10-21 under sustained
+             * CDC-ECM traffic: EVENTS_EPDATA=1, EPDATASTATUS=0, INTEN.EPDATA=1;
+             * host log "NETDEV WATCHDOG: transmit queue 0 timed out").
+             */
+            usbdev->device->EVENTS_EPDATA = 0;
+        }
     }
     cortexm_isr_end();
 }
