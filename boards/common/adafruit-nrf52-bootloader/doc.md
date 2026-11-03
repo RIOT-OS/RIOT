@@ -140,7 +140,7 @@ git clone https://github.com/adafruit/Adafruit_nRF52_Bootloader.git
 cd Adafruit_nRF52_Bootloader
 git submodule update --init
 pip3 install --user adafruit-nrfutil
-make BOARD=feather_nrf52840_sense SERIAL=/dev/ttyACM0 flash-dfu
+make BOARD=adafruit-feather-nrf52840-sense SERIAL=/dev/ttyACM0 flash-dfu
 ```
 
 Sometimes the process has to be done twice until the SoftDevice is successfully
@@ -161,8 +161,8 @@ git clone https://github.com/adafruit/Adafruit_nRF52_Bootloader
 cd Adafruit_nRF52_Bootloader
 git submodule update --init
 nrfjprog --recover
-make BOARD=feather_nrf52840_express flash
-make BOARD=feather_nrf52840_express flash-sd
+make BOARD=adafruit-feather-nrf52840-express flash
+make BOARD=adafruit-feather-nrf52840-express flash-sd
 ```
 
 More information about how to flash nRF52 microcontrollers can be found in the

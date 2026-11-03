@@ -215,7 +215,7 @@ the default UART for when `stdio_uart` is used. Since `stdio_rtt` is the default
 you need to use
 
 ```
-USEMODULE=stdio_uart BOARD=msbio make flash term
+USEMODULE=stdio_uart BOARD=msbiot make flash term
 ```
 
 Note that you need to rebuild and flash the app when switching the stdio

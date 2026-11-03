@@ -67,14 +67,14 @@ datasheet.
 
 The only requirement is `avrdude` tool installed:
 
-    make BOARD=atmega328P-xplained-mini flash
+    make BOARD=atmega328p-xplained-mini flash
 
 ## Serial Terminal
 
 The AVR Xplained Mini already have an USB CDC converter build in.  So, simple
 type to get terminal:
 
-    make BOARD=atmega328P-xplained-mini term
+    make BOARD=atmega328p-xplained-mini term
 
 ## On-Chip Debugging (OCD)
 
