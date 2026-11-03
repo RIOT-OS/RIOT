@@ -568,7 +568,7 @@ ssize_t unicoap_resource_encode_link(const unicoap_resource_t* resource, char* b
  * @{
  */
 /**
- * @brief Checks if any observers currently subscribed to resource
+ * @brief Checks if any observers are currently subscribed to the resource
  *
  * @param[in] resource CoAP resource
  *
