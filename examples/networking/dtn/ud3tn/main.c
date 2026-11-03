@@ -107,7 +107,7 @@ static void chat_callback(struct bundle_adu data, void *param, const void *bp_co
     memcpy(msg, data.payload, data.length);
     msg[data.length] = '\0';
 
-    printf("\n[DTN RECEIVE] Von Node %s: %s\n> ", data.source, msg);
+    printf("\n[DTN RECEIVE] From Node %s: %s\n> ", data.source, msg);
     fflush(stdout);
     bundle_adu_free_members(data);
 }

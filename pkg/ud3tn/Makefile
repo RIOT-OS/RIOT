@@ -7,13 +7,12 @@ include $(RIOTBASE)/pkg/pkg.mk
 
 UD3TN_SRC_DIR = $(PKG_SOURCE_DIR)/ud3tn_platform_riot
 
-UD3TN_COMPONENTS = ud3tn_runtime util aap aap2 agents bundle6 bundle7 cla \
+UD3TN_COMPONENTS =  util aap aap2 agents bundle6 bundle7 cla \
                    cla_riot platform spp ud3tn aap2generated
 
 .PHONY: all $(UD3TN_COMPONENTS)
 
 all: $(UD3TN_COMPONENTS)
-
 
 util:
 	$(QQ)"$(MAKE)" -C $(UD3TN_SRC_DIR)/util/src
