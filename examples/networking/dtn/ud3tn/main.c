@@ -317,7 +317,7 @@ int main(void)
 #ifdef CLA_OPTS_OVERRIDE
     argv[4] = CLA_OPTS_OVERRIDE; /* only for tests */
 #endif
-    argv[5] = "-R";
+    argv[5] = "-R"; /* Enables remote configuration capability*/
 
     init(argc, argv);
     start_tasks(parse_cmdline(argc, argv));
