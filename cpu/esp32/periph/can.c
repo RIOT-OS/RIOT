@@ -21,6 +21,7 @@
 #include "can_params.h"
 #include "esp_attr.h"
 #include "gpio_arch.h"
+#include "irq.h"
 #include "irq_arch.h"
 
 #include "esp_clk_tree.h"
@@ -146,27 +147,34 @@ static void _esp_can_isr(candev_t *candev)
     assert(dev);
     assert(dev->candev.event_callback);
 
-    if (dev->events & ESP_CAN_EVENT_BUS_OFF) {
-        dev->events &= ~ESP_CAN_EVENT_BUS_OFF;
+    /*
+     * The events are set by the interrupt handler while this function is
+     * executed in thread context. Therefore, the events have to be fetched
+     * and reset atomically to avoid that events set by the interrupt
+     * handler in the meantime get lost.
+     */
+    unsigned state = irq_disable();
+    uint32_t events = dev->events;
+    dev->events = 0;
+    irq_restore(state);
+
+    if (events & ESP_CAN_EVENT_BUS_OFF) {
         dev->candev.event_callback(&dev->candev, CANDEV_EVENT_BUS_OFF, NULL);
     }
 
-    if (dev->events & ESP_CAN_EVENT_ERROR_PASSIVE) {
-        dev->events &= ~ESP_CAN_EVENT_ERROR_PASSIVE;
+    if (events & ESP_CAN_EVENT_ERROR_PASSIVE) {
         dev->candev.event_callback(&dev->candev,
                                    CANDEV_EVENT_ERROR_PASSIVE, NULL);
     }
 
-    if (dev->events & ESP_CAN_EVENT_ERROR_WARNING) {
-        dev->events &= ~ESP_CAN_EVENT_ERROR_WARNING;
+    if (events & ESP_CAN_EVENT_ERROR_WARNING) {
         dev->candev.event_callback(&dev->candev,
                                    CANDEV_EVENT_ERROR_WARNING, NULL);
     }
 
-    if (dev->events & ESP_CAN_EVENT_TX_ERROR) {
+    if (events & ESP_CAN_EVENT_TX_ERROR) {
         /* a pending TX confirmation has also to be deleted on TX bus error */
-        dev->events &= ~ESP_CAN_EVENT_TX_ERROR;
-        dev->events &= ~ESP_CAN_EVENT_TX_CONFIRMATION;
+        events &= ~ESP_CAN_EVENT_TX_CONFIRMATION;
         if (dev->tx_frame) {
             /* handle the event only if there is still a frame in TX buffer */
             dev->candev.event_callback(&dev->candev,
@@ -175,8 +183,7 @@ static void _esp_can_isr(candev_t *candev)
         }
     }
 
-    if (dev->events & ESP_CAN_EVENT_TX_CONFIRMATION) {
-        dev->events &= ~ESP_CAN_EVENT_TX_CONFIRMATION;
+    if (events & ESP_CAN_EVENT_TX_CONFIRMATION) {
         if (dev->tx_frame) {
             /* handle the event only if there is still a frame in TX buffer */
             dev->candev.event_callback(&dev->candev,
@@ -186,21 +193,27 @@ static void _esp_can_isr(candev_t *candev)
         }
     }
 
-    if (dev->events & ESP_CAN_EVENT_RX_ERROR) {
-        dev->events &= ~ESP_CAN_EVENT_RX_ERROR;
+    if (events & ESP_CAN_EVENT_RX_ERROR) {
         dev->candev.event_callback(&dev->candev, CANDEV_EVENT_RX_ERROR, NULL);
     }
 
-    if (dev->events & ESP_CAN_EVENT_RX_INDICATION) {
-        dev->events &= ~ESP_CAN_EVENT_RX_INDICATION;
-
+    if (events & ESP_CAN_EVENT_RX_INDICATION) {
+        /*
+         * The interrupt handler only writes to the ring buffer slot at the
+         * write pointer and increments rx_frames_num. The slot at the read
+         * pointer can't be overwritten as long as rx_frames_num isn't
+         * decremented, so only the decrement has to be atomic.
+         */
         while (dev->rx_frames_num) {
             dev->candev.event_callback(&dev->candev,
                                        CANDEV_EVENT_RX_INDICATION,
                                        &dev->rx_frames[dev->rx_frames_rptr]);
-            dev->rx_frames_num--;
             dev->rx_frames_rptr++;
             dev->rx_frames_rptr &= ESP_CAN_MAX_RX_FRAMES-1;
+
+            state = irq_disable();
+            dev->rx_frames_num--;
+            irq_restore(state);
         }
     }
 }
