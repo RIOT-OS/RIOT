@@ -591,7 +591,7 @@ bool unicoap_observation_resource_has_observers(const unicoap_resource_t* resour
  * @{
  */
 /**
- * @brief Sends a notification to registered observed
+ * @brief Sends a notification to registered observers
  *
  * Sends the message to clients that have registered for resource observation notifications from this
  * resource.
