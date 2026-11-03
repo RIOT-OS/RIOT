@@ -25,5 +25,3 @@ USEMODULE += netstats_ipv6
 
 USEPKG += nanopb
 USEPKG += tinycbor
-
-

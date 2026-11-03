@@ -38,7 +38,7 @@ select a different node definition.
 PORT=tap0 CFLAGS="-DNODE_A" BINDIRBASE=/tmp/ud3tn-node-a  make BOARD=native
 '''
 The RIOT package downloads the pinned uD3TN revision and applies its patch
-automatically. 
+automatically.
 
 ## ESP32
 
@@ -50,14 +50,12 @@ The example supports `esp32-wroom-32`. Set `ESP_WIFI_SSID` and
 2. Building for esp32-wroom-32
 
 ```
-CFLAGS="-DNODE_A_ESP32" BINDIRBASE=/tmp/ud3tn-node-a make BOARD=esp32-wroom-32 
+CFLAGS="-DNODE_A_ESP32" BINDIRBASE=/tmp/ud3tn-node-a make BOARD=esp32-wroom-32
 ```
 
 3. Flashing
-``` 
+```
 PORT=/dev/ttyUSB0 CFLAGS="-DNODE_A_ESP32" BINDIRBASE=/tmp/ud3tn-node-a make BOARD=esp32-wroom-32 flash term
 ```
-- To find out the port, you can run `make list-ttys`. All connected USB devices should be listed here. 
+- To find out the port, you can run `make list-ttys`. All connected USB devices should be listed here.
 - If you're using WSL 2, you can use `usbipd` to forward the USB devices to the VM. Instructions are linked in the references.
-
-
