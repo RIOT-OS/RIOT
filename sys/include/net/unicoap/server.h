@@ -266,8 +266,6 @@ typedef int (*unicoap_request_handler_t)(unicoap_message_t* request, const unico
  *
  * @returns A boolean value indicating whether the request has the `Observe` option set
  *          and has been registerd.
- *
- * Requires @ref net_unicoap_observation
  */
 static inline bool unicoap_observation_requester_observes_resource(unicoap_request_context_t* ctx)
 {
