@@ -75,8 +75,8 @@ typedef struct {
  * @param[out] dev      device descriptor to initialize
  * @param[in]  params   peripheral configuration to use
  * @param[in]  index    index of @p params in a global parameter struct
- *                       array. If initialized manually, pass a unique
- *                       identifier instead.
+ *                      array. If initialized manually, pass a unique
+ *                      identifier instead.
  */
 void ksz8851_setup(ksz8851_t *dev, const ksz8851_params_t *params, uint8_t index);
 
