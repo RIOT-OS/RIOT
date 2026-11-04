@@ -8,4 +8,4 @@ The goal is to show using an external board that still needs to use the
 To allow automated testing by `murdock` this board is named 'native'.
 
 As it wants to extend native, which is not a common board, some hacks must be
-done as the 'board' module is implemented directly by the 'RIOT/boards/native'.
+done as the 'board' module is implemented directly by the 'RIOT/boards/native32'.
