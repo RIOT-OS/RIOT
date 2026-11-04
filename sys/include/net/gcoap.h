@@ -399,6 +399,7 @@
 #include "event/timeout.h"
 #include "net/sock/udp.h"
 #include "net/nanocoap.h"
+#include "time_units.h"
 
 #if IS_USED(MODULE_GCOAP_DTLS)
 #  include "net/sock/dtls.h"

@@ -82,6 +82,7 @@
 
 #include "bitfield.h"
 #include "byteorder.h"
+#include "compiler_hints.h"
 #include "iolist.h"
 #include "modules.h"
 #include "net/coap.h"
