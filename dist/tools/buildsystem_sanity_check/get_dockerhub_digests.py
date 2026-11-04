@@ -81,8 +81,8 @@ def get_upstream_digests(repo, tag="latest", token=None):
     """
     token = get_docker_token(repo) if token is None else token
     manifest, repo_digest = get_manifest(repo, tag=tag, token=token)
-    digest = manifest["config"]["digest"]
-    return (digest[len("sha256:"):], repo_digest)
+    digest = manifest.get("config", {}).get("digest")
+    return (digest[len("sha256:"):] if digest else None, repo_digest)
 
 
 if __name__ == '__main__':
