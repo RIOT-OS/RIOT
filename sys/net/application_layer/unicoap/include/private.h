@@ -157,17 +157,14 @@ typedef struct {
     unicoap_listener_t* listeners;
 #endif
 
-#if IS_USED(MODULE_UNICOAP_SERVER_OBSERVATION)
-    /** @brief Array of clients that are currently registered for notifications */
-    unicoap_endpoint_t observers[CONFIG_UNICOAP_OBSERVATION_UNIQUE_OBSERVER_CAPACITY];
-
-    /** @ref unicoap_observation_registration_t */
-    unicoap_observation_registration_t observation_registrations[CONFIG_UNICOAP_OBSERVATION_REGISTRATION_CAPACITY];
-#endif
-
-#if UNICOAP_HAVE_CLIENT_STATE
+#if UNICOAP_HAVE_CLIENT_STATE || defined(DOXYGEN)
     /** @ref unicoap_memo_t */
     unicoap_client_memo_t client_memos[CONFIG_UNICOAP_CLIENT_MEMOS_CAPACITY];
+#endif
+
+#if UNICOAP_HAVE_SERVER_STATE || defined(DOXYGEN)
+    /** @ref unicoap_memo_t */
+    unicoap_server_memo_t server_memos[CONFIG_UNICOAP_SERVER_MEMOS_CAPACITY];
 #endif
 } unicoap_state_t;
 

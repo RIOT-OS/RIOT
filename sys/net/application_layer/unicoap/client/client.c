@@ -78,16 +78,12 @@ int unicoap_client_process_response(unicoap_packet_t* packet, unicoap_client_mem
     /* TODO: Block-wise */
     res = unicoap_client_callback_success(memo, packet, UNICOAP_BLOCK_OPTION_NONE);
 
-    bool is_observation =
+    bool is_observing =
         IS_USED(MODULE_UNICOAP_CLIENT_OBSERVATION) && memo->flags & UNICOAP_REQUEST_FLAG_OBSERVE;
 
-    if (unlikely(is_observation)) {
-        /* We keep the memo, but can disregard any messaging-layer state. */
-        _CLIENT_DEBUG("not releasing memo, expecting notifications\n");
-#if UNICOAP_HAVE_MESSAGING_STATE
-        unicoap_messaging_notify(memo->super.messaging.state, UNICOAP_LAYER_NOTIFICATION_STATE_RELEASE,
-                                 NULL, packet->remote->proto);
-#endif
+    if (unlikely(is_observing)) {
+        /* Keep using same memo, avoid copy hehe. */
+        unicoap_client_memo_realloc(memo);
     } else {
         unicoap_client_memo_free(memo, 0);
     }
@@ -127,7 +123,7 @@ int unicoap_client_send_request_part(unicoap_packet_t* packet, unicoap_client_me
         messaging_flags |= UNICOAP_MESSAGING_FLAG_TRACK;
     }
     /* TODO: OSCORE */
-    if ((res = unicoap_messaging_send(packet, messaging_flags, &memo->super)) < 0) {
+    if ((res = unicoap_messaging_send(packet, messaging_flags, memo ? &memo->super : NULL)) < 0) {
         _CLIENT_DEBUG("error: could not send message\n");
         return res;
     }

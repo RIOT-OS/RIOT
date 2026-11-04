@@ -140,7 +140,7 @@ int unicoap_server_process_request(unicoap_packet_t* packet, const unicoap_resou
             switch (observe_value) {
             case UNICOAP_OBSERVE_OPTION_REGISTER: {
                 if (unicoap_observation_register(packet->remote, resource,
-                    &packet->properties) > 0
+                    &packet->properties) >= 0
                 ) {
 #if IS_USED(MODULE_UNICOAP_SERVER_OBSERVATION)
                     /* New or existing subscriber, do Observe stuff. */
@@ -205,7 +205,7 @@ int unicoap_server_process_request(unicoap_packet_t* packet, const unicoap_resou
             res = unicoap_options_set_observe_generated(options);
             assert(res >= 0);
         }
-        return unicoap_server_send_response_body(packet, resource);
+        return unicoap_server_send_response_body(packet, NULL, resource);
     }
     else if (context._packet) {
         /* application didn't send a response or deferred response,
@@ -232,7 +232,7 @@ int unicoap_server_process_request(unicoap_packet_t* packet, const unicoap_resou
     return 0;
 
 error:
-    if ((res = unicoap_server_send_response_body(packet, resource)) < 0) {
+    if ((res = unicoap_server_send_response_body(packet, NULL, resource)) < 0) {
         return res;
     }
 
@@ -243,12 +243,13 @@ error:
 /**
  * @brief Common function for @ref unicoap_send_response and @ref unicoap_send_response_deferred
  */
-int unicoap_server_send_body(unicoap_packet_t* packet, const unicoap_resource_t* resource,
-                                      unicoap_messaging_flags_t messaging_flags)
+int unicoap_server_send_body(unicoap_packet_t* packet, unicoap_server_memo_t* memo,
+                             const unicoap_resource_t* resource,
+                             unicoap_messaging_flags_t messaging_flags)
 {
     (void)resource;
     int res = 0;
-    if ((res = unicoap_messaging_send(packet, messaging_flags, NULL)) < 0) {
+    if ((res = unicoap_messaging_send(packet, messaging_flags, memo ? &memo->super : NULL)) < 0) {
         _SERVER_DEBUG("error: could not send response\n");
         goto error;
     }
@@ -314,7 +315,7 @@ int unicoap_send_response(unicoap_message_t* response, unicoap_request_context_t
     /* prevent context from being used for sending a response again.
      * If sending response on lower layer fails, then res < 0,
      * and allow calling send_response again to retry. Otherwise prevent calling again. */
-    if ((res = unicoap_server_send_response_body((unicoap_packet_t*)context->_packet,
+    if ((res = unicoap_server_send_response_body((unicoap_packet_t*)context->_packet, NULL,
                                                  context->resource
     )) >= 0) {
         context->_packet = NULL;

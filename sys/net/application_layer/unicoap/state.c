@@ -12,10 +12,14 @@
  */
 
 #include <errno.h>
+#include <string.h>
 
+#include "assert.h"
 #include "container.h"
 #include "event.h"
 #include "net/unicoap/config.h"
+#include "net/unicoap/server.h"
+#include "private/state.h"
 #include "random.h"
 #include "sched.h"
 #include "thread.h"
@@ -91,21 +95,7 @@ void unicoap_state_unlock(void)
     _unlock();
 }
 
-unicoap_observation_registration_t* unicoap_state_observation_registrations(void) {
-#if IS_USED(MODULE_UNICOAP_SERVER_OBSERVATION)
-    return _state.observation_registrations;
-#else
-    return NULL;
-#endif
-}
-
-unicoap_endpoint_t* unicoap_state_observers(void) {
-#if IS_USED(MODULE_UNICOAP_SERVER_OBSERVATION)
-    return _state.observers;
-#else
-    return NULL;
-#endif
-}
+/* MARK: - Client state */
 
 static unicoap_client_memo_t* _alloc_client(void)
 {
@@ -279,6 +269,181 @@ int unicoap_client_memo_assign_refno(unicoap_client_memo_t* memo)
     return 0;
 #endif
 }
+
+/* MARK: - Server memos */
+
+static unicoap_server_memo_t* _alloc_server(void)
+{
+#if UNICOAP_HAVE_SERVER_STATE
+    /* Find empty slot in list of transactions */
+    for (int i = 0; i < (int)ARRAY_SIZE(_state.server_memos); i += 1) {
+        if (_state.server_memos[i].super.endpoint.proto == UNICOAP_PROTO_UNSPECIFIED) {
+            return &_state.server_memos[i];
+        }
+    }
+#endif
+    _STATE_DEBUG("[server] no space to alloc\n");
+    return NULL;
+}
+
+static inline bool _is_server(const unicoap_memo_t* memo) {
+    (void)memo;
+#if UNICOAP_HAVE_SERVER_STATE
+    return (uintptr_t)memo >= (uintptr_t)&_state.server_memos[0] &&
+        (uintptr_t)memo <= (uintptr_t)&_state.server_memos[ARRAY_SIZE(_state.server_memos) - 1];
+#else
+    return false;
+#endif
+}
+
+static inline size_t _server_index(unicoap_server_memo_t* memo) {
+    /* debugging-only */
+#if UNICOAP_HAVE_SERVER_STATE
+    return ((uintptr_t)memo - (uintptr_t)_state.server_memos) / sizeof(*_state.server_memos);
+#else
+    (void)memo;
+    assert(false);
+    return 0;
+#endif
+}
+
+static void _deinit_server(unicoap_server_memo_t* memo) {
+    if (!UNICOAP_HAVE_SERVER_STATE) {
+        return;
+    }
+    _STATE_DEBUG("[server #%" PRIuSIZE "] release\n", _server_index(memo));
+    memo->resource = NULL;
+}
+
+unicoap_server_memo_t* unicoap_server_memo_create(const unicoap_endpoint_t* endpoint, 
+                                                  const unicoap_resource_t* resource) {
+    if (!UNICOAP_HAVE_SERVER_STATE) {
+        return NULL;
+    }
+    assert(endpoint);
+    assert(endpoint->proto != UNICOAP_PROTO_UNSPECIFIED);
+    _lock();
+    unicoap_server_memo_t* memo = _alloc_server();
+    if (memo) {
+        _STATE_DEBUG("[server #%" PRIuSIZE "] alloc\n", _server_index(memo));
+        memo->super.endpoint = *endpoint;
+        memo->resource = resource;
+    }
+    _unlock();
+    return memo;
+}
+
+unicoap_server_memo_t* unicoap_server_memo_with_token(const unicoap_endpoint_t* endpoint,
+                                                      const unicoap_resource_t* resource,
+                                                      const uint8_t* token, size_t token_length,
+                                                      bool allocate)
+{
+    (void)endpoint;
+    (void)token;
+    (void)token_length;
+    (void)resource;
+    assert(token);
+    unicoap_server_memo_t* memo = NULL;
+
+    if (token_length > sizeof(memo->token)) {
+        _STATE_DEBUG("[server] token of size %"PRIdSIZE" will never fit memo\n", token_length);
+        return NULL;
+    }
+
+    /* Look for memo. If not found, we'd have to go over the array again. We can avoid
+     * that second iteration by consolidating searching and allocating into a single function.
+     * We simply remember the last seen free spot. */
+
+#if UNICOAP_HAVE_SERVER_STATE
+    _lock();
+    unicoap_server_memo_t* end = (unicoap_server_memo_t*)_state.server_memos + ARRAY_SIZE(_state.server_memos);
+    for (unicoap_server_memo_t* _memo = _state.server_memos; _memo < end; _memo += 1) {
+        if (_memo->super.endpoint.proto == UNICOAP_PROTO_UNSPECIFIED) {
+            /* Keep track of free memo */
+            memo = _memo;
+        }
+        else if ((!endpoint || unicoap_endpoint_is_equal(&memo->super.endpoint, endpoint)) &&
+            token_length == _memo->token_length &&
+            memcmp(_memo->token, token, token_length) == 0) {
+            memo = _memo;
+            _STATE_DEBUG("[server #%" PRIuSIZE "] found\n", _server_index(memo));
+            break;
+        }
+    }
+
+    if (allocate && memo && memo->super.endpoint.proto == UNICOAP_PROTO_UNSPECIFIED) {
+        _STATE_DEBUG("[server #%" PRIuSIZE "] alloc\n", _server_index(memo));
+        memo->super.endpoint = *endpoint;
+        memo->resource = resource;
+        memcpy(memo->token, token, token_length);
+        memo->token_length = token_length;
+    }
+    _unlock();
+#endif
+    return memo;
+}
+
+void unicoap_server_memo_advance_with_resource(const unicoap_resource_t* resource, unicoap_server_memo_t** memo)
+{
+    (void)resource;
+    (void)memo;
+    assert(memo);
+
+#if UNICOAP_HAVE_SERVER_STATE
+    _lock();
+    unicoap_server_memo_t* end = (unicoap_server_memo_t*)_state.server_memos + ARRAY_SIZE(_state.server_memos);
+    if (!*memo) {
+        /* Initial call. */
+        *memo = _state.server_memos;
+    } else {
+        *memo += 1;
+    }
+    for (; *memo < end; *memo += 1) {
+        if ((*memo)->super.endpoint.proto != UNICOAP_PROTO_UNSPECIFIED &&
+            (*memo)->resource == resource
+        ) {
+            break;
+        }
+    }
+    _unlock();
+    if (*memo == end) {
+        /* Loop above never broken, so no memo found. Caller is expected to stop calling this
+         * this function once *memo is NULL. */
+        *memo = NULL;
+    }
+#endif
+}
+
+void unicoap_server_memo_free(unicoap_server_memo_t* memo, int error)
+{
+    if (!UNICOAP_HAVE_SERVER_STATE) {
+        return;
+    }
+    _lock();
+    /* Mark as unused, such that all the logic below can run without a lock.
+      * The messaging layer may need the lock too. */
+    unicoap_proto_t proto = memo->super.endpoint.proto;
+    (void)proto;
+    memo->super.endpoint.proto = UNICOAP_PROTO_UNSPECIFIED;
+    _unlock();
+    _deinit_server(memo);
+    (void)error;
+#if UNICOAP_HAVE_MESSAGING_STATE
+    /* On the exchange layer, we're hiding the actual reason from the driver. It should
+     * not matter to the messaging layer whether we release state because of an error or because
+     * the state object is released as usual. Should the messaging layer rely on this
+     * information, the exchange-messaging abstraction has a design flaw. */
+    if (unicoap_memo_messaging_state(&memo->super)) {
+        unicoap_messaging_notify(
+            unicoap_memo_messaging_state(&memo->super),
+            error ? unicoap_layer_notification_async_failure_from_errno(error) : UNICOAP_LAYER_NOTIFICATION_STATE_RELEASE,
+            NULL, proto);
+    }
+#endif
+    _free(&memo->super);
+}
+
+/* MARK: - Layers */
 
 void unicoap_exchange_notify(void* state, unicoap_layer_notification_t type, void* arg)
 {

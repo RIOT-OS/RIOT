@@ -242,10 +242,20 @@ static_assert(CONFIG_UNICOAP_GENERATED_TOKEN_LENGTH > 0,
  * @brief Maximum number of pending requests that can be started using the client API
  *
  ***Default**: 2
- *
  */
 #if !defined(CONFIG_UNICOAP_CLIENT_MEMOS_CAPACITY) || defined(DOXYGEN)
 #  define CONFIG_UNICOAP_CLIENT_MEMOS_CAPACITY (2)
+#endif
+
+/**
+ * @brief Maximum number of exchanges the server can keep track off
+ *
+ * Applies to active observation subscriptions and active block-wise transfers.
+ *
+ ***Default**: 2
+ */
+#if !defined(CONFIG_UNICOAP_SERVER_MEMOS_CAPACITY) || defined(DOXYGEN)
+#  define CONFIG_UNICOAP_SERVER_MEMOS_CAPACITY (2)
 #endif
 
 /** @} */
@@ -285,54 +295,6 @@ static_assert(CONFIG_UNICOAP_GENERATED_TOKEN_LENGTH > 0,
  * @name Resource observation
  * @{
  */
-/**
- * @brief If `1`, only a single observer is allowed to register for any given resource
- *
- * **Default**: Disabled.
- */
-#if !defined(CONFIG_UNICOAP_OBSERVATION_SINGLE_REGISTRATION_PER_RESOURCE) || defined(DOXYGEN)
-#  define CONFIG_UNICOAP_OBSERVATION_SINGLE_REGISTRATION_PER_RESOURCE (0)
-#endif
-
-/**
- * @brief Maximum number of registrations in total across resources
- *
- * **Default**: 2 registrations total
- *
- * If @ref CONFIG_UNICOAP_OBSERVATION_SINGLE_REGISTRATION_PER_RESOURCE is enabled,
- * this constant's value is superseeded.
- */
-#if !defined(CONFIG_UNICOAP_OBSERVATION_REGISTRATION_CAPACITY) || defined(DOXYGEN)
-#  define CONFIG_UNICOAP_OBSERVATION_REGISTRATION_CAPACITY (2)
-#endif
-
-/**
- * @brief Maximum number of resource-observing clients
- *
- * **Default**: 2 different clients total
- *
- * This is the total number of **different** remote endpoints that can register
- * for resource notifications. The same client may still register for multiple resources.
- */
-#if !defined(CONFIG_UNICOAP_OBSERVATION_UNIQUE_OBSERVER_CAPACITY) || defined(DOXYGEN)
-#  define CONFIG_UNICOAP_OBSERVATION_UNIQUE_OBSERVER_CAPACITY (2)
-#endif
-
-static_assert(
-    CONFIG_UNICOAP_OBSERVATION_UNIQUE_OBSERVER_CAPACITY <= CONFIG_UNICOAP_OBSERVATION_REGISTRATION_CAPACITY,
-    "CONFIG_UNICOAP_OBSERVATION_UNIQUE_OBSERVER_CAPACITY must not exceed "
-    "CONFIG_UNICOAP_OBSERVATION_REGISTRATION_CAPACITY");
-
-/**
- * @brief Restrict all resources to a single observer per resource
- *
- * Attempts from other clients to register for resource notifications will be denied/ignored.
- *
- * **Default**: Disabled (0)
- */
-#if !defined(CONFIG_UNICOAP_OBSERVATION_SINGLE_CLIENT_PER_RESOURCE) || defined(DOXYGEN)
-#  define CONFIG_UNICOAP_OBSERVATION_SINGLE_CLIENT_PER_RESOURCE 0
-#endif
 
 /**
  * @brief Width in bytes of the Observe option value for a notification
