@@ -92,7 +92,6 @@ static const uart_conf_t uart_config[] = {
 #define GRETH_PARAM_IRQ     (5U)            /**< GRETH interrupt line */
 /** @} */
 
-
 #ifdef __cplusplus
 }
 #endif
