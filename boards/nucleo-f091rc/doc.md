@@ -43,7 +43,7 @@ You can find general information about the Nucleo64 boards on the
 ### RIOT static pin mapping
 
 please refer to [this](https://docs.google.com/spreadsheets/d/1gnxsux5WpFrn-33Ivb9nGgTBqooqgDYxRkhZms-cvsc/edit?usp=sharing)
-document for the pin mapping as implemenented in `boards/nucleo-f091/include/periph_conf.h`
+document for the pin mapping as implemenented in `boards/nucleo-f091rc/include/periph_conf.h`
 
 ### User Interface
 
