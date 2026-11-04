@@ -420,6 +420,10 @@ static int _init(netdev_t *netdev)
     }
     DEBUG("[greth] SW reset done: ctrl=0x%08" PRIx32 "\n", _mmio_read(&regs->ctrl));
 
+    /* With EDCL the core polls the PHY itself until auto-negotiation is done.
+     * Without a link that never happens and MDIO stays busy, so stop it first. */
+    _mmio_write(&regs->ctrl, GRETH_CTRL_EDCLDIS);
+
     int phy = _phy_detect(regs);
     if (phy < 0) {
         /* MDIO may be unreachable while the PHY still works (set up by the
