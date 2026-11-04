@@ -16,4 +16,4 @@ The driver uses fixed-point arithmetic for all conversions.
 To do so, it needs a lookup table (LUT).
 A default one is provided for a Pt100 and a 330&Omega; reference resistor.
 The user can generate one for different resistor values with the
-`dist/genlut.py` script.
+`drivers/max31865/dist/genlut.py` script.
