@@ -426,7 +426,8 @@ static inline int unicoap_server_send_notification_body(unicoap_packet_t* packet
     return unicoap_server_send_body(packet, memo, resource,
                                     (resource->flags & UNICOAP_RESOURCE_FLAG_NOTIFY_RELIABLY)
                                      ? flags | UNICOAP_MESSAGING_FLAG_RELIABLE
-                                     : flags & ~UNICOAP_MESSAGING_FLAG_RELIABLE);
+                                     : flags & ~UNICOAP_MESSAGING_FLAG_RELIABLE) |
+                                     UNICOAP_MESSAGING_FLAG_TRACK;
 }
 /** @} */
 

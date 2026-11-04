@@ -44,7 +44,7 @@ static int _send_notifications(unicoap_packet_t* packet, const unicoap_resource_
     unicoap_server_memo_t* memo = NULL;
     while ((memo = unicoap_server_memo_next_with_resource(resource, memo))) {
         if (IS_ACTIVE(CONFIG_UNICOAP_DEBUG_LOGGING)) {
-            _OBSERVATION_DEBUG("found a registration for resource ");
+            _OBSERVATION_DEBUG("found a subscription for resource ");
             unicoap_print_path(&resource->path);
             DEBUG(" from ");
             DEBUG_ENDPOINT(&memo->super.endpoint);
@@ -116,9 +116,25 @@ int unicoap_send_notification(unicoap_message_t* response, const unicoap_resourc
     return _send_notifications(&packet, resource);
 }
 
-bool unicoap_observation_resource_has_observers(const unicoap_resource_t* resource) {
+bool unicoap_observation_resource_has_observers(const unicoap_resource_t* resource)
+{
     assert(resource);
     return unicoap_server_memo_next_with_resource(resource, NULL) != NULL;
+}
+
+void unicoap_observation_resource_drop_observers(const unicoap_resource_t* resource)
+{
+    unicoap_server_memo_t* memo = NULL;
+    while ((memo = unicoap_server_memo_next_with_resource(resource, memo))) {
+        unicoap_server_memo_free(memo, 0);
+        if (IS_ACTIVE(CONFIG_UNICOAP_DEBUG_LOGGING)) {
+            _OBSERVATION_DEBUG("dropped subscription for resource ");
+            unicoap_print_path(&resource->path);
+            DEBUG(" from ");
+            DEBUG_ENDPOINT(&memo->super.endpoint);
+            DEBUG("\n");
+        }
+    }
 }
 
 int unicoap_observation_register(const unicoap_endpoint_t* remote, const unicoap_resource_t* resource,

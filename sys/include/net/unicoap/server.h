@@ -583,6 +583,20 @@ bool unicoap_observation_resource_has_observers(const unicoap_resource_t* resour
     return false;
 }
 #endif
+
+/**
+ * @brief Removes all observers from the list of observers of the given resource
+ *
+ * @param[in] resource CoAP resource
+ */
+#if IS_USED(MODULE_UNICOAP_SERVER_OBSERVATION) || defined(DOXYGEN)
+void unicoap_observation_resource_drop_observers(const unicoap_resource_t* resource);
+#else
+static inline
+void unicoap_observation_resource_drop_observers(const unicoap_resource_t* resource)
+{
+}
+#endif
 /** @} */
 
 /* MARK: - Sending notifications */
