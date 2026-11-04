@@ -60,10 +60,14 @@ extern "C" {
 /**
  * ESP32-S2 specific RTC clock configuration
  */
-#define CONFIG_RTC_CLK_CAL_CYCLES               576
+#ifndef CONFIG_RTC_CLK_CAL_CYCLES
+#  define CONFIG_RTC_CLK_CAL_CYCLES             576
+#endif
 
 #ifdef MODULE_ESP_RTC_TIMER_32K
-#  define CONFIG_RTC_XTAL_CAL_RETRY             3
+#  ifndef CONFIG_RTC_XTAL_CAL_RETRY
+#    define CONFIG_RTC_XTAL_CAL_RETRY           3
+#  endif
 #endif
 
 /**

@@ -162,6 +162,11 @@
  */
 #if MODULE_ESP_RTC_TIMER_32K
 #  define CONFIG_RTC_CLK_SRC_EXT_CRYS               1
+#  define CONFIG_ESP_SYSTEM_RTC_EXT_XTAL            1
+#  ifndef CONFIG_RTC_CLK_CAL_CYCLES
+/* the 32 kHz crystal requires more cycles for calibration (ESP-IDF default) */
+#    define CONFIG_RTC_CLK_CAL_CYCLES               3000
+#  endif
 #else
 #  define CONFIG_RTC_CLK_SRC_INT_RC                 1
 #endif
@@ -330,6 +335,14 @@
 #  include "sdkconfig_esp32s3.h"
 #else
 #  error "ESP32x family implementation missing"
+#endif
+
+/**
+ * Default number of cycles for RTC slow clock calibration if not already
+ * defined for the 32 kHz crystal or by the ESP32x family specific configuration
+ */
+#ifndef CONFIG_RTC_CLK_CAL_CYCLES
+#  define CONFIG_RTC_CLK_CAL_CYCLES                 1024
 #endif
 
 #ifndef CONFIG_MMU_PAGE_SIZE

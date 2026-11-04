@@ -666,8 +666,20 @@ typedef struct {
 
 /**
  * @brief   RTT minimum offset valid for all ESP32x SoCs
+ *
+ * If the 32.768 kHz crystal is used (module `esp_rtc_timer_32k`), the RTC
+ * timer alarm is only triggered when the RTC counter reaches exactly the
+ * alarm value. An alarm that is already in the past when it becomes active,
+ * because the counter was incremented while the alarm was set, would only be
+ * triggered after a complete wrap-around of the 48-bit RTC counter. The
+ * minimum offset therefore has to cover the latency for setting the alarm,
+ * as determined with `tests/periph/rtt_min`.
  */
-#define RTT_MIN_OFFSET (1U)
+#if MODULE_ESP_RTC_TIMER_32K
+#  define RTT_MIN_OFFSET    (3U)
+#else
+#  define RTT_MIN_OFFSET    (1U)
+#endif
 
 /** @} */
 

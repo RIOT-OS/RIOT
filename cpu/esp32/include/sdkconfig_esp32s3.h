@@ -58,11 +58,6 @@ extern "C" {
 /** @} */
 
 /**
- * ESP32-S3 specific RTC clock configuration
- */
-#define CONFIG_RTC_CLK_CAL_CYCLES               1024
-
-/**
  * ESP32-S3 specific EFUSE configuration
  */
 #define CONFIG_EFUSE_MAX_BLK_LEN                256
