@@ -292,8 +292,9 @@ endif
 ifneq (,$(filter shell_cmd_saul_reg,$(USEMODULE)))
   USEMODULE += saul_reg
 endif
-ifneq (,$(filter shell_cmd_semtech-loramac,$(USEPKG)))
-  USEMODULE += semtech-loramac
+ifneq (,$(filter shell_cmd_semtech-loramac,$(USEMODULE)))
+  USEPKG += semtech-loramac
+  USEMODULE += fmt
 endif
 ifneq (,$(filter shell_cmd_sha1sum,$(USEMODULE)))
   USEMODULE += shell_cmd_vfs
