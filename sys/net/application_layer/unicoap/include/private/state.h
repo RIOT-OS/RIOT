@@ -135,22 +135,58 @@ static inline unicoap_scheduled_event_t* unicoap_scheduled_event_of_event(event_
 typedef void (*unicoap_event_callback_t)(unicoap_scheduled_event_t* event);
 
 /**
- * @brief Schedules an event on the internal unicoap queue
+ * @brief Initializes an event on the internal unicoap queue but doesn't arm it yet
  *
  * If you instead want to execute as soon as possible, use @ref unicoap_loop_enqueue instead.
  *
- * @param[in,out] event The event to schedule. Provide a pointer to a pre-allocated event
- * @param[in] callback Function pointer to be called on the internal queue after @p duration ms have elapses
+ * @param[in,out] event The event to init. Provide a pointer to a pre-allocated event
+ * @param[in] callback Function pointer to be called on the internal queue after
+ *                     @p duration ms have elapsed
  * @param duration Number of milliseconds to wait
  * @param[in] name A null-terminated string identifier to distinguish the event in debug logs
  *
  * @p name has no effect when `DEVELHELP` is disabled.
  */
-void unicoap_event_schedule(unicoap_scheduled_event_t* event, unicoap_event_callback_t callback,
-                            uint32_t duration, const char* name);
+void unicoap_event_init(unicoap_scheduled_event_t* event,
+                        unicoap_event_callback_t callback,
+                        uint32_t duration, const char* name);
+
+/**
+ * @brief Checks if event has been initialized
+ *
+ * @param[in,out] event The event to check
+ *
+ * @returns A boolean value indicating whether the event has been initialized
+ */
+static inline bool unicoap_event_is_initialized(unicoap_scheduled_event_t* event)
+{
+    return event->ztimer.arg == event && event->ztimer.base.offset > 0;
+}
+
+/**
+ * @brief Checks if event has been armed
+ *
+ * @param[in,out] event The event to check
+ *
+ * @returns A boolean value indicating whether the event has been armed
+ */
+static inline bool unicoap_event_is_scheduled(unicoap_scheduled_event_t* event)
+{
+    return unicoap_event_is_initialized(event) && 
+           ztimer_is_set(UNICOAP_CLOCK, &event->ztimer);
+}
+
+/**
+ * @brief Arms timer of a scheduled event
+ *
+ * @param[in,out] event The event to arm. Provide a pointer to a pre-allocated event
+ */
+void unicoap_event_schedule(unicoap_scheduled_event_t* event);
 
 /**
  * @brief Discards the currently set timeout, and reschedules the event to be posted in @p duration ms
+ *
+ * Changes duration and arms timer again.
  *
  * Use this method to rerun the timer with the same callbacks but a new timeout value.
  * E.g., the RFC 7252 driver utilizes this method for setting the next acknowledgement timeout.
@@ -158,7 +194,33 @@ void unicoap_event_schedule(unicoap_scheduled_event_t* event, unicoap_event_call
  * @param[in] event Scheduled event you want to reschedule
  * @param[in] duration Number of milliseconds the event should be posted on the queue
  */
-void unicoap_event_reschedule(unicoap_scheduled_event_t* event, uint32_t duration);
+static inline void unicoap_event_reschedule(unicoap_scheduled_event_t* event, uint32_t duration)
+{
+    event->ztimer.base.offset = duration;
+    unicoap_event_schedule(event);
+}
+
+/**
+ * @brief Initializes and arms an event to be fired on internal unicoap queue
+ *
+ * If you instead want to execute as soon as possible, use @ref unicoap_loop_enqueue instead.
+ *
+ * @param[in,out] event The event to schedule. Provide a pointer to a pre-allocated event
+ * @param[in] callback Function pointer to be called on the internal queue after
+ *                     @p duration ms have elapsed
+ * @param duration Number of milliseconds to wait
+ * @param[in] name A null-terminated string identifier to distinguish the event in debug logs
+ *
+ * @p name has no effect when `DEVELHELP` is disabled.
+ */
+static inline void unicoap_event_init_and_schedule(unicoap_scheduled_event_t* event,
+                                                   unicoap_event_callback_t callback,
+                                                   uint32_t duration, const char* name)
+{
+    unicoap_event_init(event, callback, duration, name);
+    unicoap_event_schedule(event);
+}
+
 /**
  * @brief Cancels the event
  *

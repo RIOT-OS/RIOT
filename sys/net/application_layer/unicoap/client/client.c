@@ -188,11 +188,11 @@ int unicoap_client_send_request_body(unicoap_message_t* request,
             unicoap_options_remove(unicoap_client_memo_options(memo), UNICOAP_OPTION_ETAG);
         }
 
-        unicoap_event_schedule(&memo->super.exchange.timeout, _on_response_timeout,
-                               (parameters && parameters->timeout_ms > 0) ?
-                                   parameters->timeout_ms :
-                                   CONFIG_UNICOAP_TIMEOUT_CLIENT_RESPONSE_MS,
-                               "client.resp-timeout");
+        unicoap_event_init_and_schedule(&memo->super.exchange.timeout, _on_response_timeout,
+                                        (parameters && parameters->timeout_ms > 0) ?
+                                            parameters->timeout_ms :
+                                            CONFIG_UNICOAP_TIMEOUT_CLIENT_RESPONSE_MS,
+                                        "client.resp-timeout");
     }
     /* TODO: OSCORE */
     if ((res = unicoap_client_send_request_part(&packet, memo, flags)) < 0) {

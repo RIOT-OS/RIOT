@@ -554,32 +554,36 @@ static void _scheduled_event_callback(void* scheduled_event)
     event_post(&_queue, (event_t*)scheduled_event);
 }
 
-void unicoap_event_schedule(unicoap_scheduled_event_t* event, unicoap_event_callback_t callback,
-                            uint32_t duration, const char* name)
+void unicoap_event_init(unicoap_scheduled_event_t* event, unicoap_event_callback_t callback,
+                        uint32_t duration, const char* name)
 {
     (void)name;
 #if DEVELHELP
     assert(name);
     event->name = name;
 #endif
-    if (IS_ACTIVE(DEVELHELP)) {
-        _STATE_EVENT_DEBUG("%s in %" PRIu32 "ms\n", unicoap_scheduled_event_name(event), duration);
-    }
+
     event->ztimer.callback = _scheduled_event_callback;
     event->ztimer.arg = (void*)event;
     /* This cast is fine because (a) the return types are identical and the function argument is
      * a pointer to a struct, too. */
     event->super = (event_t){ .handler = (event_handler_t)callback };
-    ztimer_set(UNICOAP_CLOCK, &event->ztimer, duration);
+    event->ztimer.base.offset = duration;
 }
 
-void unicoap_event_reschedule(unicoap_scheduled_event_t* event, uint32_t duration)
+void unicoap_event_schedule(unicoap_scheduled_event_t* event)
 {
+    assert(unicoap_event_is_initialized(event));
+    assert(!unicoap_event_is_scheduled(event));
+
     if (IS_ACTIVE(DEVELHELP)) {
-        _STATE_EVENT_DEBUG("%s in %" PRIu32 "ms (rescheduled)\n",
-                           unicoap_scheduled_event_name(event), duration);
+        _STATE_EVENT_DEBUG("%s in %" PRIu32 "ms\n", unicoap_scheduled_event_name(event),
+                           event->ztimer.base.offset);
     }
-    ztimer_set(UNICOAP_CLOCK, &event->ztimer, duration);
+    /* The ztimer event does not distinguish between setting the duration and arming the timer,
+     * it only let's us do that in one go. So we use ztimer_t::base.offset as the place to store
+     * the duration, and pass it to the set-duration-and-arm function called ztimer_set. */
+    ztimer_set(UNICOAP_CLOCK, &event->ztimer, event->ztimer.base.offset);
 }
 
 void unicoap_event_cancel(unicoap_scheduled_event_t* event)
@@ -591,6 +595,7 @@ void unicoap_event_cancel(unicoap_scheduled_event_t* event)
         _STATE_EVENT_DEBUG("%s cancelled\n", unicoap_scheduled_event_name(event));
     }
     bool triggered = !ztimer_remove(UNICOAP_CLOCK, &event->ztimer);
+    event->ztimer.base.offset = 0;
     if (triggered) {
         /* event cancel runs in O(n), so we really only want to call
          * event_cancel if the event has already been posted */

@@ -129,6 +129,33 @@ typedef enum {
      */
     UNICOAP_MESSAGING_FLAG_TRACK = 0x80,
 
+    /**
+     * @brief Instructs the messaging layer to limit the lifetime of a tracked transmission
+     *
+     * When the messaging layer tracks a transmission (keeps state) --- whether because it
+     * inherently does that or due to @ref UNICOAP_MESSAGING_FLAG_TRACK --- it may do so for a
+     * potentially unbounded time. This flag limits this tracked transmission lifetime to
+     * a duration defined by the relevant messaging layer. It may also be that this tracked
+     * transmission already has a lifetime limited by the driver, e.g., because it ends
+     * after a certain timeout and is considered to have failed.
+     *
+     * This flag has no effect if the transmission is not tracked. Omitting
+     * @ref UNICOAP_MESSAGING_FLAG_TRACK but passing @ref UNICOAP_MESSAGING_FLAG_EXPIRE will
+     * limit the lifetime of naturally tracked transmissions, if their lifetime isn't naturally
+     * limited.
+     *
+     * ## RFC 7252 Example
+     * TL;DR: `CON`s are alway expire, `NON`s only expire if tracked.
+     *
+     * `CON`s expire when the ACK timeout expires and the retransmission counter would exceeded the
+     * the limit, so this flag has no effect on `CON`s. `NON`s, when tracked, use the timeout
+     * set via @ref CONFIG_UNICOAP_RFC7252_NONCONFIRMABLE_WAITING_TIME_MS. A special cases
+     * arises when @ref CONFIG_UNICOAP_RFC7252_NONCONFIRMABLE_WAITING_TIME_MS is zero, i.e.,
+     * the transmission would expire immediately. This is equivalent to not passing
+     * @ref UNICOAP_MESSAGING_FLAG_TRACK at all.
+     */
+    UNICOAP_MESSAGING_FLAG_EXPIRE = 0x40,
+
     /* MARK: unicoap_driver_extension_point */
 } __attribute__((__packed__)) unicoap_messaging_flags_t;
 
@@ -424,7 +451,8 @@ static inline int unicoap_server_send_notification_body(unicoap_packet_t* packet
     return unicoap_server_send_body(packet, memo, ctx->resource,
                                      _messaging_flags_resource(ctx->resource->flags) |
                                      _messaging_flags_response(ctx->_flags) |
-                                     UNICOAP_MESSAGING_FLAG_TRACK);
+                                     UNICOAP_MESSAGING_FLAG_TRACK |
+                                     UNICOAP_MESSAGING_FLAG_EXPIRE);
 }
 /** @} */
 

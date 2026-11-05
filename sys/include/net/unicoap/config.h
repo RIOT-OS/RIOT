@@ -270,11 +270,6 @@ static_assert(CONFIG_UNICOAP_GENERATED_TOKEN_LENGTH > 0,
  */
 
 /**
- * @brief `NSTART` constant for multicast delay calculation
- */
-#define UNICOAP_NSTART          (1)
-
-/**
  * @brief `DEFAULT_LEISURE` constant for multicast delay calculation
  */
 #define UNICOAP_DEFAULT_LEISURE (5)
@@ -407,6 +402,83 @@ static_assert(CONFIG_UNICOAP_RETRANSMISSIONS_MAX < 32,
  */
 #if !defined(CONFIG_UNICOAP_RFC7252_TRANSMISSIONS_CAPACITY) || defined(DOXYGEN)
 #  define CONFIG_UNICOAP_RFC7252_TRANSMISSIONS_CAPACITY 2
+#endif
+
+/**
+ * @brief Maximum number of parallel outstanding RFC 7252 transmissions per CoAP endpoint
+ *
+ * This constant limits how many CoAP messages can be sent without queuing over UDP, DTLS, slipmux,
+ * and any transport using [RFC 7252](https://datatracker.ietf.org/doc/html/rfc7252#section-3.1).
+ * Once the limit is reached, messages get queued until sent messages have been rejected,
+ * acknowledged (if confirmable) or their lifetime (if non-confirmable) has expired.
+ *
+ * You can completely opt out of this limit and any message queuing by setting this constant to
+ * zero, which is the default.
+ *
+ * **Default**: 0 (no limit, no queuing)
+ *
+ * @remark
+ * Setting this constant to one or higher will increased latency and may require increasing
+ * @ref CONFIG_UNICOAP_RFC7252_TRANSMISSIONS_CAPACITY as more state object are utilized, and longer.
+ * If your application does not send a request, if at all, until after the previous has been
+ * completed and you do not send notifications (if any) faster than a round-trip time between
+ * all your clients and this RIOT node, you may completely opt out of this limit. Limiting would
+ * not have an effect in this instance.
+ *
+ * ## Resource Observation
+ * If you indeed limit parallel outstanding transmissions, notifications sent from your
+ * server application may get stalled, or dropped and replaced by newer notifications.
+ * When you send a notification out to registered observers using @ref unicoap_send_notification,
+ * notification transmissions will get queued as usual with every other message sent out by
+ * `unicoap`. However, if a notification destined for a particular observer is currently being
+ * transmitted and there's already a nother notification message queued, the queued message will get
+ * replaced by the new notification when you call @ref unicoap_send_notification again.
+ * You may also configure @ref CONFIG_UNICOAP_TIMEOUT_ACK_MS and/or
+ * @ref CONFIG_UNICOAP_RETRANSMISSIONS_MAX to reduce the stalling/replacing effect on notifications
+ * sent **reliably**, but keep in mind that this constant doesn't just apply to notifications.
+ * To reduce or disable stalling and replacement of notifications sent **unreliably**,
+ * configure @ref CONFIG_UNICOAP_RFC7252_NON_WAITING_TIME_MS accordingly. Alternatively,
+ * consider disabling this constant entirely.
+ *
+ * ## Technical Explanation
+ * This constant is equivalent to the maximum number of parallel outstanding transmissions
+ * in [RFC 7252](https://datatracker.ietf.org/doc/html/rfc7252#section-3.1) (`NSTART`).
+ * To achieve the same behavior the RFC requires, set this constant to `1`.
+ *
+ * - `CON` requests, responses, and notifications are always counted as outstanding transmissions
+ *   until acknowledged or rejected.
+ * - `NON` requests are be considered an outstanding transmission until the response has arrived.
+ * - `NON` responses will not be considered an outstanding transmission.
+ * - `NON` notifications will always be considered outstanding transmissions for a
+ *   duration called the [_waiting time_](https://www.rfc-editor.org/info/rfc7641/#section-4.5.1)
+ *   during which `unicoap` will _wait_ and monitor corresponding RSTs arriving.
+ */
+#if !defined(CONFIG_UNICOAP_RFC7252_PARALLEL_TRANSMISSIONS_PER_ENDPOINT) || defined(DOXYGEN)
+#  define CONFIG_UNICOAP_RFC7252_PARALLEL_TRANSMISSIONS_PER_ENDPOINT 0
+#endif
+
+/**
+ * @brief The duration in milliseconds to wait until a non-confirmable notification is no longer
+ *        considered an outstanding transmission
+ *
+ * Set this constant to change how long the RFC 7252 messaging layers waits and monitors reset
+ * message corresponding to the non-confirmable notification.
+ * This constant has an effect regardless of
+ * @ref CONFIG_UNICOAP_RFC7252_PARALLEL_TRANSMISSIONS_PER_ENDPOINT.
+ * Refer to @ref CONFIG_UNICOAP_RFC7252_PARALLEL_TRANSMISSIONS_PER_ENDPOINT for the
+ * implications of this constant in combination with a limit on oustanding transmissions.
+ *
+ * You can completely opt out of this retention period (and thus any side effect as mentioned above)
+ * by setting this constant to zero, which is the default.
+ * [RFC 7641 (Resource Observation)](https://www.rfc-editor.org/info/rfc7641/#section-4.5.1)
+ * recommends you set this to the round-trip time (RTT) between your server application and
+ * clients registered as observers. If you cannot provide such an estimate, it recommends
+ * configuring 3 seconds as the waiting time.
+ *
+ * **Default**: 0 (no waiting time, no queuing)
+ */
+#if !defined(CONFIG_UNICOAP_RFC7252_NONCONFIRMABLE_WAITING_TIME_MS) || defined(DOXYGEN)
+#  define CONFIG_UNICOAP_RFC7252_NONCONFIRMABLE_WAITING_TIME_MS 0
 #endif
 
 /* TODO: Client and advanced server features: Limit to exchange-layer state objects */

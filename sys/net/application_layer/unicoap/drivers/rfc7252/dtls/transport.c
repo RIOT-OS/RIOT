@@ -109,9 +109,10 @@ static void _dtls_pander_and_spoonfeed_session_mgmt(void)
                     " limiting session lifespan to %" PRIu32 " ms\n",
                     (unsigned int)CONFIG_UNICOAP_DTLS_MINIMUM_AVAILABLE_SESSION_SLOTS,
                     (uint32_t)CONFIG_UNICOAP_DTLS_MINIMUM_AVAILABLE_SESSION_SLOTS_TIMEOUT_MS);
-        unicoap_event_schedule(&_dtls_session_triage_event, _dtls_session_triage,
-                               CONFIG_UNICOAP_DTLS_MINIMUM_AVAILABLE_SESSION_SLOTS_TIMEOUT_MS,
-                               "messaging.dtls.triage");
+        unicoap_event_init_and_schedule(
+            &_dtls_session_triage_event, _dtls_session_triage,
+            CONFIG_UNICOAP_DTLS_MINIMUM_AVAILABLE_SESSION_SLOTS_TIMEOUT_MS,
+            "messaging.dtls.triage");
     }
     else {
         /* If enough session slots left: cancel timeout to free session. */
