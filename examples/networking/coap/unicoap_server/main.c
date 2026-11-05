@@ -18,7 +18,6 @@
 #include "net/netif.h"
 
 /* Include timer for resource notifications in this simple example. */
-#include "net/unicoap/server.h"
 #include "ztimer/periodic.h"
 
 /*
@@ -238,7 +237,7 @@ static void notify_clients(unicoap_job_t* job) {
 
     unicoap_notification_context_t ctx = {};
     unicoap_notification_set_resource(&ctx, UNICOAP_RESOURCE_NAMED(hello));
-    unicoap_notification_set_flags(&ctx, UNICOAP_NOTIFICATION_FLAG_RELIABLE);
+    unicoap_notification_set_flags(&ctx, UNICOAP_RESPONSE_FLAG_RELIABLE);
     if ((res = unicoap_send_notification(&response, &ctx)) < 0) {
         printf("app: sending notification failed (%i, %s)\n", res, strerror(-res));
     }

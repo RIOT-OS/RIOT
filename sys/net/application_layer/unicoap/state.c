@@ -342,6 +342,8 @@ unicoap_server_memo_t* unicoap_server_memo_with_token(const unicoap_endpoint_t* 
     (void)token;
     (void)token_length;
     (void)resource;
+    assert(endpoint);
+    assert(resource);
     assert(token);
     unicoap_server_memo_t* memo = NULL;
 
@@ -362,9 +364,12 @@ unicoap_server_memo_t* unicoap_server_memo_with_token(const unicoap_endpoint_t* 
             /* Keep track of free memo */
             memo = _memo;
         }
-        else if ((!endpoint || unicoap_endpoint_is_equal(&memo->super.endpoint, endpoint)) &&
+        /* Resources are identified by reference, hence comparing the pointer here is okay. */
+        else if (resource == memo->resource &&
+            unicoap_endpoint_is_equal(&memo->super.endpoint, endpoint) &&
             token_length == _memo->token_length &&
-            memcmp(_memo->token, token, token_length) == 0) {
+            memcmp(_memo->token, token, token_length) == 0
+        ) {
             memo = _memo;
             _STATE_DEBUG("[server #%" PRIuSIZE "] found\n", _server_index(memo));
             break;

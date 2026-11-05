@@ -349,14 +349,6 @@ _messaging_flags_response(unicoap_response_flags_t response_flags)
     return (unicoap_messaging_flags_t)response_flags;
 }
 
-static inline unicoap_messaging_flags_t
-_messaging_flags_notification(unicoap_notification_flags_t notification_flags)
-{
-    /* We documented other flags are RFU, hence downcasting to the messaging
-     flags bitfield width is fine here */
-    return (unicoap_messaging_flags_t)notification_flags;
-}
-
 static inline unicoap_messaging_flags_t 
 _messaging_flags_request(unicoap_request_flags_t request_flags)
 {
@@ -431,7 +423,7 @@ static inline int unicoap_server_send_notification_body(unicoap_packet_t* packet
 ) {
     return unicoap_server_send_body(packet, memo, ctx->resource,
                                      _messaging_flags_resource(ctx->resource->flags) |
-                                     _messaging_flags_notification(ctx->_flags) |
+                                     _messaging_flags_response(ctx->_flags) |
                                      UNICOAP_MESSAGING_FLAG_TRACK);
 }
 /** @} */
