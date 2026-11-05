@@ -125,3 +125,9 @@ reachable EIDs might have changed. This is automatically done in the default FWP
 implementation.
 
 @see pkg_bplib_fwp
+
+## Limitations
+
+Currently the Admin Statistics of all storage operations (store, delete, etc.)
+are not consistently updated everywhere for the VFS storage, and not at all
+updated for the void storage.

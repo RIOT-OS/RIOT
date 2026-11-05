@@ -38,6 +38,8 @@
 #define NEXT_BUNDLE_PATH_BUNDLE_READ            0
 /** @brief Iteration completed without errors, no bundle is in the iterator */
 #define NEXT_BUNDLE_PATH_ITERATION_COMPLETED    1
+/** @brief An *already expired* bundle has been read and is in the iterator */
+#define NEXT_BUNDLE_PATH_BUNDLE_READ_EXPIRED    2
 
 typedef struct {
     char path[BPLIB_STOR_PATHLEN_DAT];
@@ -114,6 +116,7 @@ static BPLib_Status_t _destroy_iterator(bundle_path_iterator_t* iterator)
  * @retval -EINVAL when the state is invalid or null pointers are passed
  * @retval -ERRNO respective negative errors from vfs_opendir if this fails
  * @retval NEXT_BUNDLE_PATH_ITERATION_COMPLETED when traversal of the whole path is completed
+ * @retval NEXT_BUNDLE_PATH_BUNDLE_READ_EXPIRED when an expired bundle has been read
  */
 static int _next_bundle_path(bundle_path_iterator_t* iterator,
     const BPLib_EID_Pattern_t* dest_eids, size_t num_eids)
@@ -253,10 +256,15 @@ static int _next_bundle_path(bundle_path_iterator_t* iterator,
             continue;
         }
 
-        /* Also ignore all bundles that have already expired */
+        /* This function is used by bundles loading as well as garbage collection, so
+         * ignoring all expired bundles leads to no garbage collection. Instead, the return
+         * code indicates if the bundle is already expired, which the normal loader can skip. */
         iterator->expiry_val = strtoull(entry.d_name, NULL, 16);
         if (iterator->expiry_val <= (uint64_t)BPLib_TIME_GetMonotonicTime()) {
-            continue;
+            res = NEXT_BUNDLE_PATH_BUNDLE_READ_EXPIRED;
+        }
+        else {
+            res = NEXT_BUNDLE_PATH_BUNDLE_READ;
         }
 
         acc_len = BPLIB_STOR_DATA_LEN + 1 + iterator->node_len + 1 + iterator->service_len;
@@ -265,7 +273,7 @@ static int _next_bundle_path(bundle_path_iterator_t* iterator,
             "/%s", entry.d_name);
         iterator->id_val = strtoul(strchr(entry.d_name, '_') + 1, NULL, 16);
 
-        return NEXT_BUNDLE_PATH_BUNDLE_READ;
+        return res;
     }
 }
 
@@ -351,6 +359,10 @@ static void _fill_bundle_cache(const BPLib_EID_Pattern_t* dest_eids,
         do {
             res = _next_bundle_path(&iterator, dest_eids, num_eids);
         } while (res == -EAGAIN);
+
+        if (res == NEXT_BUNDLE_PATH_BUNDLE_READ_EXPIRED) {
+            continue;
+        }
 
         /* Error or full traversal */
         if (res != NEXT_BUNDLE_PATH_BUNDLE_READ) {
@@ -591,42 +603,40 @@ BPLib_Status_t BPLib_STOR_EgressForID(BPLib_Instance_t* inst, uint32_t egress_id
 
 BPLib_Status_t BPLib_STOR_GarbageCollect(BPLib_Instance_t* inst)
 {
-    (void) inst;
+    if (inst->BundleStorage.BundleCountStored == 0) {
+        return BPLIB_SUCCESS;
+    }
+    /* Another early return could be added here by tracking the lowest
+     * exipiration timestamp and only continuing if some bundle actually expired,
+     * rather than checking every time. */
+
     bundle_path_iterator_t iterator = BUNDLE_PATH_ITER_INIT;
     int res;
     int fd;
     ssize_t bytes_read;
+    ssize_t seek_res;
     BPLib_EID_Pattern_t wildcard = {
         .Scheme       = BPLIB_EID_SCHEME_IPN,
         .IpnSspFormat = BPLIB_EID_IPN_SSP_FORMAT_TWO_DIGIT,
         .MinAllocator = 0,
-        .MaxAllocator = 0xFFFFFFFFFFFFFFFF,
+        .MaxAllocator = BPLIB_EID_PATTERN_MAX_ALLOCATOR,
         .MinNode      = 0,
-        .MaxNode      = 0xFFFFFFFFFFFFFFFF,
+        .MaxNode      = BPLIB_EID_PATTERN_MAX_NODE,
         .MinService   = 0,
-        .MaxService   = 0xFFFFFFFFFFFFFFFF,
+        .MaxService   = BPLIB_EID_PATTERN_MAX_SERVICE,
     };
-
-    /* TODO for follow up PR: Update this GC function
-     * It should additionally now
-     * - delete the index files, use _delete_bundle, no direct vfs_unlink here
-     * - integrate other updates to the function from upstream
-     * - check size of files to delete bundles that are less than expected (write failed)
-     * - increment AS on deletion
-     * - handle errors in vfs_read and vfs_lseek
-     * - call BPLib_CT_DeleteBundleFromCtdb for custodial bundles */
-
     uint64_t time_ref_dtn = BPLib_TIME_GetCurrentDtnTime();
     uint64_t lifetime;
     BPLib_TIME_MonotonicTime_t bundle_creation_time;
     BPLib_TIME_MonotonicTime_t curr_time;
     BPLib_Status_t bplib_status;
     int64_t delta;
+    uint8_t flags;
 
-    curr_time.Time = BPLib_TIME_GetMonotonicTime();
     curr_time.BootEra = BPLib_TIME_GetBootEra();
 
-    /* Since bundles might be deleted all caches have to be invalidated */
+    /* Since bundles might be deleted all caches have to be invalidated. Locking
+     * here early also prevents GC from happening while egressing or vice verca. */
     mutex_lock(&bplib_stor_common_data.caches_lock);
 
     while (1) {
@@ -635,29 +645,40 @@ BPLib_Status_t BPLib_STOR_GarbageCollect(BPLib_Instance_t* inst)
         do {
             res = _next_bundle_path(&iterator, &wildcard, 1);
         } while (res == -EAGAIN);
-        if (res == 0) {
+        if ((res == NEXT_BUNDLE_PATH_BUNDLE_READ) || (res == NEXT_BUNDLE_PATH_BUNDLE_READ_EXPIRED)) {
             fd = vfs_open(iterator.path, O_RDONLY, 0777);
             if (fd < 0) {
                 /* Since we just found it by the iterator but it can't seem to open
                  * try to remove it */
-                vfs_unlink(iterator.path);
+                bplib_stor_vfs_delete_bundle(iterator.id_val);
                 continue;
             }
-            /* Read relevant bundle info.
-             * Since 7.0.5 each bundle has a BPLib_BundleMetaData_t in front, but the containing
-             * BPLib_Bundle_t might not be packed, but it is on disk. */
-            vfs_lseek(fd, offsetof(BPLib_BBlocks_t, PrimaryBlock.Lifetime) +
-                          sizeof(BPLib_BundleMetaData_t), SEEK_SET);
+
+            seek_res = vfs_lseek(fd, offsetof(bundle_file_structure_t, header.flags), SEEK_SET);
+            bytes_read = vfs_read(fd, &flags, sizeof(uint8_t));
+            if (seek_res < 0 || bytes_read != sizeof(uint8_t)) {
+                continue;
+            }
+
+            seek_res = vfs_lseek(fd,
+                    offsetof(bundle_file_structure_t, bblocks.PrimaryBlock.Lifetime), SEEK_SET);
             bytes_read = vfs_read(fd, &lifetime, sizeof(uint64_t));
-            vfs_lseek(fd, offsetof(BPLib_BBlocks_t, PrimaryBlock.MonoTime) +
-                          sizeof(BPLib_BundleMetaData_t), SEEK_SET);
-            bytes_read += vfs_read(fd, &bundle_creation_time, sizeof(BPLib_TIME_MonotonicTime_t));
-
-            if ((vfs_close(fd) < 0) ||
-                (bytes_read != (sizeof(BPLib_TIME_MonotonicTime_t) + sizeof(uint64_t)))) {
+            if (seek_res < 0 || bytes_read != sizeof(uint64_t)) {
                 continue;
             }
 
+            seek_res = vfs_lseek(fd,
+                    offsetof(bundle_file_structure_t, bblocks.PrimaryBlock.MonoTime), SEEK_SET);
+            bytes_read = vfs_read(fd, &bundle_creation_time, sizeof(BPLib_TIME_MonotonicTime_t));
+            if (seek_res < 0 || bytes_read != sizeof(BPLib_TIME_MonotonicTime_t)) {
+                continue;
+            }
+
+            if (vfs_close(fd) < 0) {
+                continue;
+            }
+
+            curr_time.Time = BPLib_TIME_GetMonotonicTime();
             bplib_status = BPLib_TIME_GetTimeDelta(curr_time, bundle_creation_time, &delta);
 
             if ((bplib_status == BPLIB_SUCCESS) && (delta > (int64_t)lifetime)) {
@@ -672,7 +693,10 @@ BPLib_Status_t BPLib_STOR_GarbageCollect(BPLib_Instance_t* inst)
 
             /* Delete */
             if (delete) {
-                vfs_unlink(iterator.path);
+                if (flags & STORAGE_HEADER_FLAG_CUSTODIAL) {
+                    BPLib_CT_DeleteBundleFromCtdb(inst, iterator.id_val);
+                }
+                bplib_stor_vfs_delete_bundle(iterator.id_val);
             }
         }
         else {
