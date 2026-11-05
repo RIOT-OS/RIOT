@@ -1357,22 +1357,6 @@ static int _netif_set_state(netif_t *iface, char *state_str)
     return 0;
 }
 
-static int _hex_to_int(char c)
-{
-    if ('0' <= c && c <= '9') {
-        return c - '0';
-    }
-    else if ('a' <= c && c <= 'f') {
-        return c - 'a';
-    }
-    else if ('A' <= c && c <= 'F') {
-        return c - 'A';
-    }
-    else {
-        return -1;
-    }
-}
-
 static int _netif_set_encrypt_key(netif_t *iface, netopt_t opt, char *key_str)
 {
     size_t str_len = strlen(key_str);
@@ -1401,17 +1385,9 @@ static int _netif_set_encrypt_key(netif_t *iface, netopt_t opt, char *key_str)
         printf("error: invalid key size.\n");
         return 1;
     }
-    /* Convert any char from ASCII table in hex format */
-    for (size_t i = 0; i < str_len; i += 2) {
-        int i1 = _hex_to_int(key_str[i]);
-        int i2 = _hex_to_int(key_str[i + 1]);
-
-        if (i1 == -1 || i2 == -1) {
-            printf("error: unable to parse key\n");
-            return 1;
-        }
-
-        key[i / 2] = (uint8_t)((i1 << 4) + i2);
+    if (scn_buf_hex(key, key_len, key_str, str_len) < 0) {
+        printf("error: unable to parse key\n");
+        return 1;
     }
 
     if (netif_set_opt(iface, opt, 0, key, key_len) < 0) {
