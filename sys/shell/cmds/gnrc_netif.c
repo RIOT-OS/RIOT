@@ -216,7 +216,7 @@ static void _set_usage(char *cmd_name)
          "       * \"sf\" - alias for spreading factor\n"
          "       * \"cr\" - alias for coding rate\n"
 #endif  /* MODULE_SHELL_CMD_GNRC_NETIF_LORA */
-#if IS_USED(MODULE_SHELL_CMD_GNRC_NETIF_LORAWAN)
+#if IS_USED(MODULE_SHELL_CMD_GNRC_NETIF_LORAWAN) || defined(TESTING_MOCK_SHELL_CMD_NETIF_LORA)
          "       * \"appkey\" - sets Application key\n"
          "       * \"appskey\" - sets Application session key\n"
 #if IS_USED(MODULE_GNRC_LORAWAN_1_1)
@@ -797,7 +797,7 @@ static void _netif_list(netif_t *iface)
         }
         line_thresh++;
     }
-#if IS_USED(MODULE_SHELL_CMD_GNRC_NETIF_LORAWAN)
+#if IS_USED(MODULE_SHELL_CMD_GNRC_NETIF_LORAWAN) || defined(TESTING_MOCK_SHELL_CMD_NETIF_LORA)
     res = netif_get_opt(iface, NETOPT_DEMOD_MARGIN, 0, &u8, sizeof(u8));
     if (res >= 0) {
         printf(" Demod margin.: %u ", (unsigned)u8);
@@ -1243,7 +1243,7 @@ static int _netif_set_flag(netif_t *iface, netopt_t opt, netopt_enable_t set)
     return 0;
 }
 
-#if IS_USED(MODULE_SHELL_CMD_GNRC_NETIF_LORAWAN)
+#if IS_USED(MODULE_SHELL_CMD_GNRC_NETIF_LORAWAN) || defined(TESTING_MOCK_SHELL_CMD_NETIF_LORA)
 static int _netif_set_lw_key(netif_t *iface, netopt_t opt, char *key_str)
 {
     /* This is the longest key */
@@ -1506,7 +1506,7 @@ static int _netif_set(char *cmd_name, netif_t *iface, char *key, char *value)
         return _netif_set_coding_rate(iface, value);
     }
 #endif  /* MODULE_SHELL_CMD_GNRC_NETIF_LORA */
-#if IS_USED(MODULE_SHELL_CMD_GNRC_NETIF_LORAWAN)
+#if IS_USED(MODULE_SHELL_CMD_GNRC_NETIF_LORAWAN) || defined(TESTING_MOCK_SHELL_CMD_NETIF_LORA)
 #if IS_USED(MODULE_GNRC_LORAWAN_1_1)
     else if (strcmp("joineui", key) == 0) {
         return _netif_set_lw_key(iface, NETOPT_LORAWAN_JOINEUI, value);
