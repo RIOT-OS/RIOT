@@ -203,9 +203,7 @@ static void _set_usage(char *cmd_name)
          "       * \"freq\" - sets the \"channel\" center frequency\n"
          "       * \"channel\" - sets the frequency channel\n"
          "       * \"chan\" - alias for \"channel\"\n"
-         "       * \"checksum\" - set checksumming on-off\n"
          "       * \"csma_retries\" - set max. number of channel access attempts\n"
-         "       * \"encrypt\" - set the encryption on-off\n"
          "       * \"hop_limit\" - set hop limit\n"
          "       * \"hl\" - alias for \"hop_limit\"\n"
          "       * \"key\" - set the encryption key in hexadecimal format\n"
@@ -213,7 +211,6 @@ static void _set_usage(char *cmd_name)
          "       * \"nid\" - sets the network identifier (or the PAN ID)\n"
          "       * \"pan\" - alias for \"nid\"\n"
          "       * \"pan_id\" - alias for \"nid\"\n"
-         "       * \"phy_busy\" - set busy mode on-off\n"
 #if IS_USED(MODULE_SHELL_CMD_GNRC_NETIF_LORA)
          "       * \"bw\" - alias for channel bandwidth\n"
          "       * \"sf\" - alias for spreading factor\n"
@@ -380,10 +377,6 @@ static void _print_netopt(netopt_t opt)
         printf("CCA threshold [in dBm]");
         break;
 
-    case NETOPT_ENCRYPTION:
-        printf("encryption");
-        break;
-
     case NETOPT_ENCRYPTION_KEY:
         printf("encryption key");
         break;
@@ -460,14 +453,6 @@ static void _print_netopt(netopt_t opt)
         break;
 
 #endif /* MODULE_NETDEV_IEEE802154_MR_FSK */
-
-    case NETOPT_CHECKSUM:
-        printf("checksum");
-        break;
-
-    case NETOPT_OTAA:
-        printf("otaa");
-        break;
 
     case NETOPT_LINK_CHECK:
         printf("link check");
