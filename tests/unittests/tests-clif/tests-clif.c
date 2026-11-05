@@ -7,6 +7,7 @@
 #include "embUnit.h"
 #include "tests-clif.h"
 #include "container.h"
+#include "compiler_hints.h"
 
 #include "clif.h"
 
@@ -337,6 +338,32 @@ static void tests_clif_decode_encode_minimal(void)
     TEST_ASSERT_EQUAL_STRING(input_buf, output_buf);
 }
 
+static void tests_clif_decode_encode_non_null_terminated(void)
+{
+    NONSTRING
+    char input_buf[5] = "<>;sz";
+
+    #define BUFF_SIZE 50
+    char output_buf[BUFF_SIZE];
+    clif_t out_link;
+    clif_attr_t attrs[128];
+
+    ssize_t input_len = sizeof(input_buf);
+
+    ssize_t decode_len = clif_decode_link(&out_link, attrs, ARRAY_SIZE(attrs), input_buf, input_len);
+    if (decode_len == CLIF_NOT_FOUND) {
+        TEST_FAIL("Malformed input string");
+    }
+
+    ssize_t result_len = clif_encode_link(&out_link, output_buf, BUFF_SIZE);
+    if (result_len == CLIF_NO_SPACE) {
+        TEST_FAIL("No space left in the buffer");
+    }
+
+    TEST_ASSERT_EQUAL_INT(input_len, result_len);
+    TEST_ASSERT(strncmp("<>;sz", output_buf, input_len) == 0);
+}
+
 Test *tests_clif_tests(void)
 {
     EMB_UNIT_TESTFIXTURES(fixtures) {
@@ -346,7 +373,8 @@ Test *tests_clif_tests(void)
         new_TestFixture(test_clif_get_attr_missing_quote),
         new_TestFixture(test_clif_get_empty_attr_value),
         new_TestFixture(test_clif_get_attr_empty),
-        new_TestFixture(tests_clif_decode_encode_minimal)
+        new_TestFixture(tests_clif_decode_encode_minimal),
+        new_TestFixture(tests_clif_decode_encode_non_null_terminated)
     };
 
     EMB_UNIT_TESTCALLER(clif_tests, NULL, NULL, fixtures);
