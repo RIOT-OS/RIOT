@@ -1342,7 +1342,7 @@ static int _netif_set_state(netif_t *iface, char *state_str)
         state = NETOPT_STATE_STANDBY;
     }
     else {
-        printf("usage: ifconfig <if_id> set state [off|sleep|idle|rx|tx|reset|standby]\n");
+        printf("usage: ifconfig <if_id> set state {off|sleep|idle|rx|tx|reset|standby}\n");
         return 1;
     }
     if (netif_set_opt(iface, NETOPT_STATE, 0,
@@ -1380,22 +1380,22 @@ static int _netif_set_encrypt_key(netif_t *iface, netopt_t opt, char *key_str)
     uint8_t key[key_len];
 
     if (str_len == 14U) {
-        printf("\nNotice: setting 56 bit key.");
+        printf("\nNotice: setting 56 bit key. ");
     }
     else if (str_len == 16U) {
-        printf("\nNotice: setting 64 bit key.");
+        printf("\nNotice: setting 64 bit key. ");
     }
     else if (str_len == 32U) {
-        printf("\nNotice: setting 128 bit key.");
+        printf("\nNotice: setting 128 bit key. ");
     }
     else if (str_len == 48U) {
-        printf("\nNotice: setting 192 bit key.");
+        printf("\nNotice: setting 192 bit key. ");
     }
     else if (str_len == 64U) {
-        printf("\nNotice: setting 256 bit key.");
+        printf("\nNotice: setting 256 bit key. ");
     }
     else if (str_len == 128U) {
-        printf("\nNotice: setting 512 bit key.");
+        printf("\nNotice: setting 512 bit key. ");
     }
     else {
         printf("error: invalid key size.\n");
