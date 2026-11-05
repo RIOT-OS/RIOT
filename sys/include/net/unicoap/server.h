@@ -207,6 +207,37 @@ typedef struct unicoap_resource unicoap_resource_t;
  * @name Reacting to CoAP requests
  * @{
  */
+
+/**
+ * @brief Response flags
+ */
+typedef enum {
+    /**
+     * @brief Ensures reliable transmission of the response
+     *
+     * Use this flag to ensure the response is sent reliable. This may be useful when the resource
+     * hasn't already been defined as unconditionally reliable using
+     * @ref UNICOAP_RESOURCE_FLAG_RELIABLE. In the latter case, this flag can be used, but has no
+     * effect.
+     *
+     * This flag is ignored with reliable transports. For unreliable transports, a message
+     * sent with this flag will require an acknowledgement to be sent from the CoAP
+     * peer.
+     *
+     * **Default**: Reliable if the resource has @ref UNICOAP_RESOURCE_FLAG_RELIABLE set.
+     */
+    UNICOAP_RESPONSE_FLAG_RELIABLE = 0x0001,
+} unicoap_response_flags_t;
+
+/**
+ * @brief Prints response flags
+ *
+ * @memberof unicoap_response_flags_t
+ *
+ * @param flags Response flags
+ */
+void unicoap_print_response_flags(unicoap_response_flags_t flags);
+
 /**
  * @brief Request context used to send a response to a given request
  */
@@ -224,6 +255,13 @@ typedef struct {
      */
     void* _packet;
 
+    /**
+     * @brief Internal
+     *
+     * @warning This is an internal property. Do not access from your application!
+     * @private
+     */
+    unicoap_response_flags_t _flags : 1;
 
     /**
      * @brief Internal
@@ -231,8 +269,20 @@ typedef struct {
      * @warning This is an internal property. Do not access from your application!
      * @private
      */
-    bool _subscribed;
+    bool _subscribed : 1;
 } unicoap_request_context_t;
+
+/**
+ * @brief Sets response flags in the current request handler context
+ *
+ * @param[in,out] ctx The request handler context
+ * @param flags Flags to apply to the response
+ */
+static inline void unicoap_response_set_flags(unicoap_request_context_t* ctx, 
+                                              unicoap_response_flags_t flags)
+{
+    ctx->_flags = flags;
+}
 
 /**
  * @brief Resource request handler
@@ -341,13 +391,14 @@ unicoap_status_t unicoap_response_status_from_errno(int _errno);
  */
 typedef enum {
     /**
-     * @brief Sets the type of the response to confirmable (`CON`),
-     * if an unreliable transport is used.
+     * @brief Enforces reliable transmission of responses and notifications
+     *
+     * Use this flag to generally mark the resource as reliable, i.e., all response and
+     * notifications sent from this resource will always be sent reliably.
      *
      * This flag is ignored with reliable transports. For unreliable transports, a response
      * sent with this flag will require an acknowledgement to be sent from the CoAP
      * peer.
-     *
      */
     UNICOAP_RESOURCE_FLAG_RELIABLE = 0x0001,
 
@@ -365,22 +416,13 @@ typedef enum {
      */
     UNICOAP_RESOURCE_FLAG_OBSERVABLE = 0x0200,
 
-    /**
-     * @brief Sets the type of the notification to reliable (`CON`),
-     * if an unrealiable transport is used.
-     *
-     * This flag is ignored with reliable transports. For unreliable transports, a notification
-     * sent with this flag will require an acknowledgement to be sent from the CoAP
-     * peer.
-     *
-     */
-    UNICOAP_RESOURCE_FLAG_NOTIFY_RELIABLY = 0x0100,
-
     /* TODO: Advanced features */
 } unicoap_resource_flags_t;
 
 /**
  * @brief Prints resource flags
+ *
+ * @memberof unicoap_resource_flags_t
  *
  * @param flags Resource flags
  */
@@ -604,6 +646,79 @@ void unicoap_observation_resource_drop_observers(const unicoap_resource_t* resou
  * @name Sending notifications
  * @{
  */
+
+/**
+ * @brief Notification flags
+ */
+typedef enum {
+    /**
+     * @brief Ensures reliable transmission of the notification
+     *
+     * Use this flag to ensure the notification is sent reliable. This may be useful when the
+     * resource hasn't already been defined as unconditionally reliable using
+     * @ref UNICOAP_RESOURCE_FLAG_RELIABLE. In the latter case, this flag can be used, but has no
+     * effect.
+     *
+     * This flag is ignored with reliable transports. For unreliable transports, a message
+     * sent with this flag will require an acknowledgement to be sent from the CoAP
+     * peer.
+     *
+     * **Default**: Reliable if the resource has @ref UNICOAP_RESOURCE_FLAG_RELIABLE set.
+     */
+    UNICOAP_NOTIFICATION_FLAG_RELIABLE = 0x0001,
+} unicoap_notification_flags_t;
+
+/**
+ * @brief Prints notification flags
+ *
+ * @memberof unicoap_request_flags_t
+ *
+ * @param flags Notification flags
+ */
+void unicoap_print_notification_flags(unicoap_notification_flags_t flags);
+
+/**
+ * @brief Notification context used to send notifications to a resource's observers
+ */
+typedef struct {
+    /**
+     * @brief Resource this request was directed to
+     */
+    const unicoap_resource_t* resource;
+
+    /**
+     * @brief Internal
+     *
+     * @warning This is an internal property. Do not access from your application!
+     * @private
+     */
+    unicoap_notification_flags_t _flags;
+} unicoap_notification_context_t;
+
+/**
+ * @brief Sets the origin resource in the given notification context
+ *
+ * @param[in,out] ctx The request handler context
+ * @param resource The resource from which to send the notification to registered observers 
+ */
+static inline void unicoap_notification_set_resource(unicoap_notification_context_t* ctx, 
+                                                     const unicoap_resource_t* resource)
+{
+    ctx->resource = resource;
+}
+
+/**
+ * @brief Sets notification flags in the given notification context
+ *
+ * @param[in,out] ctx The notification context
+ * @param flags Flags to apply to the notification
+ */
+static inline void unicoap_notification_set_flags(unicoap_notification_context_t* ctx, 
+                                                  unicoap_notification_flags_t flags)
+{
+    ctx->_flags = flags;
+}
+
 /**
  * @brief Sends a notification to registered observers
  *
@@ -614,19 +729,19 @@ void unicoap_observation_resource_drop_observers(const unicoap_resource_t* resou
  * Consumes @p response .
  *
  * @param[in,out] response Response message to send
- * @param[in] resource The resource to send the notification from
+ * @param[in] ctx The notification context in which to send the notification to registered observers
  *
  * @returns Zero on success or negative integer on error
  * @retval UNICOAP_OBSERVATION_NO_SUBSCRIBERS if no subscribers are registerd for @p resource
  */
 #if IS_USED(MODULE_UNICOAP_SERVER_OBSERVATION) || defined(DOXYGEN)
-int unicoap_send_notification(unicoap_message_t* response, const unicoap_resource_t* resource);
+int unicoap_send_notification(unicoap_message_t* response, unicoap_notification_context_t* ctx);
 #else
 static inline
-int unicoap_send_notification(unicoap_message_t* response, const unicoap_resource_t* resource)
+int unicoap_send_notification(unicoap_message_t* response, unicoap_notification_context_t* ctx)
 {
     (void)response;
-    (void)resource;
+    (void)ctx;
     return -ENOTSUP;
 }
 #endif

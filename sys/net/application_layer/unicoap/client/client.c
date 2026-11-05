@@ -115,7 +115,7 @@ int unicoap_client_send_request_part(unicoap_packet_t* packet, unicoap_client_me
         }
     }
 
-    unicoap_messaging_flags_t messaging_flags = _messaging_flags_client(request_flags);
+    unicoap_messaging_flags_t messaging_flags = _messaging_flags_request(request_flags);
     if (memo) {
         /* State has been allocated, instruct the messaging layer to track success/failures
          * with this transmission. If a NON is sent, this flag tells the RFC 7252 driver

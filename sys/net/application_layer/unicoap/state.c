@@ -899,7 +899,7 @@ unicoap_preprocessing_result_t unicoap_exchange_preprocess(unicoap_packet_t* pac
             }
             unicoap_event_cancel(&memo->super.exchange.timeout);
             arg->client = memo;
-            *flags = _messaging_flags_client(memo->flags);
+            *flags = _messaging_flags_request(memo->flags);
             return UNICOAP_PREPROCESSING_SUCCESS_RESPONSE;
         }
         else {

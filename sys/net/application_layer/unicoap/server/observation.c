@@ -35,17 +35,15 @@
  * Execute _send_notifications only as part of a job scheduled by unicoap.
  */
 
-static int _send_notifications(unicoap_packet_t* packet, const unicoap_resource_t* resource) {
+static int _send_notifications(unicoap_packet_t* packet, unicoap_notification_context_t* ctx) {
     int res = 0;
-    (void)packet;
-    (void)resource;
 
     bool has_any_subscribers = false;
     unicoap_server_memo_t* memo = NULL;
-    while ((memo = unicoap_server_memo_next_with_resource(resource, memo))) {
+    while ((memo = unicoap_server_memo_next_with_resource(ctx->resource, memo))) {
         if (IS_ACTIVE(CONFIG_UNICOAP_DEBUG_LOGGING)) {
             _OBSERVATION_DEBUG("found a subscription for resource ");
-            unicoap_print_path(&resource->path);
+            unicoap_print_path(&ctx->resource->path);
             DEBUG(" from ");
             DEBUG_ENDPOINT(&memo->super.endpoint);
             DEBUG("\n");
@@ -67,7 +65,7 @@ static int _send_notifications(unicoap_packet_t* packet, const unicoap_resource_
         }
 
         unicoap_server_memo_realloc(memo);
-        if ((res = unicoap_server_send_notification_body(packet, memo, resource)) < 0) {
+        if ((res = unicoap_server_send_notification_body(packet, memo, ctx)) < 0) {
             _OBSERVATION_DEBUG("could not notify ");
             DEBUG_ENDPOINT(&memo->super.endpoint);
             DEBUG("\n");
@@ -76,17 +74,17 @@ static int _send_notifications(unicoap_packet_t* packet, const unicoap_resource_
     return has_any_subscribers ? 0 : UNICOAP_OBSERVATION_NO_SUBSCRIBERS;
 }
 
-int unicoap_send_notification(unicoap_message_t* response, const unicoap_resource_t* resource) {
+int unicoap_send_notification(unicoap_message_t* response, unicoap_notification_context_t* ctx) {
     assert(response);
-    assert(resource);
+    assert(ctx);
 
     if (IS_ACTIVE(CONFIG_UNICOAP_ASSIST)) {
-        if (!(resource->flags & UNICOAP_RESOURCE_FLAG_OBSERVABLE)) {
+        if (!(ctx->resource->flags & UNICOAP_RESOURCE_FLAG_OBSERVABLE)) {
             unicoap_assist(API_MISUSE("cannot send a notification from non-observable resource")
                                FIXIT("add OBSERVABLE flag to resource"));
         }
     }
-    assert(resource->flags & UNICOAP_RESOURCE_FLAG_OBSERVABLE);
+    assert(ctx->resource->flags & UNICOAP_RESOURCE_FLAG_OBSERVABLE);
 
     if (!response->options) {
         unicoap_message_t* _response = alloca(sizeof(unicoap_message_t));
@@ -113,7 +111,7 @@ int unicoap_send_notification(unicoap_message_t* response, const unicoap_resourc
         .message = response
         /* Remainder is going to be set by _send_notifications. */
     };
-    return _send_notifications(&packet, resource);
+    return _send_notifications(&packet, ctx);
 }
 
 bool unicoap_observation_resource_has_observers(const unicoap_resource_t* resource)

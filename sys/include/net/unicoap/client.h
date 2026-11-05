@@ -72,9 +72,12 @@ typedef enum {
 
 /**
  * @brief Prints request flags
+ *
+ * @memberof unicoap_request_flags_t
+ *
+ * @param flags Request flags
  */
 void unicoap_print_request_flags(unicoap_request_flags_t flags);
-
 
 /**
  * @brief Additional parameters to customize request behavior

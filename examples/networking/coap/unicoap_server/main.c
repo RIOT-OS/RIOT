@@ -18,6 +18,7 @@
 #include "net/netif.h"
 
 /* Include timer for resource notifications in this simple example. */
+#include "net/unicoap/server.h"
 #include "ztimer/periodic.h"
 
 /*
@@ -102,7 +103,7 @@ UNICOAP_RESOURCE(hello) {
      * In this case, we don't want to loose our precious greeting along the way.
      * To send confirmable messages (CON) over UDP or DTLS, we pass the
      * @ref UNICOAP_RESOURCE_FLAG_RELIABLE flag. */
-    .flags = UNICOAP_RESOURCE_FLAG_RELIABLE | UNICOAP_RESOURCE_FLAG_OBSERVABLE | UNICOAP_RESOURCE_FLAG_NOTIFY_RELIABLY,
+    .flags = UNICOAP_RESOURCE_FLAG_RELIABLE | UNICOAP_RESOURCE_FLAG_OBSERVABLE,
 
     /* You must declare what CoAP methods you want to allow for each resource. */
     .methods = UNICOAP_METHODS(UNICOAP_METHOD_GET, UNICOAP_METHOD_PUT, UNICOAP_METHOD_POST),
@@ -235,7 +236,10 @@ static void notify_clients(unicoap_job_t* job) {
         hellos[next_hello]);
     next_hello = (next_hello + 1) % ARRAY_SIZE(hellos);
 
-    if ((res = unicoap_send_notification(&response, UNICOAP_RESOURCE_NAMED(hello))) < 0) {
+    unicoap_notification_context_t ctx = {};
+    unicoap_notification_set_resource(&ctx, UNICOAP_RESOURCE_NAMED(hello));
+    unicoap_notification_set_flags(&ctx, UNICOAP_NOTIFICATION_FLAG_RELIABLE);
+    if ((res = unicoap_send_notification(&response, &ctx)) < 0) {
         printf("app: sending notification failed (%i, %s)\n", res, strerror(-res));
     }
 }

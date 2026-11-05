@@ -205,7 +205,7 @@ int unicoap_server_process_request(unicoap_packet_t* packet, const unicoap_resou
             res = unicoap_options_set_observe_generated(options);
             assert(res >= 0);
         }
-        return unicoap_server_send_response_body(packet, NULL, resource);
+        return unicoap_server_send_response_body(packet, NULL, &context);
     }
     else if (context._packet) {
         /* application didn't send a response or deferred response,
@@ -232,7 +232,7 @@ int unicoap_server_process_request(unicoap_packet_t* packet, const unicoap_resou
     return 0;
 
 error:
-    if ((res = unicoap_server_send_response_body(packet, NULL, resource)) < 0) {
+    if ((res = unicoap_server_send_response_body(packet, NULL, &context)) < 0) {
         return res;
     }
 
@@ -316,7 +316,7 @@ int unicoap_send_response(unicoap_message_t* response, unicoap_request_context_t
      * If sending response on lower layer fails, then res < 0,
      * and allow calling send_response again to retry. Otherwise prevent calling again. */
     if ((res = unicoap_server_send_response_body((unicoap_packet_t*)context->_packet, NULL,
-                                                 context->resource
+                                                 context
     )) >= 0) {
         context->_packet = NULL;
     }

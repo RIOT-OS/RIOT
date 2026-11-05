@@ -9,6 +9,7 @@
 #include <stdint.h>
 
 #include "net/unicoap.h"
+#include "net/unicoap/server.h"
 
 /**
  * @addtogroup net_unicoap_private
@@ -330,13 +331,9 @@ int unicoap_messaging_send_rfc7252(
  * minimum capacity of @ref CONFIG_UNICOAP_GENERATED_TOKEN_LENGTH
  */
 void unicoap_generate_token(uint8_t* token);
+/** @}  */
 
-/**
- * @brief Retrieves the part of a resource flags bitfield relevant for the messaging driver.
- *
- * @param resource_flags Resource flags
- * @return Messaging flags extracted from the given bitfield
- */
+/** @cond */
 static inline unicoap_messaging_flags_t
 _messaging_flags_resource(unicoap_resource_flags_t resource_flags)
 {
@@ -345,20 +342,30 @@ _messaging_flags_resource(unicoap_resource_flags_t resource_flags)
     return (unicoap_messaging_flags_t)resource_flags;
 }
 
-/**
- * @brief Retrieves the part of a request flags bitfield relevant for the messaging driver.
- *
- * @param request_flags Request flags
- * @return Messaging flags extracted from the given bitfield
- */
-static inline unicoap_messaging_flags_t _messaging_flags_client(
-    unicoap_request_flags_t request_flags)
+static inline unicoap_messaging_flags_t
+_messaging_flags_response(unicoap_response_flags_t response_flags)
+{
+    /* We documented other flags are RFU, hence downcasting to the messaging
+     flags bitfield width is fine here */
+    return (unicoap_messaging_flags_t)response_flags;
+}
+
+static inline unicoap_messaging_flags_t
+_messaging_flags_notification(unicoap_notification_flags_t notification_flags)
+{
+    /* We documented other flags are RFU, hence downcasting to the messaging
+     flags bitfield width is fine here */
+    return (unicoap_messaging_flags_t)notification_flags;
+}
+
+static inline unicoap_messaging_flags_t 
+_messaging_flags_request(unicoap_request_flags_t request_flags)
 {
     /* We documented other flags are RFU, hence downcasting to the messaging
      flags bitfield width is fine here */
     return (unicoap_messaging_flags_t)request_flags;
 }
-/** @}  */
+/** @endcond */
 
 /* MARK: - Private Exchange-Layer Server API */
 /**
@@ -403,10 +410,11 @@ int unicoap_server_send_body(unicoap_packet_t* packet, unicoap_server_memo_t* me
  */
 static inline int unicoap_server_send_response_body(unicoap_packet_t* packet,
                                                     unicoap_server_memo_t* memo,
-                                                    const unicoap_resource_t* resource
+                                                    unicoap_request_context_t* ctx
 ) {
-    return unicoap_server_send_body(packet, memo, resource,
-                                    _messaging_flags_resource(resource->flags));
+    return unicoap_server_send_body(packet, memo, ctx->resource,
+                                    _messaging_flags_resource(ctx->resource->flags) |
+                                    _messaging_flags_response(ctx->_flags));
 }
 
 /**
@@ -420,14 +428,12 @@ static inline int unicoap_server_send_response_body(unicoap_packet_t* packet,
  */
 static inline int unicoap_server_send_notification_body(unicoap_packet_t* packet,
                                                         unicoap_server_memo_t* memo,
-                                                        const unicoap_resource_t* resource
+                                                        unicoap_notification_context_t* ctx
 ) {
-    unicoap_messaging_flags_t flags = _messaging_flags_resource(resource->flags);
-    return unicoap_server_send_body(packet, memo, resource,
-                                    (resource->flags & UNICOAP_RESOURCE_FLAG_NOTIFY_RELIABLY)
-                                     ? flags | UNICOAP_MESSAGING_FLAG_RELIABLE
-                                     : flags & ~UNICOAP_MESSAGING_FLAG_RELIABLE) |
-                                     UNICOAP_MESSAGING_FLAG_TRACK;
+    return unicoap_server_send_body(packet, memo, ctx->resource,
+                                     _messaging_flags_resource(ctx->resource->flags) |
+                                     _messaging_flags_notification(ctx->_flags) |
+                                     UNICOAP_MESSAGING_FLAG_TRACK);
 }
 /** @} */
 
