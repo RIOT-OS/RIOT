@@ -178,6 +178,11 @@ extern "C" {
 #define IEEE802154_SYMBOL_TIME_US               (16)
 
 /**
+ * @brief O-QPSK symbol rate for 2.4 GHz in Hz (1 s / 16 us = 62500 Hz)
+ */
+#define IEEE802154_SYMBOL_RATE_HZ   (US_PER_SEC / IEEE802154_SYMBOL_TIME_US)
+
+/**
  * IEEE Std 802.15.4-2020
  * Table 11-1—PHY constants: For all other PHYs¹, the duration of
  * 8 symbol periods.
