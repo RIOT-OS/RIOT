@@ -9,7 +9,6 @@
 #include <stdint.h>
 
 #include "net/unicoap.h"
-#include "net/unicoap/server.h"
 
 /**
  * @addtogroup net_unicoap_private
