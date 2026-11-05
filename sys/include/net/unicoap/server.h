@@ -671,7 +671,7 @@ typedef enum {
 /**
  * @brief Prints notification flags
  *
- * @memberof unicoap_request_flags_t
+ * @memberof unicoap_notification_flags_t
  *
  * @param flags Notification flags
  */
