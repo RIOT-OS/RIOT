@@ -196,6 +196,7 @@ ifneq (,$(filter shell_cmd_gnrc_ipv6_whitelist,$(USEMODULE)))
 endif
 ifneq (,$(filter shell_cmd_gnrc_netif,$(USEMODULE)))
   USEMODULE += gnrc_netif
+  USEMODULE += fmt
 endif
 ifneq (,$(filter shell_cmd_gnrc_netif_lorawan,$(USEMODULE)))
   USEMODULE += gnrc_netif_lorawan
