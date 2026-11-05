@@ -613,7 +613,7 @@ static inline void unicoap_client_memo_realloc(unicoap_client_memo_t* memo)
  */
 
 /**
- * @brief Client exchange
+ * @brief Server exchange
  */
 typedef struct {
     unicoap_memo_t super;
