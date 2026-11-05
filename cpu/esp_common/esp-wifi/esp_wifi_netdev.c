@@ -586,7 +586,14 @@ static esp_err_t IRAM_ATTR _esp_system_event_handler(void *ctx, system_event_t *
             _esp_wifi_dev.event_disc++;
             netdev_trigger_event_isr(&_esp_wifi_dev.netdev);
 
-            if (reason != WIFI_REASON_ASSOC_LEAVE) {
+            /* Reconnect only if the disconnect was not caused by ourselves.
+             * Otherwise, the WiFi driver would end in an infinite
+             * disconnect/reconnect loop. */
+            if ((reason != WIFI_REASON_ASSOC_LEAVE)
+#ifndef CPU_ESP8266
+                && (reason != WIFI_REASON_STA_LEAVING)
+#endif
+               ) {
                 /* call disconnect to reset internal state */
                 result = esp_wifi_disconnect();
                 if (result != ESP_OK) {
