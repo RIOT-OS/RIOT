@@ -506,6 +506,15 @@ void unicoap_exchange_notify_all(const unicoap_endpoint_t* endpoint, unicoap_lay
         }
     }
 #endif
+
+#if UNICOAP_HAVE_SERVER_STATE
+    for (int i = 0; i < CONFIG_UNICOAP_SERVER_MEMOS_CAPACITY; i += 1) {
+        memo = &_state.server_memos[i].super;
+        if (unicoap_endpoint_is_equal(endpoint, &memo->endpoint)) {
+            unicoap_exchange_notify(memo, type, arg);
+        }
+    }
+#endif
 }
 
 void unicoap_messaging_notify(void* state, unicoap_layer_notification_t type, void* arg, unicoap_proto_t proto)
