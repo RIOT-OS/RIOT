@@ -79,6 +79,43 @@ extern "C" {
 #define ARRAY_SIZE(a) (sizeof((a)) / sizeof((a)[0]))
 #endif
 
+/**
+ * @brief Length of C string excluding the null terminator as an integer constant expression
+ *
+ * @param[in] string String literal expression or `char` array sized by initializer
+ *
+ * @returns Number of bytes occupied by string characters, excluding the null byte at the end,
+ *          as an integer compile-time expression
+ *
+ * Use this macro to determine the length of a C string at compile-time,
+ * without resorting to `strlen`.
+ *
+ * @warning
+ * Do not use this macro on `char *` pointer variables.
+ *
+ * @note
+ * Modern compilers may be able to fold calls to `strlen` given string literals or visible `char`
+ * buffers into integers at compile time, too.
+ * If the string contains additional null bytes, you should use `strlen` instead.
+ *
+ * ## Examples
+ * ```c
+ * const char string[] = "Hello, World!";
+ *
+ * char characters[STATIC_STRLEN(string)] = { 0 };
+ * memcpy(characters, string, STATIC_STRLEN(string));
+ * ```
+ *
+ * ```c
+ * static_assert(STATIC_STRLEN("x") == 1, "");
+ * #define MESSAGE(audience) "Hello, " audience "!"
+ * static_assert(STATIC_STRLEN(MESSAGE("World")) < 42, "Message too long!");
+ * ```
+ */
+#if !defined(STATIC_STRLEN) || defined(DOXYGEN)
+#  define STATIC_STRLEN(string) (sizeof(string) - 1)
+#endif
+
 #ifdef __cplusplus
 }
 #endif
