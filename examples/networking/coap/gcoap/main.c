@@ -19,7 +19,6 @@
 #include "msg.h"
 
 #include "net/gcoap.h"
-#include "shell.h"
 
 #include "gcoap_example.h"
 
@@ -33,11 +32,7 @@ int main(void)
     server_init();
     puts("gcoap example app");
 
-    /* start shell */
     puts("All up, running the shell now");
-    char line_buf[SHELL_DEFAULT_BUFSIZE];
-    shell_run(NULL, line_buf, SHELL_DEFAULT_BUFSIZE);
-
-    /* should never be reached */
+    /* shell starts implicitly after returning */
     return 0;
 }
