@@ -1,26 +1,7 @@
 /*
- * Copyright (C) 2019 Ha Thach (tinyusb.org)
- *               2022 Gunar Schorcht
- *
- * The MIT License (MIT)
- *
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- *
- * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
- * THE SOFTWARE.
+ * SPDX-FileCopyrightText: 2019 Ha Thach (tinyusb.org)
+ * SPDX-FileCopyrightText: 2022 Gunar Schorcht
+ * SPDX-License-Identifier: MIT
  */
 
 #define USB_H_USER_IS_RIOT_INTERNAL
@@ -56,7 +37,7 @@
      (CONFIG_TUSBD_HID_NUMOF > 2) || \
      (CONFIG_TUSBD_MSC_NUMOF > 1) || \
      (CONFIG_TUSBD_VENDOR_NUMOF > 1))
-#error Using generic descriptors is not possible for the selected combination \
+#error Using generic descriptors is not possible in the selected combination \
        of device class interfaces. Custom descriptors have to be implemented.
 #endif
 
@@ -168,7 +149,7 @@ uint8_t const *tud_hid_descriptor_report_cb(uint8_t itf)
  * It fills the report buffer content and returns its length. Returning
  * zero will causes the stack to send a STALL request.
  *
- * @note: The function is only a dummy function and therefore defined as a weak
+ * @note  The function is only a dummy function and therefore defined as a weak
  *        symbol that can be overwritten by real functions if needed by the
  *        application. */
 __attribute__((weak))
@@ -188,7 +169,7 @@ uint16_t tud_hid_get_report_cb(uint8_t itf, uint8_t report_id,
 /* The function is invoked when SET_REPORT control request is received or
  * data are received on OUT endpoint (Report ID = 0, Type = 0).
  *
- * @note: The function is only a dummy function and therefore defined as a weak
+ * @note  The function is only a dummy function and therefore defined as a weak
  *        symbol that can be overwritten by real functions if needed by the
  *        application. */
 __attribute__((weak))

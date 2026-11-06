@@ -1,0 +1,11 @@
+# SPDX-FileCopyrightText: 2021 HAW Hamburg
+# SPDX-License-Identifier: LGPL-2.1-only
+
+config NO_RIOT_IMAGE
+    bool
+    prompt "Avoid showing the RIOT logo on the test" if !HAS_ARCH_AVR8
+    # the logo does not usually fit in AVR8
+    default y if HAS_ARCH_AVR8
+    help
+        Say y to avoid loading the RIOT logo on the test application. Useful for architectures
+        storing it in a limited RAM.

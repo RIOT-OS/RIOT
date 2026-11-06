@@ -171,6 +171,7 @@ static void _successful_rejecting_of_invalid_uri(void)
     char *port_too_long = "coap://example.com:1234568910";
     char *white_space_in_port = "coap://example.com: 12/foo";
     char *hex_port = "coap://example.com:0x12/foo";
+    char *ipv6_missing_bracket = "coap://[::1";
 
     char *test_vec[] = {
         trailing_percent,
@@ -183,6 +184,7 @@ static void _successful_rejecting_of_invalid_uri(void)
         port_too_long,
         white_space_in_port,
         hex_port,
+        ipv6_missing_bracket,
     };
 
     uri_parser_result_t uri_res;

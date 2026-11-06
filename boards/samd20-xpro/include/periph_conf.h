@@ -134,8 +134,8 @@ static const tc32_conf_t timer_config[] = {
 static const uart_conf_t uart_config[] = {
     {    /* Virtual COM Port */
         .dev      = &SERCOM3->USART,
-        .rx_pin   = GPIO_PIN(PA,25),
-        .tx_pin   = GPIO_PIN(PA,24),
+        .rx_pin   = GPIO_PIN(PA, 25),
+        .tx_pin   = GPIO_PIN(PA, 24),
 #ifdef MODULE_PERIPH_UART_HW_FC
         .rts_pin  = GPIO_UNDEF,
         .cts_pin  = GPIO_UNDEF,
@@ -148,8 +148,8 @@ static const uart_conf_t uart_config[] = {
     },
     {    /* EXT1 */
         .dev      = &SERCOM4->USART,
-        .rx_pin   = GPIO_PIN(PB,9),
-        .tx_pin   = GPIO_PIN(PB,8),
+        .rx_pin   = GPIO_PIN(PB, 9),
+        .tx_pin   = GPIO_PIN(PB, 8),
 #ifdef MODULE_PERIPH_UART_HW_FC
         .rts_pin  = GPIO_UNDEF,
         .cts_pin  = GPIO_UNDEF,
@@ -162,8 +162,8 @@ static const uart_conf_t uart_config[] = {
     },
     {    /* EXT2 */
         .dev      = &SERCOM0->USART,
-        .rx_pin   = GPIO_PIN(PA,9),
-        .tx_pin   = GPIO_PIN(PA,8),
+        .rx_pin   = GPIO_PIN(PA, 9),
+        .tx_pin   = GPIO_PIN(PA, 8),
 #ifdef MODULE_PERIPH_UART_HW_FC
         .rts_pin  = GPIO_UNDEF,
         .cts_pin  = GPIO_UNDEF,

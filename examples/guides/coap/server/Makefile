@@ -28,7 +28,6 @@ USEMODULE += gcoap
 
 # Static local IPv6 address
 CFLAGS += -DCONFIG_GNRC_IPV6_STATIC_LLADDR='"fe80::cafe:cafe:cafe:1"'
-CFLAGS += -DCONFIG_GNRC_IPV6_STATIC_LLADDR_IS_FIXED=1
 
 # Change this to 0 show compiler invocation lines by default:
 QUIET ?= 1

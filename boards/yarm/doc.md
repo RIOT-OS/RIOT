@@ -16,17 +16,17 @@ Yarm integrates:
 See Acmesystems [product page](https://www.acmesystems.it/yarm) for more
 information.
 
-In the provided configuration, stdio is available via USB. The board could be
+In the provided configuration, stdio is available via USB. The board can be
 configured to provide it on the exposed UART instead, by defining
 
-```
+```shell
 USEMODULE=stdio_uart
 ```
 
 Depending on the connection to your PC, you will probably also need to set
 PORT_LINUX to a different value (default is /dev/ttyACM0), for instance
 
-```
+```shell
 PORT_LINUX=/dev/ttyUSB0
 ```
 
@@ -35,6 +35,7 @@ PORT_LINUX=/dev/ttyUSB0
 ![yarm image](https://www.acmesystems.it/www/yarm/yarm-dev-yarm.jpg)
 
 ### MCU
+
 | MCU           | ATSAML21J18B                                                                                           |
 |:------------- |:------------------------------------------------------------------------------------------------------ |
 | Family        | ARM Cortex-M0+                                                                                         |
@@ -52,6 +53,7 @@ PORT_LINUX=/dev/ttyUSB0
 | Datasheet     | [Datasheet](https://ww1.microchip.com/downloads/en/DeviceDoc/SAM_L21_Family_DataSheet_DS60001477C.pdf) |
 
 ### RADIO
+
 | Transceiver   | ATA8510                                                                                                             |
 |:------------- |:------------------------------------------------------------------------------------------------------------------- |
 | Vendor        | Microchip                                                                                                           |
@@ -79,7 +81,6 @@ PORT_LINUX=/dev/ttyUSB0
 |                  | Timer     | yes       |                           |
 |                  | ADC       | yes       |                           |
 
-
 ## Flashing the device
 
 Both the MCU and the radio module are flashed using
@@ -89,8 +90,8 @@ with the help of a small adapter. The software used is edbg, bundled with RIOT.
 [wiring](https://www.acmesystems.it/asquini/yarm_avr_programming/ice-wiring.jpg)
 
 On Linux you might have to add a **udev** rule for Atmel ICE, like
-```
-bash
+
+```shell
 (
 cat <<END
 # Atmel-ICE JTAG/SWD in-circuit debugger
@@ -99,9 +100,3 @@ END
 ) | sudo tee -a /etc/udev/rules.d/99-atmel-ice.rules
 sudo service udev restart
 ```
-
-## Supported Toolchains
-
-Recommended toolchain for SAML21 is [GNU Tools for ARM Embedded Processors](https://launchpad.net/gcc-arm-embedded).
-On Debian Buster, the default [gcc-arm-none-eabi](https://packages.debian.org/buster/gcc-arm-none-eabi)
-package works well.

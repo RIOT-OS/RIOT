@@ -80,12 +80,12 @@
  * SX127X configuration.
  * @{
  */
-#define SX127X_PARAM_SPI_NSS            GPIO18
-#define SX127X_PARAM_RESET              GPIO23
-#define SX127X_PARAM_DIO0               GPIO26
-#define SX127X_PARAM_DIO1               GPIO_UNDEF /* Pin is not connected to the LoRa chip directly */
-#define SX127X_PARAM_DIO2               GPIO_UNDEF /* Pin is not connected to the LoRa chip directly */
-#define SX127X_PARAM_DIO3               GPIO_UNDEF
+#define SX127X_PARAM_SPI_NSS     GPIO18
+#define SX127X_PARAM_RESET       GPIO23
+#define SX127X_PARAM_DIO0        GPIO26
+#define SX127X_PARAM_DIO1        GPIO_UNDEF /* Pin is not connected to the LoRa chip directly */
+#define SX127X_PARAM_DIO2        GPIO_UNDEF /* Pin is not connected to the LoRa chip directly */
+#define SX127X_PARAM_DIO3        GPIO_UNDEF
 /** @} */
 
 /* include common board definitions as last step */

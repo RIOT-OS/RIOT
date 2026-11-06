@@ -29,7 +29,8 @@
 /* internal value that can be read/written via CoAP */
 static uint8_t internal_value = 0;
 
-static ssize_t _value_handler(coap_pkt_t *pkt, uint8_t *buf, size_t len, coap_request_ctx_t *context)
+static ssize_t _value_handler(coap_pkt_t *pkt, uint8_t *buf, size_t len,
+                              coap_request_ctx_t *context)
 {
     (void) context;
 
@@ -40,7 +41,7 @@ static ssize_t _value_handler(coap_pkt_t *pkt, uint8_t *buf, size_t len, coap_re
     /* read coap method type in packet */
     unsigned method_flag = coap_method2flag(coap_get_code_detail(pkt));
 
-    switch(method_flag) {
+    switch (method_flag) {
     case COAP_GET:
         /* write the response buffer with the internal value */
         p += fmt_u32_dec(rsp, internal_value);

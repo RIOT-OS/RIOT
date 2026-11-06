@@ -1,14 +1,9 @@
-/**
- * Copyright (C) 2015 Kaspar Schleiser <kaspar@schleiser.de>
- *
- * This file is subject to the terms and conditions of the GNU Lesser
- * General Public License v2.1. See the file LICENSE in the top level
- * directory for more details.
- *
- * Code taken from C FAQ (http://c-faq.com/lib/rand.html).
+/*
+ * SPDX-FileCopyrightText: 2015 Kaspar Schleiser <kaspar@schleiser.de>
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
 
- /**
+/**
  * @ingroup sys_random
  * @{
  * @file
@@ -17,7 +12,9 @@
  *
  * This file contains a simple Park-Miller pseudo random number generator.
  * The implementation is taken from the C FAQ, but modified to use magic number
- * division and adapted to RIOT's coding conventions..
+ * division and adapted to RIOT's coding conventions.
+ *
+ * Code taken from C FAQ (http://c-faq.com/lib/rand.html).
  *
  * @author Kaspar Schleiser <kaspar@schleiser.de>
  * @}

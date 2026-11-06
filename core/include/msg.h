@@ -175,6 +175,7 @@
 #include <stdint.h>
 #include <stdbool.h>
 
+#include "compiler_hints.h"
 #include "sched.h"
 
 #ifdef __cplusplus
@@ -411,6 +412,7 @@ unsigned msg_queue_capacity(kernel_pid_t pid);
  * If array resides on the stack, the containing stack frame must never be
  * left, not even if it is the current thread's entry function.
  */
+ACCESS(write_only, 1, 2)
 void msg_init_queue(msg_t *array, int num);
 
 /**

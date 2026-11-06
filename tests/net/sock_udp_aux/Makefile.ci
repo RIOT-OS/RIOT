@@ -20,6 +20,7 @@ BOARD_INSUFFICIENT_MEMORY := \
     nucleo-f303k8 \
     nucleo-f334r8 \
     nucleo-f410rb \
+    nucleo-g031k8 \
     nucleo-l011k4 \
     nucleo-l031k6 \
     nucleo-l053r8 \

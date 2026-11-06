@@ -17,6 +17,9 @@ else
   KCONFIG_ADD_CONFIG += $(APPDIR)/app.config.base
 endif
 
+# helper module to synchronize the script in tests/
+USEMODULE += test_utils_interactive_sync
+
 USEMODULE += ztimer
 USEMODULE += ztimer_usec
 

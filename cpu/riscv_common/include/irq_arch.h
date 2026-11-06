@@ -33,6 +33,15 @@ extern "C" {
  */
 #define CPU_CSR_MCAUSE_CAUSE_MSK        (0x0fffu)
 
+/**
+ * @brief   If defined, the trap handler will print additional information about
+ *          the trap. This is useful for debugging, but causes heavy performance
+ *          degradation.
+ */
+#ifndef CONFIG_PRINT_VERBOSE_TRAP_INFO
+#  define CONFIG_PRINT_VERBOSE_TRAP_INFO 0
+#endif
+
 extern volatile int riscv_in_isr;
 
 /**

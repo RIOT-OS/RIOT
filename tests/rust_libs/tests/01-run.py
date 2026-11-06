@@ -1,11 +1,8 @@
 #!/usr/bin/env python3
 
-# Copyright (C) 2017 Alexandre Abadie <alexandre.abadie@inria.fr>
-#               2022 Christian Amsüss <chrysn@fsfe.org>
-#
-# This file is subject to the terms and conditions of the GNU Lesser
-# General Public License v2.1. See the file LICENSE in the top level
-# directory for more details.
+# SPDX-FileCopyrightText: 2017 Alexandre Abadie <alexandre.abadie@inria.fr>
+# SPDX-FileCopyrightText: 2022 Christian Amsüss <chrysn@fsfe.org>
+# SPDX-License-Identifier: LGPL-2.1-only
 
 import json
 import sys
@@ -19,6 +16,7 @@ EXPECTED_CMDS = {
         'echo': 'prints the input command',
         'empty': 'print nothing on command',
         'periodic': 'periodically print command',
+        'burst': 'print lines in quick succession (default: 16)',
         'hello_world': 'Print a greeting',
         'xfa_test1': 'xfa test command 1',
         'xfa_test2': 'xfa test command 2',

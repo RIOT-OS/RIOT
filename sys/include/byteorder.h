@@ -1,9 +1,6 @@
 /*
- * Copyright (C) 2014 René Kijewski
- *
- * This file is subject to the terms and conditions of the GNU Lesser
- * General Public License v2.1. See the file LICENSE in the top level
- * directory for more details.
+ * SPDX-FileCopyrightText: 2014 René Kijewski
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
 
 #pragma once
@@ -47,8 +44,6 @@ typedef union __attribute__((packed)) {
 typedef union __attribute__((packed)) {
     uint32_t u32;       /**< 32 bit representation */
     uint8_t u8[4];      /**< 8 bit representation */
-    uint16_t u16[2];    /**< 16 bit representation */
-    le_uint16_t l16[2]; /**< little endian 16 bit representation */
 } le_uint32_t;
 
 /**
@@ -59,10 +54,6 @@ typedef union __attribute__((packed)) {
 typedef union __attribute__((packed)) {
     uint64_t u64;       /**< 64 bit representation */
     uint8_t u8[8];      /**< 8 bit representation */
-    uint16_t u16[4];    /**< 16 bit representation */
-    uint32_t u32[2];    /**< 32 bit representation */
-    le_uint16_t l16[4]; /**< little endian 16 bit representation */
-    le_uint32_t l32[2]; /**< little endian 32 bit representation */
 } le_uint64_t;
 
 /**
@@ -83,8 +74,6 @@ typedef union __attribute__((packed)) {
 typedef union __attribute__((packed)) {
     uint32_t u32;       /**< 32 bit representation */
     uint8_t u8[4];      /**< 8 bit representation */
-    uint16_t u16[2];    /**< 16 bit representation */
-    be_uint16_t b16[2]; /**< big endian 16 bit representation */
 } be_uint32_t;
 
 /**
@@ -95,10 +84,6 @@ typedef union __attribute__((packed)) {
 typedef union __attribute__((packed)) {
     uint64_t u64;       /**< 64 bit representation */
     uint8_t u8[8];      /**< 8 bit representation */
-    uint16_t u16[4];    /**< 16 bit representation */
-    uint32_t u32[2];    /**< 32 bit representation */
-    be_uint16_t b16[4]; /**< big endian 16 bit representation */
-    be_uint32_t b32[2]; /**< big endian 32 bit representation */
 } be_uint64_t;
 
 /**

@@ -6,7 +6,7 @@ DHCPV6_SERVER_PORT := 61342
 RIOTBASE ?= $(CURDIR)/../..
 
 # boards don't support ethos
-BOARD_BLACKLIST += ruuvitag thingy52
+BOARDS_UNSUPPORTED += ruuvitag thingy52
 
 USEMODULE += dhcpv6_client_ia_pd
 USEMODULE += dhcpv6_client_ia_na

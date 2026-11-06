@@ -173,15 +173,15 @@ static inline uint8_t bitarithm_clzb(uint8_t x)
 {
 #if defined(BITARITHM_HAS_CLZ)
     /* clz operates on `unsigned int`, so `x` will be promoted to the size
-       of an `unsigned int` */
+     *  of an `unsigned int` */
     return __builtin_clz(x) - 8 * (sizeof(unsigned) - 1);
 #else
-    uint8_t l = 0;
+    uint8_t number = 0;
     while (!(x & 0x80)) {
-        ++l;
+        ++number;
         x <<= 1;
     }
-    return l;
+    return number;
 #endif
 }
 

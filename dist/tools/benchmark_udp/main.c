@@ -235,7 +235,10 @@ int main(int argc, char **argv)
         exit(1);
     }
 
-    while (getrandom(&cookie, sizeof(cookie), 0) != sizeof(cookie)) {}
+    if (getentropy(&cookie, sizeof(cookie)) != 0) {
+        perror("getentropy() failed");
+        exit(1);
+    }
     cookie &= BENCH_MASK_COOKIE;
 
     struct addrinfo hint = {
@@ -249,7 +252,7 @@ int main(int argc, char **argv)
     int res = getaddrinfo(argv[0], argv[1],
                           &hint, &server_addr);
     if (res != 0) {
-        perror("getaddrinfo()");
+        perror("getaddrinfo() failed");
         exit(1);
     }
 

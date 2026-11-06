@@ -169,8 +169,9 @@ static void test_hashes_sha512_256_hash_clear_ctx(void)
 
     TEST_ASSERT(memcmp(h_empty, hash, SHA512_256_DIGEST_LENGTH) == 0);
     for (size_t i=0; i<sizeof(sha512_256_context_t); i++) {
-        if (((uint8_t*)&sha512_256)[i] != 0)
+        if (((uint8_t*)&sha512_256)[i] != 0) {
             TEST_FAIL("sha512_256_context_t not completely cleared.");
+        }
     }
 }
 

@@ -263,8 +263,14 @@ static ieee802154_dev_t *_reg_callback(ieee802154_dev_type_t type, void *opaque)
         case IEEE802154_DEV_TYPE_KW2XRF:
             printf("kw2xrf");
             break;
+        case IEEE802154_DEV_TYPE_KW41ZRF:
+            printf("kw41zrf");
+            break;
         case IEEE802154_DEV_TYPE_MRF24J40:
             printf("mrf24j40");
+            break;
+        case IEEE802154_DEV_TYPE_AT86RF2XX:
+            printf("at86rf2xx");
             break;
         case IEEE802154_DEV_TYPE_ESP_IEEE802154:
             printf("esp_ieee802154");
@@ -300,6 +306,7 @@ static int _init(void)
     /* Since the device was already initialized, turn on the radio.
      * The transceiver state will be "TRX_OFF" */
     res = ieee802154_radio_request_on(&_radio);
+
     expect(res >= 0);
     while (ieee802154_radio_confirm_on(&_radio) == -EAGAIN) {}
 
@@ -319,8 +326,8 @@ static int _init(void)
     expect(res >= 0);
 
     /* Set PHY configuration */
-    ieee802154_phy_conf_t conf = { .channel=CONFIG_IEEE802154_DEFAULT_CHANNEL,
-                                   .page=CONFIG_IEEE802154_DEFAULT_SUBGHZ_PAGE,
+    ieee802154_phy_conf_t conf = { .phy_mode=CONFIG_IEEE802154_DEFAULT_PHY_MODE,
+                                   .channel=CONFIG_IEEE802154_DEFAULT_CHANNEL,
                                    .pow=CONFIG_IEEE802154_DEFAULT_TXPOWER};
 
     res = ieee802154_radio_config_phy(&_radio, &conf);
@@ -537,7 +544,7 @@ int config_phy(int argc, char **argv)
 
     ieee802154_dev_t *dev = &_radio;
     ieee802154_radio_set_idle(dev, true);
-    ieee802154_phy_conf_t conf = {.phy_mode=phy_mode, .channel=channel, .page=0, .pow=tx_pow};
+    ieee802154_phy_conf_t conf = {.phy_mode=phy_mode, .channel=channel, .pow=tx_pow};
     if (ieee802154_radio_config_phy(dev, &conf) < 0) {
         puts("Channel or TX power settings not supported");
     }

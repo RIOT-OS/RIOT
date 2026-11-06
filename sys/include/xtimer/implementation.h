@@ -1,11 +1,8 @@
 /*
- * Copyright (C) 2015 Kaspar Schleiser <kaspar@schleiser.de>
- *               2016 Eistec AB
- *               2018 Josua Arndt
- *
- * This file is subject to the terms and conditions of the GNU Lesser
- * General Public License v2.1. See the file LICENSE in the top level
- * directory for more details.
+ * SPDX-FileCopyrightText: 2015 Kaspar Schleiser <kaspar@schleiser.de>
+ * SPDX-FileCopyrightText: 2016 Eistec AB
+ * SPDX-FileCopyrightText: 2018 Josua Arndt
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
 
 #pragma once
@@ -173,7 +170,7 @@ static inline void xtimer_spin(xtimer_ticks32_t ticks) {
 
 static inline void xtimer_msleep(uint32_t milliseconds)
 {
-    _xtimer_tsleep64(_xtimer_ticks_from_usec64(milliseconds * US_PER_MS));
+    _xtimer_tsleep64(_xtimer_ticks_from_usec64((uint64_t)milliseconds * US_PER_MS));
 }
 
 static inline void xtimer_usleep(uint32_t microseconds)

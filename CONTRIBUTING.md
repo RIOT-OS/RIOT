@@ -10,12 +10,13 @@ of this document using the following links:
 * [Writing Documentation][writing-documentation]
 * [Working with Git][working with git]
 * [Mediate Conflicts][mediate-conflicts]
+* [Extractive Contributions][extractive-contributions]
 
 If you have questions, please write a post over at our [forum] or chat on
 `#riot-os:matrix.org` on [Matrix].
 
 As a reminder, all contributors are expected to follow our
-[Code of Conduct](CODE_OF_CONDUCT.md).
+[Code of Conduct](https://guide.riot-os.org/general/code_of_conduct/).
 
 [forum]: https://forum.riot-os.org
 [Matrix]: https://matrix.to/#/#riot-os:matrix.org
@@ -74,10 +75,12 @@ the following steps:
   1. Your code is merged in RIOT master branch when it passes review.
 
 Be sure to read the [general tips] below.
+If you are using AI tools, please also read [our AI Policy][ai-policy].
 
 [open-an-issue]: https://github.com/RIOT-OS/RIOT/issues?q=state:open+type:issue+label:"Type:+bug"
 [labels]: https://github.com/RIOT-OS/RIOT/wiki/RIOT%27s-labeling-system
 [open-a-pull-request]: https://help.github.com/articles/using-pull-requests
+[ai-policy]: https://doc.riot-os.org/general/ai_policy
 
 ### General Tips
 [general tips]: #general-tips
@@ -108,8 +111,8 @@ It is possible to check if your code follows these conventions:
 
 * You can [uncrustify] `.c` and `.h` files:
 
-  ```console
-  $ uncrustify -c $RIOTBASE/uncrustify-riot.cfg --no-backup <your file>
+  ```shell
+  uncrustify -c $RIOTBASE/uncrustify-riot.cfg --no-backup <your file>
   ```
 
   **Note**: The `--no-backup` flag makes uncrustify *replace* the current file
@@ -122,13 +125,13 @@ It is possible to check if your code follows these conventions:
   *Watch out:* the command below will rebase your branch on your master branch,
   so make sure they can be rebased (e.g. there's no potential conflict).
 
-  ```console
-  $ make static-test
+  ```shell
+  make static-test
   ```
 
   Use it before opening a PR to perform last time checks.
 
-[coding-conventions]: CODING_CONVENTIONS.md
+[coding-conventions]: https://guide.riot-os.org/c_tutorials/coding_conventions/
 
 ### Commit conventions
 [commit conventions]: #commit-conventions
@@ -136,7 +139,7 @@ It is possible to check if your code follows these conventions:
 * Each commit should target changes of specific parts/modules of RIOT. The
   commits use the following pattern:
 
-  ```
+  ```text
   area of code: description of changes
   ```
 
@@ -144,7 +147,7 @@ It is possible to check if your code follows these conventions:
   changes.
   For example:
 
-  ```
+  ```text
   periph/timer: Document that set_absolute is expected to wrap
 
   Most timers are implemented this way already, and keeping (documenting)
@@ -214,22 +217,19 @@ into the source repository.
 Documentation improvements are always welcome and a good starting point for
 new contributors. This kind of contribution is merged quite quickly in general.
 
-RIOT documentation is built with [doxygen][doxygen]. Doxygen is configured to
-parse header (.h) and `doc.txt` files in the RIOT source code to generate
-the modules, cpus, boards and packages documentation.
-General documentation pages are written in Markdown and located in
-`doc/doxygen/src`.
+RIOT documentation is built with [Doxygen][doxygen] and [Starlight][starlight].
+Doxygen reads files in the RIOT source code to generate
+the modules, CPUs, boards and packages API documentation.
+Starlight is used to generate the guides and tutorials.
 
-To generate the documentation, simply run the following
-from the base directory of the RIOT source code.
-
-```console
-$ make doc
-```
-
-The generated documentation is located in `doc/doxygen/html`
+Refer to the [How to Doc guide][how-to-doc] for more information on how to write guides
+and [coding conventions documentation][coding-conventions-documentation]
+for more information on how to write code documentation.
 
 [doxygen]: http://www.doxygen.nl/
+[starlight]: https://starlight.astro.build/
+[how-to-doc]: https://guide.riot-os.org/misc/how_to_doc/
+[coding-conventions-documentation]: https://guide.riot-os.org/c_tutorials/coding_conventions/#documentation
 
 ## Working with Git
 [working with git]: #working-with-git
@@ -250,24 +250,24 @@ from the [RIOT main GitHub page][riot-github].
 
 If it's your first time with git, configure your name and emails:
 
-```console
-$ git config --global user.name = "<your name here>"
-$ git config --global user.email = "<your email address here>"
+```shell
+git config --global user.name = "<your name here>"
+git config --global user.email = "<your email address here>"
 ```
 
 Then clone locally your fork of RIOT (replace `account name` with your actual
 login on GitHub):
 
-```console
-$ git clone git@github.com:<account name>/RIOT.git
+```shell
+git clone git@github.com:<account name>/RIOT.git
 ```
 
 You can keep any branch of your local repository up-to-date with the upstream
 master branch with the following commands:
 
-```console
-$ git checkout <branch name>
-$ git pull --rebase https://github.com/RIOT-OS/RIOT.git
+```shell
+git checkout <branch name>
+git pull --rebase https://github.com/RIOT-OS/RIOT.git
 ```
 
 Use it before opening a PR. This will at least ensure the PR is mergeable but
@@ -277,20 +277,21 @@ also that it is up-to-date with the upstream repository.
 
 ### Work on branches
 
-Avoid opening PR from the `master` branch of your fork to the master branch of
+Avoid opening a PR from the `master` branch of your fork to the master branch of
 the RIOT upstream repository: update your master branch and start a new branch
 from it.
 
-```console
-$ git checkout master
-$ git pull --rebase https://github.com/RIOT-OS/RIOT.git
-$ git checkout -b <new branch>
+```shell
+git checkout master
+git pull --rebase https://github.com/RIOT-OS/RIOT.git
+git checkout -b <new branch>
 ```
 
-Do your changes, commit, update with latest upstream master
+You can then do your changes, commit them and push them to your local repository
+by using the following command:
 
-```console
-$ git push
+```shell
+git push origin <your branch>
 ```
 
 ### Add fixup commits during review
@@ -304,67 +305,92 @@ Let's say your PR contains 3 commits with comments: `prefix1: change 1`,
 Instead of committing changes in `prefix2` in a 4th commit `prefix2: change 4`,
 you can use the `--fixup` option:
 
-```console
-$ git add /path/of/prefix2
-$ git commit --fixup <prefix2 commit hash>
+```shell
+git add /path/of/prefix2
+git commit --fixup <prefix2 commit hash>
 ```
 
 ### Squash commits after review
 
-*** Note: If the static tests warn you about a no-merge keyword, please look
-at [our commit conventions][commit-conventions].
+During the course of a Pull Request, a lot of `fixup!` commits can accumulate.
+To keep the project commit history clean, these commits have to be combined
+(squashed) into sensible commits. This is a good opportunity to take a look
+again at again our [commit conventions].
 
-Squashing a commit is done using the rebase subcommand of git in interactive
-mode:
+***Note:*** The static tests will warn you about no-merge keywords such as
+`fixup` or `DONOTMERGE`. These commits have to be squashed or removed before a
+merge is permitted.
 
-```console
-$ git rebase master -i
-```
+***Watch out:*** Don't squash your commits unless a maintainer asks you to do it.
 
-You can find information on rebasing in
+Otherwise the history of review changes is lost and for large PRs, it
+makes it difficult for the reviewer to follow them. It might also happen that
+you introduce a regression and won't be able to recover your working state from
+previous commits.
+
+Squashing a commit is done using the `rebase` subcommand of git in interactive
+mode, you can find information on rebasing in the
 [GitHub rebase documentation][about-git-rebase].
 
 [about-git-rebase]: https://help.github.com/articles/about-git-rebase/
 
+The safest method to squash your commits is to find out the last commit hash
+of the `master` branch with `git merge-base HEAD master`.
+
+You can then execute `git rebase -i <last master hash>`, which will show you
+all the commits you have made since in a text editor. You can select, drop,
+reorder and squash the commits here.
+
 If you used [fixup commits](#add-fixup-commits-during-review) during the review
 phase, squashing commits can be performed in a single command:
 
-```console
-$ git rebase -i --autosquash
+```shell
+git rebase -i --autosquash <last master hash>
 ```
 
-***Watch out: Don't squash your commit until a maintainer asks you to do it.***
+If you encounter a merge conflict, it is generally easiest to use a merge tool
+like [meld](https://meldmerge.org/) or the built-in merge tool of your editor
+or IDE.
 
-Otherwise the history of review changes is lost and for large PRs, it
-makes it difficult for the reviewer to follow them. It might also happen that
-you introduce regression and won't be able to recover them from previous
-commits.
+After the merge conflict is resolved you can continue the rebase by using
 
-If you encounter a merge conflict you could either resolve it by hand with an
-editor and use
-
-```console
-$ git add -p
-```
-
-To add your changes or use a merge tool like [meld](https://meldmerge.org/) to
-resolve your merge conflict.
-
-```console
-$ git mergetool
-```
-
-After the merge conflict is resolved you can continue to rebase by using
-
-```console
-$ git rebase --continue
+```shell
+git rebase --continue
 ```
 
 Once squashing is done, you will have to force push your branch to update the
 PR:
 
-```console
-$ git push --force-with-lease
+```shell
+git push origin <your branch> --force-with-lease
+```
+
+### Manually rebasing
+
+A maintainer might ask you to rebase your Pull Request for various
+reasons. Sometimes the development on the `master` branch has progressed,
+making a rebase in your Pull Request necessary to apply upstream changes.
+
+First, you have to sync your fork to the upstream `master` branch.
+You can do that by visiting your fork on https://github.com/username/RIOT.
+You will find a message such as
+`This branch is 4 commits behind RIOT-OS/RIOT:master.`. To the right of this
+message there is a `Sync Fork` button that allows you to `Update Branch`.
+
+Once the `master` branch of your fork has been updated, you can use
+`git pull master` in your console to fetch the latest changes.
+
+To perform the rebase, you have to be on your development branch, so if
+necessary checkout to your branch and run `git rebase master`.
+
+Ideally, no conflicts should arise. If that happens, take a look at the
+previous section.
+
+You then have to force push your updated branch to the remote repository by
+using the following command:
+
+```shell
+git push origin <your branch> --force-with-lease
 ```
 
 ## Mediating Conflicts
@@ -405,6 +431,25 @@ Note: Violations of our [code of conduct][code-of-conduct] should be reported
       to [email-coc]. See our [code of conduct][code-of-conduct] for more
       details.
 
-[code-of-conduct]: CODE_OF_CONDUCT.md
+[code-of-conduct]: https://guide.riot-os.org/general/code_of_conduct/
 [email-mediator]: mailto:mediation@riot-os.org
 [email-coc]: mailto:conduct@riot-os.org
+
+## Extractive Contributions
+[extractive-contributions]: #extractive-contributions
+
+Please be aware that we may close issues and pull requests
+that we consider as [extractive contribution][guide-extractive-contributions].
+
+[guide-extractive-contributions]: https://guides.riot-os.org/general/ai_policy/#extractive-contributions
+
+If your contribution has been closed as extractive contribution, this does not mean
+that you are not welcome to our community. If you are willing to invest time
+and to learn, we are more than happy to guide and help you. A good first step to
+show that you are willing to invest time is to follow [our guide][guide] to set
+up your development system, so that you can compile and test your contributions.
+A good second step would be to go [through our tutorials][tutorials] with little
+to no help of an LLM. We are also happy to answer your questions about the
+tutorials, if you get stuck.
+
+[tutorials]: https://github.com/riot-os/tutorials

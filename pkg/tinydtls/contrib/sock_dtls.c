@@ -1,9 +1,6 @@
 /*
- * Copyright (C) 2019 HAW Hamburg
- *
- * This file is subject to the terms and conditions of the GNU Lesser
- * General Public License v2.1. See the file LICENSE in the top level
- * directory for more details.
+ * SPDX-FileCopyrightText: 2019 HAW Hamburg
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
 
 /**
@@ -453,6 +450,9 @@ int sock_dtls_create(sock_dtls_t *sock, sock_udp_t *udp_sock,
     assert(sock);
     assert(udp_sock);
 
+    /* tinydtls actually does not care about role */
+    (void)role;
+
     if (role != SOCK_DTLS_CLIENT && role != SOCK_DTLS_SERVER) {
         DEBUG("sock_dtls: invalid role\n");
         return -1;
@@ -494,7 +494,6 @@ int sock_dtls_create(sock_dtls_t *sock, sock_udp_t *udp_sock,
         sock->tags_len = 0;
     }
 
-    sock->role = role;
     sock->dtls_ctx = dtls_new_context(sock);
     if (!sock->dtls_ctx) {
         DEBUG("sock_dtls: error getting DTLS context\n");

@@ -6,12 +6,13 @@ USEMODULE += xtimer_no_ztimer_default
 DISABLE_MODULE += auto_init_xtimer
 
 # Boards that can't run only on xtimer or that always select ztimer
-BOARD_BLACKLIST += \
+BOARDS_UNSUPPORTED += \
                    adafruit-feather-nrf52840-express \
                    bitcraze-crazyflie21-main \
                    esp32s2-wemos-mini \
                    hamilton \
                    mulle \
+                   msbiot \
                    pinetime \
                    ruuvitag \
                    seeedstudio-gd32 \

@@ -1,10 +1,7 @@
 /*
- * Copyright (C) 2020 Gunar Schorcht
- *               2021 Otto-von-Guericke-Universität Magdeburg
- *
- * This file is subject to the terms and conditions of the GNU Lesser
- * General Public License v2.1. See the file LICENSE in the top level
- * directory for more details.
+ * SPDX-FileCopyrightText: 2020 Gunar Schorcht
+ * SPDX-FileCopyrightText: 2021 Otto-von-Guericke-Universität Magdeburg
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
 
 #pragma once
@@ -415,7 +412,7 @@ typedef union gpio_conf_minimal gpio_conf_t;
  * @warning The layout of this structure is implementation dependent and
  *          additional implementation specific fields might be present. For this
  *          reason, this structure must be initialized using designated
- *          initializers or zeroing out the whole contents using `memset()
+ *          initializers or zeroing out the whole contents using `memset()`
  *          before initializing the individual fields.
  *
  * See @ref gpio_conf_minimal for the minimal structure fields to expect.

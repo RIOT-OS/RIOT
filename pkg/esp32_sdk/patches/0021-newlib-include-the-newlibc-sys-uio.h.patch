@@ -15,9 +15,9 @@ index 3ff3eba871..5a8652a797 100644
  
  #pragma once
  
-+#ifdef RIOT_VERSION
++#ifdef RIOT_OS
 +#include_next <sys/uio.h>
-+#endif /* RIOT_VERSION */
++#endif /* RIOT_OS */
 +
  #include <stdint.h>
  #include <sys/types.h>

@@ -85,8 +85,8 @@ int main(void)
          * to the target. */
         uint32_t last = t.last - _intervals[j];
 
-        if (!ztimer_is_set(clock, &t.timer)) {
-            print_str("Test failed, timer not set\n");
+        if (!ztimer_periodic_is_running(&t)) {
+            print_str("Test failed, timer not running\n");
             return 1;
         }
 
@@ -105,6 +105,11 @@ int main(void)
         }
 
         ztimer_periodic_stop(&t);
+
+        if (ztimer_periodic_is_running(&t)) {
+            print_str("Test failed, timer still running\n");
+            return 1;
+        }
     }
 
     if (!failed) {

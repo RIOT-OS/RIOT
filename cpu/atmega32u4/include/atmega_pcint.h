@@ -1,3 +1,8 @@
+/*
+ * SPDX-FileCopyrightText: 2019 TU Braunschweig Institut für Betriebssysteme und Rechnerverbund
+ * SPDX-License-Identifier: LGPL-2.1-only
+ */
+
 #pragma once
 
 #ifdef __cplusplus

@@ -5,6 +5,12 @@ description: How to create your own application for RIOT
 
 import FileTree from '@components/FileTree.astro';
 
+:::note
+This is an advanced tutorial, if you are looking for a beginner introduction
+about RIOT applications, take a look at
+[Creating a Project](/c_tutorials/create_project).
+:::
+
 To create your own application you need to create a directory containing one or
 multiple C file(s) with your source code and a Makefile. A template Makefile is
 available in the `dist` folder of the
@@ -64,14 +70,14 @@ include $(RIOTBASE)/Makefile.include
 
 Sometimes it is necessary to exclude boards because they don't provide a
 required functionality or don't have sufficient memory. RIOT's build system
-looks for the macros `BOARD_BLACKLIST`, `BOARD_WHITELIST`, and
+looks for the macros `BOARDS_UNSUPPORTED`, `BOARDS_SUPPORTED`, and
 `BOARD_INSUFFICIENT_MEMORY`. Any board name that is not included in
-`BOARD_WHITELIST` will issue a message that one has to expect errors if they
+`BOARDS_SUPPORTED` will issue a message that one has to expect errors if they
 build the application for the board referred by that name. The list can also be
 used by a CI system to not build the application for this board at all. A board
-that is included in `BOARD_BLACKLIST` will show the same behavior. The build
-system evaluates `BOARD_WHITELIST` first and then `BOARD_BLACKLIST`. The
-`BOARD_INSUFFICIENT_MEMORY` macro is similar to `BOARD_BLACKLIST` but will
+that is included in `BOARDS_UNSUPPORTED` will show the same behavior. The build
+system evaluates `BOARDS_SUPPORTED` first and then `BOARDS_UNSUPPORTED`. The
+`BOARD_INSUFFICIENT_MEMORY` macro is similar to `BOARDS_UNSUPPORTED` but will
 build in any case. A CI system can use the information provided by the
 `BOARD_INSUFFICIENT_MEMORY` macro to skip the linking step in the build
 process, since some linkers will issue an error if the code won't fit the
@@ -188,6 +194,37 @@ ifneq (,$(filter native native32 native64,$(BOARD)))
 endif
 ```
 
+## Modifying Board-Defaults of Peripherals
+
+Sometimes the default configuration of CPU peripherals from the board's
+`periph_conf.h` file does not fit the need of the application. This can be due
+to custom pin mapping or collosions, additional or different controllers
+required, or other reasons.
+
+Usually it is not desirable to modify the default board configuration in the
+RIOT folder, but rather to keep the custom configuration close to the
+application itself.
+Therefore, a custom `periph_conf.h` file can be created in the base directory
+of the application, as shown in the file tree below.
+
+<FileTree>
+- apps
+    - my_app
+        - Makefile
+        - main.c
+        - periph_conf.h
+- RIOT/
+    - boards
+        - specific_board
+            - include
+                - periph_conf.h
+</FileTree>
+
+It is usually a good idea to copy the `periph_conf.h` file from the board you
+are working with as a starting point and then applying the modifications. This
+ensures that all the other peripherals are still working as intended and gives
+you a reliable starting point.
+
 ## Helper Tools
 
 To help you start writing an application within RIOT, the build system provides
@@ -247,13 +284,17 @@ tree can be used:
 
 - apps
     - my_app
+        - include
+            - my_subdir_header.h
+        - my_header.h
         - Makefile
+        - main.c
 - boards
   - my_board/
 - modules
     - my_module
         - include
-            -my_module.h
+            - my_module.h
         - Makefile
         - Makefile.include
         - my_module.c
@@ -262,8 +303,10 @@ tree can be used:
 </FileTree>
 
 In this example tree, the `apps` directory contains a collection of applications
-for the project. The modules directory could contain extra modules for the
-applications.
+for the project. You can add application headers at the same level as your
+`main.c` file or in an `include/` subdirectory to keep the application's root
+folder cleaner, if many source files and/or headers are present.
+The modules directory could contain extra modules for the applications.
 
 The Makefile inside the application needs at least the following as bare minimum:
 

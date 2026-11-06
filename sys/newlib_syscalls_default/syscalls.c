@@ -1,10 +1,7 @@
 /*
- * Copyright (C) 2015 Kaspar Schleiser <kaspar@schleiser.de>
- *               2014 Freie Universität Berlin
- *
- * This file is subject to the terms and conditions of the GNU Lesser General
- * Public License v2.1. See the file LICENSE in the top level directory for more
- * details.
+ * SPDX-FileCopyrightText: 2015 Kaspar Schleiser <kaspar@schleiser.de>
+ * SPDX-FileCopyrightText: 2014 Freie Universität Berlin
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
 
 /**
@@ -167,7 +164,12 @@ __attribute__((used)) void _fini(void)
  */
 __attribute__((used)) void _exit(int n)
 {
-    LOG_INFO("#! exit %i: powering off\n", n);
+    if (n > 0) {
+        LOG_ERROR("ERR: program failed with exit code %i\n", n);
+    }
+    else {
+        LOG_WARNING("WARN: program exited\n");
+    }
 #ifdef MODULE_PERIPH_PM
     pm_off();
 #endif
@@ -410,10 +412,10 @@ int _fcntl_r (struct _reent *r, int fd, int cmd, int arg)
  */
 _off_t _lseek_r(struct _reent *r, int fd, _off_t off, int whence)
 {
-    int res = vfs_lseek(fd, off, whence);
+    off_t res = vfs_lseek(fd, off, whence);
     if (res < 0) {
         /* vfs returns negative error codes */
-        r->_errno = -res;
+        r->_errno = -(int)res;
         return -1;
     }
     return res;

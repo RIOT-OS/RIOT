@@ -36,7 +36,6 @@ export DISABLE_MODULE        # Used in the application's Makefile to suppress DE
 export RIOTBASE              # The root folder of RIOT. The folder where this very file lives in.
 export RIOTCPU               # For third party CPUs this folder is the base of the CPUs.
 export RIOTBOARD             # This folder is the base of the riot boards.
-export BOARDSDIR             # This is the folder containing the board dir
 export EXTERNAL_BOARD_DIRS   # List of folders containing external board dirs
 export BOARDDIR              # This folder contains the board
 export RIOTPKG               # For overriding RIOT's pkg directory
@@ -97,8 +96,6 @@ export WERROR                # Treat all compiler warnings as errors if set to 1
 export WPEDANTIC             # Issue all (extensive) compiler warnings demanded by strict C/C++
 # EEPROM_FILE                # (Native only!) file path where the content of the EEPROM is stored
 
-# GITCACHE                   # path to git-cache executable
-# GIT_CACHE_DIR              # path to git-cache cache directory, only used with packages
 # FLASHER                    # The command to call on "make flash".
 # PROG_DEV                   # The device to connect the FLASHER and DEBUGGER
 # FFLAGS                     # The parameters to supply to FLASHER.

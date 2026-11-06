@@ -1,9 +1,6 @@
 /*
- * Copyright (C) 2017-20 Freie Universität Berlin
- *
- * This file is subject to the terms and conditions of the GNU Lesser
- * General Public License v2.1. See the file LICENSE in the top level
- * directory for more details.
+ * SPDX-FileCopyrightText: 2017-2020 Freie Universität Berlin
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
 
 #pragma once
@@ -33,41 +30,49 @@
 #include <stdint.h>
 #include <stdbool.h>
 
-#include "sched.h"
-#include "msg.h"
-#ifdef MODULE_GNRC_NETIF_BUS
-#include "msg_bus.h"
-#endif
+#include "compiler_hints.h"
 #include "event.h"
-#include "net/ipv6/addr.h"
+#include "msg.h"
 #include "net/gnrc/netapi.h"
-#include "net/gnrc/pkt.h"
 #include "net/gnrc/netif/conf.h"
-#if IS_USED(MODULE_GNRC_NETIF_LORAWAN)
-#include "net/gnrc/netif/lorawan.h"
-#endif
-#if IS_USED(MODULE_GNRC_NETIF_6LO)
-#include "net/gnrc/netif/6lo.h"
-#endif
-#if defined(MODULE_GNRC_NETIF_DEDUP) && (GNRC_NETIF_L2ADDR_MAXLEN > 0)
-#include "net/gnrc/netif/dedup.h"
-#endif
 #include "net/gnrc/netif/flags.h"
-#if IS_USED(MODULE_GNRC_NETIF_IPV6)
-#include "net/gnrc/netif/ipv6.h"
-#endif
-#if IS_USED(MODULE_GNRC_NETIF_PKTQ)
-#include "net/gnrc/netif/pktq/type.h"
-#endif
+#include "net/gnrc/pkt.h"
+#include "net/ipv6/addr.h"
 #include "net/l2util.h"
 #include "net/ndp.h"
 #include "net/netdev.h"
-#include "net/netopt.h"
-#ifdef MODULE_NETSTATS_L2
-#include "net/netstats.h"
-#endif
-#include "rmutex.h"
 #include "net/netif.h"
+#include "net/netopt.h"
+#include "rmutex.h"
+#include "sched.h"
+
+#ifdef MODULE_GNRC_NETIF_BUS
+#  include "msg_bus.h"
+#endif
+
+#if IS_USED(MODULE_GNRC_NETIF_LORAWAN)
+#  include "net/gnrc/netif/lorawan.h"
+#endif
+
+#if IS_USED(MODULE_GNRC_NETIF_6LO)
+#  include "net/gnrc/netif/6lo.h"
+#endif
+
+#if defined(MODULE_GNRC_NETIF_DEDUP) && (GNRC_NETIF_L2ADDR_MAXLEN > 0)
+#  include "net/gnrc/netif/dedup.h"
+#endif
+
+#if IS_USED(MODULE_GNRC_NETIF_IPV6)
+#  include "net/gnrc/netif/ipv6.h"
+#endif
+
+#if IS_USED(MODULE_GNRC_NETIF_PKTQ)
+#  include "net/gnrc/netif/pktq/type.h"
+#endif
+
+#ifdef MODULE_NETSTATS_L2
+#  include "net/netstats.h"
+#endif
 
 #ifdef __cplusplus
 extern "C" {
@@ -409,6 +414,7 @@ void gnrc_netif_init_devs(void);
  * @return  0 on success
  * @return  negative number on error
  */
+ACCESS(write_only, 2, 3)
 int gnrc_netif_create(gnrc_netif_t *netif, char *stack, int stacksize,
                       char priority, const char *name, netdev_t *dev,
                       const gnrc_netif_ops_t *ops);
@@ -469,7 +475,7 @@ gnrc_netif_t *gnrc_netif_get_by_pid(kernel_pid_t pid);
  *                      addresses assigned to @p netif. May not be `NULL`
  * @param[in] max_len   Number of *bytes* available in @p addrs. Must be at
  *                      least `sizeof(ipv6_addr_t)`. It is recommended to use
- *                      @p CONFIG_GNRC_NETIF_IPV6_ADDRS_NUMOF `* sizeof(ipv6_addr_t)
+ *                      @p CONFIG_GNRC_NETIF_IPV6_ADDRS_NUMOF `* sizeof(ipv6_addr_t)`
  *                      here (and have @p addrs of the according length).
  *
  * @return  Size of the array of addresses in @p addrs on success.
@@ -555,7 +561,7 @@ static inline int gnrc_netif_ipv6_addr_remove(const gnrc_netif_t *netif,
  *                      is joined to. May not be `NULL`
  * @param[in] max_len   Number of *bytes* available in @p groups. Must be at
  *                      least `sizeof(ipv6_addr_t)`. It is recommended to use
- *                      @p GNRC_NETIF_IPV6_GROUPS_NUMOF `* sizeof(ipv6_addr_t)
+ *                      @p GNRC_NETIF_IPV6_GROUPS_NUMOF `* sizeof(ipv6_addr_t)`
  *                      here (and have @p groups of the according length).
  *
  * @return  Number of addresses in @p groups times `sizeof(ipv6_addr_t)` on
@@ -710,9 +716,10 @@ static inline char *gnrc_netif_addr_to_str(const uint8_t *addr, size_t addr_len,
  * @return  Actual length of @p out on success.
  * @return  0, on failure.
  */
-static inline size_t gnrc_netif_addr_from_str(const char *str, uint8_t *out)
+static inline size_t gnrc_netif_addr_from_str(const char *str,
+                                              uint8_t out[GNRC_NETIF_L2ADDR_MAXLEN])
 {
-    return l2util_addr_from_str(str, out);
+    return l2util_addr_from_str_sized(str, out, GNRC_NETIF_L2ADDR_MAXLEN );
 }
 
 /**

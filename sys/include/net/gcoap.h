@@ -1,10 +1,7 @@
 /*
- * Copyright (c) 2015-2017 Ken Bannister. All rights reserved.
- *               2017 Freie Universität Berlin
- *
- * This file is subject to the terms and conditions of the GNU Lesser
- * General Public License v2.1. See the file LICENSE in the top level
- * directory for more details.
+ * SPDX-FileCopyrightText: 2015-2017 Ken Bannister. All rights reserved.
+ * SPDX-FileCopyrightText: 2017 Freie Universität Berlin
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
 
 #pragma once
@@ -402,6 +399,7 @@
 #include "event/timeout.h"
 #include "net/sock/udp.h"
 #include "net/nanocoap.h"
+#include "time_units.h"
 
 #if IS_USED(MODULE_GCOAP_DTLS)
 #  include "net/sock/dtls.h"
@@ -1200,9 +1198,8 @@ static inline uint8_t *gcoap_request_memo_get_buf(gcoap_request_memo_t *memo)
     if (memo->send_limit == GCOAP_SEND_LIMIT_NON) {
         return &memo->msg.hdr_buf[0];
     }
-    else {
-        return memo->msg.data.pdu_buf;
-    }
+
+    return memo->msg.data.pdu_buf;
 }
 
 /**
@@ -1218,6 +1215,56 @@ static inline coap_udp_hdr_t *gcoap_request_memo_get_hdr(const gcoap_request_mem
 {
     gcoap_request_memo_t *evil_cast_is_evil = (gcoap_request_memo_t *)memo;
     return (coap_udp_hdr_t *)gcoap_request_memo_get_buf(evil_cast_is_evil);
+}
+
+/**
+ * @brief   Get the request header's Token length from a @ref gcoap_request_memo_t
+ *
+ * @param[in]   memo    The memo to get the request header length from
+ *
+ * @return  The length of the request header's Token stored in @p memo
+ */
+static inline size_t gcoap_request_memo_get_tkl(const gcoap_request_memo_t *memo)
+{
+    const coap_udp_hdr_t *hdr = gcoap_request_memo_get_hdr(memo);
+    /*
+     * Layout of first byte of header (cut out of Figure 7 of RFC7252)
+     * see https://datatracker.ietf.org/doc/html/rfc7252#section-3
+     *  0 1 2 3 4 5 6 7
+     * +-+-+-+-+-+-+-+-+
+     * |Ver| T |  TKL  |
+     * +-+-+-+-+-+-+-+-+
+     */
+    return hdr->ver_t_tkl & 0xf;
+}
+
+/**
+ * @brief   Get the request header length from a @ref gcoap_request_memo_t
+ *
+ * @note    Header length includes everything up to and including the CoAP Token,
+ *          but excludes the CoAP Options
+ *
+ * @param[in]   memo    The memo to get the request header length from
+ *
+ * @return  The length of the request header stored in @p memo
+ */
+static inline size_t gcoap_request_memo_get_hdr_len(const gcoap_request_memo_t *memo)
+{
+    /* CoAP header without options is static header plus Token */
+    return sizeof(coap_udp_hdr_t) + gcoap_request_memo_get_tkl(memo);
+}
+
+/**
+ * @brief   Get the request header's CoAP token from a @ref gcoap_request_memo_t
+ *
+ * @param[in]   memo    The request memo to get the request's token from
+ *
+ * @return  Pointer to the CoAP Token inside the request header copy in @p memo
+ */
+static inline void * gcoap_request_memo_get_token(gcoap_request_memo_t *memo)
+{
+    uint8_t *buf = gcoap_request_memo_get_buf(memo);
+    return buf + sizeof(coap_udp_hdr_t);
 }
 
 #ifdef __cplusplus

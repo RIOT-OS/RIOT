@@ -1,10 +1,7 @@
 #!/usr/bin/env python3
 
-# Copyright (C) 2017 Alexandre Abadie <alexandre.abadie@inria.fr>
-#
-# This file is subject to the terms and conditions of the GNU Lesser
-# General Public License v2.1. See the file LICENSE in the top level
-# directory for more details.
+# SPDX-FileCopyrightText: 2017 Alexandre Abadie <alexandre.abadie@inria.fr>
+# SPDX-License-Identifier: LGPL-2.1-only
 
 import json
 import os
@@ -22,6 +19,7 @@ EXPECTED_CMDS = {
     'echo': 'prints the input command',
     'empty': 'print nothing on command',
     'periodic': 'periodically print command',
+    'burst': 'print lines in quick succession (default: 16)',
     'app_metadata': 'Returns application metadata',
     'pm': 'interact with layered PM subsystem',
     'ps': 'Prints information about running threads.',
@@ -85,7 +83,7 @@ CMDS = (
     ('echo escaped\\ space', '"echo""escaped space"'),
     ('echo escape within \'\\s\\i\\n\\g\\l\\e\\q\\u\\o\\t\\e\'', '"echo""escape""within""singlequote"'),
     ('echo escape within "\\d\\o\\u\\b\\l\\e\\q\\u\\o\\t\\e"', '"echo""escape""within""doublequote"'),
-    ("""echo "t\\e st" "\\"" '\\'' a\ b""", '"echo""te st"""""\'""a b"'),  # noqa: W605
+    ("""echo "t\\e st" "\\"" '\\'' a\\ b""", '"echo""te st"""""\'""a b"'),
 
     # test correct quoting
     ('echo "hello"world', '"echo""helloworld"'),
@@ -154,10 +152,11 @@ def check_cmd(child, cmd, expected):
 
 def check_help(child):
     """
-    Runs the `help_json` and `help` command to check if the list of commands
+    Check the output of the `help_json` and `help` commands.
+
+    Runs the `help_json` and `help` commands to check if the lists of commands
     and descriptions match and contain a list of expected commands.
     """
-
     # Run help_json to get the list of commands present
     child.expect(PROMPT)
     child.sendline('help_json')
@@ -271,6 +270,17 @@ def check_preempt(child):
     child.sendline('')
 
 
+def check_burst(child):
+    """
+    Check that output written faster than it can be transmitted is not lost.
+    """
+    pattern = '0123456789abcdefghijklmnopqrstuvwxyz' * 3
+    child.expect(PROMPT)
+    child.sendline('burst')
+    for i in range(16):
+        child.expect_exact(f'burst {i:02}: {pattern}\r\n')
+
+
 def testfunc(child):
     # avoid sending an extra empty line on native.
     if BOARD in ['native', 'native32', 'native64']:
@@ -305,6 +315,8 @@ def testfunc(child):
             check_cmd(child, cmd, expected)
     else:
         print("skipping cleanterm tests")
+
+    check_burst(child)
 
 
 if __name__ == "__main__":

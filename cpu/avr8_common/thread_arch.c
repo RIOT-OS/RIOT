@@ -222,7 +222,16 @@ void cpu_switch_context_exit(void)
     avr8_enter_thread_mode();
 }
 
-#define STACK_POINTER  ((char *)AVR_STACK_POINTER_REG)
+/* https://github.com/avrdudes/avr-libc/commit/bb1802078495afebe78b59ead032599073d278bf
+ * removed the definition of AVR_STACK_POINTER_REG and replaced it by SP_IO_ADDR.
+ * We should remove this compat code once Debian stable ships a version of
+ * avr-libc that includes SP_IO_ADDR.
+ */
+#ifdef SP_IO_ADDR
+#  define STACK_POINTER  ((char *)SP_IO_ADDR)
+#else
+#  define STACK_POINTER  ((char *)AVR_STACK_POINTER_REG)
+#endif
 extern size_t __malloc_margin;
 extern char * __malloc_heap_start;
 extern char * __malloc_heap_end;

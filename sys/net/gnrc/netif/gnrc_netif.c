@@ -1875,7 +1875,8 @@ static void _tx_done(gnrc_netif_t *netif, gnrc_pktsnip_t *pkt,
             return; /* early return to not release */
         }
         else {
-            LOG_ERROR("gnrc_netif: can't queue packet for sending, drop it\n");
+            LOG_ERROR("gnrc_netif: iface %u queue pkt failed (cannot send), dropped\n",
+                      netif->pid);
             /* If we got here, it means the device was busy and the pkt queue
              * was full. The packet should be dropped here anyway */
             gnrc_pktbuf_release_error(pkt, ENOMEM);
@@ -1948,7 +1949,7 @@ static void _send(gnrc_netif_t *netif, gnrc_pktsnip_t *pkt, bool push_back)
             return;
         }
         else {
-            LOG_WARNING("gnrc_netif: can't queue packet for sending, try sending\n");
+            LOG_WARNING("gnrc_netif: iface %u queue pkt failed, try send\n", netif->pid);
             /* try to send anyway */
         }
     }
@@ -2038,9 +2039,6 @@ static void *_gnrc_netif_thread(void *args)
 #endif
     /* now let rest of GNRC use the interface */
     gnrc_netif_release(netif);
-#if (CONFIG_GNRC_NETIF_MIN_WAIT_AFTER_SEND_US > 0U)
-    uint32_t last_wakeup = ztimer_now(ZTIMER_USEC);
-#endif
 
     while (1) {
         msg_t msg;
@@ -2060,16 +2058,6 @@ static void *_gnrc_netif_thread(void *args)
             case GNRC_NETAPI_MSG_TYPE_SND:
                 DEBUG("gnrc_netif: GNRC_NETDEV_MSG_TYPE_SND received\n");
                 _send(netif, msg.content.ptr, false);
-#if (CONFIG_GNRC_NETIF_MIN_WAIT_AFTER_SEND_US > 0U)
-                ztimer_periodic_wakeup(
-                        ZTIMER_USEC,
-                        &last_wakeup,
-                        CONFIG_GNRC_NETIF_MIN_WAIT_AFTER_SEND_US
-                    );
-                /* override last_wakeup in case last_wakeup +
-                 * CONFIG_GNRC_NETIF_MIN_WAIT_AFTER_SEND_US was in the past */
-                last_wakeup = ztimer_now(ZTIMER_USEC);
-#endif
                 break;
             case GNRC_NETAPI_MSG_TYPE_SET:
                 opt = msg.content.ptr;

@@ -32,9 +32,11 @@ endif
 
 .PHONY: esp-qemu esptool
 
-all: esptool
+# esptool is required for the compilation to build the bootloader as well as
+# the image itself. It has to be present before the compilation is started.
+BUILDDEPS += esptool
 
-esp-qemu: $(FLASHFILE)
+esp-qemu: $(FLASHFILE) esptool
 ifeq (esp32,$(CPU))
 	$(Q)echo \
 		"--flash-mode $(FLASH_MODE) --flash-freq $(FLASH_FREQ) " \

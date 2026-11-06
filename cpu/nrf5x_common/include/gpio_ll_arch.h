@@ -41,9 +41,13 @@ extern "C" {
 #define PIN_MASK            (0x1f)
 #define NRF5X_IO_AREA_START (0x40000000UL)
 
-/* Compatibility wrapper defines for nRF9160 */
-#ifdef NRF_P0_S
-#define NRF_P0 NRF_P0_S
+/* Compatibility wrapper defines for nRF53 and nRF9160 */
+#if defined(CPU_FAM_NRF53) || defined(CPU_FAM_NRF9160)
+#  ifdef NRF_TRUSTZONE_NONSECURE
+#    define NRF_P0 NRF_P0_NS
+#  else
+#    define NRF_P0 NRF_P0_S
+#  endif
 #endif
 
 #if defined(CPU_FAM_NRF51)

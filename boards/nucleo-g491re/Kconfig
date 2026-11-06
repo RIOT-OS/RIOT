@@ -1,0 +1,13 @@
+# SPDX-FileCopyrightText: 2020 Inria
+# SPDX-License-Identifier: LGPL-2.1-only
+
+config BOARD
+    default "nucleo-g491re" if BOARD_NUCLEO_G491RE
+
+config BOARD_NUCLEO_G491RE
+    bool
+    default y
+    select BOARD_COMMON_NUCLEO64
+    select CPU_MODEL_STM32G491RE
+
+source "$(RIOTBOARD)/common/nucleo64/Kconfig"

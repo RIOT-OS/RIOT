@@ -1,6 +1,7 @@
 MODULE = esp_idf_wifi
 
 ESP32_SDK_SRC += components/esp_coex/$(CPU_FAM)/esp_coex_adapter.c
+ESP32_SDK_SRC += components/esp_coex/src/coexist.c
 ESP32_SDK_SRC += components/esp_wifi/$(CPU_FAM)/esp_adapter.c
 ESP32_SDK_SRC += components/esp_wifi/src/wifi_init.c
 

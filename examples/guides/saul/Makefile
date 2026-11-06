@@ -2,7 +2,7 @@
 APPLICATION = saul_example
 
 # Change this to your board if you want to build for a different board
-BOARD ?= arduino-feather-nrf52840-sense
+BOARD ?= adafruit-feather-nrf52840-sense
 
 # This has to be the absolute path to the RIOT base directory:
 # If you are following the tutorial, your RIOT base directory will

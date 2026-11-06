@@ -1,6 +1,6 @@
 include ../Makefile.sys_common
 
-BOARD_WHITELIST = \
+BOARDS_SUPPORTED = \
   native \
   nrf52840dk \
   #

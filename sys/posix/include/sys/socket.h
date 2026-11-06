@@ -1,9 +1,6 @@
 /*
- * Copyright (C) 2013-15 Freie Universität Berlin
- *
- * This file is subject to the terms and conditions of the GNU Lesser
- * General Public License v2.1. See the file LICENSE in the top level
- * directory for more details.
+ * SPDX-FileCopyrightText: 2013-2015 Freie Universität Berlin
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
 
 #pragma once
@@ -466,10 +463,10 @@ static inline ssize_t send(int socket, const void *buffer, size_t length,
  *          that operate on sockets.
  *
  * @param[in] domain    Specifies the communications domain in which a socket
- *                      is to be created. Valid values are prefixed with ``AF_`
+ *                      is to be created. Valid values are prefixed with `AF_`
  *                      and defined in @ref socket.h.
  * @param[in] type      Specifies the type of socket to be created. Valued
- *                      values are prefixed with ``SOCK_`` and defined in
+ *                      values are prefixed with `SOCK_` and defined in
  *                      @ref socket.h.
  * @param[in] protocol  Specifies a particular protocol to be used with the
  *                      socket. Specifying a protocol of 0 causes socket() to

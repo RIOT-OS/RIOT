@@ -116,6 +116,10 @@ ifneq (,$(filter m24c%,$(USEMODULE)))
   USEMODULE += at24cxxx
 endif
 
+ifneq (,$(filter max313%,$(USEMODULE)))
+  USEMODULE += max313xx
+endif
+
 ifneq (,$(filter mhz19_%,$(USEMODULE)))
   USEMODULE += mhz19
 endif
@@ -246,8 +250,12 @@ ifneq (,$(filter si70%,$(USEMODULE)))
   USEMODULE += si70xx
 endif
 
-ifneq (,$(filter slipdev_%,$(USEMODULE)))
-  USEMODULE += slipdev
+ifneq (,$(filter slipdev,$(USEMODULE)))
+  USEMODULE += slipdev_net
+endif
+
+ifneq (,$(filter slipdev_% stdio_slipdev,$(USEMODULE)))
+  USEMODULE += slipmux
 endif
 
 ifneq (,$(filter stmpe811_%,$(USEMODULE)))

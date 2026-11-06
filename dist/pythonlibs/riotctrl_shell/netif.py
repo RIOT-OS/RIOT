@@ -14,7 +14,6 @@ import re
 
 from riotctrl.shell import ShellInteraction, ShellInteractionParser
 
-
 # ==== Parsers ====
 
 
@@ -321,9 +320,10 @@ class Ifconfig(ShellInteraction):
         )
 
     def ifconfig_add(self, netif, addr, anycast=False, timeout=-1, async_=False):
-        args = ["add", addr]
+        args = ["add"]
         if anycast:
             args.append("anycast")
+        args.append(addr)
         return self._ifconfig_success_cmd(
             netif=netif, args=args, timeout=timeout, async_=async_
         )

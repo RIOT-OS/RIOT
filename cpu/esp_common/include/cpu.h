@@ -28,7 +28,7 @@ extern "C" {
 /**
  * @brief   Gets the last instruction's address
  *
- * @todo:   Not supported
+ * @todo    Not supported
  */
 static inline uintptr_t cpu_get_caller_pc(void)
 {

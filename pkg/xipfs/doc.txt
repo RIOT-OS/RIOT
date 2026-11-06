@@ -17,16 +17,21 @@
  *
  * To prevent fragmentation, when a file is deleted, subsequent files are shifted to fill the vacant space.
  *
- *`xipfs` is compatible with all microcontrollers featuring addressable
- * flash memory and most operating systems, provided they implement the
- * necessary functions to interact with the flash controller.
+ *`xipfs` is compatible with all ARM microcontrollers featuring addressable flash memory and
+ * most operating systems, provided they implement the necessary functions to interact with
+ * the flash controller.
+ *
+ * The filesystem is also capable to run files with memory isolation, thanks to the use of
+ * ARMv7-M Memory Protection Unit.
+ * Then, the TEXT, DATA and STACK segments of the executable are mapped to MPU regions, isolating
+ * the program from the rest of flash and RAM. It can only access to its legitimate contents.
  *
  * **To have a viable executable file within XiPFS**, please follow these steps :
  * - create a file with executable flag.
- * - Fill it with actual compiled code in an appropriate file format, here XiPFS-Format.
+ * - Fill it with actual compiled code in an appropriate file format, here FAE format.
  * *This is where the actual startup sequence and relocation happen*.
  * - Call execute on it with appropriate args *at least the executable filename should be passed along*.
  *
- * @see      https://github.com/2xs/xipfs
- * @see      https://github.com/2xs/XiPFS_Format
+ * @see      https://github.com/2xs/xipfs/tree/main
+ * @see      https://github.com/2xs/fae_format/tree/master
  */

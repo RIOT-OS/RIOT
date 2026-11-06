@@ -1,10 +1,7 @@
 #!/usr/bin/env python3
 
-# Copyright (C) 2018 Freie Universität Berlin
-#
-# This file is subject to the terms and conditions of the GNU Lesser
-# General Public License v2.1. See the file LICENSE in the top level
-# directory for more details.
+# SPDX-FileCopyrightText: 2018 Freie Universität Berlin
+# SPDX-License-Identifier: LGPL-2.1-only
 
 import os
 import pprint
@@ -318,7 +315,7 @@ class MQTTSNServer(Automaton):
                 tid = pkt.tid
                 topic_name = self._get_topic_name(tid)
             else:
-                assert(False)
+                assert False
             subscription = {"tid": tid, "topic_name": topic_name}
             if subscription not in self.subscriptions:
                 self.subscriptions.append(subscription)

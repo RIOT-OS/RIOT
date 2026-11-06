@@ -1,9 +1,6 @@
 /*
- * Copyright (C) 2018 Koen Zandberg
- *
- * This file is subject to the terms and conditions of the GNU Lesser
- * General Public License v2.1. See the file LICENSE in the top level
- * directory for more details.
+ * SPDX-FileCopyrightText: 2018 Koen Zandberg
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
 
 /**
@@ -25,7 +22,6 @@
 #include <sys/types.h>
 
 #include "log.h"
-#include "isrpipe.h"
 #include "stdio_base.h"
 
 #include "usb/usbus.h"
@@ -51,7 +47,7 @@ static void _cdc_acm_rx_pipe(usbus_cdcacm_device_t *cdcacm,
                              uint8_t *data, size_t len)
 {
     (void)cdcacm;
-    isrpipe_write(&stdin_isrpipe, data, len);
+    stdio_rx_write(data, len);
 }
 
 void usb_cdc_acm_stdio_init(usbus_t *usbus)

@@ -1,7 +1,5 @@
 #!/usr/bin/env python3
-"""
-Command line utility to generate compile_commands.json for RIOT applications
-"""
+"""Command line utility to generate `compile_commands.json` for RIOT applications."""
 import argparse
 import json
 import os
@@ -15,13 +13,18 @@ REGEX_INCLUDES = r"^#include <\.\.\.> search starts here:$((?:\n|\r|.)*?)^End of
 REGEX_INCLUDES = re.compile(REGEX_INCLUDES, re.MULTILINE)
 
 
-def detect_includes_and_version_gcc(compiler):
+def detect_includes_and_version_gcc(compiler, flags):
     """
-    Runs the given compiler with -v -E on an no-op compilation unit and parses
-    the built-in include search directories and the GCC version from the output
+    Detect the built-in include search directories and the version of GCC.
+
+    Run the given compiler with `-v -E` on a no-op compilation unit and parse
+    the built-in include search directories and the GCC version from the output.
 
     :param compiler: name / path of the compiler to run
     :type compiler: str
+    :param flags: additional flags affecting the include search directories
+                  (e.g. -specs=picolibc.specs)
+    :type flags: list of str
 
     :return: (list_of_include_paths, version)
     :rtype: tuple
@@ -29,7 +32,7 @@ def detect_includes_and_version_gcc(compiler):
     try:
         process_env = dict(os.environ)
         process_env["LC_MESSAGES"] = "C"
-        with subprocess.Popen([compiler, "-v", "-E", "-"],
+        with subprocess.Popen([compiler, *flags, "-v", "-E", "-"],
                               stdin=subprocess.PIPE, stdout=subprocess.PIPE,
                               stderr=subprocess.PIPE, env=process_env) as proc:
             inputdata = b"typedef int dont_be_pedantic;"
@@ -62,8 +65,9 @@ def detect_includes_and_version_gcc(compiler):
 
 def detect_libstdcxx_includes(compiler, includes, version):
     """
-    Tries to detect the g++ libstdc++ built-in include search directories using
-    black magic and adds them to the list given in includes
+    Try to detect the g++ libstdc++ built-in include search directories.
+
+    This uses black magic and adds them to the list given in `includes`.
 
     :param compiler: Name or path of the compiler
     :type compiler: str
@@ -83,22 +87,23 @@ def detect_libstdcxx_includes(compiler, includes, version):
             break
 
 
-def detect_built_in_includes(compiler, args):
+def detect_built_in_includes(compiler, args, flags):
     """
-    Tries to detect the built-in include search directories of the given
-    compiler
+    Try to detect the built-in include search directories of the given compiler.
 
     :param compiler: Name or path of the compiler
     :type compiler: str
     :param args: Command line arguments
+    :param flags: additional flags affecting the include search directories
+    :type flags: list of str
 
     :return: List of built-in include directories
     :rtype: list of str
     """
     if compiler.endswith('-gcc'):
-        includes, version = detect_includes_and_version_gcc(compiler)
+        includes, version = detect_includes_and_version_gcc(compiler, flags)
     elif compiler.endswith('-g++'):
-        includes, version = detect_includes_and_version_gcc(compiler)
+        includes, version = detect_includes_and_version_gcc(compiler, flags)
         if args.add_libstdcxx_includes:
             detect_libstdcxx_includes(compiler, includes, version)
     elif compiler in ('clang', 'clang++', 'gcc', 'g++'):
@@ -121,6 +126,7 @@ class CompilationDetails:  # pylint: disable=too-few-public-methods,too-many-ins
     :param path: Path of the module to read compilation details from
     :type path: str
     """
+
     def __init__(self, path):  # pylint: disable=too-many-branches
         with open(os.path.join(path, "compile_cmds.txt"), "r") as file:
             for line in file.read().splitlines():
@@ -153,15 +159,14 @@ class CompilationDetails:  # pylint: disable=too-few-public-methods,too-many-ins
 
 
 class State:  # pylint: disable=too-few-public-methods
-    """
-    Entity to store the current programs state
-    """
+    """Entity to store the current program's state."""
+
     def __init__(self):
         self.def_includes = dict()
         self.is_first = True
 
 
-def get_built_in_include_flags(compiler, state, args):
+def get_built_in_include_flags(compiler, state, args, flags):
     """
     Get built-in include search directories as parameter list.
 
@@ -170,17 +175,19 @@ def get_built_in_include_flags(compiler, state, args):
     :type compiler: str
     :param state: state of the program
     :param args: command line arguments
+    :param flags: additional flags affecting the include search directories
+    :type flags: list of str
 
     :return: The -isystem <...> compiler flags for the built-in include search
              dirs as list
     :rtype: list
     """
-
     result = []
-    if compiler not in state.def_includes:
-        state.def_includes[compiler] = detect_built_in_includes(compiler, args)
+    key = (compiler, tuple(flags))
+    if key not in state.def_includes:
+        state.def_includes[key] = detect_built_in_includes(compiler, args, flags)
 
-    for include in state.def_includes[compiler]:
+    for include in state.def_includes[key]:
         result.append('-isystem')
         result.append(include)
 
@@ -189,8 +196,9 @@ def get_built_in_include_flags(compiler, state, args):
 
 def write_compile_command(state, compiler, src, flags, cdetails, path):
     """
-    Write the compile command for the given source file with the given
-    parameters to stdout
+    Write the compile command for the given source file to stdout.
+
+    The compile command is generated using the given parameters.
 
     :param state: state of the program
     :param compiler: the C/C++ compiler used
@@ -229,8 +237,9 @@ def write_compile_command(state, compiler, src, flags, cdetails, path):
 
 def generate_module_compile_commands(path, state, args):
     """
-    Generate section of compile_commands.json for the module in path and write
-    it to stdout.
+    Generate section of `compile_commands.json` for the module in `path`.
+
+    The section is written to stdout.
 
     :param path: path of the module's bin folder to emit the
                  compile_commands.json chunk for
@@ -239,6 +248,9 @@ def generate_module_compile_commands(path, state, args):
     :param args: command line arguments
     """
     cdetails = CompilationDetails(path)
+
+    # GCC spec files (e.g. picolibc.specs) add include search directories
+    specs = [flag for flag in cdetails.cflags if flag.startswith('-specs=')]
 
     for flag in args.filter_out:
         try:
@@ -251,14 +263,26 @@ def generate_module_compile_commands(path, state, args):
             pass
 
     if args.clangd:
+        # clang does not support GCC spec files, the include search directories
+        # added by them are passed via -isystem instead
+        cdetails.cflags = [f for f in cdetails.cflags if not f.startswith('-specs=')]
+        cdetails.cxxflags = [f for f in cdetails.cxxflags if not f.startswith('-specs=')]
+        # Inject flags for better user experience if compile commands are
+        # intended to be consumed by clangd: We do not care if those are
+        # matching 100% what the compiler uses, but rather about best linting
+        # experience.
         cdetails.cflags.append('-Wno-unknown-warning-option')
+        cdetails.cflags.append('-Wdocumentation')
+        # This flag should be removed once all deprecations use the
+        # __attribute__((deprecated)) flag.
+        cdetails.cflags.append('-Wno-documentation-deprecated-sync')
 
     c_extra_includes = []
     cxx_extra_includes = []
 
     if args.add_built_in_includes:
-        c_extra_includes = get_built_in_include_flags(cdetails.cc, state, args)
-        cxx_extra_includes = get_built_in_include_flags(cdetails.cxx, state, args)
+        c_extra_includes = get_built_in_include_flags(cdetails.cc, state, args, specs)
+        cxx_extra_includes = get_built_in_include_flags(cdetails.cxx, state, args, specs)
 
     if args.clangd:
         if cdetails.target_arch_llvm:
@@ -286,7 +310,7 @@ def generate_module_compile_commands(path, state, args):
 
 def generate_compile_commands(args):
     """
-    Generate the compile_commands.json content and write them to stdout
+    Generate the `compile_commands.json` content and write them to stdout.
 
     :param args: command line arguments
     """

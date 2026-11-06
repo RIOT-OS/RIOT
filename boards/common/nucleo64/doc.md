@@ -7,7 +7,8 @@
 Due to a pin conflict on Nucleo64 boards, you can not use
 the SPI peripheral and LED0 at the same time.
 A warning will be shown during compile time:
-```
+
+```text
 Warning: Using periph_spi on Nucleo64 boards will disable LED0 due to pin conflicts.
 ```
 

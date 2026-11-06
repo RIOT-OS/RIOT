@@ -44,7 +44,7 @@ int main(void)
         expect(!xtimer_is_set(&timers[n]));
 
         unsigned int num = NUMOF-1;
-        while(num--) {
+        while (num--) {
             msg_t m;
             msg_receive(&m);
             if (m.type == n) {

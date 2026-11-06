@@ -189,14 +189,6 @@ int adc_raw_to_voltage(adc_t line, int raw, int *voltage)
     }
 }
 
-__attribute__((__deprecated__))
-int adc_line_vref_to_gpio(adc_t line, gpio_t gpio)
-{
-    LOG_TAG_ERROR("adc", "%s is no longer supported\n", __func__);
-    assert(0);
-    return 0;
-}
-
 static void _adc_driver_init(void)
 {
     if (_adc_driver_initialized) {

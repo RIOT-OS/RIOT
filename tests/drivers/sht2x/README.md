@@ -16,7 +16,7 @@ corresponding defines in your build environment, e.g.
 ```bash
 CFLAGS=-DSHT2X_PARAM_RESOLUTION=SHT2x_RES_8_12BIT make ...
 ```
-See `drivers/sht2x_params.h` for the default configuration.
+See `drivers/sht2x/include/sht2x_params.h` for the default configuration.
 
 After initialization, the sensor reads the temperature and humidity values
 every one second and prints them to STDOUT. The chip-heater of the SHT2x

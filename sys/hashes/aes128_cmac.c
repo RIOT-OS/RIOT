@@ -1,9 +1,6 @@
 /*
- * Copyright (C) 2016 Fundación Inria Chile
- *
- * This file is subject to the terms and conditions of the GNU Lesser
- * General Public License v2.1. See the file LICENSE in the top level
- * directory for more details.
+ * SPDX-FileCopyrightText: 2016 Fundación Inria Chile
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
 
 /**
@@ -23,6 +20,7 @@
 #include <string.h>
 
 #include "crypto/ciphers.h"
+#include "crypto/helper.h"
 #include "hashes/aes128_cmac.h"
 #include "macros/utils.h"
 
@@ -64,6 +62,7 @@ void aes128_cmac_update(aes128_cmac_context_t *ctx,
             _xor128(ctx->M_last, ctx->X);
             cipher_encrypt(&ctx->aes128_ctx, ctx->X, d);
             memcpy(ctx->X, d, AES128_CMAC_BLOCK_SIZE);
+            crypto_secure_wipe(d, sizeof(d));
         }
         c = MIN(AES128_CMAC_BLOCK_SIZE - ctx->M_n, len);
         memcpy(ctx->M_last + ctx->M_n, data, c);
@@ -111,4 +110,10 @@ void aes128_cmac_final(aes128_cmac_context_t *ctx, void *digest)
     _xor128(ctx->M_last, ctx->X);
     cipher_encrypt(&ctx->aes128_ctx, ctx->X, L);
     memcpy(digest, L, AES128_CMAC_BLOCK_SIZE);
+
+    crypto_secure_wipe(K, sizeof(K));
+    crypto_secure_wipe(L, sizeof(L));
+    crypto_secure_wipe(ctx->X, sizeof(ctx->X));
+    crypto_secure_wipe(ctx->M_last, sizeof(ctx->M_last));
+    crypto_secure_wipe(&ctx->aes128_ctx, sizeof(ctx->aes128_ctx));
 }

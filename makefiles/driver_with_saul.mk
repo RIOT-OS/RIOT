@@ -1,4 +1,4 @@
-MODULE ?= $(shell basename $(CURDIR))
+MODULE ?= $(notdir $(CURDIR))
 SAUL_INTERFACE ?= $(MODULE)_saul.c
 
 # by default include all .c files except <module>_saul.c

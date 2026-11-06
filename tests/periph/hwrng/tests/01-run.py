@@ -1,12 +1,10 @@
 #!/usr/bin/env python3
 
-# Copyright (C) 2019 Freie Universität Berlin
-#
-# This file is subject to the terms and conditions of the GNU Lesser
-# General Public License v2.1. See the file LICENSE in the top level
-# directory for more details.
+# SPDX-FileCopyrightText: 2019 Freie Universität Berlin
+# SPDX-License-Identifier: LGPL-2.1-only
 
-"""periph_hwrng test
+"""
+`periph_hwrng` test.
 
 Automatic checking of the periph_hwrng firmware.
 It checks the output is valid but not the number themselves.
@@ -17,7 +15,8 @@ from testrunner import run
 
 
 def testfunc(child):
-    """Test generating several numbers
+    """
+    Test generating several numbers.
 
     It prints hardware generated random bytes buffer from increasing size.
     The generated random numbers are not checked.

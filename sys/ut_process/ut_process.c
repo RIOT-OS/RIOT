@@ -1,9 +1,6 @@
 /*
- * Copyright (C) 2021 Freie Universität Berlin
- *
- * This file is subject to the terms and conditions of the GNU Lesser
- * General Public License v2.1. See the file LICENSE in the top level
- * directory for more details.
+ * SPDX-FileCopyrightText: 2021 Freie Universität Berlin
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
 
 /**
@@ -440,7 +437,7 @@ static int _copy_str(const char *in, size_t in_len, char *out, size_t out_len)
     if (in_len >= out_len) {
         return -ENOBUFS;
     }
-    strncpy(out, in, in_len);
+    memcpy(out, in, in_len);
     return in_len;
 }
 

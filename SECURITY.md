@@ -10,15 +10,44 @@ When CVE numbers are assigned to RIOT vulnerabilities, they are associated with
 
 ## Reporting a Vulnerability
 
-If a security issue is discovered, please report it to security@riot-os.org.
-A response will be provided within one week.
-The issue will be tracked in the [security mailing list](mailto:security@riot-os.org).
-The original reporter will be included in the discussion of the issue.
-You can encrypt your report using gpg key id
+If a security issue is discovered, please report it as
+[Security Advisory][GSA-report] (preferred) or report it to the
+[security mailing list](mailto:security@riot-os.org) (less preferred).
+
+We try to respond to the report as soon as possible. Due to the current influx
+of low quality, AI generated security reports, we may take a bit longer
+than we would like.
+
+If you report via e-mail, you can encrypt your report using gpg key id
 [44C6AE441172F88D3423E81F5F7964D0F4239033][security-gpg], also included at the
 bottom of this file.
 
+[GSA-report]: https://github.com/RIOT-OS/RIOT/security/advisories/new
 [security-gpg]: https://riot-os.org/assets/keys/security.asc
+
+**Before reporting, please confirm that:**
+
+- The issue does have real security implications.
+    - If there is no real world security implication, please report it as a
+      regular issue instead.
+- You have read the report, understand it, and are able to answer questions
+  about it.
+- The report contains all the details needed to understand it, but not more.
+- The report is written concisely and to the point.
+    - We often get LLM generated walls of text covering multiple screens that
+      can be reworded in one or two sentences without losing any information.
+- The underlying issue cannot be fixed with a trivial patch changing at most
+  three lines of code.
+    - For trivial to fix issues, please consider to open a PR with the fix
+      instead. We review and merge PRs with trivial and tiny changes very
+      quickly.
+- The issue is still present in the `master` branch.
+- The affected source code is actually part of our git repo.
+    - For security flaws in toolchains or packages, please report the issue
+      to the upstream project that does maintain the code instead.
+    - If the issue is already fixed upstream and we ship an outdated and
+      insecure version, you may report that *in at most two sentences*, or
+      (much preferred) just open a PR to update the package.
 
 ### Classification of a vulnerability
 

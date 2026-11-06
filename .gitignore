@@ -56,9 +56,6 @@ _sketches.cpp
 # local override files
 Makefile.local
 
-# Vagrant
-.vagrant
-
 # clang-complete command line argument lists (Vim: clang-complete, Atom: linter-clang, autocomplete-clang addons)
 .clang_complete
 # YouCompleteMe (https://github.com/Valloric/YouCompleteMe)

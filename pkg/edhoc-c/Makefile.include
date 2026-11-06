@@ -22,3 +22,5 @@ endif
 CFLAGS += -DEDHOC_CONFIG_FILE=\"edhoc_config.h\"
 # X509 backend in EDHOC-C is mbedtls currently not supported in RIOT
 CFLAGS += -DEMPTY_X509
+
+$(call echowarn,("pkg/edhoc-c is deprecated and will be removed after the 2027.04 Release!"))

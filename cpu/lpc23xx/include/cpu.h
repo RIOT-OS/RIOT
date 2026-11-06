@@ -6,9 +6,7 @@
 #pragma once
 
 /**
- * @defgroup    cpu_lpc23xx     NXP LPC23XX
- * @ingroup     cpu
- * @brief       NXP LPC23XX family specific code
+ * @ingroup cpu_lpc23xx
  * @{
  */
 
@@ -21,8 +19,6 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
-
-extern uintptr_t __stack_start;     /**< end of user stack memory space */
 
 /**
  * @brief Initialize the phase lock loop oscillator

@@ -42,8 +42,10 @@ include $(RIOTMAKE)/tools/gdb.inc.mk
 #   with windows formatted gcc directories
 #
 # CFLAGS_CPU is used to get the correct multilib include header.
+# GCC_SPECS contains GCC spec files that add include directories (e.g. the
+# ones of picolibc), as clang does not support spec files.
 gcc_include_dirs = $(realpath \
-    $(shell $(PREFIX)g++ $(CFLAGS_CPU) -v -x $1 -E /dev/null 2>&1 | \
+    $(shell $(PREFIX)g++ $(CFLAGS_CPU) $(GCC_SPECS) -v -x $1 -E /dev/null 2>&1 | \
         sed \
         -e '1,/\#include <...> search starts here:/d' \
         -e '/End of search list./,$$d' \
@@ -98,4 +100,5 @@ OPTIONAL_CFLAGS_BLACKLIST += -fno-delete-null-pointer-checks
 OPTIONAL_CFLAGS_BLACKLIST += -Wformat-overflow
 OPTIONAL_CFLAGS_BLACKLIST += -Wformat-truncation
 
-LLVM_VERSION := $(shell command -v $(CC) > /dev/null && $(CC) -dumpversion | cut -d . -f 1)
+# Parse only the major version of LLVM
+LLVM_VERSION := $(firstword $(subst ., ,$(shell command -v $(CC) > /dev/null && $(CC) -dumpversion)))

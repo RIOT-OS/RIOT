@@ -1,10 +1,8 @@
 /*
- * Copyright (C) 2019 Freie Universität Berlin
- *
- * This file is subject to the terms and conditions of the GNU Lesser
- * General Public License v2.1. See the file LICENSE in the top level
- * directory for more details.
+ * SPDX-FileCopyrightText: 2019 Freie Universität Berlin
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
+
 /**
  * @ingroup     examples
  * @{
@@ -18,6 +16,7 @@
  * @}
  */
 
+#include <assert.h>
 #include <string.h>
 
 #include "hashes/sha256.h"
@@ -48,6 +47,8 @@ void pbkdf2_sha256(const void *password, size_t password_len,
                    int iterations,
                    uint8_t *output)
 {
+    assert(iterations > 0);
+
     sha256_context_t inner;
     sha256_context_t outer;
     uint8_t tmp_digest[SHA256_DIGEST_LENGTH];

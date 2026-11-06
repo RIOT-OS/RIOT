@@ -80,7 +80,9 @@ reset_handler:
                 msr   CPSR_c, #MODE_SYS|I_BIT|F_BIT     /* User Mode */
                 ldr   sp, =__stack_usr_start
 
+                /* call the cpu-bring-up helper from arm7_common/arm7_init.c */
                 bl  bootloader
+                /* start the RIOT kernel */
                 b   kernel_init
 
                 /* Infinite Loop */

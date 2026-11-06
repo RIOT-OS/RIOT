@@ -1,14 +1,13 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
-# Copyright 2015 Oliver Hahm <oliver.hahm@inria.fr>
-#
-# This file is subject to the terms and conditions of the GNU Lesser
-# General Public License v2.1. See the file LICENSE in the top level
-# directory for more details.
+# SPDX-FileCopyrightText: 2015 Oliver Hahm <oliver.hahm@inria.fr>
+# SPDX-License-Identifier: LGPL-2.1-only
 
+# shellcheck source=dist/tools/ci/github_annotate.sh
 . "$(dirname "$0")/../ci/github_annotate.sh"
 
-IGNORE=$(awk '{ printf ":!%s ", $0 }' "$(dirname "$0")/ignore_list.txt")
+# read the ignore list into an array and generate a pattern that `git diff` understands
+mapfile -t IGNORE < <(awk '{ printf ":!%s\n", $0 }' "$(dirname "$0")/ignore_list.txt")
 
 # If no branch but an option is given, unset BRANCH.
 # Otherwise, consume this parameter.
@@ -35,25 +34,25 @@ if [ -z "${BRANCH}" ]; then
     BRANCH=$(git rev-list HEAD | tail -n 1)
 fi
 
-git -c core.whitespace="tab-in-indent,tabwidth=4" \
-    diff --check "$(git merge-base "${BRANCH}" HEAD)" -- *.[ch] ${IGNORE} \
+git -c core.whitespace="tab-in-indent,tabwidth=4" -c diff.renameLimit=20000  \
+    diff --check "$(git merge-base "${BRANCH}" HEAD)" -- *.[ch] "${IGNORE[@]}" \
             | ${LOG}
 RESULT=${PIPESTATUS[0]}
 
 # Git regards any trailing white space except `\n` as an error so `\r` is
 # checked here, too
-git -c core.whitespace="trailing-space" \
-    diff --check "$(git merge-base "${BRANCH}" HEAD)" -- . ${IGNORE} \
+git -c core.whitespace="trailing-space" -c diff.renameLimit=20000 \
+    diff --check "$(git merge-base "${BRANCH}" HEAD)" -- . "${IGNORE[@]}" \
             | ${LOG}
 
 TRAILING_RESULT=${PIPESTATUS[0]}
 
+# shellcheck disable=SC2119 # we don't want to pass arguments to this function
 github_annotate_parse_log_default
 
 github_annotate_teardown
 
-if [ ${TRAILING_RESULT} -ne 0 ] || [ ${RESULT} -ne 0 ]
-then
+if [ "${TRAILING_RESULT}" -ne 0 ] || [ "${RESULT}" -ne 0 ]; then
     echo "ERROR: This change introduces new whitespace errors"
     exit 1
 else

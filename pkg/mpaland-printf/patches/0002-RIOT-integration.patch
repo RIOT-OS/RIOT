@@ -1,7 +1,7 @@
-From ca5d3c2e0488b1888299ed7eb81c4dc16b7ac8c6 Mon Sep 17 00:00:00 2001
+From a97c23e94ad0f0d69562921777ef797bab598b4b Mon Sep 17 00:00:00 2001
 From: Marian Buschsieweke <marian.buschsieweke@posteo.net>
 Date: Sat, 11 May 2024 17:51:01 +0200
-Subject: [PATCH 2/4] RIOT integration
+Subject: [PATCH 2/7] RIOT integration
 
 Use stdio_write() from stdio_base.h for output
 ---
@@ -10,7 +10,7 @@ Use stdio_write() from stdio_base.h for output
  2 files changed, 9 insertions(+), 1 deletion(-)
 
 diff --git a/printf.c b/printf.c
-index e6e18fa..d560d2b 100644
+index f2357f4..2133eb2 100644
 --- a/printf.c
 +++ b/printf.c
 @@ -34,6 +34,7 @@
@@ -46,5 +46,5 @@ index 6075bc2..154930a 100644
  
  /**
 -- 
-2.43.0
+2.39.5
 

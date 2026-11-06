@@ -1,9 +1,6 @@
 /*
- * Copyright (C) 2015-2019 Freie Universität Berlin
- *
- * This file is subject to the terms and conditions of the GNU Lesser
- * General Public License v2.1. See the file LICENSE in the top level
- * directory for more details.
+ * SPDX-FileCopyrightText: 2015-2019 Freie Universität Berlin
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
 
 #pragma once
@@ -332,13 +329,6 @@ extern const uint8_t ieee802154_addr_bcast[IEEE802154_ADDR_BCAST_LEN];
  */
 #ifndef CONFIG_IEEE802154_DEFAULT_CHANNEL
 #define CONFIG_IEEE802154_DEFAULT_CHANNEL          (26U)
-#endif
-
-/**
- * @brief IEEE802.15.4 default sub-GHZ page
- */
-#ifndef CONFIG_IEEE802154_DEFAULT_SUBGHZ_PAGE
-#define CONFIG_IEEE802154_DEFAULT_SUBGHZ_PAGE      (2U)
 #endif
 
 /**

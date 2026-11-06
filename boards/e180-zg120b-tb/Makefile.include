@@ -3,12 +3,16 @@ JLINK_DEVICE = EFR32MG1BxxxF256
 JLINK_PRE_FLASH += r
 
 # setup OpenOCD for flashing
-PROGRAMMERS_SUPPORTED += openocd
 OPENOCD_DEBUG_ADAPTER ?= stlink
 
-# default to jlink as programmer, but only if JLinkExe is in $PATH
-ifneq (,$(shell which JLinkExe))
+# default to JLink as programmer if available
+JLINK ?= JLinkExe
+
+ifneq (,$(shell command -v $(JLINK) 2>/dev/null))
   PROGRAMMER ?= jlink
 else
   PROGRAMMER ?= openocd
 endif
+
+# board can also use BMP or OpenOCD as programmer
+PROGRAMMERS_SUPPORTED += bmp openocd

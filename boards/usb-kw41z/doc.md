@@ -10,12 +10,11 @@ convenient USB dongle form factor.
 The USB-KW41Z provides a radio device with Bluetooth Low Energy and/or IEEE
 802.15.4.
 
-
+<!-- TODO: This image is 404 -->
 <img src="https://www.nxp.com/assets/images/en/block-diagrams/USB-KW41Z-GHOSTED.jpg"
      alt="USB-KW41Z" style="height:800px;"/>
 
 [board-web-page]: https://www.nxp.com/products/wireless/bluetooth-low-energy-ble/bluetooth-low-energy-ieee-802.15.4-packet-sniffer-usb-dongle:USB-KW41Z
-
 
 ### Flash the board
 
@@ -24,14 +23,16 @@ programmed sniffer application to an OpenSDA application used for flashing and
 debugging.
 
 1. Follow the [Quick Start Guide at NXP.com][[quick-start-guide]]:
-  - click on "2. Get Software" -> "Choose a Development Path: USB-KW41Z Development Platform"
-  - scroll down to "2.3 Load Segger JLink OpenSDA App"
-  - follow the instructions
+
+    - click on "2. Get Software" -> "Choose a Development Path: USB-KW41Z Development Platform"
+    - scroll down to "2.3 Load Segger JLink OpenSDA App"
+    - follow the instructions
 
 2. Use `BOARD=usb-kw41z` with the `make` command.<br/>
    Example with `hello-world` application:
-```
-     make BOARD=usb-kw41z -C examples/basic/hello-world flash term
+
+```shell
+make BOARD=usb-kw41z -C examples/basic/hello-world flash term
 ```
 
 [quick-start-guide]: https://www.nxp.com/products/wireless/bluetooth-low-energy-ble/bluetooth-low-energy-ieee-802.15.4-packet-sniffer-usb-dongle:USB-KW41Z?&tab=In-Depth_Tab&tid=van/usb-kw41z/startnow

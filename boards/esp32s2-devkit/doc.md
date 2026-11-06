@@ -10,16 +10,7 @@ SPDX-License-Identifier: LGPL-2.1-only
 
 \section esp32s2_devkit ESP32-S2-DevKit
 
-## Table of Contents {#esp32s2_devkit_toc}
-
-1. [Overview](#esp32s2_devkit_overview)
-2. [Hardware](#esp32s2_devkit_hardware)
-    1. [MCU](#esp32s2_devkit_mcu)
-    2. [Board Configuration](#esp32s2_devkit_board_configuration)
-    3. [Board Pinout](#esp32s2_devkit_pinout)
-3. [Flashing the Device](#esp32s2_devkit_flashing)
-
-## Overview {#esp32s2_devkit_overview}
+## Overview
 
 The Espressif ESP32-S2-DevKit boards are a couple of boards that use one of
 the following modules:
@@ -31,7 +22,7 @@ the following modules:
 - ESP32-S2-WROOM module (ESP32-S2-Saola-1 board)
 - ESP32-S2-WROVER-N4R2 module (ESP32-S2-Saola-1R board)
 
-\image html "https://docs.espressif.com/projects/esp-dev-kits/en/latest/esp32s2/_images/esp32-s2-devkitm-1-v1-annotated-photo.png" "Espressif ESP32-S2-DevKitM-1" width=600px
+<img src="https://docs.espressif.com/projects/esp-dev-kits/en/latest/esp32s2/_images/esp32-s2-devkitm-1-v1-annotated-photo.png" alt="Espressif ESP32-S2-DevKitM-1" width=600px />
 
 <br>
 Due to the different modules used, the available versions of the
@@ -39,9 +30,10 @@ ESP32-S2-DevKit board differ regarding the Flash size, the integrated SPI RAM
 and the SPI voltage. To be able to use all these different versions of the
 board with a single board definition, used board version can be specified
 by the variable `BOARD_VERSION` during compilation, for example:
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+```shell
 BOARD=esp32s2-devkit BOARD_VERSION=esp32s2-devkitc-1r make ...
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+```
 
 The following table shows the available board versions, the size of the
 Flash and the SPI RAM as well as the value of the variable `BOARD_VERSION`
@@ -74,28 +66,15 @@ that is used to specify the board version.
   \ref esp32_spi_ram "esp_spi_ram" feature. The SPI RAM can then be used as
   heap by enabling the \ref esp32_spi_ram "esp_spi_ram" pseudomodule.
 
-[Back to table of contents](#esp32s2_devkit_toc)
+## Hardware
 
-## Hardware {#esp32s2_devkit_hardware}
-
-This section describes
-
-- the [MCU](#esp32s2_devkit_mcu),
-- the default [board configuration](#esp32s2_devkit_board_configuration),
-- [optional hardware configurations](#esp32s2_devkit_optional_hardware),
-- the [board pinout](#esp32s2_devkit_pinout).
-
-[Back to table of contents](#esp32s2_devkit_toc)
-
-### MCU {#esp32s2_devkit_mcu}
+### MCU
 
 Most features of the board are provided by the ESP32-S2 SoC. For detailed
 information about the ESP32-S2 SoC variant (family) and ESP32x SoCs,
 see section \ref esp32_mcu_esp32 "ESP32 SoC Series".
 
-[Back to table of contents](#esp32s2_devkit_toc)
-
-### Board Configuration {#esp32s2_devkit_board_configuration}
+### Board Configuration
 
 ESP32-S2-DevKit boards have no special hardware on board with the exception
 of a single pin RGB-LED.
@@ -158,21 +137,19 @@ SPI_DEV(0) CS0  | GPIO34 | SPI2_HOST (FSPI) is used | \ref esp32_spi_interfaces 
 UART_DEV(0) TxD | GPIO43 | Console (configuration is fixed) | \ref esp32_uart_interfaces "UART interfaces"
 UART_DEV(0) RxD | GPIO44 | Console (configuration is fixed) | \ref esp32_uart_interfaces "UART interfaces"
 </center>
-\n
+<br>
 
 For detailed information about the peripheral configurations of ESP32-S2
 boards, see section \ref esp32_peripherals "Common Peripherals".
 
-[Back to table of contents](#esp32s2_devkit_toc)
-
-### Board Pinout {#esp32s2_devkit_pinout}
+### Board Pinout
 
 The following figures show the pinouts as configured by default board
 definition.
 
-@image html "https://docs.espressif.com/projects/esp-dev-kits/en/latest/esp32s2/_images/esp32-s2-devkitm-1-v1-pin-layout.png" "ESP32-S2-DevKitM-1x Pinout" width=900px
-@image html "https://docs.espressif.com/projects/esp-dev-kits/en/latest/esp32s2/_images/esp32-s2-devkitc-1-v1-pinout.png" "ESP32-S2-DevKitC-1x Pinout" width=900px
-@image html "https://docs.espressif.com/projects/esp-dev-kits/en/latest/esp32s2/_images/esp32-s2_saola1-pinout.jpg" "ESP32-S2-Saola-1x Pinout" width=900px
+<img src="https://docs.espressif.com/projects/esp-dev-kits/en/latest/esp32s2/_images/esp32-s2-devkitm-1-v1-pin-layout.png" alt="ESP32-S2-DevKitM-1x Pinout" width=900px />
+<img src="https://docs.espressif.com/projects/esp-dev-kits/en/latest/esp32s2/_images/esp32-s2-devkitc-1-v1-pinout.png" alt="ESP32-S2-DevKitC-1x Pinout" width=900px />
+<img src="https://docs.espressif.com/projects/esp-dev-kits/en/latest/esp32s2/_images/esp32-s2_saola1-pinout.jpg" alt="ESP32-S2-Saola-1x Pinout" width=900px />
 
 The corresponding board schematics can be found:
 
@@ -180,17 +157,15 @@ The corresponding board schematics can be found:
 - [ESP32-S2-DevKitC-1x](https://dl.espressif.com/dl/schematics/SCH_ESP32-S2-DEVKITC-1_V1_20210508.pdf)
 - [ESP32-S2-Saola-1x](https://dl.espressif.com/dl/schematics/ESP32-S2-SAOLA-1_V1.1_schematics.pdf)
 
-[Back to table of contents](#esp32s2_devkit_toc)
-
-## Flashing the Device {#esp32s2_devkit_flashing}
+## Flashing the Device
 
 Flashing RIOT is quite easy. The board has a Micro-USB connector with
 reset/boot/flash logic. Just connect the board to your host computer
 and type using the programming port:
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+```shell
 BOARD=esp32s2-devkit make flash ...
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+```
+
 For detailed information about ESP32-S2 as well as configuring and compiling
 RIOT for ESP32-S2 boards, see \ref esp32_riot.
-
-[Back to table of contents](#esp32s2_devkit_toc)

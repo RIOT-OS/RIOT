@@ -9,3 +9,6 @@ ifeq (1,$(USE_PYCORTEXMDEBUG))
     DBG_EXTRA_FLAGS += --eval-command='svd_load $(SVD_VENDOR) $(SVD_MODEL)'
   endif
 endif
+
+# Add RIOT_BASE to the list of directories to search for source code in
+DBG_EXTRA_FLAGS += --eval-command='directory $(RIOTBASE)'

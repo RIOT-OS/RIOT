@@ -1,9 +1,6 @@
 /*
- * Copyright (C) 2016-2018 OTA keys S.A.
- *
- * This file is subject to the terms and conditions of the GNU Lesser General
- * Public License v2.1. See the file LICENSE in the top level directory for more
- * details.
+ * SPDX-FileCopyrightText: 2016-2018 OTA keys S.A.
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
 
 /**
@@ -166,9 +163,11 @@ int raw_can_abort(int ifnum, int handle)
     return 0;
 }
 
-static int register_filter_entry(can_reg_entry_t *entry, struct can_filter *filter, void *param)
+static int register_filter_entry(can_reg_entry_t *entry,
+                                 const struct can_filter *filter, void *param)
 {
-    msg_t msg, reply;
+    msg_t msg;
+    msg_t reply;
     int ret;
 
     DEBUG("register_filter_entry: ifnum=%d, filter=0x%" PRIx32 ", mask=0x%" PRIx32 ", param=%p\n",
@@ -178,13 +177,13 @@ static int register_filter_entry(can_reg_entry_t *entry, struct can_filter *filt
     if (ret < 0) {
         return -ENOMEM;
     }
-    else if (ret == 1) {
+    if (ret == 1) {
         DEBUG("raw_can_subscribe_rx: filter=0x%" PRIx32 " already in use\n", filter->can_id);
         return 0;
     }
 
     msg.type = CAN_MSG_SET_FILTER;
-    msg.content.ptr = filter;
+    msg.content.ptr = (void *)filter;
     msg_send_receive(&msg, &reply, candev_list[entry->ifnum]->pid);
 
     if ((int) reply.content.value < 0) {
@@ -195,9 +194,11 @@ static int register_filter_entry(can_reg_entry_t *entry, struct can_filter *filt
     return 0;
 }
 
-static int unregister_filter_entry(can_reg_entry_t *entry, struct can_filter *filter, void *param)
+static int unregister_filter_entry(can_reg_entry_t *entry,
+                                   const struct can_filter *filter, void *param)
 {
-    msg_t msg, reply;
+    msg_t msg;
+    msg_t reply;
     int ret;
 
     DEBUG("unregister_filter_entry: ifnum=%d, filter=0x%" PRIx32 ", mask=0x%" PRIx32 ", param=%p\n",
@@ -207,13 +208,13 @@ static int unregister_filter_entry(can_reg_entry_t *entry, struct can_filter *fi
     if (ret < 0) {
         return -ENOMEM;
     }
-    else if (ret == 1) {
+    if (ret == 1) {
         DEBUG("raw_can_unsubscribe_rx: filter=0x%" PRIx32 " still in use\n", filter->can_id);
         return 0;
     }
 
     msg.type = CAN_MSG_REMOVE_FILTER;
-    msg.content.ptr = filter;
+    msg.content.ptr = (void *)filter;
     msg_send_receive(&msg, &reply, candev_list[entry->ifnum]->pid);
 
     if ((int) reply.content.value < 0) {
@@ -223,7 +224,8 @@ static int unregister_filter_entry(can_reg_entry_t *entry, struct can_filter *fi
     return 0;
 }
 
-int raw_can_subscribe_rx(int ifnum, struct can_filter *filter, kernel_pid_t pid, void *param)
+int raw_can_subscribe_rx(int ifnum, const struct can_filter *filter,
+                         kernel_pid_t pid, void *param)
 {
     assert(ifnum < candev_nb);
     assert(filter);
@@ -239,7 +241,8 @@ int raw_can_subscribe_rx(int ifnum, struct can_filter *filter, kernel_pid_t pid,
 }
 
 #ifdef MODULE_CAN_MBOX
-int raw_can_subscribe_rx_mbox(int ifnum, struct can_filter *filter, mbox_t *mbox, void *param)
+int raw_can_subscribe_rx_mbox(int ifnum, const struct can_filter *filter,
+                              mbox_t *mbox, void *param)
 {
     assert(ifnum < candev_nb);
     assert(filter);
@@ -253,7 +256,7 @@ int raw_can_subscribe_rx_mbox(int ifnum, struct can_filter *filter, mbox_t *mbox
 }
 #endif
 
-int raw_can_unsubscribe_rx(int ifnum, struct can_filter *filter, kernel_pid_t pid, void *param)
+int raw_can_unsubscribe_rx(int ifnum, const struct can_filter *filter, kernel_pid_t pid, void *param)
 {
     assert(ifnum < candev_nb);
     assert(filter);
@@ -269,7 +272,8 @@ int raw_can_unsubscribe_rx(int ifnum, struct can_filter *filter, kernel_pid_t pi
 }
 
 #ifdef MODULE_CAN_MBOX
-int raw_can_unsubscribe_rx_mbox(int ifnum, struct can_filter *filter, mbox_t *mbox, void *param)
+int raw_can_unsubscribe_rx_mbox(int ifnum, const struct can_filter *filter,
+                                mbox_t *mbox, void *param)
 {
     assert(ifnum < candev_nb);
     assert(filter);

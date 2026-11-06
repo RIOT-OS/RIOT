@@ -92,9 +92,10 @@ else
   _NODES_LIST_OPTION = --nodes
   _NODES_FLASH_OPTION = --flash
   ifeq (,$(filter firefly zigduino,$(BOARD)))
-    # All boards in IoT-LAB except firefly can be flashed using $(BINFILE).
-    # On IoT-LAB, firefly only accepts $(ELFFILE) and WSN320 boards on accept $(HEXFILE).
-    # Using $(BINFILE) speeds up the firmware upload since the file is much
+    # All boards in IoT-LAB except firefly and zigduino can be flashed using $(BINFILE).
+    # On IoT-LAB, firefly only accepts $(ELFFILE) and WSN320 boards only accept $(HEXFILE).
+    # Both are assigned to $(FLASHFILE) in their respective board definitions.
+    # Using $(BINFILE) for the other boards speeds up the firmware upload since the file is much
     # smaller than an elffile.
     # This feature is only available in cli-tools version >= 3.
     FLASHFILE = $(BINFILE)

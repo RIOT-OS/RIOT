@@ -1,10 +1,7 @@
 /*
- * Copyright (C) 2020 Koen Zandberg
- *               2020 Inria
- *
- * This file is subject to the terms and conditions of the GNU Lesser
- * General Public License v2.1. See the file LICENSE in the top level
- * directory for more details.
+ * SPDX-FileCopyrightText: 2020 Koen Zandberg
+ * SPDX-FileCopyrightText: 2020 Inria
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
 
 #pragma once
@@ -327,7 +324,7 @@ void suit_storage_init_all(void);
  *
  * @param[out]  seq_no  Retrieved sequence number
  *
- * @returns     suit_ok if at least one sequence number is retrieved
+ * @returns     @ref SUIT_OK if at least one sequence number is retrieved
  * @returns     @ref suit_error_t on error
  */
 int suit_storage_get_highest_seq_no(uint32_t *seq_no);

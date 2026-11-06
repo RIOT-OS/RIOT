@@ -50,7 +50,7 @@ and no ROM Flash.
 Note that the STM32MP157C-DK2 board has no ROM Flash, thus the firmware
 needs to be reflashed each time the board is rebooted.
 
-### Boot selection jumper:
+### Boot selection jumper
 
 | BOOT mode | BOOT0 | BOOT2 |
 | :-------- |:----- |:----- |
@@ -61,42 +61,43 @@ needs to be reflashed each time the board is rebooted.
 
 The STM32MP157C-DK2 board includes an on-board ST-LINK V2 programmer. The
 easiest way to program the board is to use OpenOCD. Once you have installed
-OpenOCD (look [here](https://github.com/RIOT-OS/RIOT/wiki/OpenOCD) for
+OpenOCD (look [here](https://doc.riot-os.org/misc/openocd/) for
 installation instructions), you can flash the board simply by typing inside
 your application directory:
 
+```shell
+USEMODULE='stm32mp1_eng_mode' BOARD=stm32mp157c-dk2 make flash
 ```
-USEMODULE='stm32mp1_eng_mode' make BOARD=stm32mp157c-dk2 flash
-```
+
 and debug via GDB by simply typing
+
+```shell
+USEMODULE='stm32mp1_eng_mode' BOARD=stm32mp157c-dk2 make debug
 ```
-USEMODULE='stm32mp1_eng_mode' make BOARD=stm32mp157c-dk2 debug
-```
+
 ### SD Card (Linux) mode
 
 This assumes that Linux is booted and that your Linux kernel supports STM32
 remoteproc framework.
 
 Build the firmware inside your application directory:
+
+```shell
+BOARD=stm32mp157c-dk2 make
 ```
-make BOARD=stm32mp157c-dk2
-```
+
 Copy your firmware firmware.elf in /lib/firmwares on the Linux system.
 (replace firmware.elf by your firmware filename)
 
 Then simply launch this commands on the Linux system as root user:
-```
+
+```shell
 echo firmware.elf > /sys/class/remoteproc/remoteproc0/firmware
 echo start > /sys/class/remoteproc/remoteproc0/state
 ```
 
 You can stop RIOT from Linux command line:
-```
+
+```shell
 echo stop > /sys/class/remoteproc/remoteproc0/state
 ```
-
-## Supported Toolchains
-
-For using the STM32MP157C-DK2 board we strongly recommend the usage of the
-[GNU Tools for ARM Embedded Processors](https://launchpad.net/gcc-arm-embedded)
-toolchain.

@@ -19,7 +19,25 @@
 
 #include "macros/units.h"
 #include "cpu_conf_common.h"
-#include "vendor/RP2040.h"
+#include "RP2040.h"
+
+/* register field definitions (*_LSB, *_BITS, *_VALUE_*) from the Pico SDK */
+#include "hardware/platform_defs.h"
+#include "hardware/regs/adc.h"
+#include "hardware/regs/clocks.h"
+#include "hardware/regs/io_bank0.h"
+#include "hardware/regs/pads_bank0.h"
+#include "hardware/regs/pads_qspi.h"
+#include "hardware/regs/pio.h"
+#include "hardware/regs/pll.h"
+#include "hardware/regs/pwm.h"
+#include "hardware/regs/resets.h"
+#include "hardware/regs/rosc.h"
+#include "hardware/regs/spi.h"
+#include "hardware/regs/timer.h"
+#include "hardware/regs/uart.h"
+#include "hardware/regs/watchdog.h"
+#include "hardware/regs/xosc.h"
 
 #ifdef __cplusplus
 extern "C" {

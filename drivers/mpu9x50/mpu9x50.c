@@ -1,10 +1,7 @@
 /*
- * Copyright (C) 2015 Freie Universität Berlin
- *               2019 HAW Hamburg
- *
- * This file is subject to the terms and conditions of the GNU Lesser
- * General Public License v2.1. See the file LICENSE in the top level
- * directory for more details.
+ * SPDX-FileCopyrightText: 2015 Freie Universität Berlin
+ * SPDX-FileCopyrightText: 2019 HAW Hamburg
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
 
 /**
@@ -465,7 +462,10 @@ static int compass_init(mpu9x50_t *dev)
     conf_bypass(dev, 1);
 
     /* Check whether compass answers correctly */
-    i2c_read_reg(DEV_I2C, DEV_COMP_ADDR, COMPASS_WHOAMI_REG, data, 0);
+    if (i2c_read_reg(DEV_I2C, DEV_COMP_ADDR, COMPASS_WHOAMI_REG, data, 0) < 0) {
+        DEBUG("[Error] Cannot read compass ID\n");
+        return -1;
+    }
     if (data[0] != MPU9X50_COMP_WHOAMI_ANSWER) {
         DEBUG("[Error] Wrong answer from compass\n");
         return -1;

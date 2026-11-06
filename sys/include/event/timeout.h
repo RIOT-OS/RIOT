@@ -1,11 +1,8 @@
 /*
- * Copyright (C) 2017 Inria
- *               2017 Freie Universität Berlin
- *               2017 Kaspar Schleiser <kaspar@schleiser.de>
- *
- * This file is subject to the terms and conditions of the GNU Lesser
- * General Public License v2.1. See the file LICENSE in the top level
- * directory for more details.
+ * SPDX-FileCopyrightText: 2017 Inria
+ * SPDX-FileCopyrightText: 2017 Freie Universität Berlin
+ * SPDX-FileCopyrightText: 2017 Kaspar Schleiser <kaspar@schleiser.de>
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
 
 #pragma once
@@ -85,10 +82,10 @@ void event_timeout_init(event_timeout_t *event_timeout, event_queue_t *queue,
  * after @p timeout microseconds (if using @ref xtimer) or the @ref
  * ztimer_clock_t ticks.
  *
- * @note: the used event_timeout struct must stay valid until after the timeout
+ * @note  the used event_timeout struct must stay valid until after the timeout
  *        event has been processed!
  *
- * @param[in]   event_timeout   event_timout context object to use
+ * @param[in]   event_timeout   event_timeout context object to use
  * @param[in]   timeout         timeout in microseconds or the ztimer_clock_t
  *                              ticks units
  */
@@ -109,7 +106,7 @@ void event_timeout_clear(event_timeout_t *event_timeout);
 /**
  * @brief   Check if a timeout event is scheduled to be executed in the future
  *
- * @param[in]   event_timeout   event_timout context object to use
+ * @param[in]   event_timeout   event_timeout context object to use
  * @return      true if the event is scheduled, false otherwise
  */
 static inline bool event_timeout_is_pending(const event_timeout_t *event_timeout)

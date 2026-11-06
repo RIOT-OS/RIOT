@@ -1,9 +1,6 @@
 /*
- * Copyright (C) 2015 Freie Universität Berlin
- *
- * This file is subject to the terms and conditions of the GNU Lesser
- * General Public License v2.1. See the file LICENSE in the top level
- * directory for more details.
+ * SPDX-FileCopyrightText: 2015 Freie Universität Berlin
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
 
 #pragma once
@@ -183,6 +180,10 @@ int gpio_init(gpio_t pin, gpio_mode_t mode);
  *          enable this function
  *
  * @pre     @p cb must not be NULL
+ * @pre     The pin interrupt must not be active when calling
+ *          `gpio_init_int()`. The pin must either not have been configured as
+ *          an interrupt source before, or the interrupt must be disabled with
+ *          @ref gpio_irq_disable before calling `gpio_init_int()` again.
  *
  * @param[in] pin       pin to initialize
  * @param[in] mode      mode of the pin, see @c gpio_mode_t

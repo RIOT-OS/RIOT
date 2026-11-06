@@ -63,14 +63,6 @@ extern "C" {
 #endif
 
 /**
- * ESP32-H2 specific RTC clock configuration
- */
-#define CONFIG_RTC_CLK_CAL_CYCLES               1024
-
-#ifdef MODULE_ESP_RTC_TIMER_32K
-#endif
-
-/**
  * ESP32-H2 specific EFUSE configuration
  */
 #define CONFIG_EFUSE_MAX_BLK_LEN                256

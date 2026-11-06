@@ -28,9 +28,13 @@ extern "C" {
 #define ARDUINO_PIN_0       LED0_PIN
 #define ARDUINO_PIN_1       LED1_PIN
 #define ARDUINO_PIN_2       PB0_PIN
-#define ARDUINO_PIN_3       PB1_PIN
 
-#define ARDUINO_PIN_LAST    3
+#ifdef PB1_PIN
+#  define ARDUINO_PIN_3     PB1_PIN
+#  define ARDUINO_PIN_LAST  3
+#else
+#  define ARDUINO_PIN_LAST  2
+#endif
 /** @} */
 
 /**

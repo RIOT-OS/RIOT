@@ -247,13 +247,14 @@ void daemonize(void)
 
 /**
  * Remove any -d options from an argument vector.
+ * This is needed to ensure that a rebooted RIOT that is already
+ * daemonized doesn't try to daemonize again.
  *
  * @param[in,out]   argv    an argument vector
  */
-static void filter_daemonize_argv(char **argv)
+static void _consume_daemonize_argv(char **argv)
 {
-    int idx = 0;
-    for (char **narg = argv; *narg != NULL; narg++, idx++) {
+    for (char **narg = argv; *narg != NULL; narg++) {
         if (strcmp("-d", narg[0]) == 0) {
             char **xarg = narg;
             do {
@@ -651,7 +652,7 @@ __attribute__((constructor)) static void startup(int argc, char **argv, char **e
 #endif
 
     if (dmn) {
-        filter_daemonize_argv(_native_argv);
+        _consume_daemonize_argv(_native_argv);
         if (stderrtype == _STDIOTYPE_STDIO) {
             stderrtype = _STDIOTYPE_NULL;
         }

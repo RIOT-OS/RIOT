@@ -1,17 +1,14 @@
 /*
- * Copyright (C) 2024-2025 Carl Seifert
- * Copyright (C) 2024-2025 TU Dresden
- *
- * This file is subject to the terms and conditions of the GNU Lesser General
- * Public License v2.1. See the file LICENSE in the top level directory for
- * more details.
+ * SPDX-FileCopyrightText: 2024-2026 Carl Seifert
+ * SPDX-FileCopyrightText: 2024-2026 TU Dresden
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
 
 /**
  * @file
  * @ingroup examples
  * @brief   Demonstration of `unicoap` message, options, and parsing APIs
- * @author  Carl Seifert <carl.seifert1@mailbox.tu-dresden.de>
+ * @author  Carl Seifert <carl.seifert@tu-dresden.de>
  */
 #include <stdio.h>
 #include <assert.h>
@@ -26,10 +23,10 @@
 
 static void _example_handle_message(const unicoap_message_t* message)
 {
-    /* Use unicoap_message_is_request, unicoap_message_is_response, unicoap_message_is_signal
-     * to determine what class of message you are dealing with.
+    /* Use unicoap_message_code_is_request, unicoap_message_code_is_response,
+     * unicoap_message_code_is_signal to determine what class of message you are dealing with.
      * In this case, we expect a request. */
-    assert(unicoap_message_is_request(message->code));
+    assert(unicoap_message_code_is_request(message->code));
 
     /* The unicoap message type supports different typed views of the CoAP message code:
      * message->method, message->status, and message->signal.
@@ -76,10 +73,10 @@ static void _example_handle_message(const unicoap_message_t* message)
         printf("Error: could read first Uri-Query option");
     }
 
-    printf("First URI query: '%.*s'\n", (int)res, query);
+    printf("- First URI query: '%.*s'\n", (int)res, query);
 
     /* You can also get a query by name: */
-    res = unicoap_options_get_first_uri_query_by_name(message->options, "color", &query);
+    res = unicoap_options_get_first_uri_query_by_name_string(message->options, "color", &query);
     if (res < 0) {
         /* The getter also fails in cases where no option was found */
         if (res == -ENOENT) {
@@ -225,16 +222,32 @@ static void _example_create_message(void)
         puts("Error: could not add path component");
     }
 
+    /* Simple non-repeatable options like Content-Format can be set as follows: */
+    res = unicoap_options_set_content_format(&options, UNICOAP_FORMAT_TEXT);
+    if (res < 0) {
+        puts("Error: could not set Content-Format");
+    }
+
     /* Uri-Query is a repeatable option, and can thus also be added individually. */
     res = unicoap_options_add_uri_queries_string(&options, "unit=C&cool=yes");
     if (res < 0) {
         puts("Error: could not add URI query");
     }
 
-    /* Simple options like Content-Format can be set as follows: */
-    res = unicoap_options_set_content_format(&options, UNICOAP_FORMAT_TEXT);
+    if (IS_ACTIVE(CONFIG_UNICOAP_OPTIONS_FULL_SUPPORT)) {
+        /* As long as this configuration is enabled, options can also be
+         * set or altered out-of-order. Otherwise options need to be set
+         * and added according to their ascending option numbers. */
+        res = unicoap_options_set_content_format(&options, UNICOAP_FORMAT_JSON);
+        if (res < 0) {
+            puts("Error: could not change Content-Format");
+        }
+    }
+
+    /* This results in unit=C&cool=yes&time=now */
+    res = unicoap_options_add_uri_query_string(&options, "time=now");
     if (res < 0) {
-        puts("Error: could not set Content-Format");
+        puts("Error: could not add URI query");
     }
 
     /* Let's see if everything has been added: */

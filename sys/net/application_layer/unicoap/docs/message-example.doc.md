@@ -52,9 +52,9 @@ printf("CoAP over UDP/DTLS has id=%i type=%s\n",
 ### Inspecting a Message
 
 You use the
-@ref unicoap_message_is_request,
-@ref unicoap_message_is_response, and
-@ref unicoap_message_is_signal
+@ref unicoap_message_code_is_request,
+@ref unicoap_message_code_is_response, and
+@ref unicoap_message_code_is_signal
 methods to check whether a given message is a request, response, or signaling message.
 
 The corresponding typed view of the code is accessible through
@@ -122,7 +122,7 @@ In the case of URI queries, you can also retrieve queries by name (if they obey 
 format).
 
 ```c
-res = unicoap_options_get_first_uri_query_by_name(message->options, "color", &query);
+res = unicoap_options_get_first_uri_query_by_name_string(message->options, "color", &query);
 if (res < 0) {
     /* The getter also fails in cases where no option was found */
     if (res == -ENOENT) {
@@ -235,7 +235,7 @@ if (res < 0) {
 The same applies to `Uri-Query`.
 
 ```c
-res = unicoap_options_add_uri_queries_string(&options, "unit=C&friendly=yes");
+res = unicoap_options_add_uri_queries_string(&options, "unit=C&cool=yes");
 if (res < 0) {
     puts("Error: could not add URI query");
 }
@@ -247,6 +247,19 @@ that require a length indication instead. Example:
 @ref unicoap_options_t::unicoap_options_add_uri_queries_string, or
 @ref unicoap_options_t::unicoap_options_add_uri_query and
 @ref unicoap_options_t::unicoap_options_add_uri_query_string.
+
+As long as `CONFIG_UNICOAP_OPTIONS_FULL_SUPPORT` is enabled (the default),
+it is possible to alter options that were previously set,
+and to add options in any order.
+If it is disabled, options can only be added and set in ascending CoAP option number order.
+The setter functions will return a negative error code if that order is not followed.
+
+```c
+res = unicoap_options_set_content_format(&options, UNICOAP_FORMAT_JSON);
+if (res < 0) {
+    puts("Error: could not change Content-Format");
+}
+```
 
 ### Serializing a Message
 

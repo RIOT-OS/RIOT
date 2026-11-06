@@ -1,9 +1,6 @@
 /*
- * Copyright (C) 2017-2018 Freie Universität Berlin
- *
- * This file is subject to the terms and conditions of the GNU Lesser
- * General Public License v2.1. See the file LICENSE in the top level
- * directory for more details.
+ * SPDX-FileCopyrightText: 2017-2018 Freie Universität Berlin
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
 
 /**
@@ -260,11 +257,13 @@ int cord_ep_register(const sock_udp_ep_t *remote, const char *regif)
         }
     }
     else {
-        if (strlen(_rd_regif) >= sizeof(_rd_regif)) {
+        size_t regif_len = strlen(regif);
+        if (regif_len >= sizeof(_rd_regif)) {
             retval = CORD_EP_OVERFLOW;
             goto end;
         }
-        strncpy(_rd_regif, regif, sizeof(_rd_regif));
+
+        memcpy(_rd_regif, regif, regif_len + 1);
     }
 
     /* build and send CoAP POST request to the RD's registration interface */

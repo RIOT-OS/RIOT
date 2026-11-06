@@ -72,7 +72,11 @@
 #  define EXTI_REG_IMR          (EXTI->IMR1)
 #endif
 
-#if defined(RCC_APB2ENR_SYSCFGCOMPEN)
+/* STM32U3: SYSCFG is on APB3, RCC_APB3ENR_SYSCFGEN in CMSIS (e.g. stm32u385xx.h) */
+#if defined(CPU_FAM_STM32U3) && defined(RCC_APB3ENR_SYSCFGEN)
+#  define SYSFG_CLOCK           APB3
+#  define SYSFG_ENABLE_MASK     RCC_APB3ENR_SYSCFGEN
+#elif defined(RCC_APB2ENR_SYSCFGCOMPEN)
 #  define SYSFG_CLOCK           APB2
 #  define SYSFG_ENABLE_MASK     RCC_APB2ENR_SYSCFGCOMPEN
 #elif defined(RCC_APB2ENR_SYSCFGEN)
@@ -126,7 +130,8 @@ static IRQn_Type get_irqn(uint8_t pin)
 {
     /* TODO: Come up with a way that this doesn't need updates whenever a new
      * MCU family gets added */
-#if defined(CPU_FAM_STM32L5) ||  defined(CPU_FAM_STM32U5)
+#if defined(CPU_FAM_STM32L5) || defined(CPU_FAM_STM32U3) || \
+    defined(CPU_FAM_STM32U5)
     return EXTI0_IRQn + pin;
 #elif defined(CPU_FAM_STM32F0) || defined(CPU_FAM_STM32L0) || \
     defined(CPU_FAM_STM32G0) || defined(CPU_FAM_STM32C0)

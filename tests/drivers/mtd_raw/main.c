@@ -22,6 +22,7 @@
 #include <string.h>
 
 #include "board.h"
+#include "macros/utils.h"
 #include "mtd.h"
 #include "shell.h"
 #include "test_utils/expect.h"
@@ -141,6 +142,45 @@ static int cmd_test(int argc, char **argv)
 }
 
 SHELL_COMMAND(test, "Erase & write test data to the last two sectors", cmd_test);
+
+static int cmd_test_erase(int argc, char **argv)
+{
+    mtd_dev_t *dev = _get_dev(argc, argv);
+
+    /* limit the erased region, erasing e.g. a whole SD card would take forever */
+    uint32_t limit_mib = (argc > 2) ? strtoul(argv[2], NULL, 10) : 16;
+
+    if (dev == NULL || limit_mib == 0) {
+        printf("usage: %s <dev> [size in MiB, default 16]\n", argv[0]);
+        return -1;
+    }
+
+    uint32_t sector_size = dev->pages_per_sector * dev->page_size;
+    uint32_t sector_count = (uint64_t)limit_mib * 1024 * 1024 / sector_size;
+    sector_count = MIN(sector_count, dev->sector_count);
+
+    uint8_t byte = 0x23;
+
+    puts("[START]");
+
+    /* write one byte to every sector so that the erase can't skip any */
+    for (uint32_t sector = 0; sector < sector_count; sector++) {
+        expect(mtd_write_page_raw(dev, &byte, sector * dev->pages_per_sector, 0, 1) == 0);
+    }
+
+    /* erase the whole region at once and check that the data is gone */
+    expect(mtd_erase_sector(dev, 0, sector_count) == 0);
+    for (uint32_t sector = 0; sector < sector_count; sector++) {
+        expect(mtd_read_page(dev, &byte, sector * dev->pages_per_sector, 0, 1) == 0);
+        expect(byte == 0xFF || byte == 0x00);
+    }
+
+    puts("[SUCCESS]");
+
+    return 0;
+}
+
+SHELL_COMMAND(test_erase, "Write to large region & erase it at once", cmd_test_erase);
 
 int main(void)
 {

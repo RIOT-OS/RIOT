@@ -22,6 +22,7 @@
 #include "periph/rtc.h"
 #include "rtt_arch.h"
 #include "syscalls.h"
+#include "uart_arch.h"
 
 #include "periph/rtc.h"
 #include "periph/uart.h"
@@ -71,10 +72,11 @@ static inline void pm_set_lowest_normal(void)
     __asm__ volatile ("waiti 0");
 #else
     /* This function is entered with interrupts disabled, so we have to enable
-     * interrupts here to wait for an interrupt. */
-    irq_enable();
+     * interrupts here to wait for an interrupt.
+     * Save caller's interrupt state, enable interrupts for WFI, then restore. */
+    unsigned irq_state = irq_enable();
     __asm__ volatile ("wfi");
-    irq_disable();
+    irq_restore(irq_state);
 #endif
     /* reset system watchdog timer */
     system_wdt_feed();
@@ -140,8 +142,8 @@ void pm_set(unsigned mode)
 
 #if SOC_PM_SUPPORT_RTC_SLOW_MEM_PD
     /* Labels for RTC slow memory that are defined in the linker script */
-    extern int _rtc_bss_rtc_start;
-    extern int _rtc_bss_rtc_end;
+    extern uint8_t _rtc_bss_rtc_start;
+    extern uint8_t _rtc_bss_rtc_end;
 
     /*
      * Activate the Power Domain for slow RTC memory when the .rtc.bss
@@ -172,7 +174,7 @@ void pm_set(unsigned mode)
     gpio_iomux_out(UART0_RXD, sig->iomux_func, false);
     gpio_iomux_in(UART0_RXD, sig->signal);
 #endif
-    uart_set_wakeup_threshold(UART_DEV(0), ESP_PM_WUP_UART0);
+    esp_uart_set_wakeup_threshold(UART_DEV(0), ESP_PM_WUP_UART0);
     esp_sleep_enable_uart_wakeup(0);
 #endif
 #if (ESP_PM_WUP_UART1 > 2)
@@ -183,7 +185,7 @@ void pm_set(unsigned mode)
     gpio_iomux_out(UART1_RXD, sig->iomux_func, false);
     gpio_iomux_in(UART1_RXD, sig->signal);
 #endif
-    uart_set_wakeup_threshold(UART_DEV(1), ESP_PM_WUP_UART1);
+    esp_uart_set_wakeup_threshold(UART_DEV(1), ESP_PM_WUP_UART1);
     esp_sleep_enable_uart_wakeup(1);
 #endif
 #if MODULE_STDIO_UART

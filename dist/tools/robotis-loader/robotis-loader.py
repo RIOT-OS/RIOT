@@ -1,39 +1,20 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
-'''
-MIT License
+# SPDX-FileCopyrightText: 2014 Gregoire Passault
+# SPDX-License-Identifier: MIT
 
-Copyright (c) 2014 Gregoire Passault
+"""
+Send a program to a Robotis board using the Robotis bootloader.
 
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
+This script sends a program on a robotis board (OpenCM9.04 or CM900)
+using the robotis bootloader (used in OpenCM IDE)
 
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
+Usage: python robotis-loader.py <serial port> <binary>
 
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.
-'''
+Example: python robotis-loader.py /dev/ttyACM0 firmware.bin
 
-# This script sends a program on a robotis board (OpenCM9.04 or CM900)
-# using the robotis bootloader (used in OpenCM IDE)
-#
-# Usage:
-# python robotis-loader.py <serial port> <binary>
-#
-# Example:
-# python robotis-loader.py /dev/ttyACM0 firmware.bin
-#
-# https://github.com/Gregwar/robotis-loader
+https://github.com/Gregwar/robotis-loader
+"""
 
 import serial
 import sys
@@ -63,8 +44,7 @@ pgm, port, binary = sys.argv
 
 
 def progressBar(percent, precision=65):
-    """Prints a progress bar."""
-
+    """Print a progress bar."""
     threshold = precision*percent / 100.0
     sys.stdout.write('[ ')
     for x in range(precision):

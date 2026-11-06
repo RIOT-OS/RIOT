@@ -42,7 +42,7 @@ static void *_second_thread(void *arg)
 {
     (void)arg;
 
-    while(1) {
+    while (1) {
         mutex_lock(&_mutex);
     }
 
@@ -71,7 +71,7 @@ int main(void)
     uint32_t n = 0;
 
     xtimer_set(&timer, TEST_DURATION);
-    while(!_flag) {
+    while (!_flag) {
         mutex_unlock(&_mutex);
         n++;
     }

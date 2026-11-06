@@ -45,9 +45,9 @@ extern "C" {
 #define PLLCON_PLLC     (0x03)      /**< PLL Connect */
 #define PLLSTAT_PLOCK   (0x0400)    /**< PLL Lock Status */
 
-/*
- * @brief:  Converts 'addr' to sector number
- * @note:   Sector table (Users Manual P. 610)
+/**
+ * @brief  Converts 'addr' to sector number
+ * @note   Sector table (Users Manual P. 610)
  *
  * @param addr      Flash address
  *

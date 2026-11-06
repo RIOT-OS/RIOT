@@ -132,34 +132,36 @@ void at86rf2xx_set_pan(at86rf2xx_t *dev, uint16_t pan)
 static inline void _set_txpower(const at86rf2xx_t *dev, int16_t txpower, uint8_t channel)
 {
     (void) channel;
-    txpower += AT86RF2XX_TXPOWER_OFF;
+    int16_t txpower_index = txpower;
+    txpower_index += AT86RF2XX_TXPOWER_OFF_OFFSET;
 
-    if (txpower < 0) {
-        txpower = 0;
+    if (txpower_index < 0) {
+        txpower_index = 0;
     }
-    else if (txpower > AT86RF2XX_TXPOWER_MAX) {
-        txpower = AT86RF2XX_TXPOWER_MAX;
+    else if (txpower_index > AT86RF2XX_TXPOWER_MAX_INDEX) {
+        txpower_index = AT86RF2XX_TXPOWER_MAX_INDEX;
     }
 #if AT86RF2XX_HAVE_SUBGHZ
     if (channel == 0) {
         at86rf2xx_reg_write(dev, AT86RF2XX_REG__PHY_TX_PWR,
-                            dbm_to_tx_pow_868[txpower]);
+                            dbm_to_tx_pow_868[txpower_index]);
     }
     else if (channel < 11) {
         at86rf2xx_reg_write(dev, AT86RF2XX_REG__PHY_TX_PWR,
-                            dbm_to_tx_pow_915[txpower]);
+                            dbm_to_tx_pow_915[txpower_index]);
     }
 #else
     at86rf2xx_reg_write(dev, AT86RF2XX_REG__PHY_TX_PWR,
-                        dbm_to_tx_pow[txpower]);
+                        dbm_to_tx_pow[txpower_index]);
 #endif
 }
 
-void at86rf2xx_configure_phy(at86rf2xx_t *dev, uint8_t chan, uint8_t page, int16_t txpower)
+void at86rf2xx_configure_phy(at86rf2xx_t *dev, uint8_t chan, ieee802154_phy_mode_t mode,
+                             int16_t txpower)
 {
     /* we must be in TRX_OFF before changing the PHY configuration */
     uint8_t prev_state = at86rf2xx_set_state(dev, AT86RF2XX_STATE_TRX_OFF);
-    (void) page;
+    (void) mode;
     (void) chan;
     (void) txpower;
 
@@ -180,13 +182,11 @@ void at86rf2xx_configure_phy(at86rf2xx_t *dev, uint8_t chan, uint8_t page, int16
         trx_ctrl2 |= AT86RF2XX_TRX_CTRL_2_MASK__SUB_MODE;
     }
 
-    if (page == 0) {
-        /* BPSK coding */
+    if (mode == IEEE802154_PHY_BPSK) {
         /* Data sheet recommends using a +2 dB setting for BPSK */
         rf_ctrl0 |= AT86RF2XX_RF_CTRL_0_GC_TX_OFFS__2DB;
     }
-    else if (page == 2) {
-        /* O-QPSK coding */
+    else if (mode == IEEE802154_PHY_OQPSK) {
         trx_ctrl2 |= AT86RF2XX_TRX_CTRL_2_MASK__BPSK_OQPSK;
         /* Data sheet recommends using a +1 dB setting for O-QPSK */
         rf_ctrl0 |= AT86RF2XX_RF_CTRL_0_GC_TX_OFFS__1DB;
@@ -349,9 +349,6 @@ void at86rf2xx_set_option(at86rf2xx_t *dev, uint16_t option, bool state)
 
     DEBUG("set option %i to %i\n", option, state);
 
-    /* set option field */
-    dev->flags = (state) ? (dev->flags |  option)
-                         : (dev->flags & ~option);
     /* trigger option specific actions */
     switch (option) {
         case AT86RF2XX_OPT_CSMA:
@@ -430,8 +427,6 @@ static inline void _set_state(at86rf2xx_t *dev, uint8_t state, uint8_t cmd)
     else {
         while (at86rf2xx_get_status(dev) == AT86RF2XX_STATE_IN_PROGRESS) {}
     }
-
-    dev->state = state;
 }
 
 uint8_t at86rf2xx_set_state(at86rf2xx_t *dev, uint8_t state)
@@ -469,18 +464,18 @@ uint8_t at86rf2xx_set_state(at86rf2xx_t *dev, uint8_t state)
             /* Go to SLEEP mode from TRX_OFF */
 #if AT86RF2XX_IS_PERIPH
             /* reset interrupts states in device */
-            dev->irq_status = 0;
             /* Setting SLPTR bit brings radio transceiver to sleep in in TRX_OFF*/
             *AT86RF2XX_REG__TRXPR |= (AT86RF2XX_TRXPR_SLPTR);
 #else
             gpio_set(dev->params.sleep_pin);
 #endif
-            dev->state = state;
+            dev->sleep = true;
         }
         else {
             if (old_state == AT86RF2XX_STATE_SLEEP) {
                 DEBUG("at86rf2xx: waking up from sleep mode\n");
                 at86rf2xx_assert_awake(dev);
+                dev->sleep = false;
             }
             _set_state(dev, state, state);
         }

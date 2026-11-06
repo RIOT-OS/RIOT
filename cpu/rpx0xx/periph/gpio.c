@@ -165,7 +165,7 @@ static void _irq_enable(gpio_t pin, unsigned flank)
 
 void gpio_irq_enable(gpio_t pin)
 {
-    io_reg_atomic_clear(gpio_io_register(pin), IO_BANK0_GPIO1_CTRL_IRQOVER_Msk);
+    io_reg_atomic_clear(gpio_io_register(pin), IO_BANK0_GPIO1_CTRL_IRQOVER_BITS);
 }
 
 void gpio_irq_disable(gpio_t pin)
@@ -177,7 +177,7 @@ void gpio_irq_disable(gpio_t pin)
      *
      * IRQOVER must not be set by user code for this to work, though.
      */
-    io_reg_atomic_set(gpio_io_register(pin), IRQ_OVERRIDE_LOW << IO_BANK0_GPIO1_CTRL_IRQOVER_Pos);
+    io_reg_atomic_set(gpio_io_register(pin), IRQ_OVERRIDE_LOW << IO_BANK0_GPIO1_CTRL_IRQOVER_LSB);
 }
 
 int gpio_init_int(gpio_t pin, gpio_mode_t mode, gpio_flank_t flank, gpio_cb_t cb, void *arg)

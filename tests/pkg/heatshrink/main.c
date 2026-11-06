@@ -42,7 +42,7 @@ static int _comp_uncomp(const uint8_t *buf, size_t len)
     uint8_t *outpos = _buf;
 
     /* compress */
-    while(1) {
+    while (1) {
         size_t n_sunk = 0;
         if (n) {
             heatshrink_encoder_sink(&_encoder, inpos, n, &n_sunk);
@@ -57,7 +57,8 @@ static int _comp_uncomp(const uint8_t *buf, size_t len)
         else {
             while (heatshrink_encoder_finish(&_encoder) == HSER_FINISH_MORE) {
                 size_t written = 0;
-                heatshrink_encoder_poll(&_encoder, outpos, (_buf + sizeof(_buf) - outpos), &written);
+                heatshrink_encoder_poll(&_encoder, outpos, (_buf + sizeof(_buf) - outpos),
+                                        &written);
                 outpos += written;
             }
             break;
@@ -69,7 +70,7 @@ static int _comp_uncomp(const uint8_t *buf, size_t len)
     inpos = (uint8_t*) _buf;
     outpos = _buf_res;
 
-    while(1) {
+    while (1) {
         size_t n_sunk = 0;
         if (n) {
             heatshrink_decoder_sink(&_decoder, inpos, n, &n_sunk);
@@ -78,13 +79,15 @@ static int _comp_uncomp(const uint8_t *buf, size_t len)
                 n -= n_sunk;
             }
             size_t written = 0;
-            heatshrink_decoder_poll(&_decoder, outpos, (_buf + sizeof(_buf) - outpos), &written);
+            heatshrink_decoder_poll(&_decoder, outpos, (_buf_res + sizeof(_buf_res) - outpos),
+                                    &written);
             outpos += written;
         }
         else {
             while (heatshrink_decoder_finish(&_decoder) == HSDR_FINISH_MORE) {
                 size_t written = 0;
-                heatshrink_decoder_poll(&_decoder, outpos, (_buf_res + sizeof(_buf_res) - outpos), &written);
+                heatshrink_decoder_poll(&_decoder, outpos, (_buf_res + sizeof(_buf_res) - outpos),
+                                        &written);
                 outpos += written;
             }
             break;

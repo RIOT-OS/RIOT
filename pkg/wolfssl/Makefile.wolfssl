@@ -5,6 +5,7 @@ SUBMODULES += 1
 
 ifeq (llvm,$(TOOLCHAIN))
   CFLAGS += -Wno-unused-parameter
+  CFLAGS += -Wno-unused-function
 endif
 
 include $(RIOTBASE)/Makefile.base

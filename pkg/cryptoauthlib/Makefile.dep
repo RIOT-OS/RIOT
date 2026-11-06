@@ -5,6 +5,11 @@ FEATURES_OPTIONAL += periph_i2c_reconfigure
 DEFAULT_MODULE += auto_init_security
 USEMODULE += cryptoauthlib_contrib
 
+# avr-gcc complains about clobbering in the TEST_PROTECT() due to the use of
+# setjmp(). It is unknown if the tests will actually work, so until proven
+# otherwise, cryotoauthlib won't be built for AVRs.
+FEATURES_BLACKLIST += arch_avr8
+
 ifneq (,$(filter cryptoauthlib_test,$(USEMODULE)))
   USEMODULE += cryptoauthlib_test_jwt
   USEMODULE += cryptoauthlib_test_tng
@@ -15,10 +20,6 @@ ifneq (,$(filter cryptoauthlib_test,$(USEMODULE)))
   USEMODULE += cryptoauthlib_test_vectors
   USEMODULE += cryptoauthlib_test_third_party_unity
 endif
-
-# Some EFM32 CPU families define AES_COUNT, which is also defined by this
-# library.
-FEATURES_BLACKLIST += arch_efm32
 
 ifneq (,$(filter psa_crypto,$(USEMODULE)))
   USEMODULE += psa_atca_driver

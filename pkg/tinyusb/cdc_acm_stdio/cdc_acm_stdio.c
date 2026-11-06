@@ -1,9 +1,6 @@
 /*
- * Copyright (C) 2022 ML!PA Consulting GmbH
- *
- * This file is subject to the terms and conditions of the GNU Lesser
- * General Public License v2.1. See the file LICENSE in the top level
- * directory for more details.
+ * SPDX-FileCopyrightText: 2022 ML!PA Consulting GmbH
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
 
 /**
@@ -33,6 +30,12 @@ static ssize_t _write(const void* buffer, size_t len)
 {
     const char *start = buffer;
 
+    /* if no host is connected, we pretend we have sent everything to avoid
+     * busy-looping forever */
+    if (!tud_cdc_connected()) {
+        return len;
+    }
+
     while (tud_cdc_connected() && len) {
         size_t n = tud_cdc_write(buffer, len);
         buffer = (char *)buffer + n;
@@ -51,7 +54,7 @@ void tud_cdc_rx_cb(uint8_t itf)
 
     uint8_t buffer[64];
     unsigned res = tud_cdc_read(buffer, sizeof(buffer));
-    isrpipe_write(&stdin_isrpipe, buffer, res);
+    stdio_rx_write(buffer, res);
 }
 #endif
 

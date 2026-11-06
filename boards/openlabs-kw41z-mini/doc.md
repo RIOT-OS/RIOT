@@ -2,10 +2,10 @@
 @ingroup     boards
 @brief       Support for openlabs-kw41z-mini
 
-### General information
+## General information
 
 This is an open-source development board shipped by openlabs.co with
-source files located at https://openlabs.co/OSHW/kw41z-mini
+source files located at <https://openlabs.co/OSHW/kw41z-mini>
 
 A driver for the radio transceiver is available in [#12277](https://github.com/RIOT-OS/RIOT/pull/12277)
 (802.15.4 only).
@@ -14,84 +14,106 @@ A driver for the radio transceiver is available in [#12277](https://github.com/R
 instead of the `M41W9VT4` (512k ROM). The boards are otherwise identical.
 See @ref boards_openlabs-kw41z-mini-256kib if you happen to have this version.
 
-### Programming Pinout
+## Programming Pinout
 
 Programming and debugging can be done with a Raspberry Pi (or equivalent)
 running OpenOCD.
 
-       Pi GPIO Pins       kw41z-mini
-    ====================================
-                     ||
-       GPIO_19 ------||------- RST
-                     ||
-       GPIO_20 ------||------- SWDCLK
-                     ||
-       GPIO_21 ------||------- SWDIO
-                     ||
-         3.3V -------||------- 3.3V
-                     ||
-          GND -------||------- GND
-                     ||
+```text
+   Pi GPIO Pins       kw41z-mini
+====================================
+                 ||
+   GPIO_19 ------||------- RST
+                 ||
+   GPIO_20 ------||------- SWDCLK
+                 ||
+   GPIO_21 ------||------- SWDIO
+                 ||
+     3.3V -------||------- 3.3V
+                 ||
+      GND -------||------- GND
+                 ||
+```
 
-### Compiling and Flashing
+## Compiling and Flashing
 
-# install build deps for openocd
+### install build deps for openocd
 
-    apt install git build-essential libtool automake
+```shell
+apt install git build-essential libtool automake
+```
 
-# fetch and build openocd with support for JTAG via RPi or generic GPIO
+### fetch and build openocd with support for JTAG via RPi or generic GPIO
 
-    git clone https://github.com/beduino-project/openocd.git
-    cd openocd
-    ./bootstrap
-    ./configure --enable-bcm2835gpio --enable-sysfsgpio
-    make -j4 && sudo make install
+```shell
+git clone https://github.com/beduino-project/openocd.git
+cd openocd
+./bootstrap
+./configure --enable-bcm2835gpio --enable-sysfsgpio
+make -j4 && sudo make install
+```
 
-# install arm toolchain
+### install arm toolchain
 
-    apt install git gcc-arm-none-eabi gdb-arm-none-eabi
+```shell
+apt install git gcc-arm-none-eabi gdb-arm-none-eabi
+```
 
-# fetch Riot
+### fetch Riot
 
-    git clone https://github.com/RIOT-OS/RIOT.git
+```shell
+git clone https://github.com/RIOT-OS/RIOT.git
+```
 
-# build and flash the gnrc_networking example
+### build and flash the gnrc_networking example
 
-    cd RIOT/examples/networking/gnrc/networking
-    BOARD=openlabs-kw41z-mini CFLAGS+="-DKW41ZRF_ENABLE_LEDS=1" make -j4 flash
+```shell
+cd RIOT/examples/networking/gnrc/networking
+BOARD=openlabs-kw41z-mini CFLAGS+="-DKW41ZRF_ENABLE_LEDS=1" make -j4 flash
+```
 
 ### Debug Uart Pinout
 
 It is also possible to use the Pi for connecting to the debug uart.
 
-       Pi GPIO Pins     kw41z-mini
-    ==================================
-                    ||
-        UART TX ----||------ RXI
-                    ||
-        UART RX ----||------ TXO
-                    ||
-          GND ------||------ GND
-                    ||
+```text
+   Pi GPIO Pins     kw41z-mini
+==================================
+                ||
+    UART TX ----||------ RXI
+                ||
+    UART RX ----||------ TXO
+                ||
+      GND ------||------ GND
+                ||
+```
 
-# enable the uart on the Pi
+### enable the uart on the Pi
 
-    echo "enable_uart=1" >> /boot/config.txt
-    reboot
+```shell
+echo "enable_uart=1" >> /boot/config.txt
+reboot
+```
 
-# install serial terminal
+### install serial terminal
 
-    apt install picocom
+```shell
+apt install picocom
+```
 
-# run serial terminal to access debug uart
+### run serial terminal to access debug uart
 
-    picocom -b115200 /dev/serial0
+```shell
+picocom -b115200 /dev/serial0
+```
 
 It is recommended (if possible) to switch the Pi to the better-clocked
 uart for higher baud rates:
 
-    echo "dtoverlay=disable-bt" >> /boot/config.txt
-    reboot
+```shell
+echo "dtoverlay=disable-bt" >> /boot/config.txt
+reboot
+```
 
 ### Notes
 

@@ -6,9 +6,7 @@
 #pragma once
 
 /**
- * @defgroup    boards_samr30-xpro Atmel SAM R30 Xplained Pro
- * @ingroup     boards
- * @brief       Support for the Atmel SAM R30 Xplained Pro board.
+ * @ingroup     boards_samr30-xpro
  * @{
  *
  * @file

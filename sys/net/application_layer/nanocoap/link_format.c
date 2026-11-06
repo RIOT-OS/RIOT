@@ -1,9 +1,6 @@
 /*
- * Copyright (C) 2022 ML!PA Consulting GmbH
- *
- * This file is subject to the terms and conditions of the GNU Lesser
- * General Public License v2.1. See the file LICENSE in the top level
- * directory for more details.
+ * SPDX-FileCopyrightText: 2022 ML!PA Consulting GmbH
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
 
 /**
@@ -66,8 +63,12 @@ static int _dirlist_cb(void *arg, size_t offset, uint8_t *buf, size_t len, int m
             *ctx->cur++ = *c;
         }
 
-        if (found_end || ctx->cur == ctx->end) {
-            *ctx->cur = 0;
+        if (ctx->cur >= ctx->end) {
+            return -EOVERFLOW;
+        }
+
+        if (found_end) {
+            *ctx->cur = '\0';
             int res = ctx->cb(ctx->buf, ctx->ctx);
             ctx->cur = ctx->buf;
             if (res < 0) {
@@ -88,6 +89,10 @@ int nanocoap_link_format_get(nanocoap_sock_t *sock, const char *path,
                              coap_link_format_handler_t cb, void *arg,
                              char *dirent_buf, size_t dirent_buf_len)
 {
+    if (dirent_buf_len < 2) {
+        return -EINVAL;
+    }
+
     struct dir_list_ctx ctx = {
         .buf = dirent_buf,
         .end = dirent_buf + dirent_buf_len,

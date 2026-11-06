@@ -1,9 +1,6 @@
 /*
- * Copyright (C) 2020 Otto-von-Guericke-Universität Magdeburg
- *
- * This file is subject to the terms and conditions of the GNU Lesser
- * General Public License v2.1. See the file LICENSE in the top level
- * directory for more details.
+ * SPDX-FileCopyrightText: 2020 Otto-von-Guericke-Universität Magdeburg
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
 
 #pragma once
@@ -62,7 +59,7 @@ extern "C" {
 /**
  * @brief   stack size of an ieee802154 device
  */
-#define IEEE802154_STACKSIZE_DEFAULT    (MAX(520, GNRC_NETIF_STACKSIZE_DEFAULT) + \
+#define IEEE802154_STACKSIZE_DEFAULT    (MAX(528, GNRC_NETIF_STACKSIZE_DEFAULT) + \
                                          IEEE802154_SECURITY_EXTRA_STACKSIZE + \
                                          IEEE802154_OPENDSME_EXTRA_STACKSIZE)
 #endif

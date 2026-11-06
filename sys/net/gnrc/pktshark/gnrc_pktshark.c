@@ -1,9 +1,6 @@
 /*
- * Copyright (C) 2025 ML!PA Consulting GmbH
- *
- * This file is subject to the terms and conditions of the GNU Lesser
- * General Public License v2.1. See the file LICENSE in the top level
- * directory for more details.
+ * SPDX-FileCopyrightText: 2025 ML!PA Consulting GmbH
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
 
 /**
@@ -309,19 +306,25 @@ static void _dump_icmpv6(const icmpv6_hdr_t *hdr, size_t payload_len)
 static void _print_coap_block(coap_pkt_t *pkt, uint16_t option)
 {
     coap_block1_t block;
-    coap_get_block(pkt, &block, option);
+    int err = coap_get_block(pkt, &block, option);
 
     if (option == COAP_OPT_BLOCK1) {
         print_str(" B1[");
     } else {
         print_str(" B2[");
     }
-    print_u32_dec(block.blknum);
-    print_str(".");
-    print_u32_dec(coap_szx2size(block.szx));
 
-    if (block.more) {
-        print_str(" M");
+    if (err < 0) {
+        print_str("ERR!");
+    }
+    else {
+        print_u32_dec(block.blknum);
+        print_str(".");
+        print_u32_dec(coap_szx2size(block.szx));
+
+        if (block.more) {
+            print_str(" M");
+        }
     }
 
     print_str("]");
@@ -360,7 +363,7 @@ static bool _dump_coap(const void *buf, size_t len)
     }
 
     coap_pkt_t pkt;
-    if (coap_parse(&pkt, (void *)buf, len) < 0) {
+    if (coap_parse_udp(&pkt, (void *)buf, len) < 0) {
         return false;
     }
 

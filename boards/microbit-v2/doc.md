@@ -20,12 +20,12 @@ microphone, an accelerometer and a magnetometer.
 - [Schematics](https://github.com/microbit-foundation/microbit-v2-hardware/blob/main/V2/MicroBit_V2.0.0_S_schematic.PDF)
 - [Pinout list, detailed descriptions and data sheets](https://tech.microbit.org/hardware/schematic/)
 
-##  Flashing and Debugging
+## Flashing and Debugging
 
 The board can be flashed using OpenOCD and PyOCD. Debugger is also available
 with both programmers.
 
-```
+```shell
 BOARD=microbit make flash
 ```
 
@@ -34,7 +34,7 @@ BOARD=microbit make flash
 The programmer chip provides access to STDIO via USB. On Linux, stdio is
 usually available on /dev/ttyACM0. Use the `term` target to access stdio:
 
-```
+```shell
 BOARD=microbit make term
 ```
 

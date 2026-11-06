@@ -43,7 +43,8 @@ The rest of the process is automated in the usual way with e.g.
 `BOARD=adafruit-feather-nrf52840-express`.
 
 Example with `hello-world` application:
-```sh
+
+```shell
 make BOARD=adafruit-feather-nrf52840-express -C examples/basic/hello-world flash term
 ```
 
@@ -58,6 +59,21 @@ for in common mounting locations. If the device is not mounted, the flashing
 process fails. Please configure automounting in this case or refer to the
 [`adafruit-nrfutil` Programmer](@ref ada-nrf52-adafruit-nrfutil).
 
+#### Set a Custom Mounting Point
+
+If the UF2 mass storage device cannot be detected automatically or if multiple
+UF2 devices are connected at the same time, you can explicitly specify the
+mountpoint by setting `UF2_MOUNTPOINT` to the path that contains
+`INFO_UF2.TXT`.
+
+Example:
+
+```shell
+make UF2_MOUNTPOINT=/media/$USER/FEATHER52840 BOARD=adafruit-feather-nrf52840-express -C examples/basic/hello-world flash
+```
+
+#### Handling the SoftDevice
+
 The board definitions with RIOT retain the SoftDevice firmware blob shipped with
 the original Adafruit nRF52 Bootloader that is used by i.a. Arduino and
 CircuitPython but not used by RIOT. If you want to override the SoftDevice
@@ -66,7 +82,7 @@ the additional space, you can specify the `UF2_SOFTDEV=DROP` option in your
 `make` command. **Be aware that you have to reflash the SoftDevice if you want
 to use it in the future!**
 
-```sh
+```shell
 make UF2_SOFTDEV=DROP BOARD=adafruit-feather-nrf52840-express -C examples/basic/hello-world flash term
 ```
 
@@ -85,13 +101,15 @@ microcontroller via DFU (Direct File Upload) via the serial port or via USB.
 If you want to use the `adafruit-nrfutil` programming script, most of the
 previous information about the `uf2conv` script applies as well.
 Before using the script, you have to install it with the following command:
-```sh
+
+```shell
 pip3 install --user adafruit-nrfutil
 ```
 
 To select the `adafruit-nrfutil`, you can define the programmer in the
 environment when you call `make`:
-```sh
+
+```shell
 PROGRAMMER=adafruit-nrfutil BOARD=adafruit-feather-nrf52840-express -C examples/basic/hello-world flash term
 ```
 
@@ -117,12 +135,12 @@ repository](https://github.com/adafruit/Adafruit_nRF52_Bootloader).
 With the following commands, the bootloader with SoftDevice will be compiled
 and flashed. For MacOS, you might have to select a different serial port.
 
-```sh
+```shell
 git clone https://github.com/adafruit/Adafruit_nRF52_Bootloader.git
 cd Adafruit_nRF52_Bootloader
 git submodule update --init
 pip3 install --user adafruit-nrfutil
-make BOARD=feather_nrf52840_sense SERIAL=/dev/ttyACM0 flash-dfu
+make BOARD=adafruit-feather-nrf52840-sense SERIAL=/dev/ttyACM0 flash-dfu
 ```
 
 Sometimes the process has to be done twice until the SoftDevice is successfully
@@ -138,14 +156,14 @@ you need to have the original [`nrfjprog`][nrfjprog] installed and a compatible
 debugger, such as a J-Link. Make sure to select the right board (see the note
 in @ref ada-nrf52-update).
 
-~~~~~~~~~~~~~{.sh}
+```shell
 git clone https://github.com/adafruit/Adafruit_nRF52_Bootloader
 cd Adafruit_nRF52_Bootloader
 git submodule update --init
 nrfjprog --recover
-make BOARD=feather_nrf52840_express flash
-make BOARD=feather_nrf52840_express flash-sd
-~~~~~~~~~~~~~
+make BOARD=adafruit-feather-nrf52840-express flash
+make BOARD=adafruit-feather-nrf52840-express flash-sd
+```
 
 More information about how to flash nRF52 microcontrollers can be found in the
 **Flashing** section in @ref boards_common_nrf52. Some variants of the

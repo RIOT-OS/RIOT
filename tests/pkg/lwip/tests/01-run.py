@@ -1,12 +1,10 @@
 #! /usr/bin/env python3
 # -*- coding: utf-8 -*-
 # vim:fenc=utf-8
-#
-# Copyright © 2016 Martine Lenders <mail@martine-lenders.eu>
-#
-# Distributed under terms of the MIT license.
 
-from __future__ import print_function
+# SPDX-FileCopyrightText: 2016 Martine Lenders <mail@martine-lenders.eu>
+# SPDX-License-Identifier: MIT
+
 import os
 import sys
 import random
@@ -276,7 +274,7 @@ def test_tcpv6_send(board_group, application, env=None):
 
 
 def test_tcpv6_large_send(board_group, application, env=None):
-    """Test that the TCP server can receive a large packet in multiple reads"""
+    """Test that the TCP server can receive a large packet in multiple reads."""
     if any(b.name not in ["native", "native64"] for b in board_group.boards):
         # run test only with native
         print("SKIP_TEST INFO found non-native board")

@@ -8,4 +8,9 @@ else
   INCLUDES += -I$(ESP32_SDK_DIR)/components/esp_partition/include
 endif
 
+ifneq (,$(filter esp_now,$(USEMODULE)))
+  # esp_now_netdev.h is required for the declaration of esp_now_set_channel
+  INCLUDES += -I$(RIOTCPU)/esp_common/esp-now
+endif
+
 include $(RIOTBASE)/Makefile.base

@@ -16,7 +16,8 @@ First, make sure the default fuse settings are correct. In particular, the low
 byte fuse are enabling the use of the on-board 16MHz external oscillator.<br/>
 
 WARNING: setting the fuses incorrectly can brick your board!
-```
+
+```shell
 avrdude -p m256rfr2 -c xplainedpro -U efuse:w:0xFF:m
 avrdude -p m256rfr2 -c xplainedpro -U hfuse:w:0x1F:m
 avrdude -p m256rfr2 -c xplainedpro -U lfuse:w:0xFF:m
@@ -25,7 +26,7 @@ avrdude -p m256rfr2 -c xplainedpro -U lfuse:w:0xFF:m
 To flash the board, just call `make` from an application directory with the
 `flash` target:
 
-```
+```shell
 make BOARD=atmega256rfr2-xpro -C examples/basic/hello-world flash
 ```
 
@@ -34,6 +35,7 @@ make BOARD=atmega256rfr2-xpro -C examples/basic/hello-world flash
 STDIO can be accessed through the USB connector. The on-board UART-USB
 adapter is not affected by flashing. It shows up as /dev/ttyACM0 on Linux.
 It will be used automatically with `make term`:
-```
+
+```shell
 make BOARD=atmega256rfr2-xpro -C examples/basic/hello-world term
 ```

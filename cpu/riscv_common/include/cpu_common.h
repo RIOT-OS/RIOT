@@ -6,9 +6,7 @@
 #pragma once
 
 /**
- * @defgroup    cpu_riscv_common RISC-V common
- * @ingroup     cpu
- * @brief       Common implementations and headers for the RISC-V CPU
+ * @ingroup     cpu_riscv_common
  * @{
  *
  * @file
@@ -45,7 +43,7 @@ void riscv_irq_init(void);
 /**
  * @brief   Gets the last instruction's address
  *
- * @todo:   Not supported
+ * @todo    Not supported
  */
 static inline uintptr_t cpu_get_caller_pc(void)
 {

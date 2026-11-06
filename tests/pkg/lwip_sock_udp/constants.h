@@ -21,10 +21,12 @@
 extern "C" {
 #endif
 
-#define _TEST_PORT_LOCAL    (0x2c94)
-#define _TEST_PORT_REMOTE   (0xa615)
-#define _TEST_NETIF         (1)
-#define _TEST_TIMEOUT       (1000000U)
+#define _TEST_PORT_LOCAL        (0x2c94)
+#define _TEST_PORT_REMOTE       (0xa615)
+#define _TEST_NETIF             (1)
+#define _TEST_TIMEOUT           (1000000U)
+#define _TEST_TIMEOUT_SUB_MS    (1U)
+
 #if __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
 # define _TEST_ADDR4_LOCAL  (0x964fa8c0U)   /* 192.168.79.150 */
 # define _TEST_ADDR4_REMOTE (0x6b4fa8c0U)   /* 192.168.79.107 */
@@ -38,6 +40,7 @@ extern "C" {
 #else
 # error "Byte order is neither little nor big!"
 #endif
+
 #define _TEST_ADDR4_GW      (0UL)           /* so we can test unreachability */
 #define _TEST_ADDR6_LOCAL   { 0x2f, 0xc4, 0x11, 0x5a, 0xe6, 0x91, 0x8d, 0x5d, \
                               0x8c, 0xd1, 0x47, 0x07, 0xb7, 0x6f, 0x9b, 0x48 }

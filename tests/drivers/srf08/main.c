@@ -52,7 +52,7 @@ int main(void)
     else {
         puts("[Ok]\n");
 
-        while(1) {
+        while (1) {
             uint16_t range_array[TEST_NUM_ECHOS];
             int echo_number = srf08_get_distances(&srf08_0, range_array,
                                                   TEST_NUM_ECHOS, TEST_MODE);

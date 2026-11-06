@@ -17,7 +17,6 @@
 
 #include "periph_cpu.h"
 #include "periph_conf.h"
-#include "mutex.h"
 #include "bitarithm.h"
 #include "pm_layered.h"
 #include "thread_flags.h"
@@ -38,7 +37,8 @@ static DmacDescriptor DMA_DESCRIPTOR_ATTRS writeback[CONFIG_DMA_NUMOF];
 static uint32_t channels_free = (1LLU << CONFIG_DMA_NUMOF) - 1;
 
 struct dma_ctx {
-    mutex_t sync_lock;
+    dma_cb_t cb;
+    void *ctx;
 };
 
 struct dma_ctx dma_ctx[CONFIG_DMA_NUMOF];
@@ -56,9 +56,7 @@ static void _poweron(void)
 void dma_init(void)
 {
     _poweron();
-    for (unsigned i = 0; i < CONFIG_DMA_NUMOF; i++) {
-        mutex_init(&dma_ctx[i].sync_lock);
-    }
+
     /* Enable all priorities with RR scheduling */
     DMAC->CTRL.reg = DMAC_CTRL_LVLEN0 |
                      DMAC_CTRL_LVLEN1 |
@@ -99,8 +97,6 @@ dma_t dma_acquire_channel(void)
         channel = bitarithm_lsb(channels_free);
         /* Clear channel bit */
         channels_free &= ~(1 << channel);
-        /* ensure the sync lock is locked */
-        mutex_trylock(&dma_ctx[channel].sync_lock);
     }
     irq_restore(state);
     return channel;
@@ -140,7 +136,17 @@ static inline void _set_next_descriptor(DmacDescriptor *descr, void *next)
     descr->DESCADDR.reg = (uint32_t)next;
 }
 
-void dma_setup(dma_t dma, unsigned trigger, uint8_t prio, bool irq)
+static inline DmacDescriptor *_get_next_descriptor(const DmacDescriptor *descr)
+{
+    return (DmacDescriptor *)descr->DESCADDR.reg;
+}
+
+void dma_set_cb_arg(dma_t dma, void *ctx)
+{
+    dma_ctx[dma].ctx = ctx;
+}
+
+void dma_setup(dma_t dma, unsigned trigger, uint8_t prio, dma_cb_t cb, void *ctx)
 {
 #ifdef REG_DMAC_CHID
     /* Ensure that this set of register writes is atomic */
@@ -151,7 +157,7 @@ void dma_setup(dma_t dma, unsigned trigger, uint8_t prio, bool irq)
                         (prio << DMAC_CHCTRLB_LVL_Pos);
     /* Clear everything in case a previous user left it configured */
     DMAC->CHINTENCLR.reg = 0xFF;
-    if (irq) {
+    if (cb) {
         DMAC->CHINTENSET.reg = DMAC_CHINTENSET_TCMPL;
     }
     irq_restore(state);
@@ -160,10 +166,13 @@ void dma_setup(dma_t dma, unsigned trigger, uint8_t prio, bool irq)
                                      (trigger << DMAC_CHCTRLA_TRIGSRC_Pos);
     DMAC->Channel[dma].CHPRILVL.reg = prio;
     DMAC->Channel[dma].CHINTENCLR.reg = 0xFF;
-    if (irq) {
+    if (cb) {
         DMAC->Channel[dma].CHINTENSET.reg = DMAC_CHINTENSET_TCMPL;
     }
 #endif
+
+    dma_ctx[dma].cb = cb;
+    dma_ctx[dma].ctx = ctx;
 }
 
 void dma_prepare(dma_t dma, uint8_t width, const void *src, void *dst,
@@ -202,8 +211,8 @@ void dma_prepare_dst(dma_t dma, void *dst, size_t num, bool incr)
     _set_next_descriptor(descr, NULL);
 }
 
-void _fmt_append(DmacDescriptor *descr, DmacDescriptor *next,
-                 const void *src, void *dst, size_t num)
+static void _fmt_append(DmacDescriptor *descr, DmacDescriptor *next,
+                        const void *src, void *dst, size_t num)
 {
     /* Configure the full descriptor besides the BTCTRL data */
     _set_next_descriptor(descr, next);
@@ -246,6 +255,34 @@ void dma_append_dst(dma_t dma, DmacDescriptor *next, void *dst, size_t num,
     _fmt_append(descr, next, (void *)descr->SRCADDR.reg, dst, num);
 }
 
+void dma_enable_loop(dma_t dma)
+{
+    DmacDescriptor *first = &descriptors[dma];
+    DmacDescriptor *last = first;
+    while (_get_next_descriptor(last)) {
+        last = _get_next_descriptor(last);
+        if (last == first) {
+            /* loop already exists */
+            return;
+        }
+    }
+    _set_next_descriptor(last, first);
+}
+
+void dma_disable_loop(dma_t dma)
+{
+    DmacDescriptor *first = &descriptors[dma];
+    DmacDescriptor *last = first;
+    while (_get_next_descriptor(last) != first) {
+        last = _get_next_descriptor(last);
+        if (last == NULL) {
+            /* loop already disabled */
+            return;
+        }
+    }
+    _set_next_descriptor(last, NULL);
+}
+
 void dma_start(dma_t dma)
 {
     DEBUG("[dma]: starting: %u\n", dma);
@@ -258,12 +295,6 @@ void dma_start(dma_t dma)
 #else
     DMAC->Channel[dma].CHCTRLA.reg |= DMAC_CHCTRLA_ENABLE;
 #endif
-}
-
-void dma_wait(dma_t dma)
-{
-    DEBUG("[DMA]: mutex lock: %u\n", dma);
-    mutex_lock(&dma_ctx[dma].sync_lock);
 }
 
 void dma_cancel(dma_t dma)
@@ -293,8 +324,8 @@ void isr_dmac(void)
     /* Clear the pending interrupt flags for this channel by writing the
      * channel ID together with the flags to clear */
     DMAC->INTPEND.reg = status;
-    if (status & DMAC_INTPEND_TCMPL) {
-        mutex_unlock(&dma_ctx[dma].sync_lock);
+    if ((status & DMAC_INTPEND_TCMPL) && dma_ctx[dma].cb) {
+        dma_ctx[dma].cb(dma_ctx[dma].ctx);
     }
     DEBUG("[DMA] IRQ: %u: %x\n", dma, status);
     cortexm_isr_end();

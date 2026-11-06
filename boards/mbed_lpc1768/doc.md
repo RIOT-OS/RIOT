@@ -79,21 +79,11 @@ Status LED is not controlled by the LPC1768.
 
 This board opens a serial interface through the USB automatically.
 
-## Supported Toolchains
-
-For using the mbed LPC1768 board we strongly recommend the usage of the
-[GNU Tools for ARM Embedded Processors](https://launchpad.net/gcc-arm-embedded)
-toolchain.
-
 ## Flashing the device
 
 The easiest way to flash the device is to connect to the board via USB. The
-board appears as a 2MB usb drive. `make flash` will copy your binary file to
-the root directory but you need to manually reset your board by pressing the
-reset button.
+board appears as a 2MB usb drive. `BOARD=mbed_lpc1768 make flash` will copy
+your binary file to the root directory but you need to manually reset your
+board by pressing the reset button.
 While the LPC1768 is flashed by the MBED-IF01 with the new firmware, the
 status LED blinks fast.
-
-## Known Issues
-* Does not compile with the mentor graphics toolchain (compare
-https://github.com/RIOT-OS/RIOT/issues/751)

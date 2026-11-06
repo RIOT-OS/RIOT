@@ -16,10 +16,10 @@ CCS811 IAQ gas sensor, a MMA8652FC accelerometer and a TCS37727 RGB Light
 sensor.
 
 There board also provides an SSD1673 Active Matrix EPD 150x200 Display Driver
- with Controller on board.
+with Controller on board.
 
 <img src="https://www.phytec.eu/fileadmin/user_upload/images/content/1.Products/IoT/ePaper_IoTKit_4.png"
-     alt="PhyNODE-KW41Z" />
+alt="PhyNODE-KW41Z" />
 
 [board-web-page]: https://www.phytec.de/fileadmin/user_upload/downloads/Manuals/L-847e_0.pdf
 
@@ -29,14 +29,12 @@ To flash the board using OpenOCD:
 
 1. Use `BOARD=phynode-kw41z` with the `make` command.<br/>
    Example with `hello-world` application:
-```
-     make BOARD=phynode-kw41z -C examples/basic/hello-world flash term
+
+```shell
+make BOARD=phynode-kw41z -C examples/basic/hello-world flash term
 ```
 
 ### Current support
 
-The TCS37727 RGB Light sensor, the MMA8652FC accelerometer and the CCS811
-digital gas sensor are supported. There's ongoing work on
-[IEEE802.15.4 radio support for KW41Z][radio-support]
-
-[radio-support]: https://github.com/RIOT-OS/RIOT/pull/7107
+The TCS37727 RGB Light sensor, the MMA8652FC accelerometer, the CCS811
+digital gas sensor and IEEE 802.15.4 radio are supported.

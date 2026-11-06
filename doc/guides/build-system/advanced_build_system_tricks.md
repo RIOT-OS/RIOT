@@ -109,11 +109,8 @@ slow down the initial build of a RIOT application, depending on your
 internet connection.
 
 To avoid downloading the full archive for each fresh build, a caching script
-was used called `git-cache`. This script has been deprecated in Release 2026.04
-and will be removed in favor of
-[`git-cache-rs`](https://github.com/kaspar030/git-cache-rs), which is
-implemented in Rust, offers more feature and is still under active development
-and maintenance.
+called [`git-cache-rs`](https://github.com/kaspar030/git-cache-rs) is used,
+which is implemented in Rust and under active development.
 
 Please note that many popular Linux distributions provide very old Rust
 versions in their repositories. Therefore, it is
@@ -121,6 +118,7 @@ recommended and easiest to use [**rustup**, installed as described
 on its project website].
 
 You can then proceed to install `git-cache-rs` by executing
+
 ```sh
 cargo install git-cache
 ```
@@ -146,7 +144,7 @@ BOARD=board_name make dependency-debug
 Or with the "quick" version used by murdock to know supported boards (this is an incomplete resolution, details in `makefiles/dependencies_debug.inc.mk`) to a `dependencies_info-boards-supported_board_name` file:
 
 ```sh
-BOARDS=board_name DEPENDENCY_DEBUG=1 make info-boards-supported
+BOARDS=board_name DEPENDENCY_DEBUG=1 make info-boards-supported -j
 ```
 
 For more configuration and usage details, see in the file defining the targets `makefiles/dependencies_debug.inc.mk`.
@@ -174,16 +172,19 @@ all the boards compiled in the `NEWBIN` and `OLDBIN` and compare them.
 For boards that do not have a complementary partner, a warning is generated.
 You can use it like that:
 
-```sh
-$ cd RIOT/test/test_something
+```shell
+cd RIOT/test/test_something
 
-$ git checkout master
-$ BINDIRBASE=master-bin BOARD=native64 make all
+git checkout master
+BINDIRBASE=master-bin BOARD=native64 make all
 
-$ git checkout my-branch
-$ BINDIRBASE=my-branch-bin BOARD=native64 make all
+git checkout my-branch
+BINDIRBASE=my-branch-bin BOARD=native64 make all
 
-$ OLDBIN=master-bin NEWBIN=my-branch-bin make info-buildsizes-diff
+OLDBIN=master-bin NEWBIN=my-branch-bin make info-buildsizes-diff
+```
+
+```text
 text    data    bss     dec     BOARD/BINDIRBASE
 
 0       0       0       0       native64    **← this line contains the diff**

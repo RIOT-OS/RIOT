@@ -32,7 +32,7 @@ static int read_adc(const void *dev, phydat_t *res)
     int16_t raw;
 
     if (ads1x1x_read_raw(mydev, &raw) < 0) {
-        return ECANCELED;
+        return -ECANCELED;
     }
 
     *res->val = (int16_t)(ads1x1x_convert_to_mv(mydev, raw));

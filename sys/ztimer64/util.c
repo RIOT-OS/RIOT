@@ -1,11 +1,8 @@
 /*
- * Copyright (C) 2021 Kaspar Schleiser <kaspar@schleiser.de>
- *               2021 Inria
- *               2021 Freie Universität Berlin
- *
- * This file is subject to the terms and conditions of the GNU Lesser General
- * Public License v2.1. See the file LICENSE in the top level directory for more
- * details.
+ * SPDX-FileCopyrightText: 2021 Kaspar Schleiser <kaspar@schleiser.de>
+ * SPDX-FileCopyrightText: 2021 Inria
+ * SPDX-FileCopyrightText: 2021 Freie Universität Berlin
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
 
 /**
@@ -103,7 +100,7 @@ int ztimer64_msg_receive_until(ztimer64_clock_t *clock, msg_t *msg,
     }
 
     ztimer64_t t;
-    msg_t m = { .type = MSG_ZTIMER, .content.ptr = &m };
+    msg_t m = { .type = MSG_ZTIMER64, .content.ptr = &m };
 
     ztimer64_set_msg_at(clock, &t, target, &m, thread_getpid());
 

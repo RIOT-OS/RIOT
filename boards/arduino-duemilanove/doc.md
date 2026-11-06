@@ -3,6 +3,7 @@
 @brief       Support for the Arduino Duemilanove board
 
 ## Overview
+
 The Arduino Duemilanove ("2009") is a microcontroller board based on the
 ATmega168 or ATmega328.
 Only the ATmega328 version is supported by RIOT.
@@ -16,10 +17,13 @@ the official [Arduino web site.](https://www.arduino.cc/en/Main/Boards)
 For details, please look at the [Uno page.](@ref boards_arduino-uno)
 
 ## Flashing the device
+
 Flashing RIOT on the Arduino Duemilanove is quite straight forward, just
 connect your Arduino Uno using the programming port to your host computer and
 type:
 
-`make BOARD=arduino-duemilanove flash`
+```shell
+make BOARD=arduino-duemilanove flash
+```
 
 This should take care of everything!

@@ -6,9 +6,7 @@
 #pragma once
 
 /**
- * @defgroup cpu_native  Native CPU
- * @ingroup  cpu
- * @brief    CPU implementation for running RIOT on a Linux and BSD
+ * @ingroup  cpu_native
  * @author   Ludwig Knüpfer <ludwig.knuepfer@fu-berlin.de>
  *
  * The native CPU uses system calls to simulate hardware access.

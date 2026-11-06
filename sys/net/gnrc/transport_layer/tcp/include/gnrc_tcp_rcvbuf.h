@@ -1,9 +1,6 @@
 /*
- * Copyright (C) 2015-2017 Simon Brummer
- *
- * This file is subject to the terms and conditions of the GNU Lesser
- * General Public License v2.1. See the file LICENSE in the top level
- * directory for more details.
+ * SPDX-FileCopyrightText: 2015-2017 Simon Brummer
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
 
 #pragma once
@@ -39,6 +36,16 @@ void _gnrc_tcp_rcvbuf_init(void);
  *            -ENOMEM if all receive buffers are currently used.
  */
 int _gnrc_tcp_rcvbuf_get_buffer(gnrc_tcp_tcb_t *tcb);
+
+/**
+ * @brief Clear receive buffer.
+ *
+ * Clears the receive buffer for reuse, without releasing it first. If the
+ * receive buffer is not allocated, this function is a no-op.
+ *
+ * @param[in,out] tcb   TCB holding the receive buffer that should be cleared.
+ */
+void _gnrc_tcp_rcvbuf_clear_buffer(gnrc_tcp_tcb_t *tcb);
 
 /**
  * @brief Release allocated receive buffer.

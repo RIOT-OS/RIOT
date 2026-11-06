@@ -27,16 +27,19 @@
 #include "periph/pm.h"
 #include "thread.h"
 #include "stdio_base.h"
+#include "test_utils/main_exit_cb.h"
+
+#include "test_utils/print_stack_usage.h"
 
 #if IS_USED(MODULE_VFS)
-#include "vfs.h"
+#  include "vfs.h"
 #endif
 
 #define ENABLE_DEBUG 0
 #include "debug.h"
 
 #ifndef CONFIG_BOOT_MSG_STRING
-#define CONFIG_BOOT_MSG_STRING "main(): This is RIOT! (Version: " \
+#  define CONFIG_BOOT_MSG_STRING "main(): This is RIOT! (Version: " \
     RIOT_VERSION ")"
 #endif
 
@@ -64,16 +67,13 @@ static void *main_trampoline(void *arg)
     int res = main();
 
     if (IS_USED(MODULE_TEST_UTILS_MAIN_EXIT_CB)) {
-        void test_utils_main_exit_cb(int res);
         test_utils_main_exit_cb(res);
     }
 
-#ifdef MODULE_TEST_UTILS_PRINT_STACK_USAGE
-    void print_stack_usage_metric(const char *name, void *stack, unsigned max_size);
-    if (IS_USED(MODULE_CORE_IDLE_THREAD)) {
+    if (IS_USED(MODULE_TEST_UTILS_PRINT_STACK_USAGE) &&
+        IS_USED(MODULE_CORE_IDLE_THREAD)) {
         print_stack_usage_metric("idle", idle_stack, THREAD_STACKSIZE_IDLE);
     }
-#endif
 
 #ifdef CPU_NATIVE
     extern unsigned _native_retval;

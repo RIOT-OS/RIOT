@@ -150,7 +150,7 @@ static void test_sock_udp_create4__only_local_reuse_ep(void)
     expect(0 == ep.addr.ipv4_u32);
     expect(SOCK_ADDR_ANY_NETIF == ep2.netif);
     expect(_TEST_PORT_LOCAL == ep2.port);
-    expect(-ENOTCONN == sock_udp_get_remote(&_sock, &ep2));
+    expect(-ENOTCONN == sock_udp_get_remote(&_sock2, &ep2));
     sock_udp_close(&_sock2);
 }
 
@@ -239,6 +239,13 @@ static void test_sock_udp_recv4__ETIMEDOUT(void)
                                        sizeof(_test_buffer), _TEST_TIMEOUT,
                                        NULL));
     printf(" * (timed out with timeout %u)\n", _TEST_TIMEOUT);
+
+    /* a timeout below the millisecond resolution of the lwIP backend
+     * must still time out instead of blocking indefinitely */
+    expect(-ETIMEDOUT == sock_udp_recv(&_sock, _test_buffer,
+                                       sizeof(_test_buffer), _TEST_TIMEOUT_SUB_MS,
+                                       NULL));
+    printf(" * (timed out with timeout %u)\n", _TEST_TIMEOUT_SUB_MS);
 }
 
 static void test_sock_udp_recv4__socketed(void)
@@ -823,7 +830,7 @@ static void test_sock_udp_create6__only_local_reuse_ep(void)
                   sizeof(ipv6_addr_t)) == 0);
     expect(SOCK_ADDR_ANY_NETIF == ep2.netif);
     expect(_TEST_PORT_LOCAL == ep2.port);
-    expect(-ENOTCONN == sock_udp_get_remote(&_sock, &ep2));
+    expect(-ENOTCONN == sock_udp_get_remote(&_sock2, &ep2));
     sock_udp_close(&_sock2);
 }
 
@@ -917,6 +924,13 @@ static void test_sock_udp_recv6__ETIMEDOUT(void)
                                        sizeof(_test_buffer), _TEST_TIMEOUT,
                                        NULL));
     printf(" * (timed out with timeout %u)\n", _TEST_TIMEOUT);
+
+    /* a timeout below the millisecond resolution of the lwIP backend
+     * must still time out instead of blocking indefinitely */
+    expect(-ETIMEDOUT == sock_udp_recv(&_sock, _test_buffer,
+                                       sizeof(_test_buffer), _TEST_TIMEOUT_SUB_MS,
+                                       NULL));
+    printf(" * (timed out with timeout %u)\n", _TEST_TIMEOUT_SUB_MS);
 }
 
 static void test_sock_udp_recv6__socketed(void)

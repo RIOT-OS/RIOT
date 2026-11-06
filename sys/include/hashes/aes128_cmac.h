@@ -1,9 +1,6 @@
 /*
- * Copyright (C) 2016 Fundación Inria Chile
- *
- * This file is subject to the terms and conditions of the GNU Lesser
- * General Public License v2.1. See the file LICENSE in the top level
- * directory for more details.
+ * SPDX-FileCopyrightText: 2016 Fundación Inria Chile
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
 
 #pragma once
@@ -73,6 +70,8 @@ void aes128_cmac_update(aes128_cmac_context_t *ctx,
 
 /**
  * @brief Finalizes the CMAC message digest
+ *
+ * Internal key material will be wiped after this function is called.
  *
  * @param[in] ctx     Pointer to the AES128 CMAC context
  * @param[out] digest Result location

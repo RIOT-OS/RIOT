@@ -2,12 +2,12 @@
 @ingroup     boards
 @brief       Support for the Adafruit Metro M4 Express
 
-General information
-===================
+## General information
 
-@image html https://cdn-learn.adafruit.com/assets/assets/000/085/521/large1024/adafruit_products_metro-m4-top.jpg "Picture of the Adafruit Metro M4 Express"
+<img src="https://cdn-learn.adafruit.com/assets/assets/000/085/521/large1024/adafruit_products_metro-m4-top.jpg" alt="Picture of the Adafruit Metro M4 Express" />
 
 The main features of the board are:
+
 - ATSAMD51 Cortex M4 running at 120 MHz
 - Hardware DSP and floating point support
 - 512 MiB Flash
@@ -17,23 +17,19 @@ The main features of the board are:
 - 32-bit, 3.3V logic and power
 - native USB
 
-Pinout
-------
+### Pinout
 
-@image html https://cdn-learn.adafruit.com/assets/assets/000/111/183/original/adafruit_products_Adafruit_Metro_M4_Express_Pinout.png "Official Pinout of the Metro M4 Express" width=100%
+<img src="https://cdn-learn.adafruit.com/assets/assets/000/111/183/original/adafruit_products_Adafruit_Metro_M4_Express_Pinout.png" alt="Official Pinout of the Metro M4 Express" width=100% />
 
-Links
-=====
+## Links
 
 - [Official Board Documentation](https://learn.adafruit.com/adafruit-metro-m4-express-featuring-atsamd51)
 
-Schematics
-==========
+## Schematics
 
-@image html https://cdn-learn.adafruit.com/assets/assets/000/053/093/original/adafruit_products_schem.png "Original Board Schematics"
+<img src="https://cdn-learn.adafruit.com/assets/assets/000/053/093/original/adafruit_products_schem.png" alt="Original Board Schematics" />
 
-Arduino Compatibility
-=====================
+## Arduino Compatibility
 
 The board is compatible with Shields for the Arduino UNO / Arduino Zero.
 
@@ -43,8 +39,7 @@ The board is compatible with Shields for the Arduino UNO / Arduino Zero.
             resorting to desperate means such as bit-banging either the SPI bus
             or the UART interface.
 
-Flash the board
-===============
+## Flash the board
 
 The board is flashed using its on-board
 [boot loader](https://github.com/adafruit/uf2-samdx1).
@@ -61,8 +56,7 @@ Readiness of the bootloader is indicated by LED pulsing in red.
 @note   You may need to pass `MOST_RECENT_PORT=0` and manually pass the `PORT`
         if you enter the bootloader by hand.
 
-Accessing STDIO
----------------
+### Accessing STDIO
 
 The usual way to obtain a console on this board is using an emulated USB serial
 port.

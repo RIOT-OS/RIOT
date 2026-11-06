@@ -1,9 +1,6 @@
 /*
- * Copyright (C) 2016 OTA keys S.A.
- *
- * This file is subject to the terms and conditions of the GNU Lesser
- * General Public License v2.1. See the file LICENSE in the top level
- * directory for more details.
+ * SPDX-FileCopyrightText: 2016 OTA keys S.A.
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
 
 #pragma once
@@ -23,6 +20,7 @@
 extern "C" {
 #endif
 
+#include "compiler_hints.h"
 #include "can/can.h"
 #include "can/isotp.h"
 #include "mbox.h"
@@ -92,7 +90,8 @@ struct conn_can_isotp_master {
  * @param[in]       master      the master connection
  * @param[in,out]   slave       the slave connection to initialize
  */
-static inline void conn_can_isotp_init_slave(conn_can_isotp_t *master, conn_can_isotp_slave_t *slave)
+static inline void conn_can_isotp_init_slave(conn_can_isotp_t *master,
+                                             conn_can_isotp_slave_t *slave)
 {
     slave->next = NULL;
     slave->master = master;
@@ -164,6 +163,7 @@ int conn_can_isotp_close(conn_can_isotp_t *conn);
  * @return the number of bytes received
  * @return any other negative number in case of an error
  */
+ACCESS(write_only, 2, 3)
 int conn_can_isotp_recv(conn_can_isotp_t *conn, void *buf, size_t size, uint32_t timeout);
 
 /**
@@ -178,6 +178,7 @@ int conn_can_isotp_recv(conn_can_isotp_t *conn, void *buf, size_t size, uint32_t
  * @return the number of bytes sent
  * @return any other negative number in case of an error
  */
+ACCESS(read_only, 2, 3)
 int conn_can_isotp_send(conn_can_isotp_t *conn, const void *buf, size_t size, int flags);
 
 #if defined(MODULE_CONN_CAN_ISOTP_MULTI) || defined(DOXYGEN)
@@ -190,7 +191,8 @@ int conn_can_isotp_send(conn_can_isotp_t *conn, const void *buf, size_t size, in
  *
  * @return 0 if OK, < 0 if error
  */
-int conn_can_isotp_select(conn_can_isotp_slave_t **conn, conn_can_isotp_t *master, uint32_t timeout);
+int conn_can_isotp_select(conn_can_isotp_slave_t **conn, conn_can_isotp_t *master,
+                          uint32_t timeout);
 #endif
 
 #ifdef __cplusplus

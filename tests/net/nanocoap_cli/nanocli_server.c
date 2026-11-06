@@ -1,9 +1,6 @@
 /*
- * Copyright (c) 2018 Ken Bannister. All rights reserved.
- *
- * This file is subject to the terms and conditions of the GNU Lesser
- * General Public License v2.1. See the file LICENSE in the top level
- * directory for more details.
+ * SPDX-FileCopyrightText: 2018 Ken Bannister
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
 
 /**
@@ -59,21 +56,20 @@ static int _nanocoap_server(sock_udp_ep_t *local, uint8_t *buf, size_t bufsize,
             DEBUG("nanocoap: error receiving coap request, \n");
             return -1;
         }
-        else {
-            coap_pkt_t pkt;
-            coap_request_ctx_t ctx = {
-                .remote = &remote,
-            };
 
-            if (coap_parse_udp(&pkt, (uint8_t *)buf, res) < 0) {
-                DEBUG("nanocoap: error parsing packet\n");
-                continue;
-            }
-            if ((res = coap_handle_req(&pkt, buf, bufsize, &ctx)) > 0) {
-                res = sock_udp_send(&sock, buf, res, &remote);
-                if (res < 0) {
-                    DEBUG("nanocoap: failed to send: %" PRIdSIZE "\n", res);
-                }
+        coap_pkt_t pkt;
+        coap_request_ctx_t ctx = {
+            .remote_udp = &remote,
+        };
+
+        if (coap_parse_udp(&pkt, buf, res) < 0) {
+            DEBUG("nanocoap: error parsing packet\n");
+            continue;
+        }
+        if ((res = coap_handle_req(&pkt, buf, bufsize, &ctx)) > 0) {
+            res = sock_udp_send(&sock, buf, res, &remote);
+            if (res < 0) {
+                DEBUG("nanocoap: failed to send: %" PRIdSIZE "\n", res);
             }
         }
     }

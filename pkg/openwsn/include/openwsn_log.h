@@ -1,9 +1,6 @@
 /*
- * Copyright (C) 2015 Kaspar Schleiser <kaspar@schleiser.de>
- *
- * This file is subject to the terms and conditions of the GNU Lesser
- * General Public License v2.1. See the file LICENSE in the top level
- * directory for more details.
+ * SPDX-FileCopyrightText: 2015 Kaspar Schleiser <kaspar@schleiser.de>
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
 
 #pragma once
@@ -66,13 +63,19 @@ enum {
  */
 #ifdef __clang__    /* following pragmas required for clang 3.8.0 */
 #define LOG(level, ...) do { \
-        _Pragma("clang diagnostic push") \
-        _Pragma("clang diagnostic ignored \"-Wtautological-compare\"") \
-        if ((level) <= LOG_LEVEL) log_write((level), __VA_ARGS__); } while (0U) \
+          _Pragma("clang diagnostic push") \
+          _Pragma("clang diagnostic ignored \"-Wtautological-compare\"") \
+          if ((level) <= LOG_LEVEL) { \
+            log_write((level), __VA_ARGS__); \
+          } \
+        } while (0U) \
         _Pragma("clang diagnostic pop")
 #else
 #define LOG(level, ...) do { \
-        if ((level) <= LOG_LEVEL) log_write((level), __VA_ARGS__); } while (0U)
+          if ((level) <= LOG_LEVEL) { \
+            log_write((level), __VA_ARGS__); \
+          } \
+        } while (0U)
 #endif /* __clang__ */
 
 /**
