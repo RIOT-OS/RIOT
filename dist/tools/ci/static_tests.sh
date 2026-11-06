@@ -133,7 +133,8 @@ should_run any_example_files ./dist/tools/examples_check/check_has_readme.sh
 should_run any_example_files ./dist/tools/examples_check/check_in_readme.sh
 should_run code_in_guides ./dist/tools/code_in_guides_check/check_for_code.sh
 should_run any_c_files ./dist/tools/uncrustify/uncrustify.sh
-ERROR_EXIT_CODE=0 should_run any_c_files ./dist/tools/clang_format/check.sh
+# clang_format is disabled for now, until we reach a consensus on the formatting style.
+# ERROR_EXIT_CODE=0 should_run any_c_files ./dist/tools/clang_format/check.sh
 ERROR_EXIT_CODE=0 should_run any_shell_files ./dist/tools/shellcheck/check.sh
 
 exit "$RESULT"
