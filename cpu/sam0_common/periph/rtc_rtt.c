@@ -126,6 +126,8 @@ static void _wait_syncbusy(void)
 static void _read_req(void)
 {
 #ifdef RTC_READREQ_RREQ
+    /* writing while a synchronization is in progress would stall the bus */
+    _wait_syncbusy();
     RTC->MODE0.READREQ.reg = RTC_READREQ_RREQ;
 #endif
     _wait_syncbusy();
@@ -757,6 +759,8 @@ uint32_t rtt_get_counter(void)
 
 void rtt_set_counter(uint32_t count)
 {
+    /* writing while a synchronization is in progress would stall the bus */
+    _wait_syncbusy();
     RTC->MODE0.COUNT.reg = count;
     _wait_syncbusy();
 }

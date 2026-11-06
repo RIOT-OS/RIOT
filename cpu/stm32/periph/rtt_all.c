@@ -17,6 +17,7 @@
  */
 
 #include <assert.h>
+#include <stdbool.h>
 
 #include "cpu.h"
 #include "irq.h"
@@ -110,6 +111,33 @@ static void *ovf_arg;
 static rtt_cb_t to_cb = NULL;
 static void *to_arg;
 
+/* Writes to the CMP register are synchronized to the LPTIM kernel clock and
+ * take up to ~100 us. As another write must not happen before the previous
+ * one is finished (CMPOK), a new compare value is queued while a write is in
+ * progress and written from the CMPOK interrupt. This avoids busy waiting with
+ * interrupts disabled. */
+static volatile bool _cmp_busy;
+static volatile bool _cmp_pending;
+static uint16_t _cmp_next;
+static uint16_t _alarm_val;
+
+/* must be called with interrupts disabled, when CMPOK is set */
+static void _cmp_update(void)
+{
+    if (!(LPTIM1->ISR & LPTIM_ISR_CMPOK)) {
+        return;
+    }
+
+    LPTIM1->ICR = LPTIM_ICR_CMPOKCF;
+    if (_cmp_pending) {
+        _cmp_pending = false;
+        LPTIM1->CMP = _cmp_next;
+    }
+    else {
+        _cmp_busy = false;
+    }
+}
+
 void rtt_init(void)
 {
     /* Enable the low speed clock (LSE) */
@@ -143,8 +171,10 @@ void rtt_init(void)
 
     /* set configuration: prescale factor and external clock (LSI or LSE) */
     LPTIM1->CFGR = PRE;
-    /* enable overflow and compare interrupts */
-    LPTIM1->IER = (LPTIM_IER_ARRMIE | LPTIM_IER_CMPMIE);
+    /* enable overflow, compare and compare register update interrupts */
+    LPTIM1->IER = (LPTIM_IER_ARRMIE | LPTIM_IER_CMPMIE | LPTIM_IER_CMPOKIE);
+    _cmp_busy = false;
+    _cmp_pending = false;
     /* configure the EXTI channel, as RTT interrupts are routed through it.
      * Needs to be configured to trigger on rising edges. */
     EXTI->IMR_REG |= EXTI_IMR_BIT;
@@ -200,17 +230,26 @@ void rtt_set_alarm(uint32_t alarm, rtt_cb_t cb, void *arg)
     assert(cb && !(alarm & ~RTT_MAX_VALUE));
 
     unsigned is = irq_disable();
-    LPTIM1->ICR = LPTIM_ICR_CMPOKCF;
     to_cb  = cb;
     to_arg = arg;
-    LPTIM1->CMP = (uint16_t)alarm;
-    while (!(LPTIM1->ISR & LPTIM_ISR_CMPOK)) {}
+    _alarm_val = (uint16_t)alarm;
+    if (_cmp_busy && !(LPTIM1->ISR & LPTIM_ISR_CMPOK)) {
+        /* previous write still in progress, queue the new value */
+        _cmp_next = _alarm_val;
+        _cmp_pending = true;
+    }
+    else {
+        LPTIM1->ICR = LPTIM_ICR_CMPOKCF;
+        _cmp_pending = false;
+        _cmp_busy = true;
+        LPTIM1->CMP = _alarm_val;
+    }
     irq_restore(is);
 }
 
 uint32_t rtt_get_alarm(void)
 {
-    return LPTIM1->CMP;
+    return _alarm_val;
 }
 
 void rtt_clear_alarm(void)
@@ -231,6 +270,13 @@ void rtt_poweron(void)
 
 void rtt_poweroff(void)
 {
+    /* finish pending writes to CMP before disabling the clock */
+    unsigned state = irq_disable();
+    while (_cmp_busy) {
+        _cmp_update();
+    }
+    irq_restore(state);
+
 #ifdef RCC_APB1ENR1_LPTIM1EN
     periph_clk_dis(APB1, RCC_APB1ENR1_LPTIM1EN);
 #elif defined(RCC_APBENR1_LPTIM1EN)
@@ -246,6 +292,8 @@ void isr_tim6_dac_lptim1(void)
 void isr_lptim1(void)
 #endif
 {
+    _cmp_update();
+
     if (LPTIM1->ISR & LPTIM_ISR_CMPM) {
         if (to_cb) {
             /* 'consume' the callback (as it might be set again in the cb) */
