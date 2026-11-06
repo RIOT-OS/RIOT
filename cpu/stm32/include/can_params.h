@@ -24,6 +24,7 @@ extern "C" {
 #endif
 
 /** Default STM32 CAN devices config */
+#ifndef CPU_FAM_STM32H7
 static const can_conf_t candev_conf[] = {
     {
 #if defined(CPU_FAM_STM32G4)
@@ -137,6 +138,7 @@ static const can_conf_t candev_conf[] = {
     },
 #endif
 };
+#endif
 
 /** Default STM32 CAN devices parameters */
 static const candev_params_t candev_params[] = {
