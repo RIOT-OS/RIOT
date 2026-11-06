@@ -109,9 +109,10 @@ static void _dtls_pander_and_spoonfeed_session_mgmt(void)
                     " limiting session lifespan to %" PRIu32 " ms\n",
                     (unsigned int)CONFIG_UNICOAP_DTLS_MINIMUM_AVAILABLE_SESSION_SLOTS,
                     (uint32_t)CONFIG_UNICOAP_DTLS_MINIMUM_AVAILABLE_SESSION_SLOTS_TIMEOUT_MS);
-        unicoap_event_schedule(&_dtls_session_triage_event, _dtls_session_triage,
-                               CONFIG_UNICOAP_DTLS_MINIMUM_AVAILABLE_SESSION_SLOTS_TIMEOUT_MS,
-                               "messaging.dtls.triage");
+        unicoap_event_init_and_schedule(
+            &_dtls_session_triage_event, _dtls_session_triage,
+            CONFIG_UNICOAP_DTLS_MINIMUM_AVAILABLE_SESSION_SLOTS_TIMEOUT_MS,
+            "messaging.dtls.triage");
     }
     else {
         /* If enough session slots left: cancel timeout to free session. */
@@ -152,7 +153,8 @@ static void _dtls_on_event(sock_dtls_t* sock, sock_async_flags_t type, void* arg
             _DTLS_DEBUG("established, telling messaging can resume\n");
             unicoap_endpoint_t remote = { .proto = UNICOAP_PROTO_DTLS };
             sock_dtls_session_get_udp_ep(&session, unicoap_endpoint_get_dtls(&remote));
-            unicoap_packet_t packet = { .remote = &remote, .dtls_session = &session };
+            unicoap_packet_t packet = { .remote = &remote };
+            _packet_set_dtls_session(&packet, &session);
             unicoap_messaging_process_rfc7252(NULL, 0, UNICOAP_MESSAGING_RFC7252_EVENT_SESSION_ESTABLISHED, &packet);
         }
         else if (prev_state == NO_SPACE) {
@@ -187,7 +189,8 @@ static void _dtls_on_event(sock_dtls_t* sock, sock_async_flags_t type, void* arg
         unicoap_endpoint_t remote = { .proto = UNICOAP_PROTO_DTLS };
         sock_dtls_session_get_udp_ep(&session, unicoap_endpoint_get_dtls(&remote));
 
-        unicoap_packet_t packet = { .remote = &remote, .dtls_session = &session };
+        unicoap_packet_t packet = { .remote = &remote };
+        _packet_set_dtls_session(&packet, &session);
 
 /* tinydtls does not support auxiliary data
  * see https://github.com/RIOT-OS/RIOT/issues/16054 */

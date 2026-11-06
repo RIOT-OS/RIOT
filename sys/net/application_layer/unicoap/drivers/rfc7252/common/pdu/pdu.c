@@ -14,6 +14,7 @@
 #include <errno.h>
 #include <stdint.h>
 
+#include "compiler_hints.h"
 #include "net/unicoap/message.h"
 
 #define ENABLE_DEBUG CONFIG_UNICOAP_DEBUG_LOGGING
@@ -173,7 +174,7 @@ ssize_t unicoap_pdu_parse_rfc7252(uint8_t* pdu, size_t size, unicoap_message_t* 
     properties->token = cursor;
     properties->token_length = _get_token_length(header);
 
-    if (properties->token_length > CONFIG_UNICOAP_EXTERNAL_TOKEN_LENGTH_MAX) {
+    if (properties->token_length > CONFIG_UNICOAP_EXTERNAL_TOKEN_CAPACITY) {
         /* From RFC 7252, Section 3
          * https://datatracker.ietf.org/doc/html/rfc7252#section-3
          * Lengths 9-15 are
@@ -210,7 +211,9 @@ ssize_t unicoap_pdu_build_header_rfc7252(uint8_t* header, size_t capacity,
     _set_token_length(_header, properties->token_length);
     header += sizeof(unicoap_header_rfc7252_t);
 
-    memcpy(header, properties->token, properties->token_length);
+    if (likely(properties->token_length > 0)) {
+        memcpy(header, properties->token, properties->token_length);
+    }
     return sizeof(unicoap_header_rfc7252_t) + properties->token_length;
 }
 

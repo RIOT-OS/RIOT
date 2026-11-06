@@ -17,6 +17,13 @@
 /* This is needed for netifs_print_ipv6 in main below. */
 #include "net/netif.h"
 
+/* Include timer for resource notifications in this simple example. */
+#include "ztimer/periodic.h"
+
+/*
+ * MARK: - DTLS Setup
+ */
+
 /* If you need CoAP over DTLS support, you need to include extra dependencies. What's more,
  * you'll also need to load a DTLS credential for message encryption and verification.
  * The `IS_USED(MODULE_UNICOAP_DRIVER_DTLS)` below checks if the @ref net_unicoap_drivers_dtls
@@ -44,6 +51,12 @@ static const credman_credential_t credential = {
 };
 #endif /* IS_USED(MODULE_UNICOAP_DRIVER_DTLS) */
 
+/*
+ * MARK: - Resource definitions
+ */
+
+static ztimer_periodic_t timer;
+
 static int handle_hello_request(unicoap_message_t* message, const unicoap_aux_t* aux,
                                 unicoap_request_context_t* ctx, void* arg) {
     (void)aux;
@@ -58,7 +71,16 @@ static int handle_hello_request(unicoap_message_t* message, const unicoap_aux_t*
     unicoap_response_init_string(message, UNICOAP_STATUS_CONTENT, "Hello, World!");
 
     /* Respond. Note that you do not need to return the result of @ref unicoap_send_response. */
-    return unicoap_send_response(message, ctx);
+    int res = unicoap_send_response(message, ctx);
+
+    if (unicoap_observation_requester_observes_resource(ctx)) {
+        puts("app: this client observed hello resource");
+        if (!ztimer_periodic_is_running(&timer)) {
+            puts("app: starting notification timer");
+            ztimer_periodic_start(&timer);
+        }
+    }
+    return res;
 }
 
 /*
@@ -80,7 +102,7 @@ UNICOAP_RESOURCE(hello) {
      * In this case, we don't want to loose our precious greeting along the way.
      * To send confirmable messages (CON) over UDP or DTLS, we pass the
      * @ref UNICOAP_RESOURCE_FLAG_RELIABLE flag. */
-    .flags = UNICOAP_RESOURCE_FLAG_RELIABLE,
+    .flags = UNICOAP_RESOURCE_FLAG_RELIABLE | UNICOAP_RESOURCE_FLAG_OBSERVABLE,
 
     /* You must declare what CoAP methods you want to allow for each resource. */
     .methods = UNICOAP_METHODS(UNICOAP_METHOD_GET, UNICOAP_METHOD_PUT, UNICOAP_METHOD_POST),
@@ -191,6 +213,52 @@ UNICOAP_RESOURCE(greeting) {
     .handler_arg = NULL
 };
 
+/*
+ * MARK: - Notifications
+ */
+
+static size_t next_hello = 0;
+static const char* hellos[] = {
+    "Hi!", "¡Hola!", "Bonjour!", "Hallo!", "Ciao!", 
+    "Merhaba!", "Szia!", "Hej!", "Salut!", "Nǐ hǎo!", 
+    "Konnichiwa!", "Annyeong!", "Namaste!", "Salam!", 
+    "Oi!", "Privet!", "Jambo!"
+};
+
+static void notify_clients(unicoap_job_t* job) {
+    (void)job;
+    printf("app: sending new hello notification (%"PRIuSIZE")\n", next_hello);
+
+    int res = 0;
+    unicoap_message_t response;
+    unicoap_response_init_string(&response, UNICOAP_STATUS_CONTENT, 
+        hellos[next_hello]);
+    next_hello = (next_hello + 1) % ARRAY_SIZE(hellos);
+
+    unicoap_notification_context_t ctx = {};
+    unicoap_notification_set_resource(&ctx, UNICOAP_RESOURCE_NAMED(hello));
+    unicoap_notification_set_flags(&ctx, UNICOAP_RESPONSE_FLAG_RELIABLE);
+    if ((res = unicoap_send_notification(&response, &ctx)) < 0) {
+        printf("app: sending notification failed (%i, %s)\n", res, strerror(-res));
+    }
+}
+
+static unicoap_job_t notify_job = UNICOAP_JOB(notify_clients);
+
+static bool timer_fired(void* arg) {
+    (void)arg;
+    if (unicoap_observation_resource_has_observers(UNICOAP_RESOURCE_NAMED(hello))) {
+        unicoap_loop_enqueue(&notify_job);
+        return true;
+    }
+    ztimer_periodic_stop(&timer);
+    return false;
+}
+
+/*
+ * MARK: - Main
+ */
+
 int main(void) {
     /* By default, unicoap_init() is automatically called for you before main().
      * This is because auto_init_unicoap is part of the DEFAULT_MODULE makefile variable.
@@ -288,6 +356,9 @@ int main(void) {
     printf("app: interfaces have ipv6=[ ");
     netifs_print_ipv6(", ");
     printf(" ]\n");
+
+    ztimer_periodic_init(ZTIMER_MSEC, &timer, timer_fired,
+        "notifications", 3 * MS_PER_SEC);
 
     /* By default, unicoap_init() will create a background thread. If you do not want that,
      * set CONFIG_UNICOAP_CREATE_THREAD to 0 and run the processing loop on a thread of your choice.

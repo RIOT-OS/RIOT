@@ -129,6 +129,33 @@ typedef enum {
      */
     UNICOAP_MESSAGING_FLAG_TRACK = 0x80,
 
+    /**
+     * @brief Instructs the messaging layer to limit the lifetime of a tracked transmission
+     *
+     * When the messaging layer tracks a transmission (keeps state) --- whether because it
+     * inherently does that or due to @ref UNICOAP_MESSAGING_FLAG_TRACK --- it may do so for a
+     * potentially unbounded time. This flag limits this tracked transmission lifetime to
+     * a duration defined by the relevant messaging layer. It may also be that this tracked
+     * transmission already has a lifetime limited by the driver, e.g., because it ends
+     * after a certain timeout and is considered to have failed.
+     *
+     * This flag has no effect if the transmission is not tracked. Omitting
+     * @ref UNICOAP_MESSAGING_FLAG_TRACK but passing @ref UNICOAP_MESSAGING_FLAG_EXPIRE will
+     * limit the lifetime of naturally tracked transmissions, if their lifetime isn't naturally
+     * limited.
+     *
+     * ## RFC 7252 Example
+     * TL;DR: `CON`s are alway expire, `NON`s only expire if tracked.
+     *
+     * `CON`s expire when the ACK timeout expires and the retransmission counter would exceeded the
+     * the limit, so this flag has no effect on `CON`s. `NON`s, when tracked, use the timeout
+     * set via @ref CONFIG_UNICOAP_RFC7252_NONCONFIRMABLE_WAITING_TIME_MS. A special cases
+     * arises when @ref CONFIG_UNICOAP_RFC7252_NONCONFIRMABLE_WAITING_TIME_MS is zero, i.e.,
+     * the transmission would expire immediately. This is equivalent to not passing
+     * @ref UNICOAP_MESSAGING_FLAG_TRACK at all.
+     */
+    UNICOAP_MESSAGING_FLAG_EXPIRE = 0x40,
+
     /* MARK: unicoap_driver_extension_point */
 } __attribute__((__packed__)) unicoap_messaging_flags_t;
 
@@ -330,13 +357,9 @@ int unicoap_messaging_send_rfc7252(
  * minimum capacity of @ref CONFIG_UNICOAP_GENERATED_TOKEN_LENGTH
  */
 void unicoap_generate_token(uint8_t* token);
+/** @}  */
 
-/**
- * @brief Retrieves the part of a resource flags bitfield relevant for the messaging driver.
- *
- * @param resource_flags Resource flags
- * @return Messaging flags extracted from the given bitfield
- */
+/** @cond */
 static inline unicoap_messaging_flags_t
 _messaging_flags_resource(unicoap_resource_flags_t resource_flags)
 {
@@ -345,20 +368,22 @@ _messaging_flags_resource(unicoap_resource_flags_t resource_flags)
     return (unicoap_messaging_flags_t)resource_flags;
 }
 
-/**
- * @brief Retrieves the part of a request flags bitfield relevant for the messaging driver.
- *
- * @param request_flags Request flags
- * @return Messaging flags extracted from the given bitfield
- */
-static inline unicoap_messaging_flags_t _messaging_flags_client(
-    unicoap_request_flags_t request_flags)
+static inline unicoap_messaging_flags_t
+_messaging_flags_response(unicoap_response_flags_t response_flags)
+{
+    /* We documented other flags are RFU, hence downcasting to the messaging
+     flags bitfield width is fine here */
+    return (unicoap_messaging_flags_t)response_flags;
+}
+
+static inline unicoap_messaging_flags_t 
+_messaging_flags_request(unicoap_request_flags_t request_flags)
 {
     /* We documented other flags are RFU, hence downcasting to the messaging
      flags bitfield width is fine here */
     return (unicoap_messaging_flags_t)request_flags;
 }
-/** @}  */
+/** @endcond */
 
 /* MARK: - Private Exchange-Layer Server API */
 /**
@@ -379,15 +404,56 @@ static inline unicoap_messaging_flags_t _messaging_flags_client(
 int unicoap_server_process_request(unicoap_packet_t* packet, const unicoap_resource_t* resource);
 
 /**
+ * @brief Sends entire response/notification body, may be split into parts and then sent
+ *
+ * @param[in,out] packet Response/notification packet to send
+ * @param memo Optional memo
+ * @param[in] resource mandatory resource which is sending this response
+ * @param messaging_flags Messaging flags
+ *
+ * @returns Zero on success, negative integer otherwise
+ */
+int unicoap_server_send_body(unicoap_packet_t* packet, unicoap_server_memo_t* memo,
+                             const unicoap_resource_t* resource,
+                             unicoap_messaging_flags_t messaging_flags);
+
+/**
  * @brief Sends entire response body, may be split into parts and then sent
  *
  * @param[in,out] packet Response packet to send
+ * @param memo Optional memo
  * @param[in] resource mandatory resource which is sending this response
  *
  * @returns Zero on success, negative integer otherwise
  */
-int unicoap_server_send_response_body(unicoap_packet_t* packet,
-                                      const unicoap_resource_t* resource);
+static inline int unicoap_server_send_response_body(unicoap_packet_t* packet,
+                                                    unicoap_server_memo_t* memo,
+                                                    unicoap_request_context_t* ctx
+) {
+    return unicoap_server_send_body(packet, memo, ctx->resource,
+                                    _messaging_flags_resource(ctx->resource->flags) |
+                                    _messaging_flags_response(ctx->_flags));
+}
+
+/**
+ * @brief Sends entire notification body, may be split into parts and then sent
+ *
+ * @param[in,out] packet Notification packet to send
+ * @param memo Optional memo
+ * @param[in] resource mandatory resource which is sending this response
+ *
+ * @returns Zero on success, negative integer otherwise
+ */
+static inline int unicoap_server_send_notification_body(unicoap_packet_t* packet,
+                                                        unicoap_server_memo_t* memo,
+                                                        unicoap_notification_context_t* ctx
+) {
+    return unicoap_server_send_body(packet, memo, ctx->resource,
+                                     _messaging_flags_resource(ctx->resource->flags) |
+                                     _messaging_flags_response(ctx->_flags) |
+                                     UNICOAP_MESSAGING_FLAG_TRACK |
+                                     UNICOAP_MESSAGING_FLAG_EXPIRE);
+}
 /** @} */
 
 /* MARK: - Private exchange-layer client API */
