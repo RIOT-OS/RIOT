@@ -14,12 +14,14 @@
 
 #include <assert.h>
 #include <errno.h>
+#include <stdbool.h>
 #include <string.h>
 
 #include "can_esp.h"
 #include "can_params.h"
 #include "esp_attr.h"
 #include "gpio_arch.h"
+#include "irq.h"
 #include "irq_arch.h"
 
 #include "esp_clk_tree.h"
@@ -43,7 +45,10 @@
 #endif
 
 /** Common ESP CAN definitions */
-#define ESP_CAN_INTR_MASK   (0xffU)      /* interrupts handled by ESP CAN */
+/* Interrupts handled by ESP CAN. Bit 3 (data overrun interrupt) is excluded
+ * because of hardware peculiarities and bit 4 is the BRP_DIV bit on ESP32
+ * ECO2 and later which must not be touched by the interrupt enable mask. */
+#define ESP_CAN_INTR_MASK   (0xe7U)
 #define ESP_CAN_CLOCK       APB_CLK_FREQ /* controller main clock */
 
 /** Error mode limits used for ESP CAN */
@@ -142,27 +147,34 @@ static void _esp_can_isr(candev_t *candev)
     assert(dev);
     assert(dev->candev.event_callback);
 
-    if (dev->events & ESP_CAN_EVENT_BUS_OFF) {
-        dev->events &= ~ESP_CAN_EVENT_BUS_OFF;
+    /*
+     * The events are set by the interrupt handler while this function is
+     * executed in thread context. Therefore, the events have to be fetched
+     * and reset atomically to avoid that events set by the interrupt
+     * handler in the meantime get lost.
+     */
+    unsigned state = irq_disable();
+    uint32_t events = dev->events;
+    dev->events = 0;
+    irq_restore(state);
+
+    if (events & ESP_CAN_EVENT_BUS_OFF) {
         dev->candev.event_callback(&dev->candev, CANDEV_EVENT_BUS_OFF, NULL);
     }
 
-    if (dev->events & ESP_CAN_EVENT_ERROR_PASSIVE) {
-        dev->events &= ~ESP_CAN_EVENT_ERROR_PASSIVE;
+    if (events & ESP_CAN_EVENT_ERROR_PASSIVE) {
         dev->candev.event_callback(&dev->candev,
                                    CANDEV_EVENT_ERROR_PASSIVE, NULL);
     }
 
-    if (dev->events & ESP_CAN_EVENT_ERROR_WARNING) {
-        dev->events &= ~ESP_CAN_EVENT_ERROR_WARNING;
+    if (events & ESP_CAN_EVENT_ERROR_WARNING) {
         dev->candev.event_callback(&dev->candev,
                                    CANDEV_EVENT_ERROR_WARNING, NULL);
     }
 
-    if (dev->events & ESP_CAN_EVENT_TX_ERROR) {
+    if (events & ESP_CAN_EVENT_TX_ERROR) {
         /* a pending TX confirmation has also to be deleted on TX bus error */
-        dev->events &= ~ESP_CAN_EVENT_TX_ERROR;
-        dev->events &= ~ESP_CAN_EVENT_TX_CONFIRMATION;
+        events &= ~ESP_CAN_EVENT_TX_CONFIRMATION;
         if (dev->tx_frame) {
             /* handle the event only if there is still a frame in TX buffer */
             dev->candev.event_callback(&dev->candev,
@@ -171,8 +183,7 @@ static void _esp_can_isr(candev_t *candev)
         }
     }
 
-    if (dev->events & ESP_CAN_EVENT_TX_CONFIRMATION) {
-        dev->events &= ~ESP_CAN_EVENT_TX_CONFIRMATION;
+    if (events & ESP_CAN_EVENT_TX_CONFIRMATION) {
         if (dev->tx_frame) {
             /* handle the event only if there is still a frame in TX buffer */
             dev->candev.event_callback(&dev->candev,
@@ -182,21 +193,27 @@ static void _esp_can_isr(candev_t *candev)
         }
     }
 
-    if (dev->events & ESP_CAN_EVENT_RX_ERROR) {
-        dev->events &= ~ESP_CAN_EVENT_RX_ERROR;
+    if (events & ESP_CAN_EVENT_RX_ERROR) {
         dev->candev.event_callback(&dev->candev, CANDEV_EVENT_RX_ERROR, NULL);
     }
 
-    if (dev->events & ESP_CAN_EVENT_RX_INDICATION) {
-        dev->events &= ~ESP_CAN_EVENT_RX_INDICATION;
-
+    if (events & ESP_CAN_EVENT_RX_INDICATION) {
+        /*
+         * The interrupt handler only writes to the ring buffer slot at the
+         * write pointer and increments rx_frames_num. The slot at the read
+         * pointer can't be overwritten as long as rx_frames_num isn't
+         * decremented, so only the decrement has to be atomic.
+         */
         while (dev->rx_frames_num) {
             dev->candev.event_callback(&dev->candev,
                                        CANDEV_EVENT_RX_INDICATION,
                                        &dev->rx_frames[dev->rx_frames_rptr]);
-            dev->rx_frames_num--;
             dev->rx_frames_rptr++;
             dev->rx_frames_rptr &= ESP_CAN_MAX_RX_FRAMES-1;
+
+            state = irq_disable();
+            dev->rx_frames_num--;
+            irq_restore(state);
         }
     }
 }
@@ -352,7 +369,7 @@ static int _esp_can_set(candev_t *candev, canopt_t opt, void *value, size_t valu
 
         default:
             DEBUG("%s not supported opt\n", __func__);
-            res = ENOTSUP;
+            res = -ENOTSUP;
     }
     return res;
 }
@@ -407,7 +424,7 @@ static int _esp_can_get(candev_t *candev, canopt_t opt, void *value, size_t max_
         case CANOPT_TEC:
             DEBUG("%s %s\n", __func__, "CANOPT_TEC");
             if (max_len < sizeof(uint16_t)) {
-                res = EOVERFLOW;
+                res = -EOVERFLOW;
                 break;
             }
 
@@ -419,7 +436,7 @@ static int _esp_can_get(candev_t *candev, canopt_t opt, void *value, size_t max_
         case CANOPT_REC:
             DEBUG("%s %s\n", __func__, "CANOPT_REC");
             if (max_len < sizeof(uint16_t)) {
-                res = EOVERFLOW;
+                res = -EOVERFLOW;
                 break;
             }
 
@@ -440,7 +457,7 @@ static int _esp_can_get(candev_t *candev, canopt_t opt, void *value, size_t max_
             unsigned i;
             for (i = 0; i < ESP_CAN_MAX_RX_FILTERS && filter_num < filter_num_max; i++) {
                 if (dev->rx_filters[i].can_id != 0) {
-                    list[i] = dev->rx_filters[i];
+                    list[filter_num] = dev->rx_filters[i];
                     filter_num++;
                 }
 
@@ -815,60 +832,70 @@ static void IRAM_ATTR _esp_can_intr_handler(void *arg)
 
         for (unsigned i = 0; i < msg_cnt; i++) {
             twai_hal_frame_t esp_frame;
-            if (twai_hal_read_rx_buffer_and_clear(&hw, &esp_frame) &&
-                (dev->rx_frames_num < ESP_CAN_MAX_RX_FRAMES)) {
-                /* prepare the CAN frame from ESP32 CAN frame */
-                struct can_frame frame = {};
-
-                if (esp_frame.frame_format) {
-                    frame.can_id = esp_frame.extended.id[0];
-                    frame.can_id = (frame.can_id << 8) | esp_frame.extended.id[1];
-                    frame.can_id = (frame.can_id << 8) | esp_frame.extended.id[2];
-                    frame.can_id = (frame.can_id << 5) | (esp_frame.extended.id[3] >> 3);
-                    memcpy(frame.data, &esp_frame.extended.data, CAN_MAX_DLEN);
-                }
-                else {
-                    frame.can_id = esp_frame.standard.id[0];
-                    frame.can_id = (frame.can_id << 3) | (esp_frame.standard.id[1] >> 5);
-                    memcpy(frame.data, &esp_frame.standard.data, CAN_MAX_DLEN);
-                }
-                frame.can_id |= esp_frame.rtr ? CAN_RTR_FLAG : 0;
-                frame.can_id |= esp_frame.frame_format ? CAN_EFF_FLAG : 0;
-                frame.len = esp_frame.dlc;
-
-                /* apply acceptance filters only if they are set */
-                unsigned f_id = 0;
-                if (dev->rx_filter_num) {
-                    for (f_id = 0; f_id < ESP_CAN_MAX_RX_FILTERS; f_id++) {
-                        /* compared masked can_id with each filter */
-                        struct can_filter* f = &dev->rx_filters[f_id];
-                        if ((f->can_mask & f->can_id) ==
-                            (f->can_mask & frame.can_id)) {
-                            /* break the loop on first match */
-                            break;
-                        }
-                    }
-                }
-                /*
-                 * put the frame in the RX ring buffer if there are no
-                 * acceptance filters (f_id == 0) or one filter matched
-                 * (f_id < ESP_CAN_MAX_RX_FILTERS), otherwise drop it.
-                 */
-                if (f_id < ESP_CAN_MAX_RX_FILTERS) {
-                    dev->rx_frames[dev->rx_frames_wptr] = frame;
-
-                    dev->rx_frames_num++;
-                    dev->rx_frames_wptr++;
-                    dev->rx_frames_wptr &= ESP_CAN_MAX_RX_FRAMES-1;
-
-                    /* at least one RX frame has been saved */
-                    dev->events |= ESP_CAN_EVENT_RX_INDICATION;
-               }
-            }
-            else {
-                DEBUG("%s receive buffer overrun\n", __func__);
+            if (!twai_hal_read_rx_buffer_and_clear(&hw, &esp_frame)) {
+                DEBUG("%s RX FIFO overrun\n", __func__);
+#ifndef SOC_TWAI_SUPPORTS_RX_STATUS
+                /* all remaining frames in RX FIFO are overrun frames, they
+                 * have to be released, otherwise the RX interrupt is
+                 * triggered again and again */
+                twai_hal_clear_rx_fifo_overrun(&hw);
+#endif
                 /* we use rx error since there is no separate overrun error */
                 dev->events |= ESP_CAN_EVENT_RX_ERROR;
+                break;
+            }
+
+            if (dev->rx_frames_num >= ESP_CAN_MAX_RX_FRAMES) {
+                DEBUG("%s RX ring buffer full, frame dropped\n", __func__);
+                /* we use rx error since there is no separate overrun error */
+                dev->events |= ESP_CAN_EVENT_RX_ERROR;
+                continue;
+            }
+
+            /* prepare the CAN frame from ESP32 CAN frame */
+            struct can_frame frame = {};
+
+            if (esp_frame.frame_format) {
+                frame.can_id = esp_frame.extended.id[0];
+                frame.can_id = (frame.can_id << 8) | esp_frame.extended.id[1];
+                frame.can_id = (frame.can_id << 8) | esp_frame.extended.id[2];
+                frame.can_id = (frame.can_id << 5) | (esp_frame.extended.id[3] >> 3);
+                memcpy(frame.data, &esp_frame.extended.data, CAN_MAX_DLEN);
+            }
+            else {
+                frame.can_id = esp_frame.standard.id[0];
+                frame.can_id = (frame.can_id << 3) | (esp_frame.standard.id[1] >> 5);
+                memcpy(frame.data, &esp_frame.standard.data, CAN_MAX_DLEN);
+            }
+            frame.can_id |= esp_frame.rtr ? CAN_RTR_FLAG : 0;
+            frame.can_id |= esp_frame.frame_format ? CAN_EFF_FLAG : 0;
+            frame.len = esp_frame.dlc;
+
+            /* apply acceptance filters only if they are set */
+            bool accepted = (dev->rx_filter_num == 0);
+            for (unsigned f_id = 0;
+                 !accepted && (f_id < ESP_CAN_MAX_RX_FILTERS); f_id++) {
+                const struct can_filter *f = &dev->rx_filters[f_id];
+                /* skip unused filter entries */
+                if (f->can_id == 0) {
+                    continue;
+                }
+                /* compare masked can_id with the filter */
+                accepted = ((f->can_mask & f->can_id) ==
+                            (f->can_mask & frame.can_id));
+            }
+
+            /* put the frame in the RX ring buffer if there are no acceptance
+             * filters or one filter matched, otherwise drop it */
+            if (accepted) {
+                dev->rx_frames[dev->rx_frames_wptr] = frame;
+
+                dev->rx_frames_num++;
+                dev->rx_frames_wptr++;
+                dev->rx_frames_wptr &= ESP_CAN_MAX_RX_FRAMES-1;
+
+                /* at least one RX frame has been saved */
+                dev->events |= ESP_CAN_EVENT_RX_INDICATION;
             }
         }
     }
