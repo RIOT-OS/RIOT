@@ -927,7 +927,7 @@ struct ieee802154_radio_ops {
      * @brief Get the current radio time
      *
      * The radio time is a free running counter in microseconds that wraps
-     * around at 2^32. It is only valid while the device is on. Time values
+     * around at 2^32. It is only valid while the device is on.
      *
      * This function MAY be NULL if the radio doesn't support timed transmissions
      * @ref IEEE802154_CAP_TIMED_TX
@@ -1021,8 +1021,8 @@ static inline int ieee802154_radio_request_transmit(ieee802154_dev_t *dev)
  * @pre The upper layer should have set the transceiver to IDLE (see
  * @ref ieee802154_radio_set_idle) and the frame is already in the framebuffer
  * (@ref ieee802154_radio_ops_t::write).
- * @pre The device is on
- * @pre The device supports @ref IEEE802154_CAP_TIMED_TX
+ * @pre The device is on.
+ * @pre The device supports @ref IEEE802154_CAP_TIMED_TX.
  *
  * @note @ref ieee802154_radio_confirm_transmit MUST be used to
  * finish the transmission.
