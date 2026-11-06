@@ -74,10 +74,8 @@
 #  define CONFIG_NRF802154_TIMER_FREQ   IEEE802154_SYMBOL_RATE_HZ
 #endif
 
-#define TIMER_FREQ  CONFIG_NRF802154_TIMER_FREQ
-
 #define NRF802154_TICKS_TO_NS(ticks) \
-    (((uint64_t)(ticks) * NS_PER_SEC) / TIMER_FREQ)
+    (((uint64_t)(ticks) * NS_PER_SEC) / CONFIG_NRF802154_TIMER_FREQ)
 
 /**
  * @brief   Timestamp of the last received frame in timer ticks
@@ -441,8 +439,8 @@ int nrf802154_init(void)
     rxbuf[0] = 0;
     txbuf[0] = 0;
 
-    if(IS_USED(MODULE_IEEE802154_RX_TIMESTAMP)) {
-        int res = timer_init(NRF802154_TIMER, TIMER_FREQ, NULL, NULL);
+    if (IS_USED(MODULE_IEEE802154_RX_TIMESTAMP)) {
+        int res = timer_init(NRF802154_TIMER, CONFIG_NRF802154_TIMER_FREQ, NULL, NULL);
         assert(res >= 0);
         (void)res;
         timer_stop(NRF802154_TIMER);
@@ -464,7 +462,7 @@ void isr_radio(void)
             dev->cb(dev, IEEE802154_RADIO_INDICATION_TX_START);
         }
         else if (_state == STATE_RX) {
-            if(IS_USED(MODULE_IEEE802154_RX_TIMESTAMP)) {
+            if (IS_USED(MODULE_IEEE802154_RX_TIMESTAMP)) {
                 _rx_timestamp_ticks = MAC_TIMER_DEV->CC[MAC_TIMER_CHAN_TS];
             }
             dev->cb(dev, IEEE802154_RADIO_INDICATION_RX_START);
@@ -582,10 +580,10 @@ static int _request_on(ieee802154_dev_t *dev)
 
     NRF_RADIO->SHORTS = DEFAULT_SHORTS;
 
-    if(IS_USED(MODULE_IEEE802154_RX_TIMESTAMP)) {
-        /* EVENTS_ADDRESS marks the end of the SFD.
-         * EVENTS_FRAMESTART was measured to fire consistently 32 us later.
-         * This is expected by the manual */
+    if (IS_USED(MODULE_IEEE802154_RX_TIMESTAMP)) {
+        /* EVENTS_FRAMESTART marks the end of the SFD.
+         * https://docs.nordicsemi.com/r/bundle/ps_nrf52840/page/radio.html?
+         * section=register.EVENTS_FRAMESTART */
         NRF_PPI->CH[CONFIG_NRF802154_TIMESTAMP_PPI_CH].EEP = (uint32_t)&NRF_RADIO->EVENTS_ADDRESS;
         NRF_PPI->CH[CONFIG_NRF802154_TIMESTAMP_PPI_CH].TEP =
             (uint32_t)&MAC_TIMER_DEV->TASKS_CAPTURE[MAC_TIMER_CHAN_TS];
