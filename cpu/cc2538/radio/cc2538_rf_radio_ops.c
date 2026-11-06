@@ -50,6 +50,8 @@ static int cc2538_csma_ca_retries = CONFIG_IEEE802154_DEFAULT_CSMA_CA_RETRIES;
 
 static bool cc2538_cca_status;  /**< status of the last CCA request */
 
+static uint64_t _rx_timestamp_ticks;
+
 static void _enable_rx(void)
 {
     RFCORE_XREG_FRMCTRL0 &= ~CC2538_FRMCTRL0_RX_MODE_DIS;
@@ -269,6 +271,37 @@ static int _len(ieee802154_dev_t *dev)
     return rfcore_peek_rx_fifo(0) - IEEE802154_FCS_LEN;
 }
 
+/**
+ * Read the SFD capture of the MAC timer
+ *
+ * The MAC timer captures on the rising edge of the radio SFD status
+ *
+ */
+static uint64_t _sfd_capture_ticks(void)
+{
+    unsigned irq_state = irq_disable();
+    uint8_t mtmsel = RFCORE_SFR_MTMSEL;
+
+    /* select the capture registers */
+    RFCORE_SFR_MTMSEL = CC2538_SFR_MTMSEL_TIMER_CAP | CC2538_SFR_MTMOVFSEL_CAP;
+
+    uint64_t current_period_ticks = RFCORE_SFR_MTM0 | ((uint64_t)RFCORE_SFR_MTM1 << 8);
+
+    /* the overflow counter counts elapsed timer periods for a given period length */
+    uint64_t period_cnt = RFCORE_SFR_MTMOVF0;
+    period_cnt |= (uint64_t)RFCORE_SFR_MTMOVF1 << 8;
+    period_cnt |= (uint64_t)RFCORE_SFR_MTMOVF2 << 16;
+
+    /* the overflow counter counts elapsed timer periods not 2^16 ticks */
+    RFCORE_SFR_MTMSEL = CC2538_SFR_MTMSEL_TIMER_P;
+    uint32_t period_len = RFCORE_SFR_MTM0 | (RFCORE_SFR_MTM1 << 8);
+
+    RFCORE_SFR_MTMSEL = mtmsel;
+    irq_restore(irq_state);
+
+    return (period_cnt * period_len) + current_period_ticks;
+}
+
 static int _read(ieee802154_dev_t *dev, void *buf, size_t size, ieee802154_rx_info_t *info)
 {
     (void) dev;
@@ -324,6 +357,10 @@ static int _read(ieee802154_dev_t *dev, void *buf, size_t size, ieee802154_rx_in
          * to provide an LQI value */
         info->lqi = 255 * (corr_val - CC2538_CORR_VAL_MIN) /
                           (CC2538_CORR_VAL_MAX - CC2538_CORR_VAL_MIN);
+
+#if IS_USED(MODULE_IEEE802154_RX_TIMESTAMP)
+        info->timestamp = (_rx_timestamp_ticks * NS_PER_US) / (CLOCK_CORECLOCK / US_PER_SEC);
+#endif
     }
 
 end:
@@ -392,6 +429,9 @@ void cc2538_irq_handler(void)
         handled_f0 |= SFD;
         switch(cc2538_state) {
         case CC2538_STATE_READY:
+            if(IS_USED(MODULE_IEEE802154_RX_TIMESTAMP)) {
+                _rx_timestamp_ticks = _sfd_capture_ticks();
+            }
             cc2538_rf_hal->cb(cc2538_rf_hal, IEEE802154_RADIO_INDICATION_RX_START);
             break;
         case CC2538_STATE_TX_BUSY:
@@ -625,8 +665,8 @@ static const ieee802154_radio_ops_t cc2538_rf_ops = {
           | IEEE802154_CAP_IRQ_CCA_DONE
           | IEEE802154_CAP_IRQ_RX_START
           | IEEE802154_CAP_IRQ_TX_START
-          | IEEE802154_CAP_PHY_OQPSK,
-
+          | IEEE802154_CAP_PHY_OQPSK
+          | IEEE802154_CAP_RX_TIMESTAMP,
     .write = _write,
     .read = _read,
     .len = _len,

@@ -60,7 +60,7 @@ static uint8_t seq;
 
 static ieee802154_dev_t _radio;
 
-static void _print_packet(size_t size, uint8_t lqi, int16_t rssi)
+static void _print_packet(size_t size, ieee802154_rx_info_t *info)
 {
     if (buffer[0] & IEEE802154_FCF_TYPE_ACK && ((seq-1) == buffer[2])) {
         printf("Received valid ACK with sqn %i\n", buffer[2]);
@@ -69,7 +69,16 @@ static void _print_packet(size_t size, uint8_t lqi, int16_t rssi)
         puts("Frame received:");
         od_hex_dump(buffer, size, 0);
     }
-    printf("LQI: %i, RSSI: %i\n", (int) lqi, (int) rssi);
+
+    if (ieee802154_radio_has_capability(&_radio, IEEE802154_CAP_RX_TIMESTAMP)) {
+        printf("LQI: %i, RSSI: %i, TIMESTAMP: %" PRIu32 " us\n",
+                (int)info->lqi, (int)info->rssi,
+                (uint32_t)(info->timestamp / 1000));
+    }
+    else {
+        printf("LQI: %i, RSSI: %i\n", (int)info->lqi, (int)info->rssi);
+    }
+
     puts("");
 }
 
@@ -126,7 +135,7 @@ static event_t _crc_error_event = {
 void _rx_done_handler(event_t *event)
 {
     (void) event;
-    ieee802154_rx_info_t info;
+    ieee802154_rx_info_t info = { 0 };
     ieee802154_dev_t* dev = &_radio;
 
     /* Force transition to IDLE before calling the read function */
@@ -140,7 +149,7 @@ void _rx_done_handler(event_t *event)
     int size = ieee802154_radio_read(&_radio, buffer, 127, &info);
     if (size > 0) {
         /* Print packet while we wait for the state transition */
-        _print_packet(size, info.lqi, info.rssi);
+        _print_packet(size, &info);
     }
 
     ieee802154_radio_set_rx(dev);

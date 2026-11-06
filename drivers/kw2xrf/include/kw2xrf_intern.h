@@ -17,6 +17,8 @@
 
 #include <stdint.h>
 #include "kw2xrf.h"
+#include "macros/math.h"
+#include "time_units.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -129,6 +131,38 @@ typedef enum kw2xrf_timer_timebase {
     KW2XRF_TIMEBASE_31250HZ,
     KW2XRF_TIMEBASE_15625HZ,
 } kw2xrf_timer_timebase_t;
+
+/**
+ * @brief Event Timer time base
+ *
+ * Determines both the resolution of RX timestamps and the granularity of the
+ * sequence timeouts.
+ * 500 kHz ->  2 us,  33.554 s
+ * 250 kHz ->  4 us,  67.109 s
+ * 125 kHz ->  8 us, 134.218 s
+ * 62.5 kHz -> 16 us (one symbol), 268.436 s
+ * 31.25 kHz -> 32 us, 536.871 s
+ * 15.625 kHz -> 64 us, 1073.742 s
+ */
+#ifndef CONFIG_KW2XRF_TIMEBASE
+#  define CONFIG_KW2XRF_TIMEBASE  KW2XRF_TIMEBASE_62500HZ
+#endif
+
+/**
+ * @brief Event Timer frequency in Hz
+ */
+#define KW2XRF_TIMER_FREQ   (2000000UL >> CONFIG_KW2XRF_TIMEBASE)
+
+/**
+ * @brief Nanoseconds per Event Timer tick
+ */
+#define KW2XRF_TICK_NS      (NS_PER_SEC / KW2XRF_TIMER_FREQ)
+
+/**
+ * @brief Convert a duration in symbol to Event Timer ticks
+ */
+#define KW2XRF_SYMS_TO_TICKS(syms) \
+    ((uint32_t)DIV_ROUND_UP((uint64_t)(syms) * KW2XRF_TIMER_FREQ, (uint64_t)IEEE802154_SYMBOL_RATE_HZ))
 
 /**
  * @brief   Initialize the Event Timer Block (up counter)
