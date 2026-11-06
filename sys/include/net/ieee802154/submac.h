@@ -202,7 +202,7 @@ typedef enum {
  * @brief Internal SubMAC FSM state
  */
 typedef ieee802154_submac_fsm_return_t (*ieee802154_fsm_state_cb_t)(ieee802154_submac_t *submac,
-                                                                      ieee802154_fsm_ev_t ev);
+                                                                    ieee802154_fsm_ev_t ev);
 
 /**
  * @brief Internal SubMAC FSM
@@ -611,7 +611,8 @@ static inline int ieee802154_set_rx(ieee802154_submac_t *submac)
  *
  * @param[out]
  */
-int ieee802154_submac_config_src_address_match(ieee802154_submac_t *submac, ieee802154_src_match_t cmd, const void * value);
+int ieee802154_submac_config_src_address_match(ieee802154_submac_t *submac,
+                                               ieee802154_src_match_t cmd, const void *value);
 
 #ifdef __cplusplus
 }
