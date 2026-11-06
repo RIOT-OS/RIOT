@@ -43,7 +43,7 @@
 #include "esp_attr.h"
 #include "esp_clk_tree.h"
 #include "esp_cpu.h"
-#include "esp_driver_i2c/i2c_private.h"
+#include "esp_private/periph_ctrl.h"
 #include "esp_rom_gpio.h"
 #include "esp_rom_sys.h"
 #include "hal/i2c_hal.h"
@@ -663,7 +663,7 @@ static void _i2c_reset_and_configure(i2c_t dev)
 {
     i2c_ll_enable_controller_clock(_i2c_hw[dev].dev, true);
 
-    I2C_RCC_ATOMIC() {
+    PERIPH_RCC_ATOMIC() {
         i2c_ll_enable_bus_clock(dev, true);
         i2c_ll_reset_register(dev);
     }
