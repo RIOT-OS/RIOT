@@ -135,7 +135,7 @@ def test_ifconfig_down_error():
      ({"netif": "foobar", "addr": "dead:coff:ee::/64", "anycast": False},
       "ifconfig foobar add dead:coff:ee::/64"),
      ({"netif": "foobar", "addr": "dead:coff:ee::/64", "anycast": True},
-      "ifconfig foobar add dead:coff:ee::/64 anycast")]
+      "ifconfig foobar add anycast dead:coff:ee::/64")]
 )
 def test_ifconfig_add(kwargs, expected):
     rc = init_ctrl(output="success: added address to interface")
@@ -152,7 +152,7 @@ def test_ifconfig_add(kwargs, expected):
      ({"netif": "foobar", "addr": "dead:coff:ee::/64", "anycast": False},
       "ifconfig foobar add dead:coff:ee::/64"),
      ({"netif": "foobar", "addr": "dead:coff:ee::/64", "anycast": True},
-      "ifconfig foobar add dead:coff:ee::/64 anycast")]
+      "ifconfig foobar add anycast dead:coff:ee::/64")]
 )
 def test_ifconfig_add_error(kwargs, expected):
     rc = init_ctrl()
