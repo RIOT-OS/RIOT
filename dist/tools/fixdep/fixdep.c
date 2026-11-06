@@ -1,15 +1,12 @@
 /*
+ * SPDX-FileCopyrightText: 2002 Kai Germaschewski <kai.germaschewski@gmx.de>
+ * SPDX-License-Identifier: GPL-2.0-or-later
+ */
+
+/*
  * "Optimize" a list of dependencies as spit out by gcc -MD
  * for the kernel build
  * ===========================================================================
- *
- * Author       Kai Germaschewski
- * Copyright    2002 by Kai Germaschewski  <kai.germaschewski@gmx.de>
- *
- * This software may be used and distributed according to the terms
- * of the GNU General Public License, incorporated herein by reference.
- *
- *
  * Introduction:
  *
  * gcc produces a very nice and correct list of dependencies which

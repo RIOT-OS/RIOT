@@ -1,12 +1,8 @@
 /*
- * Copyright (C) 2016 Kaspar Schleiser <kaspar@schleiser.de>
- * Copyright (C) 2018 Freie Universität Berlin
- *
- * This file is subject to the terms and conditions of the GNU General Public
- * License v2. See the file LICENSE for more details.
- *
- * @author  Kaspar Schleiser <kaspar@schleiser.de>
- * @author  Martine Lenders <m.lenders@fu-berlin.de>
+ * SPDX-FileCopyrightText: 2016 Kaspar Schleiser <kaspar@schleiser.de>
+ * SPDX-FileCopyrightText: 2016 Martine Lenders <m.lenders@fu-berlin.de>
+ * SPDX-FileCopyrightText: 2018 Freie Universität Berlin
+ * SPDX-License-Identifier: GPL-2.0-only
  */
 
 #include <ctype.h>
