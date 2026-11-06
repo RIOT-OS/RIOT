@@ -96,17 +96,20 @@ static const pwm_conf_t pwm_config[] = {
  * @name    Timer configuration
  * @{
  */
+#define TIMER_0_MAX_VALUE   (0xffffffff) /**< max value */
+#define TIMER_1_MAX_VALUE   (0xffffffff) /**< max value */
+
 static const timer_conf_t timer_config[] = {
     {
         .dev      = TIM2,
-        .max      = 0xffffffff,
+        .max      = TIMER_0_MAX_VALUE,
         .rcc_mask = RCC_APB1ENR_TIM2EN,
         .bus      = APB1,
         .irqn     = TIM2_IRQn
     },
     {
         .dev      = TIM5,
-        .max      = 0xffffffff,
+        .max      = TIMER_1_MAX_VALUE,
         .rcc_mask = RCC_APB1ENR_TIM5EN,
         .bus      = APB1,
         .irqn     = TIM5_IRQn

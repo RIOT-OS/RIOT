@@ -20,46 +20,47 @@
 #include <stdlib.h>
 
 #include "board.h"
+#include "periph_cpu.h"
 #include "macros/units.h"
 #include "thread.h"
 #include "thread_flags.h"
 
 #include "periph/timer.h"
 
-/* recreate logic to obtain valid XTIMER_DEV used in xtimer.h, but don't include
- * xtimer.h, as this leads to issues on some boards when the xtimer module is
- * not used */
-#ifndef XTIMER_DEV
-# define XTIMER_DEV         TIMER_DEV(0)
-#endif
-#ifndef XTIMER_HZ
-# define XTIMER_HZ          MHZ(1)
-#endif
-#ifndef XTIMER_WIDTH
-# if(TIMER_0_MAX_VALUE) == 0xfffffful
-#  define XTIMER_WIDTH      (24)
-# elif (TIMER_0_MAX_VALUE) == 0xffff
-#  define XTIMER_WIDTH      (16)
+#ifndef TEST_TIMER_DEV
+# ifdef XTIMER_DEV
+#  define TEST_TIMER_DEV XTIMER_DEV
 # else
-#  define XTIMER_WIDTH      (32)
+#  define TEST_TIMER_DEV TIMER_DEV(0)
 # endif
-#endif /* !defined(XTIMER_WIDTH) */
+#endif
 
-#ifndef TEST_TIMER_FREQ
-# define TEST_TIMER_DEV     XTIMER_DEV
-# define TEST_TIMER_FREQ    XTIMER_HZ
-# define TEST_TIMER_WIDTH   XTIMER_WIDTH
+#ifndef TEST_TIMER_MAX
+# ifdef XTIMER_WIDTH
+#  define TEST_TIMER_MAX   ((1UL << XTIMER_WIDTH) - 1)
+# elif TIMER_0_MAX_VALUE
+#  define TEST_TIMER_MAX   TIMER_0_MAX_VALUE
+# else
+#  error "Expected either TEST_TIMER_MAX, XTIMER_WIDTH or TIMER_0_MAX_VALUE"
+# endif
 #endif
 
 #ifndef TEST_MAX_DIFF
 #define TEST_MAX_DIFF   (1000LU)
 #endif
 
-#if TEST_TIMER_WIDTH == 32
-# define TEST_TIMER_MAX      (0xFFFFFFFFLU)
+static uint32_t query_freq(void)
+{
+#ifdef TEST_TIMER_FREQ
+    return TEST_TIMER_FREQ;
+#elif MODULE_PERIPH_TIMER_QUERY_FREQS
+    return timer_query_freqs(TEST_TIMER_DEV, 0);
+#elif XTIMER_HZ
+    return XTIMER_HZ;
 #else
-# define TEST_TIMER_MAX      ((1UL << TEST_TIMER_WIDTH) - 1)
+    #error "Expected either TEST_TIMER_FREQ, MODULE_PERIPH_TIMER_QUERY_FREQS or XTIMER_HZ"
 #endif
+}
 
 static void cb(void *arg, int chan)
 {
@@ -69,6 +70,7 @@ static void cb(void *arg, int chan)
 
 int main(void)
 {
+    uint32_t test_timer_freq = query_freq();
     puts("\nTest for peripheral TIMER short timer_set()\n");
 
     printf("This test tries timer_set() with decreasing intervals down to 0.\n"
@@ -76,10 +78,10 @@ int main(void)
            " message.\n"
            "On failure, this test prints an error message.\n\n");
 
-    printf("testing periph_timer %u, freq %lu, bits = %u\n", TEST_TIMER_DEV, TEST_TIMER_FREQ,
-           TEST_TIMER_WIDTH);
+    printf("testing periph_timer %u, freq %" PRIu32 ", max = 0x%lx\n", TEST_TIMER_DEV, test_timer_freq,
+           (unsigned long) TEST_TIMER_MAX);
 
-    if (timer_init(TEST_TIMER_DEV, TEST_TIMER_FREQ, cb, thread_get_active()) != 0) {
+    if (timer_init(TEST_TIMER_DEV, test_timer_freq, cb, thread_get_active()) != 0) {
         puts("ERROR: timer_init() failed.\nTEST FAILED");
         return EXIT_FAILURE;
     }
