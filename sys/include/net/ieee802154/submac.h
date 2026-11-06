@@ -419,7 +419,7 @@ static inline int ieee802154_set_tx_power(ieee802154_submac_t *submac,
  */
 static inline int ieee802154_get_frame_length(ieee802154_submac_t *submac)
 {
-    return submac->rx_len;
+    return ieee802154_radio_len(&submac->dev);
 }
 
 /**
@@ -428,7 +428,7 @@ static inline int ieee802154_get_frame_length(ieee802154_submac_t *submac)
  * This functions reads the received PSDU from the device (excluding FCS)
  *
  * @pre this function MUST be called either inside @ref ieee802154_submac_cb_t::rx_done
- * or in SLEEP state.
+ *      or in SLEEP state.
  *
  * @param[in] submac pointer to the SubMAC descriptor
  * @param[out] buf buffer to write into. If NULL, the packet is discarded
@@ -441,17 +441,7 @@ static inline int ieee802154_get_frame_length(ieee802154_submac_t *submac)
 static inline int ieee802154_read_frame(ieee802154_submac_t *submac, void *buf,
                                         size_t len, ieee802154_rx_info_t *info)
 {
-    if (submac->rx_len > len) {
-        return -ENOBUFS;
-    }
-    if (info != NULL) {
-        info->rssi = submac->rx_info.rssi;
-        info->lqi = submac->rx_info.lqi;
-    }
-    if (buf != NULL) {
-        memcpy(buf, submac->rx_buf, submac->rx_len);
-    }
-    return submac->rx_len;
+    return ieee802154_radio_read(&submac->dev, buf, len, info);
 }
 
 /**
@@ -557,7 +547,7 @@ static inline void ieee802154_submac_crc_error_cb(ieee802154_submac_t *submac)
     ieee802154_submac_process_ev(submac, IEEE802154_FSM_EV_CRC_ERROR);
 }
 
-/**ieee802154_radio_config_src_address_match
+/**
  * @brief Indicate the SubMAC that the device finished the transmission procedure.
  *
  * @param[in] submac pointer to the SubMAC descriptor
