@@ -304,12 +304,16 @@ static void test_clif_get_empty_attr_value(void)
 
 static void test_clif_get_attr_empty(void)
 {
+    /* If assertions are enabled, this test case causes an assertion failure. The
+     * test case aims to ensure that we don't do smutty stuff in non-debug builds. */
+#ifdef NDEBUG
     clif_attr_t attr;
 
     /* clif_get_attr used to access data even if input was empty.
      * See: https://github.com/RIOT-OS/RIOT/pull/15947 */
     int r = clif_get_attr(NULL, 0, &attr);
     TEST_ASSERT_EQUAL_INT(CLIF_NOT_FOUND, r);
+#endif
 }
 
 static void tests_clif_decode_encode_minimal(void)
