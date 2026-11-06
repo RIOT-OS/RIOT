@@ -17,7 +17,6 @@
 
 #include "container.h"
 #include "random.h"
-#include "ztimer.h"
 
 #define ENABLE_DEBUG CONFIG_UNICOAP_DEBUG_LOGGING
 #include "debug.h"
@@ -53,6 +52,10 @@
     }
 
 typedef struct {
+    uint8_t pdu[CONFIG_UNICOAP_PDU_SIZE_MAX];
+} _carbon_copy_t;
+
+typedef struct {
     /**
      * @brief Timeout that occurs when waiting for an acknowledgement message
      */
@@ -75,12 +78,12 @@ typedef struct {
     /**
      * @brief Copy of confirmable message PDU for retransmission
      */
-    uint8_t* pdu;
+    _carbon_copy_t* carbon_copy;
 
     /**
-     * @brief Size of @ref unicoap_messaging_state_udp_dtls_t.pdu
+     * @brief Size of @ref unicoap_messaging_state_udp_dtls_t.carbon_copy
      */
-    size_t pdu_size;
+    size_t carbon_copy_size;
 
     /** @brief Message ID */
     uint16_t id;
@@ -110,7 +113,7 @@ typedef struct {
 
 #if CONFIG_UNICOAP_CARBON_COPIES_MAX > 0
     /** @brief Copy of PDU sent, used for retransmission and deduplication */
-    uint8_t carbon_copies[CONFIG_UNICOAP_CARBON_COPIES_MAX][CONFIG_UNICOAP_PDU_SIZE_MAX];
+    _carbon_copy_t carbon_copies[CONFIG_UNICOAP_CARBON_COPIES_MAX];
 #endif
 
 #if CONFIG_UNICOAP_RFC7252_TRANSMISSIONS_CAPACITY > 0
@@ -175,62 +178,108 @@ static inline const unicoap_endpoint_t* _transmission_get_endpoint(const _transm
     return &transmission->endpoint;
 }
 
-static _state_t _state = { 0 };
+/**
+ * @brief State of the RFC7252 messaging driver.
+ *
+ * @pre access from the thread with @ref _unicoap_pid, or while it is @ref KERNEL_PID_UNDEF
+ */
+static inline _state_t *_state(void)
+{
+    static _state_t _state = { 0 };
+
+    assert(thread_getpid() == _unicoap_pid || _unicoap_pid == KERNEL_PID_UNDEF);
+    return &_state;
+}
+
+static inline atomic_uint *_state_get_next_message_id(void)
+{
+    return &_state()->next_message_id;
+}
+
+static inline _carbon_copy_t *_state_get_carbon_copies(void)
+{
+#if CONFIG_UNICOAP_CARBON_COPIES_MAX > 0
+    return _state()->carbon_copies;
+#endif
+    return NULL;
+}
+
+static inline size_t _state_get_carbon_copies_len(void)
+{
+#if CONFIG_UNICOAP_CARBON_COPIES_MAX > 0
+    return ARRAY_SIZE(_state()->carbon_copies);
+#endif
+    return 0;
+}
+
+static inline _transmission_t *_state_get_transmissions(void)
+{
+#if CONFIG_UNICOAP_RFC7252_TRANSMISSIONS_CAPACITY > 0
+    return _state()->transmissions;
+#endif
+    return NULL;
+}
+
+static inline size_t _state_get_transmissions_len(void)
+{
+#if CONFIG_UNICOAP_RFC7252_TRANSMISSIONS_CAPACITY > 0
+    return ARRAY_SIZE(_state()->transmissions);
+#endif
+    return 0;
+}
 
 int unicoap_init_rfc7252_common(event_queue_t* queue)
 {
     (void)queue;
-    atomic_init(&_state.next_message_id, (unsigned int)random_uint32());
+    atomic_init(_state_get_next_message_id(), (unsigned int)random_uint32());
     return 0;
 }
 
 int unicoap_deinit_rfc7252_common(event_queue_t* queue)
 {
     (void)queue;
-    memset(&_state, 0, sizeof(_state));
+    memset(_state(), 0, sizeof(_state_t));
     return 0;
 }
 
 static uint16_t _generate_message_id(void)
 {
-    return (uint16_t)atomic_fetch_add(&_state.next_message_id, 1);
+    return (uint16_t)atomic_fetch_add(_state_get_next_message_id(), 1);
 }
 
 /* MARK: - (Re-)Transmissions */
 
-static uint8_t* _carbon_copy_alloc(void)
+static _carbon_copy_t* _carbon_copy_alloc(void)
 {
-#if CONFIG_UNICOAP_CARBON_COPIES_MAX > 0
     /* Find empty slot in list of open requests. */
-    for (int i = 0; i < (int)ARRAY_SIZE(_state.carbon_copies); i += 1) {
+    _carbon_copy_t *carbon_copies = _state_get_carbon_copies();
+    for (size_t i = 0; i < _state_get_carbon_copies_len(); i += 1) {
         /* Will never be zero due to CoAP version 1 bit. Zero indicates 'free' buffer */
-        if (*_state.carbon_copies[i] == 0) {
+        if (*carbon_copies[i].pdu == 0) {
             /* Claim that buffer by setting first byte to 0xff. Later, we adjust that. */
-            *_state.carbon_copies[i] = 0xff;
-            return _state.carbon_copies[i];
+            *carbon_copies[i].pdu = 0xff;
+            return &carbon_copies[i];
         }
     }
-#endif
     MESSAGING_7252_DEBUG("no space to alloc PDU copy\n");
     return NULL;
 }
 
-static inline void _carbon_copy_free(uint8_t* carbon_copy)
+static inline void _carbon_copy_free(_carbon_copy_t* carbon_copy)
 {
-    *carbon_copy = 0;
+    *carbon_copy->pdu = 0;
 }
 
 static inline _transmission_t* _transmission_alloc(void)
 {
-#if CONFIG_UNICOAP_RFC7252_TRANSMISSIONS_CAPACITY > 0
     /* Find empty slot in list of open requests. */
-    for (int i = 0; i < (int)ARRAY_SIZE(_state.transmissions); i += 1) {
-        if (!_state.transmissions[i].is_used) {
-            _state.transmissions[i].is_used = true;
-            return &_state.transmissions[i];
+    _transmission_t *transmissions = _state_get_transmissions();
+    for (size_t i = 0; i < _state_get_transmissions_len(); i += 1) {
+        if (!transmissions[i].is_used) {
+            transmissions[i].is_used = true;
+            return &transmissions[i];
         }
     }
-#endif
     MESSAGING_7252_DEBUG("no space to alloc transmission state\n");
     return NULL;
 }
@@ -277,18 +326,15 @@ static _transmission_t* _transmission_create(const unicoap_endpoint_t* endpoint,
 
 static _transmission_t* _transmission_find(const unicoap_endpoint_t* endpoint, uint16_t id)
 {
-    (void)endpoint;
-    (void)id;
-#if CONFIG_UNICOAP_RFC7252_TRANSMISSIONS_CAPACITY > 0
-    for (int i = 0; i < (int)ARRAY_SIZE(_state.transmissions); i += 1) {
-        _transmission_t* transmission = &_state.transmissions[i];
+    _transmission_t *transmissions = _state_get_transmissions();
+    for (size_t i = 0; i < _state_get_transmissions_len(); i += 1) {
+        _transmission_t* transmission = &transmissions[i];
         if (transmission->is_used &&
             transmission->id == id &&
             unicoap_endpoint_is_equal(&transmission->endpoint, endpoint)) {
             return transmission;
         }
     }
-#endif
     return NULL;
 }
 
@@ -297,8 +343,8 @@ static int _disconnect(_transmission_t* transmission);
 static inline void _transmission_free(_transmission_t* transmission, bool disconnect)
 {
     MESSAGING_7252_DEBUG(UNICOAP_MESSAGE_ID_FORMAT "transmission ended\n", transmission->id);
-    if (transmission->pdu) {
-        _carbon_copy_free(transmission->pdu);
+    if (transmission->carbon_copy) {
+        _carbon_copy_free(transmission->carbon_copy);
     }
     if (disconnect) {
         _disconnect(transmission);
@@ -439,12 +485,11 @@ static int _connect(unicoap_packet_t* packet, _transmission_t** transmission)
         MESSAGING_7252_DEBUG(UNICOAP_MESSAGE_ID_FORMAT
                              "delaying until connected\n",
                              _get_id(packet));
-        if (!(*transmission)->pdu) {
-            uint8_t* carbon_copy = NULL;
-            if (!(carbon_copy = _carbon_copy_alloc())) {
+        if (!(*transmission)->carbon_copy) {
+            (*transmission)->carbon_copy = _carbon_copy_alloc();
+            if (!(*transmission)->carbon_copy) {
                 return -ENOBUFS;
             }
-            (*transmission)->pdu = carbon_copy;
         }
     }
     return 0;
@@ -481,9 +526,9 @@ static ssize_t _build_and_send_pdu(
      * the iolists anyway. If we wanted to avoid this, we would need to dynamically allocate memory.
      */
 
-    uint8_t* carbon_copy = transmission && *transmission ? (*transmission)->pdu : NULL;
+    _carbon_copy_t* carbon_copy = transmission && *transmission ? (*transmission)->carbon_copy : NULL;
     if (carbon_copy) {
-        if ((size = unicoap_pdu_build_rfc7252(carbon_copy, sizeof(_state.carbon_copies[0]),
+        if ((size = unicoap_pdu_build_rfc7252(carbon_copy->pdu, sizeof(*carbon_copy),
                                               packet->message, &packet->properties)) < 0) {
             lists[0].iol_base = NULL;
             lists[0].iol_len = 0;
@@ -551,7 +596,7 @@ static int _send_carbon_copy(_transmission_t* transmission)
     int res = 0;
     uint32_t duration = 0;
     MESSAGING_7252_DEBUG(UNICOAP_MESSAGE_ID_FORMAT "transmitting carbon copy\n", transmission->id);
-    bool confirmable = _pdu_get_type(transmission->pdu) == UNICOAP_TYPE_CON;
+    bool confirmable = _pdu_get_type(transmission->carbon_copy->pdu) == UNICOAP_TYPE_CON;
     /* Must not rely on transmission->remaining_retransmissions here to determine if
      * this is a confirmable message. This function is called at two sites:
      *  - _on_ack_timeout: already know message is confirmable
@@ -571,7 +616,7 @@ static int _send_carbon_copy(_transmission_t* transmission)
                              transmission->remaining_retransmissions + 1, duration);
     }
 
-    iolist_t list = __IOLIST(transmission->pdu, transmission->pdu_size, NULL);
+    iolist_t list = __IOLIST(transmission->carbon_copy->pdu, transmission->carbon_copy_size, NULL);
     if ((res = _sendv(&list,
                       _transmission_get_endpoint(transmission), NULL,
                       _transmission_get_session(transmission))) < 0) {
@@ -590,8 +635,8 @@ static void _on_ack_timeout(unicoap_scheduled_event_t* _event)
 {
     _transmission_t* transmission = container_of(_event, _transmission_t, ack_timeout);
     assert(transmission);
-    assert(transmission->pdu);
-    assert(transmission->pdu_size > 0);
+    assert(transmission->carbon_copy);
+    assert(transmission->carbon_copy_size > 0);
     int res = 0;
 
     if (transmission->remaining_retransmissions == 0) {
@@ -666,17 +711,15 @@ static inline int _reset(unicoap_packet_t* packet)
 
 static int _resume(const unicoap_endpoint_t* endpoint, unicoap_sock_dtls_session_t* session)
 {
-    (void)endpoint;
-#if CONFIG_UNICOAP_RFC7252_TRANSMISSIONS_CAPACITY > 0
-    for (int i = 0; i < (int)ARRAY_SIZE(_state.transmissions); i += 1) {
-        _transmission_t* transmission = &_state.transmissions[i];
+    _transmission_t *transmissions = _state_get_transmissions();
+    for (size_t i = 0; i < _state_get_transmissions_len(); i += 1) {
+        _transmission_t* transmission = &transmissions[i];
         if (transmission->is_used &&
             unicoap_endpoint_is_equal(&transmission->endpoint, endpoint)) {
             _transmission_set_session(transmission, session);
             _send_carbon_copy(transmission);
         }
     }
-#endif
     return 0;
 }
 
@@ -906,7 +949,7 @@ int unicoap_messaging_send_rfc7252(unicoap_packet_t* packet, unicoap_messaging_f
     assert(packet);
     assert(packet->remote);
     int res = 0;
-    uint8_t* carbon_copy = NULL;
+    _carbon_copy_t* carbon_copy = NULL;
     _transmission_t* transmission = NULL;
 
     if (packet->properties.is_notification) {
@@ -961,7 +1004,7 @@ int unicoap_messaging_send_rfc7252(unicoap_packet_t* packet, unicoap_messaging_f
         }
 
         transmission->remaining_retransmissions = CONFIG_UNICOAP_RETRANSMISSIONS_MAX;
-        transmission->pdu = carbon_copy;
+        transmission->carbon_copy = carbon_copy;
         break;
 
     case UNICOAP_TYPE_ACK:
@@ -988,9 +1031,9 @@ int unicoap_messaging_send_rfc7252(unicoap_packet_t* packet, unicoap_messaging_f
                                    "messaging.7252.ack-timeout");
         }
         /* Only set PDU size and notify exchange layer if sending went well. */
-        if (transmission->pdu) {
+        if (transmission->carbon_copy) {
             MESSAGING_7252_DEBUG("created <carbon_copy size=%i>\n", res);
-            transmission->pdu_size = res;
+            transmission->carbon_copy_size = res;
         }
         transmission->exchange = exchange;
         if (exchange) {
@@ -1017,9 +1060,9 @@ void unicoap_messaging_print_rfc7252_state(void)
     printf("\n\t- RFC 7252 transmissions (%" PRIuSIZE " total):\n",
            (size_t)CONFIG_UNICOAP_RFC7252_TRANSMISSIONS_CAPACITY);
 
-#  if CONFIG_UNICOAP_RFC7252_TRANSMISSIONS_CAPACITY > 0
-    for (size_t i = 0; i < ARRAY_SIZE(_state.transmissions); i += 1) {
-        _transmission_t* transmission = &_state.transmissions[i];
+    _transmission_t *transmissions = _state_get_transmissions();
+    for (size_t i = 0; i < _state_get_transmissions_len(); i += 1) {
+        _transmission_t* transmission = &transmissions[i];
         printf("\t\t- transmission #%" PRIuSIZE "\n", i);
 
         if (!transmission->is_used) {
@@ -1032,16 +1075,14 @@ void unicoap_messaging_print_rfc7252_state(void)
         printf("\t\t\t- pdu_size=%" PRIuSIZE "\n", transmission->pdu_size);
         printf("\t\t\t- exchange=%p\n", transmission->exchange);
     }
-#  endif /* CONFIG_UNICOAP_RFC7252_TRANSMISSIONS_CAPACITY > 0 */
 
     printf("\n\t- RFC 7252 carbon copies (%" PRIuSIZE " total):\n",
            (size_t)CONFIG_UNICOAP_CARBON_COPIES_MAX);
 
-#  if CONFIG_UNICOAP_CARBON_COPIES_MAX > 0
-    for (size_t i = 0; i < ARRAY_SIZE(_state.carbon_copies); i += 1) {
+    _carbon_copy_t *carbon_copies = _state_get_carbon_copies();
+    for (size_t i = 0; i < _state_get_carbon_copies_len(); i += 1) {
         printf("\t\t- carbon_copy #%" PRIuSIZE " capacity=%" PRIuSIZE "B used=%u\n", i,
-               (size_t)CONFIG_UNICOAP_PDU_SIZE_MAX, *_state.carbon_copies[i] != 0);
+               sizeof(carbon_copies[i]), *carbon_copies[i] != 0);
     }
-#  endif /* CONFIG_UNICOAP_CARBON_COPIES_MAX > 0 */
 #endif   /* ENABLE_DEBUG */
 }
