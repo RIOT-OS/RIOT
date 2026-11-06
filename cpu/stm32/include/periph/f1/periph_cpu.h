@@ -27,15 +27,15 @@ extern "C" {
  * @brief   Starting address of the ROM bootloader
  *          see application note AN2606
  */
-#if defined(CPU_LINE_STM32F103xB) || defined(CPU_LINE_STM32F103xE)
-#define STM32_BOOTLOADER_ADDR   (0x1FFFF000)
-#endif
+#  if defined(CPU_LINE_STM32F103xB) || defined(CPU_LINE_STM32F103xE)
+#    define STM32_BOOTLOADER_ADDR (0x1FFFF000)
+#  endif
 
 /**
  * @brief   Readout Protection (RDP) option bytes
  */
-#define STM32_OPTION_BYTES   ((uint32_t*) 0x1FFFF800)
-#define GET_RDP(x) (x & 0xFF)
+#  define STM32_OPTION_BYTES ((uint32_t*) 0x1FFFF800)
+#  define GET_RDP(x) (x & 0xFF)
 
 #endif /* ndef DOXYGEN */
 
@@ -54,6 +54,8 @@ extern "C" {
 #define RTT_MIN_FREQUENCY   (1U)                      /* in Hz */
 /* RTC frequency of 32kHz is not recommended, see RM0008 Rev 20, p490 */
 #define RTT_MAX_FREQUENCY   (RTT_CLOCK_FREQUENCY / 2) /* in Hz */
+/* determined with tests/periph/rtt_min */
+#define RTT_MIN_OFFSET (2U)
 /** @} */
 
 /**
@@ -138,7 +140,7 @@ typedef enum {
  * or debugging via JTAG anyway, so there is nothing lost except for a few bytes
  * of ROM to initialize the `SWJ_CFG` register.
  */
-#define CONFIG_AFIO_MAPR_SWJ_CFG    SWJ_CFG_NO_JTAG_DP
+#  define CONFIG_AFIO_MAPR_SWJ_CFG  SWJ_CFG_NO_JTAG_DP
 #endif
 
 /**

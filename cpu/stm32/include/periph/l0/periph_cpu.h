@@ -22,19 +22,26 @@
 extern "C" {
 #endif
 
-#ifndef DOXYGEN
+/**
+ * @name    Real time counter configuration
+ * @{
+ */
+/* determined with tests/periph/rtt_min */
+#define RTT_MIN_OFFSET (4U)
+/** @} */
 
+#ifndef DOXYGEN
 /**
  * @brief   Starting address of the ROM bootloader
  *          see application note AN2606
  */
-#define STM32_BOOTLOADER_ADDR   (0x1FF00000)
+#  define STM32_BOOTLOADER_ADDR (0x1FF00000)
 
 /**
  * @brief   Override ADC resolution values
  * @{
  */
-#define HAVE_ADC_RES_T
+#  define HAVE_ADC_RES_T
 typedef enum {
     ADC_RES_6BIT  = (ADC_CFGR1_RES),    /**< ADC resolution: 6 bit */
     ADC_RES_8BIT  = (ADC_CFGR1_RES_1),  /**< ADC resolution: 8 bit */
@@ -52,20 +59,20 @@ typedef enum {
  * @{
  */
 #define EEPROM_START_ADDR          (0x08080000)
-#if defined(CPU_LINE_STM32L073xx) || defined(CPU_LINE_STM32L072xx)
-#define EEPROM_SIZE                (6144U)  /* 6kB */
-#elif defined(CPU_LINE_STM32L053xx) || defined(CPU_LINE_STM32L052xx)
-#define EEPROM_SIZE                (2048U)  /* 2kB */
+#if defined(CPU_LINE_STM32L072xx) || defined(CPU_LINE_STM32L073xx)
+#  define EEPROM_SIZE              (6144U)  /* 6kB */
+#elif defined(CPU_LINE_STM32L052xx) || defined(CPU_LINE_STM32L053xx)
+#  define EEPROM_SIZE              (2048U)  /* 2kB */
 #elif defined(CPU_LINE_STM32L031xx)
-#define EEPROM_SIZE                (1024U)  /* 1kB */
+#  define EEPROM_SIZE              (1024U)  /* 1kB */
 #elif defined(CPU_LINE_STM32L010xB) || defined(CPU_LINE_STM32L011x3) || \
       defined(CPU_LINE_STM32L011x4) || defined(CPU_LINE_STM32L021x4) || \
       defined(CPU_MODEL_STM32L011K4)
-#define EEPROM_SIZE                (512U)   /* 512B */
+#  define EEPROM_SIZE              (512U)   /* 512B */
 #elif defined(CPU_LINE_STM32L010x6) || defined(CPU_LINE_STM32L010x8)
-#define EEPROM_SIZE                (256U)   /* 256B */
+#  define EEPROM_SIZE              (256U)   /* 256B */
 #elif defined(CPU_LINE_STM32L010x4)
-#define EEPROM_SIZE                (128U)   /* 128B */
+#  define EEPROM_SIZE              (128U)   /* 128B */
 #endif
 /** @} */
 
