@@ -1,0 +1,14 @@
+$repl?=$ORIGIN/board.repl
+
+using sysbus
+mach create "same54-xpro"
+
+machine LoadPlatformDescription $repl
+
+macro reset
+"""
+    sysbus LoadELF $image_file
+    cpu0 VectorTableOffset 0x00000000
+"""
+
+runMacro $reset
