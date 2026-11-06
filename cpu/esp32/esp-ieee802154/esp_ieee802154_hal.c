@@ -6,7 +6,6 @@
 #include "esp_ieee802154.h"
 
 #include "esp_ieee802154_hal.h"
-#include "esp_timer.h"
 #include "iolist.h"
 #include "log.h"
 #include "net/ieee802154/radio.h"
