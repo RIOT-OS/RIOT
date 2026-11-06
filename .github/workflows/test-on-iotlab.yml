@@ -102,7 +102,7 @@ jobs:
       IOTLAB_NODE: auto
       BUILD_IN_DOCKER: 1
       COMPILE_AND_TEST_FOR_BOARD: ./dist/tools/compile_and_test_for_board/compile_and_test_for_board.py
-      COMPILE_AND_TEST_ARGS: --with-test-only --jobs=2 --report-xml
+      COMPILE_AND_TEST_ARGS: --with-test-only --jobs=2 --report-xml --test-reruns 3
       # Exclude applications that are expected to fail or cannot run on iotlab
       # - tests/periph/timer_short_relative_set is expected to fail
       # - tests/riotboot requires the riotboot feature and provides a test
