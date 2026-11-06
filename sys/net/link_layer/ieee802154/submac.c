@@ -566,8 +566,6 @@ static ieee802154_submac_fsm_return_t _fsm_state_prepare(ieee802154_submac_t *su
 {
     ieee802154_dev_t *dev = &submac->dev;
 
-    ieee802154_fsm_state_t tx_state = IEEE802154_FSM_STATE_INVALID;
-
     switch (ev) {
     case IEEE802154_FSM_EV_ENTRY: {
         ieee802154_fsm_state_cb_t tx_state = _fsm_state_tx;
@@ -1062,11 +1060,6 @@ int ieee802154_submac_init(ieee802154_submac_t *submac, const network_uint16_t *
 
     submac->fsm.fsm_state_cb = _fsm_state_rx;
     mutex_init(&submac->fsm.lock);
-
-    submac->rx_len = 0;
-    submac->rx_info.rssi = 0;
-    submac->rx_info.lqi = 0;
-    memset(submac->rx_buf, 0, sizeof(submac->rx_buf));
 
     int res;
 
