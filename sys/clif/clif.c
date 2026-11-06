@@ -178,10 +178,8 @@ ssize_t clif_add_attr(clif_attr_t *attr, char *buf, size_t maxlen)
     /* count attr name size and separator ';' */
     size_t req_space = attr->key_len + 1;
     size_t pos = 0;
-    int quoted = 0;
-    if (attr->key_len >= LF_ATTR_SIZE_S) {
-        quoted = strcmp(attr->key, LF_ATTR_SIZE) ? 1 : 0;
-    }
+    const int quoted = (LF_ATTR_SIZE_S == attr->key_len &&
+                        memcmp(attr->key, LF_ATTR_SIZE, LF_ATTR_SIZE_S) == 0) ? 0 : 1;
 
     if (attr->value) {
         /* count also '=' */
