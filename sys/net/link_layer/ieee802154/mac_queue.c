@@ -166,19 +166,19 @@ bool ieee802154_indirectq_has_addr(ieee802154_mac_indirect_q_t *indirect_q,
     return false;
 }
 
-uint16_t ieee802154_indirect_get_deadline(ieee802154_mac_t *mac)
+uint32_t ieee802154_indirect_get_deadline(ieee802154_mac_t *mac)
 {
     uint32_t unit_period_us = (uint32_t)IEEE802154_MAC_FRAME_TIMEOUT * (uint32_t)mac->sym_us;
     /* round up to handle too early timeouts */
     uint32_t unit_period_ms = (unit_period_us + 999U) / 1000U;
-    uint16_t unit_period_ticks = (uint16_t)(
-        (unit_period_ms + IEEE802154_MAC_TICK_INTERVAL_MS - 1U) / IEEE802154_MAC_TICK_INTERVAL_MS);
+    uint32_t unit_period_ticks =
+        (unit_period_ms + IEEE802154_MAC_TICK_INTERVAL_MS - 1U) / IEEE802154_MAC_TICK_INTERVAL_MS;
     return (mac->indirect_q.tick + unit_period_ticks);
 }
 
-bool ieee802154_mac_frame_is_expired(uint16_t now_tick, uint16_t deadline_tick)
+bool ieee802154_mac_frame_is_expired(uint32_t now_tick, uint32_t deadline_tick)
 {
-    return ((int16_t)(now_tick - deadline_tick)) >= 0;
+    return ((int32_t)(now_tick - deadline_tick)) >= 0;
 }
 
 static int _assoc_find_ext_locked(const ieee802154_mac_t *mac,
@@ -424,7 +424,7 @@ static int _enqueue_data_tx(ieee802154_mac_t *mac,
         .v.u8 = dsn.v.u8 + 1,
     };
     ieee802154_mac_mlme_set(mac, IEEE802154_PIB_DSN, &dsn_new);
-    uint16_t deadline = ieee802154_indirect_get_deadline(mac);
+    uint32_t deadline = ieee802154_indirect_get_deadline(mac);
     dsc->deadline_tick = deadline;
     if (was_empty) {
         txq->deadline_tick = &dsc->deadline_tick;

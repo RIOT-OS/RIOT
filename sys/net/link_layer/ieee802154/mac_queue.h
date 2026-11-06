@@ -71,11 +71,11 @@ bool ieee802154_indirectq_has_addr(ieee802154_mac_indirect_q_t *indirect_q,
 /**
  * @brief Get the deadline tick for indirect transmission.
  */
-uint16_t ieee802154_indirect_get_deadline(ieee802154_mac_t *mac);
+uint32_t ieee802154_indirect_get_deadline(ieee802154_mac_t *mac);
 /**
  * @brief Check whether a frame is expired.
  */
-bool ieee802154_mac_frame_is_expired(uint16_t now_tick, uint16_t deadline_tick);
+bool ieee802154_mac_frame_is_expired(uint32_t now_tick, uint32_t deadline_tick);
 
 /**
  * @brief Record an associated device's extended-to-short address alias.

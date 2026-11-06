@@ -494,7 +494,7 @@ typedef struct {
     bool indirect;
     bool ack;
     ieee802154_tx_state_t tx_state;                 /**< current TX state */
-    uint16_t deadline_tick;
+    uint32_t deadline_tick;
     uint8_t mhr[IEEE802154_MAX_HDR_LEN];            /**< persistent header storage */
     iolist_t iol_mhr;                               /**< persistent mhr */
     iolist_t *iol_msdu;                             /**< iolist nodes */
@@ -513,7 +513,7 @@ typedef struct {
     uint8_t head;                                       /**< queue head */
     uint8_t tail;                                       /**< queue tail */
     uint8_t cnt;                                        /**< queue count */
-    uint16_t *deadline_tick;
+    uint32_t *deadline_tick;
 } ieee802154_mac_txq_t;
 
 /**
@@ -524,7 +524,7 @@ typedef struct {
     ieee802154_mac_txq_t *current_txq;
     unsigned current_slot;
     bool busy;
-    uint16_t tick;
+    uint32_t tick;
     uint32_t free_mask;
     mutex_t lock;
 } ieee802154_mac_indirect_q_t;
@@ -564,9 +564,9 @@ typedef struct {
     ztimer_t scan_timer;
     bool scan_timer_pending;
     bool assoc_pending;
-    uint16_t assoc_deadline_tick;
+    uint32_t assoc_deadline_tick;
     bool poll_rx_active;
-    uint16_t poll_rx_deadline;
+    uint32_t poll_rx_deadline;
     uint8_t rx_retry_count;
     bool rx_retry_pending;
 } ieee802154_mac_t;
