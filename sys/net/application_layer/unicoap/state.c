@@ -74,7 +74,7 @@ static event_queue_t _queue;
 static unicoap_client_memo_t* _alloc_client(void) {
     /* Find empty slot in list of transactions */
     unicoap_client_memo_t *client_memos = unicoap_state_get_client_memos(_state());
-    for (size_t i = 0; i < unicoap_state_get_client_memos_len(_state()); i += 1) {
+    for (size_t i = 0; i < unicoap_state_get_client_memos_capacity(_state()); i += 1) {
         if (client_memos[i].super.endpoint.proto == UNICOAP_PROTO_UNSPECIFIED) {
             return &client_memos[i];
         }
@@ -91,7 +91,7 @@ static inline bool _is_client(const unicoap_memo_t* memo)
         return false;
     }
     return (uintptr_t)memo >= (uintptr_t)&client_memos[0] &&
-           (uintptr_t)memo <= (uintptr_t)&client_memos[unicoap_state_get_client_memos_len(_state()) - 1];
+           (uintptr_t)memo <= (uintptr_t)&client_memos[unicoap_state_get_client_memos_capacity(_state()) - 1];
 }
 
 static inline size_t _client_index(unicoap_client_memo_t* memo)
@@ -144,12 +144,8 @@ void unicoap_client_memo_free(unicoap_client_memo_t* memo, int error)
     }
     assert(memo);
     unicoap_proto_t proto = memo->super.endpoint.proto;
-    (void)proto;
     memo->super.endpoint.proto = UNICOAP_PROTO_UNSPECIFIED;
-    // todo: this is a race condition in case client is alloced somewhere else, then deinit'ed here!
     _deinit_client(memo);
-    (void)error;
-#if UNICOAP_HAVE_MESSAGING_STATE
     /* On the exchange layer, we're hiding the actual reason from the driver. It should
      * not matter to the messaging layer whether we release state because of an error or because
      * the state object is released as usual. Should the messaging layer rely on this
@@ -160,7 +156,6 @@ void unicoap_client_memo_free(unicoap_client_memo_t* memo, int error)
             error ? unicoap_layer_notification_async_failure_from_errno(error) : UNICOAP_LAYER_NOTIFICATION_STATE_RELEASE,
             NULL, proto);
     }
-#endif
     _free(&memo->super);
 }
 
@@ -170,7 +165,7 @@ unicoap_client_memo_t* unicoap_client_memo_find_token(const unicoap_endpoint_t* 
     assert(token);
 
     unicoap_client_memo_t *client_memos = unicoap_state_get_client_memos(_state());
-    for (size_t i = 0; i < unicoap_state_get_client_memos_len(_state()); i += 1) {
+    for (size_t i = 0; i < unicoap_state_get_client_memos_capacity(_state()); i += 1) {
         unicoap_client_memo_t* memo = &client_memos[i];
 
         if ((!endpoint || unicoap_endpoint_is_equal(&memo->super.endpoint, endpoint)) &&
@@ -196,7 +191,7 @@ unicoap_client_memo_t* unicoap_client_memo_find_refno(int refno)
     uint16_t reference_id = refno & UNICOAP_REFNO_MASK_ID;
     _STATE_DEBUG("find refno=%i (min_client_ix=#%" PRIuSIZE ", refid=%u)\n", refno, index_min, reference_id);
     unicoap_client_memo_t *client_memos = unicoap_state_get_client_memos(_state());
-    for (size_t i = index_min; i < unicoap_state_get_client_memos_len(_state()); i += 1) {
+    for (size_t i = index_min; i < unicoap_state_get_client_memos_capacity(_state()); i += 1) {
         unicoap_client_memo_t* memo = &client_memos[i];
         if (memo->reference_id == reference_id) {
             return memo;
@@ -276,7 +271,7 @@ void unicoap_exchange_notify_all(const unicoap_endpoint_t* endpoint, unicoap_lay
 {
     unicoap_memo_t* memo = NULL;
     unicoap_client_memo_t *client_memos = unicoap_state_get_client_memos(_state());
-    for (size_t i = 0; i < unicoap_state_get_client_memos_len(_state()); i += 1) {
+    for (size_t i = 0; i < unicoap_state_get_client_memos_capacity(_state()); i += 1) {
         memo = &client_memos[i].super;
         if (unicoap_endpoint_is_equal(endpoint, &memo->endpoint)) {
             unicoap_exchange_notify(memo, type, arg);

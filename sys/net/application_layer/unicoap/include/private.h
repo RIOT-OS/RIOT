@@ -181,7 +181,7 @@ static inline unicoap_client_memo_t *unicoap_state_get_client_memos(unicoap_stat
 }
 
 /** @brief Gets length of client memo array from @p state object */
-static inline size_t unicoap_state_get_client_memos_len(unicoap_state_t* state) {
+static inline size_t unicoap_state_get_client_memos_capacity(unicoap_state_t* state) {
 #if UNICOAP_HAVE_CLIENT_STATE
     return ARRAY_SIZE(state->client_memos);
 #else
