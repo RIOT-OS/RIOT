@@ -26,6 +26,7 @@ BOARDS_SUPPORTED += adafruit-clue \
                    nucleo-wl55jc \
                    omote \
                    openlabs-kw41z-mini \
+                   openmote-b \
                    openmote-cc2538 \
                    pba-d-01-kw2x \
                    phynode-kw41z \
