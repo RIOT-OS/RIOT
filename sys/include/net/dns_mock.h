@@ -35,7 +35,7 @@ extern "C" {
 
 #ifndef SOCK_DNS_MOCK_ADDR_IPV4
 /**
- * @brief IPv4 address)for @ref SOCK_DNS_MOCK_HOSTNAME
+ * @brief IPv4 address for @ref SOCK_DNS_MOCK_HOSTNAME
  */
 #  define SOCK_DNS_MOCK_ADDR_IPV4 IPV4_ADDR_INIT(93, 184, 216, 34)
 #endif
