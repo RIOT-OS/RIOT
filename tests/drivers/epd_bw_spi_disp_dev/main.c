@@ -29,7 +29,7 @@
 #include "pictures.h"
 
 const uint8_t riot_32_width = 32;
-const uint16_t riot_32_height = sizeof(riot_logo_32) / sizeof(riot_logo_32[0]);
+const uint16_t riot_32_height = ARRAY_SIZE(riot_logo_32);
 const uint8_t riot_200_width = 200;
 const uint8_t riot_200_height = 200;
 

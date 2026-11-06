@@ -5,8 +5,8 @@ This test application allows to test the riotboot_flashwrite module over coap.
 WARNING: never use this code for anything else. It allows updating the device
 over network without *any* kind of authentication or other security!
 
-Please see the README of examples/nanocoap_server for instructions on how to
-set up a network for testing.
+Please see the README of examples/networking/coap/nanocoap_server for
+instructions on how to set up a network for testing.
 
 ## Requirements
 

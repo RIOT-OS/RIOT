@@ -1,9 +1,6 @@
 /*
- * Copyright (C) 2017 Freie Universität Berlin
- *
- * This file is subject to the terms and conditions of the GNU Lesser
- * General Public License v2.1. See the file LICENSE in the top level
- * directory for more details.
+ * SPDX-FileCopyrightText: 2017 Freie Universität Berlin
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
 
 /**
@@ -21,10 +18,7 @@
 #include <stdio.h>
 #include <string.h>
 
-#include "net/gnrc.h"
-#include "net/gnrc.h"
 #include "net/gnrc/netif/hdr.h"
-#include "net/ipv6/addr.h"
 #include "shell.h"
 #include "container.h"
 
@@ -33,7 +27,8 @@ static int _gnrc_netif_send(int argc, char **argv)
     netif_t *iface;
     uint8_t addr[GNRC_NETIF_L2ADDR_MAXLEN];
     size_t addr_len;
-    gnrc_pktsnip_t *pkt, *hdr;
+    gnrc_pktsnip_t *pkt;
+    gnrc_pktsnip_t *hdr;
     gnrc_netif_hdr_t *nethdr;
     uint8_t flags = 0x00;
 

@@ -96,14 +96,14 @@ static int _init(int argc, char** argv)
     }
 
     pwm_mode_t pwm_mode;
-    switch(atoi(argv[2])) {
-        case(0):
+    switch (atoi(argv[2])) {
+        case 0:
             pwm_mode = PWM_LEFT;
             break;
-        case(1):
+        case 1:
             pwm_mode = PWM_RIGHT;
             break;
-        case(2):
+        case 2:
             pwm_mode = PWM_CENTER;
             break;
         default:

@@ -1,10 +1,7 @@
 /*
- * Copyright (C) 2017 Kaspar Schleiser <kaspar@schleiser.de>
- *               2018 Freie Universität Berlin
- *
- * This file is subject to the terms and conditions of the GNU Lesser
- * General Public License v2.1. See the file LICENSE in the top level
- * directory for more details.
+ * SPDX-FileCopyrightText: 2017 Kaspar Schleiser <kaspar@schleiser.de>
+ * SPDX-FileCopyrightText: 2018 Freie Universität Berlin
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
 
 #pragma once
@@ -29,7 +26,8 @@
 
 #include "net/sock/config.h"
 
-#if MODULE_GNRC_SOCK_UDP || MODULE_LWIP_SOCK_UDP || MODULE_OPENWSN_SOCK_UDP || DOXYGEN
+#if MODULE_GNRC_SOCK_UDP || MODULE_LWIP_SOCK_UDP || MODULE_OPENWSN_SOCK_UDP || \
+    TESTING_MOCK_SOCK_UDP || DOXYGEN
 #  include "net/sock/udp.h"
 #  define SOCK_HAS_UDP  1   /**< UDP support is enabled */
 #endif
@@ -42,8 +40,8 @@
 #  include "net/sock/dtls.h"
 #endif
 
-#if MODULE_GNRC_SOCK_UDP || MODULE_LWIP_SOCK_UDP || MODULE_OPENWSN_SOCK_UDP \
-    || MODULE_GNRC_SOCK_TCP || MODULE_LWIP_SOCK_TCP || DOXYGEN
+#if MODULE_GNRC_SOCK_UDP || MODULE_LWIP_SOCK_UDP || MODULE_OPENWSN_SOCK_UDP || \
+    MODULE_GNRC_SOCK_TCP || MODULE_LWIP_SOCK_TCP || TESTING_MOCK_SOCK_UDP || DOXYGEN
 #  define HAVE_SOCK_TL_EP   1 /**< Indicates presence of `struct _sock_tl_ep` */
 #endif
 
@@ -83,7 +81,7 @@ int sock_urlsplit(const char *url, char *hostport, char *urlpath);
  */
 const char *sock_urlpath(const char *url);
 
-#if HAVE_SOCK_TL_EP
+#if HAVE_SOCK_TL_EP || DOXYGEN
 /**
  * @brief   Format common IP-based transport layer endpoint to string and port
  *
@@ -97,7 +95,7 @@ const char *sock_urlpath(const char *url);
 int sock_tl_ep_fmt(const struct _sock_tl_ep *endpoint,
                    char *addr_str, uint16_t *port);
 
-#if IS_ACTIVE(SOCK_HAS_TCP) || DOXYGEN
+#  if IS_ACTIVE(SOCK_HAS_TCP) || DOXYGEN
 /**
  * @brief   Format TCP endpoint to string and port
  *
@@ -113,9 +111,9 @@ static inline int sock_tcp_ep_fmt(const sock_tcp_ep_t *endpoint,
 {
     return sock_tl_ep_fmt(endpoint, addr_str, port);
 }
-#endif
+#  endif /* SOCK_HAS_TCP */
 
-#if IS_ACTIVE(SOCK_HAS_UDP) || DOXYGEN
+#  if IS_ACTIVE(SOCK_HAS_UDP) || DOXYGEN
 /**
  * @brief   Format UDP endpoint to string and port
  *
@@ -131,7 +129,7 @@ static inline int sock_udp_ep_fmt(const sock_udp_ep_t *endpoint,
 {
     return sock_tl_ep_fmt(endpoint, addr_str, port);
 }
-#endif
+#  endif /* SOCK_HAS_UDP */
 
 /**
  * @brief    Convert string to common IP-based transport layer endpoint
@@ -163,7 +161,7 @@ int sock_tl_str2ep(struct _sock_tl_ep *ep_out, const char *str);
  */
 int sock_tl_name2ep(struct _sock_tl_ep *ep_out, const char *str);
 
-#if IS_ACTIVE(SOCK_HAS_TCP) || DOXYGEN
+#  if IS_ACTIVE(SOCK_HAS_TCP) || DOXYGEN
 /**
  * @brief    Convert string to TCP endpoint
  *
@@ -199,9 +197,9 @@ static inline int sock_tcp_name2ep(sock_tcp_ep_t *ep_out, const char *str)
 {
     return sock_tl_name2ep(ep_out, str);
 }
-#endif
+#  endif /* SOCK_HAS_TCP */
 
-#if IS_ACTIVE(SOCK_HAS_UDP) || DOXYGEN
+#  if IS_ACTIVE(SOCK_HAS_UDP) || DOXYGEN
 /**
  * @brief    Convert string to UDP endpoint
  *
@@ -237,7 +235,7 @@ static inline int sock_udp_name2ep(sock_udp_ep_t *ep_out, const char *str)
 {
     return sock_tl_name2ep(ep_out, str);
 }
-#endif
+#  endif /* SOCK_HAS_UDP */
 
 /**
  * @brief   Compare the two given common IP-based transport layer endpoints
@@ -255,7 +253,7 @@ static inline int sock_udp_name2ep(sock_udp_ep_t *ep_out, const char *str)
 bool sock_tl_ep_equal(const struct _sock_tl_ep *a,
                       const struct _sock_tl_ep *b);
 
-#if IS_ACTIVE(SOCK_HAS_TCP) || DOXYGEN
+#  if IS_ACTIVE(SOCK_HAS_TCP) || DOXYGEN
 /**
  * @brief   Compare the two given TCP endpoints
  *
@@ -274,9 +272,9 @@ static inline bool sock_tcp_ep_equal(const sock_tcp_ep_t *a,
 {
     return sock_tl_ep_equal(a, b);
 }
-#endif
+#  endif /* SOCK_HAS_TCP */
 
-#if IS_ACTIVE(SOCK_HAS_UDP) || DOXYGEN
+#  if IS_ACTIVE(SOCK_HAS_UDP) || DOXYGEN
 /**
  * @brief   Compare the two given UDP endpoints
  *
@@ -295,8 +293,8 @@ static inline bool sock_udp_ep_equal(const sock_udp_ep_t *a,
 {
     return sock_tl_ep_equal(a, b);
 }
-#endif
-#endif
+#  endif /* SOCK_HAS_UDP */
+#endif /* HAVE_SOCK_TL_EP */
 
 #if defined(MODULE_SOCK_DTLS) || DOXYGEN
 /**
@@ -319,7 +317,7 @@ int sock_dtls_establish_session(sock_udp_t *sock_udp, sock_dtls_t *sock_dtls,
                                 sock_dtls_session_t *session, credman_tag_t tag,
                                 sock_udp_ep_t *local, const sock_udp_ep_t *remote,
                                 void *work_buf, size_t work_buf_len);
-#endif
+#endif /* MODULE_SOCK_DTLS */
 
 #ifdef __cplusplus
 }

@@ -11,7 +11,7 @@ description: Best practices and recommended tools for RIOT development
 ### Dos
  * Use static memory. See also [Static vs. Dynamic Memory](#static-vs-dynamic-memory).
  * Select the priorities carefully.
- * Minimize stack usage with `DEVELHELP` and `CREATE_STACKTEST`.
+ * Minimize stack usage with `DEVELHELP` or `SCHED_TEST_STACK`.
  * Use threads to increase flexibility, modularity and robustness by leveraging IPC.
  * Use unsigned or signed integer (`unsigned`, `int`, `size_t` or `ssize_t`) for loop variables wherever possible,
    but keep in mind that on some platforms an `int` has a width of only 16-bit. In general, you should avoid types
@@ -96,7 +96,8 @@ The below methodology is recommended, using well-known de facto standard tools f
 compatible with RIOT. Using the below workflow improves time-to-running-code compared to typical IoT software
 workflows (which can be as retro as "LED-driven" debugging).
 
-0. For newbies, preliminaries are typically faster with the provisioned virtual environment setup, e.g. with **Vagrant**.
+0. For first-timers, setting up a build system is typically faster with the provided
+   [Docker container](https://doc.riot-os.org/build-system/build-in-docker/).
 1. To check your code, first use available **static analysis** as much as possible initially, which means
    (i) enable all compiler warnings and fix all problems found, then (ii) use a supported linter such as **cppcheck**
    to find bad coding patterns (i.e. code smells) and identify misuse of standard APIs.
@@ -105,7 +106,7 @@ workflows (which can be as retro as "LED-driven" debugging).
    as well as the **GCC stack smashing detection**, to detect and avoid undefined behavior due to invalid memory access.
 3. In case of networked applications or protocols, test **several instances of native** communicating via a virtual
    network mimicking the targeted scenario, which means (i) either using the default virtual full-mesh or other
-   topologies configured via DESvirt, and (ii) using **Wireshark** to capture and analyze virtual network traffic,
+   topologies, and (ii) using **Wireshark** to capture and analyze virtual network traffic,
    e.g. to ensure protocol packets are syntactically correct, and to observe network communication patterns.
 4. In case of incorrect behavior at this stage, analyze the system state for semantic errors on native using the
    standard debugger **gdb**, which allows virtually unlimited conditional breakpoints, record and replay,

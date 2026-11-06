@@ -23,7 +23,7 @@
 #include <stdint.h>
 #include <stdbool.h>
 
-#include "vendor/RP2040.h"
+#include "cpu.h"
 #include "io_reg.h"
 #include "timex.h"
 #include "periph_conf.h"
@@ -122,11 +122,11 @@ int timer_init(tim_t dev, uint32_t freq, timer_cb_t cb, void *arg)
     assert(freq == US_PER_SEC); (void)freq;
     _timer_ctx_cb[dev] = cb;
     _timer_ctx_arg[dev] = arg;
-    periph_reset(RESETS_RESET_timer_Msk);
-    periph_reset_done(RESETS_RESET_timer_Msk);
+    periph_reset(RESETS_RESET_TIMER_BITS);
+    periph_reset_done(RESETS_RESET_TIMER_BITS);
     io_reg_write_dont_corrupt(&WATCHDOG->TICK,
-                              (CLOCK_XOSC / MHZ(1)) << WATCHDOG_TICK_CYCLES_Pos,
-                              WATCHDOG_TICK_CYCLES_Msk);
+                              (CLOCK_XOSC / MHZ(1)) << WATCHDOG_TICK_CYCLES_LSB,
+                              WATCHDOG_TICK_CYCLES_BITS);
     _irq_enable(dev);
     return 0;
 }
@@ -221,13 +221,13 @@ unsigned int timer_read(tim_t dev)
 void timer_start(tim_t dev)
 {
     assert(dev < TIMER_NUMOF);
-    io_reg_atomic_clear(&DEV(dev)->PAUSE, (1 << TIMER_PAUSE_PAUSE_Pos));
+    io_reg_atomic_clear(&DEV(dev)->PAUSE, (1 << TIMER_PAUSE_LSB));
 }
 
 void timer_stop(tim_t dev)
 {
     assert(dev < TIMER_NUMOF);
-    io_reg_atomic_set(&DEV(dev)->PAUSE, (1 << TIMER_PAUSE_PAUSE_Pos));
+    io_reg_atomic_set(&DEV(dev)->PAUSE, (1 << TIMER_PAUSE_LSB));
 }
 
 /* timer 0 IRQ0 */

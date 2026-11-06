@@ -22,10 +22,11 @@ extern "C" {
 #endif
 
 /**
- * @brief   Compatibility wrapper for nRF9160
+ * @brief   Compatibility wrapper for nRF53 and nRF9160
  */
-#ifdef NRF_FICR_S
-#define NRF_FICR NRF_FICR_S
+#if (defined(CPU_FAM_NRF53) || defined(CPU_FAM_NRF9160)) && \
+    !defined(NRF_TRUSTZONE_NONSECURE)
+#  define NRF_FICR NRF_FICR_S
 #endif
 
 /**
@@ -367,6 +368,7 @@ typedef struct {
     gpio_t led_pin;        /**< LED GPIO, GPIO_UNDEF to disable */
     uint8_t sample_period; /**< Sample period used, e.g. QDEC_SAMPLEPER_SAMPLEPER_128us */
     bool debounce_filter;  /**< Enable/disable debounce filter */
+    bool led_active_state; /**< Active state of the LED. True is active high, false is active low */
 } qdec_conf_t;
 
 /**

@@ -21,7 +21,7 @@ Don't call `board_init()`, leave all pins in their default state.
 This is intended to be used with basic riotboot_slot which does not interact
 with any external hardware.
 
-@experimental    Only use this if you know what you are doing
+@experimental   Only use this if you know what you are doing
 
     #define DISABLE_BOARD_INIT  0
 

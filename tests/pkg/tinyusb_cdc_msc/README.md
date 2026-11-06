@@ -35,7 +35,7 @@ It should then be possible
    of the operating system
 2. to connect to the serial interface of the device with a terminal program, e.g.
    ```
-   python -m serial.tools.miniterm /dev/ttyACM0 115200
+   BOARD=... make term
    ```
    and get the entered characters sent back.
 

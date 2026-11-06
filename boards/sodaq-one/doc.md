@@ -11,14 +11,14 @@ General information about this board can be found on the
 
 Use `BOARD=sodaq-one` with the `make` command.<br/>
 Example with `hello-world` application:
-```
-    make BOARD=sodaq-one -C examples/basic/hello-world flash
+
+```shell
+make BOARD=sodaq-one -C examples/basic/hello-world flash
 ```
 
-@note   If the application crashes, automatic reflashing via USB, as explained
-        above won't be possible. In this case, the board must be set in
-        bootloader mode by double tapping the reset button before running the
-        flash command.
+@note   If the application crashes, automatic reflashing via USB won't be
+        possible. In this case, the board must be set in bootloader mode by
+        double tapping the reset button before running the flash command.
 
 ### Accessing STDIO via UART
 

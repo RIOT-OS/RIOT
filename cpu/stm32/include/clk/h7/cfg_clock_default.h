@@ -11,7 +11,7 @@
  * @{
  *
  * @file
- * @brief           Main header for STM32H7 clock configuration (STM32H753ZI)
+ * @brief           Main header for STM32H7 clock configuration
  *
  * @note
  * This configuration supports:
@@ -58,7 +58,7 @@ extern "C" {
 #    define CONFIG_USE_HSI_PLL       0
 #  else
 #    define CONFIG_USE_HSI_PLL       1
-#endif
+#  endif
 #endif
 
 /**
@@ -188,9 +188,12 @@ extern "C" {
 #   endif
 
 #  else
-#    error "Unsupported clock input for PLL configuration."
+     /* only error out when the board didn't configure the PLL itself */
+#    ifndef CONFIG_CLOCK_PLL1_M
+#      error "Unsupported clock input for PLL configuration."
+#    endif
 #  endif
-#endif /* CONFIG_USE_HSI_DIRECT */
+#endif /* CONFIG_USE_HSI_PLL CONFIG_USE_HSE_PLL CONFIG_USE_CSI_PLL */
 
 #include "clk/h7/lse.h"
 #include "clk/h7/lsi.h"

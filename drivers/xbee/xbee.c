@@ -297,12 +297,6 @@ static int _set_addr(xbee_t *dev, const uint8_t *val, size_t len)
     addr[0] = val[0];
     addr[1] = val[1];
 
-#ifdef MODULE_SIXLOWPAN
-    /* https://tools.ietf.org/html/rfc4944#section-12 requires the first bit
-     * to 0 for unicast addresses */
-    addr[1] &= 0x7F;
-#endif
-
     if (dev->addr_flags & XBEE_ADDR_FLAGS_LONG ||
         _set_short_addr(dev, addr) == 0) {
 

@@ -19,7 +19,7 @@
 #include <assert.h>
 
 #include "macros/units.h"
-#include "vendor/RP2040.h"
+#include "cpu.h"
 #include "io_reg.h"
 
 static inline uint32_t _xosc_conf_sartup_delay(uint32_t f_crystal_mhz, uint32_t t_stable_ms)
@@ -31,15 +31,15 @@ void xosc_start(uint32_t f_ref)
 {
     assert(f_ref == MHZ(12));
     uint32_t delay = _xosc_conf_sartup_delay(f_ref, 1);
-    io_reg_write_dont_corrupt(&XOSC->STARTUP, delay << XOSC_STARTUP_DELAY_Pos,
-                              XOSC_STARTUP_DELAY_Msk);
-    io_reg_write_dont_corrupt(&XOSC->CTRL, XOSC_CTRL_ENABLE_ENABLE << XOSC_CTRL_ENABLE_Pos,
-                              XOSC_CTRL_ENABLE_Msk);
-    while (!(XOSC->STATUS & XOSC_STATUS_STABLE_Msk)) { }
+    io_reg_write_dont_corrupt(&XOSC->STARTUP, delay << XOSC_STARTUP_DELAY_LSB,
+                              XOSC_STARTUP_DELAY_BITS);
+    io_reg_write_dont_corrupt(&XOSC->CTRL, XOSC_CTRL_ENABLE_VALUE_ENABLE << XOSC_CTRL_ENABLE_LSB,
+                              XOSC_CTRL_ENABLE_BITS);
+    while (!(XOSC->STATUS & XOSC_STATUS_STABLE_BITS)) { }
 }
 
 void xosc_stop(void)
 {
-    io_reg_write_dont_corrupt(&XOSC->CTRL, XOSC_CTRL_ENABLE_DISABLE << XOSC_CTRL_ENABLE_Pos,
-                              XOSC_CTRL_ENABLE_Msk);
+    io_reg_write_dont_corrupt(&XOSC->CTRL, XOSC_CTRL_ENABLE_VALUE_DISABLE << XOSC_CTRL_ENABLE_LSB,
+                              XOSC_CTRL_ENABLE_BITS);
 }

@@ -1,9 +1,6 @@
 /*
- * Copyright (C) 2023 ML!PA Consulting GmbH
- *
- * This file is subject to the terms and conditions of the GNU Lesser
- * General Public License v2.1. See the file LICENSE in the top level
- * directory for more details.
+ * SPDX-FileCopyrightText: 2023 ML!PA Consulting GmbH
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
 
 /**
@@ -49,7 +46,7 @@ static void _sock_cb(sock_udp_t *sock, sock_async_flags_t flags, void *arg)
 
     int res;
     while ((res = sock_udp_recv_buf(sock, &data, &ctx, 0, &remote)) > 0) {
-        isrpipe_write(&stdin_isrpipe, data, res);
+        stdio_rx_write(data, res);
 
         /* detach remote */
         if (res == 1 && *(int8_t *)data == EOT) {

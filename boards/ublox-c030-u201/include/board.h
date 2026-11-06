@@ -6,9 +6,7 @@
 #pragma once
 
 /**
- * @defgroup    boards_ublox-c030-u201 Ublox C030-U201
- * @ingroup     boards
- * @brief       Support for the Ublox C030-U201 board
+ * @ingroup     boards_ublox-c030-u201
  * @{
  *
  * @file
@@ -55,9 +53,9 @@ extern "C" {
  * TODO:    Check this when support is added in si70xx driver
  * @{
  */
-#define SI70XX_PARAM_I2C_DEV    I2C_DEV(1)
-#define SI70XX_PARAM_ADDR       (0x70)
-#define SI70XX_SAUL_INFO        { .name = "si7034" }
+#define SI70XX_PARAM_I2C_DEV    I2C_DEV(1)              /**< I2C device used for the temp sensor */
+#define SI70XX_PARAM_ADDR       (0x70)                  /**< I2C address */
+#define SI70XX_SAUL_INFO        { .name = "si7034" }    /**< Saul Alias for the temp sensor */
 /** @} */
 
 /**
@@ -75,11 +73,11 @@ extern "C" {
  * @name    Modem/GPS pins
  * @{
  */
-#define UB_PWRON_PIN            GPIO_PIN(PORT_E, 14)
-#define UB_M_RST_PIN            GPIO_PIN(PORT_B, 5)
-#define M_GPIO2_PIN             GPIO_PIN(PORT_D, 1)
-#define M_GPIO3_PIN             GPIO_PIN(PORT_B, 4)
-#define GPS_RST_PIN             GPIO_PIN(PORT_C, 10) /* Not connected */
+#define UB_PWRON_PIN            GPIO_PIN(PORT_E, 14)    /**< Power On for the Modem/GPS */
+#define UB_M_RST_PIN            GPIO_PIN(PORT_B, 5)     /**< Reset Pin for the Modem/GPS */
+#define M_GPIO2_PIN             GPIO_PIN(PORT_D, 1)     /**< GPIO2 Pin of the Modem/GPS */
+#define M_GPIO3_PIN             GPIO_PIN(PORT_B, 4)     /**< GPIO3 Pin of the Modem/GPS */
+#define GPS_RST_PIN             GPIO_PIN(PORT_C, 10)    /**< Not connected */
 /** @} */
 
 #ifdef __cplusplus

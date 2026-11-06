@@ -68,7 +68,7 @@
 static esp_now_netdev_t _esp_now_dev = { 0 };
 static const netdev_driver_t _esp_now_driver;
 
-static bool _esp_now_add_peer(const uint8_t* bssid, uint8_t channel, const uint8_t* key)
+static bool _esp_now_add_peer(const uint8_t* bssid, const uint8_t* key)
 {
     if (esp_now_is_peer_exist(bssid)) {
         return false;
@@ -77,7 +77,12 @@ static bool _esp_now_add_peer(const uint8_t* bssid, uint8_t channel, const uint8
     esp_now_peer_info_t peer = {};
 
     memcpy(peer.peer_addr, bssid, ESP_NOW_ETH_ALEN);
-    peer.channel = channel;
+    /* Channel 0 means the peer uses the current channel. The channel may
+     * change at runtime, either by the user or by the `esp_wifi` interface
+     * when it connects to an AP. Peers with a fixed channel would then
+     * become unreachable since `esp_now_send` fails with
+     * ESP_ERR_ESPNOW_CHAN. */
+    peer.channel = 0;
     peer.ifidx = WIFI_IF_AP;
 
     if (esp_now_params.key) {
@@ -88,7 +93,7 @@ static bool _esp_now_add_peer(const uint8_t* bssid, uint8_t channel, const uint8
     esp_err_t ret = esp_now_add_peer(&peer);
     DEBUG("esp_now_add_peer node %02x:%02x:%02x:%02x:%02x:%02x "
           "added with return value %d\n",
-          bssid[0], bssid[1], bssid[2], bssid[3], bssid[4], bssid[5], ret);
+          bssid[0], bssid[1], bssid[2], bssid[3], bssid[4], bssid[5], (int)ret);
     return (ret == ESP_OK);
 }
 
@@ -120,7 +125,7 @@ static void IRAM_ATTR esp_now_scan_peers_done(void)
     uint16_t ap_num;
 
     ret = esp_wifi_scan_get_ap_num(&ap_num);
-    DEBUG("wifi_scan_get_ap_num ret=%d num=%d\n", ret, ap_num);
+    DEBUG("wifi_scan_get_ap_num ret=%d num=%d\n", (int)ret, ap_num);
 
     if (ret == ESP_OK && ap_num) {
         uint32_t state;
@@ -142,7 +147,7 @@ static void IRAM_ATTR esp_now_scan_peers_done(void)
 
         ret = esp_wifi_scan_get_ap_records(&ap_num, aps);
 
-        DEBUG("wifi_scan_get_aps ret=%d num=%d\n", ret, ap_num);
+        DEBUG("wifi_scan_get_aps ret=%d num=%d\n", (int)ret, ap_num);
 
         critical_enter_var(state);
         /* iterate over APs records */
@@ -151,7 +156,7 @@ static void IRAM_ATTR esp_now_scan_peers_done(void)
             /* check whether the AP is an ESP_NOW node */
             if (strncmp((char*)aps[i].ssid, ESP_NOW_AP_PREFIX, ESP_NOW_AP_PREFIX_LEN) == 0) {
                 /* add the AP as peer */
-                _esp_now_add_peer(aps[i].bssid, aps[i].primary, esp_now_params.key);
+                _esp_now_add_peer(aps[i].bssid, esp_now_params.key);
             }
         }
         critical_exit_var(state);
@@ -333,7 +338,7 @@ esp_now_netdev_t *netdev_esp_now_setup(void)
     result = nvs_flash_init();
     if (result != ESP_OK) {
         LOG_TAG_ERROR("esp_now",
-                      "nfs_flash_init failed with return value %d\n", result);
+                      "nfs_flash_init failed with return value %d\n", (int)result);
         return NULL;
     }
 #endif /* CONFIG_ESP_WIFI_NVS_ENABLED */
@@ -343,7 +348,7 @@ esp_now_netdev_t *netdev_esp_now_setup(void)
     result = esp_wifi_init(&cfg);
     if (result != ESP_OK) {
         LOG_TAG_ERROR("esp_now",
-                      "esp_wifi_init failed with return value %d\n", result);
+                      "esp_wifi_init failed with return value %d\n", (int)result);
         return NULL;
     }
 
@@ -352,7 +357,7 @@ esp_now_netdev_t *netdev_esp_now_setup(void)
     if (result != ESP_OK) {
         LOG_TAG_ERROR("esp_now",
                       "esp_wifi_set_storage failed with return value %d\n",
-                      result);
+                      (int)result);
         return NULL;
     }
 
@@ -393,7 +398,7 @@ esp_now_netdev_t *netdev_esp_now_setup(void)
     if (result != ESP_OK) {
         LOG_TAG_ERROR("esp_now",
                       "esp_wifi_set_mode failed with return value %d\n",
-                      result);
+                      (int)result);
         return NULL;
     }
 
@@ -401,14 +406,14 @@ esp_now_netdev_t *netdev_esp_now_setup(void)
     result = esp_wifi_set_config(WIFI_IF_STA, &wifi_config_sta);
     if (result != ESP_OK) {
         LOG_TAG_ERROR("esp_now", "esp_wifi_set_config station failed with "
-                      "return value %d\n", result);
+                      "return value %d\n", (int)result);
         return NULL;
     }
     result = esp_wifi_set_config(WIFI_IF_AP, &wifi_config_ap);
     if (result != ESP_OK) {
         LOG_TAG_ERROR("esp_now",
                       "esp_wifi_set_config softap failed with return value %d\n",
-                      result);
+                      (int)result);
         return NULL;
     }
 
@@ -417,7 +422,7 @@ esp_now_netdev_t *netdev_esp_now_setup(void)
     result = esp_wifi_start();
     if (result != ESP_OK) {
         LOG_TAG_ERROR("esp_now",
-                      "esp_wifi_start failed with return value %d\n", result);
+                      "esp_wifi_start failed with return value %d\n", (int)result);
         return NULL;
     }
 
@@ -440,7 +445,7 @@ esp_now_netdev_t *netdev_esp_now_setup(void)
     result = esp_now_init();
     if (result != ESP_OK) {
         LOG_TAG_ERROR("esp_now", "esp_now_init failed with return value %d\n",
-                      result);
+                      (int)result);
         return NULL;
     }
     esp_now_register_send_cb(esp_now_send_cb);
@@ -456,8 +461,7 @@ esp_now_netdev_t *netdev_esp_now_setup(void)
     esp_now_scan_peers_start();
 
 #else /* ESP_NOW_UNICAST */
-    bool res = _esp_now_add_peer((uint8_t*)_esp_now_mac, esp_now_params.channel,
-                                                         esp_now_params.key);
+    bool res = _esp_now_add_peer(_esp_now_mac, esp_now_params.key);
     DEBUG("%s: multicast node add %s\n", __func__, res ? "success" : "error");
 #endif /* ESP_NOW_UNICAST */
 
@@ -482,7 +486,7 @@ int esp_now_set_channel(uint8_t channel)
     if (result != ESP_OK) {
         LOG_TAG_ERROR("esp_now",
                       "esp_wifi_set_config softap failed with return value %d\n",
-                      result);
+                      (int)result);
         wifi_config_ap.ap.channel = old_channel;
         return result;
     }
@@ -539,6 +543,7 @@ static int _send(netdev_t *netdev, const iolist_t *iolist)
         if (((int)data_len + iolist->iol_len) > ESP_NOW_MAX_SIZE_RAW) {
             DEBUG("%s: payload length exceeds maximum(%u>%u)\n", __func__,
                   data_len + iolist->iol_len, ESP_NOW_MAX_SIZE_RAW);
+            mutex_unlock(&dev->dev_lock);
             return -EBADMSG;
         }
         if (iolist->iol_len) {
@@ -626,7 +631,7 @@ static int _recv(netdev_t *netdev, void *buf, size_t len, void *info)
 
 #if ESP_NOW_UNICAST
     if (esp_now_is_peer_exist(mac) <= 0) {
-        _esp_now_add_peer(mac, esp_now_params.channel, esp_now_params.key);
+        _esp_now_add_peer(mac, esp_now_params.key);
     }
 #endif
     return size;
@@ -749,7 +754,9 @@ static void _isr(netdev_t *netdev)
         esp_now_scan_peers_start();
 #endif
     }
-    return;
+    else {
+        critical_exit();
+    }
 }
 
 static const netdev_driver_t _esp_now_driver =

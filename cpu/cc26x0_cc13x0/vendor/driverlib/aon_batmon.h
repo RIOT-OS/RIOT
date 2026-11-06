@@ -115,8 +115,6 @@ extern "C"
 //! voltage detects a change on the reference value, a new measurement of the
 //! battery voltage only is performed immediately after. This has no impact on
 //! the cycle count.
-//!
-//! \return None
 //
 //*****************************************************************************
 __STATIC_INLINE void
@@ -134,8 +132,6 @@ AONBatMonEnable(void)
 //!
 //! This function will disable the measurements of the temperature and the
 //! battery voltage.
-//!
-//! \return None
 //
 //*****************************************************************************
 __STATIC_INLINE void

@@ -1,0 +1,29 @@
+From 0e955b27f0714e6d5c47fb4e379eacd034086a9b Mon Sep 17 00:00:00 2001
+From: Adarsh Nair Mullachery <adarsh.mullachery@tuhh.de>
+Date: Tue, 28 Jul 2026 19:48:41 +0200
+Subject: [PATCH] stm32u3xx: remove ErrorStatus
+
+---
+ Include/stm32u3xx.h | 6 ------
+ 1 file changed, 6 deletions(-)
+
+diff --git a/Include/stm32u3xx.h b/Include/stm32u3xx.h
+index 83ef39d..b007b47 100644
+--- a/Include/stm32u3xx.h
++++ b/Include/stm32u3xx.h
+@@ -120,12 +120,6 @@ typedef enum
+ } FunctionalState;
+ #define IS_FUNCTIONAL_STATE(STATE) (((STATE) == DISABLE) || ((STATE) == ENABLE))
+ 
+-typedef enum
+-{
+-  SUCCESS = 0,
+-  ERROR = !SUCCESS
+-} ErrorStatus;
+-
+ /**
+   * @}
+   */
+-- 
+2.43.0
+

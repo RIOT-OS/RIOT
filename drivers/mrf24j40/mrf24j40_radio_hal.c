@@ -1,3 +1,19 @@
+/*
+ * SPDX-FileCopyrightText: 2022 HAW Hamburg
+ * SPDX-License-Identifier: LGPL-2.1-only
+ */
+
+/**
+ * @ingroup     drivers_mrf24j40
+ * @{
+ *
+ * @file
+ * @brief       IEEE 802.15.4 Radio HAL implementation for the MRF24J40 drivers
+ *
+ * @author      José I. Álamos <jose.alamos@haw-hamburg.de>
+ * @}
+ */
+
 #include "mrf24j40.h"
 #include "mrf24j40_params.h"
 #include "mrf24j40_internal.h"

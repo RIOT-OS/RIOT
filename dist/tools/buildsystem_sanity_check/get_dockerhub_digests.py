@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
 """
-Command line utility to get the image sha256 sum and the manifest sha256 sum
-of the latest image at dockerhub.
+Command line utility to get the SHA-256 sums of the latest image at Docker Hub.
+
+It gets both the image SHA-256 sum and the manifest SHA-256 sum.
 """
 import http.client
 import json
@@ -10,7 +11,7 @@ import sys
 
 def get_docker_token(repo):
     """
-    Get an API access token for the docker registry
+    Get an API access token for the docker registry.
 
     :param repo: the repository the API token should be valid for
     :type repo: str
@@ -32,7 +33,7 @@ def get_docker_token(repo):
 
 def get_manifest(repo, tag="latest", token=None):
     """
-    Get the manifest of the given repo
+    Get the manifest of the given repo.
 
     :param repo: The repository to get the latest manifest of
     :type repo: str
@@ -64,8 +65,9 @@ def get_manifest(repo, tag="latest", token=None):
 
 def get_upstream_digests(repo, tag="latest", token=None):
     """
-    Get the SHA256 hash of the latest image of the given repo at dockerhub
-    as string of hex digests
+    Get the SHA-256 hash of the latest image of the given repo at Docker Hub.
+
+    The hash is returned as string of hex digests.
 
     :param repo: The repository to get the hash from
     :type repo: str
@@ -79,13 +81,16 @@ def get_upstream_digests(repo, tag="latest", token=None):
     """
     token = get_docker_token(repo) if token is None else token
     manifest, repo_digest = get_manifest(repo, tag=tag, token=token)
-    digest = manifest["config"]["digest"]
-    return (digest[len("sha256:"):], repo_digest)
+    digest = manifest.get("config", {}).get("digest")
+    return (digest[len("sha256:"):] if digest else None, repo_digest)
 
 
 if __name__ == '__main__':
-    if len(sys.argv) != 2:
+    if (len(sys.argv) == 2):
+        _, repo_digest = get_upstream_digests(sys.argv[1])
+    elif (len(sys.argv) == 3):
+        _, repo_digest = get_upstream_digests(sys.argv[1], sys.argv[2])
+    else:
         sys.exit(f"Usage {sys.argv[0]} <REPO_NAME>")
 
-    _, repo_digest = get_upstream_digests(sys.argv[1])
     print(f"{repo_digest}")

@@ -1,7 +1,7 @@
 name: check-labels
 on:
   pull_request_target:
-    types: [opened, reopened, labeled, unlabeled, synchronize]
+    types: [opened, reopened, labeled, unlabeled, auto_merge_enabled]
   pull_request_review:
     types: [submitted, dismissed]
   merge_group:

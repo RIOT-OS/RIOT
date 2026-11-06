@@ -24,7 +24,7 @@
 #include "pictures.h"
 
 const uint8_t riot_32_width = 32;
-const uint16_t riot_32_height = sizeof(riot_logo_32) / sizeof(riot_logo_32[0]);
+const uint16_t riot_32_height = ARRAY_SIZE(riot_logo_32);
 
 /* Draw the large RIOT logo with a full refresh */
 void draw_riot(epd_bw_spi_t *dev)

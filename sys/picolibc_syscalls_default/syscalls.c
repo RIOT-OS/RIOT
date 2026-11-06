@@ -1,9 +1,6 @@
 /*
- * Copyright (C) 2019 Koen Zandberg
- *
- * This file is subject to the terms and conditions of the GNU Lesser General
- * Public License v2.1. See the file LICENSE in the top level directory for more
- * details.
+ * SPDX-FileCopyrightText: 2019 Koen Zandberg
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
 
 /**
@@ -116,7 +113,12 @@ static const struct heap heaps[NUM_HEAPS] = {
 void __attribute__((__noreturn__))
 _exit(int n)
 {
-    LOG_INFO("#! exit %i: powering off\n", n);
+    if (n > 0) {
+        LOG_ERROR("ERR: program failed with exit code %i\n", n);
+    }
+    else {
+        LOG_WARNING("WARN: program exited\n");
+    }
 #ifdef MODULE_PERIPH_PM
     pm_off();
 #endif /* MODULE_PERIPH_PM */
@@ -475,13 +477,13 @@ int fcntl(int fd, int cmd, int arg)
  * @return the new seek location in the file on success
  * @return -1 on error, @c errno set to a constant from errno.h to indicate the error
  */
-off_t lseek(int fd, _off_t off, int whence)
+off_t lseek(int fd, off_t off, int whence)
 {
 #ifdef MODULE_VFS
-    int res = vfs_lseek(fd, off, whence);
+    off_t res = vfs_lseek(fd, off, whence);
     if (res < 0) {
         /* vfs returns negative error codes */
-        errno = -res;
+        errno = -(int)res;
         return -1;
     }
     return res;
@@ -536,10 +538,10 @@ int fstat(int fd, struct stat *buf)
 /**
  * @brief Status of a file (by name)
  *
- * This is a wrapper around @c vfs_fstat
+ * This is a wrapper around @c vfs_stat
  *
  * @param[in]  name     path to file
- * @param[out] buf      pointer to stat struct to fill
+ * @param[out] st       pointer to stat struct to fill
  *
  * @return 0 on success
  * @return -1 on error, @c errno set to a constant from errno.h to indicate the error

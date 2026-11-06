@@ -27,7 +27,8 @@
 #include "debug.h"
 
 static ssize_t _sha256_handler(coap_pkt_t* pdu, uint8_t *buf, size_t len, coap_request_ctx_t *ctx);
-static ssize_t _riot_block2_handler(coap_pkt_t *pdu, uint8_t *buf, size_t len, coap_request_ctx_t *ctx);
+static ssize_t _riot_block2_handler(coap_pkt_t *pdu, uint8_t *buf, size_t len,
+                                    coap_request_ctx_t *ctx);
 
 /* CoAP resources */
 static const coap_resource_t _resources[] = {
@@ -45,11 +46,17 @@ static const uint8_t block2_intro[] = "This is RIOT (Version: ";
 static const uint8_t block2_board[] = " running on a ";
 static const uint8_t block2_mcu[] = " board with a ";
 
-static ssize_t _riot_block2_handler(coap_pkt_t *pdu, uint8_t *buf, size_t len, coap_request_ctx_t *ctx)
+static ssize_t _riot_block2_handler(coap_pkt_t *pdu, uint8_t *buf, size_t len,
+                                    coap_request_ctx_t *ctx)
 {
     (void)ctx;
     coap_block_slicer_t slicer;
-    coap_block2_init(pdu, &slicer);
+    int res = coap_block2_init(pdu, &slicer);
+    if (res) {
+        const char *errmsg = "Block2";
+        return coap_reply_simple(pdu, COAP_CODE_BAD_OPTION, buf, len,
+                                 COAP_FORMAT_TEXT, errmsg, strlen(errmsg));
+    }
 
     gcoap_resp_init(pdu, buf, len, COAP_CODE_CONTENT);
     coap_opt_add_format(pdu, COAP_FORMAT_TEXT);
@@ -57,7 +64,7 @@ static ssize_t _riot_block2_handler(coap_pkt_t *pdu, uint8_t *buf, size_t len, c
     ssize_t plen = coap_opt_finish(pdu, COAP_OPT_FINISH_PAYLOAD);
 
     /* Add actual content */
-    int res = coap_blockwise_put_bytes_pkt(pdu, &slicer, block2_intro, sizeof(block2_intro)-1);
+    res = coap_blockwise_put_bytes_pkt(pdu, &slicer, block2_intro, sizeof(block2_intro)-1);
     if (res) { return res; }
     res = coap_blockwise_put_bytes_pkt(pdu, &slicer, RIOT_VERSION, strlen(RIOT_VERSION));
     if (res) { return res; }
@@ -99,12 +106,17 @@ static ssize_t _sha256_handler(coap_pkt_t* pdu, uint8_t *buf, size_t len, coap_r
      * support, not proper synchronisation. */
     static sha256_context_t sha256;
     uint8_t digest[SHA256_DIGEST_LENGTH];
-    coap_block1_t block1;
+    coap_block1_t block1 = { 0 };
 
     int blockwise = coap_get_block1(pdu, &block1);
+    if (blockwise < 0) {
+        static const char *errmsg = "Block1";
+        return coap_reply_simple(pdu, COAP_CODE_BAD_OPTION, buf, len,
+                                 COAP_FORMAT_TEXT, errmsg, strlen(errmsg));
+    }
 
     printf("_sha256_handler: received data: offset=%" PRIuSIZE " len=%u blockwise=%i more=%i\n",
-            block1.offset, pdu->payload_len, blockwise, block1.more);
+           block1.offset, pdu->payload_len, blockwise, block1.more);
 
     /* initialize sha256 calculation and add payload bytes */
     if (block1.blknum == 0) {

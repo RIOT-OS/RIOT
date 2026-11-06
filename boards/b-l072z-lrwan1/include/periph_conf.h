@@ -46,7 +46,10 @@ static const dma_conf_t dma_config[] = {
 #define DMA_SHARED_ISR_0            isr_dma1_channel2_3
 #define DMA_SHARED_ISR_0_STREAMS    { 0, 1 } /* Indexes 0 and 1 of dma_config share the same isr */
 #define DMA_SHARED_ISR_1            isr_dma1_channel4_5_6_7
-#define DMA_SHARED_ISR_1_STREAMS    { 2, 3, 4 } /* Indexes 2, 3 and 4 of dma_config share the same isr */
+/*
+ * @brief Indexes 2, 3 and 4 of dma_config share the same isr
+ */
+#define DMA_SHARED_ISR_1_STREAMS    { 2, 3, 4 }
 
 #define DMA_NUMOF           ARRAY_SIZE(dma_config)
 /** @} */

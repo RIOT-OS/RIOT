@@ -42,6 +42,9 @@ endif
 
 ifneq (,$(filter esp_wifi% esp_eth, $(USEMODULE)))
     SRC += esp_ztimer.c
+else ifneq (,$(word 2,$(filter esp_ble esp_ieee802154,$(USEMODULE))))
+    # ETS timer functions are also required by the software coexistence
+    SRC += esp_ztimer.c
 endif
 
 include $(RIOTBASE)/Makefile.base

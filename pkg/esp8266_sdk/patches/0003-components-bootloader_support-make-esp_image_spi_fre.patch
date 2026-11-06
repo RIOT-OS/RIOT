@@ -1,0 +1,30 @@
+From c1d8a0825bc29f4962bd317d153a664f31a4d5de Mon Sep 17 00:00:00 2001
+From: Bas Stottelaar <basstottelaar@gmail.com>
+Date: Sun, 4 Oct 2026 18:01:50 +0200
+Subject: [PATCH] components/bootloader_support: make esp_image_spi_freq_t
+ a typedef
+
+The esp_image_spi_freq_t enum is declared without typedef, which defines
+a variable in every compilation unit that includes esp_image_format.h.
+Since GCC 10 defaults to -fno-common, this results in multiple
+definition errors at link time.
+---
+ components/bootloader_support/include/esp_image_format.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/components/bootloader_support/include/esp_image_format.h b/components/bootloader_support/include/esp_image_format.h
+index c8be9f6..6652349 100644
+--- a/components/bootloader_support/include/esp_image_format.h
++++ b/components/bootloader_support/include/esp_image_format.h
+@@ -37,7 +37,7 @@ typedef enum {
+ } esp_image_spi_mode_t;
+ 
+ /* SPI flash clock frequency */
+-enum {
++typedef enum {
+     ESP_IMAGE_SPI_SPEED_40M,
+     ESP_IMAGE_SPI_SPEED_26M,
+     ESP_IMAGE_SPI_SPEED_20M,
+-- 
+2.53.0
+

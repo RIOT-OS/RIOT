@@ -1,9 +1,6 @@
 /*
- * Copyright (C) 2021 ML!PA Consulting GmbH
- *
- * This file is subject to the terms and conditions of the GNU Lesser
- * General Public License v2.1. See the file LICENSE in the top level
- * directory for more details.
+ * SPDX-FileCopyrightText: 2021 ML!PA Consulting GmbH
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
 
 /**
@@ -275,7 +272,7 @@ static void *telnet_thread(void *arg)
                 }
 write:
                 if (IS_USED(MODULE_STDIO_TELNET)) {
-                    isrpipe_write_one(&stdin_isrpipe, c);
+                    stdio_rx_write_one(c);
                 }
                 else {
                     pipe_write(&_stdin_pipe, &c, 1);

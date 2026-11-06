@@ -17,7 +17,7 @@
  */
 
 #include "cpu.h"
-#include "vendor/RP2040.h"
+#include "RP2040.h"
 #include "io_reg.h"
 #include "macros/units.h"
 #include "periph/pio.h" /* pio_t */
@@ -186,7 +186,7 @@ extern "C" {
 /**
  * @brief   How to source the peripheral clock (default: 125 MHz system clock)
  */
-#define CLOCK_PERIPH_SOURCE CLOCKS_CLK_PERI_CTRL_AUXSRC_clk_sys
+#define CLOCK_PERIPH_SOURCE CLOCKS_CLK_PERI_CTRL_AUXSRC_VALUE_CLK_SYS
 #endif
 
 #if !defined(CLOCK_PERIPH) || defined(DOXYGEN)
@@ -200,31 +200,31 @@ extern "C" {
  * @brief   Periphery blocks that can be reset
  */
 #define RESETS_RESET_MASK               \
-    (RESETS_RESET_usbctrl_Msk       |   \
-     RESETS_RESET_uart1_Msk         |   \
-     RESETS_RESET_uart0_Msk         |   \
-     RESETS_RESET_timer_Msk         |   \
-     RESETS_RESET_tbman_Msk         |   \
-     RESETS_RESET_sysinfo_Msk       |   \
-     RESETS_RESET_syscfg_Msk        |   \
-     RESETS_RESET_spi1_Msk          |   \
-     RESETS_RESET_spi0_Msk          |   \
-     RESETS_RESET_rtc_Msk           |   \
-     RESETS_RESET_pwm_Msk           |   \
-     RESETS_RESET_pll_usb_Msk       |   \
-     RESETS_RESET_pll_sys_Msk       |   \
-     RESETS_RESET_pio1_Msk          |   \
-     RESETS_RESET_pio0_Msk          |   \
-     RESETS_RESET_pads_qspi_Msk     |   \
-     RESETS_RESET_pads_bank0_Msk    |   \
-     RESETS_RESET_jtag_Msk          |   \
-     RESETS_RESET_io_qspi_Msk       |   \
-     RESETS_RESET_io_bank0_Msk      |   \
-     RESETS_RESET_i2c1_Msk          |   \
-     RESETS_RESET_i2c0_Msk          |   \
-     RESETS_RESET_dma_Msk           |   \
-     RESETS_RESET_busctrl_Msk       |   \
-     RESETS_RESET_adc_Msk)
+    (RESETS_RESET_USBCTRL_BITS       |   \
+     RESETS_RESET_UART1_BITS         |   \
+     RESETS_RESET_UART0_BITS         |   \
+     RESETS_RESET_TIMER_BITS         |   \
+     RESETS_RESET_TBMAN_BITS         |   \
+     RESETS_RESET_SYSINFO_BITS       |   \
+     RESETS_RESET_SYSCFG_BITS        |   \
+     RESETS_RESET_SPI1_BITS          |   \
+     RESETS_RESET_SPI0_BITS          |   \
+     RESETS_RESET_RTC_BITS           |   \
+     RESETS_RESET_PWM_BITS           |   \
+     RESETS_RESET_PLL_USB_BITS       |   \
+     RESETS_RESET_PLL_SYS_BITS       |   \
+     RESETS_RESET_PIO1_BITS          |   \
+     RESETS_RESET_PIO0_BITS          |   \
+     RESETS_RESET_PADS_QSPI_BITS     |   \
+     RESETS_RESET_PADS_BANK0_BITS    |   \
+     RESETS_RESET_JTAG_BITS          |   \
+     RESETS_RESET_IO_QSPI_BITS       |   \
+     RESETS_RESET_IO_BANK0_BITS      |   \
+     RESETS_RESET_I2C1_BITS          |   \
+     RESETS_RESET_I2C0_BITS          |   \
+     RESETS_RESET_DMA_BITS           |   \
+     RESETS_RESET_BUSCTRL_BITS       |   \
+     RESETS_RESET_ADC_BITS)
 
 /**
  * @brief   Convert (port, pin) tuple to a @ref gpio_t value
@@ -518,8 +518,8 @@ static inline void gpio_set_io_config(uint8_t pin, gpio_io_ctrl_t config)
  */
 static inline void gpio_set_function_select(uint8_t pin, gpio_function_select_t funcsel)
 {
-    io_reg_write_dont_corrupt(gpio_io_register(pin), funcsel << IO_BANK0_GPIO0_CTRL_FUNCSEL_Pos,
-                              IO_BANK0_GPIO0_CTRL_FUNCSEL_Msk);
+    io_reg_write_dont_corrupt(gpio_io_register(pin), funcsel << IO_BANK0_GPIO0_CTRL_FUNCSEL_LSB,
+                              IO_BANK0_GPIO0_CTRL_FUNCSEL_BITS);
 }
 
 /**
@@ -565,10 +565,11 @@ static inline void periph_reset_done(uint32_t components)
  *
  * @param   f_in        Input frequency of the reference clock
  * @param   f_out       Output frequency of the system clock
- * @param   source      Clock source
+ * @param   source      Clock source,
+ *                       one of `CLOCKS_CLK_SYS_CTRL_SRC_VALUE_*`
  */
 void clock_sys_configure_source(uint32_t f_in, uint32_t f_out,
-                                CLOCKS_CLK_SYS_CTRL_SRC_Enum source);
+                                uint32_t source);
 
 /**
  * @brief   Configure the system clock to run from an auxiliary clock source,
@@ -578,10 +579,11 @@ void clock_sys_configure_source(uint32_t f_in, uint32_t f_out,
  *
  * @param   f_in        Input frequency of the auxiliary clock source
  * @param   f_out       Output frequency of the system clock
- * @param   aux         Which auxiliary clock source to use
+ * @param   aux         Which auxiliary clock source to use,
+ *                       one of `CLOCKS_CLK_SYS_CTRL_AUXSRC_VALUE_*`
  */
 void clock_sys_configure_aux_source(uint32_t f_in, uint32_t f_out,
-                                    CLOCKS_CLK_SYS_CTRL_AUXSRC_Enum aux);
+                                    uint32_t aux);
 
 /**
  * @brief   Configure the reference clock to run from a clock source,
@@ -591,10 +593,11 @@ void clock_sys_configure_aux_source(uint32_t f_in, uint32_t f_out,
  *
  * @param   f_in        Input frequency of the reference clock
  * @param   f_out       Output frequency of the system clock
- * @param   source      Clock source
+ * @param   source      Clock source,
+ *                       one of `CLOCKS_CLK_REF_CTRL_SRC_VALUE_*`
  */
 void clock_ref_configure_source(uint32_t f_in, uint32_t f_out,
-                                CLOCKS_CLK_REF_CTRL_SRC_Enum source);
+                                uint32_t source);
 
 /**
  * @brief   Configure the reference clock to run from an auxiliary clock source,
@@ -604,18 +607,20 @@ void clock_ref_configure_source(uint32_t f_in, uint32_t f_out,
  *
  * @param   f_in        Input frequency of the auxiliary clock source
  * @param   f_out       Output frequency of the reference clock
- * @param   aux         Which auxiliary clock source to use
+ * @param   aux         Which auxiliary clock source to use,
+ *                       one of `CLOCKS_CLK_REF_CTRL_AUXSRC_VALUE_*`
  */
 void clock_ref_configure_aux_source(uint32_t f_in, uint32_t f_out,
-                                    CLOCKS_CLK_REF_CTRL_AUXSRC_Enum aux);
+                                    uint32_t aux);
 
 /**
  * @brief   Configure the peripheral clock to run from a dedicated auxiliary
  *          clock source
  *
- * @param   aux     Auxiliary clock source
+ * @param   aux     Auxiliary clock source,
+                    one of `CLOCKS_CLK_PERI_CTRL_AUXSRC_VALUE_*`
  */
-void clock_periph_configure(CLOCKS_CLK_PERI_CTRL_AUXSRC_Enum aux);
+void clock_periph_configure(uint32_t aux);
 
 /**
  * @brief   Configure gpio21 as clock output pin
@@ -625,9 +630,10 @@ void clock_periph_configure(CLOCKS_CLK_PERI_CTRL_AUXSRC_Enum aux);
  *
  * @param   f_in        Input frequency
  * @param   f_out       Output frequency
- * @param   aux         Auxiliary clock source
+ * @param   aux         Auxiliary clock source,
+ *                       one of `CLOCKS_CLK_GPOUT0_CTRL_AUXSRC_VALUE_*`
  */
-void clock_gpout0_configure(uint32_t f_in, uint32_t f_out, CLOCKS_CLK_GPOUT0_CTRL_AUXSRC_Enum aux);
+void clock_gpout0_configure(uint32_t f_in, uint32_t f_out, uint32_t aux);
 
 /**
  * @brief   Configure gpio23 as clock output pin
@@ -637,9 +643,10 @@ void clock_gpout0_configure(uint32_t f_in, uint32_t f_out, CLOCKS_CLK_GPOUT0_CTR
  *
  * @param   f_in        Input frequency
  * @param   f_out       Output frequency
- * @param   aux         Auxiliary clock source
+ * @param   aux         Auxiliary clock source,
+ *                       one of `CLOCKS_CLK_GPOUT1_CTRL_AUXSRC_VALUE_*`
  */
-void clock_gpout1_configure(uint32_t f_in, uint32_t f_out, CLOCKS_CLK_GPOUT1_CTRL_AUXSRC_Enum aux);
+void clock_gpout1_configure(uint32_t f_in, uint32_t f_out, uint32_t aux);
 
 /**
  * @brief   Configure gpio24 as clock output pin
@@ -649,9 +656,10 @@ void clock_gpout1_configure(uint32_t f_in, uint32_t f_out, CLOCKS_CLK_GPOUT1_CTR
  *
  * @param   f_in        Input frequency
  * @param   f_out       Output frequency
- * @param   aux         Auxiliary clock source
+ * @param   aux         Auxiliary clock source,
+ *                       one of `CLOCKS_CLK_GPOUT2_CTRL_AUXSRC_VALUE_*`
  */
-void clock_gpout2_configure(uint32_t f_in, uint32_t f_out, CLOCKS_CLK_GPOUT2_CTRL_AUXSRC_Enum aux);
+void clock_gpout2_configure(uint32_t f_in, uint32_t f_out, uint32_t aux);
 
 /**
  * @brief   Configure gpio25 as clock output pin
@@ -661,17 +669,19 @@ void clock_gpout2_configure(uint32_t f_in, uint32_t f_out, CLOCKS_CLK_GPOUT2_CTR
  *
  * @param   f_in        Input frequency
  * @param   f_out       Output frequency
- * @param   aux         Auxiliary clock source
+ * @param   aux         Auxiliary clock source,
+ *                       one of `CLOCKS_CLK_GPOUT3_CTRL_AUXSRC_VALUE_*`
  */
-void clock_gpout3_configure(uint32_t f_in, uint32_t f_out, CLOCKS_CLK_GPOUT3_CTRL_AUXSRC_Enum aux);
+void clock_gpout3_configure(uint32_t f_in, uint32_t f_out, uint32_t aux);
 
 /**
  * @brief   Configure the ADC clock to run from a dedicated auxiliary
  *          clock source
  *
- * @param   aux     Auxiliary clock source
+ * @param   aux     Auxiliary clock source,
+                    one of `CLOCKS_CLK_ADC_CTRL_AUXSRC_VALUE_*`
  */
-void clock_adc_configure(CLOCKS_CLK_ADC_CTRL_AUXSRC_Enum aux);
+void clock_adc_configure(uint32_t aux);
 /** @} */
 
 /**

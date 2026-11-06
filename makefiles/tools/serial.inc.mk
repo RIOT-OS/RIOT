@@ -68,18 +68,35 @@ ifeq ($(RIOT_TERMINAL),pyterm)
 else ifeq ($(RIOT_TERMINAL),socat)
   SOCAT_OUTPUT ?= -
   TERMPROG ?= $(RIOT_TERMINAL)
-  TERMFLAGS ?= $(SOCAT_OUTPUT) open:$(PORT),b$(BAUD),echo=0,raw,cs8,parenb=0,cstopb=0
+  ifeq ($(OS),Linux)
+    # RIOT's build image is based on Ubuntu 22.04, which ships a broken version
+    # of socat that does not support the "ispeed" and "ospeed" options. Once
+    # Ubuntu 22.04 is end-of-life (April 2027), the Linux-specific case can be
+    # removed. See https://bugs.launchpad.net/ubuntu/+source/socat/+bug/2165102
+    # for more information on the issue.
+    TERMFLAGS ?= $(SOCAT_OUTPUT) open:$(PORT),b$(BAUD),nonblock,clocal=1,cread=1,echo=0,raw,cs8,parenb=0,cstopb=0
+  else ifeq ($(OS),Darwin)
+    TERMFLAGS ?= $(SOCAT_OUTPUT) open:$(PORT),ispeed=$(BAUD),ospeed=$(BAUD),nonblock,clocal=1,cread=1,echo=0,raw,cs8,parenb=0,cstopb=0
+  endif
 else ifeq ($(RIOT_TERMINAL),picocom)
   TERMPROG  ?= picocom
   TERMFLAGS ?= --nolock --imap lfcrlf --baud "$(BAUD)" "$(PORT)"
 else ifeq ($(RIOT_TERMINAL),miniterm)
-  # Check if miniterm.py is available in the path, if not use just miniterm
-  # since new versions will only have miniterm and not miniterm.py
-  ifeq (,$(shell command -v miniterm.py 2>/dev/null))
+  # The executable for miniterm depends on the version and the way it was
+  # installed. Check for all (currently) known possibilities and select
+  # the correct one.
+  ifneq (,$(shell command -v pyserial-miniterm.py 2>/dev/null))
+    TERMPROG ?= pyserial-miniterm.py
+  else ifneq (,$(shell command -v pyserial-miniterm 2>/dev/null))
+    TERMPROG ?= pyserial-miniterm
+  else ifneq (,$(shell command -v miniterm.py 2>/dev/null))
+    TERMPROG ?= miniterm.py
+  else ifneq (,$(shell command -v miniterm 2>/dev/null))
     TERMPROG ?= miniterm
   else
-    TERMPROG ?= miniterm.py
+    $(error The pyserial miniterm was not found! Check if pyserial is installed.)
   endif
+
   # The RIOT shell will still transmit back a CRLF, but at least with --eol LF
   # we avoid sending two lines on every "enter".
   TERMFLAGS ?= --eol LF "$(PORT)" "$(BAUD)" $(MINITERMFLAGS)
@@ -102,4 +119,7 @@ else ifeq (${RIOT_TERMINAL},bootterm)
   TERMDEPS += $(TERMPROG)
 else ifeq (${RIOT_TERMINAL},native)
   TERMPROG ?= $(ELFFILE)
+else ifeq (${RIOT_TERMINAL},jelly)
+  TERMPROG = Jelly
+  TERMFLAGS += $(PORT)
 endif

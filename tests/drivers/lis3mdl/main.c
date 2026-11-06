@@ -1,10 +1,6 @@
-
 /*
- * Copyright (C) 2015 HAW Hamburg
- *
- * This file is subject to the terms and conditions of the GNU Lesser
- * General Public License v2.1. See the file LICENSE in the top level
- * directory for more details.
+ * SPDX-FileCopyrightText: 2015 HAW Hamburg
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
 
 /**
@@ -43,7 +39,7 @@ int main(void)
         return 1;
     }
 
-    while(1) {
+    while (1) {
         lis3mdl_3d_data_t mag_value;
         lis3mdl_read_mag(&dev, &mag_value);
         printf("Magnetometer [G]:\tX: %2d\tY: %2d\tZ: %2d\n",

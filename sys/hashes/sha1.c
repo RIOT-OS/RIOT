@@ -1,13 +1,8 @@
 /*
- * Copyright (C) 2016 Oliver Hahm <oliver.hahm@inria.fr>
- *
- * This file is subject to the terms and conditions of the GNU Lesser
- * General Public License v2.1. See the file LICENSE in the top level
- * directory for more details.
- */
-
-/* This code is public-domain - it is based on libcrypt
- * placed in the public domain by Wei Dai and other contributors.
+ * SPDX-FileCopyrightText: 2016 Oliver Hahm <oliver.hahm@inria.fr>
+ * SPDX-FileCopyrightText: Implementation based on libcrypt that was released
+ *                         by Wei Dai et al. into the public domain.
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
 
 /**
@@ -25,6 +20,7 @@
 #include <stdint.h>
 #include <string.h>
 
+#include "crypto/helper.h"
 #include "hashes/sha1.h"
 
 #define SHA1_K0  0x5a827999
@@ -94,7 +90,7 @@ static void sha1_add_uncounted(sha1_context *s, uint8_t data)
 {
     uint8_t *const b = (uint8_t *) s->buffer;
 
-#ifdef __BIG_ENDIAN__
+#if __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
     b[s->buffer_offset] = data;
 #else
     b[s->buffer_offset ^ 3] = data;
@@ -202,6 +198,7 @@ void sha1_final_hmac(sha1_context *ctx, void *digest)
 
     /* Complete inner hash */
     sha1_final(ctx, ctx->inner_hash);
+
     /* Calculate outer hash */
     sha1_init(ctx);
     for (i = 0; i < SHA1_BLOCK_LENGTH; i++) {
@@ -211,5 +208,10 @@ void sha1_final_hmac(sha1_context *ctx, void *digest)
         sha1_update_byte(ctx, ctx->inner_hash[i]);
     }
 
+    /* Finalize hash */
     sha1_final(ctx, digest);
+
+    /* Securely wipe sensitive data */
+    crypto_secure_wipe(ctx->key_buffer, sizeof(ctx->key_buffer));
+    crypto_secure_wipe(ctx->inner_hash, sizeof(ctx->inner_hash));
 }

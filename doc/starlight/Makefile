@@ -27,7 +27,7 @@ clean:
 	-@rm -rf node_modules .astro dist
 
 .PHONY: integrate_outside_files
-integrate_outside_files: code_of_conduct governance lostandfound coding_conventions coding_conventions_cpp security unittests
+integrate_outside_files: code_of_conduct governance lostandfound coding_conventions coding_conventions_cpp security unittests contributing
 
 .PHONY: code_of_conduct
 code_of_conduct: ../../CODE_OF_CONDUCT.md
@@ -66,3 +66,9 @@ unittests: ../../tests/unittests/README.md
 	-@echo "Generating Unittests documentation..."
 	-@mkdir -p ../guides/generated/tests/unittests
 	-@sed '1,2d' $< | cat ./templates/UNITTESTS.template.md - > ../guides/generated/tests/unittests/README.md
+
+.PHONY: contributing
+contributing: ../../CONTRIBUTING.md
+	-@echo "Generating Contributing documentation..."
+	-@mkdir -p ../guides/generated
+	-@sed '1,2d' $< | cat ./templates/CONTRIBUTING.template.md - > ../guides/generated/CONTRIBUTING.md

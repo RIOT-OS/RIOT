@@ -1,9 +1,6 @@
 /*
- * Copyright (C) 2016 Freie Universität Berlin
- *
- * This file is subject to the terms and conditions of the GNU Lesser
- * General Public License v2.1. See the file LICENSE in the top level
- * directory for more details.
+ * SPDX-FileCopyrightText: 2016 Freie Universität Berlin
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
 
 #pragma once
@@ -22,11 +19,13 @@
  * @author  Martine Lenders <mlenders@inf.fu-berlin.de>
  */
 
+#include <assert.h>
 #include <stdbool.h>
 #include <stdint.h>
 
 #include "net/af.h"
 #include "net/sock.h"
+#include "time_units.h"
 
 #include "lwip/ip_addr.h"
 #include "lwip/api.h"
@@ -69,6 +68,29 @@ static inline ssize_t lwip_sock_send(struct netconn *conn,
 
     return lwip_sock_sendv(conn, &snip, proto, remote, type);
 }
+
+/**
+ * @brief   Converts a sock timeout to the millisecond resolution used by lwIP
+ *
+ * lwIP interprets a receive timeout of 0 as "no timeout", so a sub-millisecond
+ * sock timeout must not be truncated to 0. The conversion rounds up instead,
+ * so that any non-zero timeout maps to at least one millisecond.
+ *
+ * @pre     @p timeout is neither 0 nor @ref SOCK_NO_TIMEOUT
+ *
+ * @param[in] timeout   A sock timeout in microseconds.
+ *
+ * @return  The equivalent lwIP timeout in milliseconds.
+ */
+static inline uint32_t lwip_sock_timeout_ms(uint32_t timeout)
+{
+    assert((timeout != 0) && (timeout != SOCK_NO_TIMEOUT));
+
+    /* DIV_ROUND_UP() is not used here, because its (a + b - 1) form overflows
+     * for large timeouts on platforms where unsigned long is 32 bit */
+    return (timeout - 1) / US_PER_MS + 1;
+}
+
 /** @internal
  * @}
  */

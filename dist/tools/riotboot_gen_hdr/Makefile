@@ -1,4 +1,6 @@
 RIOTBASE       := ../../..
+BUILD_DIR      ?= $(RIOTBASE)/build
+GENHDR_BINDIR  := $(BUILD_DIR)/genhdr
 RIOT_INCLUDE   := $(RIOTBASE)/sys/include
 RIOT_CORE_INC  := $(RIOTBASE)/core/include
 NATIVE_INCLUDE := $(RIOTBASE)/cpu/native/include
@@ -26,16 +28,16 @@ else
   Q=
 endif
 
-all: bin/genhdr
+all: $(GENHDR_BINDIR)/genhdr
 
-bin/:
-	$(Q)mkdir -p bin
+$(GENHDR_BINDIR)/:
+	$(Q)mkdir -p "$@"
 
-bin/genhdr: $(GENHDR_HDR) $(GENHDR_SRC) Makefile | bin/
+$(GENHDR_BINDIR)/genhdr: $(GENHDR_HDR) $(GENHDR_SRC) Makefile | $(GENHDR_BINDIR)/
 	$(Q)$(CC) $(CFLAGS) -I$(RIOT_INCLUDE) -I$(RIOT_CORE_INC) \
 		-I$(NATIVE_INCLUDE) $(GENHDR_SRC) -o $@
 
 clean:
-	$(Q)rm -rf bin/
+	$(Q)rm -rf $(GENHDR_BINDIR)
 
 distclean: clean

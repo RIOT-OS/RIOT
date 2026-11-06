@@ -1,12 +1,9 @@
 /*
- * Copyright (C) 2016-18 Kaspar Schleiser <kaspar@schleiser.de>
- *               2018 Freie Universität Berlin
- *               2018 Inria
- *               2018 Ken Bannister <kb2ma@runbox.com>
- *
- * This file is subject to the terms and conditions of the GNU Lesser
- * General Public License v2.1. See the file LICENSE in the top level
- * directory for more details.
+ * SPDX-FileCopyrightText: 2016-2018 Kaspar Schleiser <kaspar@schleiser.de>
+ * SPDX-FileCopyrightText: 2018 Freie Universität Berlin
+ * SPDX-FileCopyrightText: 2018 Inria
+ * SPDX-FileCopyrightText: 2018 Ken Bannister <kb2ma@runbox.com>
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
 
 #pragma once
@@ -83,17 +80,16 @@
 #include <string.h>
 #include <unistd.h>
 
-#include "bitarithm.h"
 #include "bitfield.h"
 #include "byteorder.h"
+#include "compiler_hints.h"
 #include "iolist.h"
-#include "macros/utils.h"
 #include "modules.h"
 #include "net/coap.h"
 #include "net/sock/udp.h"
 
 #if defined(MODULE_NANOCOAP_RESOURCES)
-#include "xfa.h"
+#  include "xfa.h"
 #endif
 
 #ifdef __cplusplus
@@ -131,7 +127,7 @@ extern "C" {
  */
 /** @brief   Maximum number of Options in a message */
 #ifndef CONFIG_NANOCOAP_NOPTS_MAX
-#define CONFIG_NANOCOAP_NOPTS_MAX          (16)
+#  define CONFIG_NANOCOAP_NOPTS_MAX             (16)
 #endif
 
 /**
@@ -139,26 +135,26 @@ extern "C" {
  *           a message
  */
 #ifndef CONFIG_NANOCOAP_URI_MAX
-#define CONFIG_NANOCOAP_URI_MAX            (64)
+#  define CONFIG_NANOCOAP_URI_MAX               (64)
 #endif
 
 /**
  * @brief    Maximum size for a blockwise transfer as a power of 2
  */
-#ifndef CONFIG_NANOCOAP_BLOCK_SIZE_EXP_MAX
-#define CONFIG_NANOCOAP_BLOCK_SIZE_EXP_MAX  (6)
+#ifndef CONFIG_NANOCOAP_BLOCK_SIZE_MAX
+#  define CONFIG_NANOCOAP_BLOCK_SIZE_MAX        COAP_BLOCKSIZE_64
 #endif
 
 /**
  * @brief CoAP block-wise-transfer size that should be used by default
  */
 #ifndef CONFIG_NANOCOAP_BLOCKSIZE_DEFAULT
-#define CONFIG_NANOCOAP_BLOCKSIZE_DEFAULT  COAP_BLOCKSIZE_64
+#  define CONFIG_NANOCOAP_BLOCKSIZE_DEFAULT     COAP_BLOCKSIZE_64
 #endif
 
 /** @brief   Maximum length of a query string written to a message */
 #ifndef CONFIG_NANOCOAP_QS_MAX
-#define CONFIG_NANOCOAP_QS_MAX             (64)
+#  define CONFIG_NANOCOAP_QS_MAX                (64)
 #endif
 /** @} */
 
@@ -168,7 +164,7 @@ extern "C" {
  *           Value obtained experimentally when using SUIT
  */
 #ifndef CONFIG_NANOCOAP_BLOCK_HEADER_MAX
-#define CONFIG_NANOCOAP_BLOCK_HEADER_MAX   (80)
+#  define CONFIG_NANOCOAP_BLOCK_HEADER_MAX      (80)
 #endif
 
 /**
@@ -191,14 +187,6 @@ typedef struct __attribute__((packed)) {
     uint8_t code;               /**< CoAP code (e.g.m 205)                  */
     uint16_t id;                /**< Req/resp ID                            */
 } coap_udp_hdr_t;
-
-/**
- * @brief       Alias for @ref coap_udp_hdr_t for backward compatibility
- *
- * @deprecated  Avoid using low level types in your application, but rather use
- *              the zero overhead wrappers and work on @ref coap_pkt_t instead.
- */
-typedef coap_udp_hdr_t coap_hdr_t;
 
 /**
  * @brief   CoAP option array entry
@@ -227,26 +215,12 @@ typedef struct {
  * (or header byte) in the original CoAP packet buffer.
  */
 typedef struct {
-    union {
-        /**
-         * @brief pointer to the beginning of the buffer holding the pkt
-         *
-         * In other words: Pointer to the first byte of the header.
-         */
-        uint8_t *buf;
-        /**
-         * @brief   Deprecated alias for @ref coap_pkt_t::buf
-         *
-         * @warning This alias for @ref coap_pkt_t::buf is not available if a
-         *          non-UDP transport for nanocoap is used, as this has the
-         *          assumption baked in that the beginning of the message
-         *          buffer holds a UDP style CoAP header.
-         * @deprecated  Use @ref coap_pkt_t::buf to access the underlying buffer.
-         *              Use helpers such as @ref coap_get_code_raw to parse the
-         *              contents in a transport agnostic way.
-         */
-        coap_udp_hdr_t *hdr;
-    };
+    /**
+     * @brief pointer to the beginning of the buffer holding the pkt
+     *
+     * In other words: Pointer to the first byte of the header.
+     */
+    uint8_t *buf;
     uint8_t *payload;                                 /**< pointer to end of the header */
     iolist_t *snips;                                  /**< payload snips (optional)*/
     uint16_t payload_len;                             /**< length of payload       */
@@ -355,12 +329,12 @@ struct _coap_request_ctx {
     const coap_resource_t *resource;    /**< resource of the request */
     union {
         sock_udp_ep_t *remote_udp;      /**< remote UDP endpoint of the request */
-        sock_udp_ep_t *remote;          /**< deprecated alias for request_udp */
+        sock_udp_ep_t *remote;          /**< @deprecated Use `remote_udp` instead */
     };
 #if defined(MODULE_SOCK_AUX_LOCAL) || DOXYGEN
     union {
         sock_udp_ep_t *local_udp;       /**< local UDP endpoint of the request */
-        sock_udp_ep_t *local;           /**< deprecated alias for local_udp */
+        sock_udp_ep_t *local;           /**< @deprecated Use `local_udp` instead */
     };
 #endif
 #if defined(MODULE_GCOAP) || DOXYGEN
@@ -373,11 +347,6 @@ struct _coap_request_ctx {
     uint32_t tl_type;
 #endif
 };
-
-/* forward declarations */
-static inline uint8_t *coap_hdr_data_ptr(const coap_udp_hdr_t *hdr);
-static inline size_t coap_hdr_get_token_len(const coap_udp_hdr_t *hdr);
-static inline const void *coap_hdr_get_token(const coap_udp_hdr_t *hdr);
 
 /**
  * @brief   Get resource path associated with a CoAP request
@@ -460,14 +429,28 @@ typedef struct {
 
 /**
  * @brief   Block1 helper struct
+ * @internal
+ *
+ * @note    Generic Block1 / Block2 helper struct for shared Block1 / Block2
+ *          code. Use @ref coap_block1_t or @ref coap_block2_t instead for
+ *          user facing code.
  */
-typedef struct {
+struct _coap_block {
     size_t offset;                  /**< offset of received data            */
     uint32_t blknum;                /**< block number                       */
     uint8_t szx;                    /**< szx value                          */
-    int8_t more;                    /**< -1 for no option, 0 for last block,
-                                          1 for more blocks coming          */
-} coap_block1_t;
+    bool more;                      /**< 0 for last block, 1 for more blocks coming */
+};
+
+/**
+ * @brief   Block1 helper struct
+ */
+typedef struct _coap_block coap_block1_t;
+
+/**
+ * @brief   Block2 helper struct
+ */
+typedef struct _coap_block coap_block2_t;
 
 /**
  * @brief Blockwise transfer helper struct
@@ -629,16 +612,22 @@ static inline void coap_set_id(coap_pkt_t *pkt, uint16_t id)
 /**
  * @brief   Get a message's token length [in byte]
  *
- * If the `nanocoap_token_ext` module is enabled, this will include
- * the extended token length.
- *
  * @param[in]   pkt   CoAP packet
  *
- * @returns     length of token in the given message (0-8 byte)
+ * @returns     token length in bytes (0-COAP_TOKEN_LENGTH_MAX for valid packets)
  */
 static inline unsigned coap_get_token_len(const coap_pkt_t *pkt)
 {
-    return coap_hdr_get_token_len((const coap_udp_hdr_t *)pkt->buf);
+    const coap_udp_hdr_t *udp = coap_get_udp_hdr_const(pkt);
+    /*
+     * Layout of first byte of header (cut out of Figure 7 of RFC7252)
+     * see https://datatracker.ietf.org/doc/html/rfc7252#section-3
+     *  0 1 2 3 4 5 6 7
+     * +-+-+-+-+-+-+-+-+
+     * |Ver| T |  TKL  |
+     * +-+-+-+-+-+-+-+-+
+     */
+    return udp->ver_t_tkl & 0x0f;
 }
 
 /**
@@ -650,7 +639,7 @@ static inline unsigned coap_get_token_len(const coap_pkt_t *pkt)
  */
 static inline void *coap_get_token(const coap_pkt_t *pkt)
 {
-    return coap_hdr_data_ptr(coap_get_udp_hdr_const(pkt));
+    return pkt->buf + sizeof(coap_udp_hdr_t);
 }
 
 /**
@@ -695,52 +684,6 @@ static inline unsigned coap_get_ver(const coap_pkt_t *pkt)
 }
 
 /**
- * @brief   Get the size of the extended Token length field
- *          (RFC 8974)
- *
- * @deprecated  Use @ref coap_pkt_tkl_ext_len instead.
- *
- * @note    This requires the `nanocoap_token_ext` module to be enabled
- *
- * @param[in]   hdr   CoAP header
- *
- * @returns     number of bytes used for extended token length
- */
-static inline uint8_t coap_hdr_tkl_ext_len(const coap_udp_hdr_t *hdr)
-{
-    if (!IS_USED(MODULE_NANOCOAP_TOKEN_EXT)) {
-        return 0;
-    }
-
-    switch (hdr->ver_t_tkl & 0x0f) {
-    case 13:
-        return 1;
-    case 14:
-        return 2;
-    case 15:
-        assert(0);
-        /* fall-through */
-    default:
-        return 0;
-    }
-}
-
-/**
- * @brief   Get the size of the extended Token length field
- *          (RFC 8974)
- *
- * @note    This requires the `nanocoap_token_ext` module to be enabled
- *
-     * @param[in]   pkt     CoAP packet
- *
- * @returns     number of bytes used for extended token length
- */
-static inline uint8_t coap_pkt_tkl_ext_len(const coap_pkt_t *pkt)
-{
-    return coap_hdr_tkl_ext_len(coap_get_udp_hdr_const(pkt));
-}
-
-/**
  * @brief   Validate that the header of @p pkt is no longer than
  *          @p len bytes.
  *
@@ -763,20 +706,6 @@ static inline uint8_t coap_pkt_tkl_ext_len(const coap_pkt_t *pkt)
 bool coap_is_hdr_in_bounds(const coap_pkt_t *pkt, size_t len);
 
 /**
- * @brief   Get the start of data after the header
- *
- * @param[in]   hdr   Header of CoAP packet in contiguous memory
- *
- * @deprecated  Use coap_get_token() instead
- *
- * @returns     pointer to first byte after the header
- */
-static inline uint8_t *coap_hdr_data_ptr(const coap_udp_hdr_t *hdr)
-{
-    return ((uint8_t *)hdr) + sizeof(coap_udp_hdr_t) + coap_hdr_tkl_ext_len(hdr);
-}
-
-/**
  * @brief   Get the total header length (4-byte header + token length)
  *
  * @param[in]   pkt   CoAP packet
@@ -785,8 +714,7 @@ static inline uint8_t *coap_hdr_data_ptr(const coap_udp_hdr_t *hdr)
  */
 static inline unsigned coap_get_total_hdr_len(const coap_pkt_t *pkt)
 {
-    return sizeof(coap_udp_hdr_t) + coap_hdr_tkl_ext_len(pkt->hdr) +
-           coap_get_token_len(pkt);
+    return sizeof(coap_udp_hdr_t) + coap_get_token_len(pkt);
 }
 
 /**
@@ -802,19 +730,6 @@ static inline unsigned coap_get_response_hdr_len(const coap_pkt_t *pkt)
 }
 
 /**
- * @brief   Write the given raw message code to given CoAP header
- *
- * @param[out]  hdr     CoAP header to write to
- * @param[in]   code    raw message code
- *
- * @deprecated  Use @ref coap_pkt_set_code instead
- */
-static inline void coap_hdr_set_code(coap_udp_hdr_t *hdr, uint8_t code)
-{
-    hdr->code = code;
-}
-
-/**
  * @brief   Write the given raw message code to given CoAP pkt
  *
  * @param[out]  pkt     CoAP packet to write to
@@ -822,107 +737,8 @@ static inline void coap_hdr_set_code(coap_udp_hdr_t *hdr, uint8_t code)
  */
 static inline void coap_pkt_set_code(coap_pkt_t *pkt, uint8_t code)
 {
-    coap_hdr_set_code(coap_get_udp_hdr(pkt), code);
-}
-
-/**
- * @brief   Set the message type for the given CoAP header
- *
- * @pre     (type := [0-3])
- *
- * @param[out]  hdr     CoAP header to write
- * @param[in]   type    message type as integer value [0-3]
- *
- * @deprecated  Use @ref coap_pkt_set_type instead
- */
-static inline void coap_hdr_set_type(coap_udp_hdr_t *hdr, unsigned type)
-{
-    /* assert correct range of type */
-    assert(!(type & ~0x3));
-
-    hdr->ver_t_tkl &= ~0x30;
-    hdr->ver_t_tkl |= type << 4;
-}
-
-/**
- * @brief       Get the token length of a CoAP over UDP (DTLS) packet
- * @param[in]   hdr     CoAP over UDP header
- * @return      The size of the token in bytes
- *
- * @warning     This API is super goofy. It assumes that the packet is valid
- *              and will read more than `sizeof(*hdr)` into the data `hdr`
- *              points to while crossing fingers hard.
- *
- * @deprecated  This function was introduced to keep legacy code alive.
- *              Introducing new callers should be avoided. In the RX path an
- *              @ref coap_pkt_t will be available, so that you can call
- *              @ref coap_get_token instead. In the TX path the token was
- *              added by us, so we really should know.
- */
-static inline size_t coap_hdr_get_token_len(const coap_udp_hdr_t *hdr)
-{
-    const uint8_t *buf = (const void *)hdr;
-    /* Regarding use unnamed magic numbers 13 and 269:
-     * - If token length is < 13 it fits into TKL field (4 bit)
-     * - If token length is < 269 it fits into 8-bit extended TKL field
-     * - Otherwise token length goes into 16-bit extended TKL field.
-     *
-     * (Not using named constants here, as RFC 8974 also has no names for those
-     * magic numbers.)
-     *
-     * See: https://www.rfc-editor.org/rfc/rfc8974#name-extended-token-length-tkl-f
-     */
-    switch (coap_hdr_tkl_ext_len(hdr)) {
-    case 0:
-        return hdr->ver_t_tkl & 0x0f;
-    case 1:
-        return buf[sizeof(coap_udp_hdr_t)] + 13;
-    case 2:
-        return byteorder_bebuftohs(buf + sizeof(coap_udp_hdr_t)) + 269;
-    }
-
-    return 0;
-}
-
-/**
- * @brief       Get the Token of a CoAP over UDP (DTLS) packet
- * @param[in]   hdr     CoAP over UDP header
- * @return      The CoAP Token inside the packet that @p hdr belongs to
- *
- * @warning     This API is super goofy. It assumes that the packet is valid
- *              and will read more than `sizeof(*hdr)` into the data `hdr`
- *              points to while crossing fingers hard.
- *
- * @deprecated  This function was introduced to keep legacy code alive.
- *              Introducing new callers should be avoided. In the RX path an
- *              @ref coap_pkt_t will be available, so that you can call
- *              @ref coap_get_token instead. In the TX path the token was
- *              added by us, so we really should know.
- */
-static inline const void * coap_hdr_get_token(const coap_udp_hdr_t *hdr)
-{
-    uint8_t *token = (void *)hdr;
-    token += sizeof(*hdr) + coap_hdr_tkl_ext_len(hdr);
-    return token;
-}
-
-/**
- * @brief       Get the header length of a CoAP packet.
- *
- * @warning     This API is super goofy. It assumes that the packet is valid
- *              and will read more than `sizeof(*hdr)` into the data `hdr`
- *              points to while crossing fingers hard.
- *
- * @deprecated  This function was introduced to keep legacy code alive.
- *              Introducing new callers should be avoided. In the RX path an
- *              @ref coap_pkt_t will be available, so that you can call
- *              @ref coap_get_total_hdr_len instead. In the TX path the header
- *              was created by us (e.g. using @ref coap_build_hdr which returns
- *              the header size), so we really should know already.
- */
-static inline size_t coap_hdr_len(const coap_udp_hdr_t *hdr)
-{
-    return sizeof(*hdr) + coap_hdr_tkl_ext_len(hdr) + coap_hdr_get_token_len(hdr);
+    coap_udp_hdr_t *hdr = coap_get_udp_hdr(pkt);
+    hdr->code = code;
 }
 
 /**
@@ -935,10 +751,13 @@ static inline size_t coap_hdr_len(const coap_udp_hdr_t *hdr)
  */
 static inline void coap_pkt_set_type(coap_pkt_t *pkt, unsigned type)
 {
-    coap_udp_hdr_t *hdr = coap_get_udp_hdr(pkt);
+    /* assert correct range of type */
+    assert(!(type & ~0x3));
+    coap_udp_hdr_t *udp = coap_get_udp_hdr(pkt);
 
-    if (hdr) {
-        coap_hdr_set_type(hdr, type);
+    if (udp) {
+        udp->ver_t_tkl &= ~0x30;
+        udp->ver_t_tkl |= type << 4;
     }
 }
 
@@ -1265,7 +1084,7 @@ static inline ssize_t coap_get_proxy_uri(coap_pkt_t *pkt, char **target)
  * @param[in]    blknum     offset from the beginning of content, in terms of
                             @p blksize byte blocks
  * @param[in]    blksize    size of each block; must be a power of 2 between 16
- *                          and 2 raised to #CONFIG_NANOCOAP_BLOCK_SIZE_EXP_MAX
+ *                          and `coap_szx2size(CONFIG_NANOCOAP_BLOCK_SIZE_MAX)`
  * @param[in]    more       more blocks? use 1 if yes; 0 if no or unknown
  */
 void coap_block_object_init(coap_block1_t *block, size_t blknum, size_t blksize,
@@ -1333,8 +1152,14 @@ static inline bool coap_block2_finish(coap_block_slicer_t *slicer)
  *
  * @param[in]   pkt         packet to work on
  * @param[out]  slicer      Preallocated slicer struct to fill
+ *
+ * @retval       0          Success
+ * @retval       -EBADMSG   @p pkt contains an invalid block options
+ * @retval       -EOVERFLOW slice specified by block option exceeds address
+ *                          space (16-bit / 8-bit MCUs only)
  */
-void coap_block2_init(coap_pkt_t *pkt, coap_block_slicer_t *slicer);
+WARN_UNUSED_RESULT
+int coap_block2_init(coap_pkt_t *pkt, coap_block_slicer_t *slicer);
 
 /**
  * @brief Initialize a block slicer struct from content information
@@ -1343,10 +1168,14 @@ void coap_block2_init(coap_pkt_t *pkt, coap_block_slicer_t *slicer);
  * @param[in]    blknum     offset from the beginning of content, in terms of
                             @p blksize byte blocks
  * @param[in]    blksize    size of each block; must be a power of 2 between 16
- *                          and 2 raised to #CONFIG_NANOCOAP_BLOCK_SIZE_EXP_MAX
+ *                          `coap_szx2size(CONFIG_NANOCOAP_BLOCK_SIZE_MAX)`
+ * @retval       0          Success
+ * @retval       -EINVAL    @p blknum and/or @p blksize are invalid, e.g.
+ *                          because they point outside the addressable RAM
  */
-void coap_block_slicer_init(coap_block_slicer_t *slicer, size_t blknum,
-                            size_t blksize);
+WARN_UNUSED_RESULT
+int coap_block_slicer_init(coap_block_slicer_t *slicer, size_t blknum,
+                           size_t blksize);
 
 /**
  * @brief Add a byte array to a block2 reply when building the response using
@@ -1425,24 +1254,35 @@ int coap_blockwise_put_char(coap_builder_t *state, coap_block_slicer_t *slicer, 
 int coap_blockwise_put_char_pkt(coap_pkt_t *pdu, coap_block_slicer_t *slicer, char c);
 
 /**
- * @brief    Block option getter
+ * @brief    Internal Block Option getter
+ *
+ * @internal
+ *
+ * @note    Use @ref coap_get_block1 or @ref coap_get_block2 instead
  *
  * This function gets a CoAP packet's block option and parses it into a helper
  * structure.
  *
- * If no block option is present in @p pkt, the values in @p block will be
- * initialized with zero. That implies both block->offset and block->more are
- * also valid in that case, as packet with offset==0 and more==0 means it contains
- * all the payload for the corresponding request.
+ * If no block option is present in @p pkt, the values in @p block will
+ * be initialized with defaults. That implies both `block->offset` and
+ * `block->more` are also valid in that case, as a packet with `offset==0` and
+ * `more==0` means it contains all the payload for the corresponding request.
+ * `block-szx` will be set to `CONFIG_NANOCOAP_BLOCKSIZE_DEFAULT` when no
+ * option is present.
  *
  * @param[in]   pkt     pkt to work on
  * @param[out]  block   ptr to preallocated coap_block1_t structure
  * @param[in]   option  block1 or block2
  *
- * @returns     0 if block option not present
- * @returns     1 if structure has been filled
+ * @retval      1           option present and parsed, @p block filled with
+ *                          parsed values
+ * @retval      0           option not present, @p block filled with defaults
+ * @retval      -EBADMSG    option present, but invalid encoding
+ * @retval      -EOVERFLOW  `block->offset` is overflown. (8-bit / 16-bit MCU
+ *                          and offset >= 64 KiB)
  */
-int coap_get_block(coap_pkt_t *pkt, coap_block1_t *block, uint16_t option);
+WARN_UNUSED_RESULT
+int coap_get_block(coap_pkt_t *pkt, struct _coap_block *block, uint16_t option);
 
 /**
  * @brief    Block1 option getter
@@ -1450,17 +1290,24 @@ int coap_get_block(coap_pkt_t *pkt, coap_block1_t *block, uint16_t option);
  * This function gets a CoAP packet's block1 option and parses it into a helper
  * structure.
  *
- * If no block1 option is present in @p pkt, the values in @p block1 will be
- * initialized with zero. That implies both block1->offset and block1->more are
- * also valid in that case, as packet with offset==0 and more==0 means it contains
- * all the payload for the corresponding request.
+ * If no block option is present in @p pkt, the values in @p block will
+ * be initialized with defaults. That implies both `block->offset` and
+ * `block->more` are also valid in that case, as a packet with `offset==0` and
+ * `more==0` means it contains all the payload for the corresponding request.
+ * `block-szx` will be set to `CONFIG_NANOCOAP_BLOCKSIZE_DEFAULT` when no
+ * option is present.
  *
  * @param[in]   pkt     pkt to work on
  * @param[out]  block   ptr to preallocated coap_block1_t structure
  *
- * @returns     0 if block1 option not present
- * @returns     1 if structure has been filled
+ * @retval      1           option present and parsed, @p block filled with
+ *                          parsed values
+ * @retval      0           option not present, @p block filled with defaults
+ * @retval      -EBADMSG    option present, but invalid encoding
+ * @retval      -EOVERFLOW  `block->offset` is overflown. (8-bit / 16-bit MCU
+ *                          and offset >= 64 KiB)
  */
+WARN_UNUSED_RESULT
 static inline int coap_get_block1(coap_pkt_t *pkt, coap_block1_t *block)
 {
     return coap_get_block(pkt, block, COAP_OPT_BLOCK1);
@@ -1469,30 +1316,25 @@ static inline int coap_get_block1(coap_pkt_t *pkt, coap_block1_t *block)
 /**
  * @brief    Block2 option getter
  *
- * @param[in]   pkt     pkt to work on
- * @param[out]  block   ptr to preallocated coap_block1_t structure
+ * @note        CoAP servers should use @ref coap_block2_init instead. It will
+ *              internally parse the request's Block2 Option (when present) and
+ *              set up response slicing accordingly.
  *
- * @returns     0 if block2 option not present
- * @returns     1 if structure has been filled
+ * @param[in]   pkt     pkt to work on
+ * @param[out]  block   ptr to preallocated coap_block2_t structure
+ *
+ * @retval      1           option present and parsed, @p block filled with
+ *                          parsed values
+ * @retval      0           option not present, @p block filled with defaults
+ * @retval      -EBADMSG    option present, but invalid encoding
+ * @retval      -EOVERFLOW  `block->offset` is overflown. (8-bit / 16-bit MCU
+ *                          and offset >= 64 KiB)
  */
-static inline int coap_get_block2(coap_pkt_t *pkt, coap_block1_t *block)
+WARN_UNUSED_RESULT
+static inline int coap_get_block2(coap_pkt_t *pkt, coap_block2_t *block)
 {
     return coap_get_block(pkt, block, COAP_OPT_BLOCK2);
 }
-
-/**
- * @brief    Generic block option getter
- *
- * @param[in]   pkt     pkt to work on
- * @param[in]   option  actual block option number to get
- * @param[out]  blknum  block number
- * @param[out]  szx     SZX value
- *
- * @returns     -1 if option not found
- * @returns     0 if more flag is not set
- * @returns     1 if more flag is set
- */
-int coap_get_blockopt(coap_pkt_t *pkt, uint16_t option, uint32_t *blknum, uint8_t *szx);
 
 /**
  * @brief    Check whether any of the packet's options that are critical
@@ -1512,28 +1354,6 @@ int coap_get_blockopt(coap_pkt_t *pkt, uint16_t option, uint32_t *blknum, uint8_
  * @returns false if there are no critical options, or all have been accessed.
  */
 bool coap_has_unprocessed_critical_options(const coap_pkt_t *pkt);
-
-/**
- * @brief   Helper to decode SZX value to size in bytes
- *
- * @param[in]   szx     SZX value to decode
- *
- * @returns     SZX value decoded to bytes
- */
-#define coap_szx2size(szx) (1U << ((szx) + 4))
-
-/**
- * @brief   Helper to encode byte size into next equal or smaller SZX value
- *
- * @param[in]   len     Size in bytes
- *
- * @returns     closest SZX value that fits into a buffer of @p len
- */
-static inline unsigned coap_size2szx(unsigned len)
-{
-    assert(len >= 16);
-    return bitarithm_msb(len >> 4);
-}
 /**@}*/
 
 /**
@@ -2552,40 +2372,6 @@ static inline int coap_opt_put_ct(coap_builder_t *state, uint16_t content_type)
  */
 ssize_t coap_build_udp_hdr(void *buf, size_t buf_len, uint8_t type, const void *token,
                            size_t token_len, uint8_t code, uint16_t id);
-/**
- * @brief   Builds a CoAP header
- *
- * Caller *must* ensure @p hdr can hold the header and the full token!
- *
- * @param[out]   hdr        hdr to fill
- * @param[in]    type       CoAP packet type (e.g., COAP_TYPE_CON, ...)
- * @param[in]    token      token
- * @param[in]    token_len  length of @p token
- * @param[in]    code       CoAP code (e.g., COAP_CODE_204, ...)
- * @param[in]    id         CoAP request id
- *
- * @pre     @p token is either not overlapping with the memory buffer
- *          @p hdr points to, or is already at the right offset (e.g.
- *          when building the response inside the buffer the contained
- *          the request).
- *
- * @returns      length of resulting header
- *
- * @deprecated  Use @ref coap_build_udp_hdr instead
- */
-static inline ssize_t coap_build_hdr(coap_udp_hdr_t *hdr, unsigned type, const void *token,
-                                     size_t token_len, unsigned code, uint16_t id)
-{
-    size_t fingers_crossed_size = sizeof(*hdr) + token_len;
-
-    if (IS_USED(MODULE_NANOCOAP_TOKEN_EXT)) {
-        /* With RFC 8974, we have an additional extended TKL
-         * field of 0-4 bytes in length */
-        fingers_crossed_size += 4;
-    }
-
-    return coap_build_udp_hdr(hdr, fingers_crossed_size, type, token, token_len, code, id);
-}
 
 /**
  * @brief   Build reply to CoAP request
@@ -2753,16 +2539,6 @@ static inline coap_method_flags_t coap_method2flag(unsigned code)
  * @retval      <0          error
  */
 ssize_t coap_parse_udp(coap_pkt_t *pkt, uint8_t *buf, size_t len);
-
-/**
- * @brief   Alias for @ref coap_parse_udp
- *
- * @deprecated  Use @ref coap_parse_udp instead
- */
-static inline ssize_t coap_parse(coap_pkt_t *pkt, uint8_t *buf, size_t len)
-{
-    return coap_parse_udp(pkt, buf, len);
-}
 
 /**
  * @brief   Initialize a packet struct, to build a message buffer

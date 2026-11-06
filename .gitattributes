@@ -1,10 +1,10 @@
 *.a binary
-*.patch binary
-Cargo.lock binary
+*.patch linguist-generated
+Cargo.lock linguist-generated
 # Default conflict marker size is 7 which causes some of the headings in
 # release-notes.txt to trigger git diff --check: 'leftover conflict marker'
 # when the heading is exactly 7 characters long.
 *.md conflict-marker-size=100
 *.txt conflict-marker-size=100
-*.svg binary
-package-lock.json binary
+*.svg linguist-generated
+package-lock.json linguist-generated

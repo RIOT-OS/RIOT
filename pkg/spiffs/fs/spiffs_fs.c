@@ -1,9 +1,6 @@
 /*
- * Copyright (C) 2016 OTA keys S.A.
- *
- * This file is subject to the terms and conditions of the GNU Lesser
- * General Public License v2.1. See the file LICENSE in the top level
- * directory for more details.
+ * SPDX-FileCopyrightText: 2016 OTA keys S.A.
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
 
 /**
@@ -26,6 +23,7 @@
 #include "fs/spiffs_fs.h"
 
 #include "kernel_defines.h"
+#include "string_utils.h"
 
 #define ENABLE_DEBUG 0
 #include <debug.h>
@@ -397,7 +395,7 @@ static int _readdir(vfs_DIR *dirp, vfs_dirent_t *entry)
 
     if (ret) {
         entry->d_ino = e.obj_id;
-        strncpy(entry->d_name, (char*) e.name, VFS_NAME_MAX);
+        strscpy(entry->d_name, (char *)e.name, sizeof(entry->d_name));
         return 1;
     }
     else {

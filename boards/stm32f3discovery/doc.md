@@ -4,25 +4,19 @@
 
 ## Overview
 
-The STM32F3-discovery is cheap evaluation board designed by ST for pushing
-the STM32F3 microcontoller to a broad audience. It features an STM32F303VC
+The STM32F3Discovery is cheap evaluation board designed by ST for pushing
+the STM32F3 microcontroller to a broad audience. It features an STM32F303VC
 microcontroller with 48Kb of RAM and 256Kb flash memory running with up to
-72MHz. Addionially it provides USB host capabilities, 8 LEDs and sensors for a
+72MHz. Additionally it provides USB host capabilities, 8 LEDs and sensors for a
 9-degree of freedom initial measurement unit (3-axis accelerometer, 3-axis gyro
 and 3-axis magnetometer).
-
-The board does however not provide any radio capabilities, radio devices have
-to be connected externally via I2C, SPI, UART or similar.
-
-See [this page](https://github.com/RIOT-OS/RIOT/wiki/Getting-started-with-STM32F%5B0%7C3%7C4%5Ddiscovery-boards)
-for a quick getting started guide.
 
 ## Hardware
 
 ![STM32F3discovery image](https://www.st.com/bin/ecommerce/api/image.PF254044.en.feature-description-include-personalized-no-cpn-large.jpg)
 
-
 ### MCU
+
 | MCU        | STM32F303VC       |
 |:------------- |:--------------------- |
 | Family | ARM Cortex-M4     |
@@ -45,7 +39,8 @@ for a quick getting started guide.
 ### RIOT static pin mapping
 
 please refer to [this](https://docs.google.com/spreadsheets/d/1gnxsux5WpFrn-33Ivb9nGgTBqooqgDYxRkhZms-cvsc/edit?usp=sharing)
-*  document for the pin mapping as
+
+* document for the pin mapping as
 implemenented in `boards/stm32f3discovery/include/periph_conf.h`
 
 ### User Interface
@@ -62,8 +57,6 @@ implemenented in `boards/stm32f3discovery/include/periph_conf.h`
 | -----  | ----- | ----- | ----- | ----- | ----- | ----- | ----- | ----- |
 | Color  | red   | blue  | orange| green | green | orange| blue  | red   |
 | Pin    | PE9   | PE8   | PE10  | PE15  | PE11  | PE14  | PE12  | PE13  |
-
-
 
 ### E-Compass / Accelerometer
 
@@ -84,8 +77,6 @@ e-compass.
 | INT1       | PE4 (IN)      |
 | INT2       | PE5 (IN)      |
 
-
-
 ### Gyroscope
 
 An 3-axis gyroscope is soldered on the board.
@@ -102,7 +93,7 @@ An 3-axis gyroscope is soldered on the board.
 | SCK        | PA5 (OUT, SPI1_SCK)   |
 | MISO       | PA6 (IN,  SPI1_MISO)  |
 | MOSI       | PA7 (OUT, SPI1_MOSI)  |
-| CS     | PE3 (OUT)     |
+| CS         | PE3 (OUT)     |
 | INT1       | PE0 (IN)      |
 | INT2/DRDY  | PE1 (IN)      |
 
@@ -126,34 +117,15 @@ The driver detects automatically which sensor variant is on the board.
 | Magnetometer   | LSM303DLHC    | no        | planned |
 | Gyroscope  | L3GD20/I3G4250D | yes        | |
 
+## Flashing the Board
 
-## Flashing the device
-
-
-The STM32F3discovery board includes an on-board ST-LINK V2 programmer. The
-easiest way to program the board is to use OpenOCD. Once you have installed
-OpenOCD (look [here](https://github.com/RIOT-OS/RIOT/wiki/OpenOCD) for
-installation instructions), you can flash the board simply by typing
-
-```
-make flash
-```
-and debug via GDB by simply typing
-```
-make debug
-```
-
-
-## Supported Toolchains
-
-For using the STM32F3discovery board we strongly recommend the usage of the
-[GNU Tools for ARM Embedded Processors](https://launchpad.net/gcc-arm-embedded)
-toolchain.
-
+A detailed description about the flashing process can be found on the
+[guides page](https://guide.riot-os.org/board_specific/stm32/).
+The board name for the STM32F3discovery is `stm32f3discovery`.
 
 ## Using UART
 
 1. connect your usb tty to: RX=PA10 TX=PA9 and GND=GND
-   - **PA10** is connected with **TX** on the UART converter
-   - **PA9** is connected with **RX** on the UART converter
+   * **PA10** is connected with **TX** on the UART converter
+   * **PA9** is connected with **RX** on the UART converter
 2. done

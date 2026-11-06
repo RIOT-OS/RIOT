@@ -13,15 +13,57 @@
 extern "C" {
 #endif
 
+/**
+ * @brief   Frequency of the Current Controlled Oscillator (CCO)
+ *
+ * A frequency generated an input clock in the range of 32 kHz to 50 MHz using
+ * a phase locked loop in the range of 275 MHz to 550 MHz. The CPU clock is
+ * derived from it using a clock divider. E.g. an F_CCO of 288 MHz can be
+ * divided by for to generate a CPU clock of 72 MHz.
+ *
+ * See section 6.11 "PLL frequency calculation" in "UM10211 LPC23XX User manual"
+ * for more details.
+ */
 #define F_CCO                   288000000
-#define CL_CPU_DIV              4                                   ///< CPU clock divider
+
+/**
+ * @brief   CPU clock divider
+ *
+ * In other words: The CPU clock is `F_CCO / CL_CPU_DIV`
+ */
+#define CL_CPU_DIV              4
 #define F_RC_OSCILLATOR         4000000                             ///< Frequency of internal RC oscillator
 #define F_RTC_OSCILLATOR        32767                               ///< Frequency of RTC oscillator
 
 #define VIC_SIZE                32
 
-#define PLLCFG_N(n)             ((n - 1) << 16)
-#define PLLCFG_M(m)             (m - 1)
+/**
+ * @name    Macros to assemble the PLLCFG register
+ *
+ * The PLL generating `F_CCO` can be configured from the input frequency `F_IN`
+ * via the parameters `M` and `N` such that:
+ *
+ * ```
+ * F_CCO = (2 * M * F_IN) / N
+ * ```
+ *
+ * `M` and `N` must be chosen so that `275000000 <= F_CCO <= 550000000` and
+ * `6 <= M <= 512`.
+ *
+ * The `PLLCFG` register than can be programmed by:
+ *
+ * ```c
+ * PLLCFG = PLLCFG_M(VALUE_OF_M) | PLLCFG_N(VALUE_OF_N);
+ * ```
+ *
+ * See section 6.11 "PLL frequency calculation" in "UM10211 LPC23XX User manual"
+ * for more details.
+ *
+ * @{
+ */
+#define PLLCFG_N(n)             (((n) - 1) << 16) ///< Helper for programming PLLCFG
+#define PLLCFG_M(m)             ((m) - 1)         ///< Helper for programming PLLCFG
+/** @} */
 
 #define GPIO_INT 17
 #define IRQP_GPIO 4

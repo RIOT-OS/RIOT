@@ -10,20 +10,10 @@ SPDX-License-Identifier: LGPL-2.1-only
 
 \section esp32s3_pros3 ESP32 ProS3
 
-## Table of Contents {#esp32s3_pros3_toc}
-
-1. [Overview](#esp32s3_pros3_overview)
-2. [Hardware](#esp32s3_pros3_hardware)
-    1. [MCU](#esp32s3_pros3_mcu)
-    2. [Board Configuration](#esp32s3_pros3_board_configuration)
-    3. [Board Pinout](#esp32s3_pros3_pinout)
-3. [Flashing the Device](#esp32s3_pros3_flashing)
-4. [Using STDIO](#esp32s3_pros3_stdio)
-
-## Overview {#esp32s3_pros3_overview}
+## Overview
 
 The ESP32 ProS3 is one of the ESP32-S3 boards from Unexpected Maker.
-\image html https://esp32s3.com/images/main_features_pros3.jpg "ESP32 ProS3" width=800px
+<img src="https://esp32s3.com/images/main_features_pros3.jpg" alt="ESP32 ProS3" width=800px />
 
 The main features of the board are:
 
@@ -36,27 +26,15 @@ The main features of the board are:
 - VBAT and 5V Sensing Pins
 - 3D High Gain Antenna
 
-[Back to table of contents](#esp32s3_pros3_toc)
+## Hardware
 
-## Hardware {#esp32s3_pros3_hardware}
-
-This section describes
-
-- the [MCU](#esp32s3_pros3_mcu),
-- the default [board configuration](#esp32s3_pros3_board_configuration),
-- the [board pinout](#esp32s3_pros3_pinout).
-
-[Back to table of contents](#esp32s3_pros3_toc)
-
-### MCU {#esp32s3_pros3_mcu}
+### MCU
 
 Most features of the board are provided by the ESP32-S3 SoC. For detailed
 information about the ESP32-S3 SoC variant (family) and ESP32x SoCs,
 see section \ref esp32_mcu_esp32 "ESP32 SoC Series".
 
-[Back to table of contents](#esp32s3_pros3_toc)
-
-### Board Configuration {#esp32s3_pros3_board_configuration}
+### Board Configuration
 
 ESP32 ProS3 boards have no special hardware on board with the exception
 of a single pin RGB-LED WS2812B that uses a special bit-oriented protocol to
@@ -111,43 +89,42 @@ SPI_DEV(0) CS0  | GPIO34 | SPI2_HOST (FSPI) is used | \ref esp32_spi_interfaces 
 UART_DEV(0) TxD | GPIO43 | Console (configuration is fixed) | \ref esp32_uart_interfaces "UART interfaces"
 UART_DEV(0) RxD | GPIO44 | Console (configuration is fixed) | \ref esp32_uart_interfaces "UART interfaces"
 </center>
-\n
+<br>
 
 For detailed information about the peripheral configurations of ESP32-S3
 boards, see section \ref esp32_peripherals "Common Peripherals".
 
-[Back to table of contents](#esp32s3_pros3_toc)
-
-### Board Pinout {#esp32s3_pros3_pinout}
+### Board Pinout
 
 The following figure shows the pinout as configured by board definition.
 
-@image html https://esp32s3.com/images/pins_pros3.jpg "ESP32 ProS3C-1 Pinout" width=900px
+<img src="https://esp32s3.com/images/pins_pros3.jpg" alt="ESP32 ProS3C-1 Pinout" width=900px />
 
 The corresponding board schematic can be found
 [here](https://github.com/UnexpectedMaker/esp32s3/raw/main/schematics/schematic-pros3.pdf)
 
-[Back to table of contents](#esp32s3_pros3_toc)
-
-## Flashing the Device {#esp32s3_pros3_flashing}
+## Flashing the Device
 
 Since the board does not have a USB-to-Serial chip, the easiest way to flash
 the board is using the USB Serial/JTAG interface. Just connect the board to
 your host computer and use the following command:
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+```shell
 BOARD=esp32s3-pros3 make flash ...
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+```
 
 @note Usually the make system resets the board before flashing to enable the
 USB Serial/JTAG interface. In some special cases this reset does not work so
 that the programmer cannot connect to the board and the flashing is aborted
 with a timeout:
-```
+
+```text
 Serial port /dev/ttyACM0
 Connecting...
 ...
 serial.serialutil.SerialTimeoutException: Write timeout
 ```
+
 This can happen for example if the board is not yet flashed with RIOT or the
 USB interface is used for another purpose. In this case, restart the board
 manually in download mode by pressing and releasing the RESET button while
@@ -160,16 +137,15 @@ of the UART0 interface. Before RIOT can be flashed, the board has to be
 switched to download mode. To do this, press and release the RESET button
 while holding down the BOOT button. Once the board is in download mode, use
 the following command to flash RIOT:
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+```shell
 BOARD=esp32s3-pros3 make flash ...
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+```
 
 For detailed information about ESP32-S3 as well as configuring and compiling
 RIOT for ESP32-S3 boards, see \ref esp32_riot.
 
-[Back to table of contents](#esp32s3_pros3_toc)
-
-## Using STDIO {#esp32s3_pros3_stdio}
+## Using STDIO
 
 Since the board does not have a USB-to-Serial chip, the USB Serial/JTAG
 interface is used by default for the STDIO (module `stdio_usb_serial_jtag`)
@@ -181,6 +157,7 @@ via the USB CDC ACM interface.
 
 Alternatively, the UART interface could be used with an external USB-to-Serial
 adapter. Simply add `stdio_uart` to the list of used modules for this purpose:
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+```shell
 BOARD=esp32s3-pros3 USEMODULE=stdio_uart make flash ...
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+```

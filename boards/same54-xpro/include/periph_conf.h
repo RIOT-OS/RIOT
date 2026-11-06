@@ -24,33 +24,25 @@ extern "C" {
 
 /**
  * @brief   Use the external oscillator to source all fast clocks.
- *          This allows us to use the buck voltage regulator for
- *          maximum power efficiency, but limits the maximum clock
- *          frequency to 12 MHz.
+ *
+ * This allows us to use the buck voltage regulator for maximum power
+ * efficiency, but limits the maximum clock frequency to 12 MHz.
  */
 #ifndef USE_XOSC_ONLY
-#define USE_XOSC_ONLY       (0)
+#  define USE_XOSC_ONLY     (0)
 #endif
 
-/**
- * @name    external Oscillator (XOSC1) configuration
- * @{
- */
+/** External Oscillator (XOSC1) configuration */
 #define XOSC1_FREQUENCY     MHZ(12)
-/** @} */
 
-/**
- * @name    desired core clock frequency
- * @{
- */
+/** Desired core clock frequency */
 #ifndef CLOCK_CORECLOCK
-#if USE_XOSC_ONLY
-#define CLOCK_CORECLOCK     XOSC1_FREQUENCY
-#else
-#define CLOCK_CORECLOCK     MHZ(120)
+#  if USE_XOSC_ONLY
+#    define CLOCK_CORECLOCK XOSC1_FREQUENCY
+#  else
+#    define CLOCK_CORECLOCK MHZ(120)
+#  endif
 #endif
-#endif
-/** @} */
 
 /**
  * @name    32kHz Oscillator configuration
@@ -62,7 +54,8 @@ extern "C" {
 
 /**
  * @brief Enable the internal DC/DC converter
- *        The board is equipped with the necessary inductor.
+ *
+ * The board is equipped with the necessary inductor.
  */
 #define USE_VREG_BUCK       (1)
 
@@ -102,12 +95,8 @@ static const tc32_conf_t timer_config[] = {
 #define TIMER_NUMOF         ARRAY_SIZE(timer_config)
 /** @} */
 
-/**
- * @brief ATA6561 STANDBY pin definition
- * @{
- */
+/** ATA6561 STANDBY pin definition */
 #define AT6561_STBY_PIN            GPIO_PIN(PC, 13)
-/** @} */
 
 /**
  * @name CAN configuration
@@ -119,9 +108,9 @@ static const can_conf_t candev_conf[] = {
         .can = CAN1,
         .rx_pin = GPIO_PIN(PB, 13),
         .tx_pin = GPIO_PIN(PB, 12),
-        .gclk_src = SAM0_GCLK_PERIPH,
         .enable_pin = AT6561_STBY_PIN,
         .enable_pin_mode = GPIO_OUT,
+        .gclk_src = SAM0_GCLK_PERIPH,
         .enable_pin_active_low = true,
     }
 };
@@ -208,7 +197,6 @@ static const uart_conf_t uart_config[] = {
  * @name PWM configuration
  * @{
  */
-
 /* PWM0 channels */
 static const pwm_conf_chan_t pwm_chan0_config[] = {
     /* GPIO pin, MUX value, TCC channel */
@@ -283,10 +271,10 @@ static const spi_conf_t spi_config[] = {
         .miso_pad = SPI_PAD_MISO_0,         /* unused */
         .mosi_pad = SPI_PAD_MOSI_0_SCK_1,   /* unused */
         .gclk_src = SAM0_GCLK_MAIN,         /* unused */
-#ifdef MODULE_PERIPH_DMA
+#  ifdef MODULE_PERIPH_DMA
         .tx_trigger = QSPI_DMAC_ID_TX,
         .rx_trigger = QSPI_DMAC_ID_RX,
-#endif
+#  endif
     },
 #endif
 };
@@ -327,7 +315,7 @@ static const i2c_conf_t i2c_config[] = {
  * @{
  */
 #ifndef RTT_FREQUENCY
-#define RTT_FREQUENCY       (32768U)
+#  define RTT_FREQUENCY     (32768U)
 #endif
 /** @} */
 
@@ -350,7 +338,6 @@ static const sam0_common_usb_config_t sam_usbdev_config[] = {
  * @name ADC Configuration
  * @{
  */
-
 /* ADC Default values */
 #define ADC_GCLK_SRC                        SAM0_GCLK_PERIPH    /**< clock used for ADC */
 #define ADC_PRESCALER                       ADC_CTRLA_PRESCALER_DIV8
@@ -376,15 +363,15 @@ static const adc_conf_chan_t adc_channels[] = {
 #define DAC_CLOCK           SAM0_GCLK_TIMER
 #ifndef DAC_VREF
                             /* Internal reference only gives 1V */
-#define DAC_VREF            DAC_CTRLB_REFSEL_INTREF
+#  define DAC_VREF          DAC_CTRLB_REFSEL_INTREF
 #endif
 /** @} */
 
 /**
  * @name SDHC configuration
  *
- *       This is entirely optional, but allows us to save a few bytes if only
- *       a single SDHC instance is used.
+ * This is entirely optional, but allows us to save a few bytes if only
+ * a single SDHC instance is used.
  * @{
  */
 #define SDHC_DEV            SDHC1       /**< The SDHC instance to use */

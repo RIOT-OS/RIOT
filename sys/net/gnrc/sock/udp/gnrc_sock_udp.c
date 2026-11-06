@@ -1,9 +1,6 @@
 /*
- * Copyright (C) 2015 Martine Lenders <mlenders@inf.fu-berlin.de>
- *
- * This file is subject to the terms and conditions of the GNU Lesser
- * General Public License v2.1. See the file LICENSE in the top level
- * directory for more details.
+ * SPDX-FileCopyrightText: 2015 Martine Lenders <mlenders@inf.fu-berlin.de>
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
 
 /**
@@ -20,19 +17,23 @@
 #include <string.h>
 
 #include "byteorder.h"
+#include "gnrc_sock_internal.h"
 #include "net/af.h"
-#include "net/protnum.h"
 #include "net/gnrc/ipv6.h"
 #include "net/gnrc/udp.h"
+#include "net/protnum.h"
 #include "net/sock/udp.h"
 #include "net/udp.h"
 #include "random.h"
 
 #ifdef SOCK_HAS_ASYNC_CTX
-#include "net/sock/async/event.h"
+#  include "net/sock/async/event.h"
 #endif
 
-#include "gnrc_sock_internal.h"
+#ifdef MODULE_GNRC_SOCK_CHECK_REUSE
+#  include "utlist.h"
+#endif
+
 
 #define ENABLE_DEBUG 0
 #include "debug.h"

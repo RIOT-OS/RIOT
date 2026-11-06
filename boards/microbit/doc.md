@@ -15,7 +15,6 @@ a Nordic proprietary radio mode.
 Additionally the boards features 2 buttons, a 5x5 LED matrix, a MAG3110
 3-axis magnetometer, and a MMA8653 3-axis accelerometer.
 
-
 ## Hardware
 
 ![micro:bit](https://github.com/RIOT-OS/RIOT/wiki/images/board_microbit.png)
@@ -36,8 +35,7 @@ Additionally the boards features 2 buttons, a 5x5 LED matrix, a MAG3110
 | Vcc               | 1.8V - 3.6V                       |
 | Reference Manual  | [Reference Manual](http://infocenter.nordicsemi.com/pdf/nRF51_RM_v3.0.pdf) |
 
-
-##  Flashing and Debugging
+## Flashing and Debugging
 
 There are two possibilities to flash the board: using the default ARM DAPLink
 or you can flash the board using Segger's JLink.
@@ -52,7 +50,7 @@ file onto the board, and that's it.
 The `micro:bit` port comes with a little script that does this automatically,
 so you can flash the board as usual with
 
-```
+```shell
 BOARD=microbit make flash
 ```
 
@@ -67,7 +65,7 @@ default anytime ([as described here](https://www.mbed.com/en/development/hardwar
 
 Once you have flashed the JLink firmware, you can flash the board like this:
 
-```
+```shell
 BOARD=microbit PROGRAMMER=jlink make flash
 ```
 
@@ -76,7 +74,6 @@ With the JLink firmware, you can now also do in-circuit debugging etc.
 **Note: The current version of the JLink firmware
 (JLink_OB_BBC_microbit_16-07-29.hex) does not support any serial port over USB,
 so you can not use the RIOT shell with this firmware.**
-
 
 ### QEMU emulation
 
@@ -91,9 +88,11 @@ fail.
 
 Use it like this:
 
-    $ cd examples/basic/hello-world
-    $ BOARD=microbit make clean all -j4
-    $ EMULATE=1 BOARD=microbit make term
+```shell
+cd examples/basic/hello-world
+BOARD=microbit make clean all -j4
+EMULATE=1 BOARD=microbit make term
+```
 
 ## Display
 

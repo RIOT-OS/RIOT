@@ -10,6 +10,7 @@
 RIOTMAKE ?= $(RIOTBASE)/makefiles
 
 include $(RIOTMAKE)/utils/ansi.mk
+include $(RIOTMAKE)/utils/strings.mk
 include $(RIOTMAKE)/color.inc.mk
 
 ifneq (,$(.DEFAULT_GOAL))
@@ -49,24 +50,31 @@ else
   PKG_BUILD_DIR = $(PKG_SOURCE_DIR)
 endif
 
-PKG_SOURCE_LOCAL ?= $(PKG_SOURCE_LOCAL_$(shell echo $(PKG_NAME) | tr a-z- A-Z_))
+# If CARGO_HOME is set, use it to search for `git-cache-rs` (git-cache),
+# otherwise try the local default directory. The git-cache can also be set
+# directly with GIT_CACHE_RS.
+CARGO_HOME ?= $(HOME)/.cargo
 
-# git-cache specific management: GIT_CACHE_DIR is exported only
-# when cloning the repository.
-GITCACHE ?= $(RIOTTOOLS)/git/git-cache
-GIT_CACHE_DIR ?= $(HOME)/.gitcache
-include $(RIOTBASE)/makefiles/utils/variables.mk
-$(call target-export-variables,$(PKG_BUILDDIR)/.git,GIT_CACHE_DIR)
-
-# Check if git-cache-rs is installed in the local default directory and if so,
-# set the `GIT_CACHE_RS` variable to use it.
-DEFAULT_GIT_CACHE_RS ?= $(HOME)/.cargo/bin/git-cache
+DEFAULT_GIT_CACHE_RS ?= $(CARGO_HOME)/bin/git-cache
 ifeq ($(DEFAULT_GIT_CACHE_RS),$(wildcard $(DEFAULT_GIT_CACHE_RS)))
   GIT_CACHE_RS ?= $(DEFAULT_GIT_CACHE_RS)
 endif
 
-# allow overriding package source with local folder (useful during development)
+# The PKG_SOURCE_LOCAL and PKG_SOURCE_LOCAL_$(PKG_NAME) variables can be used to
+# override the package source with a local folder, which is useful during
+# development.
+ifeq ("environment", "$(origin PKG_SOURCE_LOCAL)")
+  $(call echowarn,("Warning: You set a global PKG_SOURCE_LOCAL in the"\
+         "environment. This can have effects on all packages! Consider using"\
+         "PKG_SOURCE_LOCAL_$(call uppercase_and_underscore,$(PKG_NAME)) instead!"))
+endif
+
+PKG_SOURCE_LOCAL ?= $(PKG_SOURCE_LOCAL_$(call uppercase_and_underscore,$(PKG_NAME)))
+
 ifneq (,$(PKG_SOURCE_LOCAL))
+  $(call echowarn,("Warning: PKG_SOURCE_LOCAL in use! Remember to remove it"\
+         "before committing!"))
+
   include $(RIOTBASE)/pkg/local.mk
 else
 
@@ -75,8 +83,17 @@ ifeq ($(QUIET),1)
 endif
 
 GITFLAGS ?= -c user.email=buildsystem@riot -c user.name="RIOT buildsystem"
-GITAMFLAGS ?= $(GIT_QUIET)
-GITAMFLAGS += --no-gpg-sign --ignore-whitespace --whitespace=nowarn
+
+ifneq (,$(GITAMFLAGS))
+  $(call echowarn,("Setting GITAMFLAGS is deprecated and will be removed after"\
+                   "the 2027.04 Release. Modify your patch to be applicable"\
+                   "with the default settings!"))
+else
+  # These flags will be amended to the `git am` command after the deprecation
+  # period has ended.
+  GITAMFLAGS ?= $(GIT_QUIET)
+  GITAMFLAGS += --no-gpg-sign --ignore-whitespace --whitespace=nowarn
+endif
 
 .PHONY: all prepare clean distclean FORCE
 
@@ -130,13 +147,19 @@ gen_dependency_files = $(file >$1,$@: $2)$(foreach f,$2,$(file >>$1,$(f):))
 # * clean, without removing the 'state' files
 # * checkout the wanted base commit
 # * apply patches if there are any. (If none, it does nothing)
+#   * CI builds use `git apply`, which is >10x faster than `git am`, but does
+#     not create individual commits.
 $(PKG_PATCHED): $(PKG_PATCHED_PREREQUISITES)
 	$(if $(QUIETER),,$(info [INFO] patch $(PKG_NAME)))
 	$(call gen_dependency_files,$@.d,$(PKG_PATCHED_PREREQUISITES))
 	$(Q)$(GIT_IN_PKG) clean $(GIT_QUIET) -xdff '**' -e $(PKG_STATE:$(PKG_SOURCE_DIR)/%='%*')
 	$(Q)$(GIT_IN_PKG) checkout $(GIT_QUIET) -f $(PKG_VERSION)
 	$(Q) if test -n "$(PKG_PATCHES)" ; then \
-	       $(GIT_IN_PKG) $(GITFLAGS) am $(GITAMFLAGS) $(PKG_PATCHES) ; \
+	       if test "$(RIOT_CI_BUILD)" = "1" ; then \
+	         $(GIT_IN_PKG) apply --index --ignore-whitespace --whitespace=nowarn $(PKG_PATCHES) ; \
+	       else \
+	         $(GIT_IN_PKG) $(GITFLAGS) am $(GITAMFLAGS) $(PKG_PATCHES) ; \
+	       fi ; \
 	     fi
 	$(Q)touch $@
 
@@ -169,31 +192,21 @@ $(PKG_SOURCE_DIR)/.git: $(PKG_SPARSE_TAG) | $(PKG_CUSTOM_PREPARED)
 	$(if $(QUIETER),,$(info [INFO] cloning $(PKG_NAME) with git-cache-rs))
 	$(Q)rm -Rf $(PKG_SOURCE_DIR)
 	$(Q)$(GIT_CACHE_RS) clone --commit $(PKG_VERSION) $(addprefix --sparse-add ,$(PKG_SPARSE_PATHS)) -- $(PKG_URL) $(PKG_SOURCE_DIR)
-else ifeq ($(GIT_CACHE_DIR),$(wildcard $(GIT_CACHE_DIR)))
-$(PKG_SOURCE_DIR)/.git: | $(PKG_CUSTOM_PREPARED)
-	$(if $(QUIETER),,$(info [INFO] cloning $(PKG_NAME) with git-cache))
-	@echo "$(COLOR_YELLOW)Warning: git-cache is deprecated and will be" \
-	  "removed after the 2026.04 release! See" \
-	  "https://guides.riot-os.org/build-system/advanced_build_system_tricks/#speed-up-builds-with-git-cache-rs" \
-	  "for more information.$(COLOR_RESET)"
-	$(Q)rm -Rf $(PKG_SOURCE_DIR)
-	$(Q)mkdir -p $(PKG_SOURCE_DIR)
-	$(Q)$(GITCACHE) clone $(PKG_URL) $(PKG_VERSION) $(PKG_SOURCE_DIR)
 else
 # redirect stderr so git sees a pipe and not a terminal see https://github.com/git/git/blob/master/progress.c#L138
 $(PKG_SOURCE_DIR)/.git: $(PKG_SPARSE_TAG) | $(PKG_CUSTOM_PREPARED)
 	$(if $(QUIETER),,$(info [INFO] cloning $(PKG_NAME) without cache))
-	@echo "$(COLOR_YELLOW)[INFO] Consider using git-cache-rs to speed up your build" \
+	@$(call sh_echowarn,("[INFO] Consider using git-cache-rs to speed up your build"\
 	  "and reduce network traffic! See:" \
-	  "https://guides.riot-os.org/build-system/advanced_build_system_tricks/#speed-up-builds-with-git-cache-rs" \
-	  "$(COLOR_RESET)"
+	  "https://guides.riot-os.org/build-system/advanced_build_system_tricks/#speed-up-builds-with-git-cache-rs"))
 	$(Q)rm -Rf $(PKG_SOURCE_DIR)
 	$(Q)mkdir -p $(PKG_SOURCE_DIR)
 	$(Q)git init $(GIT_QUIET) $(PKG_SOURCE_DIR)
 	$(Q)if [ -n "$(PKG_SPARSE_PATHS)" ]; then \
 	  # iff the package uses sparse paths, initialize the repository as sparse \
 	  $(if $(QUIETER),,echo "[INFO] using sparse checkout";) \
-	  $(GIT_IN_PKG) sparse-checkout set --no-cone -- $(foreach p,$(PKG_SPARSE_PATHS),"$(p)"); \
+	  $(GIT_IN_PKG) sparse-checkout init --no-cone; \
+	  $(GIT_IN_PKG) sparse-checkout set -- $(foreach p,$(PKG_SPARSE_PATHS),"$(p)"); \
 	fi
 	$(Q)$(GIT_IN_PKG) remote add origin $(PKG_URL)
 	$(Q)$(GIT_IN_PKG) config remote.origin.promisor true
@@ -229,7 +242,6 @@ ifeq (llvm,$(TOOLCHAIN))
   CFLAGS += -Wno-documentation
 endif
 
-include $(RIOTBASE)/makefiles/utils/strings.mk
 # Disabling -Wunterminated-string-initialization on toolchains that support this
 # warning
 ifeq (1,$(call version_is_greater_or_equal,$(GCC_VERSION),15))

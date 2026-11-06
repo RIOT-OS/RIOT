@@ -1,9 +1,6 @@
 /*
- * Copyright (C) 2017 Freie Universität Berlin
- *
- * This file is subject to the terms and conditions of the GNU Lesser
- * General Public License v2.1. See the file LICENSE in the top level
- * directory for more details.
+ * SPDX-FileCopyrightText: 2017 Freie Universität Berlin
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
 
 #pragma once
@@ -18,6 +15,7 @@
  * @author  Martine Lenders <mlenders@inf.fu-berlin.de>
  */
 
+#include "compiler_hints.h"
 #include "net/gnrc/netif.h"
 
 #ifdef __cplusplus
@@ -39,6 +37,7 @@ extern "C" {
  * @return  0 on success
  * @return  negative number on error
  */
+ACCESS(write_only, 2, 3)
 int gnrc_netif_ethernet_create(gnrc_netif_t *netif, char *stack, int stacksize,
                                char priority, char *name, netdev_t *dev);
 

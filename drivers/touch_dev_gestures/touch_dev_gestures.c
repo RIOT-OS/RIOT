@@ -36,9 +36,9 @@ static touch_dev_gesture_t _handle_swipe(const touch_t *prev,
           ztimer_now(ZTIMER_MSEC), prev[0].x, prev[0].y, curr[0].x, curr[0].y);
 
     assert(curr[0].x != UINT16_MAX);
-    assert(curr[0].x != UINT16_MAX);
+    assert(curr[0].y != UINT16_MAX);
     assert(prev[0].x != UINT16_MAX);
-    assert(prev[0].x != UINT16_MAX);
+    assert(prev[0].y != UINT16_MAX);
 
     uint16_t x_diff = MAX(curr[0].x, prev[0].x) - MIN(curr[0].x, prev[0].x);
     uint16_t y_diff = MAX(curr[0].y, prev[0].y) - MIN(curr[0].y, prev[0].y);
@@ -80,13 +80,13 @@ static touch_dev_gesture_t _handle_zoom(const touch_t *prev,
           curr[0].x, curr[0].y, curr[1].x, curr[1].y);
 
     assert(curr[0].x != UINT16_MAX);
-    assert(curr[0].x != UINT16_MAX);
+    assert(curr[0].y != UINT16_MAX);
     assert(curr[1].x != UINT16_MAX);
-    assert(curr[1].x != UINT16_MAX);
+    assert(curr[1].y != UINT16_MAX);
     assert(prev[0].x != UINT16_MAX);
-    assert(prev[0].x != UINT16_MAX);
+    assert(prev[0].y != UINT16_MAX);
     assert(prev[1].x != UINT16_MAX);
-    assert(prev[1].x != UINT16_MAX);
+    assert(prev[1].y != UINT16_MAX);
 
     uint32_t prev_x_diff = MAX(prev[0].x, prev[1].x) - MIN(prev[0].x, prev[1].x);
     uint32_t prev_y_diff = MAX(prev[0].y, prev[1].y) - MIN(prev[0].y, prev[1].y);

@@ -1,9 +1,6 @@
 /*
- * Copyright (C) 2020 HAW Hamburg
- *
- * This file is subject to the terms and conditions of the GNU Lesser General
- * Public License v2.1. See the file LICENSE in the top level directory for more
- * details.
+ * SPDX-FileCopyrightText: 2020 HAW Hamburg
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
 
 #pragma once
@@ -40,7 +37,6 @@ extern "C" {
 #define NETDEV_SUBMAC_FLAGS_TX_DONE     (1 << 1)    /**< Flag for TX Done event */
 #define NETDEV_SUBMAC_FLAGS_RX_DONE     (1 << 2)    /**< Flag for RX Done event */
 #define NETDEV_SUBMAC_FLAGS_CRC_ERROR   (1 << 3)    /**< Flag for CRC ERROR event */
-#define NETDEV_SUBMAC_FLAGS_BH_REQUEST  (1 << 4)    /**< Flag for Bottom Half request event */
 
 /**
  * @brief IEEE 802.15.4 SubMAC netdev descriptor

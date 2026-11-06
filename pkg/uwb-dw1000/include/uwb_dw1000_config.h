@@ -1,9 +1,6 @@
 /*
- * Copyright (C) 2020 Inria
- *
- * This file is subject to the terms and conditions of the GNU Lesser
- * General Public License v2.1. See the file LICENSE in the top level
- * directory for more details.
+ * SPDX-FileCopyrightText: 2020 Inria
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
 
 #pragma once
@@ -141,10 +138,11 @@ extern "C" {
 
 /**
  * @brief Default UWB SFD Timeout (-1=auto, timeout in symbols)
- *
  */
 #ifndef CONFIG_DW1000_RX_SFD_TO_DEFAULT
-#define CONFIG_DW1000_RX_SFD_TO_DEFAULT   (128 + 1 + 8 - 8) /* (preamble length + 1 + SFD length - PAC size) */
+
+/* (preamble length + 1 + SFD length - PAC size) */
+#define CONFIG_DW1000_RX_SFD_TO_DEFAULT   (128 + 1 + 8 - 8)
 #endif
 
 /**

@@ -7,8 +7,8 @@ RIOTBOOT_DIR = $(RIOTBASE)/bootloaders/riotboot
 RIOTBOOT ?= $(RIOTBOOT_DIR)/bin/$(BOARD)/riotboot.elf
 CFLAGS += -I$(BINDIR)/riotbuild
 
-HEADER_TOOL_DIR = $(RIOTBASE)/dist/tools/riotboot_gen_hdr
-HEADER_TOOL ?= $(HEADER_TOOL_DIR)/bin/genhdr
+HEADER_TOOL_DIR = $(RIOTTOOLS)/riotboot_gen_hdr
+HEADER_TOOL ?= $(BUILD_DIR)/genhdr/genhdr
 BINDIR_RIOTBOOT = $(BINDIR)/riotboot_files
 
 $(BINDIR_RIOTBOOT): $(CLEAN)
@@ -58,6 +58,7 @@ $(HEADER_TOOL): FORCE
 	$(Q)/usr/bin/env -i \
 		QUIET=$(QUIET) \
 		PATH="$(PATH)" \
+		BUILD_DIR="$(BUILD_DIR)" \
 			$(MAKE) --no-print-directory -C $(HEADER_TOOL_DIR) all
 
 # Generate RIOT header and keep the original binary file

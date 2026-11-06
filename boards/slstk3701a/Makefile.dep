@@ -1,3 +1,7 @@
+ifneq (,$(filter netdev_default,$(USEMODULE)))
+  USEMODULE += efm32_eth
+endif
+
 ifneq (,$(filter saul_default,$(USEMODULE)))
   USEMODULE += efm32_coretemp
   USEMODULE += saul_gpio

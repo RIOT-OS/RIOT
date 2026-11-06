@@ -1,10 +1,7 @@
 #!/usr/bin/env python3
 
-# Copyright (C) 2018 Freie Universität Berlin
-#
-# This file is subject to the terms and conditions of the GNU Lesser
-# General Public License v2.1. See the file LICENSE in the top level
-# directory for more details.
+# SPDX-FileCopyrightText: 2018 Freie Universität Berlin
+# SPDX-License-Identifier: LGPL-2.1-only
 
 import sys
 from testrunner import run
@@ -65,14 +62,14 @@ def check_prefix(addr, prefix):
 
 
 def check_ia_na_addr(ia_na_addr, global_pfx):
-    """Check if the expected IA_NA address has been assigned"""
+    """Check if the expected IA_NA address has been assigned."""
     result = IPv6Address(ia_na_addr) in IPv6Network(f"{IA_NA_ADDRESS_POOL_PREFIX}/64")
     result = result and check_prefix(ia_na_addr, global_pfx)
     return result
 
 
 def check_ia_pd_addr(ia_pd_addr, global_pfx):
-    """Check if the expected IA_PD address has been assigned"""
+    """Check if the expected IA_PD address has been assigned."""
     result = IPv6Address(ia_pd_addr) in IPv6Network(f"{IA_PD_PREFIX}/33")
     result = result and check_prefix(ia_pd_addr, global_pfx)
     return result

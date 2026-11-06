@@ -9,3 +9,8 @@ It was developed by PHYTEC in cooperation with the Zephyr project.
 
 @see https://www.phytec.eu/product-eu/internet-of-things/reelboard/
 @see https://docs.zephyrproject.org/latest/boards/arm/reel_board/doc/reel_board.html
+
+## Buttons
+
+The board has a user button (S5) connected to P0.07 and exposed as `BTN0`.
+The reset button (S4) is connected to P0.18 and resets the nRF52840.

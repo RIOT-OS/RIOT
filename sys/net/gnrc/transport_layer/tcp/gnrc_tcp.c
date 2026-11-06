@@ -1,9 +1,6 @@
 /*
- * Copyright (C) 2015-2017 Simon Brummer
- *
- * This file is subject to the terms and conditions of the GNU Lesser
- * General Public License v2.1. See the file LICENSE in the top level
- * directory for more details.
+ * SPDX-FileCopyrightText: 2015-2017 Simon Brummer
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
 
 /**
@@ -18,16 +15,15 @@
  */
 
 #include <assert.h>
-#include <errno.h>
+#include <errno.h> /* IWYU pragma: keep */
 #include <string.h>
 #include <utlist.h>
 
 #include "evtimer.h"
 #include "evtimer_mbox.h"
 #include "mbox.h"
-#include "net/af.h"
+#include "net/af.h" /* IWYU pragma: keep */
 #include "net/tcp.h"
-#include "net/gnrc.h"
 #include "net/gnrc/netif.h"
 #include "net/gnrc/tcp.h"
 #include "net/sock.h"
@@ -37,12 +33,8 @@
 #include "include/gnrc_tcp_eventloop.h"
 #include "include/gnrc_tcp_rcvbuf.h"
 
-#ifdef MODULE_GNRC_IPV6
-#include "net/gnrc/ipv6.h"
-#endif
-
 #define ENABLE_DEBUG 0
-#include "debug.h"
+#include "debug.h" /* IWYU pragma: keep */
 
 #define TCP_MSG_QUEUE_SIZE (1 << CONFIG_GNRC_TCP_MSG_QUEUE_SIZE_EXP)
 
@@ -184,8 +176,8 @@ int gnrc_tcp_ep_from_str(gnrc_tcp_ep_t *ep, const char *str)
     unsigned netif = 0;
 
     /* Examine given string */
-    char *addr_begin = strchr(str, '[');
-    char *addr_end = strchr(str, ']');
+    const char *addr_begin = strchr(str, '[');
+    const char *addr_end = strchr(str, ']');
 
     /* 1) Ensure that str contains a single pair of brackets */
     if (!addr_begin || !addr_end || strchr(addr_begin + 1, '[') || strchr(addr_end + 1, ']')) {
@@ -193,15 +185,16 @@ int gnrc_tcp_ep_from_str(gnrc_tcp_ep_t *ep, const char *str)
         TCP_DEBUG_LEAVE;
         return -EINVAL;
     }
+
     /* 2) Ensure that the first character is the opening bracket */
-    else if (addr_begin != str) {
+    if (addr_begin != str) {
         TCP_DEBUG_ERROR("-EINVAL: Invalid address string.");
         TCP_DEBUG_LEAVE;
         return -EINVAL;
     }
 
     /* 3) Examine optional port number */
-    char *port_begin = strchr(addr_end, ':');
+    const char *port_begin = strchr(addr_end, ':');
     if (port_begin) {
         /* 3.1) Ensure that there are characters left to parse after ':'. */
         if (*(++port_begin) == '\0') {
@@ -211,7 +204,7 @@ int gnrc_tcp_ep_from_str(gnrc_tcp_ep_t *ep, const char *str)
         }
 
         /* 3.2) Ensure that port is a number (atol, does not report errors) */
-        for (char *ptr = port_begin; *ptr; ++ptr) {
+        for (const char *ptr = port_begin; *ptr; ++ptr) {
             if ((*ptr < '0') || ('9' < *ptr)) {
                 TCP_DEBUG_ERROR("-EINVAL: Invalid address string.");
                 TCP_DEBUG_LEAVE;
@@ -229,7 +222,7 @@ int gnrc_tcp_ep_from_str(gnrc_tcp_ep_t *ep, const char *str)
     }
 
     /* 4) Examine optional interface identifier. */
-    char *if_begin = strchr(str, '%');
+    const char *if_begin = strchr(str, '%');
     if (if_begin) {
         /* 4.1) Ensure that the identifier is not empty and within brackets. */
         if (addr_end <= (++if_begin)) {
@@ -239,7 +232,7 @@ int gnrc_tcp_ep_from_str(gnrc_tcp_ep_t *ep, const char *str)
         }
 
         /* 4.2) Ensure that the identifier is a number (atol, does not report errors) */
-        for (char *ptr = if_begin; ptr != addr_end; ++ptr) {
+        for (const char *ptr = if_begin; ptr != addr_end; ++ptr) {
             if ((*ptr < '0') || ('9' < *ptr)) {
                 TCP_DEBUG_ERROR("-EINVAL: Invalid address string.");
                 TCP_DEBUG_LEAVE;
@@ -259,9 +252,9 @@ int gnrc_tcp_ep_from_str(gnrc_tcp_ep_t *ep, const char *str)
     /* 5.1) Verify address length and copy address into temporary buffer.
      *      This is required to preserve constness of input.
      */
-    int len = addr_end - (++addr_begin);
+    size_t len = addr_end - (++addr_begin);
 
-    if (0 <= len && len < (int) sizeof(tmp)) {
+    if (len < sizeof(tmp)) {
         memcpy(tmp, addr_begin, len);
         tmp[len] = '\0';
     }
@@ -303,7 +296,7 @@ int gnrc_tcp_init(void)
     evtimer_init_mbox(&_tcp_mbox_timer);
 
     /* Start TCP processing thread */
-    kernel_pid_t pid = _gnrc_tcp_eventloop_init();
+    int pid = _gnrc_tcp_eventloop_init();
     TCP_DEBUG_LEAVE;
     return pid;
 }

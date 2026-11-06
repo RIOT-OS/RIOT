@@ -42,16 +42,23 @@ DOXYGEN_CUR_VERSION = $(shell $(DOXYGEN) --version | cut -d ' ' -f1)
 # Valid options are `latest` and version numbers such as `1.13.2`.
 DOXYGEN_VERSION ?= $(DOXYGEN_MIN_VERSION)
 
+# If we don't build the Doxygen version specified here, remove the SHA512 sum
+# to avoid a checksum error from `dist/tools/dlcache.sh`
+ifneq ($(DOXYGEN_VERSION),$(DOXYGEN_MIN_VERSION))
+  DOXYGEN_TGZ_SHA512=
+endif
+
 # include color echo macros
 include $(RIOTMAKE)/utils/ansi.mk
 include $(RIOTMAKE)/color.inc.mk
+
+.NOTPARALLEL:
 
 .PHONY: doc doc-man doc-latex
 doc doc-man doc-latex: graphviz-check $(DOCUMENTATION_FORMAT) doxygen-version
 
 # Check the Doxygen version and print a warning
 .PHONY: doxygen-version
-.NOTPARALLEL: doxygen-version
 doxygen-version:
 	@if [ "`{ echo "$(DOXYGEN_MIN_VERSION)"; echo "$(DOXYGEN_CUR_VERSION)"; } | \
 	  sort -V | head -n1`" != "$(DOXYGEN_MIN_VERSION)" ]; then \

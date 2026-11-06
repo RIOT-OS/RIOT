@@ -126,7 +126,7 @@ void board_init(void)
     PINSEL3 &= ~(BIT12 | BIT13 | BIT18 | BIT19);
 
     //SD
-    FIO0DIR &= ~(BIT19 | BIT20 | BIT21 | BIT22) ; //0.19 0.20 0.21 0.22 as input
+    FIO0DIR &= ~(BIT19 | BIT20 | BIT21 | BIT22); //0.19 0.20 0.21 0.22 as input
     PINMODE1 |= (BIT7) | (BIT9) | (BIT11) | (BIT13); // no resistors
     FIO2DIR &= ~(BIT11 + BIT12 + BIT13); //2.11 2.12 2.13 as input
     PINMODE4 |= (BIT23) | (BIT25) | (BIT27); // no resistors

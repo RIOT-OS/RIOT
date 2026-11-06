@@ -197,9 +197,13 @@ PROGRAMMER ?= openocd
 
 ### doc.md
 
-Although not explicitly needed, if upstreamed and as a general good
-practice, this file holds all `BOARD` documentation. This can include
-datasheet reference, documentation on how to flash, etc.
+This file holds all `BOARD` documentation and is mandatory for every
+newly ported board. It can (and should) include datasheet references,
+documentation on how to flash the board, etc.
+
+Proper documentation about your board makes it easier for others to use it
+to its full potential. Remember to also mention any features that are not
+supported yet!
 
 The documentation must be under the proper doxygen group, you can compile the
 documentation by calling `make doc` and then open the generated html file on
@@ -279,7 +283,7 @@ functions. This offset can be compensated for.
 It can be measured by running `tests/sys/ztimer_overhead` on your board, i.e:
 
 ```bash
-$ BOARD=my-new-board make -C tests/sys/ztimer_overhead flash term
+BOARD=my-new-board make -C tests/sys/ztimer_overhead flash term
 ```
 
 This should give the following output:

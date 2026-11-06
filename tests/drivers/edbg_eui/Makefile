@@ -1,5 +1,5 @@
 BOARD ?= samr21-xpro
-BOARD_WHITELIST = samr21-xpro
+BOARDS_SUPPORTED = samr21-xpro
 
 include ../Makefile.drivers_common
 

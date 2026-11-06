@@ -12,7 +12,13 @@ PROGRAMMER ?= openocd
 OPENOCD_DEBUG_ADAPTER ?= stlink
 
 # openocd programmer is supported
-PROGRAMMERS_SUPPORTED += openocd
+PROGRAMMERS_SUPPORTED += openocd cpy2remed
 
-# this board uses openocd
-include $(RIOTMAKE)/tools/openocd.inc.mk
+# Automatic flash directory name generation failed for this board
+# and it should be set manually - see PR #18057
+DIR_NAME_AT_REMED = "DIS_C011F6"
+
+# if this board uses openocd
+ifeq ($(PROGRAMMER), openocd)
+  include $(RIOTMAKE)/tools/openocd.inc.mk
+endif

@@ -22,7 +22,11 @@ extern "C" {
 
 /* Doc is provided centrally in architecture.h, hide this from Doxygen */
 #ifndef DOXYGEN
-#define ARCHITECTURE_WORD_BITS      (32U)
+#  if __riscv_xlen == 64
+#    define ARCHITECTURE_WORD_BITS  (64U)
+#  else
+#    define ARCHITECTURE_WORD_BITS  (32U)
+#  endif
 #endif /* DOXYGEN */
 
 #ifdef __cplusplus

@@ -31,7 +31,7 @@
 #include "sched.h"
 #include "timex.h"
 
-#define _BUFFER_SIZE    (128)
+#define _BUFFER_SIZE    (192)
 #define _CUR_HL         (155)
 #define _RTR_LTIME      (6612U)
 #define _REACH_TIME     (1210388825UL)

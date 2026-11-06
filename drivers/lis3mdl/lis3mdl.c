@@ -1,9 +1,6 @@
 /*
- * Copyright (C) 2015 HAW Hamburg
- *
- * This file is subject to the terms and conditions of the GNU Lesser
- * General Public License v2.1. See the file LICENSE in the top level
- * directory for more details.
+ * SPDX-FileCopyrightText: 2015 HAW Hamburg
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
 
 /**
@@ -62,10 +59,15 @@ int lis3mdl_init(lis3mdl_t *dev, const lis3mdl_params_t *params)
 
     i2c_acquire(DEV_I2C);
 
-    i2c_read_reg(DEV_I2C, DEV_ADDR, LIS3DML_WHO_AM_I_REG, &tmp, 0);
+    if (i2c_read_reg(DEV_I2C, DEV_ADDR, LIS3DML_WHO_AM_I_REG, &tmp, 0) < 0) {
+        DEBUG("LIS3MDL: Could not read identification\n");
+        i2c_release(DEV_I2C);
+        return -1;
+    }
     if (tmp != LIS3MDL_CHIP_ID) {
         DEBUG("LIS3MDL: Identification failed, %02X != %02X\n",
               tmp, LIS3MDL_CHIP_ID);
+        i2c_release(DEV_I2C);
         return -1;
     }
 

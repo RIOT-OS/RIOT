@@ -157,7 +157,7 @@ static const pwm_conf_t pwm_config[] = {
         .rcc_mask = RCC_APB2ENR_TIM1EN,
         .chan     = { { .pin = GPIO_PIN(PORT_E,  9), .cc_chan = 0 },
                       { .pin = GPIO_PIN(PORT_E, 11), .cc_chan = 1 },
-                      { .pin = GPIO_PIN(PORT_E, 11), .cc_chan = 2 },
+                      { .pin = GPIO_PIN(PORT_E, 13), .cc_chan = 2 },
                       { .pin = GPIO_PIN(PORT_E, 14), .cc_chan = 3 } },
         .af       = GPIO_AF1,
         .bus      = APB2

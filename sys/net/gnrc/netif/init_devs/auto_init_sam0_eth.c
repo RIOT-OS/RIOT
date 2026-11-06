@@ -1,9 +1,6 @@
 /*
- * Copyright (C) 2020 Mesotic SAS
- *
- * This file is subject to the terms and conditions of the GNU Lesser
- * General Public License v2.1. See the file LICENSE in the top level
- * directory for more details.
+ * SPDX-FileCopyrightText: 2020 Mesotic SAS
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
 
 /**
@@ -14,8 +11,6 @@
  *
  * @author      Dylan Laduranty <dylan.laduranty@mesotic.com>
  */
-
-#ifdef MODULE_SAM0_ETH
 
 #include "net/gnrc/netif/ethernet.h"
 #include "sam0_eth_netdev.h"
@@ -33,8 +28,4 @@ void auto_init_sam0_eth(void)
     gnrc_netif_ethernet_create(&_netif, stack, GNRC_NETIF_STACKSIZE_DEFAULT,
                                GNRC_NETIF_PRIO, "sam0_eth", &sam0eth);
 }
-
-#else
-typedef int dont_be_pedantic;
-#endif /* MODULE_SAM0_ETH */
 /** @} */

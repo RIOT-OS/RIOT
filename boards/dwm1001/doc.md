@@ -17,13 +17,13 @@ This board can be flashed using OpenOCD or JLink. Jlink is the default programme
 To program this board, plug it to your computer via USB and run the following
 command:
 
-```
+```shell
 make BOARD=dwm1001 -C examples/basic/hello-world flash
 ```
 
 To program the board with OpenOCD, use:
 
-```
+```shell
 PROGRAMMER=openocd make BOARD=dwm1001 -C examples/basic/hello-world flash
 ```
 
@@ -33,6 +33,7 @@ The STDIO is directly accessible via the USB port. On a Linux host, it's
 generally mapped to `/dev/ttyACM0`.
 
 Use the `term` target to connect to the board serial port<br/>
-```
+
+```shell
 make BOARD=dwm1001 -C examples/basic/hello-world term
 ```

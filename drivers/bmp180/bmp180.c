@@ -54,7 +54,11 @@ int bmp180_init(bmp180_t *dev, const bmp180_params_t *params)
 
     /* Check sensor ID */
     uint8_t checkid;
-    i2c_read_reg(DEV_I2C, DEV_ADDR, BMP180_REGISTER_ID, &checkid, 0);
+    if (i2c_read_reg(DEV_I2C, DEV_ADDR, BMP180_REGISTER_ID, &checkid, 0) < 0) {
+        DEBUG("[Error] Cannot read device ID\n");
+        i2c_release(DEV_I2C);
+        return -BMP180_ERR_NODEV;
+    }
     if (checkid != 0x55) {
         DEBUG("[Error] Wrong device ID\n");
         i2c_release(DEV_I2C);

@@ -60,12 +60,22 @@ DEP := $(OBJC:.o=.d) $(OBJCXX:.o=.d) $(ASSMOBJ:.o=.d)
 
 $(MODULE).module compile-commands $(OBJ): | $(BINDIR)/$(MODULE)/
 
+# The object files are placed in a directory tree that mirrors the ESP-IDF
+# source tree, since the linker scripts place code and data in sections based
+# on the object file path (e.g. `*components/hal/...`). Create each directory
+# only once instead of calling `mkdir` for every single object file.
+ESP32_SDK_OBJ_DIRS := $(sort $(dir $(OBJ)))
+
+$(OBJ): | $(ESP32_SDK_OBJ_DIRS)
+
+$(filter-out $(BINDIR)/$(MODULE)/ $(SUBDIRS),$(ESP32_SDK_OBJ_DIRS)):
+	$(Q)mkdir -p $@
+
 $(MODULE).module: $(OBJ) $(ESP32_LD_DST) \
     $(if $(OBJECTS_TO_REMOVE),$(MODULE).cleanup) | $(DIRS:%=ALL--%)
 
 $(OBJC): $(BINDIR)/$(MODULE)/%.o: $(ESP32_SDK_DIR)/%.c $(OBJ_DEPS) \
             | $(if $(SHOULD_RUN_KCONFIG),$(KCONFIG_GENERATED_AUTOCONF_HEADER_C))
-	$(Q)mkdir -p $(dir $@)
 	$(Q)$(CCACHE) $(CC) \
 		$(CFLAGS) $(INCLUDES) -MQ '$@' -MD -MP -c $(abspath $<) -o $@
 ifneq (,$(SHOULD_RUN_KCONFIG))
@@ -75,7 +85,6 @@ endif
 
 $(OBJCXX): $(BINDIR)/$(MODULE)/%.o: $(ESP32_SDK_DIR)/%.$(SRCXXEXT) $(OBJ_DEPS) \
             | $(if $(SHOULD_RUN_KCONFIG),$(KCONFIG_GENERATED_AUTOCONF_HEADER_C))
-	$(Q)mkdir -p $(dir $@)
 	$(Q)$(CCACHE) $(CXX) \
 		$(CXXFLAGS) $(CXXINCLUDES) $(INCLUDES) -MQ '$@' -MD -MP -c $(abspath $<) -o $@
 ifneq (,$(SHOULD_RUN_KCONFIG))
@@ -85,7 +94,6 @@ endif
 
 $(ASMOBJ): $(BINDIR)/$(MODULE)/%.o: $(ESP32_SDK_DIR)/%.S $(OBJ_DEPS) \
             | $(if $(SHOULD_RUN_KCONFIG),$(KCONFIG_GENERATED_AUTOCONF_HEADER_C))
-	$(Q)mkdir -p $(dir $@)
 	$(Q)$(CCACHE) $(CC) \
 		$(CFLAGS) $(INCLUDES) -MQ '$@' -MD -MP -c $(abspath $<) -o $@
 ifneq (,$(SHOULD_RUN_KCONFIG))

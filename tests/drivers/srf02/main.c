@@ -80,7 +80,7 @@ static int cmd_sample(int argc, char **argv)
     (void)argv;
     xtimer_ticks32_t wakeup = xtimer_now();
 
-    while(1) {
+    while (1) {
         sample();
         xtimer_periodic_wakeup(&wakeup, SAMPLE_PERIOD);
     }

@@ -33,18 +33,22 @@ int u8g2_display_init(u8g2_display_t *dev, const u8g2_display_params_t *params)
 {
     assert(dev != NULL);
     assert(params != NULL);
+    assert(params->init_function != NULL);
+    assert(params->rotation_function != NULL);
 
     dev->params = *params;
 
     u8g2_init_function_t init = dev->params.init_function;
     if (IS_USED(MODULE_PERIPH_SPI) && dev->params.i2c_address == 0) {
         DEBUG("u8g2_display_init: Initializing SPI display\n");
-        init(&dev->u8g2, U8G2_R0, u8x8_byte_hw_spi_riotos, u8x8_gpio_and_delay_riotos);
+        init(&dev->u8g2, dev->params.rotation_function, u8x8_byte_hw_spi_riotos,
+             u8x8_gpio_and_delay_riotos);
     }
     else if (IS_USED(MODULE_PERIPH_I2C) && dev->params.i2c_address != 0) {
         DEBUG("u8g2_display_init: Initializing I2C display with addr: 0x%02x\n",
               dev->params.i2c_address);
-        init(&dev->u8g2, U8G2_R0, u8x8_byte_hw_i2c_riotos, u8x8_gpio_and_delay_riotos);
+        init(&dev->u8g2, dev->params.rotation_function, u8x8_byte_hw_i2c_riotos,
+             u8x8_gpio_and_delay_riotos);
         u8g2_SetI2CAddress(&dev->u8g2, dev->params.i2c_address);
     }
     else {

@@ -1,9 +1,6 @@
 /*
- * Copyright (C) 2016 Freie Universität Berlin
- *
- * This file is subject to the terms and conditions of the GNU Lesser
- * General Public License v2.1. See the file LICENSE in the top level
- * directory for more details.
+ * SPDX-FileCopyrightText: 2016 Freie Universität Berlin
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
 
 /**
@@ -569,7 +566,7 @@ int lwip_sock_recv(struct netconn *conn, uint32_t timeout, struct netbuf **buf)
 
 #if LWIP_SO_RCVTIMEO
     if ((timeout != 0) && (timeout != SOCK_NO_TIMEOUT)) {
-        netconn_set_recvtimeout(conn, timeout / US_PER_MS);
+        netconn_set_recvtimeout(conn, lwip_sock_timeout_ms(timeout));
     }
     else
 #endif
@@ -681,6 +678,7 @@ ssize_t lwip_sock_sendv(struct netconn *conn, const iolist_t *snips,
                 DEBUG("[lwip_sock_sendv] lwip_sock_bind_addr_to_netif() "
                       "returned %u, but expected %u\n",
                       (unsigned)netif, (unsigned)remote->netif);
+                netbuf_delete(buf);
                 return -EINVAL;
             }
         }
@@ -698,7 +696,10 @@ ssize_t lwip_sock_sendv(struct netconn *conn, const iolist_t *snips,
     }
 #if LWIP_TCP
     else if (tmp->type & NETCONN_TCP) {
-        err = netconn_write_partly(tmp, buf->p->payload, buf->p->len, 0, (size_t *)(&res));
+        /* buf is deleted below, but lwIP may still need the data for
+         * (re)transmission, so it has to copy it */
+        err = netconn_write_partly(tmp, buf->p->payload, buf->p->len,
+                                   NETCONN_COPY, (size_t *)(&res));
     }
 #endif /* LWIP_TCP */
     else {

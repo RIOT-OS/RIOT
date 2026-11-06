@@ -42,9 +42,6 @@
     - There is no message queue. The whole message must be ready in a buffer.
     - It is not optimized for performance.
 
-   The implementation is even simpler on a little endian platform. Just define the
-   LITTLE_ENDIAN symbol in that case.
-
    For a more complete set of implementations, please refer to
    the Keccak Code Package at https://github.com/gvanas/KeccakCodePackage
 
@@ -175,11 +172,7 @@ typedef uint8_t UINT8;
 typedef uint64_t UINT64;
 typedef UINT64 tKeccakLane;
 
-#if __BYTE_ORDER__ == __ORDER__LITTLE_ENDIAN__
-#define LITTLE_ENDIAN
-#endif
-
-#ifndef LITTLE_ENDIAN
+#if __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
 /** Function to load a 64-bit value using the little-endian (LE) convention.
  * On a LE platform, this could be greatly simplified using a cast.
  */
@@ -220,7 +213,7 @@ static void xor64(UINT8 *x, UINT64 u)
         u >>= 8;
     }
 }
-#endif
+#endif /* __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__ */
 
 /*
    ================================================================
@@ -231,15 +224,15 @@ static void xor64(UINT8 *x, UINT64 u)
 #define ROL64(a, offset) ((((UINT64)a) << offset) ^ (((UINT64)a) >> (64 - offset)))
 #define i(x, y) ((x) + 5 * (y))
 
-#ifdef LITTLE_ENDIAN
-    #define readLane(x, y)          (((tKeccakLane *)state)[i(x, y)])
-    #define writeLane(x, y, lane)   (((tKeccakLane *)state)[i(x, y)]) = (lane)
-    #define XORLane(x, y, lane)     (((tKeccakLane *)state)[i(x, y)]) ^= (lane)
-#else
+#if __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
     #define readLane(x, y)          load64((UINT8 *)state + sizeof(tKeccakLane) * i(x, y))
     #define writeLane(x, y, lane)   store64((UINT8 *)state + sizeof(tKeccakLane) * i(x, y), lane)
     #define XORLane(x, y, lane)     xor64((UINT8 *)state + sizeof(tKeccakLane) * i(x, y), lane)
-#endif
+#else /* __BYTE_ORDER__ != __ORDER_BIG_ENDIAN__ */
+    #define readLane(x, y)          (((tKeccakLane *)state)[i(x, y)])
+    #define writeLane(x, y, lane)   (((tKeccakLane *)state)[i(x, y)]) = (lane)
+    #define XORLane(x, y, lane)     (((tKeccakLane *)state)[i(x, y)]) ^= (lane)
+#endif /* __BYTE_ORDER__ != __ORDER_BIG_ENDIAN__ */
 
 /**
  * Function that computes the linear feedback shift register (LFSR) used to

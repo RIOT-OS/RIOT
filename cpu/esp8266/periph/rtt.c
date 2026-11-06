@@ -16,6 +16,8 @@
  * @}
  */
 
+#include <inttypes.h>
+
 #define ENABLE_DEBUG 0
 #include "debug.h"
 
@@ -112,7 +114,7 @@ void IRAM rtt_cb(void *arg)
 
 void rtt_init(void)
 {
-    DEBUG("%s saved rtt=%u rtc=%u\n",
+    DEBUG("%s saved rtt=%" PRIu32 " rtc=%" PRIu32 "\n",
           __func__, _rtt_counter_saved, _rtc_counter_saved);
 
     frc2.ctrl.clk_div = FRC2_CLK_DIV_256;
@@ -212,7 +214,7 @@ void rtt_save_counter(void)
     _rtt_counter_saved = frc2.count;
     _rtc_counter_saved = RTC.COUNTER;
 
-    DEBUG("%s saved rtt=%u rtc=%u\n",
+    DEBUG("%s saved rtt=%" PRIu32 " rtc=%" PRIu32 "\n",
           __func__, _rtt_counter_saved, _rtc_counter_saved);
 }
 
@@ -224,6 +226,6 @@ void rtt_restore_counter(void)
 
     frc2.load = _rtt_counter_saved + rtt_diff;
 
-    DEBUG("%s rtc_diff=%u rtt_diff=%u load=%u\n", __func__,
+    DEBUG("%s rtc_diff=%" PRIu32 " rtt_diff=%" PRIu32 " load=%" PRIu32 "\n", __func__,
           rtc_diff, rtt_diff, _rtt_counter_saved + rtt_diff);
 }

@@ -1,1 +1,7 @@
+## @defgroup drivers_netdev_ieee802154_submac_soft_ack netdev_ieee802154_submac_soft_ack
+## @ingroup drivers_netdev_ieee802154_submac
+## @{
+## @deprecated Use `ieee802154_submac_soft_ack` instead. Will be removed after
+## the 2027.04 release.
 PSEUDOMODULES += netdev_ieee802154_submac_soft_ack
+## @}

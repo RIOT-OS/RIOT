@@ -1,0 +1,35 @@
+From 6e436101ac89ef1e33d916488ca5489757d42ed9 Mon Sep 17 00:00:00 2001
+From: Marian Buschsieweke <marian.buschsieweke@ml-pa.com>
+Date: Mon, 19 Oct 2026 13:09:06 +0200
+Subject: [PATCH] Wrapper targets: add internal newlib endpoints
+
+newlib has some special iprintf variants that are 100% idintial except
+for not having floating point support. We just plug them to the
+regular versions.
+---
+ printf.c | 9 +++++++++
+ 1 file changed, 9 insertions(+)
+
+diff --git a/printf.c b/printf.c
+index 7a3d10d..3a03353 100644
+--- a/printf.c
++++ b/printf.c
+@@ -985,6 +985,15 @@ __attribute__((alias("vsnprintf_")))
+ __attribute__((used))
+ int __wrap_vsnprintf(char* buffer, size_t count, const char* format, va_list va);
+ 
++/* newlib internal has some special iprintf that has no floating point support,
++ * but is otherwise identical. We can just wrap them to the regular variants */
++__attribute__((alias("__wrap_printf")))
++__attribute__((used))
++int __wrap_iprintf(const char* format, ...);
++
++__attribute__((alias("__wrap_fprintf")))
++__attribute__((used))
++int __wrap_fiprintf(FILE *stream, const char *format, ...);
+ 
+ __attribute__((used))
+ int __wrap_putchar(int c)
+-- 
+2.53.0
+

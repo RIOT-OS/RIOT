@@ -275,7 +275,6 @@ static void tests_relic_paillier_encrypted_addition(void)
 
     TEST_ASSERT_EQUAL_INT(RLC_EQ, bn_cmp(sum, dec));
 
-
 #if (TEST_RELIC_SHOW_OUTPUT == 1)
     printf("RELIC Paillier -  addition of encrypted data successful\n");
     printf("encrypted a+b = ");

@@ -1,4 +1,4 @@
-BOARD_WHITELIST = native32 native64
+BOARDS_SUPPORTED = native32 native64
 
 include ../Makefile.build_system_common
 include $(RIOTBASE)/Makefile.include
@@ -16,15 +16,20 @@ endef
 
 MAKEFILES_UTILS = $(RIOTMAKE)/utils
 
+COMPILE_TESTS += test-chars_from
+COMPILE_TESTS += test-chars_upto
 COMPILE_TESTS += test-ensure_value test-ensure_value-negative
 COMPILE_TESTS += test-exported-variables
-COMPILE_TESTS += test-memoized-variables
+COMPILE_TESTS += test-is_number
 COMPILE_TESTS += test-lowercase
+COMPILE_TESTS += test-max_number
+COMPILE_TESTS += test-memoized-variables
+COMPILE_TESTS += test-split_chars
 COMPILE_TESTS += test-uppercase
 COMPILE_TESTS += test-uppercase_and_underscore
 COMPILE_TESTS += test-version_is_greater
 COMPILE_TESTS += test-version_is_greater_or_equal
-COMPILE_TESTS += test-max_number
+COMPILE_TESTS += test-version_tuple
 
 # Tests will be run both in the host machine and in `docker`
 all: build-system-utils-tests
@@ -55,6 +60,15 @@ test-uppercase:
 test-uppercase_and_underscore:
 	$(Q)$(call command_should_succeed,"$(MAKE)" -C $(MAKEFILES_UTILS) -f test-strings.mk test-uppercase_and_underscore)
 
+test-split_chars:
+	$(Q)$(call command_should_succeed,"$(MAKE)" -C $(MAKEFILES_UTILS) -f test-strings.mk test-split_chars)
+
+test-chars_from:
+	$(Q)$(call command_should_succeed,"$(MAKE)" -C $(MAKEFILES_UTILS) -f test-strings.mk test-chars_from)
+
+test-chars_upto:
+	$(Q)$(call command_should_succeed,"$(MAKE)" -C $(MAKEFILES_UTILS) -f test-strings.mk test-chars_upto)
+
 test-version_is_greater:
 	$(Q)$(call command_should_succeed,"$(MAKE)" -C $(MAKEFILES_UTILS) -f test-strings.mk test-version_is_greater)
 
@@ -63,3 +77,9 @@ test-version_is_greater_or_equal:
 
 test-max_number:
 	$(Q)$(call command_should_succeed,"$(MAKE)" -C $(MAKEFILES_UTILS) -f test-strings.mk test-max_number)
+
+test-is_number:
+	$(Q)$(call command_should_succeed,"$(MAKE)" -C $(MAKEFILES_UTILS) -f test-strings.mk test-is_number)
+
+test-version_tuple:
+	$(Q)$(call command_should_succeed,"$(MAKE)" -C $(MAKEFILES_UTILS) -f test-strings.mk test-version_tuple)

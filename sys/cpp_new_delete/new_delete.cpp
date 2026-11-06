@@ -1,50 +1,74 @@
 /*
- * Copyright (c) 2014 Arduino.  All right reserved.
- *
- * This library is free software; you can redistribute it and/or
- * modify it under the terms of the GNU Lesser General Public
- * License as published by the Free Software Foundation; either
- * version 2.1 of the License, or (at your option) any later version.
- *
- * This library is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- * See the GNU Lesser General Public License for more details.
- *
- * You should have received a copy of the GNU Lesser General Public
- * License along with this library; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
- *
+ * SPDX-FileCopyrightText: Copyright (c) 2014 Arduino.  All right reserved.
  * SPDX-License-Identifier: LGPL-2.1-or-later
  */
 
 #include <stdlib.h>
 
-void *operator new(size_t size) {
-    return malloc(size);
+#include "compiler_hints.h"
+
+#ifndef __EXCEPTIONS
+#  include "panic.h"
+#else
+#  include <new>
+#endif
+
+namespace
+{
+void *_new_helper(size_t size)
+{
+    if (size == 0) {
+        /* C++ requires new to return unique ptrs. If we allocate at least 1
+         * byte, we can do so */
+        size = 1;
+    }
+    void *result = malloc(size);
+    if (unlikely(result == NULL)) {
+#ifdef __EXCEPTIONS
+        throw std::bad_alloc();
+#else
+        core_panic(PANIC_MEM_MANAGE, "C++ new alloc failure");
+#endif
+    }
+
+    return result;
+}
+} /* end anonymous namespace */
+
+__attribute__((weak))
+void *operator new(size_t size)
+{
+    return _new_helper(size);
 }
 
-void *operator new[](size_t size) {
-    return malloc(size);
+__attribute__((weak))
+void *operator new[](size_t size)
+{
+    return _new_helper(size);
 }
 
-void *operator new(size_t size, void *ptr) noexcept {
-    (void)size;
-    return ptr;
-}
-
-void operator delete(void *ptr) noexcept {
+__attribute__((weak))
+void operator delete(void *ptr) noexcept
+{
     free(ptr);
 }
 
-void operator delete(void *ptr, size_t) noexcept {
+__attribute__((weak))
+void operator delete(void *ptr, size_t unused) noexcept
+{
+    (void)unused;
     free(ptr);
 }
 
-void operator delete[](void *ptr) noexcept {
+__attribute__((weak))
+void operator delete[](void *ptr) noexcept
+{
     free(ptr);
 }
 
-void operator delete [](void *ptr, size_t) noexcept {
+__attribute__((weak))
+void operator delete[](void *ptr, size_t unused) noexcept
+{
+    (void)unused;
     free(ptr);
 }

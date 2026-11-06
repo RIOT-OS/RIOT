@@ -10,4 +10,8 @@ USEMODULE += saul_default
 
 TOOLCHAINS_BLACKLIST += llvm
 
+CFLAGS += -DXIPFS_ENABLE_SAFE_EXEC_SUPPORT
+
+BLOBS += minimal.fae
+
 include $(RIOTBASE)/Makefile.include

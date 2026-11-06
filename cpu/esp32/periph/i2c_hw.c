@@ -393,7 +393,7 @@ int i2c_write_bytes(i2c_t dev, uint16_t addr, const void *data, size_t len, uint
 #endif
 
 /*
- * @note:
+ * @note
  * It is a known problem that the ESP32x I2C hardware implementation checks
  * the ACK when the next command in the pipeline is executed. That is,
  * for a segmented write operation of type `START ADDR DATA0 STOP` the
@@ -416,7 +416,7 @@ static int _i2c_status_to_errno(i2c_t dev)
         LOG_TAG_DEBUG("i2c", "ack error dev=%u\n", dev);
         if (_i2c_bus[dev].cmd_op == I2C_LL_CMD_WRITE) {
             /*
-             * @note: In a write transfer, an ACK error can happen for the
+             * @note  In a write transfer, an ACK error can happen for the
              * address field as well as for data. If the FIFO still contains
              * all data bytes, the ACK error happened in address field and we
              * have to return -ENXIO. Otherwise, the ACK error happened in data
@@ -429,7 +429,7 @@ static int _i2c_status_to_errno(i2c_t dev)
         }
         else {
             /*
-             * @note: In a read transfer, an ACK is only expected for the
+             * @note  In a read transfer, an ACK is only expected for the
              * address field. Thus, an ACK error can only happen for the address
              * field. Therefore, we always return -ENXIO in case of an ACK
              * error.
@@ -644,12 +644,12 @@ void i2c_print_config(void)
 
 static void _i2c_configure_gpios(i2c_t dev)
 {
-    gpio_init(i2c_config[dev].scl, i2c_config[dev].scl_pullup ? GPIO_IN_OD_PU : GPIO_IN_OD_PU);
+    gpio_init(i2c_config[dev].scl, i2c_config[dev].scl_pullup ? GPIO_IN_OD_PU : GPIO_IN_OD);
     gpio_set(i2c_config[dev].scl);
     esp_rom_gpio_connect_out_signal(i2c_config[dev].scl, i2c_periph_signal[dev].scl_out_sig, 0, 0);
     esp_rom_gpio_connect_in_signal(i2c_config[dev].scl, i2c_periph_signal[dev].scl_in_sig, 0);
 
-    gpio_init(i2c_config[dev].sda, i2c_config[dev].sda_pullup ? GPIO_IN_OD_PU : GPIO_IN_OD_PU);
+    gpio_init(i2c_config[dev].sda, i2c_config[dev].sda_pullup ? GPIO_IN_OD_PU : GPIO_IN_OD);
     gpio_set(i2c_config[dev].sda);
     esp_rom_gpio_connect_out_signal(i2c_config[dev].sda, i2c_periph_signal[dev].sda_out_sig, 0, 0);
     esp_rom_gpio_connect_in_signal(i2c_config[dev].sda, i2c_periph_signal[dev].sda_in_sig, 0);
@@ -720,8 +720,8 @@ static void _i2c_clear_bus(i2c_t dev)
     gpio_set_pin_usage(i2c_config[dev].scl, _GPIO);
     gpio_set_pin_usage(i2c_config[dev].sda, _GPIO);
 
-    gpio_init(i2c_config[dev].scl, i2c_config[dev].scl_pullup ? GPIO_IN_OD_PU : GPIO_IN_OD_PU);
-    gpio_init(i2c_config[dev].sda, i2c_config[dev].sda_pullup ? GPIO_IN_OD_PU : GPIO_IN_OD_PU);
+    gpio_init(i2c_config[dev].scl, i2c_config[dev].scl_pullup ? GPIO_IN_OD_PU : GPIO_IN_OD);
+    gpio_init(i2c_config[dev].sda, i2c_config[dev].sda_pullup ? GPIO_IN_OD_PU : GPIO_IN_OD);
 
     gpio_set(i2c_config[dev].scl);
     gpio_set(i2c_config[dev].sda);

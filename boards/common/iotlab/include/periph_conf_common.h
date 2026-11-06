@@ -42,9 +42,9 @@ extern "C" {
  * @{
  */
 static const adc_conf_t adc_config[] = {
-    { GPIO_PIN(PORT_A,3), 0, 3  },
-    { GPIO_UNDEF        , 0, 16 },
-    { GPIO_UNDEF        , 0, 17 }
+    { GPIO_PIN(PORT_A, 3), 0, 3 },
+    { GPIO_UNDEF, 0, 16 },
+    { GPIO_UNDEF, 0, 17 }
 };
 
 #define ADC_NUMOF           ARRAY_SIZE(adc_config)

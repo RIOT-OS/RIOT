@@ -13,5 +13,12 @@ include $(RIOTBASE)/pkg/pkg.mk
 CFLAGS += -Wno-maybe-uninitialized
 CFLAGS += -Wno-type-limits
 
+# The newlib implementation of some ESP variants does not implement the
+# `feclearexcept` and `fetestexcept` functions from `fenv.h` used by
+# QCBOR. Disabling the HW FPU support works around this issue.
+ifneq (,$(filter esp8266 esp32s2, $(CPU_FAM)))
+  CFLAGS += -DQCBOR_DISABLE_FLOAT_HW_USE
+endif
+
 all:
 	$(QQ)"$(MAKE)" -C $(PKG_SOURCE_DIR)/src -f $(RIOTBASE)/Makefile.base MODULE=$(PKG_NAME)

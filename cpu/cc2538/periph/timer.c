@@ -185,7 +185,7 @@ static inline cc2538_gptimer_t *dev(tim_t tim)
  */
 int timer_init(tim_t tim, uint32_t freq, timer_cb_t cb, void *arg)
 {
-    DEBUG("%s(%u, %lu, %p, %p)\n", __FUNCTION__, tim, freq, cb, arg);
+    DEBUG("%s(%u, %" PRIu32 ", %p, %p)\n", __FUNCTION__, tim, freq, cb, arg);
 
     if (tim >= TIMER_NUMOF) {
         return -1;
@@ -362,8 +362,8 @@ void timer_start(tim_t tim)
 /**
  * @brief   timer interrupt handler
  *
- * @param[in] num   GPT instance number
- * @param[in] chn   channel number (0=A, 1=B)
+ * @param[in]   tim     timer
+ * @param[in]   channel channel number (0=A, 1=B)
  */
 static void irq_handler(tim_t tim, int channel)
 {

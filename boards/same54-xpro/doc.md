@@ -8,15 +8,12 @@ The `SAME54 Xplained Pro` is an evaluation board by Microchip featuring an
 ATSAME54P20A SoC. The SoC includes a SAME54 ARM Cortex-M4F microcontroller.
 For programming the MCU comes with 256Kb of RAM and 1024Kb of flash memory.
 
-The same54-xpro is available from various hardware vendors for ~70USD (as of
-2019 March).
-
 ## Hardware
 
 ![same54-xpro image](http://www.microchip.com/_ImagedCopy/ATSAME54-XPRO_angle.jpg)
 
-
 ### MCU
+
 | MCU        | ATSAME54P20A      |
 |:------------- |:--------------------- |
 | Family | ARM Cortex-M4F    |
@@ -43,7 +40,6 @@ The same54-xpro is available from various hardware vendors for ~70USD (as of
 | LED0   | PC18 |
 | SW0 (button) | PB31 |
 
-
 ## Implementation Status
 
 | Device           | ID        | Supported | Comments  |
@@ -66,27 +62,30 @@ The same54-xpro is available from various hardware vendors for ~70USD (as of
 |                  | Timer     | yes       |           |
 |                  | Ethernet  | yes       |           |
 
-
 ## Flashing the device
 
 Connect the device to your Micro-USB cable using the port labeled as *DEBUG
 USB*.
 
 The standard method for flashing RIOT to the same54-xpro is using [edbg](https://github.com/ataradov/edbg).
-by calling: `make BOARD=same54-xpro -C tests/leds flash`
+by calling:
+
+```shell
+make BOARD=same54-xpro -C tests/leds flash
+```
 
 Note that on Linux, you will need libudev-dev package to be installed.
 
 Users can also use openOCD to flash and/or debug the board using:
-`PROGRAMMER=openocd make BOARD=same54-xpro -C tests/leds flash`
 
+```shell
+PROGRAMMER=openocd make BOARD=same54-xpro -C tests/leds flash
+```
 
 On Linux you will have to add a **udev** rule for hidraw, like
-```
-bash
+
+```shell
 echo 'KERNEL=="hidraw*", SUBSYSTEM=="hidraw", MODE="0664", GROUP="plugdev"' \
     | sudo tee -a /etc/udev/rules.d/99-usb.rules
 sudo service udev restart
 ```
-
-## Known Issues / Problems

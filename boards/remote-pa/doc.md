@@ -9,7 +9,7 @@ following section focuses on the revision A.
 
 The official RE-Mote wiki page is maintained by Zolertia at:
 
-https://github.com/Zolertia/Resources/wiki
+<https://github.com/Zolertia/Resources/wiki>
 
 # Components
 
@@ -52,15 +52,15 @@ And under work or pending at CC2538 base CPU:
 
 # Flashing
 
-The RE-Mote has built-in support to flash over USB using the BSL.  Previous
-versions required to unlock the bootloader by manually pressing the `user
-button` and `reset button`, but the current version handles the sequence with an
-on-board PIC, so automatically unlocks the bootloader upon flashing.
+The RE-Mote has built-in support to flash over USB using the BSL. Previous
+versions required to unlock the bootloader by manually pressing the
+`user button` and `reset button`, but the current version handles the sequence
+with an on-board PIC, so automatically unlocks the bootloader upon flashing.
 
 e.g.
-```
-Bash
-$ make BOARD=remote-reva flash
+
+```shell
+BOARD=remote-reva make flash
 ```
 
 The RE-Mote in its current Revision A has the following pin-out:
@@ -72,9 +72,9 @@ The RE-Mote in its current Revision A has the following pin-out:
 
 ## RE-Mote ports and connectors
 
-![](http://i.imgur.com/TF21Hin.png)
+![](https://i.imgur.com/TF21Hin.png)
 
-![](http://i.imgur.com/J7aisKJ.png)
+![](https://i.imgur.com/J7aisKJ.png)
 
 ## RE-Mote on-board connectors pin-out
 
@@ -83,5 +83,5 @@ connect digital sensors based on I2C and SPI protocols, as well as other sensors
 or actuators you may need to connect.  The pins are 2.54 mm spaced and the
 connector has the following pin-out:
 
-![](http://i.imgur.com/2DZ17PV.png)
-![](http://i.imgur.com/q7Hb7Y8.png)
+![](https://i.imgur.com/2DZ17PV.png)
+![](https://i.imgur.com/q7Hb7Y8.png)

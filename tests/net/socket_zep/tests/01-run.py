@@ -1,10 +1,7 @@
 #!/usr/bin/env python3
 
-# Copyright (C) 2016 Freie Universität Berlin
-#
-# This file is subject to the terms and conditions of the GNU Lesser
-# General Public License v2.1. See the file LICENSE in the top level
-# directory for more details.
+# SPDX-FileCopyrightText: 2016 Freie Universität Berlin
+# SPDX-License-Identifier: LGPL-2.1-only
 
 import os
 import sys
@@ -39,15 +36,15 @@ def testfunc(child):
     child.expect(r"Initializing socket ZEP with " +
                  r"\(local: \[(?P<local_addr>[.0-9a-f]+)\]:(?P<local_port>\d+), " +
                  r"remote: \[(?P<remote_addr>[.0-9a-f]+)\]:(?P<remote_port>\d+)\)")
-    assert(child.match.group('local_addr') == zep_params['local_addr'])
-    assert(int(child.match.group('local_port')) == zep_params['local_port'])
-    assert(child.match.group('remote_addr') == zep_params['remote_addr'])
-    assert(int(child.match.group('remote_port')) == zep_params['remote_port'])
+    assert (child.match.group('local_addr') == zep_params['local_addr'])
+    assert (int(child.match.group('local_port')) == zep_params['local_port'])
+    assert (child.match.group('remote_addr') == zep_params['remote_addr'])
+    assert (int(child.match.group('remote_port')) == zep_params['remote_port'])
     child.expect(r"\(Hwaddrs: (?P<short_addr>[0-9a-f]{4}), (?P<long_addr>[0-9a-f]{16})\)")
     child.expect_exact("Send 'Hello\\0World\\0'")
     data, addr = s.recvfrom(RCVBUF_LEN)
-    assert(len(data) == (ZEP_DATA_HEADER_SIZE + len("Hello\0World\0") + FCS_LEN))
-    assert(b"Hello\0World\0" == data[ZEP_DATA_HEADER_SIZE:-2])
+    assert (len(data) == (ZEP_DATA_HEADER_SIZE + len("Hello\0World\0") + FCS_LEN))
+    assert (b"Hello\0World\0" == data[ZEP_DATA_HEADER_SIZE:-2])
     child.expect_exact("Waiting for an incoming message (use `make test`)")
     s.sendto(b"\x45\x58\x02\x01\x1a\x44\xe0\x01\xff\xdb\xde\xa6\x1a\x00\x8b" +
              b"\xfd\xae\x60\xd3\x21\xf1\x00\x00\x00\x00\x00\x00\x00\x00\x00" +

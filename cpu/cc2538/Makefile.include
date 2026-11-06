@@ -1,6 +1,6 @@
 
 # Strip 'K' from ROM_LEN definition
-_rom_len_k = $(shell echo $1 | sed 's/K//')
+_rom_len_k = $(subst K,,$1)
 
 # Set ROM and RAM lengths according to CPU model
 ifneq (,$(filter cc2538nf11,$(CPU_MODEL)))

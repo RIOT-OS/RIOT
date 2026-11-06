@@ -30,7 +30,7 @@ index a99be65cb..3efc81fa0 100644
  
      /* Disable IRQ, set priority and set vector in table */
      NVIC_DisableIRQ(irq_num);
-+#ifndef RIOT_VERSION
++#ifndef RIOT_OS
      NVIC_SetPriority(irq_num, (1 << __NVIC_PRIO_BITS) - 1);
 -    NVIC_SetVector(irq_num, (uint32_t)irq_isr);
 +#endif
@@ -63,7 +63,7 @@ index fc6fe834d..c2ca88f65 100644
 -
      /* Disable IRQ, set priority and set vector in table */
      NVIC_DisableIRQ(irq_num);
-+#ifndef RIOT_VERSION
++#ifndef RIOT_OS
      NVIC_SetPriority(irq_num, (1 << __NVIC_PRIO_BITS) - 1);
 -    NVIC_SetVector(irq_num, (uint32_t)irq_isr);
 +#endif

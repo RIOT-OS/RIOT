@@ -11,6 +11,15 @@ ESP32_SDK_SRC += components/ieee802154/driver/esp_ieee802154_util.c
 ESP32_SDK_SRC += components/ieee802154/esp_ieee802154.c
 ESP32_SDK_SRC += components/soc/$(CPU_FAM)/ieee802154_periph.c
 
+# The software coexistence is also enabled if BT and IEEE 802.15.4 are used,
+# the coexistence sources are only compiled with WiFi otherwise.
+ifneq (,$(filter esp_ble,$(USEMODULE)))
+  ifeq (,$(filter esp_wifi_any,$(USEMODULE)))
+    ESP32_SDK_SRC += components/esp_coex/$(CPU_FAM)/esp_coex_adapter.c
+    ESP32_SDK_SRC += components/esp_coex/src/coexist.c
+  endif
+endif
+
 INCLUDES += -I$(ESP32_SDK_DIR)/components/esp_coex/include
 INCLUDES += -I$(ESP32_SDK_DIR)/components/esp_phy/include
 INCLUDES += -I$(ESP32_SDK_DIR)/components/esp_phy/$(CPU_FAM)/include

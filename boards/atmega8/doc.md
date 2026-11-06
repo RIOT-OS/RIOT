@@ -10,6 +10,7 @@ programmer will be needed to program it; or to program a bootloader to
 subsequently allow programming via UART.)
 
 ### MCU
+
 | MCU           | ATmega8                                       |
 |:------------- |:--------------------------------------------- |
 | Family        | AVR/ATmega                                    |
@@ -28,10 +29,11 @@ subsequently allow programming via UART.)
 
 ### Pinout
 
-\htmlonly<style>div.image img[src="https://camo.githubusercontent.com/c55beef2f138da61fe671a1e4a307ff4ffbc318d/68747470733a2f2f692e696d6775722e636f6d2f715849456368542e6a7067"]{width:100%;}</style>\endhtmlonly
-@image html "https://camo.githubusercontent.com/c55beef2f138da61fe671a1e4a307ff4ffbc318d/68747470733a2f2f692e696d6775722e636f6d2f715849456368542e6a7067" "Pinout of the ATmega328p"<br>
+<img src="https://camo.githubusercontent.com/c55beef2f138da61fe671a1e4a307ff4ffbc318d/68747470733a2f2f692e696d6775722e636f6d2f715849456368542e6a7067" width="100%" />
+<img src="https://camo.githubusercontent.com/c55beef2f138da61fe671a1e4a307ff4ffbc318d/68747470733a2f2f692e696d6775722e636f6d2f715849456368542e6a7067" alt="Pinout of the ATmega328p" />
+<br>
 
-All credit for above pinout image goes to https://github.com/MCUdude/MiniCore#pinout
+All credit for above pinout image goes to <https://github.com/MCUdude/MiniCore#pinout>
 
 ### Clock Frequency
 
@@ -41,7 +43,9 @@ configured to use the internal oscillator and an operating mode resulting in a
 clock speed of 1MHz. By setting the `CKSEL` fuses to 0100 the clock will operate
 at 8MHz without an external clock source. This can be done like this:
 
-    avrdude -c usbasp -p m8 -B 32 -U lfuse:w:0xe4:m
+```shell
+avrdude -c usbasp -p m8 -B 32 -U lfuse:w:0xe4:m
+```
 
 (Replace `usbasp` with the ISP programmer you are using. The `-B 32` might
 be needed on some ISP programmers to communicate with slow ATmega MCUs. It will
@@ -80,17 +84,23 @@ needed. Connect the programmer as follows:
 
 The tool `avrdude` needs to be installed. When using the `usbasp` running
 
-    make BOARD=atmega8 flash
+```shell
+BOARD=atmega8 make flash
+```
 
 will take care of everything. To use the programmer `<FOOBAR>` instead, run
 
-    make BOARD=atmega8 PROGRAMMER=<FOOBAR> flash
+```shell
+BOARD=atmega8 PROGRAMMER=<FOOBAR> make flash
+```
 
 ## Serial Terminal
 
 Connect a TTL adapter with pins 2/RXD and 3/TXD an run
 
-    make BOARD=atmega8 term
+```shell
+BOARD=atmega8 make term
+```
 
 Please note that the supply voltage should be compatible with the logic level of
 the TTL adapter. Usually everything between 3.3 V and 5 V should work.

@@ -10,7 +10,7 @@
  * @{
  *
  * @file
- * @brief           Peripheral MCU configuration for TI CC1312 LaunchPad
+ * @brief           Peripheral MCU configuration for TI CC1352P LaunchPad
  *
  * @author          Jean Pierre Dudey <jeandudey@hotmail.com>
  * @author          Luis A. Ruiz <luisan00@hotmail.com>

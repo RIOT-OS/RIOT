@@ -4,8 +4,8 @@ This benchmark will run a periodic timer every `TEST_INTERVAL` microseconds
 (`TEST_HZ`). Two other threads are also running only to cause CPU load with
 extra interrupts and context switches.
 
-This benchmark is heavily based on tests/xtimer_drift. It basically minimizes
-the per-second printout and adds statistic gathering / printing.
+This benchmark is heavily based on tests/sys/xtimer_drift. It basically
+minimizes the per-second printout and adds statistic gathering / printing.
 
 With low TEST_HZ (`<64`), this test can expose accuracy issues in the timer
 configuration.

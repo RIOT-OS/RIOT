@@ -240,11 +240,11 @@ typedef struct {
 #define AUX_SYSIF            ((aux_sysif_regs_t *) (AUX_SYSIF_BASE))
 
 /**
- * @brief   AUX_SYSIF functions
+ * @name    AUX_SYSIF functions
  * @{
  */
 /**
- * @brief    Changes the AUX operational mode
+ * @brief   Changes the AUX operational mode
  *
  * @note Only this function should be used to change the operational mode,
  * because it needs to be done in order.

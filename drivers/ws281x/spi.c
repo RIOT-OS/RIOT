@@ -120,9 +120,11 @@ void ws281x_end_transmission(ws281x_t *dev)
     const uint8_t *non_zero_spi_byte = memchk(_spi_buf, 0x00, sizeof(_spi_buf));
     if (non_zero_spi_byte) {
         size_t led_numof = (non_zero_spi_byte - _spi_buf) / sizeof(ws281x_spi_data_t);
-        led_numof -= (_SPI_RESET_BYTES / sizeof(ws281x_spi_data_t));
-        dev->params.numof = led_numof;
-        DEBUG("Detected %u LEDs in chain\n", (unsigned)dev->params.numof);
+        if (led_numof > (_SPI_RESET_BYTES / sizeof(ws281x_spi_data_t))) {
+            led_numof -= (_SPI_RESET_BYTES / sizeof(ws281x_spi_data_t));
+            dev->params.numof = led_numof;
+            DEBUG("Detected %u LEDs in chain\n", (unsigned)dev->params.numof);
+        }
     }
 #if ENABLE_DEBUG && MODULE_OD
     DEBUG("Received SPI data (%u bytes):\n", (unsigned)_spi_size);
@@ -189,7 +191,8 @@ void ws281x_write_buffer(ws281x_t *dev, const void *_buf, size_t size)
     (void)dev;
     assert(dev);
     assert(size % WS281X_BYTES_PER_DEVICE == 0);
-    assert(size * WS281X_SPI_BITS_PER_WS_BIT <= sizeof(_spi_buf));
+    /* number of already written bytes plus number of bytes to write fits in buffer */
+    assert(_spi_size + size * WS281X_SPI_BITS_PER_WS_BIT <= sizeof(_spi_buf));
 
     if (8 % WS281X_SPI_BITS_PER_WS_BIT) {
         _ws281x_write_buffer_unaligned(_buf, size);

@@ -1,0 +1,23 @@
+# SPDX-FileCopyrightText: 2026 Technische Universität Hamburg
+# SPDX-License-Identifier: LGPL-2.1-only
+
+menu "GC9A01 driver"
+    depends on USEMODULE_GC9A01
+
+config GC9A01_VREG1A
+    int "VREG1A voltage level (in millivolts)"
+    default 5340
+    range 4800 7340
+    help
+        Configure VREG1A level, which is the highest positive grayscale reference voltage.
+        VREG1A should be between 4.8 V and 7.34 V .
+
+config GC9A01_VREG2A
+    int "VREG2A voltage level (in millivolts)"
+    default -3980
+    range -4200 -1660
+    help
+        Configure VREG2A level, which is the lowest negative grayscale reference voltage.
+        VREG2A should be between -4.2 V and -1.66 V .
+
+endmenu # GC9A01 driver

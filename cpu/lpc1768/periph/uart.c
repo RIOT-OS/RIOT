@@ -30,9 +30,9 @@ static uart_isr_ctx_t config[UART_NUMOF];
 static inline void init_base(uart_t uart, uint32_t baudrate);
 
 /**
- * @brief   Get the GPT register base for a timer
+ * @brief   Get the UART register base for a UART instance
  *
- * @param[in] tim   index of the timer
+ * @param[in] uart  index of the UART instance
  *
  * @return          base address
  */
@@ -89,22 +89,22 @@ static inline void init_base(uart_t uart, uint32_t baudrate)
 
     /* Clear register for mux selection */
     *(&LPC_PINCON->PINSEL0 + cfg->pinsel) &=
-            ~((uint32_t)0xF << (cfg->pinsel_shift * 2));
+        ~((uint32_t)0xF << (cfg->pinsel_shift * 2));
     /* Select uart TX mux */
     *(&LPC_PINCON->PINSEL0 + cfg->pinsel) |=
-            ((uint32_t)cfg->pinsel_af << (cfg->pinsel_shift * 2));
+        ((uint32_t)cfg->pinsel_af << (cfg->pinsel_shift * 2));
     /* Select uart RX mux */
     *(&LPC_PINCON->PINSEL0 + cfg->pinsel) |=
-            ((uint32_t)cfg->pinsel_af << (cfg->pinsel_shift * 2 + 2));
+        ((uint32_t)cfg->pinsel_af << (cfg->pinsel_shift * 2 + 2));
     /* Clear modes for RX and TX pins */
     *(&LPC_PINCON->PINMODE0 + cfg->pinsel) &=
-            ~((uint32_t)0xF << (cfg->pinsel_shift * 2));
+        ~((uint32_t)0xF << (cfg->pinsel_shift * 2));
     /* Set TX mode */
     *(&LPC_PINCON->PINMODE0 + cfg->pinsel) |=
-            ((uint32_t)0x2 << (cfg->pinsel_shift * 2));
+        ((uint32_t)0x2 << (cfg->pinsel_shift * 2));
     /* Set RX mode */
     *(&LPC_PINCON->PINMODE0 + cfg->pinsel) |=
-            ((uint32_t)0x2 << (cfg->pinsel_shift * 2 + 2));
+        ((uint32_t)0x2 << (cfg->pinsel_shift * 2 + 2));
     /* disable access to divisor latch */
     dev(uart)->LCR &= ~(1 << 7);
 }

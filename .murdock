@@ -5,27 +5,53 @@
 # and / or
 #export APPS="examples/basic/hello-world tests/unittests"
 
+# The quickbuild boards should cover all CPU architectures and the most
+# important CPU families supported by RIOT:
+#
+# atmega256rfr2-xpro     AVR ATmega256RFR2, megaRF with integrated radio
+# atxmega-a1u-xpro       AVR ATxmega128A1U, XMEGA A1 (PMIC, EBI)
+# esp32-wroom-32         Xtensa LX6, ESP32
+# esp32c3-devkit         RISC-V rv32imc, ESP32-C3 (RISC-V code of esp_common)
+# esp32s3-devkit         Xtensa LX7, ESP32-S3
+# frdm-k64f              ARMv7-M Cortex-M4F, NXP Kinetis K64F
+# hifive1b               RISC-V rv32imac, SiFive FE310 (PLIC/CLINT)
+# iotlab-m3              ARMv7-M Cortex-M3 without FPU, STM32F1
+# msb-430                MSP430 x1xx, MSP430F1612
+# msba2                  ARMv4T ARM7TDMI-S, NXP LPC2387
+# native32               native, 32 bit host build
+# native64               native, 64 bit host build
+# nrf52840dk             ARMv7-M Cortex-M4F, nRF52 (BLE / IEEE 802.15.4)
+# nucleo-u575zi-q        ARMv8-M Cortex-M33 with TrustZone, STM32U5
+# remote-revb            ARMv7-M Cortex-M3, TI CC2538 (cc2538_rf radio)
+# samr21-xpro            ARMv6-M Cortex-M0+, SAMR21 (sam0 samd21, at86rf2xx)
+# stk3200                ARMv6-M Cortex-M0+, EFM32 Zero Gecko (Gecko SDK)
+# stm32f429i-disc1       ARMv7-M Cortex-M4F, STM32F4
+# zedboard-noelv         RISC-V rv64imac, Gaisler NOEL-V (only rv64 platform)
 QUICKBUILD_BOARDS="
-adafruit-itsybitsy-m4
 atmega256rfr2-xpro
+atxmega-a1u-xpro
 esp32-wroom-32
+esp32c3-devkit
 esp32s3-devkit
 frdm-k64f
 hifive1b
+iotlab-m3
 msb-430
 msba2
 native32
 native64
 nrf52840dk
-qn9080dk
+nucleo-u575zi-q
+remote-revb
 samr21-xpro
 stk3200
-stm32f429i-disc1"
+stm32f429i-disc1
+zedboard-noelv"
 
 # this configures boards that are available via pifleet
 case "${CI_MURDOCK_PROJECT}" in
     riot)
-        : ${TEST_BOARDS_AVAILABLE:="samr21-xpro"}
+        : ${TEST_BOARDS_AVAILABLE:=""}
         ;;
     riot-staging)
         : ${TEST_BOARDS_AVAILABLE:=""}
@@ -42,6 +68,7 @@ esac
 # TODO: Consider reusing QUICKBUILD_BOARDS once all those boards are supported
 # on LLVM.
 : ${TEST_BOARDS_LLVM_COMPILE:="iotlab-m3 native32 native64 nrf52dk mulle nucleo-f401re samr21-xpro slstk3402a"}
+#: ${TEST_BOARDS_LLVM_COMPILE:=${QUICKBUILD_BOARDS}}
 
 : ${TEST_WITH_CONFIG_SUPPORTED:="examples/advanced/suit_update tests/drivers/at86rf2xx_aes"}
 
@@ -106,23 +133,6 @@ if [ -z "${QUICK_BUILD}" ]; then
         export QUICK_BUILD=1
     fi
 fi
-
-# This is a work around for a bug in CCACHE which interacts very badly with
-# some features of RIOT and of murdock. The result is that ccache is
-# ineffective (i.e. objects are never reused, resulting in extreme cache miss
-# rate) and murdock becomes slow.
-#
-# - CCACHE thinks that -gz by itself enables debugging, which is not true.
-#   see https://github.com/ccache/ccache/issues/464
-#   - When debug info is included, CCACHE hashes the file paths, as these
-#     influence the debug information (the name of compile units and/or their
-#     "comp_dir" attribute)
-# - Riot does not set -fdebug-prefix-map. This is not that easy as it may not
-#   be supported in every toolchain (some are quite old).
-# - Murdock builds PRs in different directories each time.
-#
-# It is only the combination of these three factors which causes this bug.
-export OPTIONAL_CFLAGS_BLACKLIST="-gz"
 
 DWQ_ENV="-E BOARDS -E APPS -E NIGHTLY -E RUN_TESTS -E ENABLE_TEST_CACHE
          -E TEST_HASH -E CI_PULL_LABELS -ECI_BASE_BRANCH -ECI_BASE_COMMIT
@@ -224,7 +234,6 @@ get_supported_boards() {
         fi
     else
         if [ -n "$BOARDS_CHANGED" ]; then
-            echo d
             # no changed apps, some changed boards -> build for changed boards
             only_changed=1
         else
@@ -235,15 +244,23 @@ get_supported_boards() {
 
     BOARDS_=${BOARDS}
     if [ $only_changed -eq 1 ]; then
-        # if can_fast_ci_run figured out changes to specific boards,
-        # only consider those
-        export BOARDS="$BOARDS_CHANGED"
-    elif [ -z "${BOARDS}" -a ${QUICK_BUILD} -eq 1 ]; then
+        if [ -z "${BOARDS}" ] && [ ${QUICK_BUILD} -eq 1 ]; then
+            # Quickbuild: add changed boards additionally to the quickbuild-list
+            # rather than replacing them
+            export BOARDS="${QUICKBUILD_BOARDS} ${BOARDS_CHANGED}"
+        else
+            # if can_fast_ci_run figured out changes to specific boards,
+            # only consider those
+            export BOARDS="${BOARDS_CHANGED}"
+        fi
+    elif [ -z "${BOARDS}" ] && [ ${QUICK_BUILD} -eq 1 ]; then
         # quickbuild board filter is applied here
         export BOARDS="${QUICKBUILD_BOARDS}"
     fi
 
-    local boards="$(make --no-print-directory -C$appdir info-boards-supported 2>/dev/null || echo broken)"
+    # The `info-boards-supported` target supports multithreading, but
+    # using too many threads causes it to become flaky in CI.
+    local boards="$(make --no-print-directory -C$appdir -j2 info-boards-supported 2>/dev/null || echo broken)"
 
     export BOARDS="${BOARDS_}"
 
@@ -351,9 +368,10 @@ compile() {
 
     # set build directory. CI ensures only one build at a time in $(pwd).
     export BINDIR="$(pwd)/build"
-    export PKGDIRBASE="${BINDIR}/pkg"
 
-    # Pre-build cleanup
+    # pre-build cleanup: this is effectively a superset of "make clean" that
+    # will not cost a full parse of the build system as well as one sub-make
+    # per package.
     rm -rf ${BINDIR}
 
     print_worker
@@ -367,7 +385,6 @@ compile() {
     # reduces disk IO.
     export CCACHE_TEMPDIR="$(pwd)/.ccache/tmp"
 
-    BOARD=${board} make -C${appdir} clean
     CCACHE_BASEDIR="$(pwd)" BOARD=$board TOOLCHAIN=$toolchain RIOT_CI_BUILD=1 \
         make -C${appdir} all test-input-hash -j${JOBS:-4}
     RES=$?
@@ -534,6 +551,12 @@ update_changed_modules() {
 
     # if this errors, it means we cannot skip any builds.
     if [ -n "$CFCR_ERROR" ]; then
+        # Although we can't skip builds, we might have gotten some insight about
+        # which boards have to be built. Therefore we pass BOARDS_CHANGED
+        # so it can be added to the boards list on quickbuilds.
+        if [ -n "$BOARDS_CHANGED" ]; then
+            export BOARDS_CHANGED="$(basename_list $BOARDS_CHANGED)"
+        fi
         return 0
     fi
 
@@ -543,8 +566,8 @@ update_changed_modules() {
         return 1
     fi
 
-    # can_fast_ci_run.py outputs "board/fooboard", but the rest of this script
-    # expects a board name without leading "board/".
+    # can_fast_ci_run.py outputs "boards/fooboard", but the rest of this script
+    # expects a board name without leading "boards/".
     if [ -n "$BOARDS_CHANGED" ]; then
         export BOARDS_CHANGED="$(basename_list $BOARDS_CHANGED)"
     fi

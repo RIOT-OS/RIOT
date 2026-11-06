@@ -35,7 +35,7 @@ void *run(void *parameter) {
         }
     }
 
-    printf("pthread: factorial = %" PRIuSIZE "\n",factorial);
+    printf("pthread: factorial = %" PRIuSIZE "\n", factorial);
     pthread_exit((void *)factorial);
 
     return NULL;

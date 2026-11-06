@@ -57,11 +57,16 @@ int tsl2561_init(tsl2561_t *dev, const tsl2561_params_t *params)
 
     /* Verify sensor ID */
     uint8_t id;
-    i2c_read_reg(DEV_I2C, DEV_ADDR,
-                 TSL2561_COMMAND_MODE | TSL2561_REGISTER_ID, &id, 0);
+    if (i2c_read_reg(DEV_I2C, DEV_ADDR,
+                     TSL2561_COMMAND_MODE | TSL2561_REGISTER_ID, &id, 0) < 0) {
+        DEBUG("[Error] could not read sensor ID\n");
+        i2c_release(DEV_I2C);
+        return TSL2561_NOI2C;
+    }
     DEBUG("[Info] ID ? %d\n", id);
     if (id != TSL2561_ID ) {
         DEBUG("[Error] not a TSL2561 sensor\n");
+        i2c_release(DEV_I2C);
         return TSL2561_BADDEV;
     }
 

@@ -6,9 +6,7 @@
 #pragma once
 
 /**
- * @defgroup    boards_frdm-kl43z NXP FRDM-KL43Z Board
- * @ingroup     boards
- * @brief       Support for the NXP FRDM-KL43Z
+ * @ingroup     boards_frdm-kl43z
  * @{
  *
  * @file

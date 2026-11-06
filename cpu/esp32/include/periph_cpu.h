@@ -36,6 +36,23 @@ extern "C" {
 #define STDIO_UART_DEV  CONFIG_ESP_CONSOLE_UART_NUM
 
 /**
+ * @brief   Time in microseconds to wait for the host to fetch data from
+ *          the TX FIFO before further output is dropped
+ *
+ * If no terminal is connected, the host does not fetch any data and the TX
+ * FIFO stays full. In this case, writing to stdio must not block forever.
+ *
+ * The data that is already in the TX FIFO (at most one packet of 64 bytes)
+ * can't be discarded, it is fetched by the host as soon as a terminal is
+ * connected again. All output written in the meantime is lost.
+ *
+ * Only used by the `stdio_usb_serial_jtag` module.
+ */
+#ifndef CONFIG_STDIO_USB_SERIAL_JTAG_TX_TIMEOUT_US
+#  define CONFIG_STDIO_USB_SERIAL_JTAG_TX_TIMEOUT_US (50 * US_PER_MS)
+#endif
+
+/**
  * @name    Power management configuration
  * @{
  */
@@ -63,14 +80,7 @@ extern "C" {
 /**
  * @brief   Length of the CPU_ID in octets
  */
-#if defined(CPU_FAM_ESP32H2) && defined(CONFIG_IEEE802154_ENABLED)
-/* ESP32H2 has IEEE802.15.4 radio which has an EUI64 address. Function
- * esp_efuse_mac_get_default will return this 8 byte address if
- * CONFIG_IEEE802154_ENABLED */
-#  define CPUID_LEN             (8U)
-#else
-#  define CPUID_LEN             (6U)
-#endif
+#define CPUID_LEN               (6U)
 
 /**
  * @name   GPIO configuration
@@ -653,6 +663,23 @@ typedef struct {
  * @brief   RTT is a 32-bit counter
  */
 #define RTT_MAX_VALUE       (0xFFFFFFFFUL)
+
+/**
+ * @brief   RTT minimum offset valid for all ESP32x SoCs
+ *
+ * If the 32.768 kHz crystal is used (module `esp_rtc_timer_32k`), the RTC
+ * timer alarm is only triggered when the RTC counter reaches exactly the
+ * alarm value. An alarm that is already in the past when it becomes active,
+ * because the counter was incremented while the alarm was set, would only be
+ * triggered after a complete wrap-around of the 48-bit RTC counter. The
+ * minimum offset therefore has to cover the latency for setting the alarm,
+ * as determined with `tests/periph/rtt_min`.
+ */
+#if MODULE_ESP_RTC_TIMER_32K
+#  define RTT_MIN_OFFSET    (3U)
+#else
+#  define RTT_MIN_OFFSET    (1U)
+#endif
 
 /** @} */
 

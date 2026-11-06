@@ -59,12 +59,21 @@ static fib_table_t test_fib_sr_table;
 static int _create_sr(const char *pre, size_t from, size_t to, fib_sr_t *sr, size_t buf_size)
 {
     char addr_nxt[buf_size];
+    size_t pre_len = strlen(pre);
 
-    strncpy(addr_nxt, pre, strlen(pre));
+    /* the prefix must leave room for at least one digit and the terminator */
+    if (pre_len + 2 > buf_size) {
+        return -EINVAL;
+    }
+
+    memcpy(addr_nxt, pre, pre_len);
 
     for (size_t i = from; i < to; ++i) {
         int res;
-        snprintf(&(addr_nxt[strlen(pre)]), buf_size, "%" PRIuSIZE, i);
+        res = snprintf(&(addr_nxt[pre_len]), buf_size - pre_len, "%" PRIuSIZE, i);
+        if (res < 0 || (size_t)res >= buf_size - pre_len) {
+            return -ENOBUFS;
+        }
         /* append a  hop */
         res = fib_sr_entry_append(&test_fib_sr_table, sr, (uint8_t *)&addr_nxt, buf_size);
         if (res != 0) {
@@ -485,9 +494,10 @@ static void test_fib_sr_10_create_sr_with_hops_and_get_a_route(void)
 
     TEST_ASSERT_EQUAL_INT(0, _create_sr("Some address X", 0, 10, local_sourceroutes[0], 16));
 
-    size_t addr_list_elements = 10;
-    size_t element_size = 16;
-    uint8_t addr_list[ addr_list_elements * element_size ];
+    enum { ADDR_LIST_ELEMENTS = 10, ELEMENT_SIZE = 16 };
+    size_t addr_list_elements = ADDR_LIST_ELEMENTS;
+    size_t element_size = ELEMENT_SIZE;
+    uint8_t addr_list[ADDR_LIST_ELEMENTS * ELEMENT_SIZE];
     kernel_pid_t sr_iface_id;
     uint32_t sr_flags = 0x0;
     snprintf(addr_nxt, add_buf_size, "Some address X9");
@@ -556,9 +566,10 @@ static void test_fib_sr_11_create_sr_with_hops_and_get_a_partial_route(void)
 
     TEST_ASSERT_EQUAL_INT(0, _create_sr("Some address X", 0, 10, local_sourceroutes[0], 16));
 
-    size_t addr_list_elements = 10;
-    size_t element_size = 16;
-    uint8_t addr_list[ addr_list_elements * element_size ];
+    enum { ADDR_LIST_ELEMENTS = 10, ELEMENT_SIZE = 16 };
+    size_t addr_list_elements = ADDR_LIST_ELEMENTS;
+    size_t element_size = ELEMENT_SIZE;
+    uint8_t addr_list[ADDR_LIST_ELEMENTS * ELEMENT_SIZE];
     kernel_pid_t sr_iface_id;
     uint32_t sr_flags = 0x0;
     snprintf(addr_nxt, add_buf_size, "Some address X7");
@@ -660,9 +671,10 @@ static void test_fib_sr_12_get_consecutive_sr(void)
 
     fib_sr_t *iter[1];
     iter[0] = NULL;
-    size_t addr_list_elements = 11;
-    size_t element_size = 16;
-    uint8_t addr_list[ addr_list_elements * element_size ];
+    enum { ADDR_LIST_ELEMENTS = 11, ELEMENT_SIZE = 16 };
+    size_t addr_list_elements = ADDR_LIST_ELEMENTS;
+    size_t element_size = ELEMENT_SIZE;
+    uint8_t addr_list[ADDR_LIST_ELEMENTS * ELEMENT_SIZE];
     kernel_pid_t sr_iface_id;
     uint32_t sr_flags = 0x0;
     snprintf(addr_nxt, add_buf_size, "Some address XX");

@@ -1,0 +1,40 @@
+PKG_NAME    = bplib
+PKG_URL     = https://github.com/nasa/bplib
+# Original bplibs 7.0.2 release
+PKG_VERSION = 5eda6abc1f2c4d7e1aea0a5681992e9e717b60bf
+PKG_LICENSE = Apache-2.0
+
+include $(RIOTBASE)/pkg/pkg.mk
+
+# These are the bplib pseudomodules
+IGNORE  := bplib_walltime_available bplib_include_nc_telemetry bplib_include_as
+IGNORE  += bplib_no_vfs
+
+SUBMODS := $(filter-out $(IGNORE),$(filter bplib_%,$(USEMODULE)))
+
+all: $(SUBMODS)
+	$(QQ)"$(MAKE)" -C $(PKG_SOURCE_DIR) -f $(CURDIR)/Makefile.$(PKG_NAME)
+
+# ------------------------- General helper submodules --------------------------
+bplib_fwp:
+	+"$(MAKE)" -C $(RIOTPKG)/bplib/fwp
+
+bplib_nc:
+	+"$(MAKE)" -C $(RIOTPKG)/bplib/nc
+
+bplib_init:
+	+"$(MAKE)" -C $(RIOTPKG)/bplib/init
+
+# ----------------------------- Storage modules --------------------------------
+bplib_stor_vfs:
+	+"$(MAKE)" -C $(RIOTPKG)/bplib/storage/vfs
+
+bplib_stor_void:
+	+"$(MAKE)" -C $(RIOTPKG)/bplib/storage/void
+
+# -------------------------------- CLA modules ---------------------------------
+bplib_cla_ble:
+	+"$(MAKE)" -C $(RIOTPKG)/bplib/cla/ble
+
+bplib_cla_udp:
+	+"$(MAKE)" -C $(RIOTPKG)/bplib/cla/udp

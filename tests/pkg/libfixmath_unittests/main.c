@@ -17,6 +17,8 @@
 
 #include <stdio.h>
 
+#include "test_utils/main_exit_cb.h"
+
 void test_utils_main_exit_cb(int res)
 {
     if (res) {

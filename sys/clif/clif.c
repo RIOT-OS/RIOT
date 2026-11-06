@@ -1,9 +1,6 @@
 /*
- * Copyright (c) 2019 HAW Hamburg
- *
- * This file is subject to the terms and conditions of the GNU Lesser
- * General Public License v2.1. See the file LICENSE in the top level
- * directory for more details.
+ * SPDX-FileCopyrightText: 2019 HAW Hamburg
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
 
 /**
@@ -64,7 +61,7 @@ static const unsigned _attr_to_size[] = {
 #define ATTRS_NUMOF ARRAY_SIZE(_attr_to_str)
 
 ssize_t clif_decode_link(clif_t *link, clif_attr_t *attrs, unsigned attrs_len,
-                         const char *buf, size_t maxlen)
+                         char *buf, size_t maxlen)
 {
 
     assert(buf);
@@ -229,10 +226,10 @@ ssize_t clif_add_attr(clif_attr_t *attr, char *buf, size_t maxlen)
     return pos;
 }
 
-ssize_t clif_get_target(const char *input, size_t input_len, char **output)
+ssize_t clif_get_target_const(const char *input, size_t input_len, const char **output)
 {
     assert(input);
-    char *target_end;
+    const char *target_end;
 
     *output = memchr(input, LF_PATH_BEGIN_C, input_len);
     if (!*output) {

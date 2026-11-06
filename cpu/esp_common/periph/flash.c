@@ -36,6 +36,7 @@
 #include "rom/cache.h"
 #include "esp_rom_spiflash.h"
 #include "soc/soc.h"
+#include "spi_flash_chip_driver.h"
 
 #else /* !CPU_ESP8266 */
 
@@ -77,12 +78,31 @@ extern uint32_t spi_flash_get_id(void);
 
 #else
 
-static inline esp_err_t spi_flash_erase_range(size_t start_address, size_t size)
+static esp_err_t spi_flash_erase_range(size_t start_address, size_t size)
 {
-    esp_err_t res;
-    uint32_t state = irq_disable();
-    res = esp_flash_erase_region(esp_flash_default_chip, start_address, size);
-    irq_restore(state);
+    esp_err_t res = ESP_OK;
+
+    const spi_flash_chip_t *drv = esp_flash_default_chip->chip_drv;
+    size_t sector_size = drv->sector_size;
+    size_t block_size = drv->erase_block ? drv->block_erase_size : sector_size;
+
+    /* Interrupts have to be disabled during flash operations. To avoid starving
+     * pending interrupts (e.g. the watchdog refresh) for too long, the region
+     * is erased block- or sectorwise. */
+    while ((res == ESP_OK) && size) {
+        /* A block erase is faster than multiple sector erases,
+         * prefer that if possible. */
+        size_t chunk = ((start_address % block_size) == 0) && (size >= block_size)
+                     ? block_size : sector_size;
+        chunk = MIN(chunk, size);
+
+        uint32_t state = irq_disable();
+        res = esp_flash_erase_region(esp_flash_default_chip, start_address, chunk);
+        irq_restore(state);
+
+        start_address += chunk;
+        size -= chunk;
+    }
     return res;
 }
 

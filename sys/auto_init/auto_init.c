@@ -1,14 +1,11 @@
+/*
+ * SPDX-FileCopyrightText: 2020 Freie Universität Berlin
+ * SPDX-FileCopyrightText: 2020 Kaspar Schleiser <kaspar@schleiser.de>
+ * SPDX-FileCopyrightText: 2013 INRIA
+ * SPDX-License-Identifier: LGPL-2.1-only
+ */
+
 /**
- * Auto initialization for used modules
- *
- * Copyright (C) 2020 Freie Universität Berlin
- *               2020 Kaspar Schleiser <kaspar@schleiser.de>
- *               2013  INRIA.
- *
- * This file is subject to the terms and conditions of the GNU Lesser
- * General Public License v2.1. See the file LICENSE in the top level
- * directory for more details.
- *
  * @ingroup sys_auto_init
  * @{
  * @file
@@ -19,6 +16,7 @@
  * @author  Martine S. Lenders <m.lenders@fu-berlin.de>
  * @}
  */
+
 #include <stdint.h>
 #include <stdio.h>
 #include "sched.h"
@@ -164,6 +162,11 @@ AUTO_INIT(gcoap_init,
 extern void auto_init_nanocoap_server(void);
 AUTO_INIT(auto_init_nanocoap_server, AUTO_INIT_PRIO_MOD_NANOCOAP);
 #endif
+#if IS_USED(MODULE_AUTO_INIT_UNICOAP)
+extern void unicoap_init(void);
+AUTO_INIT(unicoap_init,
+          AUTO_INIT_PRIO_MOD_UNICOAP);
+#endif
 #if IS_USED(MODULE_DEVFS)
 extern void auto_init_devfs(void);
 AUTO_INIT(auto_init_devfs,
@@ -213,6 +216,11 @@ AUTO_INIT(nimble_riot_init,
 extern void auto_init_loramac(void);
 AUTO_INIT(auto_init_loramac,
           AUTO_INIT_PRIO_MOD_LORAMAC);
+#endif
+#if IS_USED(MODULE_AUTO_INIT_RADIOLIB)
+extern void auto_init_radiolib(void);
+AUTO_INIT(auto_init_radiolib,
+          AUTO_INIT_PRIO_MOD_RADIOLIB);
 #endif
 #if IS_USED(MODULE_DSM)
 extern void dsm_init(void);
@@ -348,6 +356,10 @@ AUTO_INIT(auto_init_gnrc_ipv6_static_addr,
 extern void psa_crypto_init(void);
 AUTO_INIT(psa_crypto_init,
           AUTO_INIT_PRIO_MOD_PSA_CRYPTO);
+#endif
+#if IS_USED(MODULE_SLIPMUX) && !IS_USED(MODULE_SLIPDEV_NET)
+extern void slipmux_init(void);
+AUTO_INIT(slipmux_init, AUTO_INIT_PRIO_MOD_SLIPDEV);
 #endif
 
 void auto_init(void)

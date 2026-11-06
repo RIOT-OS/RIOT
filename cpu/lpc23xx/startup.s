@@ -62,7 +62,7 @@ It is 64 bytes and can be mapped (see documentation 1.4.2). */
 /* Exception vector handlers branching table */
 reset_addr:     .word   reset_handler       /* defined in this module below  */
 undef_addr:     .word   isr_undef           /* defined in arm7_common/vectors.c */
-swi_addr:       .word   ctx_switch          /* defined in arm7_common/common.s */
+swi_addr:       .word   ctx_switch_from_swi /* defined in arm7_common/common.s */
 pabt_addr:      .word   isr_pabt            /* defined in arm7_common/vectors.c */
 dabt_addr:      .word   isr_dabt            /* defined in arm7_common/vectors.c */
 irq_addr:       .word   arm_irq_handler     /* defined in arm7_common/common.s */

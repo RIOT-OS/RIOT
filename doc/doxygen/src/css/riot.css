@@ -527,5 +527,10 @@ blockquote {
  * can be removed as soon as the doxygen issue is fixed */
 li:has(> .item a[class^="md_"][class$="doc.html"]),
 tr:has(> .entry a[href^="md_"][href$="doc.html"]) {
-    display: none;
+  display: none;
+}
+
+/* This is to prevent board pinout files to overflow the body */
+img {
+  max-width: 100%;
 }

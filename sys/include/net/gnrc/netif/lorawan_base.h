@@ -1,9 +1,6 @@
 /*
- * Copyright (C) 2019 HAW Hamburg
- *
- * This file is subject to the terms and conditions of the GNU Lesser
- * General Public License v2.1. See the file LICENSE in the top level
- * directory for more details.
+ * SPDX-FileCopyrightText: 2019 HAW Hamburg
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
 
 #pragma once
@@ -18,6 +15,7 @@
  * @author  Jose Ignacio Alamos <jose.alamos@haw-hamburg.de>
  */
 
+#include "compiler_hints.h"
 #include "net/gnrc/netif.h"
 
 #ifdef __cplusplus
@@ -39,6 +37,7 @@ extern "C" {
  * @return  0 on success
  * @return  negative number on error
  */
+ACCESS(write_only, 2, 3)
 int gnrc_netif_lorawan_create(gnrc_netif_t *netif, char *stack, int stacksize,
                               char priority, char *name, netdev_t *dev);
 

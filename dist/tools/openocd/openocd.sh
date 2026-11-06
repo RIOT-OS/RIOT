@@ -19,7 +19,7 @@
 #                      scripts directory needs to be passed in like this:
 #                      `OPENOCD="~/openocd/src/openocd -s ~/openocd/tcl"`.
 # OPENOCD_CONFIG:      OpenOCD configuration file name,
-#                      default: "${BOARDSDIR}/${BOARD}/dist/openocd.cfg"
+#                      default: "${BOARDDIR}/dist/openocd.cfg"
 # OPENOCD_SERVER_ADDRESS: OpenOCD server bind address, default: "localhost"
 #
 # The script supports the following actions:

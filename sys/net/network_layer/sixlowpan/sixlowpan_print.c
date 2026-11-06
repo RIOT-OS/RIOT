@@ -1,9 +1,6 @@
 /*
- * Copyright (C) 2015 Martine Lenders <mlenders@inf.fu-berlin.de>
- *
- * This file is subject to the terms and conditions of the GNU Lesser
- * General Public License v2.1. See the file LICENSE in the top level
- * directory for more details.
+ * SPDX-FileCopyrightText: 2015 Martine Lenders <mlenders@inf.fu-berlin.de>
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
 
 /**
@@ -62,6 +59,12 @@ void sixlowpan_print(uint8_t *data, size_t size)
     }
     else if ((data[0] & SIXLOWPAN_IPHC1_DISP_MASK) == SIXLOWPAN_IPHC1_DISP) {
         uint8_t offset = SIXLOWPAN_IPHC_HDR_LEN;
+
+        if (SIXLOWPAN_IPHC_HDR_LEN > size) {
+            printf("Malformed IPHC dispatch (second byte missing)\n");
+            return;
+        }
+
         printf("IPHC dispatch\n");
 
         switch (data[0] & SIXLOWPAN_IPHC1_TF) {
@@ -238,6 +241,10 @@ void sixlowpan_print(uint8_t *data, size_t size)
 
         if (data[1] & SIXLOWPAN_IPHC2_CID_EXT) {
             offset += SIXLOWPAN_IPHC_CID_EXT_LEN;
+            if (offset > size) {
+                printf("CID bit set but no CID extension provided (header malformed)\n");
+                return;
+            }
             printf("SCI: 0x%x, DCI: 0x%x\n", (unsigned)(data[2] >> 4),
                    (unsigned)(data[2] & 0xf));
         }

@@ -1,9 +1,6 @@
 /*
- * Copyright (C) 2015 Martine Lenders <mlenders@inf.fu-berlin.de>
- *
- * This file is subject to the terms and conditions of the GNU Lesser
- * General Public License v2.1. See the file LICENSE in the top level
- * directory for more details.
+ * SPDX-FileCopyrightText: 2015 Martine Lenders <mlenders@inf.fu-berlin.de>
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
 
 #pragma once
@@ -23,6 +20,7 @@
 #include <inttypes.h>
 
 #include "byteorder.h"
+#include "compiler_hints.h"
 #include "net/gnrc/netif.h"
 #include "net/gnrc/netif/hdr.h"
 #include "net/ipv6/hdr.h"
@@ -45,8 +43,9 @@ extern "C" {
  * @return  The echo message on success
  * @return  NULL, on failure
  */
+ACCESS(read_only, 4, 5)
 gnrc_pktsnip_t *gnrc_icmpv6_echo_build(uint8_t type, uint16_t id, uint16_t seq,
-                                       uint8_t *data, size_t data_len);
+                                       const void *data, size_t data_len);
 
 /**
  * @brief   ICMPv6 echo request handler

@@ -8,8 +8,8 @@ The E104-BT5011A Test Board is a cheap break-out board for the E104-BT5011A modu
 It's based on the nRF52811 and by default comes with a Firmware that accepts AT
 commands over UART, but it can be flashed with RIOT easily.
 
- - [Module Datasheet](http://www.ebyte.com/en/downpdf.aspx?id=1074)
- - [Module Website](http://www.ebyte.com/en/product-view-news.aspx?id=1074)
+- [Module Datasheet](http://www.ebyte.com/en/downpdf.aspx?id=1074)
+- [Module Website](http://www.ebyte.com/en/product-view-news.aspx?id=1074)
 
 ## Flashing the board
 
@@ -23,6 +23,7 @@ The STDIO is directly accessible via the USB port. On a Linux host, it's
 generally mapped to `/dev/ttyUSB0`.
 
 Use the `term` target to connect to the board serial port<br/>
-```
-    make BOARD=e104-bt5011a-tb -C examples/basic/hello-world term
+
+```shell
+make BOARD=e104-bt5011a-tb -C examples/basic/hello-world term
 ```

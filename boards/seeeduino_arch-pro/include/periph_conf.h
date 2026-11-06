@@ -10,12 +10,13 @@
  * @{
  *
  * @file
- * @brief       Peripheral MCU configuration for the Seeeduino Archo Pro board
+ * @brief       Peripheral MCU configuration for the Seeeduino Arch Pro board
  *
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  * @author      Bas Stottelaar <basstottelaar@gmail.com>
  */
 
+#include "mii.h"
 #include "periph_cpu.h"
 #include "vendor/conf.h"
 
@@ -72,6 +73,23 @@ static const uart_conf_t uart_config[] = {
 
 #define UART_NUMOF          ARRAY_SIZE(uart_config)
 
+/** @} */
+
+/**
+ * @name    Ethernet configuration
+ *
+ * The Seeeduino Arch Pro wires the LPC1768 EMAC to a TI DP83848 PHY at MIIM
+ * address 1. The 50 MHz RMII reference clock is supplied by an external
+ * oscillator whose enable line is driven by P1.27. A dedicated reset line for
+ * the PHY is available at P1.28.
+ * @{
+ */
+static const eth_conf_t eth_config = {
+    .phy_en_pin = GPIO_PIN(1, 27),
+    .phy_rst_pin = GPIO_PIN(1, 28),
+    .speed = MII_BMCR_SPEED_100 | MII_BMCR_FULL_DPLX,
+    .phy_addr = 1, /* TI DP83848 */
+};
 /** @} */
 
 #ifdef __cplusplus

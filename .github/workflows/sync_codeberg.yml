@@ -7,7 +7,7 @@ on:
 
 jobs:
   check-secret:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest
     outputs:
       secret-configured: ${{ steps.secret-exists-check.outputs.defined }}
     steps:
@@ -29,7 +29,7 @@ jobs:
     if: needs.check-secret.outputs.secret-configured == 'true'
     steps:
       - name: "Checkout"
-        uses: actions/checkout@v2
+        uses: actions/checkout@main
         with:
           fetch-depth: 0
       - name: "Sync repo"

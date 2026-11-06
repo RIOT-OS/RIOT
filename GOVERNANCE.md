@@ -119,11 +119,23 @@ their project duties.
 Maintainers may also be removed after being inactive, upon failure to fulfill their Maintainer
 responsibilities or because of violating the Code of Conduct. This also includes actively,
 persistently, and intentionally trying to harm or successfully harming the code base of RIOT.
-Especially, but not limited to, endangering the security or safety of RIOT. Inactivity is defined as
-a period of very low or no activity in the project. A yearly maintainer ping, an e-mail sent to
-inactive maintainers, determines if the maintainer is still willing to fulfill their project duties.
-During this process, the list of maintainers is reviewed. On failure to reply to the maintainer ping
-within the specified amount of time (usually a month), the maintainer will be removed.
+Especially, but not limited to, endangering the security or safety of RIOT.
+
+#### Retiring a Maintainer
+
+A maintainer who has not shown a single interaction in a pull request or issue that took more than
+5 minutes of effort over a period of 2 years will be retired. On retirement, all permissions to
+the repository will be revoked. The reason is that any account can be compromised. For maintainers
+that make active use of the permissions, this risk is justified.
+
+A retired maintainer will keep their permissions in the forum and their access to the internal
+maintainer matrix room. In addition, a retired maintainer may return to active maintainer duty
+at any point in time by reaching out to an admin to restore their permissions. A retired
+maintainer who returned to active duty can be retired again under the same rules, with the
+following exception: during a grace period of 3 months, starting from the point in time when
+the permissions have been restored, the maintainer should not be retired again due to inactivity.
+
+A maintainer may choose to retire at any point in time by reaching out to a RIOT admin.
 
 ### Release Managers
 
@@ -223,12 +235,14 @@ moderator, it may be someone else). The agenda for the VMA is collected before t
 be bashed at the start of the meeting. The notes of the VMA will be published publicly in the RIOT
 forum.
 
-The Weekly Coordinational Meeting is a closed meeting among maintainers. It usually serves as a
-small communal get-together of maintainers on a regular basis. Smaller maintenance decisions are
-made during these meetings, but also short term admistrative tasks are discussed. The Weekly
-Coordinational Meeting usually takes place every Friday at 10:00 in a virtual space, such as a video
-conference. A maintainer that feels responsible for it shares the link to the meeting as well as a
-proposed agenda, which may be amended by other maintainers, usually a day in advance.
+The Weekly Coordinational Meeting is an open meeting among maintainers and
+contributors. It usually serves as a small communal get-together on a regular
+basis. Smaller maintenance decisions are made during these meetings, but also
+short term administrative tasks are discussed. The Weekly Coordinational
+Meeting usually takes place every Friday at 15:00 Berlin time in a virtual
+space, such as a video conference. A maintainer that feels responsible for it
+shares the link to the meeting as well as a proposed agenda on the RIOT forum,
+which may be amended by other maintainers, usually a day in advance.
 
 ## Code of Conduct
 

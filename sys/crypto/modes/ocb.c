@@ -1,9 +1,6 @@
 /*
- * Copyright (C) 2018 Mathias Tausig
- *
- * This file is subject to the terms and conditions of the GNU Lesser
- * General Public License v2.1. See the file LICENSE in the top level
- * directory for more details.
+ * SPDX-FileCopyrightText: 2018 Mathias Tausig
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
 
 /**
@@ -17,9 +14,11 @@
  *
  */
 
-#include "crypto/modes/ocb.h"
 #include <stdint.h>
 #include <string.h>
+
+#include "crypto/helper.h"
+#include "crypto/modes/ocb.h"
 
 #define OCB_MODE_ENCRYPT 1
 #define OCB_MODE_DECRYPT 2
@@ -341,15 +340,14 @@ int32_t cipher_decrypt_ocb(const cipher_t *cipher,
         return plain_text_length;
     }
     /* Check the tag */
-    if (memcmp(tag, input + input_len - tag_len, tag_len) == 0) {
+    if (crypto_equals(tag, input + input_len - tag_len, tag_len)) {
         /* Tag is valid */
         /* P = P_1 || P_2 || ... || P_m || P_* */
         return plain_text_length;
     }
-    else {
-        /* Tag is not valid */
-        /* Destroy the decrypted data to prevent misuse */
-        memset(output, 0, input_len - tag_len);
-        return OCB_ERR_INVALID_TAG;
-    }
+
+    /* Tag is not valid */
+    /* Destroy the decrypted data to prevent misuse */
+    crypto_secure_wipe(output, input_len - tag_len);
+    return OCB_ERR_INVALID_TAG;
 }

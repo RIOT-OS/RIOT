@@ -1,5 +1,9 @@
 CFLAGS += -Wno-strict-aliasing
 CFLAGS += -Wno-unused-parameter
 
+ifeq (llvm,$(TOOLCHAIN))
+  CFLAGS += -Wno-unused-but-set-variable
+endif
+
 # Include RIOT settings and recipes
 include $(RIOTBASE)/Makefile.base

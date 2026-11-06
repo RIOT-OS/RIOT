@@ -3,7 +3,7 @@ include ../Makefile.drivers_common
 
 # Only build on a subset of boards (one per arch supported and
 # with enough features provided)
-BOARD_WHITELIST ?= \
+BOARDS_SUPPORTED ?= \
     atmega256rfr2-xpro \
     esp32-wroom-32 \
     stm32f4discovery \

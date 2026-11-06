@@ -38,7 +38,7 @@ void cpu_init(void)
     /* initialize hf clock */
     clock_init_hf();
 
-#ifdef NVMC_ICACHECNF_CACHEEN_Msk
+#if !defined(NRF_TRUSTZONE_NONSECURE) && defined(NVMC_ICACHECNF_CACHEEN_Msk)
     /* enable instruction cache */
     NRF_NVMC_S->ICACHECNF = (NVMC_ICACHECNF_CACHEEN_Msk);
 #endif

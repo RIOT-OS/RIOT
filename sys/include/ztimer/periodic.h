@@ -1,11 +1,8 @@
 /*
- * Copyright (C) 2020 Kaspar Schleiser <kaspar@schleiser.de>
- *               2020 Freie Universität Berlin
- *               2020 Inria
- *
- * This file is subject to the terms and conditions of the GNU Lesser
- * General Public License v2.1. See the file LICENSE in the top level
- * directory for more details.
+ * SPDX-FileCopyrightText: 2020 Kaspar Schleiser <kaspar@schleiser.de>
+ * SPDX-FileCopyrightText: 2020 Freie Universität Berlin
+ * SPDX-FileCopyrightText: 2020 Inria
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
 
 #pragma once
@@ -118,6 +115,21 @@ void ztimer_periodic_init(ztimer_clock_t *clock, ztimer_periodic_t *timer,
                           void *arg, uint32_t interval);
 
 /**
+ * @brief    Check if a periodic timer has been started
+ *
+ * @pre @p timer has been initialized with @ref ztimer_periodic_init
+ *
+ * @param[in]   timer   periodic timer object to check
+ *
+ * @retval true     if periodic timer has been started
+ * @retval false    if periodic timer has not been started
+ */
+static inline bool ztimer_periodic_is_running(ztimer_periodic_t *timer)
+{
+    return ztimer_is_set(timer->clock, &timer->timer);
+}
+
+/**
  * @brief    Start or restart a periodic timer
  *
  * When called on a newly initialized timer, the timer will start.
@@ -125,6 +137,8 @@ void ztimer_periodic_init(ztimer_clock_t *clock, ztimer_periodic_t *timer,
  * When called on an already running timer, the current interval is reset to its
  * start (thus the next callback will be called after the configured interval
  * has passed).
+ *
+ * @pre @p timer has been initialized with @ref ztimer_periodic_init
  *
  * @param[in]   timer   periodic timer object to work on
  */
@@ -139,6 +153,8 @@ void ztimer_periodic_start(ztimer_periodic_t *timer);
  * start (thus the next callback will be called after the configured interval
  * has passed).
  *
+ * @pre @p timer has been initialized with @ref ztimer_periodic_init
+ *
  * @param[in]   timer   periodic timer object to work on
  */
 void ztimer_periodic_start_now(ztimer_periodic_t *timer);
@@ -147,6 +163,10 @@ void ztimer_periodic_start_now(ztimer_periodic_t *timer);
  * @brief   Stop a periodic timer
  *
  * The periodic timer will not trigger anymore.
+ *
+ * If the timer has not been started before, this function does nothing.
+ *
+ * @pre @p timer has been initialized with @ref ztimer_periodic_init
  *
  * @param[in]   timer   periodic timer object to stop
  */

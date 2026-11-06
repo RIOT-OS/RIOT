@@ -1,13 +1,10 @@
 /*
- * Copyright (C) 2019 HAW Hamburg
- *                    Freie Universität Berlin
- *                    Inria
- *                    Daniele Lacamera
- *                    Ken Bannister
- *
- * This file is subject to the terms and conditions of the GNU Lesser
- * General Public License v2.1. See the file LICENSE in the top level
- * directory for more details.
+ * SPDX-FileCopyrightText: 2019 HAW Hamburg
+ * SPDX-FileCopyrightText: 2019 Freie Universität Berlin
+ * SPDX-FileCopyrightText: 2019 Inria
+ * SPDX-FileCopyrightText: 2019 Daniele Lacamera
+ * SPDX-FileCopyrightText: 2019 Ken Bannister
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
 
 #pragma once
@@ -60,7 +57,7 @@
  * a module that implements
  * this API in our applications Makefile. For example the module that
  * implements this API for [tinydtls](@ref pkg_tinydtls) is called
- * `tinydtls_sock_dtls'.
+ * `tinydtls_sock_dtls`.
  *
  * The corresponding [pkg](@ref pkg) providing the DTLS implementation will be
  * automatically included so there is no need to use `USEPKG` to add the pkg

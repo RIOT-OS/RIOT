@@ -40,22 +40,20 @@ Full help:
     positional arguments:
       PR                    Pull request number to backport
 
-    optional arguments:
+    options:
       -h, --help            show this help message and exit
-      -k KEYFILE, --keyfile KEYFILE
+      -k, --keyfile KEYFILE
                             File containing github token
-      -c, --comment         Put a comment with a reference underthe original PR
-      -n, --noop            Limited noop mode, creates branch, but doesn'tpush and
-                            create the PR
-      -r RELEASE_BRANCH, --release-branch RELEASE_BRANCH
-                            Base the backport on this branch, default is the
-                            latest
+      -c, --comment         Put a comment with a reference under the original PR
+      -n, --noop            Limited no-op mode. Creates the branch, but does not push
+                            and create the PR
+      -r, --release-branch RELEASE_BRANCH
+                            Base the backport on this branch, default is the latest
       --backport-branch-fmt BACKPORT_BRANCH_FMT
                             Backport branch format. Fields '{release}' and
                             '{origbranch} will be replaced by the release name and
                             remote branch name.
-      -d GITDIR, --gitdir GITDIR
-                            Base git repo to work from
+      -d, --gitdir GITDIR   Base git repo to work from
 
 
 ### Create an authentication token

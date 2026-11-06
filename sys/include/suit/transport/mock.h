@@ -1,10 +1,8 @@
 /*
- * Copyright (C) 2020 Koen Zandberg
- *               2020 Inria
- *
- * This file is subject to the terms and conditions of the GNU Lesser
- * General Public License v2.1. See the file LICENSE in the top level
- * directory for more details.
+ * SPDX-FileCopyrightText: 2020 Koen Zandberg
+ * SPDX-FileCopyrightText: 2020 Inria
+ * SPDX-FileCopyrightText: 2026 TU Dresden
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
 
 #pragma once
@@ -26,6 +24,8 @@
  * `num_payloads` must be provided.
  */
 
+#include <sys/types.h>
+
 #include "suit.h"
 
 #ifdef __cplusplus
@@ -39,6 +39,39 @@ typedef struct {
     const uint8_t *buf; /**< Ptr to the memory space containing the payload */
     size_t len;         /**< Length of the payload in bytes */
 } suit_transport_mock_payload_t;
+
+#ifdef DOXYGEN
+/**
+ * @brief Enable to provide a mocked manifest file from an application
+ *
+ * @see @ref suit_transport_mock_get_manifest()
+ *
+ * Set this if you want to provide a manifest in @ref suit_handle_url()
+ * from a test application. The test application then needs to implement
+ * the function @ref suit_transport_mock_get_manifest().
+ */
+#define SUIT_TRANSPORT_MOCK_APP_MANIFEST
+#endif
+
+#if defined(SUIT_TRANSPORT_MOCK_APP_MANIFEST) || defined(DOXYGEN)
+/**
+ * @brief  Get mock manifest from an application
+ *
+ * @param[out] buf      Manifest buffer
+ * @param[in] buf_len   Maximum length of @p buf
+ *
+ * @see @ref SUIT_TRANSPORT_MOCK_APP_MANIFEST
+ *
+ * If @ref SUIT_TRANSPORT_MOCK_APP_MANIFEST is not defined, the function is a
+ * macro that returns `0U`.
+ *
+ * @return Actual length of the manifest.
+ * @return -ENOBUFS, if @p buf_len does not fit the manifest.
+ */
+ssize_t suit_transport_mock_get_manifest(uint8_t *buf, size_t buf_len);
+#else
+#define suit_transport_mock_get_manifest(buf, buf_len)  0U
+#endif
 
 /**
  * @brief 'fetch' a payload

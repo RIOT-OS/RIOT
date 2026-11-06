@@ -1,11 +1,8 @@
 /*
- * Copyright (C) 2019 Freie Universität Berlin
- *               2019 Inria
- *               2019 Kaspar Schleiser <kaspar@schleiser.de>
- *
- * This file is subject to the terms and conditions of the GNU Lesser
- * General Public License v2.1. See the file LICENSE in the top level
- * directory for more details.
+ * SPDX-FileCopyrightText: 2019 Freie Universität Berlin
+ * SPDX-FileCopyrightText: 2019 Inria
+ * SPDX-FileCopyrightText: 2019 Kaspar Schleiser <kaspar@schleiser.de>
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
 
 /**
@@ -44,6 +41,9 @@
 #endif
 #ifdef MODULE_SUIT_TRANSPORT_VFS
 #include "vfs_util.h"
+#endif
+#ifdef MODULE_SUIT_TRANSPORT_MOCK
+#include "suit/transport/mock.h"
 #endif
 
 #ifdef MODULE_RIOTBOOT_SLOT
@@ -99,6 +99,12 @@ int suit_handle_url(const char *url)
                                                  CONFIG_SUIT_COAP_BLOCKSIZE,
                                                  _manifest_buf,
                                                  sizeof(_manifest_buf));
+    }
+#endif
+#ifdef MODULE_SUIT_TRANSPORT_MOCK
+    else if (strncmp(url, "test://", 7) == 0) {
+        /* Get mocked manifest from application */
+        size = suit_transport_mock_get_manifest(_manifest_buf, sizeof(_manifest_buf));
     }
 #endif
 #ifdef MODULE_SUIT_TRANSPORT_VFS
@@ -219,7 +225,8 @@ bool suit_worker_trigger(const char *url, size_t len)
     assert(len != 0); /* A zero-length URI is invalid, but _url[0] == '\0' is
                          special to _suit_worker_thread */
 
-    if (len == 0 || len > sizeof(_url)) {
+    if (len == 0 || len >= sizeof(_url)) {
+        mutex_unlock(&_worker_lock);
         return false;
     }
 

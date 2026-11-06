@@ -49,7 +49,11 @@ int adxl345_init(adxl345_t *dev, const adxl345_params_t* params)
     i2c_acquire(ADXL345_BUS);
 
     /* test if the target device responds */
-    i2c_read_reg(ADXL345_BUS, ADXL345_ADDR, ADXL345_CHIP_ID_REG, &reg, 0);
+    if (i2c_read_reg(ADXL345_BUS, ADXL345_ADDR, ADXL345_CHIP_ID_REG, &reg, 0) < 0) {
+        i2c_release(ADXL345_BUS);
+        DEBUG("[adxl345] init - error: unable to read id\n");
+        return ADXL345_NOI2C;
+    }
     if (reg != ADXL345_CHIP_ID) {
         i2c_release(ADXL345_BUS);
         DEBUG("[adxl345] init - error: invalid id value [0x%02x]\n", (int)reg);

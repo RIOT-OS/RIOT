@@ -19,7 +19,7 @@ host platform. For more information on the native boards please refer to
 You will need cross-compiling support for 32-bit executables if you are on a 64-bit
 host platform. On Debian/Ubuntu you can install the required libraries with
 
-```
+```shell
 sudo apt install gcc-multilib g++-multilib lib32asan5
 ```
 

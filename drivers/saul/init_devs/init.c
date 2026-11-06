@@ -287,9 +287,17 @@ void saul_init_devs(void)
         extern void auto_init_pulse_counter(void);
         auto_init_pulse_counter();
     }
+    if (IS_USED(MODULE_QMA6100P)) {
+        extern void auto_init_qma6100p(void);
+        auto_init_qma6100p();
+    }
     if (IS_USED(MODULE_QMC5883L)) {
         extern void auto_init_qmc5883l(void);
         auto_init_qmc5883l();
+    }
+    if (IS_USED(MODULE_QMI8658)) {
+        extern void auto_init_qmi8658(void);
+        auto_init_qmi8658();
     }
     if (IS_USED(MODULE_SCD30)) {
         extern void auto_init_scd30(void);

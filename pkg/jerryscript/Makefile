@@ -36,6 +36,9 @@ else ifeq (esp8266,$(CPU))
   EXT_CFLAGS += -Wno-undef -Wno-error=undef
   EXT_CFLAGS += -Wno-conversion -Wno-error=conversion
   EXT_CFLAGS += -Wno-sign-conversion -Wno-error=sign-conversion
+else ifeq ($(TOOLCHAIN),llvm)
+  # LLVM 20 complains about this. Should be fixed upstream.
+  EXT_CFLAGS += -Wno-enum-enum-conversion
 endif
 
 all: $(BINDIR)/jerryscript.a

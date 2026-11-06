@@ -408,7 +408,7 @@ int run_demo(int argc, char **argv)
 
     pca9633_set_grp_pwm(&pca9633_dev, 255);
     pca9633_set_rgb(&pca9633_dev, 255, 128, 0);
-    pca9633_set_ldr_state(&pca9633_dev,PCA9633_LDR_STATE_IND, PCA9633_PWM_CHANNEL_1);
+    pca9633_set_ldr_state(&pca9633_dev, PCA9633_LDR_STATE_IND, PCA9633_PWM_CHANNEL_1);
     // color should be orange
     xtimer_msleep(500);
 

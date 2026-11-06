@@ -18,7 +18,7 @@ For example this one for debian base linux users
 ## Running the example
 - Run on RIOT's root directory:
 
-  make -C examples/paho-mqtt all term
+  make -C examples/networking/mqtt/paho-mqtt all term
 
 - To connect to a broker, use the `con` command:
 ```

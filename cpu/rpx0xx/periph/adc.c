@@ -55,11 +55,11 @@ int adc_init(adc_t line)
     /* Lock mutex for exclusive access */
     _prep();
     /* Reset ADC peripheral */
-    periph_reset(RESETS_RESET_adc_Msk);
-    periph_reset_done(RESETS_RESET_adc_Msk);
+    periph_reset(RESETS_RESET_ADC_BITS);
+    periph_reset_done(RESETS_RESET_ADC_BITS);
 
     /* Enable ADC peripheral and its clock */
-    io_reg_atomic_set(&ADC->CS, 1 << ADC_CS_EN_Pos);
+    io_reg_atomic_set(&ADC->CS, 1 << ADC_CS_EN_LSB);
     /* Disable associated GPIO functionality as requested by datasheet */
     _disable_digital_func(adc_config[line].pin);
     /* Unlock mutex */
@@ -78,16 +78,16 @@ int32_t adc_sample(adc_t line, adc_res_t res)
     /* Lock mutex for exclusive access */
     _prep();
     /* Select the channel */
-    io_reg_write_dont_corrupt(&ADC->CS, adc_config[line].chan << ADC_CS_AINSEL_Pos,
-                              ADC_CS_AINSEL_Msk);
+    io_reg_write_dont_corrupt(&ADC->CS, adc_config[line].chan << ADC_CS_AINSEL_LSB,
+                              ADC_CS_AINSEL_BITS);
     /* Wait for ADC to be ready */
-    while (!(ADC->CS & ADC_CS_READY_Msk)) {}
+    while (!(ADC->CS & ADC_CS_READY_BITS)) {}
     /* Trigger one-shot sample */
-    io_reg_atomic_set(&ADC->CS, 1 << ADC_CS_START_ONCE_Pos);
+    io_reg_atomic_set(&ADC->CS, 1 << ADC_CS_START_ONCE_LSB);
     /* Wait for completion */
-    while (!(ADC->CS & ADC_CS_READY_Msk)) {}
+    while (!(ADC->CS & ADC_CS_READY_BITS)) {}
     /* Get the result */
-    val = ADC->RESULT & ADC_RESULT_RESULT_Msk;
+    val = ADC->RESULT & ADC_RESULT_BITS;
     /* Unlock mutex */
     _done();
     return val;

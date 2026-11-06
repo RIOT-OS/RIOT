@@ -85,13 +85,7 @@ int msg_try_send(msg_t *m, kernel_pid_t target_pid)
 static int _msg_send(msg_t *m, kernel_pid_t target_pid, bool block,
                      unsigned state)
 {
-#ifdef DEVELHELP
-    if (!pid_is_valid(target_pid)) {
-        DEBUG("msg_send(): target_pid is invalid, continuing anyways\n");
-    }
-#endif /* DEVELHELP */
-
-    thread_t *target = thread_get_unchecked(target_pid);
+    thread_t *target = thread_get(target_pid);
 
     m->sender_pid = thread_getpid();
 
@@ -191,13 +185,7 @@ int msg_send_to_self(msg_t *m)
 
 static int _msg_send_oneway(msg_t *m, kernel_pid_t target_pid)
 {
-#ifdef DEVELHELP
-    if (!pid_is_valid(target_pid)) {
-        DEBUG("%s: target_pid is invalid, continuing anyways\n", __func__);
-    }
-#endif /* DEVELHELP */
-
-    thread_t *target = thread_get_unchecked(target_pid);
+    thread_t *target = thread_get(target_pid);
 
     if (target == NULL) {
         DEBUG("%s: target thread %d does not exist\n", __func__, target_pid);
@@ -272,17 +260,38 @@ int msg_send_bus(msg_t *m, msg_bus_t *bus)
 int msg_send_receive(msg_t *m, msg_t *reply, kernel_pid_t target_pid)
 {
     assert(thread_getpid() != target_pid);
+    if (thread_getpid() == target_pid) {
+        DEBUG("msg_send_receive(): Cannot send and receive on the same thread\n");
+        return -1;
+    }
+
     unsigned state = irq_disable();
     thread_t *me = thread_get_active();
 
+    thread_status_t prev_status = thread_get_status(me);
     sched_set_status(me, STATUS_REPLY_BLOCKED);
     me->wait_data = reply;
 
     /* we reuse (abuse) reply for sending, because wait_data might be
      * overwritten if the target is not in RECEIVE_BLOCKED */
     *reply = *m;
-    /* msg_send blocks until reply received */
-    return _msg_send(reply, target_pid, true, state);
+    /* _msg_send blocks until reply received (except there is an error while sending) */
+    int res = _msg_send(reply, target_pid, true, state);
+
+    if (res == -1) {
+        /* Sending the message failed. We have to restore the previous thread
+         * status, otherwise the thread would remain in a blocked state. */
+
+        /* _msg_send restored interrupts before returning */
+        state = irq_disable();
+
+        me->wait_data = NULL;
+        sched_set_status(me, prev_status);
+
+        irq_restore(state);
+    }
+
+    return res;
 }
 
 int msg_reply(msg_t *m, msg_t *reply)

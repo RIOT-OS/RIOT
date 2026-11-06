@@ -2,6 +2,9 @@ ifneq (,$(filter cc2538_rf,$(USEMODULE)))
   ifneq (,$(filter netdev,$(USEMODULE)))
     USEMODULE += netdev_ieee802154_submac
   endif
+  ifneq (,$(filter ieee802154_submac,$(USEMODULE)))
+    USEMODULE += ieee802154_submac_soft_frame_retrans
+  endif
 endif
 
 ifneq (,$(filter periph_rtc,$(USEMODULE)))

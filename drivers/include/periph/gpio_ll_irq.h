@@ -1,10 +1,7 @@
 /*
- * Copyright (C) 2020 Gunar Schorcht
- *               2021 Otto-von-Guericke-Universität Magdeburg
- *
- * This file is subject to the terms and conditions of the GNU Lesser
- * General Public License v2.1. See the file LICENSE in the top level
- * directory for more details.
+ * SPDX-FileCopyrightText: 2020 Gunar Schorcht
+ * SPDX-FileCopyrightText: 2021 Otto-von-Guericke-Universität Magdeburg
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
 
 #pragma once
@@ -98,6 +95,9 @@ typedef void (*gpio_ll_cb_t)(void *arg);
  * @pre     The given GPIO pin has been initialized using
  *          @ref gpio_ll_init prior to this call
  * @pre     The trigger in @p trig is supported by the MCU
+ * @pre     IRQs on the given pin must not be active when calling
+ *          `gpio_ll_irq()`. The pin must either not have been configured yet,
+ *          or IRQs must be disabled with @ref gpio_ll_irq_off first.
  *
  * @retval  0           Success
  * @retval  -ENOTSUP    No external IRQs supported for @p port and @p pin

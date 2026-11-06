@@ -194,7 +194,7 @@ static int _tm1637_transmit_segments(const tm1637_t *dev,
         return -1;
     }
 
-    /* transmit each byte indiviudally */
+    /* transmit each byte individually */
     for (int i = 0; i < DIGIT_COUNT; ++i) {
         res = _tm1637_transmit_byte(dev, segments[i]);
         if (res < 0) {

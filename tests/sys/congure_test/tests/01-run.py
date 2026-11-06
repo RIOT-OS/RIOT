@@ -1,10 +1,7 @@
 #! /usr/bin/env python3
 
-# Copyright (C) 2021 Freie Universität Berlin
-#
-# This file is subject to the terms and conditions of the GNU Lesser
-# General Public License v2.1. See the file LICENSE in the top level
-# directory for more details.
+# SPDX-FileCopyrightText: 2021 Freie Universität Berlin
+# SPDX-License-Identifier: LGPL-2.1-only
 
 import logging
 import os
@@ -18,7 +15,7 @@ from riotctrl.shell.json import RapidJSONShellInteractionParser, rapidjson
 
 from riotctrl_shell.congure_test import CongureTest
 
-from testrunner.spawn import MAKE_TERM_CONNECT_DELAY
+from testrunner.spawn import flush_child, MAKE_TERM_CONNECT_DELAY
 
 
 class TestCongUREBase(unittest.TestCase):
@@ -32,6 +29,7 @@ class TestCongUREBase(unittest.TestCase):
         cls.ctrl.start_term()
         if cls.DEBUG:
             cls.ctrl.term.logfile = sys.stdout
+        flush_child(cls.ctrl.term)
         cls.shell = ShellInteraction(cls.ctrl)
         cls.json_parser = RapidJSONShellInteractionParser()
         cls.json_parser.set_parser_args(
@@ -47,6 +45,7 @@ class TestCongUREBase(unittest.TestCase):
 
     def setUp(self):
         self.shell.cmd('cong_clear')
+        flush_child(self.ctrl.term)
 
     def exec_cmd(self, cmd, timeout=-1, async_=False):
         res = self.shell.cmd(cmd, timeout, async_)

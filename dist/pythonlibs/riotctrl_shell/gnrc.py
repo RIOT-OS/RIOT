@@ -14,7 +14,6 @@ import re
 
 from riotctrl.shell import ShellInteraction, ShellInteractionParser
 
-
 # ==== Parsers ====
 
 

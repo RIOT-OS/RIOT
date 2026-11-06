@@ -1,9 +1,6 @@
 /*
- * Copyright (C) 2020 Freie Universität Berlin
- *
- * This file is subject to the terms and conditions of the GNU Lesser
- * General Public License v2.1. See the file LICENSE in the top level
- * directory for more details.
+ * SPDX-FileCopyrightText: 2020 Freie Universität Berlin
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
 
 /**
@@ -79,6 +76,12 @@ gnrc_pktsnip_t *gnrc_ipv6_ext_opt_process(gnrc_pktsnip_t *pkt,
             /* nothing more to do */
             continue;
         }
+
+        if (offset >= hdr_len) {
+            DEBUG("gnrc_ipv6_ext_opt: option type without length byte\n");
+            goto error;
+        }
+
         opt_len = opts[offset++];
         if (opt_len > (hdr_len - offset)) {
             DEBUG("gnrc_ipv6_ext_opt: invalid option size\n");

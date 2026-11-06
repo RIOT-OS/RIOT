@@ -1,9 +1,6 @@
 /*
- * Copyright (C) 2020 HAW Hamburg
- *
- * This file is subject to the terms and conditions of the GNU Lesser General
- * Public License v2.1. See the file LICENSE in the top level directory for more
- * details.
+ * SPDX-FileCopyrightText: 2020 HAW Hamburg
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
 
 #pragma once
@@ -38,6 +35,11 @@ extern "C" {
  * @brief Forward declaration of the radio ops structure.
  */
 typedef struct ieee802154_radio_ops ieee802154_radio_ops_t;
+
+/**
+ * @brief Forward declaration of radio cipher ops structure.
+ */
+struct ieee802154_radio_cipher_ops;
 
 /**
  * @brief IEEE802.15.4 Radio capabilities
@@ -164,6 +166,21 @@ typedef enum {
      * set if the source address matches one from the table.
      */
     IEEE802154_CAP_SRC_ADDR_MATCH       = BIT19,
+    /**
+     * @brief the devices records timestamps on received frames
+     */
+    IEEE802154_CAP_RX_TIMESTAMP         = BIT20,
+    /**
+     * @brief the received frame remains valid until the reception is closed
+     *
+     * A device that declares this capability keeps the received frame in
+     * the framebuffer while a reception is pending (see @ref
+     * ieee802154_radio_ops::read), regardless of any other operation
+     * performed in between (e.g. a transmission). This is required to
+     * transmit a frame before reading the received one, which is needed
+     * e.g. for software handling of the ACK reply.
+     */
+    IEEE802154_CAP_FRAME_RETENTION      = BIT21,
 } ieee802154_rf_caps_t;
 
 /**
@@ -182,7 +199,7 @@ typedef enum {
  */
 typedef enum {
     /**
-     * @brief the transceiver successfully sent a frame.
+     * @brief The transceiver successfully sent a frame.
      *
      * Depending of the type of transmissions and available caps, this could
      * mean one of the following:
@@ -196,14 +213,14 @@ typedef enum {
      */
     TX_STATUS_SUCCESS,
     /**
-     * @brief the transceiver received a valid ACK with the frame pending bit
+     * @brief The transceiver received a valid ACK with the frame pending bit
      *
      * This status is present only if the device supports @ref
      * IEEE802154_CAP_FRAME_RETRANS or @ref IEEE802154_CAP_IRQ_ACK_TIMEOUT.
      */
     TX_STATUS_FRAME_PENDING,
     /**
-     * @brief the transceiver ran out of retransmission
+     * @brief The transceiver ran out of retransmission
      *
      * This status is present only if the device supports @ref
      * IEEE802154_CAP_FRAME_RETRANS or @ref IEEE802154_CAP_IRQ_ACK_TIMEOUT.
@@ -223,27 +240,24 @@ typedef enum {
  */
 typedef enum {
     /**
-     * @brief the transceiver detected a valid SFD
+     * @brief The transceiver detected a valid SFD
      *
      * This event is present if radio has @ref IEEE802154_CAP_IRQ_RX_START cap.
      */
     IEEE802154_RADIO_INDICATION_RX_START,
 
     /**
-     * @brief the transceiver received a frame with an invalid crc.
+     * @brief The transceiver received a frame with an invalid crc.
      *
-     * @note some radios won't flush the framebuffer on reception of a frame
-     * with invalid CRC. Therefore it's required to call @ref
-     * ieee802154_radio_read.
-     *
-     * @note since the behavior of radios after frame reception is undefined,
-     * the upper layer should set the transceiver state to IDLE as soon as
-     * possible before calling @ref ieee802154_radio_read
+     * This indication opens a reception (see @ref ieee802154_radio_ops::read).
+     * Some radios won't flush the framebuffer on reception of a frame with
+     * invalid CRC, so the reception MUST be closed by calling @ref
+     * ieee802154_radio_read with a NULL buffer.
      */
     IEEE802154_RADIO_INDICATION_CRC_ERROR,
 
     /**
-     * @brief the transceiver sent out a valid SFD
+     * @brief The transceiver sent out a valid SFD
      *
      * This event is present if radio has @ref IEEE802154_CAP_IRQ_TX_START cap.
      *
@@ -252,29 +266,22 @@ typedef enum {
     IEEE802154_RADIO_INDICATION_TX_START,
 
     /**
-     * @brief the transceiver received a frame and lies in the
+     * @brief The transceiver received a frame and lies in the
      *        internal framebuffer.
      *
      * This indication should be generated only if CRC is valid and the frame
      * passes the address matching filter (this includes ACK and Beacon frames).
      * The latter only applies if the radio is not in promiscuous mode.
      *
-     * The transceiver or driver MUST handle the ACK reply if the Ack Request
-     * bit is set in the received frame and promiscuous mode is disabled.
-     *
-     * The transceiver might be in a "FB Lock" state where no more frames are
-     * received. This is done in order to avoid overwriting the Frame Buffer
-     * with new frame arrivals.  In order to leave this state, the upper layer
-     * must call @ref ieee802154_radio_read
-     *
-     * @note since the behavior of radios after frame reception is undefined,
-     * the upper layer should set the transceiver state to IDLE as soon as
-     * possible before calling @ref ieee802154_radio_read
+     * This indication opens a reception (see @ref
+     * ieee802154_radio_ops::read). While the reception is pending, the
+     * transceiver might block new frame receptions in order to avoid
+     * overwriting the Frame Buffer with new frame arrivals.
      */
     IEEE802154_RADIO_INDICATION_RX_DONE,
 
     /**
-     * @brief the transceiver either finished sending a frame, the retransmission
+     * @brief The transceiver either finished sending a frame, the retransmission
      *        procedure or the channel activity detection prior transmission.
      *
      * This event is present if radio has @ref IEEE802154_CAP_IRQ_TX_DONE cap.
@@ -390,7 +397,8 @@ typedef struct {
      * The minimum and maximum values are 0 (-174 dBm) and 254 (80 dBm).
      */
     uint8_t rssi;
-    uint8_t lqi;    /**< LQI of the received frame */
+    uint8_t lqi;            /**< LQI of the received frame */
+    uint64_t timestamp;     /**< Timestamp value of a received frame in ns */
 } ieee802154_rx_info_t;
 
 /**
@@ -462,7 +470,6 @@ typedef enum {
 typedef struct {
     ieee802154_phy_mode_t phy_mode; /**< IEEE802.15.4 PHY mode */
     uint16_t channel;               /**< IEEE802.15.4 channel number */
-    uint8_t page;                   /**< IEEE802.15.4 channel page */
     int8_t pow;                     /**< TX power in dBm */
 } ieee802154_phy_conf_t;
 
@@ -546,11 +553,14 @@ struct ieee802154_radio_ops {
     int (*write)(ieee802154_dev_t *dev, const iolist_t *psdu);
 
     /**
-     * @brief Get the length of the received PSDU frame.
+     * @brief Get the length of the received PSDU frame
      *
-     * @pre the device is on
-     * @pre the radio already received a frame (e.g
-     *      @ref ieee802154_dev::cb with @ref IEEE802154_RADIO_INDICATION_RX_DONE).
+     * This function provides non-destructive access to the received frame
+     * while a reception is pending (see @ref ieee802154_radio_ops::read).
+     *
+     * @pre The device is on
+     * @pre A reception is pending and the radio was set to IDLE beforehand
+     *      (see @ref ieee802154_radio_ops::read).
      *
      * @post the frame buffer is still protected against new frame arrivals.
      *
@@ -561,29 +571,103 @@ struct ieee802154_radio_ops {
     int (*len)(ieee802154_dev_t *dev);
 
     /**
-     * @brief Read a frame from the internal framebuffer
+     * @brief Read or discard the received frame and close the reception
      *
-     * This function reads the received frame from the internal framebuffer.
-     * It should try to copy the received PSDU frame into @p buf. The FCS
-     * field will **not** be copied and its size **not** be taken into account
-     * for the return value. If the radio provides any kind of framebuffer
-     * protection, this function should release it.
+     * Reception lifecycle: a reception is opened by an indication
+     * (@ref IEEE802154_RADIO_INDICATION_RX_DONE or @ref
+     * IEEE802154_RADIO_INDICATION_CRC_ERROR) and MUST be closed by exactly
+     * one call to this function:
      *
-     * @post Don't call this function if there was no reception event
-     * (either @ref IEEE802154_RADIO_INDICATION_RX_DONE or @ref
-     * IEEE802154_RADIO_INDICATION_CRC_ERROR). Otherwise there's risk of RX
+     * ```
+     *        RX_DONE / CRC_ERROR                read
+     * NONE ---------------------> PENDING ---------------------> NONE
+     * ```
+     *
+     * While a reception is pending:
+     * - the upper layer SHOULD set the radio to IDLE (@ref
+     *   ieee802154_radio_set_idle) before any framebuffer access, since
+     *   the behavior of radios after frame reception is undefined
+     *   otherwise.
+     * - @ref ieee802154_radio_ops::len and @ref ieee802154_radio_ops::peek
+     *   provide non-destructive access to the received frame.
+     * - the received frame remains valid until the reception is closed,
+     *   unless another operation overwrites the framebuffer (e.g. a
+     *   transmission). Radios that declare @ref
+     *   IEEE802154_CAP_FRAME_RETENTION keep the received frame valid
+     *   regardless of interleaved operations between reception and calling
+     *   this function.
+     * - new frame receptions might be blocked (framebuffer protection).
+     *
+     * If @p buf is not NULL, the received PSDU frame is copied into @p buf
+     * and, if @p info is not NULL, the frame information (RSSI and LQI, if
+     * supported) is filled in. The FCS field is **not** copied and its size is
+     * **not** taken into account for the return value.
+     *
+     * If @p buf is NULL, the received frame is discarded. This is the only
+     * way to close a reception without copying the frame (e.g. after @ref
+     * IEEE802154_RADIO_INDICATION_CRC_ERROR, or when the upper layer
+     * doesn't need the frame).
+     *
+     * Once this function returns, the reception is closed: the framebuffer
+     * may be reused and the transceiver can be set back to RX (@ref
+     * ieee802154_radio_set_rx). If the radio provides any kind of
+     * framebuffer protection, this function releases it.
+     *
+     * @pre The device is on
+     * @pre A reception is pending and the radio was set to IDLE beforehand
+     *      (@ref ieee802154_radio_set_idle), since the behavior of radios
+     *      after frame reception is otherwise undefined.
+     *
+     * @post The reception is closed. Don't call this function again until a
+     * new reception event is indicated, otherwise there's risk of RX
      * underflow.
      *
      * @param[in] dev IEEE802.15.4 device descriptor
-     * @param[out] buf buffer to write the received PSDU frame into.
+     * @param[out] buf buffer to write the received PSDU frame into, or NULL
+     *             to discard the frame
      * @param[in] size size of @p buf
      * @param[in] info information of the received frame (LQI, RSSI). Can be
      *            NULL if this information is not needed.
      *
-     * @retval number of bytes written in @p buffer (0 if @p buf == NULL)
-     * @retval -ENOBUFS if the frame doesn't fit in @p buf
+     * @return number of bytes written in @p buf (0 if @p buf == NULL)
+     * @retval -ENOBUFS if the frame doesn't fit in @p buf. In this case
+     *         nothing is consumed: the reception stays pending and the
+     *         received frame is not modified.
      */
     int (*read)(ieee802154_dev_t *dev, void *buf, size_t size, ieee802154_rx_info_t *info);
+
+    /**
+     * @brief Peek a part of a received frame from the internal framebuffer
+     *
+     * This function copies @p size bytes of the received PSDU frame, starting
+     * at @p offset, into @p buf **without consuming the frame** (see @ref
+     * ieee802154_radio_ops::read): the received frame remains in the
+     * framebuffer until the reception is closed. Unlike @ref
+     * ieee802154_radio_ops::read, this function MUST NOT release any kind
+     * of framebuffer protection and MUST NOT change the state of the radio.
+     *
+     * This function MAY be NULL if the radio doesn't provide random access
+     * to the received frame.
+     *
+     * @pre The device is on
+     * @pre @p buf != NULL
+     * @pre A reception is pending and the radio was set to IDLE beforehand
+     *      (see @ref ieee802154_radio_ops::read).
+     * @pre @p offset + @p size doesn't exceed the length of the received
+     *      frame, excluding FCS.
+     *
+     * @param[in] dev IEEE802.15.4 device descriptor
+     * @param[out] buf buffer to write the peeked bytes into.
+     * @param[in] offset offset of the first byte to peek, relative to the
+     *                   start of the PSDU frame.
+     * @param[in] size number of bytes to peek
+     *
+     * @return number of bytes written in @p buf
+     * @retval -EINVAL if @p offset + @p size exceeds the length of the
+     *         received frame
+     */
+    int (*peek)(ieee802154_dev_t *dev, void *buf, size_t offset, size_t size);
+
     /**
      * @brief Turn off the device
      *
@@ -604,7 +688,7 @@ struct ieee802154_radio_ops {
      * @note @ref ieee802154_radio_ops::confirm_on MUST be used to finish the
      * procedure.
      *
-     * @pre the init function of the radio succeeded.
+     * @pre The init function of the radio succeeded.
      *
      * @param[in] dev IEEE802.15.4 device descriptor
      *
@@ -616,9 +700,9 @@ struct ieee802154_radio_ops {
     /**
      * @brief Confirmation function for @ref ieee802154_radio_ops::request_on.
      *
-     * @pre call to @ref ieee802154_radio_ops::request_on was successful.
+     * @pre Call to @ref ieee802154_radio_ops::request_on was successful.
      *
-     * @post the transceiver state is IDLE
+     * @post The transceiver state is IDLE
      * During boot or in case the radio doesn't support @ref
      * IEEE802154_CAP_REG_RETENTION when @ref off was called, the
      * Physical Information Base will be undefined. Thus, take into
@@ -677,7 +761,7 @@ struct ieee802154_radio_ops {
     /**
      * @brief Set the threshold for the Energy Detection (first mode of CCA)
      *
-     * @pre the device is on
+     * @pre The device is on
      *
      * @param[in] dev IEEE802.15.4 device descriptor
      * @param[in] threshold the threshold in dBm.
@@ -692,7 +776,7 @@ struct ieee802154_radio_ops {
      *
      * All radios MUST at least implement the first CCA mode (ED Threshold).
      *
-     * @pre the device is on
+     * @pre The device is on
      *
      * @param[in] dev IEEE802.15.4 device descriptor
      * @param[in] mode the CCA mode
@@ -712,8 +796,8 @@ struct ieee802154_radio_ops {
      * In case a configuration is not valid (e.g parameters out of range), this
      * function should return -EINVAL
      *
-     * @pre the device is on
-     * @pre the transceiver state is IDLE.
+     * @pre The device is on
+     * @pre The transceiver state is IDLE.
      *
      * @param[in] dev IEEE802.15.4 device descriptor
      * @param[in] conf the PHY configuration
@@ -727,9 +811,9 @@ struct ieee802154_radio_ops {
     /**
      * @brief Set number of frame retransmissions
      *
-     * @pre the device is on
+     * @pre The device is on
      *
-     * @note this function pointer can be NULL if the device doesn't support
+     * @note This function pointer can be NULL if the device doesn't support
      *       frame retransmissions
      *
      * @param[in] dev IEEE802.15.4 device descriptor
@@ -743,7 +827,7 @@ struct ieee802154_radio_ops {
     /**
      * @brief Set the CSMA-CA parameters.
      *
-     * @pre the device is on
+     * @pre The device is on
      *
      * @param[in] dev IEEE802.15.4 device descriptor
      * @param[in] bd parameters of the exponential backoff. If NULL, the
@@ -764,7 +848,7 @@ struct ieee802154_radio_ops {
     /**
      * @brief Set the frame filter mode.
      *
-     * @pre the device is on
+     * @pre The device is on
      *
      * @param[in] dev IEEE802.15.4 device descriptor
      * @param[in] mode address filter mode
@@ -777,7 +861,7 @@ struct ieee802154_radio_ops {
     /**
      * @brief Get the frame filter mode.
      *
-     * @pre the device is on
+     * @pre The device is on
      *
      * @param[in] dev IEEE802.15.4 device descriptor
      * @param[out] mode address filter mode
@@ -793,7 +877,7 @@ struct ieee802154_radio_ops {
      * This functions is used for configuring the address filter parameters
      * required by the IEEE 802.15.4 standard.
      *
-     * @pre the device is on
+     * @pre The device is on
      *
      * @param[in] dev IEEE802.15.4 device descriptor
      * @param[in] cmd command for the address filter
@@ -813,7 +897,7 @@ struct ieee802154_radio_ops {
      * this functions is used to activate the Frame Pending bit for all ACK
      * frames (in order to be compliant with the IEEE 802.15.4 standard).
      *
-     * @pre the device is on
+     * @pre The device is on
      *
      * @param[in] dev IEEE802.15.4 device descriptor
      * @param[in] cmd command for the source address match configuration
@@ -824,6 +908,13 @@ struct ieee802154_radio_ops {
      */
     int (*config_src_addr_match)(ieee802154_dev_t *dev, ieee802154_src_match_t cmd,
                                  const void *value);
+
+    /**
+     * @brief Radio cipher ops.
+     *
+     * May be NULL if the radio does not support crypto acceleration.
+     */
+    const struct ieee802154_radio_cipher_ops *cipher_ops;
 };
 
 /**
@@ -838,6 +929,20 @@ struct ieee802154_radio_ops {
 static inline bool ieee802154_radio_has_capability(ieee802154_dev_t *dev, uint32_t cap)
 {
     return (dev->driver->caps & cap) == cap;
+}
+
+/**
+ * @brief Check if the device implements the peek function
+ *
+ * Internally this function reads @ref ieee802154_radio_ops::peek and
+ * checks whether it's not NULL.
+ *
+ * @retval true if the device supports @ref ieee802154_radio_ops::peek
+ * @retval false if it doesn't
+ */
+static inline bool ieee802154_radio_has_peek(ieee802154_dev_t *dev)
+{
+    return dev->driver->peek != NULL;
 }
 
 /**
@@ -862,7 +967,7 @@ static inline int ieee802154_radio_write(ieee802154_dev_t *dev, const iolist_t *
  * @pre The upper layer should have called set the transceiver to IDLE (see
  * @ref ieee802154_radio_set_idle) and the frame is already in the framebuffer
  * (@ref ieee802154_radio_ops_t::write).
- * @pre the device is on
+ * @pre The device is on
  *
  * @note @ref ieee802154_radio_confirm_transmit MUST be used to
  * finish the transmission.
@@ -887,8 +992,8 @@ static inline int ieee802154_radio_request_transmit(ieee802154_dev_t *dev)
  * This functions calls ieee802154_radio_ops::confirm_op with @ref
  * IEEE802154_HAL_OP_TRANSMIT and sets the context to @p info.
  *
- * @pre the device is on
- * @pre call to @ref ieee802154_radio_request_transmit was successful.
+ * @pre The device is on
+ * @pre Call to @ref ieee802154_radio_request_transmit was successful.
  *
  * @param[in] dev IEEE802.15.4 device descriptor
  * @param[out] info the TX information. Pass NULL
@@ -940,6 +1045,26 @@ static inline int ieee802154_radio_read(ieee802154_dev_t *dev,
 }
 
 /**
+ * @brief Shortcut to @ref ieee802154_radio_ops::peek
+ *
+ * @pre This function MUST be called before @ref ieee802154_radio_read, since
+ *      the frame is consumed by the latter.
+ *
+ * @param[in] dev IEEE802.15.4 device descriptor
+ * @param[out] buf buffer to write the peeked bytes into.
+ * @param[in] offset offset of the first byte to peek, relative to the
+ *                   start of the PSDU frame.
+ * @param[in] size number of bytes to peek
+ *
+ * @return result of @ref ieee802154_radio_ops::peek
+ */
+static inline int ieee802154_radio_peek(ieee802154_dev_t *dev,
+                                        void *buf, size_t offset, size_t size)
+{
+    return dev->driver->peek(dev, buf, offset, size);
+}
+
+/**
  * @brief Shortcut to @ref ieee802154_radio_ops::set_cca_threshold
  *
  * @param[in] dev IEEE802.15.4 device descriptor
@@ -970,7 +1095,7 @@ static inline int ieee802154_radio_set_cca_mode(ieee802154_dev_t *dev,
 /**
  * @brief Shortcut to @ref ieee802154_radio_ops::config_phy
  *
- * @pre the transceiver state is IDLE.
+ * @pre The transceiver state is IDLE.
  *
  * @param[in] dev IEEE802.15.4 device descriptor
  * @param[in] conf the PHY configuration
@@ -986,7 +1111,7 @@ static inline int ieee802154_radio_config_phy(ieee802154_dev_t *dev,
 /**
  * @brief Shortcut to @ref ieee802154_radio_ops::config_src_addr_match
  *
- * @pre the device is on
+ * @pre The device is on
  *
  * @param[in] dev IEEE802.15.4 device descriptor
  * @param[in] cmd command for the source address match configuration
@@ -1006,7 +1131,7 @@ static inline int ieee802154_radio_config_src_address_match(ieee802154_dev_t *de
  *
  * @param[in] dev IEEE802.15.4 device descriptor
  *
- * @post the transceiver state is IDLE.
+ * @post The transceiver state is IDLE.
  *
  * @return result of @ref ieee802154_radio_ops::off
  */
@@ -1018,7 +1143,7 @@ static inline int ieee802154_radio_off(ieee802154_dev_t *dev)
 /**
  * @brief Shortcut to @ref ieee802154_radio_ops::config_addr_filter
  *
- * @pre the device is on
+ * @pre The device is on
  *
  * @param[in] dev IEEE802.15.4 device descriptor
  * @param[in] cmd command for the address filter
@@ -1036,7 +1161,7 @@ static inline int ieee802154_radio_config_addr_filter(ieee802154_dev_t *dev,
 /**
  * @brief Shortcut to @ref ieee802154_radio_ops::set_frame_filter_mode
  *
- * @pre the device is on
+ * @pre The device is on
  *
  * @param[in] dev IEEE802.15.4 device descriptor
  * @param[in] mode frame filter mode
@@ -1052,7 +1177,7 @@ static inline int ieee802154_radio_set_frame_filter_mode(ieee802154_dev_t *dev,
 /**
  * @brief Shortcut to @ref ieee802154_radio_ops::get_frame_filter_mode
  *
- * @pre the device is on
+ * @pre The device is on
  *
  * @param[in] dev IEEE802.15.4 device descriptor
  * @param[out] mode frame filter mode
@@ -1071,7 +1196,7 @@ static inline int ieee802154_radio_get_frame_filter_mode(ieee802154_dev_t *dev,
 /**
  * @brief Shortcut to @ref ieee802154_radio_ops::set_frame_retrans
  *
- * @pre the device is on
+ * @pre The device is on
  * @pre the device supports frame retransmissions
  *      (@ref ieee802154_radio_has_frame_retrans() == true)
  *
@@ -1089,7 +1214,7 @@ static inline int ieee802154_radio_set_frame_retrans(ieee802154_dev_t *dev,
 /**
  * @brief Shortcut to @ref ieee802154_radio_ops::set_csma_params
  *
- * @pre the device is on
+ * @pre The device is on
  * @pre the device supports frame retransmissions
  *      (@ref ieee802154_radio_has_frame_retrans() == true)
  *
@@ -1140,7 +1265,7 @@ static inline int ieee802154_radio_confirm_on(ieee802154_dev_t *dev)
  * This functions calls ieee802154_radio_ops::request_op with @ref
  * IEEE802154_HAL_OP_SET_IDLE and sets the context to @p force
  *
- * @pre the device is on
+ * @pre The device is on
  *
  * @note @ref ieee802154_radio_confirm_set_idle MUST be used to
  * finish the state transition.
@@ -1162,8 +1287,8 @@ static inline int ieee802154_radio_request_set_idle(ieee802154_dev_t *dev, bool 
 /**
  * @brief Confirmation function for @ref ieee802154_radio_request_set_idle
  *
- * @pre call to @ref ieee802154_radio_request_set_idle was successful.
- * @pre the device is on
+ * @pre Call to @ref ieee802154_radio_request_set_idle was successful.
+ * @pre The device is on
  *
  * @param[in] dev IEEE802.15.4 device descriptor
  *
@@ -1185,7 +1310,7 @@ static inline int ieee802154_radio_confirm_set_idle(ieee802154_dev_t *dev)
  * This functions calls ieee802154_radio_ops::request_op with @ref
  * IEEE802154_HAL_OP_SET_RX and NULL context.
  *
- * @pre the device is on
+ * @pre The device is on
  *
  * @note @ref ieee802154_radio_confirm_set_rx MUST be used to
  * finish the state transition.
@@ -1205,8 +1330,8 @@ static inline int ieee802154_radio_request_set_rx(ieee802154_dev_t *dev)
 /**
  * @brief Confirmation function for @ref ieee802154_radio_request_set_rx
  *
- * @pre call to @ref ieee802154_radio_request_set_rx was successful.
- * @pre the device is on
+ * @pre Call to @ref ieee802154_radio_request_set_rx was successful.
+ * @pre The device is on
  *
  * @param[in] dev IEEE802.15.4 device descriptor
  *
@@ -1226,7 +1351,7 @@ static inline int ieee802154_radio_confirm_set_rx(ieee802154_dev_t *dev)
  * This function will internally call @ref ieee802154_radio_request_set_idle
  * and poll @ref ieee802154_radio_confirm_set_idle.
  *
- * @pre the device is on
+ * @pre The device is on
  *
  * @param[in] dev IEEE802.15.4 device descriptor
  * @param[in] force whether the state transition should be forced or not. If
@@ -1254,7 +1379,7 @@ static inline int ieee802154_radio_set_idle(ieee802154_dev_t *dev, bool force)
  * This function will internally call @ref ieee802154_radio_request_set_rx
  * and poll @ref ieee802154_radio_confirm_set_rx.
  *
- * @pre the device is on
+ * @pre The device is on
  *
  * @param[in] dev IEEE802.15.4 device descriptor
  *
@@ -1280,7 +1405,7 @@ static inline int ieee802154_radio_set_rx(ieee802154_dev_t *dev)
  * This functions calls ieee802154_radio_ops::request_op with @ref
  * IEEE802154_HAL_OP_CCA and NULL context.
  *
- * @pre the device is on
+ * @pre The device is on
  *
  * @note @ref ieee802154_radio_confirm_cca MUST be used to
  * finish the CCA procedure and get the channel status.
@@ -1306,14 +1431,14 @@ static inline int ieee802154_radio_request_cca(ieee802154_dev_t *dev)
  * IEEE802154_HAL_OP_CCA and sets the context to a boolean where the result
  * of the CCA should be store. Setting it to true means the channel is clear.
  *
- * @pre call to @ref ieee802154_radio_request_cca was successful.
- * @pre the device is on
+ * @pre Call to @ref ieee802154_radio_request_cca was successful.
+ * @pre The device is on
  *
  * @param[in] dev IEEE802.15.4 device descriptor
  *
  * @return status of the CCA procedure
  *
- * @retval positive number if the channel is clear
+ * @return positive number if the channel is clear
  * @retval 0 if the channel is busy
  * @retval -EAGAIN if the CCA procedure hasn't finished.
  */
@@ -1333,13 +1458,13 @@ static inline int ieee802154_radio_confirm_cca(ieee802154_dev_t *dev)
  * This function will internally call @ref ieee802154_radio_request_cca
  * and poll @ref ieee802154_radio_confirm_cca.
  *
- * @pre the device is on
+ * @pre The device is on
  *
  * @param[in] dev IEEE802.15.4 device descriptor
  *
  * @return status of the CCA
  *
- * @retval positive number if the channel is clear
+ * @return positive number if the channel is clear
  * @retval 0 if the channel is busy
  * @retval negative errno on error
  */
@@ -1352,6 +1477,18 @@ static inline int ieee802154_radio_cca(ieee802154_dev_t *dev)
     while ((res = ieee802154_radio_confirm_cca(dev)) == -EAGAIN) {}
 
     return res;
+}
+
+/**
+ * @brief Retrieve radio cipher ops
+ *
+ * @param[in] dev IEEE802.15.4 device descriptor
+ *
+ * @return Radio cipher ops or NULL if device has no cipher ops
+ */
+static inline const struct ieee802154_radio_cipher_ops *ieee802154_radio_get_cipher_ops(const ieee802154_dev_t *dev)
+{
+    return dev->driver->cipher_ops;
 }
 
 /**

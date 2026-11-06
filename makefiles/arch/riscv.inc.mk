@@ -27,12 +27,16 @@ ifeq (1,$(BUILD_IN_DOCKER))
   TARGET_ARCH_RISCV := riscv-none-elf
 endif
 
+# 'command -v' only takes a single name, so the triples are tested one by one.
+# The loop stops at the first hit, which is the most correct triple available.
 TARGET_ARCH_RISCV ?= \
   $(strip \
     $(subst -gcc,,\
       $(notdir \
         $(word 1,\
-          $(shell which $(addsuffix -gcc,$(_TRIPLES_TO_TEST)) 2> /dev/null)))))
+          $(shell for triple in $(addsuffix -gcc,$(_TRIPLES_TO_TEST)); do \
+                    command -v $$triple && break; \
+                  done 2> /dev/null)))))
 
 TARGET_ARCH ?= $(TARGET_ARCH_RISCV)
 
@@ -51,7 +55,11 @@ endif
 
 GCC_DEFAULTS_TO_NEW_RISCV_ISA ?= 0
 
-CFLAGS_CPU := -march=rv32imac -mabi=ilp32
+ifeq (rv64,$(CPU_ARCH))
+  CFLAGS_CPU := -march=rv64imac -mabi=lp64
+else
+  CFLAGS_CPU := -march=rv32imac -mabi=ilp32
+endif
 ASFLAGS := $(CFLAGS_CPU)
 
 # Since RISC-V ISA specifications 20191213 instructions previously included in
@@ -64,9 +72,13 @@ ifeq (1,$(GCC_DEFAULTS_TO_NEW_RISCV_ISA))
   CFLAGS_CPU += -misa-spec=2.2
 endif
 
-# Always use riscv32-none-elf as target triple for clang, as some
+# Always use riscv{32,64}-none-elf as target triple for clang, as some
 # autodetected gcc target triples are incompatible with clang
-TARGET_ARCH_LLVM := riscv32-none-elf
+ifeq (rv64,$(CPU_ARCH))
+  TARGET_ARCH_LLVM := riscv64-none-elf
+else
+  TARGET_ARCH_LLVM := riscv32-none-elf
+endif
 ifneq ($(TOOLCHAIN),llvm)
   CFLAGS_NO_ASM += -mcmodel=medlow -msmall-data-limit=8
   # We cannot invoke the compiler on the host system if build in docker.
@@ -84,6 +96,11 @@ CFLAGS_DBG  ?= -g3
 CFLAGS_OPT  ?= -Os
 
 LINKFLAGS += -L$(RIOTCPU)/$(CPU)/ldscripts -L$(RIOTCPU)/riscv_common/ldscripts
+ifeq (rv64,$(CPU_ARCH))
+  LINKFLAGS += -Wl,--defsym=_riscv_word_bytes=8
+else
+  LINKFLAGS += -Wl,--defsym=_riscv_word_bytes=4
+endif
 LINKER_SCRIPT ?= $(CPU_MODEL).ld
 LINKFLAGS += -T$(LINKER_SCRIPT)
 
@@ -93,4 +110,8 @@ ASFLAGS += $(CFLAGS_CPU)
 LINKFLAGS += $(CFLAGS_CPU) $(CFLAGS_LINK) $(CFLAGS_DBG) $(CFLAGS_OPT) -nostartfiles -Wl,--gc-sections -static -lgcc
 
 # Platform triple as used by Rust
-RUST_TARGET = riscv32imac-unknown-none-elf
+ifeq (rv64,$(CPU_ARCH))
+  RUST_TARGET = riscv64imac-unknown-none-elf
+else
+  RUST_TARGET = riscv32imac-unknown-none-elf
+endif

@@ -1,9 +1,6 @@
 /*
- * Copyright (C) 2017 Freie Universität Berlin
- *
- * This file is subject to the terms and conditions of the GNU Lesser
- * General Public License v2.1. See the file LICENSE in the top level
- * directory for more details.
+ * SPDX-FileCopyrightText: 2017 Freie Universität Berlin
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
 
 /**
@@ -206,24 +203,20 @@ static void _set_usage(char *cmd_name)
          "       * \"freq\" - sets the \"channel\" center frequency\n"
          "       * \"channel\" - sets the frequency channel\n"
          "       * \"chan\" - alias for \"channel\"\n"
-         "       * \"checksum\" - set checksumming on-off\n"
          "       * \"csma_retries\" - set max. number of channel access attempts\n"
-         "       * \"encrypt\" - set the encryption on-off\n"
          "       * \"hop_limit\" - set hop limit\n"
          "       * \"hl\" - alias for \"hop_limit\"\n"
          "       * \"key\" - set the encryption key in hexadecimal format\n"
          "       * \"mtu\" - IPv6 maximum transmission unit\n"
          "       * \"nid\" - sets the network identifier (or the PAN ID)\n"
-         "       * \"page\" - set the channel page (IEEE 802.15.4)\n"
          "       * \"pan\" - alias for \"nid\"\n"
          "       * \"pan_id\" - alias for \"nid\"\n"
-         "       * \"phy_busy\" - set busy mode on-off\n"
 #if IS_USED(MODULE_SHELL_CMD_GNRC_NETIF_LORA)
          "       * \"bw\" - alias for channel bandwidth\n"
          "       * \"sf\" - alias for spreading factor\n"
          "       * \"cr\" - alias for coding rate\n"
 #endif  /* MODULE_SHELL_CMD_GNRC_NETIF_LORA */
-#if IS_USED(MODULE_SHELL_CMD_GNRC_NETIF_LORAWAN)
+#if IS_USED(MODULE_SHELL_CMD_GNRC_NETIF_LORAWAN) || defined(TESTING_MOCK_SHELL_CMD_NETIF_LORA)
          "       * \"appkey\" - sets Application key\n"
          "       * \"appskey\" - sets Application session key\n"
 #if IS_USED(MODULE_GNRC_LORAWAN_1_1)
@@ -356,10 +349,6 @@ static void _print_netopt(netopt_t opt)
         printf("frequency [in Hz]");
         break;
 
-    case NETOPT_CHANNEL_PAGE:
-        printf("page");
-        break;
-
     case NETOPT_HOP_LIMIT:
         printf("hop limit");
         break;
@@ -386,10 +375,6 @@ static void _print_netopt(netopt_t opt)
 
     case NETOPT_CCA_THRESHOLD:
         printf("CCA threshold [in dBm]");
-        break;
-
-    case NETOPT_ENCRYPTION:
-        printf("encryption");
         break;
 
     case NETOPT_ENCRYPTION_KEY:
@@ -468,14 +453,6 @@ static void _print_netopt(netopt_t opt)
         break;
 
 #endif /* MODULE_NETDEV_IEEE802154_MR_FSK */
-
-    case NETOPT_CHECKSUM:
-        printf("checksum");
-        break;
-
-    case NETOPT_OTAA:
-        printf("otaa");
-        break;
 
     case NETOPT_LINK_CHECK:
         printf("link check");
@@ -673,10 +650,6 @@ static void _netif_list(netif_t *iface)
     if (res >= 0) {
         printf(" Frequency: %" PRIu32 "Hz ", u32);
     }
-    res = netif_get_opt(iface, NETOPT_CHANNEL_PAGE, 0, &u16, sizeof(u16));
-    if (res >= 0) {
-        printf(" Page: %" PRIu16 " ", u16);
-    }
     res = netif_get_opt(iface, NETOPT_NID, 0, &u16, sizeof(u16));
     if (res >= 0) {
         printf(" NID: 0x%" PRIx16 " ", u16);
@@ -824,7 +797,7 @@ static void _netif_list(netif_t *iface)
         }
         line_thresh++;
     }
-#if IS_USED(MODULE_SHELL_CMD_GNRC_NETIF_LORAWAN)
+#if IS_USED(MODULE_SHELL_CMD_GNRC_NETIF_LORAWAN) || defined(TESTING_MOCK_SHELL_CMD_NETIF_LORA)
     res = netif_get_opt(iface, NETOPT_DEMOD_MARGIN, 0, &u8, sizeof(u8));
     if (res >= 0) {
         printf(" Demod margin.: %u ", (unsigned)u8);
@@ -1270,7 +1243,7 @@ static int _netif_set_flag(netif_t *iface, netopt_t opt, netopt_enable_t set)
     return 0;
 }
 
-#if IS_USED(MODULE_SHELL_CMD_GNRC_NETIF_LORAWAN)
+#if IS_USED(MODULE_SHELL_CMD_GNRC_NETIF_LORAWAN) || defined(TESTING_MOCK_SHELL_CMD_NETIF_LORA)
 static int _netif_set_lw_key(netif_t *iface, netopt_t opt, char *key_str)
 {
     /* This is the longest key */
@@ -1312,7 +1285,7 @@ static int _netif_set_lw_key(netif_t *iface, netopt_t opt, char *key_str)
 static int _netif_set_addr(netif_t *iface, netopt_t opt, char *addr_str)
 {
     uint8_t addr[GNRC_NETIF_L2ADDR_MAXLEN];
-    size_t addr_len = l2util_addr_from_str(addr_str, addr);
+    size_t addr_len = l2util_addr_from_str_sized(addr_str, addr, sizeof(addr));
 
     if (addr_len == 0) {
         printf("error: unable to parse address.\n"
@@ -1369,7 +1342,7 @@ static int _netif_set_state(netif_t *iface, char *state_str)
         state = NETOPT_STATE_STANDBY;
     }
     else {
-        printf("usage: ifconfig <if_id> set state [off|sleep|idle|rx|tx|reset|standby]\n");
+        printf("usage: ifconfig <if_id> set state {off|sleep|idle|rx|tx|reset|standby}\n");
         return 1;
     }
     if (netif_set_opt(iface, NETOPT_STATE, 0,
@@ -1384,22 +1357,6 @@ static int _netif_set_state(netif_t *iface, char *state_str)
     return 0;
 }
 
-static int _hex_to_int(char c)
-{
-    if ('0' <= c && c <= '9') {
-        return c - '0';
-    }
-    else if ('a' <= c && c <= 'f') {
-        return c - 'a';
-    }
-    else if ('A' <= c && c <= 'F') {
-        return c - 'A';
-    }
-    else {
-        return -1;
-    }
-}
-
 static int _netif_set_encrypt_key(netif_t *iface, netopt_t opt, char *key_str)
 {
     size_t str_len = strlen(key_str);
@@ -1407,38 +1364,30 @@ static int _netif_set_encrypt_key(netif_t *iface, netopt_t opt, char *key_str)
     uint8_t key[key_len];
 
     if (str_len == 14U) {
-        printf("\nNotice: setting 56 bit key.");
+        printf("\nNotice: setting 56 bit key. ");
     }
     else if (str_len == 16U) {
-        printf("\nNotice: setting 64 bit key.");
+        printf("\nNotice: setting 64 bit key. ");
     }
     else if (str_len == 32U) {
-        printf("\nNotice: setting 128 bit key.");
+        printf("\nNotice: setting 128 bit key. ");
     }
     else if (str_len == 48U) {
-        printf("\nNotice: setting 192 bit key.");
+        printf("\nNotice: setting 192 bit key. ");
     }
     else if (str_len == 64U) {
-        printf("\nNotice: setting 256 bit key.");
+        printf("\nNotice: setting 256 bit key. ");
     }
     else if (str_len == 128U) {
-        printf("\nNotice: setting 512 bit key.");
+        printf("\nNotice: setting 512 bit key. ");
     }
     else {
         printf("error: invalid key size.\n");
         return 1;
     }
-    /* Convert any char from ASCII table in hex format */
-    for (size_t i = 0; i < str_len; i += 2) {
-        int i1 = _hex_to_int(key_str[i]);
-        int i2 = _hex_to_int(key_str[i + 1]);
-
-        if (i1 == -1 || i2 == -1) {
-            printf("error: unable to parse key\n");
-            return 1;
-        }
-
-        key[i / 2] = (uint8_t)((i1 << 4) + i2);
+    if (scn_buf_hex(key, key_len, key_str, str_len) < 0) {
+        printf("error: unable to parse key\n");
+        return 1;
     }
 
     if (netif_set_opt(iface, opt, 0, key, key_len) < 0) {
@@ -1461,7 +1410,7 @@ static int _netif_set_encrypt_key(netif_t *iface, netopt_t opt, char *key_str)
 static int _netif_addrm_l2filter(netif_t *iface, char *val, bool add)
 {
     uint8_t addr[GNRC_NETIF_L2ADDR_MAXLEN];
-    size_t addr_len = l2util_addr_from_str(val, addr);
+    size_t addr_len = l2util_addr_from_str_sized(val, addr, sizeof(addr));
 
     if ((addr_len == 0) || (addr_len > CONFIG_L2FILTER_ADDR_MAXLEN)) {
         printf("error: given address is invalid\n");
@@ -1533,7 +1482,7 @@ static int _netif_set(char *cmd_name, netif_t *iface, char *key, char *value)
         return _netif_set_coding_rate(iface, value);
     }
 #endif  /* MODULE_SHELL_CMD_GNRC_NETIF_LORA */
-#if IS_USED(MODULE_SHELL_CMD_GNRC_NETIF_LORAWAN)
+#if IS_USED(MODULE_SHELL_CMD_GNRC_NETIF_LORAWAN) || defined(TESTING_MOCK_SHELL_CMD_NETIF_LORA)
 #if IS_USED(MODULE_GNRC_LORAWAN_1_1)
     else if (strcmp("joineui", key) == 0) {
         return _netif_set_lw_key(iface, NETOPT_LORAWAN_JOINEUI, value);
@@ -1639,9 +1588,6 @@ static int _netif_set(char *cmd_name, netif_t *iface, char *key, char *value)
     else if ((strcmp("nid", key) == 0) || (strcmp("pan", key) == 0) ||
              (strcmp("pan_id", key) == 0)) {
         return _netif_set_u16(iface, NETOPT_NID, 0, value);
-    }
-    else if (strcmp("page", key) == 0) {
-        return _netif_set_u16(iface, NETOPT_CHANNEL_PAGE, 0, value);
     }
     else if (strcmp("power", key) == 0) {
         return _netif_set_i16(iface, NETOPT_TX_POWER, value);
@@ -1769,7 +1715,7 @@ static int _netif_add(char *cmd_name, netif_t *iface, int argc, char **argv)
     (void)iface;
     (void)argc;
     (void)argv;
-    printf("error: GNRC_IPV6 module not enabled.\n");
+    puts("error: no ipv6 support\nUse 'USEMODULE += gnrc_ipv6' to enable it");
 
     return 1;
 #endif

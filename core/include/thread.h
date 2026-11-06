@@ -192,7 +192,8 @@ struct _thread {
                                          to this thread's message queue */
 #endif
 #if defined(DEVELHELP) || IS_ACTIVE(SCHED_TEST_STACK) \
-    || defined(MODULE_MPU_STACK_GUARD) || defined(DOXYGEN)
+    || defined(MODULE_MPU_STACK_GUARD) || defined(MODULE_CORTEXM_STACK_LIMIT) \
+    || defined(DOXYGEN)
     char *stack_start;              /**< thread's stack start address   */
 #endif
 #if defined(CONFIG_THREAD_NAMES) || defined(DOXYGEN)
@@ -232,18 +233,10 @@ struct _thread {
 /**
  * @brief Never write markers into the thread's stack to measure stack usage
  *
- * This flag is ignored when DEVELHELP or SCHED_TEST_STACK is not enabled
+ * This flag is ignored if `SCHED_TEST_STACK` is 0 or not defined.
+ * `SCHED_TEST_STACK` defaults to 1 with `DEVELHELP=1`.
  */
 #define THREAD_CREATE_NO_STACKTEST      (8)
-
-/**
- * @brief Legacy flag kept for compatibility.
- *
- * @deprecated will be removed after 2025.07 release
- *
- * This is always enabled with `DEVELHELP=1` or `SCHED_TEST_STACK`.
- */
-#define THREAD_CREATE_STACKTEST         (0)
 /** @} */
 
 /**
@@ -273,6 +266,7 @@ struct _thread {
  *                      @ref SCHED_PRIO_LEVELS or @p stacksize is too small
  * @retval  -EOVERFLOW  there are too many threads running already
  */
+ACCESS(write_only, 1, 2)
 kernel_pid_t thread_create(char *stack,
                            int stacksize,
                            uint8_t priority,
@@ -282,11 +276,31 @@ kernel_pid_t thread_create(char *stack,
                            const char *name);
 
 /**
- * @brief       Retrieve a thread control block by PID.
- * @pre         @p pid is valid
+ * @brief       Retrieve a thread control block by PID without bounds checking
  * @param[in]   pid         Thread to retrieve.
  * @return      The thread identified by @p pid
- * @retval      `NULL`      no thread at the given valid PID is active.
+ * @retval      NULL        Thread identified by @p pid does not exist
+ *
+ * @pre         The caller has checked that @p pid is valid
+ * @warning     RIOT does not provide any means to synchronize access to the
+ *              thread control block with the life cycle of the thread. Most
+ *              threads will never exit and are created before any application
+ *              logic is running.
+ *
+ * A safe access would be:
+ *
+ * ```c
+ * unsigned irq_state = irq_disable();
+ * assert(pid_is_valid(pid));
+ * thread_t *t = thread_get_unchecked(pid);
+ * if (t) {
+ *     do_something_with_thread(t);
+ * }
+ * else {
+ *     LOG_ERROR("Thread %" PRIkernel_pid " does not exist\n", pid);
+ * }
+ * irq_restore(irq_state);
+ * ```
  */
 static inline thread_t *thread_get_unchecked(kernel_pid_t pid)
 {
@@ -298,7 +312,26 @@ static inline thread_t *thread_get_unchecked(kernel_pid_t pid)
  * @details     This is a bound-checked variant of accessing `sched_threads[pid]` directly.
  *              If you know that the PID is valid, then don't use this function.
  * @param[in]   pid   Thread to retrieve.
- * @return      `NULL` if the PID is invalid or there is no such thread.
+ * @return      The thread identified by @p pid
+ * @retval      NULL        @p pid is out of bounds or the thread does not exist
+ * @warning     RIOT does not provide any means to synchronize access to the
+ *              thread control block with the life cycle of the thread. Most
+ *              threads will never exit and are created before any application
+ *              logic is running.
+ *
+ * A safe access would be:
+ *
+ * ```c
+ * unsigned irq_state = irq_disable();
+ * thread_t *t = thread_get(pid);
+ * if (t) {
+ *     do_something_with_thread(t);
+ * }
+ * else {
+ *     LOG_ERROR("Thread %" PRIkernel_pid " does not exist or is out of bounds\n", pid);
+ * }
+ * irq_restore(irq_state);
+ * ```
  */
 static inline thread_t *thread_get(kernel_pid_t pid)
 {
@@ -424,6 +457,7 @@ static inline thread_t *thread_get_active(void)
  *
  * @return stack pointer
  */
+ACCESS(write_only, 3, 4)
 char *thread_stack_init(thread_task_func_t task_func, void *arg,
                         void *stack_start, int stack_size);
 
@@ -463,20 +497,27 @@ static inline const char *thread_getname(kernel_pid_t pid)
 #endif
 
 /**
- * @brief       Measures the stack usage of a stack
+ * @brief       Measure the stack usage of a stack
  * @internal    Should not be used externally
  *
  * Only works if the stack is filled with canaries
  * (`*((uintptr_t *)ptr) == (uintptr_t)ptr` for naturally aligned `ptr` within
  * the stack).
- * This is enabled if `DEVELHELP` or `SCHED_TEST_STACK` is set.
+ * This is done by thread_create() if `SCHED_TEST_STACK` is 1 (the default
+ * with `DEVELHELP=1`), unless the thread is created with
+ * @ref THREAD_CREATE_NO_STACKTEST.
  *
- * @param[in] stack     the stack you want to measure. Try
- *                      `thread_get_stackstart(thread_get_active())`
- * @param[in] size      size of @p stack in bytes
+ * @param[in] stack     The stack you want to measure, must be aligned to
+ *                      `alignof(void *)`. Try
+ *                      `thread_get_stackstart(thread_get_active())`, which
+ *                      is aligned by thread_create(), but is `NULL` if the
+ *                      stack start is not stored for the thread.
+ * @param[in] size      Size of @p stack in bytes.
  *
- * @return              the amount of unused space of the thread's stack
+ * @return              The amount of unused space of the thread's stack.
+ * @retval              0 if @p stack is `NULL`.
  */
+ACCESS(read_only, 1, 2)
 uintptr_t measure_stack_free_internal(const char *stack, size_t size);
 
 /**
@@ -578,7 +619,7 @@ const char *thread_state_to_string(thread_status_t state);
 static inline void *thread_get_stackstart(const thread_t *thread)
 {
 #if defined(DEVELHELP) || IS_ACTIVE(SCHED_TEST_STACK) \
-    || defined(MODULE_MPU_STACK_GUARD)
+    || defined(MODULE_MPU_STACK_GUARD) || defined(MODULE_CORTEXM_STACK_LIMIT)
     return thread->stack_start;
 #else
     (void)thread;

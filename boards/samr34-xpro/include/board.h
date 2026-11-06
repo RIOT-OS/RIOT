@@ -41,8 +41,8 @@ extern "C" {
  * @name Board specific configuration
  *  @{
  */
-#define TCXO_PWR_PIN                        GPIO_PIN(PA, 9)     /**< 32 MHz oscillator for radio enable */
-#define TX_OUTPUT_SEL_PIN                   GPIO_PIN(PA, 13)    /**< BAND_SEL */
+#define TCXO_PWR_PIN                GPIO_PIN(PA, 9)     /**< 32 MHz oscillator for radio enable */
+#define TX_OUTPUT_SEL_PIN           GPIO_PIN(PA, 13)    /**< BAND_SEL */
 /** @}*/
 
 /**

@@ -92,9 +92,6 @@ void at86rf215_reset_and_cfg(at86rf215_t *dev)
             IS_ACTIVE(CONFIG_IEEE802154_DEFAULT_ACK_REQ) ? NETOPT_ENABLE : NETOPT_DISABLE;
     netdev_ieee802154_set(&dev->netdev, NETOPT_ACK_REQ,
                           &ack_req, sizeof(ack_req));
-
-    /* enable RX start IRQs */
-    at86rf215_reg_or(dev, dev->BBC->RG_IRQM, BB_IRQ_RXAM);
 }
 
 void at86rf215_reset(at86rf215_t *dev)
@@ -130,8 +127,8 @@ if (!IS_ACTIVE(CONFIG_AT86RF215_USE_CLOCK_OUTPUT)){
     at86rf215_set_trim(dev, CONFIG_AT86RF215_TRIM_VAL);
 #endif
 
-    /* enable TXFE & RXFE IRQ */
-    at86rf215_reg_write(dev, dev->BBC->RG_IRQM, BB_IRQ_TXFE | BB_IRQ_RXFE);
+    /* enable TXFE, RXFE & RX Start IRQ */
+    at86rf215_reg_write(dev, dev->BBC->RG_IRQM, BB_IRQ_TXFE | BB_IRQ_RXFE | BB_IRQ_RXAM);
 
     /* enable EDC IRQ */
     at86rf215_reg_write(dev, dev->RF->RG_IRQM, RF_IRQ_EDC | RF_IRQ_TRXRDY);
@@ -224,6 +221,12 @@ void at86rf215_tx_done(at86rf215_t *dev)
 
     at86rf215_reg_write(dev, dev->BBC->RG_AMCS, amcs);
 
+    /* listen to non-ACK packets again */
+    if (dev->flags & AT86RF215_OPT_ACK_REQUESTED) {
+        dev->flags &= ~AT86RF215_OPT_ACK_REQUESTED;
+        at86rf215_filter_ack(dev, false);
+    }
+
     /* re-enable reduced power consumption */
     at86rf215_enable_rpc(dev);
 }
@@ -287,7 +290,13 @@ int at86rf215_tx_exec(at86rf215_t *dev)
         dev->flags |= AT86RF215_OPT_CCA_PENDING;
     }
 
-    if (dev->state == AT86RF215_STATE_IDLE) {
+    /* AGCH marks a reception in progress. A high IRQ pin marks an unserviced
+     * radio event - e.g. a finished RX whose auto-ACK is still transmitting
+     * (AGCR already cleared AGCH). Prevent kicking TXPREP during ongoing frame
+     * reception, so defer: the pending _isr resumes the TX via _set_idle(). */
+    if ((dev->state == AT86RF215_STATE_IDLE) &&
+        !(dev->flags & AT86RF215_OPT_AGCH) &&
+        !gpio_read(dev->params.int_pin)) {
         at86rf215_rf_cmd(dev, CMD_RF_TXPREP);
     } else {
         DEBUG("[at86rf215] will TX after %s\n", at86rf215_sw_state2a(dev->state));
@@ -312,7 +321,9 @@ bool at86rf215_cca(at86rf215_t *dev)
     bool clear;
     uint8_t old_state;
 
-    if (dev->state != AT86RF215_STATE_IDLE) {
+    /* Check both software state AND hardware reception state (AGCH)
+     * to prevent CCA during ongoing frame reception */
+    if (dev->state != AT86RF215_STATE_IDLE || (dev->flags & AT86RF215_OPT_AGCH)) {
         return false;
     }
 

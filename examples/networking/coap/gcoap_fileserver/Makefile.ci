@@ -13,6 +13,7 @@ BOARD_INSUFFICIENT_MEMORY := \
     bluepill-stm32f103c8 \
     derfmega128 \
     i-nucleo-lrwan1 \
+    microduino-corerf \
     msb-430 \
     msb-430h \
     nucleo-c031c6 \
@@ -22,6 +23,7 @@ BOARD_INSUFFICIENT_MEMORY := \
     nucleo-f302r8 \
     nucleo-f303k8 \
     nucleo-f334r8 \
+    nucleo-g031k8 \
     nucleo-l011k4 \
     nucleo-l031k6 \
     nucleo-l053r8 \

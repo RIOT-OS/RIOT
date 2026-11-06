@@ -29,7 +29,7 @@ Note that this only works from within the directory of the test, so if you are
 somewhere else, use
 
 ```console
-$ cd tests/congure_test
+$ cd tests/sys/congure_test
 ```
 
 first to change into that.

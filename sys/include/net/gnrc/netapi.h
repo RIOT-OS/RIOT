@@ -1,9 +1,6 @@
 /*
- * Copyright (C) 2015 Freie Universität Berlin
- *
- * This file is subject to the terms and conditions of the GNU Lesser
- * General Public License v2.1. See the file LICENSE in the top level
- * directory for more details.
+ * SPDX-FileCopyrightText: 2015 Freie Universität Berlin
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
 
 #pragma once
@@ -58,11 +55,12 @@
  * @}
  */
 
-#include "thread.h"
-#include "net/netopt.h"
+#include "compiler_hints.h"
 #include "net/gnrc/netapi/notify.h"
 #include "net/gnrc/nettype.h"
 #include "net/gnrc/pkt.h"
+#include "net/netopt.h"
+#include "thread.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -206,6 +204,7 @@ static inline int gnrc_netapi_dispatch_send(gnrc_nettype_t type, uint32_t demux_
  *
  * @return Number of subscribers to (@p type, @p demux_ctx).
  */
+ACCESS(read_write, 4, 5)
 int gnrc_netapi_notify(gnrc_nettype_t type, uint32_t demux_ctx, netapi_notify_t event,
                        void *data, size_t data_len);
 
@@ -254,6 +253,7 @@ static inline int gnrc_netapi_dispatch_receive(gnrc_nettype_t type, uint32_t dem
  *                      actual error value is for the implementation to decide but should be
  *                      sensible to indicate what went wrong.
  */
+ACCESS(write_only, 4, 5)
 static inline int gnrc_netapi_get(kernel_pid_t pid, netopt_t opt,
                                   uint16_t context, void *data, size_t max_len)
 {
@@ -276,6 +276,7 @@ static inline int gnrc_netapi_get(kernel_pid_t pid, netopt_t opt,
  *                      implementation to decide but should be sensible to indicate what went
  *                      wrong.
  */
+ACCESS(read_only, 4, 5)
 static inline int gnrc_netapi_set(kernel_pid_t pid, netopt_t opt,
                                   uint16_t context, const void *data,
                                   size_t data_len)

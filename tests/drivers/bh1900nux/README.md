@@ -1,7 +1,7 @@
 # About
 This test application is created for testing/demonstrating the BH1900NUX driver.
 It uses the default device parameters as specified in
-`drivers/bh1900nux/include/bh1900nux.h`. To override these setting, you
+`drivers/bh1900nux/include/bh1900nux_params.h`. To override these setting, you
 can simply do this by defining these parameters as compiler flags while uilding,
 e.g.:
 ```

@@ -1,17 +1,28 @@
-/**
- * @brief Fortuna PRNG implementation.
- *
- * The MIT License applies to this software. See the included LICENSE.txt file
- * for more information.
+/*
+ * SPDX-FileCopyrightText: 2016 Brandon Lin
+ * SPDX-FileCopyrightText: 2016-2026 Bas Stottelaar <basstottelaar@gmail.com>
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
 
-/*
+#pragma once
+
+/**
+ * @{
+ * @file
+ *
+ * @brief   Fortuna CSPRNG interface.
+ *
+ * @author  Bas Stottelaar <basstottelaar@gmail.com>
+ *
  * This is not your general purpose PRNG: it is hungry for memory.
  *
- * See https://www.schneier.com/cryptography/paperfiles/fortuna.pdf for the
- * implementation details. Code insipred by https://github.com/blin00/os (MIT
- * licensed), but heavily modified, stripped and improved for RIOT-OS.
+ * Code inspired by https://github.com/blin00/os and originally licensed under
+ * the MIT license. Since then it was heavily modified, stripped and improved
+ * for RIOT-OS. Permission granted by the original author to relicense under
+ * the LGPL-2.1-only license.
  *
+ * Fortuna is based on a paper by Bruce Schneier and Niels Ferguson, which can
+ * be found at https://www.schneier.com/cryptography/paperfiles/fortuna.pdf.
  * The implementation follows the paper, with a few exceptions:
  *
  * - Initialization of the generator and PRNG is combined in fortuna_init.
@@ -24,20 +35,14 @@
  *   https://crypto.stackexchange.com/q/56390 for more information.
  */
 
-#ifndef FORTUNA_H
-#define FORTUNA_H
-
-#include "mutex.h"
-#if FORTUNA_RESEED_INTERVAL_MS > 0 && IS_USED(MODULE_FORTUNA_RESEED)
-#if IS_USED(MODULE_ZTIMER_MSEC)
-#include "ztimer.h"
-#else
-#include "xtimer.h"
-#endif
-#endif
+#include <stdint.h>
 
 #include "crypto/aes.h"
 #include "hashes/sha256.h"
+#include "mutex.h"
+#if IS_USED(MODULE_FORTUNA_RESEED)
+#  include "ztimer.h"
+#endif
 
 #ifdef __cplusplus
 extern "C" {
@@ -49,7 +54,7 @@ extern "C" {
  *       state. The recommended value is 32, as discussed in section 9.5.2.
  */
 #ifndef FORTUNA_POOLS
-#define FORTUNA_POOLS               (32U)
+#  define FORTUNA_POOLS                 (32U)
 #endif
 
 /**
@@ -58,7 +63,7 @@ extern "C" {
  *        9.5.5, a suitable value of 64 bytes is suggested.
  */
 #ifndef FORTUNA_MIN_POOL_SIZE
-#define FORTUNA_MIN_POOL_SIZE       (64U)
+#  define FORTUNA_MIN_POOL_SIZE         (64U)
 #endif
 
 /**
@@ -66,29 +71,34 @@ extern "C" {
  *        default value of 64 bytes is suggested by section 9.6.1.
  */
 #ifndef FORTUNA_SEED_SIZE
-#define FORTUNA_SEED_SIZE           (64U)
+#  define FORTUNA_SEED_SIZE             (64U)
 #endif
 
 #if IS_USED(MODULE_FORTUNA_RESEED) || DOXYGEN
 /**
- * @brief Reseed interval in us. After this interval, the PRNG must be
+ * @brief Reseed interval in ms. After this interval, the PRNG must be
  *        reseeded. Per section 9.5.5, the recommended value is 100ms. Set to
  *        zero to disable this security feature.
  *
  * @note Requires `fortuna_reseed` module.
  */
-#ifndef FORTUNA_RESEED_INTERVAL_MS
-#define FORTUNA_RESEED_INTERVAL_MS  100
-#endif
+#  ifndef FORTUNA_RESEED_INTERVAL_MS
+#    define FORTUNA_RESEED_INTERVAL_MS  (100)
+#  endif
 #endif
 
 /**
  * @brief Reseed limit in bytes. After this number of bytes, the PRNG must be
  *        reseeded. Per section 9.4.4, the recommended value is 2^20 bytes
- *        (=1 MB). Set to zero to disable this security feature.
+ *        (=1 MB), but it is limited by SIZE_MAX. Set to zero to disable this
+ *        security feature.
  */
 #ifndef FORTUNA_RESEED_LIMIT
-#define FORTUNA_RESEED_LIMIT        (1U << 20)
+#  if (1UL << 20) < SIZE_MAX
+#    define FORTUNA_RESEED_LIMIT        (1UL << 20)
+#  else
+#    define FORTUNA_RESEED_LIMIT        (SIZE_MAX)
+#  endif
 #endif
 
 /**
@@ -100,15 +110,17 @@ extern "C" {
  *        effects can be found at https://crypto.stackexchange.com/a/5736.
  */
 #ifndef FORTUNA_AES_KEY_SIZE
-#define FORTUNA_AES_KEY_SIZE        (16U)
+#  define FORTUNA_AES_KEY_SIZE          (16U)
 #endif
 
 /**
  * @brief Use a mutex to lock concurrent access when running sensitive
  *        operations in multi-threaded applications.
+ *
+ * @note  The implementation is not thread-safe when FORTUNA_LOCK is disabled.
  */
 #ifndef FORTUNA_LOCK
-#define FORTUNA_LOCK                (1)
+#  define FORTUNA_LOCK                  (1)
 #endif
 
 /**
@@ -116,7 +128,7 @@ extern "C" {
  *        variables to prevent leaking sensitive information.
  */
 #ifndef FORTUNA_CLEANUP
-#define FORTUNA_CLEANUP             (1)
+#  define FORTUNA_CLEANUP               (1)
 #endif
 
 /**
@@ -148,15 +160,15 @@ typedef struct {
     fortuna_generator_t gen;
     fortuna_pool_t pools[FORTUNA_POOLS];
     uint32_t reseeds;
+    union {
+        sha256_context_t sha256;
+        cipher_context_t cipher;
+    } scratchpad;
 #if FORTUNA_LOCK
     mutex_t lock;
 #endif
-#if FORTUNA_RESEED_INTERVAL_MS > 0 && IS_USED(MODULE_FORTUNA_RESEED)
-#if IS_USED(MODULE_ZTIMER_MSEC)
+#if IS_USED(MODULE_FORTUNA_RESEED) && FORTUNA_RESEED_INTERVAL_MS > 0
     ztimer_t reseed_timer;
-#else
-    xtimer_t reseed_timer;
-#endif
     uint8_t needs_reseed;
 #endif
 } fortuna_state_t;
@@ -164,7 +176,7 @@ typedef struct {
 /**
  * @brief Type definition of a Fortuna seed file.
  */
-typedef uint32_t fortuna_seed_t[FORTUNA_SEED_SIZE];
+typedef uint8_t fortuna_seed_t[FORTUNA_SEED_SIZE];
 
 /**
  * @brief   Initialize the Fortuna PRNG state.
@@ -218,7 +230,7 @@ int fortuna_add_random_event(fortuna_state_t *state, const uint8_t *data,
  * shutdown).
  *
  * @param[in,out] state     PRNG state
- * @param[out]    data      pointer to output buffer for the seed
+ * @param[out]    out       pointer to output buffer for the seed
  *
  * @return                  zero on success
  */
@@ -232,7 +244,7 @@ int fortuna_write_seed(fortuna_state_t *state, fortuna_seed_t *out);
  * available.
  *
  * @param[in,out] state     PRNG state
- * @param[in,out] data      pointer to input and output buffer for the seed
+ * @param[in,out] inout     pointer to input and output buffer for the seed
  *
  * @return                  zero on success
  */
@@ -242,5 +254,4 @@ int fortuna_update_seed(fortuna_state_t *state, fortuna_seed_t *inout);
 }
 #endif
 
-#endif /* FORTUNA_H */
 /** @} */

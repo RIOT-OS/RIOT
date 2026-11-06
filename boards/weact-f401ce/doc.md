@@ -4,7 +4,7 @@
 
 ## Overview
 
-WeAct-F401CE is a board with the same form-factor as the blue/blackpill,
+The WeAct-F401CE is a board with the same form-factor as the blue/blackpill,
 but with an STM32F401CEU6 and a USB-C connector.
 
 It is available on sites like AliExpress for less than 3€.
@@ -14,6 +14,7 @@ It is available on sites like AliExpress for less than 3€.
 ![WeAct-F401CE](https://user-images.githubusercontent.com/1301112/69389644-eb5fb080-0ccc-11ea-8002-67d3db851250.png)
 
 ### MCU
+
 | MCU              | STM32F401CEU6         |
 |:---------------- |:--------------------- |
 | Family           | ARM Cortex-M4F        |
@@ -38,7 +39,7 @@ It is available on sites like AliExpress for less than 3€.
 |:----------------- |:------------- |:------------------------- |:--------------------------------------------------------- |
 | MCU               | STM32F401CE   | partly                    | Energy saving modes not fully utilized                    |
 | Low-level driver  | GPIO          | yes                       |                                                           |
-|                   | PWM           | yes (4 pins available))   |                                                           |
+|                   | PWM           | yes (4 pins available)    |                                                           |
 |                   | UART          | 2 UARTs                   | USART2 via  PA3(RX)/PA2(TX), USART1 on PA10(RX)/PA9(TX)   |
 |                   | I2C           | 1 I2C                     |                                                           |
 |                   | SPI           | 1 SPI                     |                                                           |
@@ -46,12 +47,13 @@ It is available on sites like AliExpress for less than 3€.
 |                   | Timer         | 1 32 bit timer (TIM5)     |                                                           |
 
 ## Flashing the device
+
 The device comes with a bootloader that allows flashing via `dfu-util`.
 
 If RIOT is already running on the board, you can upload your RIOT-firmware by typing
 
-```
-make BOARD=weact-f401ce flash
+```shell
+BOARD=weact-f401ce make flash
 ```
 
 RIOT will make sure to enter the bootloader automatically.
@@ -61,8 +63,8 @@ the bootloader manually.
 
 There are two buttons on the board labeled `BOOT0` and `NRST`.
 
- - Hold down `BOOT0`
- - Shortly press `NRST` to reset the CPU while keeping `BOOT0` held down
+- Hold down `BOOT0`
+- Shortly press `NRST` to reset the CPU while keeping `BOOT0` held down
 
 The board will now show up as `0483:df11` - `STM32 BOOTLOADER` and will accept
 firmware using the DFU protocol.
@@ -70,7 +72,7 @@ firmware using the DFU protocol.
 *Note:* You need to have write permissions to the device.
 On Linux you could add yourself to the `plugdev` group and store the following as `/etc/udev/rules.d/99-weact-f401ce.rules`:
 
-```
+```text
 SUBSYSTEMS=="usb", ATTRS{idVendor}=="0483", ATTRS{idProduct}=="df11", GROUP="plugdev", MODE="660"
 ```
 

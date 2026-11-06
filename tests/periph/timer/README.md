@@ -14,4 +14,4 @@ amount of time, i.e. the diff values should be equal (with some jitter...).
 ## Note
 
 This test does however **NOT** show whether the timeouts and diffs were correct
-in relation to the expected real-time; use e.g. tests/xtimer_msg for this.
+in relation to the expected real-time; use e.g. tests/sys/xtimer_msg for this.

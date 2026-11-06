@@ -88,6 +88,7 @@
  */
 
 #include <stdio.h>
+#include <errno.h>
 
 #include "sched.h"
 #include "thread.h"
@@ -128,8 +129,15 @@ extern uint32_t _sstack;
 /**
  * @brief   ARM Cortex-M specific exception return value, that triggers the
  *          return to the task mode stack pointer
+ *
+ * If RIOT runs in non-secure mode, this return value must point
+ * to non-secure mode and the non-secure exception stack.
  */
-#define EXCEPT_RET_TASK_MODE        (0xfffffffd)
+#ifdef NRF_TRUSTZONE_NONSECURE
+#  define EXCEPT_RET_TASK_MODE      (0xffffffbc)
+#else
+#  define EXCEPT_RET_TASK_MODE      (0xfffffffd)
+#endif
 
 char *thread_stack_init(thread_task_func_t task_func,
                              void *arg,
@@ -272,6 +280,11 @@ void *thread_isr_stack_pointer(void)
 void *thread_isr_stack_start(void)
 {
     return (void *)&_sstack;
+}
+
+void *thread_isr_stack_end(void)
+{
+    return (void *)&_estack;
 }
 
 void NORETURN cpu_switch_context_exit(void)
@@ -488,6 +501,14 @@ void __attribute__((naked)) __attribute__((used)) isr_svc(void)
 #endif
 }
 
+__attribute__((weak)) int
+svc_dispatch_handler(unsigned int svc_number, unsigned int *svc_args)
+{
+    (void)svc_number;
+    (void)svc_args;
+    return -ENOTSUP;
+}
+
 static void __attribute__((used)) _svc_dispatch(unsigned int *svc_args)
 {
     /* stack frame:
@@ -514,6 +535,9 @@ static void __attribute__((used)) _svc_dispatch(unsigned int *svc_args)
             SCB->ICSR = SCB_ICSR_PENDSVSET_Msk;
             break;
         default:
+            if (svc_dispatch_handler(svc_number, svc_args) >= 0) {
+                return;
+            }
             DEBUG("svc: unhandled SVC #%u\n", svc_number);
             break;
     }

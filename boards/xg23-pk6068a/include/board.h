@@ -36,7 +36,7 @@ extern "C" {
  * @{
  */
 #define CONFIG_ZTIMER_LPTIMER_DEV            TIMER_DEV(1)
-#define CONFIG_ZTIMER_LPTIMER_FREQ           LFXO_FREQ
+#define CONFIG_ZTIMER_LPTIMER_FREQ           (32768UL)
 #define CONFIG_ZTIMER_LPTIMER_WIDTH          24
 #define CONFIG_ZTIMER_LPTIMER_BLOCK_PM_MODE  EFM32_PM_MODE_EM3
 /** @} */

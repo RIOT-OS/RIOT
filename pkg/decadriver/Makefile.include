@@ -1,0 +1,9 @@
+# Include headers provided by decadriver
+INCLUDES += -isystem$(PKGDIRBASE)/decadriver/dwt_uwb_driver
+INCLUDES += -isystem$(PKGDIRBASE)/decadriver/platform
+
+# Include headers for device config in platform code
+INCLUDES += -I$(RIOTPKG)/decadriver/platform/include
+
+PSEUDOMODULES += decadriver_dw3000
+PSEUDOMODULES += decadriver_dw3720

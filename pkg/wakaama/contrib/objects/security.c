@@ -1,10 +1,8 @@
 /*
- * Copyright (C) 2024 HAW Hamburg
- *
- * This file is subject to the terms and conditions of the GNU Lesser
- * General Public License v2.1. See the file LICENSE in the top level
- * directory for more details.
+ * SPDX-FileCopyrightText: 2024 HAW Hamburg
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
+
 /**
  * @{
  * @ingroup     lwm2m_objects_security
@@ -495,10 +493,11 @@ static uint8_t _write_cb(lwm2m_context_t * context, uint16_t instance_id, int nu
                 DEBUG("[lwm2m:security:write]: writing URI\n");
                 if (data->value.asBuffer.length > CONFIG_LWM2M_URI_MAX_SIZE - 1) {
                     result = COAP_400_BAD_REQUEST;
+                    break;
                 }
 
-                strncpy(instance->uri, (char *)data->value.asBuffer.buffer,
-                        data->value.asBuffer.length);
+                memcpy(instance->uri, data->value.asBuffer.buffer,
+                       data->value.asBuffer.length);
                 instance->uri[data->value.asBuffer.length] = '\0';
                 result = COAP_204_CHANGED;
                 break;
@@ -574,6 +573,7 @@ static uint8_t _write_cb(lwm2m_context_t * context, uint16_t instance_id, int nu
                 if (data->value.asBuffer.length >
                     CONFIG_LWM2M_OBJ_SECURITY_PUB_KEY_ID_BUFSIZE) {
                     result = COAP_500_INTERNAL_SERVER_ERROR;
+                    break;
                 }
 
                 /* copy the new value */
@@ -595,6 +595,7 @@ static uint8_t _write_cb(lwm2m_context_t * context, uint16_t instance_id, int nu
                 if (data->value.asBuffer.length >
                     CONFIG_LWM2M_OBJ_SECURITY_SEC_KEY_BUFSIZE) {
                     result = COAP_500_INTERNAL_SERVER_ERROR;
+                    break;
                 }
 
                 /* copy the new value */
@@ -616,6 +617,7 @@ static uint8_t _write_cb(lwm2m_context_t * context, uint16_t instance_id, int nu
                 if (data->value.asBuffer.length >
                     CONFIG_LWM2M_OBJ_SECURITY_SERVER_PUB_KEY_BUFSIZE) {
                     result = COAP_500_INTERNAL_SERVER_ERROR;
+                    break;
                 }
 
                 /* copy the new value */
@@ -736,7 +738,7 @@ static uint8_t _create_cb(lwm2m_context_t * context, uint16_t instance_id, int n
     result = _write_cb(context, instance_id, num_data, data_array, object, LWM2M_WRITE_PARTIAL_UPDATE);
 
     if (result != COAP_204_CHANGED) {
-        _delete_cb(context,instance_id, object);
+        _delete_cb(context, instance_id, object);
     }
     else {
         result = COAP_201_CREATED;
@@ -786,8 +788,7 @@ static int _initialize_new_instance(lwm2m_obj_security_inst_t *instance, uint16_
         return -ENOMEM;
     }
 
-    strncpy(instance->uri, args->server_uri, uri_len);
-    instance->uri[uri_len] = '\0';
+    memcpy(instance->uri, args->server_uri, uri_len + 1);
 
 #if IS_USED(MODULE_WAKAAMA_CLIENT_DTLS)
     if (LWM2M_SECURITY_MODE_NONE != args->security_mode) {
