@@ -336,6 +336,7 @@ typedef enum {
     NETDEV_LPC1768_ETH,
     NETDEV_GRETH,
     NETDEV_EFM32_ETH,
+    NETDEV_KSZ8851,
     /* add more if needed */
 } netdev_type_t;
 /** @} */
