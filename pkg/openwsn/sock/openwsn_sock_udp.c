@@ -377,40 +377,6 @@ int sock_udp_get_remote(sock_udp_t *sock, sock_udp_ep_t *ep)
     return 0;
 }
 
-ssize_t sock_udp_recv_aux(sock_udp_t *sock, void *data, size_t max_len,
-                          uint32_t timeout, sock_udp_ep_t *remote,
-                          sock_udp_aux_rx_t *aux)
-{
-    void *pkt = NULL, *ctx = NULL;
-    ssize_t res;
-
-    assert((sock != NULL) && (data != NULL) && (max_len > 0));
-    res = sock_udp_recv_buf_aux(sock, &pkt, &ctx, timeout, remote, aux);
-    /* set data to copy, check if enough buffer space */
-    if (res >= 0) {
-        ssize_t tmp;
-        if ((ssize_t)max_len >= res) {
-            memset(data, 0, max_len);
-            if (res > 0) {
-                /* copy received data */
-                memcpy(data, pkt, res);
-                /* free packet */
-                tmp = sock_udp_recv_buf_aux(sock, &pkt, &ctx, timeout, remote,
-                                            aux);
-                assert(tmp == 0);
-            }
-            (void) tmp;
-        }
-        else {
-            res = -ENOBUFS;
-            /* free packet */
-            tmp = sock_udp_recv_buf_aux(sock, &pkt, &ctx, timeout, remote, aux);
-            assert(tmp == 0);
-        }
-    }
-    return res;
-}
-
 ssize_t sock_udp_recv_buf_aux(sock_udp_t *sock, void **data, void **buf_ctx,
                               uint32_t timeout, sock_udp_ep_t *remote,
                               sock_udp_aux_rx_t *aux)
