@@ -539,7 +539,7 @@ class GNRCICMPv6Echo(ShellInteraction):
         )
 
         if hop_limit is not None:
-            cmd += " -h {hop_limit}".format(hop_limit=hop_limit)
+            cmd += " -t {hop_limit}".format(hop_limit=hop_limit)
 
         # wait a second longer than all pings
         cmd_timeout = ((timeout / 1000) * count) + 1
