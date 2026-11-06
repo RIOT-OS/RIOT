@@ -43,6 +43,26 @@
 #define SERCOM_I2CM_CTRLA_MODE_I2C_MASTER SERCOM_I2CM_CTRLA_MODE(5)
 #endif
 
+#define SERCOM_I2CM_INACTOUT_DISABLED 0x0 /**< inactive bus timeout disabled */
+#define SERCOM_I2CM_INACTOUT_55_US    0x1 /**< inactive bus timeout 55 µs */
+#define SERCOM_I2CM_INACTOUT_105_US   0x2 /**< inactive bus timeout 105 µs */
+#define SERCOM_I2CM_INACTOUT_205_US   0x3 /**< inactive bus timeout 205 µs */
+
+/**
+ * @brief Enable master inactive bus timeout
+ *
+ * In a multi-master scenario, a misbehaving master that doesn't properly issue
+ * a stop condition may lock the bus status into BUSY. The first transaction
+ * attempt from our side will then fail with a bus timeout.
+ *
+ * With the inactive bus timeout enabled, the bus status will automatically
+ * reset to IDLE if the bus is inactive and the timeout expired. This feature
+ * is required for SMBus compatibility.
+ */
+#ifndef SERCOM_I2CM_INACTOUT
+#  define SERCOM_I2CM_INACTOUT SERCOM_I2CM_INACTOUT_DISABLED
+#endif
+
 static int _i2c_start(i2c_t dev_id, uint16_t addr);
 static inline int _write(SercomI2cm *dev, const uint8_t *data, size_t length,
                          uint8_t stop);
@@ -247,6 +267,10 @@ void i2c_init(i2c_t dev)
 #endif
     {
         bus(dev)->BAUD.reg = SERCOM_I2CM_BAUD_BAUD(tmp_baud);
+    }
+
+    if (SERCOM_I2CM_INACTOUT != SERCOM_I2CM_INACTOUT_DISABLED) {
+        bus(dev)->CTRLA.reg |= SERCOM_I2CM_CTRLA_INACTOUT(SERCOM_I2CM_INACTOUT);
     }
 
     /* ENABLE I2C MASTER */
