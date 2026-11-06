@@ -20,7 +20,7 @@ INCLUDES += -I$(ESP32_SDK_DIR)/components/esp_timer/private_include
 INCLUDES += -I$(ESP32_SDK_DIR)/components/freertos/esp_additions/include
 INCLUDES += -I$(ESP32_SDK_DIR)/components/hal/platform_port/include/hal
 INCLUDES += -I$(ESP32_SDK_DIR)/components/hal/$(CPU_FAM)/include
-INCLUDES += -I$(ESP32_SDK_DIR)/components/newlib/priv_include
+INCLUDES += -I$(ESP32_SDK_DIR)/components/esp_libc/priv_include
 INCLUDES += -I$(ESP32_SDK_DIR)/components/spi_flash/include
 
 ifneq (,$(filter xtensa%,$(TARGET_ARCH)))
@@ -28,18 +28,14 @@ ifneq (,$(filter xtensa%,$(TARGET_ARCH)))
   INCLUDES += -I$(ESP32_SDK_DIR)/components/xtensa/$(CPU_FAM)/include
 endif
 
-ifeq (esp32c6,$(CPU_FAM))
-  INCLUDES += -I$(ESP32_SDK_DIR)/components/esp_hw_support/include/esp_private
-  INCLUDES += -I$(ESP32_SDK_DIR)/components/esp_hw_support/port/$(CPU_FAM)/private_include
-endif
+INCLUDES += -I$(ESP32_SDK_DIR)/components/esp_hw_support/include/esp_private
 
-ifeq (esp32h2,$(CPU_FAM))
-  INCLUDES += -I$(ESP32_SDK_DIR)/components/esp_hw_support/include/esp_private
+ifneq (,$(filter esp32c6 esp32h2,$(CPU_FAM)))
   INCLUDES += -I$(ESP32_SDK_DIR)/components/esp_hw_support/port/$(CPU_FAM)/private_include
 endif
 
 ifeq (esp32s3,$(CPU_FAM))
-  INCLUDES += -I$(ESP32_SDK_DIR)/components/spi_flash/include/spi_flash
+  INCLUDES += -I$(ESP32_SDK_DIR)/components/spi_flash/include/esp_flash_chips
 endif
 
 ifneq (,$(filter periph_i2c%,$(USEMODULE)))

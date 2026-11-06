@@ -1,14 +1,14 @@
-From b21ceb6f079a63d05552831d372de5d8bbda1173 Mon Sep 17 00:00:00 2001
+From dd13624cab412b7a566cc16de032d98079845de4 Mon Sep 17 00:00:00 2001
 From: Gunar Schorcht <gunar@schorcht.net>
 Date: Mon, 20 Jan 2025 21:49:10 +0100
-Subject: [PATCH 01/28] compilation: avoid multiple definitions of macros
+Subject: [PATCH 01/51] compilation: avoid multiple definitions of macros
 
 ---
  components/xtensa/include/xtensa/xtruntime-frames.h | 7 +++++++
  1 file changed, 7 insertions(+)
 
 diff --git a/components/xtensa/include/xtensa/xtruntime-frames.h b/components/xtensa/include/xtensa/xtruntime-frames.h
-index b78095e0dd..4a5b4d356a 100644
+index 3557e0c17b..1be9a749a7 100644
 --- a/components/xtensa/include/xtensa/xtruntime-frames.h
 +++ b/components/xtensa/include/xtensa/xtruntime-frames.h
 @@ -29,6 +29,13 @@
@@ -26,5 +26,5 @@ index b78095e0dd..4a5b4d356a 100644
  #if defined(_ASMLANGUAGE) || defined(__ASSEMBLER__)
  
 -- 
-2.34.1
+2.43.0
 

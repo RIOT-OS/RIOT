@@ -1,0 +1,26 @@
+From f0719e8e07608e08827e22d4bdf9206611ce8bd5 Mon Sep 17 00:00:00 2001
+From: Gunar Schorcht <gunar@schorcht.net>
+Date: Mon, 31 Mar 2025 09:18:33 +0200
+Subject: [PATCH 32/51] hal/esp32h2/spimem_flash_ll: fix signed/unsigned
+ comparison
+
+---
+ components/esp_hal_mspi/esp32h2/include/hal/spimem_flash_ll.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/components/esp_hal_mspi/esp32h2/include/hal/spimem_flash_ll.h b/components/esp_hal_mspi/esp32h2/include/hal/spimem_flash_ll.h
+index b305c17338..6291ea7c8b 100644
+--- a/components/esp_hal_mspi/esp32h2/include/hal/spimem_flash_ll.h
++++ b/components/esp_hal_mspi/esp32h2/include/hal/spimem_flash_ll.h
+@@ -355,7 +355,7 @@ static inline void spimem_flash_ll_get_buffer_data(spi_mem_dev_t *dev, void *buf
+     } else {
+         // Otherwise, slow(er) path copies word by word
+         int copy_len = read_len;
+-        for (int i = 0; i < (read_len + 3) / 4; i++) {
++        for (uint32_t i = 0; i < (read_len + 3) / 4; i++) {
+             int word_len = MIN(sizeof(uint32_t), copy_len);
+             uint32_t word = dev->data_buf[i];
+             memcpy(buffer, &word, word_len);
+-- 
+2.43.0
+

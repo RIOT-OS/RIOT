@@ -1,17 +1,17 @@
-From 0065ed08bb49264552b1f966196736872e27eba2 Mon Sep 17 00:00:00 2001
+From 23bf0a6ea216e5d8bfa45dbb90ae10c178b0a32f Mon Sep 17 00:00:00 2001
 From: Gunar Schorcht <gunar@schorcht.net>
 Date: Sat, 1 Mar 2025 18:28:29 +0100
-Subject: [PATCH 18/28] freertos/portasm: changes for RIOT for riscv32
+Subject: [PATCH 18/51] freertos/portasm: changes for RIOT for riscv32
 
 ---
- .../FreeRTOS-Kernel/portable/riscv/portasm.S  | 33 ++++++++++++++++---
- 1 file changed, 28 insertions(+), 5 deletions(-)
+ .../FreeRTOS-Kernel/portable/riscv/portasm.S  | 34 +++++++++++++++----
+ 1 file changed, 28 insertions(+), 6 deletions(-)
 
 diff --git a/components/freertos/FreeRTOS-Kernel/portable/riscv/portasm.S b/components/freertos/FreeRTOS-Kernel/portable/riscv/portasm.S
-index 5f32c613a0..f6ba4eb72b 100644
+index be5b80e8a3..fbf8523206 100644
 --- a/components/freertos/FreeRTOS-Kernel/portable/riscv/portasm.S
 +++ b/components/freertos/FreeRTOS-Kernel/portable/riscv/portasm.S
-@@ -4,17 +4,30 @@
+@@ -4,18 +4,30 @@
   * SPDX-License-Identifier: Apache-2.0
   */
  #include "sdkconfig.h"
@@ -21,6 +21,7 @@ index 5f32c613a0..f6ba4eb72b 100644
 -#include "riscv/rvruntime-frames.h"
 -#include "riscv/csr_hwlp.h"
 -#include "riscv/csr_pie.h"
+-#include "riscv/csr_dsp.h"
  
      .extern pxCurrentTCBs
  
@@ -47,7 +48,7 @@ index 5f32c613a0..f6ba4eb72b 100644
  #endif
  
      .global port_uxInterruptNesting
-@@ -30,6 +43,14 @@
+@@ -32,6 +44,14 @@
      .global esp_hw_stack_guard_set_bounds
  #endif /* CONFIG_ESP_SYSTEM_HW_STACK_GUARD */
  
@@ -62,7 +63,7 @@ index 5f32c613a0..f6ba4eb72b 100644
      .section .text
  
  
-@@ -707,7 +728,9 @@ no_switch_restored:
+@@ -855,7 +875,9 @@ restore_stack_pointer:
  #else
      /* Recover the stack of next task */
      lw      a0, pxCurrentTCBs
@@ -71,7 +72,7 @@ index 5f32c613a0..f6ba4eb72b 100644
 +rtos_enter_isr_stack:
  #endif /* ( configNUM_CORES > 1 ) */
  
- 
+ #if ( configNUM_CORES > 1 )
 -- 
-2.34.1
+2.43.0
 

@@ -289,13 +289,13 @@ static struct syscall_stub_table s_stub_table =
 #endif
 /* if mpaland-printf is used, do not keep references to _printf_float here to
  * not pull in two stdio implementations */
-#if CONFIG_NEWLIB_NANO_FORMAT && !MODULE_MPALAND_PRINTF
+#if CONFIG_LIBC_NEWLIB_NANO_FORMAT && !MODULE_MPALAND_PRINTF
     ._printf_float = &_printf_float,
     ._scanf_float = &_scanf_float,
-#else /* CONFIG_NEWLIB_NANO_FORMAT */
+#else /* CONFIG_LIBC_NEWLIB_NANO_FORMAT */
     ._printf_float = NULL,
     ._scanf_float = NULL,
-#endif /* CONFIG_NEWLIB_NANO_FORMAT */
+#endif /* CONFIG_LIBC_NEWLIB_NANO_FORMAT */
 #if !defined(CPU_FAM_ESP32) && !defined(CPU_FAM_ESP32S2)
     .__assert_func = &_riot__assert_func,
     .__sinit = &_riot__sinit,
@@ -438,8 +438,8 @@ void IRAM syscalls_init_arch(void)
                                  ESP_CLK_TREE_SRC_FREQ_PRECISION_CACHED,
                                  &clk_freq);
 
-    timer_ll_set_clock_source(sys_timer.dev, sys_timer.timer_id, GPTIMER_CLK_SRC_DEFAULT);
-    timer_ll_enable_clock(sys_timer.dev, sys_timer.timer_id, true);
+    timer_ll_set_clock_source(TIMER_SYSTEM_GROUP, sys_timer.timer_id, GPTIMER_CLK_SRC_DEFAULT);
+    timer_ll_enable_clock(TIMER_SYSTEM_GROUP, sys_timer.timer_id, true);
     timer_ll_set_clock_prescale(sys_timer.dev, sys_timer.timer_id, clk_freq / MHZ);
     timer_ll_set_count_direction(sys_timer.dev, sys_timer.timer_id, GPTIMER_COUNT_UP);
     timer_ll_enable_auto_reload(sys_timer.dev, sys_timer.timer_id, false);

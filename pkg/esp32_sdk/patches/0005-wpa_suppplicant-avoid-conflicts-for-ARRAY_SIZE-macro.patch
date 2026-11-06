@@ -1,17 +1,17 @@
-From e3f73720b24abaa73b6f818c954b6dbdc0d879b3 Mon Sep 17 00:00:00 2001
+From 6f1fca180cb152754bbc2b1b0cd30d3f33703330 Mon Sep 17 00:00:00 2001
 From: Gunar Schorcht <gunar@schorcht.net>
 Date: Sat, 1 Mar 2025 17:38:43 +0100
-Subject: [PATCH 05/28] wpa_suppplicant: avoid conflicts for ARRAY_SIZE macro
+Subject: [PATCH 05/51] wpa_suppplicant: avoid conflicts for ARRAY_SIZE macro
 
 ---
  components/wpa_supplicant/src/utils/common.h | 3 +++
  1 file changed, 3 insertions(+)
 
 diff --git a/components/wpa_supplicant/src/utils/common.h b/components/wpa_supplicant/src/utils/common.h
-index 998870e90f..8f01822939 100644
+index 4fa4e11798..549c21a733 100644
 --- a/components/wpa_supplicant/src/utils/common.h
 +++ b/components/wpa_supplicant/src/utils/common.h
-@@ -449,7 +449,10 @@ struct wpa_freq_range_list {
+@@ -456,7 +456,10 @@ struct wpa_freq_range_list {
  	unsigned int num;
  };
  
@@ -23,5 +23,5 @@ index 998870e90f..8f01822939 100644
  #define TEST_FAIL() 0
  #endif
 -- 
-2.34.1
+2.43.0
 

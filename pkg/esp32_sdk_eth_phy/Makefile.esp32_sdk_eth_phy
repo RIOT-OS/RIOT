@@ -1,0 +1,11 @@
+MODULE = esp32_sdk_eth_phy
+
+SRC = \
+  dp83848/src/esp_eth_phy_dp83848.c \
+  ip101/src/esp_eth_phy_ip101.c \
+  ksz80xx/src/esp_eth_phy_ksz80xx.c \
+  lan87xx/src/esp_eth_phy_lan87xx.c \
+  rtl8201/src/esp_eth_phy_rtl8201.c \
+  #
+
+include $(RIOTBASE)/Makefile.base
