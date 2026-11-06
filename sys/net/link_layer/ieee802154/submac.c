@@ -409,8 +409,10 @@ static ieee802154_submac_fsm_return_t _handle_fsm_ev_request_tx(ieee802154_subma
 static ieee802154_submac_fsm_return_t _handle_fsm_ev_tx_ack(ieee802154_submac_t *submac,
                                                             uint8_t seq_num)
 {
-    /* TODO: set pending bit accordingly, currently always 0 */
     uint8_t ack[] = { IEEE802154_FCF_TYPE_ACK, 0x00,  seq_num };
+    if (submac->frame_pending){
+        ack[0] |= IEEE802154_FCF_FRAME_PEND;
+    }
     iolist_t iolist = {
         .iol_base = ack,
         .iol_len = sizeof(ack),
