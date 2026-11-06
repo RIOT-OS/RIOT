@@ -10,12 +10,12 @@ from testrunner import run
 VALUE = 42
 STRING = 'test'
 
-STRING_FORMAT = '{}{}Logging value \'{}\' and string \'{}\''
-ERROR = '\033[1;31m'
-WARNING = '\033[1;33m'
-INFO = '\033[1m'
-DEBUG = '\033[0;32m'
-RESET = '\033[0m'
+STRING_FORMAT = "{}{}Logging value '{}' and string '{}'"
+ERROR = '\x1b[1;31m'
+WARNING = '\x1b[1;33m'
+INFO = '\x1b[1m'
+DEBUG = '\x1b[32m'
+RESET = '\x1b[0m'
 
 LEVELS = [ERROR, WARNING, INFO, DEBUG]
 

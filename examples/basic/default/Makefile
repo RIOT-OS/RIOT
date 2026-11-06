@@ -33,6 +33,7 @@ USEMODULE += shell_cmds_default
 USEMODULE += ps
 # include and auto-initialize all available sensors
 USEMODULE += saul_default
+USEMODULE += log_clownfish
 
 # Use a network interface, if available. The handling is done in
 # Makefile.board.dep, which is processed recursively as part of the dependency
