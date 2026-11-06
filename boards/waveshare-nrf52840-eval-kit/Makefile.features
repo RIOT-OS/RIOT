@@ -15,4 +15,3 @@ FEATURES_PROVIDED += arduino_pins
 FEATURES_PROVIDED += arduino_pwm
 FEATURES_PROVIDED += arduino_shield_uno
 FEATURES_PROVIDED += sdcard_spi
-FEATURES_PROVIDED += tinyusb_device
