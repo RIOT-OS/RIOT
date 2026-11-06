@@ -42,6 +42,10 @@ extern "C" {
 #include "psa_periph_hashes_ctx.h"
 #endif
 
+#if IS_USED(MODULE_PSA_CRYPTOSERVICE_HASHES_SHA256)
+#include "CYS_hashes.h"
+#endif
+
 /**
  * @brief   Structure containing the hash contexts needed by the application.
  */

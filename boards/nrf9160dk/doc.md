@@ -39,6 +39,16 @@ A secure image has to be present in flash; the non-secure application does not
 boot on its own. The secure image configures which flash, RAM and
 peripherals are handed over to the non-secure world.
 
+The `riot-tee` package provides such a secure image. When it is used, it is
+built together with the application, and `make flash` writes both images:
+
+```shell
+make BOARD=nrf9160dk -C tests/sys/psa_riot_tee flash
+```
+
+The application is linked behind the flash and RAM that riot-tee reserves for
+itself. The sizes are set in `pkg/riot-tee/riot-tee-layout.mk`.
+
 ### Accessing STDIO via UART
 
 The STDIO is directly accessible via the USB port. On a Linux host, it's
