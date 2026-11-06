@@ -1,0 +1,25 @@
+# Copyright (c) 2022 Nicole Faerber, Siegen, Germany
+#
+# This file is subject to the terms and conditions of the GNU Lesser
+# General Public License v2.1. See the file LICENSE in the top level
+# directory for more details.
+
+config BOARD
+    default "banglejs2" if BOARD_BANGLEJS2
+
+config BOARD_BANGLEJS2
+    bool
+    default y
+    select BOARD_COMMON_NRF52
+    select CPU_MODEL_NRF52840XXAA
+    select HAS_PERIPH_I2C
+    select HAS_PERIPH_SPI
+    select HAS_PERIPH_UART
+    select HAS_PERIPH_PWM
+    select HAS_VDD_LC_FILTER_REG1
+    select HAVE_CST816S
+    select HAVE_LPM013M126
+    select HAVE_MTD_SPI_NOR
+    select HAVE_BMP280_I2C
+
+source "$(RIOTBOARD)/common/nrf52/Kconfig"
