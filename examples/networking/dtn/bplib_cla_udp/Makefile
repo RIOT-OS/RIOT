@@ -6,6 +6,7 @@ BOARD ?= native
 
 # This has to be the absolute path to the RIOT base directory:
 RIOTBASE ?= $(CURDIR)/../../../..
+RIOTMAKE ?= $(RIOTBASE)/makefiles
 
 # Include bplib and the configuration modules
 USEPKG += bplib
@@ -28,20 +29,28 @@ CFLAGS += -DCONFIG_BPLIB_STOR_BASE=\"/nvm0/bp\"
 # ability of bplib can be disabled with the `bplib_no_vfs` module.
 CFLAGS += -DBPLIB_TIME_FILE_NAME=\"/nvm0/bp_time.dat\"
 
+include $(RIOTMAKE)/color.inc.mk
+
 # Example configuration
 ifeq (,$(REMOTE))
-  $(warning REMOTE IPv6 address not set, defaulting to [::1])
+  ifeq (,$(filter info-% generate-%,$(MAKECMDGOALS)))
+    $(call echowarn,("REMOTE IPv6 address not set, defaulting to [::1]"))
+  endif
   REMOTE := ::1
 endif
 CFLAGS += -DBPLIB_EXAMPLE_IP_REMOTE=\"$(REMOTE)\"
 ifeq (,$(REMOTE_EID_NODE))
-  $(warning REMOTE_EID_NODE destination node number not set, defaulting to 100)
+  ifeq (,$(filter info-% generate-%,$(MAKECMDGOALS)))
+    $(call echowarn,("REMOTE_EID_NODE destination node number not set, defaulting to 100"))
+  endif
   REMOTE_EID_NODE := 100
 endif
 # This sets the destination node number
 CFLAGS += -DBPLIB_EXAMPLE_REMOTE_NODE_NO=$(REMOTE_EID_NODE)
 ifeq (,$(LOCAL_EID_NODE))
-  $(warning LOCAL_EID_NODE destination node number not set, defaulting to 100)
+  ifeq (,$(filter info-% generate-%,$(MAKECMDGOALS)))
+    $(call echowarn,("LOCAL_EID_NODE destination node number not set, defaulting to 100"))
+  endif
   LOCAL_EID_NODE := 100
 endif
 # This sets the node number of the device that runs bplib.
