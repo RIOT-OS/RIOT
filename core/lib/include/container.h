@@ -79,6 +79,47 @@ extern "C" {
 #define ARRAY_SIZE(a) (sizeof((a)) / sizeof((a)[0]))
 #endif
 
+/**
+ * @brief        Size in bytes of a container type's member as a constant compile-time expression
+ *
+ * @param TYPE   Type of the container
+ * @param MEMBER Member designator, not evaluated (must not be bit field or flexible array member)
+ *
+ * @returns      Number of bytes occupied by the member as an integer constant expression
+ *
+ * Use this macro to get the size of a `struct` or `union` member when there's no instance
+ * of @p TYPE in scope you could use to get the member's size using `sizeof`.
+ *
+ * ## Examples
+ * ```c
+ * typedef struct {
+ *     int result;
+ * } bar_t;
+ *
+ * typedef struct foo {
+ *     uint32_t flags;
+ *     uint16_t message[42];
+ *     bar_t bar;
+ *     struct foo* next;
+ * } foo_t;
+ * ```
+ *
+ * Instead of `sizeof(instance->member)` or `sizeof(instance.member)`, you can write
+ * `MEMBER_SIZE(type_t, member)`:
+ *
+ * ```c
+ * MEMBER_SIZE(foo_t, flags)
+ * MEMBER_SIZE(foo_t, message)
+ * MEMBER_SIZE(foo_t, message[0])
+ * MEMBER_SIZE(struct foo, bar)
+ * MEMBER_SIZE(foo_t, bar.result)
+ * MEMBER_SIZE(foo_t, next->bar.result)
+ * ```
+ */
+#if !defined(MEMBER_SIZE) || defined(DOXYGEN)
+#  define MEMBER_SIZE(TYPE, MEMBER) (sizeof(((TYPE *)NULL)->MEMBER))
+#endif
+
 #ifdef __cplusplus
 }
 #endif
