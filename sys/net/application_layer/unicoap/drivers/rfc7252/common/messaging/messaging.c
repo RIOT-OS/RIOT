@@ -204,7 +204,7 @@ static inline _carbon_copy_t *_state_get_carbon_copies(void)
     return NULL;
 }
 
-static inline size_t _state_get_carbon_copies_len(void)
+static inline size_t _state_get_carbon_copies_capacity(void)
 {
 #if CONFIG_UNICOAP_CARBON_COPIES_MAX > 0
     return ARRAY_SIZE(_state()->carbon_copies);
@@ -220,7 +220,7 @@ static inline _transmission_t *_state_get_transmissions(void)
     return NULL;
 }
 
-static inline size_t _state_get_transmissions_len(void)
+static inline size_t _state_get_transmissions_capacity(void)
 {
 #if CONFIG_UNICOAP_RFC7252_TRANSMISSIONS_CAPACITY > 0
     return ARRAY_SIZE(_state()->transmissions);
@@ -253,7 +253,7 @@ static _carbon_copy_t* _carbon_copy_alloc(void)
 {
     /* Find empty slot in list of open requests. */
     _carbon_copy_t *carbon_copies = _state_get_carbon_copies();
-    for (size_t i = 0; i < _state_get_carbon_copies_len(); i += 1) {
+    for (size_t i = 0; i < _state_get_carbon_copies_capacity(); i += 1) {
         /* Will never be zero due to CoAP version 1 bit. Zero indicates 'free' buffer */
         if (*carbon_copies[i].pdu == 0) {
             /* Claim that buffer by setting first byte to 0xff. Later, we adjust that. */
@@ -274,7 +274,7 @@ static inline _transmission_t* _transmission_alloc(void)
 {
     /* Find empty slot in list of open requests. */
     _transmission_t *transmissions = _state_get_transmissions();
-    for (size_t i = 0; i < _state_get_transmissions_len(); i += 1) {
+    for (size_t i = 0; i < _state_get_transmissions_capacity(); i += 1) {
         if (!transmissions[i].is_used) {
             transmissions[i].is_used = true;
             return &transmissions[i];
@@ -327,7 +327,7 @@ static _transmission_t* _transmission_create(const unicoap_endpoint_t* endpoint,
 static _transmission_t* _transmission_find(const unicoap_endpoint_t* endpoint, uint16_t id)
 {
     _transmission_t *transmissions = _state_get_transmissions();
-    for (size_t i = 0; i < _state_get_transmissions_len(); i += 1) {
+    for (size_t i = 0; i < _state_get_transmissions_capacity(); i += 1) {
         _transmission_t* transmission = &transmissions[i];
         if (transmission->is_used &&
             transmission->id == id &&
@@ -712,7 +712,7 @@ static inline int _reset(unicoap_packet_t* packet)
 static int _resume(const unicoap_endpoint_t* endpoint, unicoap_sock_dtls_session_t* session)
 {
     _transmission_t *transmissions = _state_get_transmissions();
-    for (size_t i = 0; i < _state_get_transmissions_len(); i += 1) {
+    for (size_t i = 0; i < _state_get_transmissions_capacity(); i += 1) {
         _transmission_t* transmission = &transmissions[i];
         if (transmission->is_used &&
             unicoap_endpoint_is_equal(&transmission->endpoint, endpoint)) {
@@ -1061,7 +1061,7 @@ void unicoap_messaging_print_rfc7252_state(void)
            (size_t)CONFIG_UNICOAP_RFC7252_TRANSMISSIONS_CAPACITY);
 
     _transmission_t *transmissions = _state_get_transmissions();
-    for (size_t i = 0; i < _state_get_transmissions_len(); i += 1) {
+    for (size_t i = 0; i < _state_get_transmissions_capacity(); i += 1) {
         _transmission_t* transmission = &transmissions[i];
         printf("\t\t- transmission #%" PRIuSIZE "\n", i);
 
@@ -1080,7 +1080,7 @@ void unicoap_messaging_print_rfc7252_state(void)
            (size_t)CONFIG_UNICOAP_CARBON_COPIES_MAX);
 
     _carbon_copy_t *carbon_copies = _state_get_carbon_copies();
-    for (size_t i = 0; i < _state_get_carbon_copies_len(); i += 1) {
+    for (size_t i = 0; i < _state_get_carbon_copies_capacity(); i += 1) {
         printf("\t\t- carbon_copy #%" PRIuSIZE " capacity=%" PRIuSIZE "B used=%u\n", i,
                sizeof(carbon_copies[i]), *carbon_copies[i] != 0);
     }
