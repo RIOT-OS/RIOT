@@ -1,1 +1,3 @@
+CFLAGS += -DCPU_MODEL_$(call uppercase_and_underscore,$(CPU_MODEL))
+
 include $(RIOTCPU)/arm7_common/Makefile.include
