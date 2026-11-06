@@ -19,7 +19,22 @@ ifeq (,$(CPU))
   $(error $(BOARD): CPU must be defined by board / board_common Makefile.features)
 endif
 
-include $(RIOTCPU)/$(CPU)/Makefile.features
+# Resolve nested CPU family paths, e.g. cpu/sam0/samd21 or cpu/sam/sam4s.
+CPU_DIR := $(strip $(CPU_DIR))
+ifeq ($(CPU_DIR),)
+  CPU_DIR := $(CPU)
+endif
+ifneq ($(wildcard $(RIOTCPU)/$(CPU)/Makefile.features),)
+  CPU_DIR := $(CPU)
+else
+  _cpu_dir_candidates := $(wildcard $(RIOTCPU)/*/$(CPU)/Makefile.features)
+  ifneq ($(_cpu_dir_candidates),)
+    CPU_DIR := $(patsubst %/Makefile.features,%,$(patsubst $(RIOTCPU)/%,%,$(firstword $(_cpu_dir_candidates))))
+  endif
+endif
+export CPU_DIR
+
+include $(RIOTCPU)/$(CPU_DIR)/Makefile.features
 
 # Provide CPU as a feature to allow listing all boards with a CPU
 FEATURES_PROVIDED += cpu_$(CPU)
