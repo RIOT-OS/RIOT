@@ -1,6 +1,21 @@
+ifneq (,$(filter periph_adc_dma,$(USEMODULE)))
+  FEATURES_REQUIRED += periph_adc
+  USEMODULE += periph_dma
+endif
+
 ifneq (,$(filter periph_dac_play,$(USEMODULE)))
   USEMODULE += periph_dma
   FEATURES_REQUIRED += periph_dac
+endif
+
+ifneq (,$(filter periph_dma_event,$(USEMODULE)))
+  FEATURES_REQUIRED += periph_dma
+  FEATURES_REQUIRED += periph_event
+endif
+
+ifneq (,$(filter periph_gpio_event,$(USEMODULE)))
+  FEATURES_REQUIRED += periph_gpio
+  FEATURES_REQUIRED += periph_event
 endif
 
 ifneq (,$(filter periph_uart_nonblocking,$(USEMODULE)))
