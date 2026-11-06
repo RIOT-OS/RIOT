@@ -412,10 +412,10 @@ static ieee802154_submac_fsm_return_t _handle_fsm_ev_tx_ack(ieee802154_submac_t 
                                                             uint8_t seq_num)
 {
     uint8_t ack[] = { IEEE802154_FCF_TYPE_ACK, 0x00,  seq_num };
-
     if (submac->frame_pending) {
         ack[0] |= IEEE802154_FCF_FRAME_PEND;
     }
+
     iolist_t iolist = {
         .iol_base = ack,
         .iol_len = sizeof(ack),
@@ -629,7 +629,6 @@ static ieee802154_submac_fsm_return_t _fsm_state_tx_process_tx_done(ieee802154_s
     case TX_STATUS_FRAME_PENDING:
         assert(_does_handle_ack(dev));
         info->frame_pending = true;
-
     /* FALL-THRU */
     case TX_STATUS_SUCCESS:
         _set_csma_retries_nb(submac, 0);
@@ -1238,9 +1237,9 @@ int ieee802154_submac_config_src_address_match(ieee802154_submac_t *submac,
     }
     else {
         if (cmd != IEEE802154_SRC_MATCH_EN) {
-            return -ENOTSUP;
+            return -ENOTSUP; 
         }
-        submac->frame_pending = value;
+        submac->frame_pending = *(const bool *)value;
     }
     return 0;
 }
