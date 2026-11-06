@@ -165,6 +165,13 @@ typedef struct {
      * @brief   ISR event for the network device
      */
     event_t event_isr;
+#if IS_USED(MODULE_GNRC_NETIF_PKTQ) || defined(DOXYGEN)
+    /**
+     * @brief   Dequeue event for GNRC Pktq
+     */
+    event_t event_pktq;
+#endif
+
 #if IS_USED(MODULE_NETDEV_NEW_API) || defined(DOXYGEN)
     /**
      * @brief   TX done event for the network device
