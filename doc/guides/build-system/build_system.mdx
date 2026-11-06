@@ -38,7 +38,7 @@ Besides typical targets like `clean`, `all`, or `doc`, RIOT provides the
 special targets `flash` and `term` to invoke the configured flashing and
 terminal tools for the specified platform. These targets use the variable
 `PORT` for the serial communication to the device, which defaults to
-`/dev/ttyACM0` and `/dev/tty.usbmodem*` on Linux and macOS, respectively.
+`/dev/ttyACM0` and `/dev/cu.usbmodem*` on Linux and macOS, respectively.
 ([source](https://github.com/RIOT-OS/RIOT/blob/master/makefiles/tools/serial.inc.mk#L37-L38)).
 Setting `MOST_RECENT_PORT=1` enables a more sophisticated serial port selection
 algorithm, which selects the most recently connected serial port whose metadata

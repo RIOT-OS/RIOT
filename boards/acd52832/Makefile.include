@@ -1,4 +1,5 @@
 # set default port depending on operating system
 PORT_LINUX ?= /dev/ttyUSB0
+PORT_DARWIN ?= $(firstword $(sort $(wildcard /dev/cu.usbserial*)))
 
 include $(RIOTBOARD)/common/nrf52/Makefile.include

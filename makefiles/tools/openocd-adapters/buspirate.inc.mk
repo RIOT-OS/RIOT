@@ -5,7 +5,7 @@
 #   CLK - SWCLK
 
 ifeq ($(OS),Darwin)
-  PROG_DEV ?= $(firstword $(sort $(wildcard /dev/tty.usbmodem*)))
+  PROG_DEV ?= $(firstword $(sort $(wildcard /dev/cu.usbserial*)))
 else
   PROG_DEV ?= /dev/ttyUSB0
 endif
