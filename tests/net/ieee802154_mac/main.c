@@ -194,7 +194,7 @@ static void my_scan_confirm(void *arg, int status,
                             ieee802154_mlme_scan_req_t *req)
 {
     (void)arg;
-    printf("SCAN confirm res=%d (%s), results=%u\n",
+    printf("SCAN confirm res=%d (%s), results=%zu\n",
            status, strerror(-status), *req->results_used);
     for (size_t i = 0; i < *req->results_used; i++) {
         char addr_str[IEEE802154_LONG_ADDRESS_LEN_STR_MAX];
