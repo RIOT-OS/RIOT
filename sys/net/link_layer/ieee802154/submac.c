@@ -360,7 +360,7 @@ static ieee802154_submac_fsm_return_t _tx_end(ieee802154_submac_t *submac, int s
     int res;
 
     /* This is required to prevent unused variable warnings */
-    (void) res;
+    (void)res;
 
     ieee802154_dev_t *dev = &submac->dev;
 
@@ -369,7 +369,7 @@ static ieee802154_submac_fsm_return_t _tx_end(ieee802154_submac_t *submac, int s
     if ((submac->tx_opts & IEEE802154_SUBMAC_TX_OPT_NO_RETRANS) &&
         ieee802154_radio_has_frame_retrans(dev)) {
         res = ieee802154_radio_set_frame_retrans(dev,
-                                                CONFIG_IEEE802154_DEFAULT_MAX_FRAME_RETRANS);
+                                                 CONFIG_IEEE802154_DEFAULT_MAX_FRAME_RETRANS);
         assert(res >= 0);
     }
     if (submac->tx_opts & IEEE802154_SUBMAC_TX_OPT_NO_CSMA_CA) {
@@ -384,10 +384,12 @@ static ieee802154_submac_fsm_return_t _tx_end(ieee802154_submac_t *submac, int s
     return _state_transition(&submac->fsm, _fsm_state_idle);
 }
 
-static inline void _print_state_transition(ieee802154_fsm_state_cb_t old, ieee802154_fsm_state_cb_t new,
+static inline void _print_state_transition(ieee802154_fsm_state_cb_t old,
+                                           ieee802154_fsm_state_cb_t new,
                                            ieee802154_fsm_ev_t ev)
 {
-    DEBUG("IEEE802154 submac: %s--(%s)->%s\n", get_state_name(old), str_ev[ev], get_state_name(new));
+    DEBUG("IEEE802154 submac: %s--(%s)->%s\n", get_state_name(old), str_ev[ev],
+          get_state_name(new));
 }
 
 static inline void _print_state_event(ieee802154_fsm_state_cb_t state, ieee802154_fsm_ev_t ev)
@@ -400,7 +402,7 @@ static ieee802154_submac_fsm_return_t _handle_tx_no_ack(ieee802154_submac_t *sub
     int res;
 
     /* This is required to prevent unused variable warnings */
-    (void) res;
+    (void)res;
 
     /* In case of ACK Timeout, either trigger retransmissions or end
      * the TX procedure */
@@ -442,6 +444,7 @@ static ieee802154_submac_fsm_return_t _handle_fsm_ev_tx_ack(ieee802154_submac_t 
         .iol_len = sizeof(ack),
         .iol_next = NULL
     };
+
     _set_wait_for_ack(submac, false);
     _set_retrans(submac, 0);
     _set_csma_retries_nb(submac, 0);
@@ -457,7 +460,7 @@ static ieee802154_submac_fsm_return_t _handle_fsm_ev_tx_ack(ieee802154_submac_t 
 static ieee802154_submac_fsm_return_t _fsm_state_invalid(ieee802154_submac_t *submac,
                                                          ieee802154_fsm_ev_t ev)
 {
-    (void) submac;
+    (void)submac;
     assert(false);
     switch (ev) {
     case IEEE802154_FSM_EV_ENTRY:
@@ -474,7 +477,7 @@ static ieee802154_submac_fsm_return_t _fsm_state_rx(ieee802154_submac_t *submac,
     int res;
 
     /* This is required to prevent unused variable warnings */
-    (void) res;
+    (void)res;
 
     switch (ev) {
     case IEEE802154_FSM_EV_REQUEST_SET_RX_ON:
@@ -653,7 +656,7 @@ static ieee802154_submac_fsm_return_t _fsm_state_tx_process_tx_done(ieee802154_s
     int res;
 
     /* This is required to prevent unused variable warnings */
-    (void) res;
+    (void)res;
 
     switch (info->status) {
     case TX_STATUS_FRAME_PENDING:
@@ -709,7 +712,7 @@ static ieee802154_submac_fsm_return_t _fsm_state_tx(ieee802154_submac_t *submac,
     int res;
 
     /* This is required to prevent unused variable warnings */
-    (void) res;
+    (void)res;
 
     switch (ev) {
     case IEEE802154_FSM_EV_TX_DONE:
@@ -863,8 +866,8 @@ int ieee802154_send(ieee802154_submac_t *submac, const iolist_t *iolist)
 }
 
 int ieee802154_send_opts(ieee802154_submac_t *submac,
-                        const iolist_t *iolist,
-                        ieee802154_submac_tx_opts_t tx_opts)
+                         const iolist_t *iolist,
+                         ieee802154_submac_tx_opts_t tx_opts)
 {
     if (iolist == NULL) {
         return 0;
@@ -954,7 +957,7 @@ static inline uint8_t _mr_oqpsk_ack_psdu_duration_syms(uint8_t chips, uint8_t mo
 
     /* phyPSDUDuration = ceiling(Npsdu / Ns) + ceiling(Npsdu / Mp) */
     /* with Mp = Np * 16, see Table 182 */
-    return (Npsdu + Ns/2) / Ns + (Npsdu + 8 * Ns) / (16 * Ns);
+    return (Npsdu + Ns / 2) / Ns + (Npsdu + 8 * Ns) / (16 * Ns);
 }
 
 MAYBE_UNUSED
@@ -962,19 +965,19 @@ static inline uint16_t _mr_oqpsk_ack_timeout_us(const ieee802154_mr_oqpsk_conf_t
 {
     /* see 802.15.4g-2012, p. 30 */
     uint16_t symbols = _mr_oqpsk_cca_duration_syms(conf->chips)
-                     + _mr_oqpsk_shr_duration_syms(conf->chips)
-                     + 15   /* PHR duration */
-                     + _mr_oqpsk_ack_psdu_duration_syms(conf->chips, conf->rate_mode);
+                       + _mr_oqpsk_shr_duration_syms(conf->chips)
+                       + 15 /* PHR duration */
+                       + _mr_oqpsk_ack_psdu_duration_syms(conf->chips, conf->rate_mode);
 
     return _mr_oqpsk_symbol_duration_us(conf->chips) * symbols
-         + IEEE802154G_ATURNAROUNDTIME_US;
+           + IEEE802154G_ATURNAROUNDTIME_US;
 }
 
 MAYBE_UNUSED
 static inline uint16_t _mr_oqpsk_csma_backoff_period_us(const ieee802154_mr_oqpsk_conf_t *conf)
 {
     return _mr_oqpsk_cca_duration_syms(conf->chips) * _mr_oqpsk_symbol_duration_us(conf->chips)
-         + IEEE802154G_ATURNAROUNDTIME_US;
+           + IEEE802154G_ATURNAROUNDTIME_US;
 }
 
 /*
@@ -995,7 +998,7 @@ static unsigned _mr_ofdm_frame_duration(uint8_t option, uint8_t scheme, uint8_t 
     const unsigned phySHRDuration = 6;
     const unsigned phyPHRDuration = option ? 6 : 3;
     const unsigned phyPDUDuration = ((bytes + 1) * (1 << option) + quot[scheme] - 1)
-                                  / quot[scheme];
+                                    / quot[scheme];
 
     return (phySHRDuration + phyPHRDuration + phyPDUDuration) * IEEE802154_MR_OFDM_SYMBOL_TIME_US;
 }
@@ -1005,15 +1008,15 @@ static inline uint16_t _mr_ofdm_csma_backoff_period_us(const ieee802154_mr_ofdm_
     (void)conf;
 
     return IEEE802154_CCA_DURATION_IN_SYMBOLS * IEEE802154_MR_OFDM_SYMBOL_TIME_US
-         + IEEE802154G_ATURNAROUNDTIME_US;
+           + IEEE802154G_ATURNAROUNDTIME_US;
 }
 
 MAYBE_UNUSED
 static inline uint16_t _mr_ofdm_ack_timeout_us(const ieee802154_mr_ofdm_conf_t *conf)
 {
     return _mr_ofdm_csma_backoff_period_us(conf)
-         + IEEE802154G_ATURNAROUNDTIME_US
-         + _mr_ofdm_frame_duration(conf->option, conf->scheme, IEEE802154_ACK_FRAME_LEN);
+           + IEEE802154G_ATURNAROUNDTIME_US
+           + _mr_ofdm_frame_duration(conf->option, conf->scheme, IEEE802154_ACK_FRAME_LEN);
 }
 
 /*
@@ -1029,7 +1032,7 @@ static inline uint16_t _mr_fsk_csma_backoff_period_us(const ieee802154_mr_fsk_co
     (void)conf;
 
     return IEEE802154_CCA_DURATION_IN_SYMBOLS * IEEE802154_MR_FSK_SYMBOL_TIME_US
-         + IEEE802154G_ATURNAROUNDTIME_US;
+           + IEEE802154G_ATURNAROUNDTIME_US;
 }
 
 MAYBE_UNUSED
@@ -1052,9 +1055,9 @@ static inline uint16_t _mr_fsk_ack_timeout_us(const ieee802154_mr_fsk_conf_t *co
     }
 
     return _mr_fsk_csma_backoff_period_us(conf)
-         + IEEE802154G_ATURNAROUNDTIME_US
-         /* long Preamble + SFD; SFD=2 */
-         + ((fsk_pl * 8 + 2) + ack_len) * 8 * IEEE802154_MR_FSK_SYMBOL_TIME_US;
+           + IEEE802154G_ATURNAROUNDTIME_US
+           /* long Preamble + SFD; SFD=2 */
+           + ((fsk_pl * 8 + 2) + ack_len) * 8 * IEEE802154_MR_FSK_SYMBOL_TIME_US;
 }
 
 static int ieee802154_submac_config_phy(ieee802154_submac_t *submac,
@@ -1201,7 +1204,7 @@ int ieee802154_submac_init(ieee802154_submac_t *submac, const network_uint16_t *
 
     if (ieee802154_radio_has_frame_retrans(&submac->dev)) {
         ieee802154_radio_set_frame_retrans(&submac->dev,
-                CONFIG_IEEE802154_DEFAULT_MAX_FRAME_RETRANS);
+                                           CONFIG_IEEE802154_DEFAULT_MAX_FRAME_RETRANS);
     }
 
     _init_csma(submac);
