@@ -245,11 +245,9 @@ int unicoap_transport_sendv_dtls(iolist_t* iolist, const sock_udp_ep_t* remote,
     sock_dtls_session_set_udp_ep(session, remote);
     /* Get session state to assert session has been established before using connect(). */
     dsm_state_t session_state = dsm_store(&_dtls_socket, session, SESSION_STATE_HANDSHAKE, true);
-    (void)session_state;
-    if (IS_ACTIVE(DEVELHELP) && session_state != SESSION_STATE_ESTABLISHED) {
-        _DTLS_DEBUG("FATAL ERROR: session not established, call connect() before\n");
+    if (session_state != SESSION_STATE_ESTABLISHED) {
+        return -ENOTCONN;
     }
-    assert(session_state == SESSION_STATE_ESTABLISHED);
 
     if (unlikely(local)) {
         sock_dtls_aux_tx_t aux_tx = { .flags = SOCK_AUX_SET_LOCAL, .local = *local };
