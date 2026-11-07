@@ -262,12 +262,61 @@ static void test_pdu_rfc7252_cbor_request_round_trip(void)
     _TEST_ASSERT_EQUAL_BYTES(pdu, pdu_copy, sizeof(pdu));
 }
 
+static void _test_extended_token_round_trip(const uint8_t* pdu, size_t size,
+                                            size_t token_offset, size_t token_length)
+{
+    static uint8_t pdu_copy[280];
+    unicoap_parser_result_t parsed = { 0 };
+
+    TEST_ASSERT_EQUAL_INT(0, unicoap_pdu_parse_rfc7252_result((uint8_t*)pdu, size, &parsed));
+    TEST_ASSERT_EQUAL_INT(token_length, parsed.properties.token_length);
+    TEST_ASSERT(parsed.properties.token == pdu + token_offset);
+
+    TEST_ASSERT_EQUAL_INT(size, unicoap_pdu_build_rfc7252(pdu_copy, sizeof(pdu_copy),
+                                                          &parsed.message,
+                                                          &parsed.properties));
+    _TEST_ASSERT_EQUAL_BYTES(pdu, pdu_copy, size);
+}
+
+static void test_pdu_rfc7252_extended_token_0_round_trip(void)
+{
+    /* CON GET, MID 0x1234, TKL 12 */
+    static const uint8_t pdu[4 + 12] = {
+        0x4c, 0x01, 0x12, 0x34,
+        [4 ... 15] = 0xa5,
+    };
+    _test_extended_token_round_trip(pdu, sizeof(pdu), 4, 12);
+}
+
+static void test_pdu_rfc7252_extended_token_1_round_trip(void)
+{
+    /* CON GET, MID 0x1234, TKL 13, 1 token length byte, 20 bytes token */
+    static const uint8_t pdu[4 + 1 + 20] = {
+        0x4d, 0x01, 0x12, 0x34, 0x07,
+        [5 ... 24] = 0xa5,
+    };
+    _test_extended_token_round_trip(pdu, sizeof(pdu), 5, 20);
+}
+
+static void test_pdu_rfc7252_extended_token_2_round_trip(void)
+{
+    /* CON GET, MID 0x1234, TKL 14, 2 token length bytes, 270 token bytes */
+    static const uint8_t pdu[4 + 2 + 270] = {
+        0x4e, 0x01, 0x12, 0x34, 0x00, 0x01,
+        [6 ... 269] = 0xa5,
+    };
+    _test_extended_token_round_trip(pdu, sizeof(pdu), 6, 270);
+}
+
 Test *tests_unicoap_pdu(void)
 {
     EMB_UNIT_TESTFIXTURES(fixtures){
         new_TestFixture(test_pdu_rfc7252_actuators_round_trip),
         new_TestFixture(test_pdu_rfc7252_method_not_allowed_ack_round_trip),
         new_TestFixture(test_pdu_rfc7252_cbor_request_round_trip),
+        new_TestFixture(test_pdu_rfc7252_extended_token_0_round_trip),
+        new_TestFixture(test_pdu_rfc7252_extended_token_1_round_trip),
+        new_TestFixture(test_pdu_rfc7252_extended_token_2_round_trip),
     };
 
     EMB_UNIT_TESTCALLER(test_unicoap, NULL, NULL, fixtures);
