@@ -4,12 +4,15 @@
  */
 
 #include <string.h>
+#include <errno.h>
 
 #include "mutex.h"
 #include "byteorder.h"
 
 #include "net/ieee802154/mac.h"
 #include "mac_fsm.h"
+#include "mac_queue.h"
+#include "mac_pib.h"
 
 #define ENABLE_DEBUG 0
 #include "debug.h"
@@ -159,6 +162,17 @@ void ieee802154_mac_rx_process(ieee802154_mac_t *mac, iolist_t *buf)
     (void)ieee802154_read_frame(&mac->submac, buf->iol_base, buf->iol_len, &info);
     mutex_unlock(&mac->submac_lock);
     if (!_mac_rx_prepare_ctx(mac, buf, len, &info, &ctx, &ev, &frame_type, &do_fsm)) {
+        ieee802154_pib_value_t rx_on;
+
+        ieee802154_mac_mlme_get(mac, IEEE802154_PIB_RX_ON_WHEN_IDLE, &rx_on);
+
+        if (!rx_on.v.b) {
+            return;
+        }
+
+        if (mac->cbs.rx_request) {
+            mac->cbs.rx_request(mac);
+        }
         return;
     }
     if (do_fsm) {
@@ -171,8 +185,44 @@ void ieee802154_mac_rx_process(ieee802154_mac_t *mac, iolist_t *buf)
             mac->cbs.dealloc_request(mac, buf);
         }
     }
-    if (mac->scan_active)
-    {
+    ieee802154_pib_value_t rx_on;
+
+    ieee802154_mac_mlme_get(mac, IEEE802154_PIB_RX_ON_WHEN_IDLE, &rx_on);
+
+    if (!rx_on.v.b) {
+        return;
+    }
+
+    if (mac->cbs.rx_request) {
         mac->cbs.rx_request(mac);
+    }
+}
+
+void ieee802154_mac_rx_request_process(ieee802154_mac_t *mac)
+{
+    mutex_lock(&mac->submac_lock);
+    if (!mac->rx_retry_pending) {
+        mac->rx_retry_count = 0;
+    }
+    mac->rx_retry_pending = false;
+
+    int res = ieee802154_set_rx(&mac->submac);
+    bool retry = (res == -EBUSY) && mac->cbs.rx_request &&
+                 (mac->rx_retry_count < IEEE802154_MAC_RX_RETRY_MAX);
+
+    if (retry) {
+        mac->rx_retry_count++;
+        mac->rx_retry_pending = true;
+    }
+    else {
+        mac->rx_retry_count = 0;
+    }
+    mutex_unlock(&mac->submac_lock);
+
+    if (retry) {
+        mac->cbs.rx_request(mac);
+    }
+    else if ((res < 0) && (res != -EALREADY)) {
+        DEBUG("IEEE802154 MAC: failed to switch to RX: %d\n", res);
     }
 }

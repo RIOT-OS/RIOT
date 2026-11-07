@@ -118,9 +118,16 @@ static int _mac_data_request(ieee802154_mac_t *mac, const ieee802154_mac_fsm_ctx
 {
     int res = _mac_enqueue_and_tx(mac, ctx, ctx->src_mode, IEEE802154_FCF_TYPE_DATA,
                                   ctx->msdu, &ctx->msdu_handle, ctx->ack_req, ctx->indirect);
+
+    /* Ensure coordinator stays in RX to receive polls after queuing */
     if ((res >= 0) && ctx->indirect && mac->is_coordinator) {
-        /* Ensure coordinator stays in RX to receive polls after queuing */
-        (void)ieee802154_set_rx(&mac->submac);
+        ieee802154_pib_value_t rx_on;
+
+        ieee802154_mac_mlme_get(mac, IEEE802154_PIB_RX_ON_WHEN_IDLE, &rx_on);
+
+        if (rx_on.v.b && mac->cbs.rx_request) {
+            mac->cbs.rx_request(mac);
+        }
     }
     return res;
 }
@@ -689,7 +696,12 @@ static int _mac_fsm_process_ev(ieee802154_mac_t *mac, ieee802154_mac_fsm_ev_t ev
             return res;
         }
         mac->is_coordinator = true;
-        mac->cbs.rx_request(mac);
+        ieee802154_pib_value_t rx_on;
+        ieee802154_mac_mlme_get(mac, IEEE802154_PIB_RX_ON_WHEN_IDLE, &rx_on);
+
+        if (rx_on.v.b && mac->cbs.rx_request) {
+            mac->cbs.rx_request(mac);
+        }
     }
 
     return 0;

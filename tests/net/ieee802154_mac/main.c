@@ -347,9 +347,7 @@ static void _ev_alloc_handler(event_t *event)
 static void _ev_rx_handler(event_t *event)
 {
     (void)event;
-    if (ieee802154_set_rx(&mac.submac) < 0) {
-        printf("error switching back to rx\n");
-    }
+    ieee802154_mac_rx_request_process(&mac);
 }
 
 static void _ev_assoc_indication_handler(event_t *event)
