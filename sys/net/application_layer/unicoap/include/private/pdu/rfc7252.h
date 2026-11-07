@@ -6,6 +6,7 @@
 #pragma once
 
 #include <assert.h>
+#include <stddef.h>
 #include <stdint.h>
 #include "byteorder.h"
 #include "net/unicoap.h"
@@ -177,6 +178,44 @@ static inline uint8_t unicoap_rfc7252_header_get_token_length_indicator(
     const unicoap_rfc7252_header_t* header)
 {
     return header->token_length;
+}
+
+/** @brief The `TKL` value that is reserved for future use */
+#define UNICOAP_RFC7252_TOKEN_LENGTH_INDICATOR_RFU 0xf
+
+/** @brief The upper token length bound representing the token length verbatim */
+#define UNICOAP_RFC7252_TOKEN_LENGTH_VERBATIM_UPPER_BOUND 12
+
+/** @brief The lower token length bound representing the token length using 1 additional byte */
+#define UNICOAP_RFC7252_TOKEN_LENGTH_ONE_BYTE_LOWER_BOUND \
+    (UNICOAP_RFC7252_TOKEN_LENGTH_VERBATIM_UPPER_BOUND + 1)
+
+/** @brief The upper token length bound representing the token length using 1 additional byte */
+#define UNICOAP_RFC7252_TOKEN_LENGTH_ONE_BYTE_UPPER_BOUND \
+    (UNICOAP_RFC7252_TOKEN_LENGTH_VERBATIM_UPPER_BOUND + 0x100)
+
+/** @brief The lower token length bound representing the token length using 2 additional bytes */
+#define UNICOAP_RFC7252_TOKEN_LENGTH_TWO_BYTE_LOWER_BOUND \
+    (UNICOAP_RFC7252_TOKEN_LENGTH_ONE_BYTE_UPPER_BOUND + 1)
+
+/** @brief The upper token length bound representing the token length using 2 additional bytes */
+#define UNICOAP_RFC7252_TOKEN_LENGTH_TWO_BYTE_UPPER_BOUND \
+    (UNICOAP_RFC7252_TOKEN_LENGTH_ONE_BYTE_UPPER_BOUND + 0x10000)
+
+/**
+ * @brief Determines the number of additional PDU bytes necessary to encode token length field
+ *
+ * @param token_length Length of token in bytes
+ *
+ * @retval 0 No additional bytes
+ * @retval 1 8-bit token length field
+ * @retval 2 16-bit token length field
+ */
+static inline uint8_t unicoap_rfc7252_header_extra_token_length_bytes(size_t token_length)
+{
+    assert(token_length < UNICOAP_RFC7252_TOKEN_LENGTH_TWO_BYTE_UPPER_BOUND);
+    return (token_length > UNICOAP_RFC7252_TOKEN_LENGTH_VERBATIM_UPPER_BOUND) +
+           (token_length > UNICOAP_RFC7252_TOKEN_LENGTH_ONE_BYTE_UPPER_BOUND);
 }
 
 /**
