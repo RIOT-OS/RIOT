@@ -21,7 +21,9 @@ ifneq (,$(filter native native32 native64,$(BOARD)))
   USEMODULE += socket_zep
 endif
 
-CFLAGS += -DEVENT_THREAD_MEDIUM_STACKSIZE=1024
+ifeq (,$(filter native native32 native64,$(BOARD)))
+  CFLAGS += -DEVENT_THREAD_MEDIUM_STACKSIZE=1024
+endif
 CFLAGS += -DDEBUG_ASSERT_VERBOSE
 
 include $(RIOTBASE)/Makefile.include
