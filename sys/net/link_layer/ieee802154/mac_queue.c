@@ -5,6 +5,7 @@
 
 #include <string.h>
 
+#include "byteorder.h"
 #include "mac_queue.h"
 #include "mac_fsm.h"
 #include "mac_pib.h"
@@ -121,6 +122,50 @@ bool ieee802154_indirectq_empty(const ieee802154_mac_indirect_q_t *indirect_q)
     return indirect_q->free_mask == ((1U << IEEE802154_MAC_TX_INDIRECTQ_SIZE) - 1U);
 }
 
+bool ieee802154_indirectq_has_addr(ieee802154_mac_indirect_q_t *indirect_q,
+                                   ieee802154_addr_mode_t dst_mode,
+                                   const void *dst_addr)
+{
+    if (!indirect_q || !dst_addr) {
+        return false;
+    }
+
+    for (unsigned i = 0; i < IEEE802154_MAC_TX_INDIRECTQ_SIZE; i++) {
+        ieee802154_mac_txq_t *txq = &indirect_q->q[i];
+
+        if (ieee802154_mac_tx_empty(txq)) {
+            continue;
+        }
+
+        if (txq->key_mode != dst_mode) {
+            continue;
+        }
+
+        if (dst_mode == IEEE802154_ADDR_MODE_SHORT) {
+            const network_uint16_t *short_addr =
+                (const network_uint16_t *)dst_addr;
+
+            if (memcmp(&txq->dst_short_addr,
+                       short_addr,
+                       sizeof(network_uint16_t)) == 0) {
+                return true;
+            }
+        }
+        else if (dst_mode == IEEE802154_ADDR_MODE_EXTENDED) {
+            const ieee802154_ext_addr_t *ext_addr =
+                (const ieee802154_ext_addr_t *)dst_addr;
+
+            if (memcmp(&txq->dst_ext_addr,
+                       ext_addr,
+                       sizeof(ieee802154_ext_addr_t)) == 0) {
+                return true;
+            }
+        }
+    }
+
+    return false;
+}
+
 uint16_t ieee802154_indirect_get_deadline(ieee802154_mac_t *mac)
 {
     uint32_t unit_period_us = (uint32_t)IEEE802154_MAC_FRAME_TIMEOUT * (uint32_t)mac->sym_us;
@@ -217,34 +262,44 @@ void ieee802154_mac_indirect_fp_update(ieee802154_mac_t *mac,
 {
 #ifdef IEEE802154_MAC_INDIRECT_ENABLE
 #  ifdef IEEE802154_MAC_HAS_SRC_ADDR_MATCH
+    bool still_pending = pending;
+
+    if (!still_pending && dst_addr) {
+        still_pending = ieee802154_indirectq_has_addr(&mac->indirect_q,
+                                                      dst_mode,
+                                                      dst_addr);
+    }
     if (dst_mode == IEEE802154_ADDR_MODE_SHORT) {
         if (dst_addr) {
-            const network_uint16_t *short_addr = (const network_uint16_t *)dst_addr;
+            const network_uint16_t *short_addr = dst_addr;
+
             ieee802154_submac_config_src_address_match(&mac->submac,
-                                                      pending ? IEEE802154_SRC_MATCH_SHORT_ADD
-                                                              : IEEE802154_SRC_MATCH_SHORT_CLEAR,
-                                                      short_addr);
+                still_pending ? IEEE802154_SRC_MATCH_SHORT_ADD
+                              : IEEE802154_SRC_MATCH_SHORT_CLEAR,
+                short_addr);
         }
     }
     else if (dst_mode == IEEE802154_ADDR_MODE_EXTENDED) {
-        const ieee802154_ext_addr_t *ext = (const ieee802154_ext_addr_t *)dst_addr;
+        const ieee802154_ext_addr_t *ext = dst_addr;
+
         if (ext) {
             ieee802154_submac_config_src_address_match(&mac->submac,
-                                                      pending ? IEEE802154_SRC_MATCH_EXT_ADD
-                                                              : IEEE802154_SRC_MATCH_EXT_CLEAR,
-                                                      ext);
+                still_pending ? IEEE802154_SRC_MATCH_EXT_ADD
+                              : IEEE802154_SRC_MATCH_EXT_CLEAR,
+                ext);
+
             int slot = _assoc_find_ext_locked(mac, ext);
             if (slot >= 0) {
                 ieee802154_submac_config_src_address_match(&mac->submac,
-                                                          pending ? IEEE802154_SRC_MATCH_SHORT_ADD
-                                                                  : IEEE802154_SRC_MATCH_SHORT_CLEAR,
-                                                          &mac->assoc_table[slot].short_addr);
+                    still_pending ? IEEE802154_SRC_MATCH_SHORT_ADD
+                                  : IEEE802154_SRC_MATCH_SHORT_CLEAR,
+                    &mac->assoc_table[slot].short_addr);
             }
         }
     }
 #  else
     (void) dst_mode;
-    (void)dst_addr;
+    (void) dst_addr;
     bool any_pending = pending;
     if (!pending) {
         any_pending = !ieee802154_indirectq_empty(&mac->indirect_q);
@@ -381,9 +436,9 @@ static int _enqueue_data_tx(ieee802154_mac_t *mac,
     return 0;
 }
 
-static int _indirectq_search_slot_locked(ieee802154_mac_t *mac,
-                                         ieee802154_addr_mode_t dst_mode,
-                                         const void *dst_addr)
+int ieee802154_mac_indirectq_search_slot_locked(ieee802154_mac_t *mac,
+                                                ieee802154_addr_mode_t dst_mode,
+                                                const void *dst_addr)
 {
     ieee802154_mac_indirect_q_t *indirect_q = &mac->indirect_q;
     if (!dst_addr) {
@@ -440,7 +495,7 @@ int ieee802154_mac_indirectq_search_slot(ieee802154_mac_t *mac,
 {
     int slot;
     mutex_lock(&mac->indirect_q.lock);
-    slot = _indirectq_search_slot_locked(mac, dst_mode, dst_addr);
+    slot = ieee802154_mac_indirectq_search_slot_locked(mac, dst_mode, dst_addr);
     mutex_unlock(&mac->indirect_q.lock);
     return slot;
 }
@@ -449,7 +504,7 @@ static int _indirectq_get_slot_locked(ieee802154_mac_t *mac,
                                       ieee802154_addr_mode_t dst_mode,
                                       const void *dst_addr)
 {
-    int slot = _indirectq_search_slot_locked(mac, dst_mode, dst_addr);
+    int slot = ieee802154_mac_indirectq_search_slot_locked(mac, dst_mode, dst_addr);
     ieee802154_mac_indirect_q_t *indirect_q = &mac->indirect_q;
 
     if (slot >= 0) {

@@ -64,6 +64,10 @@ void ieee802154_indirectq_free_slot(ieee802154_mac_indirect_q_t *indirect_q, uin
  */
 bool ieee802154_indirectq_empty(const ieee802154_mac_indirect_q_t *indirect_q);
 
+bool ieee802154_indirectq_has_addr(ieee802154_mac_indirect_q_t *indirect_q,
+                                   ieee802154_addr_mode_t dst_mode,
+                                   const void *dst_addr);
+
 /**
  * @brief Get the deadline tick for indirect transmission.
  */
@@ -98,6 +102,14 @@ void ieee802154_mac_handle_indirectq_auto_free(ieee802154_mac_t *mac,
 int ieee802154_mac_indirectq_search_slot(ieee802154_mac_t *mac,
                                          ieee802154_addr_mode_t dst_mode,
                                          const void *dst_addr);
+/**
+ * @brief Find an indirect queue slot by destination address.
+ *
+ * The caller must hold @ref ieee802154_mac_indirect_q_t::lock.
+ */
+int ieee802154_mac_indirectq_search_slot_locked(ieee802154_mac_t *mac,
+                                                ieee802154_addr_mode_t dst_mode,
+                                                const void *dst_addr);
 /**
  * @brief Get a slot index for the given destination address.
  */

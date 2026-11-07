@@ -761,14 +761,17 @@ static int _mac_enqueue_beacon(ieee802154_mac_t *mac)
 static int _mac_tx_request(ieee802154_mac_t *mac, ieee802154_addr_mode_t dst_mode,
                            const void *dst_addr)
 {
-    int slot = ieee802154_mac_indirectq_search_slot(mac, dst_mode, dst_addr);
+    mutex_lock(&mac->indirect_q.lock);
+    int slot = ieee802154_mac_indirectq_search_slot_locked(mac, dst_mode, dst_addr);
 
     if (slot < 0) {
+        mutex_unlock(&mac->indirect_q.lock);
         return 1;
     }
     ieee802154_mac_txq_t *txq = &mac->indirect_q.q[slot];
     if (ieee802154_mac_tx_empty(txq) || mac->indirect_q.busy) {
         ieee802154_mac_handle_indirectq_auto_free(mac, &mac->indirect_q, slot);
+        mutex_unlock(&mac->indirect_q.lock);
         return -ENOBUFS;
     }
     if (txq->key_mode == IEEE802154_ADDR_MODE_SHORT) {
@@ -779,16 +782,22 @@ static int _mac_tx_request(ieee802154_mac_t *mac, ieee802154_addr_mode_t dst_mod
     }
 
     ieee802154_mac_tx_desc_t *d = ieee802154_mac_tx_peek(txq);
-
+    if (d == NULL) {
+        ieee802154_mac_handle_indirectq_auto_free(mac, &mac->indirect_q, slot);
+        mutex_unlock(&mac->indirect_q.lock);
+        return -ENOBUFS;
+    }
     mac->indirect_q.current_slot = slot;
     mac->indirect_q.current_txq = txq;
     d->tx_state = IEEE802154_TX_STATE_IN_PROGRESS;
+    mac->indirect_q.busy = true;
+    mutex_unlock(&mac->indirect_q.lock);
+
     int r = ieee802154_send(&mac->submac, &d->iol_mhr);
     if (r != 0)
     {
         ieee802154_mac_tx_finish_current(mac, r, NULL);
         return -EIO;
     }
-    mac->indirect_q.busy = true;
     return 0;
 }
