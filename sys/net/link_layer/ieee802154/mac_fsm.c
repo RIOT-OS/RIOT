@@ -31,7 +31,6 @@ static int _mac_assoc_request(ieee802154_mac_t *mac, const ieee802154_mac_fsm_ct
 static int _mac_poll_request(ieee802154_mac_t *mac, const ieee802154_mac_fsm_ctx_t *ctx);
 static int _mac_assoc_response(ieee802154_mac_t *mac, const ieee802154_mac_fsm_ctx_t *ctx);
 static int _mac_enqueue_beacon(ieee802154_mac_t *mac);
-static void _debug_data_req(ieee802154_mac_t *mac, const ieee802154_mac_fsm_ctx_t *ctx);
 static ieee802154_mac_state_t _mac_fsm_state_idle(ieee802154_mac_t *mac,
                                                   ieee802154_mac_fsm_ev_t ev,
                                                   const ieee802154_mac_fsm_ctx_t *ctx);
@@ -217,24 +216,6 @@ static int _mac_assoc_response(ieee802154_mac_t *mac, const ieee802154_mac_fsm_c
                                &mac->cmd, &handle, true, true);
 }
 
-static void _debug_data_req(ieee802154_mac_t *mac, const ieee802154_mac_fsm_ctx_t *ctx)
-{
-    if (!mac || !ctx) {
-        return;
-    }
-
-    ieee802154_filter_mode_t mode;
-    int res = ieee802154_radio_get_frame_filter_mode(&mac->submac.dev, &mode);
-    if (res == 0) {
-        DEBUG("IEEE802154 MAC: RX_CMD_DATA_REQ src_mode=%u src_len=%d filter=%u\n",
-              (unsigned)ctx->src_mode, ctx->src_len, (unsigned)mode);
-    }
-    else {
-        DEBUG("IEEE802154 MAC: RX_CMD_DATA_REQ src_mode=%u src_len=%d filter=na(%d)\n",
-              (unsigned)ctx->src_mode, ctx->src_len, res);
-    }
-}
-
 static ieee802154_mac_state_t _mac_fsm_state_idle(ieee802154_mac_t *mac,
                                                   ieee802154_mac_fsm_ev_t ev,
                                                   const ieee802154_mac_fsm_ctx_t *ctx)
@@ -278,7 +259,6 @@ static ieee802154_mac_state_t _mac_fsm_state_idle(ieee802154_mac_t *mac,
         return IEEE802154_MAC_STATE_IDLE;
     case IEEE802154_MAC_FSM_EV_RX_CMD_DATA_REQ:
         if (ctx) {
-            _debug_data_req(mac, ctx);
             const void *src_addr = (ctx->src_mode == IEEE802154_ADDR_MODE_SHORT)
                                     ? (const void *)ctx->src
                                     : (const void *)&ctx->src_addr;
@@ -396,7 +376,6 @@ static ieee802154_mac_state_t _mac_fsm_state_scan_active(ieee802154_mac_t *mac,
         return IEEE802154_MAC_STATE_SCAN_ACTIVE;
     case IEEE802154_MAC_FSM_EV_RX_CMD_DATA_REQ:
         if (ctx) {
-            _debug_data_req(mac, ctx);
             const void *src_addr = (ctx->src_mode == IEEE802154_ADDR_MODE_SHORT)
                                     ? (const void *)ctx->src
                                     : (const void *)&ctx->src_addr;
@@ -436,7 +415,6 @@ static ieee802154_mac_state_t _mac_fsm_state_coordinator(ieee802154_mac_t *mac,
         return IEEE802154_MAC_STATE_COORDINATOR;
     case IEEE802154_MAC_FSM_EV_RX_CMD_DATA_REQ:
         if (ctx) {
-            _debug_data_req(mac, ctx);
             const void *src_addr = (ctx->src_mode == IEEE802154_ADDR_MODE_SHORT)
                                     ? (const void *)ctx->src
                                     : (const void *)&ctx->src_addr;
@@ -789,6 +767,7 @@ static int _mac_tx_request(ieee802154_mac_t *mac, ieee802154_addr_mode_t dst_mod
     }
 
     ieee802154_mac_tx_desc_t *d = ieee802154_mac_tx_peek(txq);
+
     mac->indirect_q.current_slot = slot;
     mac->indirect_q.current_txq = txq;
     d->tx_state = IEEE802154_TX_STATE_IN_PROGRESS;
