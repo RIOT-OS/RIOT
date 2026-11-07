@@ -58,7 +58,7 @@
 #include "debug.h"
 
 #ifndef GNRC_NETIF_IEEE802154_MAC_POLL_INTERVAL_MS
-#define GNRC_NETIF_IEEE802154_MAC_POLL_INTERVAL_MS (1000U)
+#define GNRC_NETIF_IEEE802154_MAC_POLL_INTERVAL_MS (200U)
 #endif
 
 static gnrc_netif_ieee802154_mac_dev_t *_global_dev;
