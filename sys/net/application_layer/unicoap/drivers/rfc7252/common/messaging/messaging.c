@@ -653,33 +653,44 @@ error:
 
 /* MARK: - Empty Messages */
 
-static int _send_empty_message(unicoap_packet_t* packet)
+static int _acknowledge_or_reset(unicoap_packet_t* packet, unicoap_rfc7252_message_type_t type)
 {
-    unicoap_message_t* original_message = packet->message;
-    packet->message = NULL; /* Empty message, PDU builder handles this */
+    /* This is all faster than going through the PDU builder for an empty message. And it saves us
+     * stack allocations that we'd need to prepare for an arbitrary message (more iolist structs and
+     * bigger header buffer for additional token. */
+    unicoap_header_rfc7252_t empty_message = {
+        .version = UNICOAP_COAP_VERSION_1,
+        .code = UNICOAP_CODE_EMPTY,
+        .token_length = 0,
+    };
 
-    unicoap_message_properties_t original_properties = packet->properties;
-    packet->properties.token = NULL;
-    packet->properties.token_length = 0;
+    iolist_t vector = {
+        .iol_base = &empty_message,
+        .iol_len = sizeof(empty_message)
+    };
 
-    int res = (int)_build_and_send_pdu(packet, NULL);
-    packet->message = original_message;
-    packet->properties = original_properties;
-    return res;
+    empty_message.message_id = _get_id(packet);
+    empty_message.type = type;
+
+    /* We do not reconnect here for messaging-layer-only PDUs (empty ACKs and RSTs).
+     * Reason: If we send an ACK or RST that means we got a message before. This implies
+     * there was a DTLS session. RFC 7252 mandates ACKs and RSTs must be sent within the
+     * same epoch. A new DTLS session always leads to a new epoch. So sending an ACK or RST
+     * after reconnecting is pointless. Hence, we do not need to call _connect here and can
+     * just send, possibly getting an error from the DTLS transport layer if there's no session. */
+    return _sendv(&vector, packet->remote, packet->local, _packet_get_dtls_session(packet));
 }
 
 static inline int _acknowledge(unicoap_packet_t* packet)
 {
     MESSAGING_7252_DEBUG(UNICOAP_MESSAGE_ID_FORMAT "sending empty ACK\n", _get_id(packet));
-    _set_type(packet, UNICOAP_TYPE_ACK);
-    return _send_empty_message(packet);
+    return _acknowledge_or_reset(packet, UNICOAP_TYPE_ACK);
 }
 
 static inline int _reset(unicoap_packet_t* packet)
 {
     MESSAGING_7252_DEBUG(UNICOAP_MESSAGE_ID_FORMAT "sending RST\n", _get_id(packet));
-    _set_type(packet, UNICOAP_TYPE_RST);
-    return _send_empty_message(packet);
+    return _acknowledge_or_reset(packet, UNICOAP_TYPE_RST);
 }
 
 static int _resume(const unicoap_endpoint_t* endpoint, unicoap_sock_dtls_session_t* session)
