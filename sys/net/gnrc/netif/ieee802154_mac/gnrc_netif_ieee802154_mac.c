@@ -12,8 +12,6 @@
  *
  * @file
  * @brief       GNRC netif adapter for IEEE 802.15.4 MAC (mac.h)
- *
- * @}
  */
 
 #include <assert.h>
@@ -38,7 +36,6 @@
 #include "net/gnrc/netapi.h"
 #include "net/gnrc/nettype.h"
 #include "net/gnrc/netif/dedup.h"
-#include "net/ieee802154.h"
 #ifdef MODULE_IEEE802154_SECURITY
 #include "net/ieee802154_security.h"
 #endif
@@ -146,20 +143,20 @@ static void _mac_buf_free(gnrc_netif_ieee802154_mac_dev_t *dev, gnrc_pktsnip_t *
 static netdev_type_t _netdev_type_from_devtype(ieee802154_dev_type_t dev_type)
 {
     switch (dev_type) {
-        case IEEE802154_DEV_TYPE_CC2538_RF:
-            return NETDEV_CC2538;
-        case IEEE802154_DEV_TYPE_NRF802154:
-            return NETDEV_NRF802154;
-        case IEEE802154_DEV_TYPE_SOCKET_ZEP:
-            return NETDEV_SOCKET_ZEP;
-        case IEEE802154_DEV_TYPE_KW2XRF:
-            return NETDEV_KW2XRF;
-        case IEEE802154_DEV_TYPE_MRF24J40:
-            return NETDEV_MRF24J40;
-        case IEEE802154_DEV_TYPE_ESP_IEEE802154:
-            return NETDEV_ESP_IEEE802154;
-        default:
-            return NETDEV_KW2XRF;
+    case IEEE802154_DEV_TYPE_CC2538_RF:
+        return NETDEV_CC2538;
+    case IEEE802154_DEV_TYPE_NRF802154:
+        return NETDEV_NRF802154;
+    case IEEE802154_DEV_TYPE_SOCKET_ZEP:
+        return NETDEV_SOCKET_ZEP;
+    case IEEE802154_DEV_TYPE_KW2XRF:
+        return NETDEV_KW2XRF;
+    case IEEE802154_DEV_TYPE_MRF24J40:
+        return NETDEV_MRF24J40;
+    case IEEE802154_DEV_TYPE_ESP_IEEE802154:
+        return NETDEV_ESP_IEEE802154;
+    default:
+        return NETDEV_KW2XRF;
     }
 }
 
@@ -276,6 +273,7 @@ static void _ev_rx_handler(event_t *event)
 {
     gnrc_netif_ieee802154_mac_dev_t *dev =
         container_of(event, gnrc_netif_ieee802154_mac_dev_t, ev_rx);
+
     ieee802154_mac_rx_request_process(&dev->mac);
 }
 
@@ -283,6 +281,7 @@ static void _ev_tick_handler(event_t *event)
 {
     gnrc_netif_ieee802154_mac_dev_t *dev =
         container_of(event, gnrc_netif_ieee802154_mac_dev_t, ev_tick);
+
     ieee802154_mac_tick(&dev->mac);
 }
 
@@ -290,6 +289,7 @@ static void _ev_scan_timer_handler(event_t *event)
 {
     gnrc_netif_ieee802154_mac_dev_t *dev =
         container_of(event, gnrc_netif_ieee802154_mac_dev_t, ev_scan_timer);
+
     ieee802154_mac_scan_timer_process(&dev->mac);
 }
 
@@ -297,6 +297,7 @@ static void _ev_ack_timeout_handler(event_t *event)
 {
     gnrc_netif_ieee802154_mac_dev_t *dev =
         container_of(event, gnrc_netif_ieee802154_mac_dev_t, ev_ack_timeout);
+
     ieee802154_mac_ack_timeout_fired(&dev->mac);
 }
 
@@ -304,6 +305,7 @@ static void _ev_assoc_res_handler(event_t *event)
 {
     gnrc_netif_ieee802154_mac_dev_t *dev =
         container_of(event, gnrc_netif_ieee802154_mac_dev_t, ev_assoc_res);
+
     if (!dev->assoc_res_pending) {
         return;
     }
@@ -346,8 +348,10 @@ static void _ev_poll_handler(event_t *event)
         ieee802154_pib_value_t coord_ext;
 
         ieee802154_mac_mlme_get_request(&dev->mac, IEEE802154_PIB_PAN_ID, &panid);
-        ieee802154_mac_mlme_get_request(&dev->mac, IEEE802154_PIB_COORD_SHORT_ADDRESS, &coord_short);
-        ieee802154_mac_mlme_get_request(&dev->mac, IEEE802154_PIB_COORD_EXTENDED_ADDRESS, &coord_ext);
+        ieee802154_mac_mlme_get_request(&dev->mac, IEEE802154_PIB_COORD_SHORT_ADDRESS,
+                                        &coord_short);
+        ieee802154_mac_mlme_get_request(&dev->mac, IEEE802154_PIB_COORD_EXTENDED_ADDRESS,
+                                        &coord_ext);
 
         if (coord_short.v.short_addr.u16 != 0xffff) {
             (void)ieee802154_mac_mlme_poll(&dev->mac, IEEE802154_ADDR_MODE_SHORT,
@@ -368,6 +372,7 @@ static void _ev_radio_handler(event_t *event)
 {
     gnrc_netif_ieee802154_mac_dev_t *dev =
         container_of(event, gnrc_netif_ieee802154_mac_dev_t, ev_radio);
+
     if (dev->radio_dev) {
         ieee802154_mac_handle_radio(dev->radio_dev, dev->radio_ev);
     }
@@ -377,6 +382,7 @@ static void _mac_data_confirm(void *arg, uint8_t handle, int status)
 {
     ieee802154_mac_t *mac = (ieee802154_mac_t *)arg;
     gnrc_netif_ieee802154_mac_dev_t *dev = _dev_from_mac(mac);
+
     (void)handle;
 
     mutex_lock(&dev->tx_lock);
@@ -458,6 +464,7 @@ static void _mac_dealloc_request(void *arg, iolist_t *iolist)
     ieee802154_mac_t *mac = (ieee802154_mac_t *)arg;
     gnrc_netif_ieee802154_mac_dev_t *dev = _dev_from_mac(mac);
     gnrc_pktsnip_t *pkt = _pkt_from_iolist(iolist);
+
     _mac_buf_free(dev, pkt);
 }
 
@@ -465,6 +472,7 @@ static void _mac_scan_timer_request(void *arg)
 {
     ieee802154_mac_t *mac = (ieee802154_mac_t *)arg;
     gnrc_netif_ieee802154_mac_dev_t *dev = _dev_from_mac(mac);
+
     event_post(&dev->netif->evq[GNRC_NETIF_EVQ_INDEX_PRIO_HIGH], &dev->ev_scan_timer);
 }
 
@@ -472,6 +480,7 @@ static void _mac_tick_request(void *arg)
 {
     ieee802154_mac_t *mac = (ieee802154_mac_t *)arg;
     gnrc_netif_ieee802154_mac_dev_t *dev = _dev_from_mac(mac);
+
     event_post(&dev->netif->evq[GNRC_NETIF_EVQ_INDEX_PRIO_HIGH], &dev->ev_tick);
 }
 
@@ -480,6 +489,7 @@ static void _mac_ack_timeout(void *arg)
 {
     ieee802154_mac_t *mac = (ieee802154_mac_t *)arg;
     gnrc_netif_ieee802154_mac_dev_t *dev = _dev_from_mac(mac);
+
     event_post(&dev->netif->evq[GNRC_NETIF_EVQ_INDEX_PRIO_HIGH], &dev->ev_ack_timeout);
 }
 
@@ -487,6 +497,7 @@ static void _mac_allocate_request(void *arg, size_t len)
 {
     ieee802154_mac_t *mac = (ieee802154_mac_t *)arg;
     gnrc_netif_ieee802154_mac_dev_t *dev = _dev_from_mac(mac);
+
     if ((len == 0) || (len > IEEE802154_FRAME_LEN_MAX)) {
         dev->rx_alloc_len = IEEE802154_FRAME_LEN_MAX;
     }
@@ -500,6 +511,7 @@ static void _mac_rx_request(void *arg)
 {
     ieee802154_mac_t *mac = (ieee802154_mac_t *)arg;
     gnrc_netif_ieee802154_mac_dev_t *dev = _dev_from_mac(mac);
+
     event_post(&dev->netif->evq[GNRC_NETIF_EVQ_INDEX_PRIO_HIGH], &dev->ev_rx);
 }
 
@@ -516,6 +528,7 @@ static void _mac_radio_cb(ieee802154_dev_t *dev, ieee802154_trx_ev_t st)
 static void _poll_timer_cb(void *arg)
 {
     gnrc_netif_ieee802154_mac_dev_t *dev = arg;
+
     if (!dev->netif) {
         return;
     }
@@ -580,10 +593,10 @@ static inline bool _already_received(gnrc_netif_t *netif,
 {
     const uint8_t seq = ieee802154_get_seq(mhr);
 
-    return  (netif->last_pkt.seq == seq) &&
-            (netif->last_pkt.src_len == netif_hdr->src_l2addr_len) &&
-            (memcmp(netif->last_pkt.src, gnrc_netif_hdr_get_src_addr(netif_hdr),
-                    netif_hdr->src_l2addr_len) == 0);
+    return (netif->last_pkt.seq == seq) &&
+           (netif->last_pkt.src_len == netif_hdr->src_l2addr_len) &&
+           (memcmp(netif->last_pkt.src, gnrc_netif_hdr_get_src_addr(netif_hdr),
+                   netif_hdr->src_l2addr_len) == 0);
 }
 #endif
 
@@ -786,6 +799,7 @@ static void _poll_stop(gnrc_netif_ieee802154_mac_dev_t *dev)
 static int _netdev_init(netdev_t *dev)
 {
     gnrc_netif_ieee802154_mac_dev_t *mdev = _dev_from_netdev(dev);
+
     assert(_dev_type_cfg != IEEE802154_DEV_TYPE_INVALID);
 
     netdev_register(dev, _netdev_type_from_devtype(_dev_type_cfg), 0);
@@ -820,7 +834,7 @@ static int _netdev_init(netdev_t *dev)
     mdev->start_status = 0;
     mdev->start_in_progress = false;
 
-    if (_radio_init_cb)     {
+    if (_radio_init_cb) {
         int res = _radio_init_cb(&mdev->mac.submac.dev, _dev_type_cfg,
                                  _radio_init_idx++, _radio_init_arg);
         if (res < 0) {
@@ -900,151 +914,151 @@ static int _netdev_get(netdev_t *dev, netopt_t opt, void *value, size_t max_len)
     int res = -ENOTSUP;
 
     switch (opt) {
-        case NETOPT_DEVICE_TYPE: {
-            assert(max_len == sizeof(uint16_t));
-            *((uint16_t *)value) = NETDEV_TYPE_IEEE802154;
-            res = sizeof(uint16_t);
-            break;
-        }
-        case NETOPT_PROTO: {
-            assert(max_len == sizeof(gnrc_nettype_t));
-            *((gnrc_nettype_t *)value) = mdev->proto;
-            res = sizeof(gnrc_nettype_t);
-            break;
-        }
-        case NETOPT_ADDRESS: {
-            ieee802154_pib_value_t v;
-            ieee802154_mac_mlme_get_request(&mdev->mac, IEEE802154_PIB_SHORT_ADDR, &v);
-            assert(max_len >= sizeof(v.v.short_addr));
-            memcpy(value, &v.v.short_addr, sizeof(v.v.short_addr));
-            res = sizeof(v.v.short_addr);
-            break;
-        }
-        case NETOPT_ADDRESS_LONG: {
-            ieee802154_pib_value_t v;
-            ieee802154_mac_mlme_get_request(&mdev->mac, IEEE802154_PIB_EXTENDED_ADDRESS, &v);
-            assert(max_len >= sizeof(v.v.ext_addr));
-            memcpy(value, &v.v.ext_addr, sizeof(v.v.ext_addr));
-            res = sizeof(v.v.ext_addr);
-            break;
-        }
-        case NETOPT_SRC_LEN: {
-            ieee802154_pib_value_t v;
-            ieee802154_mac_mlme_get_request(&mdev->mac, IEEE802154_PIB_SHORT_ADDR, &v);
-            uint16_t len = (byteorder_ntohs(v.v.short_addr) == 0xffff)
+    case NETOPT_DEVICE_TYPE: {
+        assert(max_len == sizeof(uint16_t));
+        *((uint16_t *)value) = NETDEV_TYPE_IEEE802154;
+        res = sizeof(uint16_t);
+        break;
+    }
+    case NETOPT_PROTO: {
+        assert(max_len == sizeof(gnrc_nettype_t));
+        *((gnrc_nettype_t *)value) = mdev->proto;
+        res = sizeof(gnrc_nettype_t);
+        break;
+    }
+    case NETOPT_ADDRESS: {
+        ieee802154_pib_value_t v;
+        ieee802154_mac_mlme_get_request(&mdev->mac, IEEE802154_PIB_SHORT_ADDR, &v);
+        assert(max_len >= sizeof(v.v.short_addr));
+        memcpy(value, &v.v.short_addr, sizeof(v.v.short_addr));
+        res = sizeof(v.v.short_addr);
+        break;
+    }
+    case NETOPT_ADDRESS_LONG: {
+        ieee802154_pib_value_t v;
+        ieee802154_mac_mlme_get_request(&mdev->mac, IEEE802154_PIB_EXTENDED_ADDRESS, &v);
+        assert(max_len >= sizeof(v.v.ext_addr));
+        memcpy(value, &v.v.ext_addr, sizeof(v.v.ext_addr));
+        res = sizeof(v.v.ext_addr);
+        break;
+    }
+    case NETOPT_SRC_LEN: {
+        ieee802154_pib_value_t v;
+        ieee802154_mac_mlme_get_request(&mdev->mac, IEEE802154_PIB_SHORT_ADDR, &v);
+        uint16_t len = (byteorder_ntohs(v.v.short_addr) == 0xffff)
                 ? IEEE802154_LONG_ADDRESS_LEN
                 : IEEE802154_SHORT_ADDRESS_LEN;
-            assert(max_len == sizeof(uint16_t));
-            *((uint16_t *)value) = len;
-            res = sizeof(uint16_t);
-            break;
-        }
-        case NETOPT_ADDR_LEN: {
-            ieee802154_pib_value_t v;
-            ieee802154_mac_mlme_get_request(&mdev->mac, IEEE802154_PIB_SHORT_ADDR, &v);
-            uint16_t len = (byteorder_ntohs(v.v.short_addr) == 0xffff)
+        assert(max_len == sizeof(uint16_t));
+        *((uint16_t *)value) = len;
+        res = sizeof(uint16_t);
+        break;
+    }
+    case NETOPT_ADDR_LEN: {
+        ieee802154_pib_value_t v;
+        ieee802154_mac_mlme_get_request(&mdev->mac, IEEE802154_PIB_SHORT_ADDR, &v);
+        uint16_t len = (byteorder_ntohs(v.v.short_addr) == 0xffff)
                 ? IEEE802154_LONG_ADDRESS_LEN
                 : IEEE802154_SHORT_ADDRESS_LEN;
-            assert(max_len == sizeof(uint16_t));
-            *((uint16_t *)value) = len;
-            res = sizeof(uint16_t);
-            break;
-        }
-        case NETOPT_NID: {
-            ieee802154_pib_value_t v;
-            ieee802154_mac_mlme_get_request(&mdev->mac, IEEE802154_PIB_PAN_ID, &v);
-            assert(max_len == sizeof(uint16_t));
-            *((uint16_t *)value) = v.v.u16;
-            res = sizeof(uint16_t);
-            break;
-        }
-        case NETOPT_CHANNEL: {
-            assert(max_len == sizeof(uint16_t));
-            *((uint16_t *)value) = mdev->mac.submac.channel_num;
-            res = sizeof(uint16_t);
-            break;
-        }
-        case NETOPT_TX_POWER: {
-            assert(max_len == sizeof(int16_t));
-            *((int16_t *)value) = mdev->mac.submac.tx_pow;
-            res = sizeof(int16_t);
-            break;
-        }
-        case NETOPT_TX_INDIRECT: {
-            assert(max_len == sizeof(netopt_enable_t));
-            *((netopt_enable_t *)value) = mdev->tx_indirect ? NETOPT_ENABLE : NETOPT_DISABLE;
-            res = sizeof(netopt_enable_t);
-            break;
-        }
-        case NETOPT_PAN_COORD: {
-            ieee802154_pib_value_t v;
+        assert(max_len == sizeof(uint16_t));
+        *((uint16_t *)value) = len;
+        res = sizeof(uint16_t);
+        break;
+    }
+    case NETOPT_NID: {
+        ieee802154_pib_value_t v;
+        ieee802154_mac_mlme_get_request(&mdev->mac, IEEE802154_PIB_PAN_ID, &v);
+        assert(max_len == sizeof(uint16_t));
+        *((uint16_t *)value) = v.v.u16;
+        res = sizeof(uint16_t);
+        break;
+    }
+    case NETOPT_CHANNEL: {
+        assert(max_len == sizeof(uint16_t));
+        *((uint16_t *)value) = mdev->mac.submac.channel_num;
+        res = sizeof(uint16_t);
+        break;
+    }
+    case NETOPT_TX_POWER: {
+        assert(max_len == sizeof(int16_t));
+        *((int16_t *)value) = mdev->mac.submac.tx_pow;
+        res = sizeof(int16_t);
+        break;
+    }
+    case NETOPT_TX_INDIRECT: {
+        assert(max_len == sizeof(netopt_enable_t));
+        *((netopt_enable_t *)value) = mdev->tx_indirect ? NETOPT_ENABLE : NETOPT_DISABLE;
+        res = sizeof(netopt_enable_t);
+        break;
+    }
+    case NETOPT_PAN_COORD: {
+        ieee802154_pib_value_t v;
 
-            if (max_len != sizeof(netopt_enable_t)) {
-                return -EOVERFLOW;
-            }
-
-            ieee802154_mac_mlme_get_request(&mdev->mac,
-                                            IEEE802154_PIB_RX_ON_WHEN_IDLE,
-                                            &v);
-
-            *((netopt_enable_t *)value) = v.v.b ? NETOPT_ENABLE : NETOPT_DISABLE;
-            res = sizeof(netopt_enable_t);
-            break;
+        if (max_len != sizeof(netopt_enable_t)) {
+            return -EOVERFLOW;
         }
-        case NETOPT_BEACON_PAYLOAD: {
-            ieee802154_pib_value_t v;
 
-            ieee802154_mac_mlme_get_request(&mdev->mac,
-                                            IEEE802154_PIB_BEACON_PAYLOAD,
-                                            &v);
+        ieee802154_mac_mlme_get_request(&mdev->mac,
+                                        IEEE802154_PIB_RX_ON_WHEN_IDLE,
+                                        &v);
 
-            if (max_len < v.v.bytes.len) {
-                return -EOVERFLOW;
-            }
+        *((netopt_enable_t *)value) = v.v.b ? NETOPT_ENABLE : NETOPT_DISABLE;
+        res = sizeof(netopt_enable_t);
+        break;
+    }
+    case NETOPT_BEACON_PAYLOAD: {
+        ieee802154_pib_value_t v;
 
-            if (v.v.bytes.len > 0 && v.v.bytes.ptr != NULL) {
-                memcpy(value, v.v.bytes.ptr, v.v.bytes.len);
-            }
+        ieee802154_mac_mlme_get_request(&mdev->mac,
+                                        IEEE802154_PIB_BEACON_PAYLOAD,
+                                        &v);
 
-            res = (int)v.v.bytes.len;
-            break;
+        if (max_len < v.v.bytes.len) {
+            return -EOVERFLOW;
         }
-        case NETOPT_POLL_INTERVAL: {
-            if (max_len != sizeof(uint32_t)) {
-                return -EOVERFLOW;
-            }
 
-            *(uint32_t *)value = mdev->poll_interval_ms;
-            res = sizeof(uint32_t);
-            break;
+        if (v.v.bytes.len > 0 && v.v.bytes.ptr != NULL) {
+            memcpy(value, v.v.bytes.ptr, v.v.bytes.len);
         }
-        case NETOPT_ACK_REQ: {
-            assert(max_len == sizeof(netopt_enable_t));
-            *((netopt_enable_t *)value) = mdev->ack_req ? NETOPT_ENABLE : NETOPT_DISABLE;
-            res = sizeof(netopt_enable_t);
-            break;
+
+        res = (int)v.v.bytes.len;
+        break;
+    }
+    case NETOPT_POLL_INTERVAL: {
+        if (max_len != sizeof(uint32_t)) {
+            return -EOVERFLOW;
         }
-        case NETOPT_RAWMODE: {
-            assert(max_len == sizeof(netopt_enable_t));
-            bool enabled = mdev->netif && (mdev->netif->flags & GNRC_NETIF_FLAGS_RAWMODE);
-            *((netopt_enable_t *)value) = enabled ? NETOPT_ENABLE : NETOPT_DISABLE;
-            res = sizeof(netopt_enable_t);
-            break;
-        }
-        case NETOPT_MAX_PDU_SIZE: {
-            assert(max_len >= sizeof(uint16_t));
-            uint16_t max_pdu = IEEE802154_FRAME_LEN_MAX
-                             - IEEE802154_MAX_HDR_LEN
-                             - IEEE802154_FCS_LEN;
+
+        *(uint32_t *)value = mdev->poll_interval_ms;
+        res = sizeof(uint32_t);
+        break;
+    }
+    case NETOPT_ACK_REQ: {
+        assert(max_len == sizeof(netopt_enable_t));
+        *((netopt_enable_t *)value) = mdev->ack_req ? NETOPT_ENABLE : NETOPT_DISABLE;
+        res = sizeof(netopt_enable_t);
+        break;
+    }
+    case NETOPT_RAWMODE: {
+        assert(max_len == sizeof(netopt_enable_t));
+        bool enabled = mdev->netif && (mdev->netif->flags & GNRC_NETIF_FLAGS_RAWMODE);
+        *((netopt_enable_t *)value) = enabled ? NETOPT_ENABLE : NETOPT_DISABLE;
+        res = sizeof(netopt_enable_t);
+        break;
+    }
+    case NETOPT_MAX_PDU_SIZE: {
+        assert(max_len >= sizeof(uint16_t));
+        uint16_t max_pdu = IEEE802154_FRAME_LEN_MAX
+                           - IEEE802154_MAX_HDR_LEN
+                           - IEEE802154_FCS_LEN;
 #ifdef MODULE_IEEE802154_SECURITY
-            max_pdu -= IEEE802154_SEC_MAX_AUX_HDR_LEN;
+        max_pdu -= IEEE802154_SEC_MAX_AUX_HDR_LEN;
 #endif
-            *((uint16_t *)value) = max_pdu;
-            res = sizeof(uint16_t);
-            break;
-        }
-        default:
-            break;
+        *((uint16_t *)value) = max_pdu;
+        res = sizeof(uint16_t);
+        break;
+    }
+    default:
+        break;
     }
     return res;
 }
@@ -1055,412 +1069,412 @@ static int _netdev_set(netdev_t *dev, netopt_t opt, const void *value, size_t le
     int res = -ENOTSUP;
 
     switch (opt) {
-        case NETOPT_PROTO:
-            assert(len == sizeof(gnrc_nettype_t));
-            mdev->proto = *((const gnrc_nettype_t *)value);
-            res = sizeof(gnrc_nettype_t);
-            break;
-        case NETOPT_ADDRESS: {
-            ieee802154_pib_value_t v = {
-                .type = IEEE802154_PIB_TYPE_NUI16,
-            };
-            assert(len == sizeof(v.v.short_addr));
-            memcpy(&v.v.short_addr, value, len);
-            ieee802154_mac_mlme_set_request(&mdev->mac, IEEE802154_PIB_SHORT_ADDR, &v);
-            res = len;
-            break;
+    case NETOPT_PROTO:
+        assert(len == sizeof(gnrc_nettype_t));
+        mdev->proto = *((const gnrc_nettype_t *)value);
+        res = sizeof(gnrc_nettype_t);
+        break;
+    case NETOPT_ADDRESS: {
+        ieee802154_pib_value_t v = {
+            .type = IEEE802154_PIB_TYPE_NUI16,
+        };
+        assert(len == sizeof(v.v.short_addr));
+        memcpy(&v.v.short_addr, value, len);
+        ieee802154_mac_mlme_set_request(&mdev->mac, IEEE802154_PIB_SHORT_ADDR, &v);
+        res = len;
+        break;
+    }
+    case NETOPT_ADDRESS_LONG: {
+        ieee802154_pib_value_t v = {
+            .type = IEEE802154_PIB_TYPE_EUI64,
+        };
+        assert(len == sizeof(v.v.ext_addr));
+        memcpy(&v.v.ext_addr, value, len);
+        ieee802154_mac_mlme_set_request(&mdev->mac, IEEE802154_PIB_EXTENDED_ADDRESS, &v);
+        res = len;
+        break;
+    }
+    case NETOPT_NID: {
+        ieee802154_pib_value_t v = {
+            .type = IEEE802154_PIB_TYPE_U16,
+            .v.u16 = *((const uint16_t *)value),
+        };
+        assert(len == sizeof(uint16_t));
+        ieee802154_mac_mlme_set_request(&mdev->mac, IEEE802154_PIB_PAN_ID, &v);
+        res = len;
+        break;
+    }
+    case NETOPT_CHANNEL:
+        assert(len == sizeof(uint16_t));
+        res = ieee802154_set_channel_number(&mdev->mac.submac, *(const uint16_t *)value);
+        if (res == 0) {
+            res = sizeof(uint16_t);
         }
-        case NETOPT_ADDRESS_LONG: {
-            ieee802154_pib_value_t v = {
-                .type = IEEE802154_PIB_TYPE_EUI64,
-            };
-            assert(len == sizeof(v.v.ext_addr));
-            memcpy(&v.v.ext_addr, value, len);
-            ieee802154_mac_mlme_set_request(&mdev->mac, IEEE802154_PIB_EXTENDED_ADDRESS, &v);
-            res = len;
-            break;
+        break;
+    case NETOPT_TX_POWER:
+        assert(len == sizeof(int16_t));
+        res = ieee802154_set_tx_power(&mdev->mac.submac, *(const int16_t *)value);
+        if (res == 0) {
+            res = sizeof(int16_t);
         }
-        case NETOPT_NID: {
-            ieee802154_pib_value_t v = {
-                .type = IEEE802154_PIB_TYPE_U16,
-                .v.u16 = *((const uint16_t *)value),
-            };
-            assert(len == sizeof(uint16_t));
-            ieee802154_mac_mlme_set_request(&mdev->mac, IEEE802154_PIB_PAN_ID, &v);
-            res = len;
-            break;
+        break;
+    case NETOPT_TX_INDIRECT:
+        assert(len == sizeof(netopt_enable_t));
+        mdev->tx_indirect = (*(const netopt_enable_t *)value == NETOPT_ENABLE);
+        res = sizeof(netopt_enable_t);
+        break;
+    case NETOPT_ACK_REQ:
+        if (len != sizeof(netopt_enable_t)) {
+            return -EOVERFLOW;
         }
-        case NETOPT_CHANNEL:
-            assert(len == sizeof(uint16_t));
-            res = ieee802154_set_channel_number(&mdev->mac.submac, *(const uint16_t *)value);
-            if (res == 0) {
-                res = sizeof(uint16_t);
-            }
-            break;
-        case NETOPT_TX_POWER:
-            assert(len == sizeof(int16_t));
-            res = ieee802154_set_tx_power(&mdev->mac.submac, *(const int16_t *)value);
-            if (res == 0) {
-                res = sizeof(int16_t);
-            }
-            break;
-        case NETOPT_TX_INDIRECT:
-            assert(len == sizeof(netopt_enable_t));
-            mdev->tx_indirect = (*(const netopt_enable_t *)value == NETOPT_ENABLE);
-            res = sizeof(netopt_enable_t);
-            break;
-        case NETOPT_ACK_REQ:
-            if (len != sizeof(netopt_enable_t)) {
-                return -EOVERFLOW;
-            }
-            mdev->ack_req = (*(const netopt_enable_t *)value == NETOPT_ENABLE);
-            res = sizeof(netopt_enable_t);
-            break;
-        case NETOPT_RAWMODE:
-            if (len != sizeof(netopt_enable_t)) {
-                return -EOVERFLOW;
-            }
-            if (mdev->netif) {
-                if (*(const netopt_enable_t *)value == NETOPT_ENABLE) {
-                    mdev->netif->flags |= GNRC_NETIF_FLAGS_RAWMODE;
-                }
-                else {
-                    mdev->netif->flags &= ~GNRC_NETIF_FLAGS_RAWMODE;
-                }
-            }
-            res = sizeof(netopt_enable_t);
-            break;
-        case NETOPT_ADDR_LEN:
-        case NETOPT_SRC_LEN: {
-            if (len != sizeof(uint16_t)) {
-                return -EOVERFLOW;
-            }
-            uint16_t addr_len = *(const uint16_t *)value;
-            ieee802154_pib_value_t v = {
-                .type = IEEE802154_PIB_TYPE_NUI16,
-            };
-            if (addr_len == IEEE802154_LONG_ADDRESS_LEN) {
-                v.v.short_addr = byteorder_htons(0xffff);
-            }
-            else if (addr_len == IEEE802154_SHORT_ADDRESS_LEN) {
-                ieee802154_pib_value_t cur;
-                ieee802154_mac_mlme_get_request(&mdev->mac, IEEE802154_PIB_SHORT_ADDR, &cur);
-                v.v.short_addr = cur.v.short_addr;
-                if (byteorder_ntohs(v.v.short_addr) == 0xffff) {
-                    v.v.short_addr = byteorder_htons(0x0000);
-                }
+        mdev->ack_req = (*(const netopt_enable_t *)value == NETOPT_ENABLE);
+        res = sizeof(netopt_enable_t);
+        break;
+    case NETOPT_RAWMODE:
+        if (len != sizeof(netopt_enable_t)) {
+            return -EOVERFLOW;
+        }
+        if (mdev->netif) {
+            if (*(const netopt_enable_t *)value == NETOPT_ENABLE) {
+                mdev->netif->flags |= GNRC_NETIF_FLAGS_RAWMODE;
             }
             else {
-                return -EAFNOSUPPORT;
+                mdev->netif->flags &= ~GNRC_NETIF_FLAGS_RAWMODE;
             }
-            ieee802154_mac_mlme_set_request(&mdev->mac, IEEE802154_PIB_SHORT_ADDR, &v);
-            res = sizeof(uint16_t);
-            break;
         }
-        case NETOPT_STATE: {
-            assert(len == sizeof(netopt_state_t));
-            netopt_state_t state = *((const netopt_state_t *)value);
+        res = sizeof(netopt_enable_t);
+        break;
+    case NETOPT_ADDR_LEN:
+    case NETOPT_SRC_LEN: {
+        if (len != sizeof(uint16_t)) {
+            return -EOVERFLOW;
+        }
+        uint16_t addr_len = *(const uint16_t *)value;
+        ieee802154_pib_value_t v = {
+            .type = IEEE802154_PIB_TYPE_NUI16,
+        };
+        if (addr_len == IEEE802154_LONG_ADDRESS_LEN) {
+            v.v.short_addr = byteorder_htons(0xffff);
+        }
+        else if (addr_len == IEEE802154_SHORT_ADDRESS_LEN) {
+            ieee802154_pib_value_t cur;
+            ieee802154_mac_mlme_get_request(&mdev->mac, IEEE802154_PIB_SHORT_ADDR, &cur);
+            v.v.short_addr = cur.v.short_addr;
+            if (byteorder_ntohs(v.v.short_addr) == 0xffff) {
+                v.v.short_addr = byteorder_htons(0x0000);
+            }
+        }
+        else {
+            return -EAFNOSUPPORT;
+        }
+        ieee802154_mac_mlme_set_request(&mdev->mac, IEEE802154_PIB_SHORT_ADDR, &v);
+        res = sizeof(uint16_t);
+        break;
+    }
+    case NETOPT_STATE: {
+        assert(len == sizeof(netopt_state_t));
+        netopt_state_t state = *((const netopt_state_t *)value);
+        ieee802154_pib_value_t rx_on = {
+            .type = IEEE802154_PIB_TYPE_BOOL,
+            .v.b = (state == NETOPT_STATE_IDLE),
+        };
+        ieee802154_mac_mlme_set_request(&mdev->mac, IEEE802154_PIB_RX_ON_WHEN_IDLE, &rx_on);
+        if ((state == NETOPT_STATE_SLEEP || state == NETOPT_STATE_IDLE) && mdev->radio_off) {
+            int on_res = ieee802154_radio_request_on(&mdev->mac.submac.dev);
+            if (on_res < 0) {
+                return on_res;
+            }
+            while (ieee802154_radio_confirm_on(&mdev->mac.submac.dev) == -EAGAIN) {}
+
+            ieee802154_phy_conf_t phy_conf = {
+                .channel = mdev->mac.submac.channel_num,
+                .pow = mdev->mac.submac.tx_pow,
+                .phy_mode = mdev->mac.submac.phy_mode,
+            };
+            int conf_res = ieee802154_radio_config_phy(&mdev->mac.submac.dev, &phy_conf);
+            if (conf_res < 0) {
+                return conf_res;
+            }
+
+            mdev->radio_off = false;
+        }
+        if (state == NETOPT_STATE_SLEEP) {
+            res = ieee802154_set_idle(&mdev->mac.submac);
+        }
+        else if (state == NETOPT_STATE_IDLE) {
+            res = ieee802154_set_rx(&mdev->mac.submac);
+        }
+        else if (state == NETOPT_STATE_OFF) {
             ieee802154_pib_value_t rx_on = {
                 .type = IEEE802154_PIB_TYPE_BOOL,
-                .v.b = (state == NETOPT_STATE_IDLE),
+                .v.b = false,
             };
             ieee802154_mac_mlme_set_request(&mdev->mac, IEEE802154_PIB_RX_ON_WHEN_IDLE, &rx_on);
-            if ((state == NETOPT_STATE_SLEEP || state == NETOPT_STATE_IDLE) && mdev->radio_off) {
-                int on_res = ieee802154_radio_request_on(&mdev->mac.submac.dev);
-                if (on_res < 0) {
-                    return on_res;
-                }
-                while (ieee802154_radio_confirm_on(&mdev->mac.submac.dev) == -EAGAIN) {}
-
-                ieee802154_phy_conf_t phy_conf = {
-                    .channel = mdev->mac.submac.channel_num,
-                    .pow = mdev->mac.submac.tx_pow,
-                    .phy_mode = mdev->mac.submac.phy_mode,
-                };
-                int conf_res = ieee802154_radio_config_phy(&mdev->mac.submac.dev, &phy_conf);
-                if (conf_res < 0) {
-                    return conf_res;
-                }
-
-                mdev->radio_off = false;
+            res = ieee802154_set_idle(&mdev->mac.submac);
+            if ((res < 0) && (res != -EALREADY)) {
+                return res;
             }
-            if (state == NETOPT_STATE_SLEEP) {
-                res = ieee802154_set_idle(&mdev->mac.submac);
-            }
-            else if (state == NETOPT_STATE_IDLE) {
-                res = ieee802154_set_rx(&mdev->mac.submac);
-            }
-            else if (state == NETOPT_STATE_OFF) {
-                ieee802154_pib_value_t rx_on = {
-                    .type = IEEE802154_PIB_TYPE_BOOL,
-                    .v.b = false,
-                };
-                ieee802154_mac_mlme_set_request(&mdev->mac, IEEE802154_PIB_RX_ON_WHEN_IDLE, &rx_on);
-                res = ieee802154_set_idle(&mdev->mac.submac);
-                if ((res < 0) && (res != -EALREADY)) {
-                    return res;
-                }
-                res = ieee802154_radio_off(&mdev->mac.submac.dev);
-                if (res == 0) {
-                    mdev->radio_off = true;
-                }
-            }
-            else {
-                return -ENOTSUP;
-            }
-            if (res == -EALREADY) {
-                res = 0;
-            }
+            res = ieee802154_radio_off(&mdev->mac.submac.dev);
             if (res == 0) {
-                res = sizeof(netopt_state_t);
+                mdev->radio_off = true;
             }
-            break;
+        }
+        else {
+            return -ENOTSUP;
+        }
+        if (res == -EALREADY) {
+            res = 0;
+        }
+        if (res == 0) {
+            res = sizeof(netopt_state_t);
+        }
+        break;
+    }
+
+    case NETOPT_SCAN: {
+        const gnrc_netif_ieee802154_mac_scan_request_t *req = value;
+        ieee802154_mlme_scan_req_t *scan_req = &mdev->scan_req;
+
+        if (len != sizeof(*req)) {
+            return -EINVAL;
+        }
+        if (req == NULL || req->results == NULL || req->results_used == NULL) {
+            return -EINVAL;
+        }
+        if (mdev->scan_in_progress) {
+            return -EBUSY;
         }
 
-        case NETOPT_SCAN: {
-            const gnrc_netif_ieee802154_mac_scan_request_t *req = value;
-            ieee802154_mlme_scan_req_t *scan_req = &mdev->scan_req;
+        memset(scan_req, 0, sizeof(*scan_req));
 
-            if (len != sizeof(*req)) {
+        *req->results_used = 0;
+        memset(req->results, 0, req->results_len * sizeof(req->results[0]));
+
+        if ((req->channels != NULL) && (req->channel_count > 0)) {
+            scan_req->channels = req->channels;
+            scan_req->channel_count = req->channel_count;
+        }
+        else if (req->base.channel == NETOPT_SCAN_REQ_ALL_CH) {
+            mdev->scan_all_ch_count = _scan_expand_channels_from_current(
+                mdev,
+                mdev->scan_all_channels,
+                sizeof(mdev->scan_all_channels) / sizeof(mdev->scan_all_channels[0]));
+
+            if (mdev->scan_all_ch_count == 0) {
                 return -EINVAL;
             }
-            if (req == NULL || req->results == NULL || req->results_used == NULL) {
-                return -EINVAL;
-            }
-            if (mdev->scan_in_progress) {
-                return -EBUSY;
-            }
 
+            scan_req->channels = mdev->scan_all_channels;
+            scan_req->channel_count = mdev->scan_all_ch_count;
+        }
+        else {
+            mdev->scan_all_channels[0] = req->base.channel;
+            mdev->scan_all_ch_count = 1;
+            scan_req->channels = mdev->scan_all_channels;
+            scan_req->channel_count = 1;
+        }
+
+        scan_req->results = req->results;
+        scan_req->results_len = req->results_len;
+        scan_req->results_used = req->results_used;
+        scan_req->duration = req->duration_us;
+
+        mdev->scan_cb = req->base.scan_cb;
+        mdev->scan_in_progress = true;
+
+        res = ieee802154_mac_mlme_scan_request(&mdev->mac, req->type, scan_req);
+        if (res < 0) {
+            mdev->scan_in_progress = false;
+            mdev->scan_cb = NULL;
             memset(scan_req, 0, sizeof(*scan_req));
-
-            *req->results_used = 0;
-            memset(req->results, 0, req->results_len * sizeof(req->results[0]));
-
-            if ((req->channels != NULL) && (req->channel_count > 0)) {
-                scan_req->channels = req->channels;
-                scan_req->channel_count = req->channel_count;
-            }
-            else if (req->base.channel == NETOPT_SCAN_REQ_ALL_CH) {
-                mdev->scan_all_ch_count = _scan_expand_channels_from_current(
-                    mdev,
-                    mdev->scan_all_channels,
-                    sizeof(mdev->scan_all_channels) / sizeof(mdev->scan_all_channels[0]));
-
-                if (mdev->scan_all_ch_count == 0) {
-                    return -EINVAL;
-                }
-
-                scan_req->channels = mdev->scan_all_channels;
-                scan_req->channel_count = mdev->scan_all_ch_count;
-            }
-            else {
-                mdev->scan_all_channels[0] = req->base.channel;
-                mdev->scan_all_ch_count = 1;
-                scan_req->channels = mdev->scan_all_channels;
-                scan_req->channel_count = 1;
-            }
-
-            scan_req->results = req->results;
-            scan_req->results_len = req->results_len;
-            scan_req->results_used = req->results_used;
-            scan_req->duration = req->duration_us;
-
-            mdev->scan_cb = req->base.scan_cb;
-            mdev->scan_in_progress = true;
-
-            res = ieee802154_mac_mlme_scan_request(&mdev->mac, req->type, scan_req);
-            if (res < 0) {
-                mdev->scan_in_progress = false;
-                mdev->scan_cb = NULL;
-                memset(scan_req, 0, sizeof(*scan_req));
-                return res;
-            }
-
-            return sizeof(*req);
+            return res;
         }
-        case NETOPT_CONNECT: {
-            const gnrc_netif_ieee802154_mac_connect_request_t *req = value;
 
-            if (len != sizeof(*req)) {
-                return -EINVAL;
-            }
-            if (req == NULL) {
-                return -EINVAL;
-            }
-            if (mdev->connect_in_progress) {
-                return -EBUSY;
-            }
+        return sizeof(*req);
+    }
+    case NETOPT_CONNECT: {
+        const gnrc_netif_ieee802154_mac_connect_request_t *req = value;
 
-            mdev->connect_cb = req->base.conn_cb;
-            mdev->connect_in_progress = true;
-            mdev->connect_status = -EINPROGRESS;
-            mdev->connect_short_addr = 0xffff;
-            mdev->connect_panid = req->panid;
-            mdev->connect_coord_addr = req->coord_addr;
+        if (len != sizeof(*req)) {
+            return -EINVAL;
+        }
+        if (req == NULL) {
+            return -EINVAL;
+        }
+        if (mdev->connect_in_progress) {
+            return -EBUSY;
+        }
 
-            res = ieee802154_mac_mlme_associate_request(&mdev->mac,
-                                                        &req->coord_addr,
-                                                        req->channel,
-                                                        req->panid,
-                                                        req->capability);
-            if (res < 0) {
-                mdev->connect_in_progress = false;
-                mdev->connect_cb = NULL;
-                mdev->connect_status = res;
-                return res;
+        mdev->connect_cb = req->base.conn_cb;
+        mdev->connect_in_progress = true;
+        mdev->connect_status = -EINPROGRESS;
+        mdev->connect_short_addr = 0xffff;
+        mdev->connect_panid = req->panid;
+        mdev->connect_coord_addr = req->coord_addr;
+
+        res = ieee802154_mac_mlme_associate_request(&mdev->mac,
+                                                    &req->coord_addr,
+                                                    req->channel,
+                                                    req->panid,
+                                                    req->capability);
+        if (res < 0) {
+            mdev->connect_in_progress = false;
+            mdev->connect_cb = NULL;
+            mdev->connect_status = res;
+            return res;
+        }
+
+        _poll_start(mdev);
+
+        return sizeof(*req);
+    }
+    case NETOPT_START: {
+        const gnrc_netif_ieee802154_mac_start_request_t *req = value;
+
+        if (req == NULL) {
+            return -EINVAL;
+        }
+        if (len != sizeof(*req)) {
+            return -EINVAL;
+        }
+        if (mdev->start_in_progress) {
+            return -EBUSY;
+        }
+
+        mdev->start_in_progress = true;
+        mdev->start_status = -EINPROGRESS;
+
+        res = ieee802154_mlme_start_request(&mdev->mac, req->channel);
+        if (res < 0) {
+            mdev->start_in_progress = false;
+            mdev->start_status = res;
+            return res;
+        }
+
+        return sizeof(*req);
+    }
+    case NETOPT_PAN_COORD: {
+        ieee802154_pib_value_t v = {
+            .type = IEEE802154_PIB_TYPE_BOOL,
+        };
+
+        if (len != sizeof(netopt_enable_t)) {
+            return -EINVAL;
+        }
+
+        v.v.b = (*(const netopt_enable_t *)value == NETOPT_ENABLE);
+
+        ieee802154_mac_mlme_set_request(&mdev->mac,
+                                        IEEE802154_PIB_RX_ON_WHEN_IDLE,
+                                        &v);
+
+        if (v.v.b) {
+            if (mdev->mac.cbs.rx_request) {
+                mdev->mac.cbs.rx_request(&mdev->mac);
             }
+        }
+        else {
+            (void)ieee802154_set_idle(&mdev->mac.submac);
+        }
 
+        res = sizeof(netopt_enable_t);
+        break;
+    }
+    case NETOPT_POLL_INTERVAL: {
+        uint32_t interval;
+
+        if (len != sizeof(interval)) {
+            return -EINVAL;
+        }
+
+        interval = *(const uint32_t *)value;
+        mdev->poll_interval_ms = interval;
+
+        if (interval == 0) {
+            _poll_stop(mdev);
+        }
+        else {
             _poll_start(mdev);
-
-            return sizeof(*req);
         }
-        case NETOPT_START: {
-            const gnrc_netif_ieee802154_mac_start_request_t *req = value;
 
-            if (req == NULL) {
-                return -EINVAL;
-            }
-            if (len != sizeof(*req)) {
-                return -EINVAL;
-            }
-            if (mdev->start_in_progress) {
-                return -EBUSY;
-            }
+        return sizeof(interval);
+    }
+    case NETOPT_POLL: {
+        const gnrc_netif_ieee802154_mac_poll_request_t *req = value;
+        const void *coord_ptr = NULL;
 
-            mdev->start_in_progress = true;
-            mdev->start_status = -EINPROGRESS;
-
-            res = ieee802154_mlme_start_request(&mdev->mac, req->channel);
-            if (res < 0) {
-                mdev->start_in_progress = false;
-                mdev->start_status = res;
-                return res;
-            }
-
-            return sizeof(*req);
+        if (req == NULL) {
+            return -EINVAL;
         }
-        case NETOPT_PAN_COORD: {
-            ieee802154_pib_value_t v = {
+        if (len != sizeof(*req)) {
+            return -EINVAL;
+        }
+
+        if (req->coord_addr.type == IEEE802154_ADDR_MODE_SHORT) {
+            coord_ptr = &req->coord_addr.v.short_addr;
+        }
+        else if (req->coord_addr.type == IEEE802154_ADDR_MODE_EXTENDED) {
+            coord_ptr = &req->coord_addr.v.ext_addr;
+        }
+        else {
+            return -EINVAL;
+        }
+
+        if (req->force_rx_on_when_idle) {
+            ieee802154_pib_value_t rx_on = {
                 .type = IEEE802154_PIB_TYPE_BOOL,
+                .v.b = true,
             };
-
-            if (len != sizeof(netopt_enable_t)) {
-                return -EINVAL;
-            }
-
-            v.v.b = (*(const netopt_enable_t *)value == NETOPT_ENABLE);
 
             ieee802154_mac_mlme_set_request(&mdev->mac,
                                             IEEE802154_PIB_RX_ON_WHEN_IDLE,
-                                            &v);
+                                            &rx_on);
 
-            if (v.v.b) {
-                if (mdev->mac.cbs.rx_request) {
-                    mdev->mac.cbs.rx_request(&mdev->mac);
-                }
+            if (mdev->mac.cbs.rx_request) {
+                mdev->mac.cbs.rx_request(&mdev->mac);
             }
-            else {
-                (void)ieee802154_set_idle(&mdev->mac.submac);
-            }
-
-            res = sizeof(netopt_enable_t);
-            break;
         }
-        case NETOPT_POLL_INTERVAL: {
-            uint32_t interval;
 
-            if (len != sizeof(interval)) {
-                return -EINVAL;
-            }
-
-            interval = *(const uint32_t *)value;
-            mdev->poll_interval_ms = interval;
-
-            if (interval == 0) {
-                _poll_stop(mdev);
-            }
-            else {
-                _poll_start(mdev);
-            }
-
-            return sizeof(interval);
+        res = ieee802154_mac_mlme_poll(&mdev->mac,
+                                       req->coord_addr.type,
+                                       req->panid,
+                                       coord_ptr);
+        if (res < 0) {
+            return res;
         }
-        case NETOPT_POLL: {
-            const gnrc_netif_ieee802154_mac_poll_request_t *req = value;
-            const void *coord_ptr = NULL;
 
-            if (req == NULL) {
-                return -EINVAL;
-            }
-            if (len != sizeof(*req)) {
-                return -EINVAL;
-            }
+        return sizeof(*req);
+    }
+    case NETOPT_BEACON_PAYLOAD: {
+        ieee802154_pib_value_t v = {
+            .type = IEEE802154_PIB_TYPE_BYTES,
+        };
 
-            if (req->coord_addr.type == IEEE802154_ADDR_MODE_SHORT) {
-                coord_ptr = &req->coord_addr.v.short_addr;
-            }
-            else if (req->coord_addr.type == IEEE802154_ADDR_MODE_EXTENDED) {
-                coord_ptr = &req->coord_addr.v.ext_addr;
-            }
-            else {
-                return -EINVAL;
-            }
-
-            if (req->force_rx_on_when_idle) {
-                ieee802154_pib_value_t rx_on = {
-                    .type = IEEE802154_PIB_TYPE_BOOL,
-                    .v.b = true,
-                };
-
-                ieee802154_mac_mlme_set_request(&mdev->mac,
-                                                IEEE802154_PIB_RX_ON_WHEN_IDLE,
-                                                &rx_on);
-
-                if (mdev->mac.cbs.rx_request) {
-                    mdev->mac.cbs.rx_request(&mdev->mac);
-                }
-            }
-
-            res = ieee802154_mac_mlme_poll(&mdev->mac,
-                                           req->coord_addr.type,
-                                           req->panid,
-                                           coord_ptr);
-            if (res < 0) {
-                return res;
-            }
-
-            return sizeof(*req);
+        if (len > sizeof(mdev->beacon_payload)) {
+            return -EOVERFLOW;
         }
-        case NETOPT_BEACON_PAYLOAD: {
-            ieee802154_pib_value_t v = {
-                .type = IEEE802154_PIB_TYPE_BYTES,
-            };
 
-            if (len > sizeof(mdev->beacon_payload)) {
-                return -EOVERFLOW;
-            }
-
-            if ((len > 0) && (value == NULL)) {
-                return -EINVAL;
-            }
-
-            if (len > 0) {
-                memcpy(mdev->beacon_payload, value, len);
-            }
-            mdev->beacon_payload_len = len;
-
-            v.v.bytes.ptr = mdev->beacon_payload;
-            v.v.bytes.len = len;
-
-            ieee802154_mac_mlme_set_request(&mdev->mac,
-                                            IEEE802154_PIB_BEACON_PAYLOAD,
-                                            &v);
-
-            res = (int)len;
-            break;
+        if ((len > 0) && (value == NULL)) {
+            return -EINVAL;
         }
-        default:
-            break;
+
+        if (len > 0) {
+            memcpy(mdev->beacon_payload, value, len);
+        }
+        mdev->beacon_payload_len = len;
+
+        v.v.bytes.ptr = mdev->beacon_payload;
+        v.v.bytes.len = len;
+
+        ieee802154_mac_mlme_set_request(&mdev->mac,
+                                        IEEE802154_PIB_BEACON_PAYLOAD,
+                                        &v);
+
+        res = (int)len;
+        break;
+    }
+    default:
+        break;
     }
     return res;
 }
@@ -1486,7 +1500,7 @@ static void _mac_scan_confirm(void *arg, int status, ieee802154_mlme_scan_req_t 
     gnrc_netif_ieee802154_mac_dev_t *dev = _dev_from_mac(mac);
 
     printf("scan confirm: status=%d used=%u\n", status,
-       (unsigned)(req && req->results_used ? *req->results_used : 0));
+           (unsigned)(req && req->results_used ? *req->results_used : 0));
 
     dev->scan_in_progress = false;
 
@@ -1546,7 +1560,7 @@ static void _mac_associate_confirm(void *arg, int status, uint16_t short_addr)
 
 static void _mac_start_confirm(void *arg, uint8_t handle, int status)
 {
-    (void) handle;
+    (void)handle;
     ieee802154_mac_t *mac = (ieee802154_mac_t *)arg;
     gnrc_netif_ieee802154_mac_dev_t *dev = _dev_from_mac(mac);
 
@@ -1573,3 +1587,5 @@ int gnrc_netif_ieee802154_mac_create(gnrc_netif_t *netif, char *stack,
                                 name, &dev->netdev, &_ops);
     return res;
 }
+
+/** @} */

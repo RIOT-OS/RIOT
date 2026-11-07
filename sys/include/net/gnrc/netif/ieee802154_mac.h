@@ -6,8 +6,6 @@
  *
  * @file
  * @brief       GNRC netif adapter for IEEE 802.15.4 MAC (mac.h)
- *
- * @}
  */
 
 #ifdef __cplusplus
@@ -45,8 +43,8 @@ extern "C" {
 #endif
 
 #define GNRC_NETIF_IEEE802154_MAC_SCAN_ALL_CHANNELS_LEN \
-    ((IEEE802154_CHANNEL_MAX_SUBGHZ - IEEE802154_CHANNEL_MIN_SUBGHZ + 1) + \
-     (IEEE802154_CHANNEL_MAX - IEEE802154_CHANNEL_MIN + 1))
+        ((IEEE802154_CHANNEL_MAX_SUBGHZ - IEEE802154_CHANNEL_MIN_SUBGHZ + 1) + \
+         (IEEE802154_CHANNEL_MAX - IEEE802154_CHANNEL_MIN + 1))
 
 
 /**
@@ -163,7 +161,7 @@ typedef struct gnrc_netif_ieee802154_mac_dev {
     bool scan_in_progress;
     gnrc_netif_ieee802154_mac_scan_list_t scan_list;
     gnrc_netif_ieee802154_mac_scan_list_node_t
-    scan_nodes[GNRC_NETIF_IEEE802154_MAC_SCAN_MAX_CH];
+        scan_nodes[GNRC_NETIF_IEEE802154_MAC_SCAN_MAX_CH];
     uint16_t scan_all_channels[GNRC_NETIF_IEEE802154_MAC_SCAN_ALL_CHANNELS_LEN];
     uint8_t scan_all_ch_count;
 
@@ -243,3 +241,5 @@ ieee802154_mac_t *gnrc_netif_ieee802154_mac_get(void);
 #ifdef __cplusplus
 }
 #endif
+
+/** @} */
