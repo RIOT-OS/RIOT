@@ -235,6 +235,8 @@ struct ieee802154_submac {
     uint8_t csma_retries;               /**< maximum number of CSMA-CA retries */
     uint8_t backoff_mask;               /**< internal value used for random backoff calculation */
     uint8_t csma_retries_nb;            /**< current number of CSMA-CA retries */
+#endif
+#if IS_USED(MODULE_IEEE802154_SUBMAC_SOFT_ACK)
     bool frame_pending;                 /**< whether frame is pending */
 #endif
 #if IS_USED(MODULE_IEEE802154_SUBMAC_SOFT_FRAME_RETRANS)
@@ -627,11 +629,17 @@ static inline int ieee802154_set_rx(ieee802154_submac_t *submac)
 /**
  * @brief Set the src address matching.
  *
+ * Try the radio HAL first. Software ACKs support a global frame-pending
+ * fallback for @ref IEEE802154_SRC_MATCH_EN only.
+ *
  * @param[in] submac pointer to the SubMAC descriptor
  * @param[in] cmd command for the source address match configuration
  * @param[in] value value associated to cmd.
  *
- * @param[out]
+ * @retval 0 on success
+ * @retval -ENOTSUP if neither hardware nor software supports the command
+ * @retval -EINVAL if the software fallback receives a NULL value
+ * @return Other errors returned by the radio HAL
  */
 int ieee802154_submac_config_src_address_match(ieee802154_submac_t *submac,
                                                ieee802154_src_match_t cmd, const void *value);

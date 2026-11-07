@@ -438,9 +438,11 @@ static ieee802154_submac_fsm_return_t _handle_fsm_ev_tx_ack(ieee802154_submac_t 
                                                             uint8_t seq_num)
 {
     uint8_t ack[] = { IEEE802154_FCF_TYPE_ACK, 0x00,  seq_num };
+#if IS_USED(MODULE_IEEE802154_SUBMAC_SOFT_ACK)
     if (submac->frame_pending) {
         ack[0] |= IEEE802154_FCF_FRAME_PEND;
     }
+#endif
 
     iolist_t iolist = {
         .iol_base = ack,
@@ -1272,16 +1274,26 @@ bool ieee802154_submac_state_is_rx(ieee802154_submac_t *submac)
 int ieee802154_submac_config_src_address_match(ieee802154_submac_t *submac,
                                                ieee802154_src_match_t cmd, const void *value)
 {
-    if (_does_handle_ack(&submac->dev)) {
-        return ieee802154_radio_config_src_address_match(&submac->dev, cmd, value);
+    ieee802154_dev_t *dev = &submac->dev;
+    int res = -ENOTSUP;
+
+    if (dev->driver->config_src_addr_match) {
+        res = ieee802154_radio_config_src_address_match(dev, cmd, value);
     }
-    else {
-        if (cmd != IEEE802154_SRC_MATCH_EN) {
-            return -ENOTSUP; 
+    if (res != -ENOTSUP) {
+        return res;
+    }
+
+#if IS_USED(MODULE_IEEE802154_SUBMAC_SOFT_ACK)
+    if (!_does_send_ack(dev) && cmd == IEEE802154_SRC_MATCH_EN) {
+        if (!value) {
+            return -EINVAL;
         }
         submac->frame_pending = *(const bool *)value;
+        return 0;
     }
-    return 0;
+#endif
+    return -ENOTSUP;
 }
 
 /** @} */
