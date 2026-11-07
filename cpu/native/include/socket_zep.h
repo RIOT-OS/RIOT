@@ -118,6 +118,7 @@ typedef struct {
     ieee802154_filter_mode_t filter_mode;   /**< frame filter mode */
     zepdev_state_t state;                   /**< device state machine */
     bool send_hello;                        /**< send HELLO packet on connect */
+    bool pan_coord;                         /**< accept frames addressed to the PAN coordinator */
 } socket_zep_t;
 
 /**
