@@ -8,6 +8,7 @@
 #include "ztimer.h"
 
 #include "mac_pib.h"
+#include "mac_fsm.h"
 #include "mac_tx.h"
 #include "mac_queue.h"
 
@@ -108,12 +109,7 @@ void ieee802154_mac_tick(ieee802154_mac_t *mac)
     mutex_lock(&mac->indirect_q.lock);
 
     mac->indirect_q.tick++;
-    if (mac->assoc_pending &&
-        ieee802154_mac_frame_is_expired(mac->indirect_q.tick, mac->assoc_deadline_tick)) {
-        mac->assoc_pending = false;
-        //(void)ieee802154_mac_fsm_process_ev_ctx(mac, IEEE802154_MAC_FSM_EV_ASSOC_TIMEOUT, NULL);
-        //(void)ieee802154_set_idle(&mac->submac);
-    }
+    uint32_t now_tick = mac->indirect_q.tick;
 
     if (mac->poll_rx_active
         && ieee802154_mac_frame_is_expired(mac->indirect_q.tick,
@@ -165,6 +161,14 @@ void ieee802154_mac_tick(ieee802154_mac_t *mac)
                (uint32_t)IEEE802154_MAC_TICK_INTERVAL_MS);
 
     mutex_unlock(&mac->indirect_q.lock);
+
+    mutex_lock(&mac->submac_lock);
+    if (mac->assoc_pending &&
+        ieee802154_mac_frame_is_expired(now_tick, mac->assoc_deadline_tick)) {
+        (void)ieee802154_mac_fsm_process_ev_ctx(mac, IEEE802154_MAC_FSM_EV_ASSOC_TIMEOUT,
+                                               NULL);
+    }
+    mutex_unlock(&mac->submac_lock);
 
     if (stop_poll_rx) {
         mutex_lock(&mac->submac_lock);
