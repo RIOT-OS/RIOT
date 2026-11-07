@@ -178,12 +178,8 @@ typedef struct {
  */
 typedef enum {
     IEEE802154_SUBMAC_TX_OPT_NONE        = 0,
-#if IS_USED(MODULE_IEEE802154_SUBMAC_SOFT_CSMA_CA)
     IEEE802154_SUBMAC_TX_OPT_NO_CSMA_CA  = BIT0,
-#endif
-#if IS_USED(MODULE_IEEE802154_SUBMAC_SOFT_FRAME_RETRANS)
     IEEE802154_SUBMAC_TX_OPT_NO_RETRANS  = BIT1,
-#endif
 } ieee802154_submac_tx_opts_t;
 
 /**
@@ -244,10 +240,7 @@ struct ieee802154_submac {
     uint8_t retrans;                    /**< current number of retransmissions */
     bool wait_for_ack;                  /**< SubMAC is waiting for an ACK frame */
 #endif
-#if IS_USED(MODULE_IEEE802154_SUBMAC_SOFT_CSMA_CA) || \
-    IS_USED(MODULE_IEEE802154_SUBMAC_SOFT_FRAME_RETRANS)
     uint8_t tx_opts;
-#endif
     uint16_t ack_timeout_us;            /**< ACK timeout in µs */
     uint16_t panid;                     /**< IEEE 802.15.4 PAN ID */
     uint16_t channel_num;               /**< IEEE 802.15.4 channel number */
@@ -279,8 +272,11 @@ int ieee802154_send(ieee802154_submac_t *submac, const iolist_t *iolist);
 /**
  * @brief Transmit an IEEE 802.15.4 PSDU
  *
- * This function performs an IEEE 802.15.4 transmission,
- * same as ieee802154_send but with tx opts
+ * This function performs an IEEE 802.15.4 transmission like
+ * @ref ieee802154_send, with per-transmission options.
+ *
+ * Options apply to this send operation only. The SubMAC restores affected radio
+ * settings and clears the options before calling @ref ieee802154_submac_cb_t::tx_done.
  *
  * @param[in] submac pointer to the SubMAC descriptor
  * @param[in] iolist pointer to the PSDU frame (without FCS)
@@ -291,7 +287,7 @@ int ieee802154_send(ieee802154_submac_t *submac, const iolist_t *iolist);
  *         @ref ieee802154_submac_cb_t::rx_done or
  *         @ref ieee802154_submac_cb_t::tx_done
  */
-int ieee802154_send_ext(ieee802154_submac_t *submac,
+int ieee802154_send_opts(ieee802154_submac_t *submac,
                        const iolist_t *iolist,
                        ieee802154_submac_tx_opts_t tx_opts);
 
