@@ -160,7 +160,11 @@ static int _mac_assoc_request(ieee802154_mac_t *mac, const ieee802154_mac_fsm_ct
 
     ieee802154_pib_value_t wait;
     ieee802154_mac_mlme_get(mac, IEEE802154_PIB_RESPONSE_WAIT_TIME, &wait);
-    uint32_t duration_us = (uint32_t)wait.v.u8 * 60U * mac->sym_us;
+    /* IEEE Std 802.15.4-2024, 8.4.3.1 (Table 8-36): macResponseWaitTime is
+     * measured in aBaseSuperframeDuration units, defined in 8.4.2 (Table 8-35).
+     * See 10.21.2 for the association procedure. */
+    uint32_t duration_us = (uint32_t)wait.v.u8 * IEEE802154_MAC_BASE_SUPERFRAME_DURATION *
+                           mac->sym_us;
     uint32_t duration_ms = (duration_us + 999U) / 1000U;
     uint32_t ticks = (duration_ms + IEEE802154_MAC_TICK_INTERVAL_MS - 1U) /
                      IEEE802154_MAC_TICK_INTERVAL_MS;
