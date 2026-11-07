@@ -11,6 +11,7 @@
  * @author  Carl Seifert <carl.seifert@tu-dresden.de>
  */
 
+#include <assert.h>
 #include <errno.h>
 #include <stdio.h>
 #include <string.h>
@@ -106,8 +107,13 @@ bool unicoap_endpoint_is_equal(const unicoap_endpoint_t* lhs,
 {
     (void)lhs;
     (void)rhs;
+    assert(lhs);
+    assert(rhs);
     if (lhs->proto != rhs->proto) {
         return false;
+    }
+    if (lhs == rhs) {
+        return true;
     }
     switch (lhs->proto) {
 #if IS_USED(MODULE_UNICOAP_SOCK_SUPPORT)
