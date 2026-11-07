@@ -1196,7 +1196,10 @@ static int _netdev_set(netdev_t *dev, netopt_t opt, const void *value, size_t le
                     .v.b = false,
                 };
                 ieee802154_mac_mlme_set_request(&mdev->mac, IEEE802154_PIB_RX_ON_WHEN_IDLE, &rx_on);
-                (void)ieee802154_set_idle(&mdev->mac.submac);
+                res = ieee802154_set_idle(&mdev->mac.submac);
+                if ((res < 0) && (res != -EALREADY)) {
+                    return res;
+                }
                 res = ieee802154_radio_off(&mdev->mac.submac.dev);
                 if (res == 0) {
                     mdev->radio_off = true;
@@ -1204,6 +1207,9 @@ static int _netdev_set(netdev_t *dev, netopt_t opt, const void *value, size_t le
             }
             else {
                 return -ENOTSUP;
+            }
+            if (res == -EALREADY) {
+                res = 0;
             }
             if (res == 0) {
                 res = sizeof(netopt_state_t);
