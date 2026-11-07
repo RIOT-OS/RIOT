@@ -23,7 +23,6 @@
 
 //static void _ev_data_confirm_handler(event_t *event);                        /**< TX Done event handler */                        /**< RX Done event handler */
 static void _ev_radio_handler(event_t *event);                      /**< CRC Error event handler */
-static void _ev_bh_request_handler(event_t *event);                 /**< BH Request event handler */
 static void _ev_ack_timeout_handler(event_t *event);                /**< ACK Timeout event handler */
 static void _ev_tick_handler(event_t *event);
 static void _ev_scan_timer_handler(event_t *event);
@@ -32,7 +31,6 @@ static void _ev_rx_handler(event_t *event);
 static void _ev_assoc_indication_handler(event_t *event);
 
 //static event_t ev_data_confirm = { .handler = _ev_data_confirm_handler };         /**< TX Done descriptor */         /**< RX Done descriptor */
-static event_t ev_bh_request = { .handler = _ev_bh_request_handler };   /**< BH Request descriptor */
 static event_t ev_ack_timeout = { .handler = _ev_ack_timeout_handler }; /**< ACK TO descriptor */
 static event_t ev_tick = { .handler = _ev_tick_handler };
 static event_t ev_scan_timer = { .handler = _ev_scan_timer_handler };
@@ -311,11 +309,6 @@ static void my_timeout(void *mac)
     event_post(EVENT_PRIO_HIGHEST, &ev_ack_timeout);
 }
 
-static void my_bh_cb(void *mac)
-{
-    (void)mac;
-    event_post(EVENT_PRIO_HIGHEST, &ev_bh_request);
-}
 ieee802154_dev_t *_dev_radio_cb;
 ieee802154_trx_ev_t _st_radio_cb;
 static void my_radio_cb(ieee802154_dev_t *dev, ieee802154_trx_ev_t st)
@@ -334,11 +327,6 @@ static void _ev_scan_timer_handler(event_t *event)
 {
     (void)event;
     ieee802154_mac_scan_timer_process(&mac);
-}
-static void _ev_bh_request_handler(event_t *event)
-{
-    (void)event;
-    ieee802154_mac_bh_process(&mac);
 }
 static void _ev_ack_timeout_handler(event_t *event)
 {
@@ -834,7 +822,6 @@ static int _init(void)
         .mlme_associate_confirm = my_associate_confirm,
         .scan_timer_request = my_scan_timer,
         .tick_request = my_tick,
-        .bh_request = my_bh_cb,
         .radio_cb_request = my_radio_cb,
         .ack_timeout = my_timeout,
         .allocate_request = my_alloc,
