@@ -413,7 +413,6 @@ typedef struct {
     ieee802154_mlme_associate_indication_cb_t mlme_associate_indication; /**< MLME-ASSOCIATE.indication callback */
     ieee802154_mlme_associate_confirm_cb_t mlme_associate_confirm; /**< MLME-ASSOCIATE.confirm callback */
     ieee802154_mac_ack_timeout_fired_cb_t ack_timeout;          /**< ieee802154_mac_ack_timeout_fired() should be dispatched */
-    ieee802154_mac_bh_request_cb_t bh_request;                  /**< ieee802154_mac_bh_process() should be dispatched */
     ieee802154_radio_cb_request_t radio_cb_request;             /**< ieee802154_mac_handle_radio() should be dispatched */
     ieee802154_mac_scan_timer_request_t scan_timer_request;     /**< ieee802154_mac_scan_timer_process() should be dispatched */
     ieee802154_mac_tick_t tick_request;                         /**< ieee802154_mac_tick() should be dispatched */
@@ -532,11 +531,6 @@ typedef enum {
  * @brief Has to be called from thread context when ieee802154_mac_ack_timeout_fired_cb_t is called.
  */
 void ieee802154_mac_ack_timeout_fired(ieee802154_mac_t *mac);
-
-/**
- * @brief Has to be called from thread context when ieee802154_mac_bh_request_cb_t is called.
- */
-void ieee802154_mac_bh_process(ieee802154_mac_t *mac);
 
 /**
  * @brief Has to be called from thread context when ieee802154_radio_cb_request_t is called.

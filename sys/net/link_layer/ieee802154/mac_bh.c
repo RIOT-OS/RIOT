@@ -19,8 +19,7 @@ static void _process_event(ieee802154_mac_t *mac, uint8_t ev)
 {
     switch ((ieee802154_mac_ev_t)ev) {
     case IEEE802154_MAC_EV_RADIO_TX_DONE:
-        DEBUG("IEEE802154 MAC: processing event IEEE802154_MAC_EV_RADIO_TX_DONE (submac_state=%u)\n",
-              mac->submac.fsm_state);
+        DEBUG("IEEE802154 MAC: processing event IEEE802154_MAC_EV_RADIO_TX_DONE\n");
         ieee802154_submac_tx_done_cb(&mac->submac);
         if (mac->scan_active && mac->scan_timer_pending && (mac->scan_req != NULL)) {
             uint32_t duration_us = mac->scan_req->duration * mac->sym_us;
@@ -29,8 +28,7 @@ static void _process_event(ieee802154_mac_t *mac, uint8_t ev)
         }
         break;
     case IEEE802154_MAC_EV_RADIO_RX_DONE:
-        DEBUG("IEEE802154 MAC: processing event IEEE802154_MAC_EV_RADIO_RX_DONE (submac_state=%u)\n",
-              mac->submac.fsm_state);
+        DEBUG("IEEE802154 MAC: processing event IEEE802154_MAC_EV_RADIO_RX_DONE\n");
         ieee802154_submac_rx_done_cb(&mac->submac);
         break;
 
@@ -68,21 +66,6 @@ void ieee802154_mac_handle_radio(ieee802154_dev_t *dev, ieee802154_trx_ev_t st)
     mutex_lock(&mac->submac_lock);
     _process_event(mac, ev);
     mutex_unlock(&mac->submac_lock);
-}
-
-void ieee802154_mac_bh_process(ieee802154_mac_t *mac)
-{
-    mutex_lock(&mac->submac_lock);
-    ieee802154_submac_bh_process(&mac->submac);
-    mutex_unlock(&mac->submac_lock);
-}
-
-/* ===== Required SubMAC extern hooks ===== */
-void ieee802154_submac_bh_request(ieee802154_submac_t *submac)
-{
-    ieee802154_mac_t *mac = container_of(submac, ieee802154_mac_t, submac);
-
-    mac->cbs.bh_request(mac);
 }
 
 void ieee802154_mac_scan_timer_process(ieee802154_mac_t *mac)
