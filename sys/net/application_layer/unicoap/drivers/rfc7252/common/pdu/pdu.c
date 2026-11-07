@@ -22,25 +22,6 @@
 
 #define PDU_7252_DEBUG(...) _UNICOAP_PREFIX_DEBUG(".pdu.rfc7252", __VA_ARGS__)
 
-/*  0                   1                   2                   3
- *  0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
- * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
- * |Ver| T |  TKL  |      Code     |          Message ID           |
- * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
- * |   Token (if any, TKL bytes) ...
- * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
- * |   Options (if any) ...
- * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
- * |1 1 1 1 1 1 1 1|    Payload (if any) ...
- * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
- * https://datatracker.ietf.org/doc/html/rfc7252#section-3
- */
-typedef struct __attribute__((packed)) {
-    uint8_t version_type_token_length;
-    uint8_t code;
-    uint16_t message_id;
-} unicoap_header_rfc7252_t;
-
 /**
  * @brief       Gets message CoAP version
  * @param[in]   header   CoAP PDU header
@@ -48,7 +29,7 @@ typedef struct __attribute__((packed)) {
  */
 static inline unicoap_protocol_version_t _get_version(const unicoap_header_rfc7252_t* header)
 {
-    return header->version_type_token_length >> 6;
+    return header->version;
 }
 
 /**
@@ -57,7 +38,7 @@ static inline unicoap_protocol_version_t _get_version(const unicoap_header_rfc72
  */
 static inline void _set_version(unicoap_header_rfc7252_t* header)
 {
-    header->version_type_token_length |= UNICOAP_COAP_VERSION_1 << 6;
+    header->version = UNICOAP_COAP_VERSION_1;
 }
 
 /**
@@ -70,7 +51,7 @@ static inline void _set_version(unicoap_header_rfc7252_t* header)
  */
 static inline unsigned _get_type(const unicoap_header_rfc7252_t* header)
 {
-    return (header->version_type_token_length & 0x30) >> 4;
+    return header->type;
 }
 
 /**
@@ -81,7 +62,7 @@ static inline unsigned _get_type(const unicoap_header_rfc7252_t* header)
 static inline void _set_type(unicoap_header_rfc7252_t* header, unicoap_rfc7252_message_type_t type)
 {
     assert((type & ~0x3) == 0);
-    header->version_type_token_length |= type << 4;
+    header->type = type;
 }
 
 /**
@@ -131,7 +112,7 @@ static inline void _set_message_id(unicoap_header_rfc7252_t* header, uint16_t me
  */
 static inline uint8_t _get_token_length(const unicoap_header_rfc7252_t* header)
 {
-    return header->version_type_token_length & 0xf;
+    return header->token_length;
 }
 
 /**
@@ -142,7 +123,7 @@ static inline uint8_t _get_token_length(const unicoap_header_rfc7252_t* header)
 static inline void _set_token_length(unicoap_header_rfc7252_t* header, uint8_t token_length)
 {
     assert((token_length & ~0xf) == 0);
-    header->version_type_token_length |= token_length;
+    header->token_length = token_length;
 }
 
 ssize_t unicoap_pdu_parse_rfc7252(uint8_t* pdu, size_t size, unicoap_message_t* message,
