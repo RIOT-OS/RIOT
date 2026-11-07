@@ -16,7 +16,10 @@
 #include <stdint.h>
 
 #include "container.h"
+#include "iolist.h"
+#include "modules.h"
 #include "random.h"
+#include "private/pdu/rfc7252.h"
 
 #define ENABLE_DEBUG CONFIG_UNICOAP_DEBUG_LOGGING
 #include "debug.h"
@@ -658,10 +661,9 @@ static int _acknowledge_or_reset(unicoap_packet_t* packet, unicoap_rfc7252_messa
     /* This is all faster than going through the PDU builder for an empty message. And it saves us
      * stack allocations that we'd need to prepare for an arbitrary message (more iolist structs and
      * bigger header buffer for additional token. */
-    unicoap_header_rfc7252_t empty_message = {
+    unicoap_rfc7252_header_t empty_message = {
         .version = UNICOAP_COAP_VERSION_1,
         .code = UNICOAP_CODE_EMPTY,
-        .token_length = 0,
     };
 
     iolist_t vector = {
@@ -669,8 +671,8 @@ static int _acknowledge_or_reset(unicoap_packet_t* packet, unicoap_rfc7252_messa
         .iol_len = sizeof(empty_message)
     };
 
-    empty_message.message_id = _get_id(packet);
-    empty_message.type = type;
+    unicoap_rfc7252_header_set_message_id(&empty_message, _get_id(packet));
+    unicoap_rfc7252_header_set_type(&empty_message, type);
 
     /* We do not reconnect here for messaging-layer-only PDUs (empty ACKs and RSTs).
      * Reason: If we send an ACK or RST that means we got a message before. This implies
