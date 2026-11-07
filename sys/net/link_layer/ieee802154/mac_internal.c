@@ -65,6 +65,7 @@ static void _init_tx_q(ieee802154_mac_t *mac)
     mac->indirect_q.free_mask = (1U << IEEE802154_MAC_TX_INDIRECTQ_SIZE) - 1;
     mutex_init(&mac->indirect_q.lock);
     memset(&mac->indirect_q.q, 0, sizeof(mac->indirect_q.q));
+    memset(&mac->assoc_table, 0, sizeof(mac->assoc_table));
 }
 
 void ieee802154_init_mac_internal(ieee802154_mac_t *mac)

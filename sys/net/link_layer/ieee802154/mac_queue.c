@@ -6,7 +6,10 @@
 #include <string.h>
 
 #include "mac_queue.h"
+#include "mac_fsm.h"
 #include "mac_pib.h"
+#include "net/ieee802154.h"
+#include "net/ieee802154/radio.h"
 
 #define ENABLE_DEBUG 0
 #include "debug.h"
@@ -133,6 +136,80 @@ bool ieee802154_mac_frame_is_expired(uint16_t now_tick, uint16_t deadline_tick)
     return ((int16_t)(now_tick - deadline_tick)) >= 0;
 }
 
+static int _assoc_find_ext_locked(const ieee802154_mac_t *mac,
+                                  const ieee802154_ext_addr_t *ext_addr)
+{
+    for (int i = 0; i < IEEE802154_MAC_ASSOC_TABLE_SIZE; i++) {
+        const ieee802154_mac_assoc_entry_t *entry = &mac->assoc_table[i];
+
+        if (entry->valid &&
+            memcmp(entry->ext_addr.uint8, ext_addr->uint8,
+                   IEEE802154_LONG_ADDRESS_LEN) == 0) {
+            return i;
+        }
+    }
+    return -1;
+}
+
+static int _assoc_find_short_locked(const ieee802154_mac_t *mac,
+                                    ieee802154_short_addr_t short_addr)
+{
+    for (int i = 0; i < IEEE802154_MAC_ASSOC_TABLE_SIZE; i++) {
+        const ieee802154_mac_assoc_entry_t *entry = &mac->assoc_table[i];
+
+        if (entry->valid && (entry->short_addr.u16 == short_addr.u16)) {
+            return i;
+        }
+    }
+    return -1;
+}
+
+void ieee802154_mac_assoc_update(ieee802154_mac_t *mac,
+                                 const ieee802154_ext_addr_t *ext_addr,
+                                 ieee802154_short_addr_t short_addr)
+{
+    if (!mac || !ext_addr) {
+        return;
+    }
+
+    uint16_t short_host = byteorder_ntohs(short_addr);
+    if ((short_host == 0xffffU) || (short_host == 0xfffeU)) {
+        return;
+    }
+
+    mutex_lock(&mac->indirect_q.lock);
+    int slot = _assoc_find_ext_locked(mac, ext_addr);
+    if (slot < 0) {
+        slot = _assoc_find_short_locked(mac, short_addr);
+    }
+    if (slot < 0) {
+        for (int i = 0; i < IEEE802154_MAC_ASSOC_TABLE_SIZE; i++) {
+            if (!mac->assoc_table[i].valid) {
+                slot = i;
+                break;
+            }
+        }
+    }
+    if (slot < 0) {
+        slot = 0;
+    }
+
+    mac->assoc_table[slot].ext_addr = *ext_addr;
+    mac->assoc_table[slot].short_addr = short_addr;
+    mac->assoc_table[slot].valid = true;
+    mutex_unlock(&mac->indirect_q.lock);
+}
+
+static bool _assoc_ext_matches_short_locked(const ieee802154_mac_t *mac,
+                                            const ieee802154_ext_addr_t *ext_addr,
+                                            ieee802154_short_addr_t short_addr)
+{
+    int slot = _assoc_find_ext_locked(mac, ext_addr);
+
+    return (slot >= 0) &&
+           (mac->assoc_table[slot].short_addr.u16 == short_addr.u16);
+}
+
 void ieee802154_mac_indirect_fp_update(ieee802154_mac_t *mac,
                                        ieee802154_addr_mode_t dst_mode,
                                        const void *dst_addr,
@@ -156,6 +233,13 @@ void ieee802154_mac_indirect_fp_update(ieee802154_mac_t *mac,
                                                       pending ? IEEE802154_SRC_MATCH_EXT_ADD
                                                               : IEEE802154_SRC_MATCH_EXT_CLEAR,
                                                       ext);
+            int slot = _assoc_find_ext_locked(mac, ext);
+            if (slot >= 0) {
+                ieee802154_submac_config_src_address_match(&mac->submac,
+                                                          pending ? IEEE802154_SRC_MATCH_SHORT_ADD
+                                                                  : IEEE802154_SRC_MATCH_SHORT_CLEAR,
+                                                          &mac->assoc_table[slot].short_addr);
+            }
         }
     }
 #  else
@@ -312,7 +396,6 @@ static int _indirectq_search_slot_locked(ieee802154_mac_t *mac,
         return -1;
     }
 
-    ieee802154_addr_mode_t key_mode = dst_mode;
     network_uint16_t short_addr = { .u16 = 0 };
     const ieee802154_ext_addr_t *ext_addr = NULL;
     if (dst_mode == IEEE802154_ADDR_MODE_SHORT) {
@@ -327,18 +410,23 @@ static int _indirectq_search_slot_locked(ieee802154_mac_t *mac,
         if (!q->has_dst_addr) {
             continue;
         }
-        if (q->key_mode != key_mode) {
-            continue;
-        }
-        if (key_mode == IEEE802154_ADDR_MODE_EXTENDED) {
+        if (q->key_mode == IEEE802154_ADDR_MODE_EXTENDED) {
             if (ext_addr &&
                 memcmp(q->dst_ext_addr.uint8, ext_addr->uint8,
                        IEEE802154_LONG_ADDRESS_LEN) == 0) {
                 return i;
             }
+            if ((dst_mode == IEEE802154_ADDR_MODE_SHORT) &&
+                _assoc_ext_matches_short_locked(mac, &q->dst_ext_addr, short_addr)) {
+                return i;
+            }
         }
-        else if (key_mode == IEEE802154_ADDR_MODE_SHORT) {
+        else if (q->key_mode == IEEE802154_ADDR_MODE_SHORT) {
             if (q->dst_short_addr.u16 == short_addr.u16) {
+                return i;
+            }
+            if (ext_addr &&
+                _assoc_ext_matches_short_locked(mac, ext_addr, q->dst_short_addr)) {
                 return i;
             }
         }

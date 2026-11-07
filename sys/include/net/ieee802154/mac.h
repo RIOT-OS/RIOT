@@ -60,6 +60,13 @@ extern "C" {
 #define IEEE802154_MAC_TX_INDIRECTQ_SIZE     (4)
 #endif
 
+#ifndef CONFIG_IEEE802154_MAC_ASSOC_TABLE_SIZE
+#define CONFIG_IEEE802154_MAC_ASSOC_TABLE_SIZE      (IEEE802154_MAC_TX_INDIRECTQ_SIZE)
+#endif
+#ifndef IEEE802154_MAC_ASSOC_TABLE_SIZE
+#define IEEE802154_MAC_ASSOC_TABLE_SIZE      CONFIG_IEEE802154_MAC_ASSOC_TABLE_SIZE
+#endif
+
 #ifndef IEEE802154_MAC_BASE_SLOT_DURATION
 #define IEEE802154_MAC_BASE_SLOT_DURATION   (60U)
 #endif
@@ -490,6 +497,15 @@ typedef struct {
 } ieee802154_mac_indirect_q_t;
 
 /**
+ * @brief IEEE 802.15.4 association address alias entry.
+ */
+typedef struct {
+    ieee802154_ext_addr_t ext_addr;
+    ieee802154_short_addr_t short_addr;
+    bool valid;
+} ieee802154_mac_assoc_entry_t;
+
+/**
  * @brief IEEE 802.15.4 MAC descriptor
  */
 typedef struct {
@@ -507,6 +523,7 @@ typedef struct {
     uint8_t cmd_buf[IEEE802154_FRAME_LEN_MAX];                  /**< receiving buf */
     iolist_t cmd;
     ieee802154_mac_indirect_q_t indirect_q;
+    ieee802154_mac_assoc_entry_t assoc_table[IEEE802154_MAC_ASSOC_TABLE_SIZE];
     uint16_t sym_us;
     ieee802154_mlme_scan_req_t *scan_req;
     bool scan_active;

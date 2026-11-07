@@ -205,6 +205,13 @@ static int _mac_assoc_response(ieee802154_mac_t *mac, const ieee802154_mac_fsm_c
         src_mode = IEEE802154_ADDR_MODE_SHORT;
     }
 
+    if ((ctx->assoc_status == IEEE802154_ASSOC_STATUS_SUCCESS) &&
+        (ctx->dst_mode == IEEE802154_ADDR_MODE_EXTENDED)) {
+        ieee802154_mac_assoc_update(mac,
+                                    (const ieee802154_ext_addr_t *)ctx->data_dst_addr,
+                                    byteorder_htons(ctx->assoc_short_addr));
+    }
+
     /* Association response should be sent indirectly after a data request */
     return _mac_enqueue_and_tx(mac, ctx, src_mode, IEEE802154_FCF_TYPE_MACCMD,
                                &mac->cmd, &handle, true, true);

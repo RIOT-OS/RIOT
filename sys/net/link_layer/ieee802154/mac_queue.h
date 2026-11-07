@@ -72,6 +72,13 @@ uint16_t ieee802154_indirect_get_deadline(ieee802154_mac_t *mac);
  * @brief Check whether a frame is expired.
  */
 bool ieee802154_mac_frame_is_expired(uint16_t now_tick, uint16_t deadline_tick);
+
+/**
+ * @brief Record an associated device's extended-to-short address alias.
+ */
+void ieee802154_mac_assoc_update(ieee802154_mac_t *mac,
+                                 const ieee802154_ext_addr_t *ext_addr,
+                                 ieee802154_short_addr_t short_addr);
 /**
  * @brief Update the frame pending bit for a destination address.
  */
@@ -130,4 +137,3 @@ int ieee802154_mac_enqueue_beacon_request(ieee802154_mac_t *mac);
 #endif
 
 /** @} */
-
