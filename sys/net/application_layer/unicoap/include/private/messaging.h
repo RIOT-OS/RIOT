@@ -247,25 +247,6 @@ unicoap_preprocessing_result_t unicoap_exchange_preprocess(unicoap_packet_t* pac
  */
 int unicoap_exchange_process(unicoap_packet_t* packet, unicoap_exchange_arg_t arg);
 
-/** @brief RFC 7252 header */
-typedef struct __attribute__((packed)) {
-
-    /** @brief Version number */
-    unicoap_protocol_version_t version : 2;
-
-    /** @brief Message type */
-    unicoap_rfc7252_message_type_t type : 2;
-
-    /** @brief Token length (nibble) */
-    uint8_t token_length : 4;
-
-    /** @brief Code */
-    uint8_t code;
-
-    /** @brief Message ID */
-    uint16_t message_id;
-} unicoap_header_rfc7252_t;
-
 /**
  * @brief RFC 7252 event used to notify messaging layer of a change
  */

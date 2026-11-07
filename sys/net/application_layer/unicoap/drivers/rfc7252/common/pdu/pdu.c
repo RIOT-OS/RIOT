@@ -14,7 +14,10 @@
 #include <errno.h>
 #include <stdint.h>
 
+#include "compiler_hints.h"
+#include "net/unicoap/constants.h"
 #include "net/unicoap/message.h"
+#include "private/pdu/rfc7252.h"
 
 #define ENABLE_DEBUG CONFIG_UNICOAP_DEBUG_LOGGING
 #include "debug.h"
@@ -22,137 +25,33 @@
 
 #define PDU_7252_DEBUG(...) _UNICOAP_PREFIX_DEBUG(".pdu.rfc7252", __VA_ARGS__)
 
-/**
- * @brief       Gets message CoAP version
- * @param[in]   header   CoAP PDU header
- * @return      CoAP version
- */
-static inline unicoap_protocol_version_t _get_version(const unicoap_header_rfc7252_t* header)
-{
-    return header->version;
-}
-
-/**
- * @brief       Sets message CoAP version to 1
- * @param[in]   header   CoAP PDU header
- */
-static inline void _set_version(unicoap_header_rfc7252_t* header)
-{
-    header->version = UNICOAP_COAP_VERSION_1;
-}
-
-/**
- * @brief       Gets the message type of an RFC 7252 PDU
- * @param[in]   header   CoAP PDU header
- * @returns     @ref COAP_TYPE_CON
- * @returns     @ref COAP_TYPE_NON
- * @returns     @ref COAP_TYPE_ACK
- * @returns     @ref COAP_TYPE_RST
- */
-static inline unsigned _get_type(const unicoap_header_rfc7252_t* header)
-{
-    return header->type;
-}
-
-/**
- * @brief       Sets the message type of an RFC 7252 PDU
- * @param[in]   header   CoAP PDU header
- * @param       type   CoAP PDU type
- */
-static inline void _set_type(unicoap_header_rfc7252_t* header, unicoap_rfc7252_message_type_t type)
-{
-    assert((type & ~0x3) == 0);
-    header->type = type;
-}
-
-/**
- * @brief       Gets a message's raw code (class + detail)
- * @param[in]   header   CoAP PDU header
- * @returns     Raw message code
- */
-static inline uint8_t _get_code(const unicoap_header_rfc7252_t* header)
-{
-    return header->code;
-}
-
-/**
- * @brief       Sets a message's raw code (class + detail)
- * @param[in]   header   CoAP PDU header
- * @param code     Raw message code
- */
-static inline void _set_code(unicoap_header_rfc7252_t* header, uint8_t code)
-{
-    header->code = code;
-}
-
-/**
- * @brief       Gets a message's ID
- * @param[in]   header   CoAP PDU header
- * @returns     Raw message ID
- */
-static inline uint16_t _get_message_id(const unicoap_header_rfc7252_t* header)
-{
-    return ntohs(header->message_id);
-}
-
-/**
- * @brief       Sets a message's ID
- * @param[in]   header   CoAP PDU header
- * @param       message_id Raw message ID
- */
-static inline void _set_message_id(unicoap_header_rfc7252_t* header, uint16_t message_id)
-{
-    header->message_id = htons(message_id);
-}
-
-/**
- * @brief       Gets a message's token length (segment)
- * @param[in]   header   CoAP PDU header
- * @returns     First segment of token length
- */
-static inline uint8_t _get_token_length(const unicoap_header_rfc7252_t* header)
-{
-    return header->token_length;
-}
-
-/**
- * @brief       Sets a message's token length (segment)
- * @param[in]   header   CoAP PDU header
- * @param token_length     First segment of token length
- */
-static inline void _set_token_length(unicoap_header_rfc7252_t* header, uint8_t token_length)
-{
-    assert((token_length & ~0xf) == 0);
-    header->token_length = token_length;
-}
-
 ssize_t unicoap_pdu_parse_rfc7252(uint8_t* pdu, size_t size, unicoap_message_t* message,
                                   unicoap_message_properties_t* properties)
 {
-    if (size < sizeof(unicoap_header_rfc7252_t)) {
+    if (size < sizeof(unicoap_rfc7252_header_t)) {
         PDU_7252_DEBUG("msg too short\n");
         return -EBADMSG;
     }
-    const unicoap_header_rfc7252_t* header = (unicoap_header_rfc7252_t*)pdu;
+    const unicoap_rfc7252_header_t* header = (unicoap_rfc7252_header_t*)pdu;
 
-    if (_get_version(header) != UNICOAP_COAP_VERSION_1) {
-        PDU_7252_DEBUG("invalid version %" PRIu8 "\n", _get_version(header));
+    if (unicoap_rfc7252_header_get_version(header) != UNICOAP_COAP_VERSION_1) {
+        PDU_7252_DEBUG("invalid version %" PRIu8 "\n", unicoap_rfc7252_header_get_version(header));
         return -EBADMSG;
     }
 
-    if ((_get_code(header) == UNICOAP_CODE_EMPTY) && (size > sizeof(unicoap_header_rfc7252_t))) {
+    if ((unicoap_rfc7252_header_get_code(header) == UNICOAP_CODE_EMPTY) && (size > sizeof(unicoap_rfc7252_header_t))) {
         PDU_7252_DEBUG("empty msg is too long\n");
         return -EBADMSG;
     }
 
     uint8_t* end = pdu + size;
-    uint8_t* cursor = pdu + sizeof(unicoap_header_rfc7252_t);
+    uint8_t* cursor = pdu + sizeof(unicoap_rfc7252_header_t);
 
-    message->code = _get_code(header);
-    properties->rfc7252.type = _get_type(header);
-    properties->rfc7252.id = _get_message_id(header);
+    message->code = unicoap_rfc7252_header_get_code(header);
+    properties->rfc7252.type = unicoap_rfc7252_header_get_type(header);
+    properties->rfc7252.id = unicoap_rfc7252_header_get_message_id(header);
     properties->token = cursor;
-    properties->token_length = _get_token_length(header);
+    properties->token_length = unicoap_rfc7252_header_get_token_length_indicator(header);
 
     if (properties->token_length > CONFIG_UNICOAP_EXTERNAL_TOKEN_LENGTH_MAX) {
         /* From RFC 7252, Section 3
@@ -178,21 +77,23 @@ ssize_t unicoap_pdu_build_header_rfc7252_with_code(uint8_t* header, size_t capac
                                                    uint8_t code)
 {
     assert(properties->token_length <= 0xf);
-    if (capacity < sizeof(unicoap_header_rfc7252_t) + properties->token_length) {
+    if (capacity < sizeof(unicoap_rfc7252_header_t) + properties->token_length) {
         return -ENOBUFS;
     }
 
     *header = 0;
-    unicoap_header_rfc7252_t* _header = (unicoap_header_rfc7252_t*)header;
-    _set_version(_header);
-    _set_type(_header, properties->rfc7252.type);
-    _set_message_id(_header, properties->rfc7252.id);
-    _set_code(_header, code);
-    _set_token_length(_header, properties->token_length);
-    header += sizeof(unicoap_header_rfc7252_t);
+    unicoap_rfc7252_header_t* _header = (unicoap_rfc7252_header_t*)header;
+    unicoap_rfc7252_header_set_version(_header, UNICOAP_COAP_VERSION_1);
+    unicoap_rfc7252_header_set_type(_header, properties->rfc7252.type);
+    unicoap_rfc7252_header_set_message_id(_header, properties->rfc7252.id);
+    unicoap_rfc7252_header_set_code(_header, code);
+    unicoap_rfc7252_header_set_token_length_indicator(_header, properties->token_length);
+    header += sizeof(unicoap_rfc7252_header_t);
 
-    memcpy(header, properties->token, properties->token_length);
-    return sizeof(unicoap_header_rfc7252_t) + properties->token_length;
+    if (likely(properties->token_length > 0)) {
+        memcpy(header, properties->token, properties->token_length);
+    }
+    return sizeof(unicoap_rfc7252_header_t) + properties->token_length;
 }
 
 const char* unicoap_string_from_rfc7252_type(unicoap_rfc7252_message_type_t type)
