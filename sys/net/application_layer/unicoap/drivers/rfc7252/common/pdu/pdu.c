@@ -192,9 +192,9 @@ ssize_t unicoap_pdu_parse_rfc7252(uint8_t* pdu, size_t size, unicoap_message_t* 
     return unicoap_pdu_parse_options_and_payload(cursor, end, message);
 }
 
-ssize_t unicoap_pdu_build_header_rfc7252(uint8_t* header, size_t capacity,
-                                         const unicoap_message_t* message,
-                                         const unicoap_message_properties_t* properties)
+ssize_t unicoap_pdu_build_header_rfc7252_with_code(uint8_t* header, size_t capacity,
+                                                   const unicoap_message_properties_t* properties,
+                                                   uint8_t code)
 {
     assert(properties->token_length <= 0xf);
     if (capacity < sizeof(unicoap_header_rfc7252_t) + properties->token_length) {
@@ -206,7 +206,7 @@ ssize_t unicoap_pdu_build_header_rfc7252(uint8_t* header, size_t capacity,
     _set_version(_header);
     _set_type(_header, properties->rfc7252.type);
     _set_message_id(_header, properties->rfc7252.id);
-    _set_code(_header, message->code);
+    _set_code(_header, code);
     _set_token_length(_header, properties->token_length);
     header += sizeof(unicoap_header_rfc7252_t);
 

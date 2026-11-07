@@ -17,7 +17,6 @@
 
 #include "container.h"
 #include "random.h"
-#include "ztimer.h"
 
 #define ENABLE_DEBUG CONFIG_UNICOAP_DEBUG_LOGGING
 #include "debug.h"
@@ -468,7 +467,11 @@ static ssize_t _build_and_send_pdu(
     _transmission_t** transmission)
 {
     assert(packet);
-    assert(packet->message);
+    /* Require allocated message struct unless it's an empty message. This saves memory at the call
+     * site when sending an (empty) ACK or RST. */
+    assert(packet->message ||
+           _get_type(packet) == UNICOAP_TYPE_ACK ||
+           _get_type(packet) == UNICOAP_TYPE_RST);
     assert(packet->remote);
     MESSAGING_7252_DEBUG("sending ");
     PACKET_7252_DEBUG(packet);
@@ -652,15 +655,17 @@ error:
 
 static int _send_empty_message(unicoap_packet_t* packet)
 {
-    packet->message->code = UNICOAP_CODE_EMPTY;
-    packet->message->options = NULL;
-    packet->message->payload = NULL;
-    packet->message->payload_size = 0;
+    unicoap_message_t* original_message = packet->message;
+    packet->message = NULL; /* Empty message, PDU builder handles this */
 
+    unicoap_message_properties_t original_properties = packet->properties;
     packet->properties.token = NULL;
     packet->properties.token_length = 0;
 
-    return (int)_build_and_send_pdu(packet, NULL);
+    int res = (int)_build_and_send_pdu(packet, NULL);
+    packet->message = original_message;
+    packet->properties = original_properties;
+    return res;
 }
 
 static inline int _acknowledge(unicoap_packet_t* packet)
@@ -842,11 +847,7 @@ int unicoap_messaging_process_rfc7252(const uint8_t* pdu, size_t size, unicoap_m
                                  _get_id(packet));
 
             /* We're going to need the response below, don't override it. */
-            unicoap_message_t* message = packet->message;
-            unicoap_message_t m = *packet->message;
-            packet->message = &m;
             _acknowledge(packet);
-            packet->message = message;
         }
         break;
     }
