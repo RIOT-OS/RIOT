@@ -73,6 +73,9 @@ int uart_init(uart_t dev, uint32_t baudrate, uart_rx_cb_t rx_cb, void *arg)
     APBUART_REG(uart_config[dev].addr, APBUART_SCALER) =
         APBUART_SCALER_VAL(CLOCK_CORECLOCK, baudrate);
 
+    /* Keep the FIFO debug mode bit:*/
+    uint32_t ctrl = APBUART_REG(uart_config[dev].addr, APBUART_CTRL) & APBUART_CTRL_DB;
+
     if (rx_cb) {
         /* Disable external interrupts while configuring PLIC */
         clear_csr(mie, MIP_MEIP);
@@ -87,7 +90,7 @@ int uart_init(uart_t dev, uint32_t baudrate, uart_rx_cb_t rx_cb, void *arg)
 
         /* Enable TX + RX + RX interrupt */
         APBUART_REG(uart_config[dev].addr, APBUART_CTRL) =
-            APBUART_CTRL_TE | APBUART_CTRL_RE | APBUART_CTRL_RI;
+            ctrl | APBUART_CTRL_TE | APBUART_CTRL_RE | APBUART_CTRL_RI;
 
         /* Re-enable external interrupts */
         set_csr(mie, MIP_MEIP);
@@ -95,7 +98,7 @@ int uart_init(uart_t dev, uint32_t baudrate, uart_rx_cb_t rx_cb, void *arg)
     else {
         /* TX only mode — no interrupt needed */
         APBUART_REG(uart_config[dev].addr, APBUART_CTRL) =
-            APBUART_CTRL_TE | APBUART_CTRL_RE;
+            ctrl | APBUART_CTRL_TE | APBUART_CTRL_RE;
     }
 
     return UART_OK;
