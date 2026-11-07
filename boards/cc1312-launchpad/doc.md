@@ -42,18 +42,16 @@ through the USB Micro-USB connector. Once either TI Uniflash or OpenOCD are
 installed just connect the board using the Micro-USB port to your computer and
 type:
 
-```
-make flash BOARD=cc1312-launchpad
+```shell
+BOARD=cc1312-launchpad make flash
 ```
 
 To use OpenOCD instead of uniflash we need to set the `PROGRAMMER` environment
 variable, this is to enable OpenOCD instead of Uniflash.
 
+```shell
+PROGRAMMER=openocd BOARD=cc1312-launchpad make flash
 ```
-export PROGRAMMER=openocd
-```
-
-Now we can just do `make flash` and `make debug`, this all using OpenOCD.
 
 For detailed information about CC1312 MCUs as well as configuring, compiling
 RIOT and installation of flashing tools for CC1312 boards,

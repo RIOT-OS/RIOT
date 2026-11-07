@@ -1,9 +1,6 @@
 /*
- * Copyright (C) 2016-2018 Bas Stottelaar <basstottelaar@gmail.com>
- *
- * This file is subject to the terms and conditions of the GNU Lesser
- * General Public License v2.1. See the file LICENSE in the top level
- * directory for more details.
+ * SPDX-FileCopyrightText: 2016-2018 Bas Stottelaar <basstottelaar@gmail.com>
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
 
 /**
@@ -186,9 +183,9 @@ uint8_t u8x8_byte_hw_i2c_riotos(u8x8_t *u8g2, uint8_t msg, uint8_t arg_int, void
 
     switch (msg) {
         case U8X8_MSG_BYTE_SEND:
+            assert((index + arg_int) <= sizeof(buffer));
             memcpy(&buffer[index], arg_ptr, arg_int);
             index += arg_int;
-            assert(index <= sizeof(buffer));
             break;
         case U8X8_MSG_BYTE_INIT:
             break;

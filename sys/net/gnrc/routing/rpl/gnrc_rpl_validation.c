@@ -1,9 +1,6 @@
 /*
- * Copyright (C) 2016 Cenk Gündoğan <cenk.guendogan@haw-hamburg.de>
- *
- * This file is subject to the terms and conditions of the GNU Lesser General
- * Public License v2.1. See the file LICENSE in the top level directory for more
- * details.
+ * SPDX-FileCopyrightText: 2016 Cenk Gündoğan <cenk.guendogan@haw-hamburg.de>
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
 
 /**
@@ -49,6 +46,12 @@ bool gnrc_rpl_validation_options(int msg_type, gnrc_rpl_instance_t *inst,
                 if (opt->length != GNRC_RPL_OPT_DODAG_CONF_LEN) {
                     DEBUG("RPL: wrong DIO option (DODAG CONF) len: %d, expected: %d\n",
                            opt->length, GNRC_RPL_OPT_DODAG_CONF_LEN);
+                    return false;
+                }
+
+                if (byteorder_ntohs(
+                        ((gnrc_rpl_opt_dodag_conf_t *)opt)->min_hop_rank_inc) == 0) {
+                    DEBUG("RPL: invalid DODAG CONF min_hop_rank_inc 0\n");
                     return false;
                 }
                 break;

@@ -1,0 +1,19 @@
+MAKEFILE_PATH := $(patsubst %/,%,$(dir $(abspath $(lastword $(MAKEFILE_LIST)))))
+
+RIOTBASE ?= $(MAKEFILE_PATH)/../..
+include $(MAKEFILE_PATH)/../Makefile.tests_common
+
+.PHONY: warn_release_tests
+
+BUILDDEPS += warn_release_tests
+TERMDEPS += warn_release_tests
+PYTHONPATH += $(MAKEFILE_PATH)
+
+include $(RIOTBASE)/Makefile.include
+
+warn_release_tests:
+	@$(COLOR_ECHO) \
+		"\n${COLOR_RED}IF YOU NEED TO CHANGE ANYTHING IN THIS TEST,${COLOR_RESET}" \
+		"${COLOR_RED}YOU ALSO MIGHT NEED TO CHANGE THE RELEASE TEST FRAMEWORK.${COLOR_RESET}\n"\
+		"${COLOR_RESET}See ${COLOR_PURPLE}https://github.com/RIOT-OS/Release-Specs/"\
+		"${COLOR_RESET}\n\n"

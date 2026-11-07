@@ -8,8 +8,8 @@ The CC2650STK is an 'IoT kit' with 10 sensors, a fancy case, and a radio unit
 that is capable of irradiating IEEE802.15.4 and BLE (or SMART or whatever they
 call it now).
 
- - [Official homepage](https://www.ti.com/tool/cc2650stk)
- - [Platform](https://www.ti.com/product/CC2650) <- CPU data sheet here
+- [Official homepage](https://www.ti.com/tool/cc2650stk)
+- [Platform](https://www.ti.com/product/CC2650) <- CPU data sheet here
 
 Use `BOARD=cc2650stk` for building RIOT for this platform.
 
@@ -94,7 +94,9 @@ manually reset using the reset button on the XDS110 probe.
 ***
 WORK IN PROGRESS
 ***
+
 # **Bluetooth Low Energy on the CC2650STK**
+
 This section is meant to provide information regarding the BLE specifications
 as well as their implementation on the CC2650.
 
@@ -125,7 +127,7 @@ radio operation command. The following table describes the format of the PDU for
 advertising channels, as well as the corresponding variables in the RIOT
 command.
 
-```
+```c
 typedef struct __attribute__ ((aligned(4))) {
     radio_op_command_t ropCmd;
     uint8_t channel;
@@ -181,36 +183,37 @@ In order to configure a BLE beacon, a radio operation command `cmd` of type
 `ble_rop_cmd_t` must be sent to the RF core.
 
 1. Define the parameters of the command by filling a structure of type
-`rfc_ble_param_advertiser_t`. Minimum requirements are as follows:
- 1. Set `params->endTime = 0` and `params->endTrigger.triggerType = 0` unless
-you want to do something fancy timewise.
- 2. Set `params->pDeviceAddress` to an `unsigned char` array containing the
-[48-bit MAC address](https://en.wikipedia.org/wiki/MAC_address) of the MCU. The
-MAC-48 identifier can be obtained from the function `ble_mac48_get()` defined in
-`cpu/cc26x0/periph/cpuid.c`. This function returns a **public device address**,
-defined in the factory config data (FCFG->MAC_BLE_n): bits 0-24 contain a serial
-number unique to the MCU, while the bits 24-48 contain the Organizationally
-Unique Identifier
-([OUI](https://en.wikipedia.org/wiki/Organizationally_unique_identifier)) for
-Texas Instrument, i.e. b0:b4:48.
- 3. Set `params->pAdvData` to a byte array containing the data to be
-broadcasted. The size of the array must be written as `params->advLen`. Since
-the advertising packet is non-connectable, the Flag data type (described in
-[Core Specification Supplement v6](https://www.bluetooth.org/DocMan/handlers/DownloadDoc.ashx?doc_id=302735))
-may be omitted from the advertising payload.
+   `rfc_ble_param_advertiser_t`. Minimum requirements are as follows:
+    1. Set `params->endTime = 0` and `params->endTrigger.triggerType = 0` unless
+       you want to do something fancy timewise.
+    2. Set `params->pDeviceAddress` to an `unsigned char` array containing the
+       [48-bit MAC address](https://en.wikipedia.org/wiki/MAC_address) of the MCU. The
+       MAC-48 identifier can be obtained from the function `ble_mac48_get()` defined in
+       `cpu/cc26x0/periph/cpuid.c`. This function returns a **public device address**,
+       defined in the factory config data (FCFG->MAC_BLE_n): bits 0-24 contain a serial
+       number unique to the MCU, while the bits 24-48 contain the Organizationally
+       Unique Identifier
+       ([OUI](https://en.wikipedia.org/wiki/Organizationally_unique_identifier)) for
+       Texas Instrument, i.e. b0:b4:48.
+    3. Set `params->pAdvData` to a byte array containing the data to be
+       broadcasted. The size of the array must be written as `params->advLen`. Since
+       the advertising packet is non-connectable, the Flag data type (described in
+       [Core Specification Supplement v6](https://www.bluetooth.org/DocMan/handlers/DownloadDoc.ashx?doc_id=302735))
+       may be omitted from the advertising payload.
+
 2. Configure the command itself by filling a structure of type
-`ble_rop_cmd_t`. Minimum requirements are as follows:
- 1. Set `cmd.ropCmd.commandNo = CMDR_CMDID_BLE_ADV_NC`. The PDU type will be
-set accordingly by the RF core.
- 2. Set `cmd.condition.rule = R_OP_CONDITION_RULE_NEVER` unless you plan on
-executing an additional command via `cmd.pNextOp`.
- 3. Set `cmd.whitening.bOverride = 0` and `cmd.whitening.init = 0` unless you
-understand how to use it.
- 4. Set `cmd.pParams` to the address of the `rfc_ble_param_advertiser_t`
-structure defined in 1).
- 5. Set the advertising channel via `cmd.channel`. There are 3 possible
-channels, each identified by a `uint8_t`: 37, 38 or 39. If you want to broadcast
-on all three channels you can create three ble_rop_cmd_t commands and chain them
-via `cmd.pNextOp`.
-3. Send the command to be executed to the RF core via the `rfc_send_cmd()`
-function
+   `ble_rop_cmd_t`. Minimum requirements are as follows:
+    1. Set `cmd.ropCmd.commandNo = CMDR_CMDID_BLE_ADV_NC`. The PDU type will be
+       set accordingly by the RF core.
+    2. Set `cmd.condition.rule = R_OP_CONDITION_RULE_NEVER` unless you plan on
+       executing an additional command via `cmd.pNextOp`.
+    3. Set `cmd.whitening.bOverride = 0` and `cmd.whitening.init = 0` unless you
+       understand how to use it.
+    4. Set `cmd.pParams` to the address of the `rfc_ble_param_advertiser_t`
+       structure defined in 1.
+    5. Set the advertising channel via `cmd.channel`. There are 3 possible
+       channels, each identified by a `uint8_t`: 37, 38 or 39. If you want to broadcast
+       on all three channels you can create three ble_rop_cmd_t commands and chain them
+       via `cmd.pNextOp`.
+    6. Send the command to be executed to the RF core via the `rfc_send_cmd()`
+       function

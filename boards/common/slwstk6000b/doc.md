@@ -1,8 +1,9 @@
-@defgroup    boards_common_slwstk6000b Silicon Labs SLWSTK6000B starter kit
-@ingroup     boards
-@brief       Support for the Silicon Labs SLWSTK6000B starter kit
+@defgroup   boards_common_slwstk6000b Silicon Labs SLWSTK6000B starter kit
+@ingroup    boards
+@brief      Support for the Silicon Labs SLWSTK6000B starter kit
 
 ## Overview
+
 Silicon Labs Mighty Gecko Wireless Starter Kit is equipped with the EFM32
 microcontroller. It is specifically designed for low-power applications, having
 energy-saving peripherals, different energy modes and short wake-up times.
@@ -13,7 +14,9 @@ actively measure the power consumption of your hardware and code, in real-time.
 ## Hardware
 
 ### MCU
-The MCU depends on the module used.
+
+The MCU depends on the module used. All modules are based on an EFR32
+Series 1 MCU.
 
 | Module     | MCU                     |
 |------------|-------------------------|
@@ -38,17 +41,18 @@ The MCU depends on the module used.
 **Note:** not all MCUs are supported by RIOT-OS out of the box.
 
 ## Implementation Status
+
 | Device           | ID                    | Supported | Comments                                                       |
 |------------------|-----------------------|-----------|----------------------------------------------------------------|
 | MCU              | EFR32MG1P/12P/13P/14P | yes       | Power modes supported                                          |
 | Low-level driver | ADC                   | yes       |                                                                |
 |                  | Flash                 | yes       |                                                                |
 |                  | GPIO                  | yes       | Interrupts are shared across pins (see reference manual)       |
-|                  | HW Crypto             | yes       |                                                                |
+|                  | HWRNG                 | yes       | Only on the EFR32MG12P, the EFR32MG1P has no TRNG              |
 |                  | I2C                   | yes       |                                                                |
 |                  | PWM                   | yes       |                                                                |
 |                  | RTCC                  | yes       | As RTT or RTC                                                  |
-|                  | SPI                   | partially | Only master mode                                               |
+|                  | SPI                   | yes       | Only master mode                                               |
 |                  | Timer                 | yes       |                                                                |
 |                  | UART                  | yes       | USART is shared with SPI. LEUART baud rate limited (see below) |
 |                  | USB                   | no        |                                                                |
@@ -56,8 +60,9 @@ The MCU depends on the module used.
 ## Board configuration
 
 ### Board controller
+
 The starter kit is equipped with a Board Controller. This controller provides a
-virtual serial port. The boardcontroller is enabled via a GPIO pin.
+virtual serial port. The board controller is enabled via a GPIO pin.
 
 By default, this pin is enabled. You can disable the board controller module by
 passing `DISABLE_MODULE=silabs_bc` to the `make` command.
@@ -70,6 +75,7 @@ controller firmware installed.
 expects data from the MCU with the same settings.
 
 ### Advanced Energy Monitor
+
 This development kit has an Advanced Energy Monitor. It can be connected to the
 Simplicity Studio development software.
 
@@ -88,6 +94,7 @@ defaults to GDB debug symbols, but Simplicity Studio requires DWARF-2 debug
 symbols (`-gdwarf-2` for GCC).
 
 ### Clock selection
+
 There are several clock sources that are available for the different
 peripherals. You are advised to read
 [AN0004.1](https://www.silabs.com/documents/public/application-notes/an0004.1-efm32-cmu.pdf)
@@ -126,6 +133,7 @@ You can override the branch's clock source by adding `CLOCK_LFA=source` to your
 compiler defines, e.g. `CLOCK_LFA=cmuSelect_LFRCO`.
 
 ### Low-power peripherals
+
 The low-power UART is capable of providing an UART peripheral using a low-speed
 clock. When the LFB clock source is the LFRCO or LFXO, it can still be used in
 EM2. However, this limits the baud rate to 9600 baud. If a higher baud rate is
@@ -135,6 +143,7 @@ desired, set the clock source to CORELEDIV2.
 this setting. Ensure you do not refer to any low-power peripherals.
 
 ### RTC or RTT
+
 RIOT-OS has support for *Real-Time Tickers* and *Real-Time Clocks*.
 
 However, this board MCU family has support for a 32-bit *Real-Time Clock and
@@ -143,15 +152,9 @@ Therefore, only one of both peripherals can be enabled at the same time.
 
 Configured at 1 Hz interval, the RTCC will overflow each 136 years.
 
-### Hardware crypto
-This MCU is equipped with a hardware accelerated crypto peripheral that can
-speed up AES128, AES256, SHA1, SHA256 and several other cryptographic
-computations.
-
-A peripheral driver interface for RIOT-OS is proposed, but not yet implemented.
-
 ### Usage of EMLIB
-This port makes uses of EMLIB by Silicon Labs to abstract peripheral registers.
+
+This port makes use of EMLIB by Silicon Labs to abstract peripheral registers.
 While some overhead is to be expected, it ensures proper setup of devices,
 provides chip errata and simplifies development. The exact overhead depends on
 the application and peripheral usage, but the largest overhead is expected
@@ -160,9 +163,13 @@ inline methods or macros (which have no overhead).
 
 Another advantage of EMLIB are the included assertions. These assertions ensure
 that peripherals are used properly. To enable this, pass `DEBUG_EFM` to your
-compiler.
+compiler defines.
+
+EMLIB is licensed by Silicon Labs under the zlib-style license, which permits
+distribution of source.
 
 ### Pin locations
+
 The EFM32 platform supports peripherals to be mapped to different pins
 (predefined locations). The definitions in `periph_conf.h` mostly consist of a
 location number and the actual pins. The actual pins are required to configure
@@ -176,37 +183,30 @@ This MCU has extended pin mapping support. Each pin of a peripheral can be
 connected separately to one of the predefined pins for that peripheral.
 
 ## Flashing the device
+
 To flash, [SEGGER JLink](https://www.segger.com/jlink-software.html) is
 required.
 
 Flashing is supported by RIOT-OS using the command below:
 
-```
-make flash
+```shell
+BOARD=slwstk6000b make flash
 ```
 
 To run the GDB debugger, use the command:
 
-```
-make debug
+```shell
+BOARD=slwstk6000b make debug
 ```
 
 Or, to connect with your own debugger:
 
-```
-make debug-server
+```shell
+BOARD=slwstk6000b make debug-server
 ```
 
 Some boards have (limited) support for emulation, which can be started with:
 
+```shell
+BOARD=slwstk6000b make emulate
 ```
-make emulate
-```
-
-## Supported Toolchains
-For using the Silicon Labs SLWSTK6000B starter kit we strongly recommend the
-usage of the [GNU Tools for ARM Embedded Processors](https://developer.arm.com/open-source/gnu-toolchain/gnu-rm)
-toolchain.
-
-## License information
-Silicon Labs' EMLIB: zlib-style license (permits distribution of source).

@@ -14,7 +14,6 @@ import re
 
 from riotctrl.shell import ShellInteraction, ShellInteractionParser
 
-
 # ==== Parsers ====
 
 
@@ -120,8 +119,8 @@ class CordEp(ShellInteraction):
     def cord_ep_register(self, uri, timeout=-1, async_=False):
         return self.cord_ep_cmd(self.REGISTER, (uri,), timeout, async_)
 
-    def cord_ep_discover(self, uri, timeout=-1, async_=False):
-        return self.cord_ep_cmd(self.DISCOVER, (uri,), timeout, async_)
+    def cord_ep_discover(self, server_addr, timeout=-1, async_=False):
+        return self.cord_ep_cmd(self.DISCOVER, (server_addr,), timeout, async_)
 
     def cord_ep_update(self, timeout=-1, async_=False):
         return self.cord_ep_cmd(self.UPDATE, None, timeout, async_)

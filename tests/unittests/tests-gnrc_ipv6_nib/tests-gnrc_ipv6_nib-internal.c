@@ -1594,7 +1594,7 @@ static void test_nib_offl_clear__cleared(void)
 
 /*
  * Iterates over empty off-link entries
- * Expected result: _nib_drl_iter returns NULL
+ * Expected result: _nib_offl_iter returns NULL
  */
 static void test_nib_offl_iter__empty(void)
 {

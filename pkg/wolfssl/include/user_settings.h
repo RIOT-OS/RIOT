@@ -1,3 +1,8 @@
+/*
+ * SPDX-FileCopyrightText: 2017 wolfSSL Inc.
+ * SPDX-License-Identifier: LGPL-2.1-only
+ */
+
 #pragma once
 
 /* user_settings.h : custom configuration for wolfcrypt/wolfSSL */
@@ -33,6 +38,9 @@ extern "C" {
  * using sockets
  */
 #ifndef MODULE_WOLFSSL_SOCKET
+#ifndef WOLFSSL_NO_SOCK
+#define WOLFSSL_NO_SOCK
+#endif
 #define WOLFSSL_GNRC
 #define WOLFSSL_USER_IO
 #else

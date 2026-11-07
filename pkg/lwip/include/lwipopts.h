@@ -1,9 +1,6 @@
 /*
- * Copyright (C) 2015 Martine Lenders <mlenders@inf.fu-berlin.de>
- *
- * This file is subject to the terms and conditions of the GNU Lesser
- * General Public License v2.1. See the file LICENSE in the top level
- * directory for more details.
+ * SPDX-FileCopyrightText: 2015 Martine Lenders <mlenders@inf.fu-berlin.de>
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
 
 #pragma once
@@ -162,7 +159,9 @@ extern "C" {
 #define NETIF_MAX_HWADDR_LEN    (GNRC_NETIF_HDR_L2ADDR_MAX_LEN)
 
 #ifndef TCPIP_THREAD_STACKSIZE
-#define TCPIP_THREAD_STACKSIZE  (THREAD_STACKSIZE_DEFAULT)
+/* TODO: some more benchmarking needed for a proper value.
+ * this was deduced from reception of UDP packet on closed port, needed 1100 B on ARM Cortex-M */
+#define TCPIP_THREAD_STACKSIZE  (THREAD_STACKSIZE_DEFAULT * 3 / 2)
 #endif
 
 #define MEM_ALIGNMENT           4

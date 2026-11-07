@@ -12,12 +12,13 @@ system's default lua installation.
 Type `make all flash` to program your board. The lua interpreter communicates
 via UART (like the shell).
 
-It is not recommended to use `make term` because the default RIOT terminal messes
+It is not recommended to use the default RIOT terminal from `make term` because it
 up the input and output and the REPL needs multi-line input. Instead, use something
-like `miniterm.py` from pyserial:
+like `miniterm` from `pyserial` by setting the `RIOT_TERMINAL` environment
+variable:
 
 ```
-miniterm.py --eol LF --echo /dev/ttyACM0 115200
+RIOT_TERMINAL=miniterm BOARD=... make term
 ```
 
 By default only some of the builtin modules are loaded, to preserve RAM. See

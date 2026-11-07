@@ -13,7 +13,7 @@ from twr_shell import TwrCmd, TwrIfconfigParser
 
 
 class TwrShell(Reboot, TwrCmd):
-    """Convenience class inheriting from the Reboot and TwrCmd shell"""
+    """Convenience class inheriting from the `Reboot` and `TwrCmd` shell."""
 
     _netif = {
         "netif": None,

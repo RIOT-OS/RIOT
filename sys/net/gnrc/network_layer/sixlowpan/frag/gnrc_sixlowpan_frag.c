@@ -1,10 +1,7 @@
 /*
- * Copyright (C) 2015 Martine Lenders <mlenders@inf.fu-berlin.de>
- * Copyright (C) 2015 Hamburg University of Applied Sciences
- *
- * This file is subject to the terms and conditions of the GNU Lesser
- * General Public License v2.1. See the file LICENSE in the top level
- * directory for more details.
+ * SPDX-FileCopyrightText: 2015 Martine Lenders <mlenders@inf.fu-berlin.de>
+ * SPDX-FileCopyrightText: 2015 HAW Hamburg
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
 
 /**
@@ -323,9 +320,19 @@ void gnrc_sixlowpan_frag_recv(gnrc_pktsnip_t *pkt, void *ctx, unsigned page)
     (void)ctx;
     switch (frag->disp_size.u8[0] & SIXLOWPAN_FRAG_DISP_MASK) {
         case SIXLOWPAN_FRAG_1_DISP:
+            if (pkt->size < sizeof(sixlowpan_frag_t)) {
+                DEBUG("6lo rbuf: Invalid (too short) fragment header.\n");
+                gnrc_pktbuf_release(pkt);
+                return;
+            }
             break;
 
         case SIXLOWPAN_FRAG_N_DISP:
+            if (pkt->size < sizeof(sixlowpan_frag_n_t)) {
+                DEBUG("6lo rbuf: Invalid (too short) fragment header.\n");
+                gnrc_pktbuf_release(pkt);
+                return;
+            }
             offset = (((sixlowpan_frag_n_t *)frag)->offset * 8);
             break;
 

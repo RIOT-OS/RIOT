@@ -17,6 +17,7 @@
  */
 
 #include <assert.h>
+#include <inttypes.h>
 #include <string.h>
 
 #include "esp_common.h"
@@ -269,7 +270,7 @@ void IRAM_ATTR spi_acquire(spi_t bus, spi_cs_t cs, spi_mode_t mode, spi_clk_t cl
     spi_clkdiv_pre--;
     spi_clkcnt_N--;
 
-    DEBUG("%s spi_clkdiv_prev=%u spi_clkcnt_N=%u\n",
+    DEBUG("%s spi_clkdiv_prev=%" PRIu32 " spi_clkcnt_N=%" PRIu32 "\n",
           __func__, spi_clkdiv_pre, spi_clkcnt_N);
 
     IOMUX.CONF &= ~IOMUX_CONF_SPI1_CLOCK_EQU_SYS_CLOCK;
@@ -283,7 +284,7 @@ void IRAM_ATTR spi_acquire(spi_t bus, spi_cs_t cs, spi_mode_t mode, spi_clk_t cl
     _spi[bus].regs->clock.clkcnt_h = (spi_clkcnt_N+1)/2-1;
     _spi[bus].regs->clock.clkcnt_l = spi_clkcnt_N;
 
-    DEBUG("%s bus %d: SPI_CLOCK_REG=%08x\n",
+    DEBUG("%s bus %d: SPI_CLOCK_REG=%08" PRIx32 "\n",
           __func__, bus, _spi[bus].regs->clock.val);
 }
 

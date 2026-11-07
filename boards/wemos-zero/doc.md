@@ -18,8 +18,8 @@ It has 256KiB of flash memory and 32KiB of RAM.
 
 ![wemos-zero](https://forum.arduino.cc/index.php?action=dlattach;topic=526753.0;attach=244160)
 
-
 ### MCU
+
 | MCU           | ATSAMD21G18A                          |
 |:------------- |:------------------------------------- |
 | Family        | ARM Cortex-M0+                        |
@@ -44,13 +44,12 @@ It has 256KiB of flash memory and 32KiB of RAM.
 |:------ |:---- |
 | LED0   | PA17 |
 
-
 ## Flashing the device
 
 Assuming the Arduino Bootloader is installed, just run:
 
-```
-make BOARD=wemos-zero flash
+```shell
+BOARD=wemos-zero make flash
 ```
 
 Hint: You can you press the reset button twice to manually enter the bootloader.

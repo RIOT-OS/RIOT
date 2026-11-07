@@ -242,11 +242,13 @@ static int _cmd_sub(int argc, char **argv)
         return -1;
     }
 
-    if (strlen(argv[1]) > MAX_LEN_TOPIC) {
+    size_t topic_len = strlen(argv[1]);
+    if (topic_len >= MAX_LEN_TOPIC) {
         printf("mqtt_example: Not subscribing, topic too long %s\n", argv[1]);
         return -1;
     }
-    strncpy(_topic_to_subscribe[topic_cnt], argv[1], strlen(argv[1]));
+
+    memcpy(_topic_to_subscribe[topic_cnt], argv[1], topic_len + 1);
 
     printf("mqtt_example: Subscribing to %s\n", _topic_to_subscribe[topic_cnt]);
     int ret = MQTTSubscribe(&client,

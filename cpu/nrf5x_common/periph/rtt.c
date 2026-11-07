@@ -23,9 +23,13 @@
 #include "periph/rtt.h"
 
 /* get the IRQ configuration */
-#ifdef NRF_RTC0_S
+#if defined(CPU_FAM_NRF53) || defined(CPU_FAM_NRF9160)
 #if (RTT_DEV == 0)
+#ifdef NRF_TRUSTZONE_NONSECURE
+#define DEV             NRF_RTC0_NS
+#else
 #define DEV             NRF_RTC0_S
+#endif
 #define ISR             isr_rtc0
 #define IRQn            RTC0_IRQn
 #elif (RTT_DEV == 1)
@@ -47,7 +51,7 @@
 #else
 #error "RTT configuration: invalid or no RTC device specified (RTT_DEV)"
 #endif
-#endif /* def NRF_RTC0_S */
+#endif /* CPU_FAM_NRF53 || CPU_FAM_NRF9160 */
 
 /* allocate memory for callbacks and their args */
 static rtt_cb_t alarm_cb;

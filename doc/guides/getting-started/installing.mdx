@@ -56,7 +56,7 @@ Depending on the operation distribution you are using, the installation of the r
 #### Arch Linux
 
 ```bash title="Arch Linux command to install required packages"
-    sudo pacman -S make gcc-multilib python-pyserial python-psutil wget unzip git openocd gdb esptool podman-docker clang
+    sudo pacman -S make base-devel gcc-multilib python-pyserial python-psutil wget unzip git openocd gdb esptool podman-docker clang
 ```
 
 This will show something like this depending on your distribution:
@@ -77,6 +77,16 @@ You will still need a "clone" of the RIOT Repository to work with.
 :::
 
 ![Cloning of the RIOT Repo in the Ubuntu terminal](img/05-First_Steps-00.png)
+
+:::tip
+We are cloning the RIOT repository to a folder named `RIOT` in the home directory
+for this tutorial. You can choose a different location if you want,
+but make sure to adjust the commands accordingly.
+In particular, you will need to adjust the path to the `hello-world` example app in the next steps.
+
+In the [Creating a Project](/c_tutorials/create_project/) tutorial, we will go into
+more detail on how to set up your own project folder structure so don't worry about that for now.
+:::
 
 - Open the terminal.
 - Type `git clone https://github.com/RIOT-OS/RIOT` and confirm with the return-key
@@ -159,18 +169,6 @@ modification of the compile commands off. For a list of available flags, run
 You can also install that extension via the extension marketplace if that pop up does not show up.
 :::
 
-:::danger
-![VS Code asking to configure RIOT as CMake project](img/06-Use_VS_Code-04.png)
-
-Do **NOT** configure RIOT as CMake project. VS Code will incorrectly detect
-RIOT as CMake project, because it contains external packages that indeed are
-using CMake.
-
-1. Click on "Not now" to not configure RIOT as CMake project
-2. Click on "Never" to never ask again whether RIOT should be configured as
-   CMake project (not shown in screenshot)
-:::
-
 ![IntelliSense showing that `RIOT_BOARD` is `"native"`](img/06-Use_VS_Code-05.png)
 
 - Confirm that when hovering over `RIOT_BOARD` in the source code, IntelliSense
@@ -239,7 +237,7 @@ tool for its architecture is used.
     * Some boards use UF2 based bootloaders, which require auto-mounting to work with `make flash`
     * Some boards default to using J-Link for flashing/debugging. Either install that or export
       `PROGRAMMER=openocd` to just use OpenOCD instead
-    * installation instructions can be found [here](https://github.com/RIOT-OS/RIOT/wiki/OpenOCD)
+    * installation instructions can be found [here](https://doc.riot-os.org/misc/openocd/)
 * Optional: picolibc for `arm-none-eabi` to link against picolibc instead of newlib
 * Optional: clang to build with `TOOLCHAIN=llvm`
 * Optional: GDB multiarch for debugging

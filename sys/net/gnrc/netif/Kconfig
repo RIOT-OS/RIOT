@@ -1,9 +1,6 @@
-# Copyright (c) 2020 HAW Hamburg
-#
-# This file is subject to the terms and conditions of the GNU Lesser
-# General Public License v2.1. See the file LICENSE in the top level
-# directory for more details.
-#
+# SPDX-FileCopyrightText: 2020 HAW Hamburg
+# SPDX-License-Identifier: LGPL-2.1-only
+
 menu "GNRC network interface"
     depends on USEMODULE_GNRC_NETIF
 
@@ -28,13 +25,6 @@ config GNRC_NETIF_IPV6_ADDRS_NUMOF
 config GNRC_NETIF_DEFAULT_HL
     int "Default hop limit"
     default 64
-
-config GNRC_NETIF_MIN_WAIT_AFTER_SEND_US
-    int "Minimum wait time after a send operation"
-    default 0
-    help
-        This value is expressed in microseconds. It is purely meant as a debugging
-        feature to slow down a radios sending.
 
 config GNRC_NETIF_NONSTANDARD_6LO_MTU
     bool "Enable usage of non standard MTU for 6LoWPAN network interfaces"

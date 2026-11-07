@@ -1,9 +1,6 @@
 /*
- * Copyright (C) 2015 Freie Universität Berlin
- *
- * This file is subject to the terms and conditions of the GNU Lesser
- * General Public License v2.1. See the file LICENSE in the top level
- * directory for more details.
+ * SPDX-FileCopyrightText: 2015 Freie Universität Berlin
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
 
 /**
@@ -43,9 +40,6 @@
 #define ENABLE_DEBUG                0
 #include "debug.h"
 
-#define LWIP_NETDEV_NAME            "lwip_netdev_mux"
-#define LWIP_NETDEV_PRIO            (THREAD_PRIORITY_MAIN - 4)
-#define LWIP_NETDEV_STACKSIZE       (THREAD_STACKSIZE_DEFAULT)
 #define LWIP_NETDEV_MSG_TYPE_EVENT  0x1235
 
 #define ETHERNET_IFNAME1 'E'
@@ -67,7 +61,7 @@ static err_t _eth_link_output(struct netif *netif, struct pbuf *p);
 #ifdef MODULE_LWIP_SIXLOWPAN
 static err_t _ieee802154_link_output(struct netif *netif, struct pbuf *p);
 #endif
-#ifdef MODULE_SLIPDEV
+#ifdef MODULE_SLIPDEV_NET
 static err_t _slip_link_output(struct netif *netif, struct pbuf *p);
 #if LWIP_IPV4
 static err_t slip_output4(struct netif *netif, struct pbuf *q, const ip4_addr_t *ipaddr);
@@ -209,7 +203,7 @@ err_t lwip_netdev_init(struct netif *netif)
         break;
     }
 #endif
-#ifdef MODULE_SLIPDEV
+#ifdef MODULE_SLIPDEV_NET
     case NETDEV_TYPE_SLIP:
         netif->name[0] = 'S';
         netif->name[1] = 'L';
@@ -384,7 +378,7 @@ static err_t _ieee802154_link_output(struct netif *netif, struct pbuf *p)
 }
 #endif
 
-#ifdef MODULE_SLIPDEV
+#ifdef MODULE_SLIPDEV_NET
 #if LWIP_IPV4
 static err_t slip_output4(struct netif *netif, struct pbuf *q, const ip4_addr_t *ipaddr)
 {

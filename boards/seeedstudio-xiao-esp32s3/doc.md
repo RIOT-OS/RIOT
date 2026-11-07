@@ -10,20 +10,10 @@ SPDX-License-Identifier: LGPL-2.1-only
 
 \section esp32s3_seeedstudio Seeed Studio Xiao ESP32S3
 
-## Table of Contents {#esp32s3_seeedstudio_toc}
-
--# [Overview](#esp32s3_seeedstudio_overview)
--# [Hardware](#esp32s3_seeedstudio_hardware)
-    -# [MCU](#esp32s3_seeedstudio_mcu)
-    -# [Board Configuration](#esp32s3_seeedstudio_board_configuration)
-    -# [Board Pinout](#esp32s3_seeedstudio_pinout)
--# [Flashing the Device](#esp32s3_seeedstudio_flashing)
--# [Using STDIO](#esp32s3_seeedstudio_stdio)
-
-## Overview {#esp32s3_seeedstudio_overview}
+## Overview
 
 The Seeed Studio Xiao ESP32S3 is one of the ESP32-S3 boards from Seeed Studio.
-\image html https://files.seeedstudio.com/wiki/SeeedStudio-XIAO-ESP32S3/img/xiaoesp32s3.jpg "Seeed Studio ESP32S3" width=800px
+<img src="https://files.seeedstudio.com/wiki/SeeedStudio-XIAO-ESP32S3/img/xiaoesp32s3.jpg" alt="Seeed Studio ESP32S3" width=800px />
 
 Vendor's info page for the board [here](https://wiki.seeedstudio.com/xiao_esp32s3_getting_started/)
 
@@ -35,27 +25,15 @@ The main features of the board are:
 - Native USB and USB Serial JTAG
 - 21 x 17.8 mm footprint
 
-[Back to table of contents](#esp32s3_seeedstudio_toc)
+## Hardware
 
-## Hardware {#esp32s3_seeedstudio_hardware}
-
-This section describes
-
-- the [MCU](#esp32s3_seeedstudio_mcu),
-- the default [board configuration](#esp32s3_seeedstudio_board_configuration),
-- the [board pinout](#esp32s3_seeedstudio_pinout).
-
-[Back to table of contents](#esp32s3_seeedstudio_toc)
-
-### MCU {#esp32s3_seeedstudio_mcu}
+### MCU
 
 Most features of the board are provided by the ESP32-S3 SoC. For detailed
 information about the ESP32-S3 SoC variant (family) and ESP32x SoCs,
 see section \ref esp32_mcu_esp32 "ESP32 SoC Series".
 
-[Back to table of contents](#esp32s3_seeedstudio_toc)
-
-### Board Configuration {#esp32s3_seeedstudio_board_configuration}
+### Board Configuration
 
 Seeed Studio Xiao ESP32S3 boards have no special hardware on board,
 besides a yellow LED connected to GPIO21.
@@ -71,39 +49,38 @@ The default board configuration provides:
 For detailed information about the peripheral configurations of ESP32-S3
 boards, see section \ref esp32_peripherals "Common Peripherals".
 
-[Back to table of contents](#esp32s3_seeedstudio_toc)
-
-### Board Pinout {#esp32s3_seeedstudio_pinout}
+### Board Pinout
 
 The following figure shows the pinout as configured by board definition
 (excluding the camera module).
 
-@image html https://files.seeedstudio.com/wiki/SeeedStudio-XIAO-ESP32S3/img/2.jpg "Seeed Studio Xiao ESP32S3 Pinout" width=900px
+<img src="https://files.seeedstudio.com/wiki/SeeedStudio-XIAO-ESP32S3/img/2.jpg" alt="Seeed Studio Xiao ESP32S3 Pinout" width=900px />
 
 The corresponding board schematic can be found
 [here](https://files.seeedstudio.com/wiki/SeeedStudio-XIAO-ESP32S3/res/XIAO_ESP32S3_SCH_v1.2.pdf)
 
-[Back to table of contents](#esp32s3_seeedstudio_toc)
-
-## Flashing the Device {#esp32s3_seeedstudio_flashing}
+## Flashing the Device
 
 Since the board does not have a USB-to-Serial chip, the easiest way to flash
 the board is using the USB Serial/JTAG interface. Just connect the board to
 your host computer and use the following command:
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+```shell
 BOARD=seeedstudio-xiao-esp32s3 make flash ...
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+```
 
 @note Usually the make system resets the board before flashing to enable the
 USB Serial/JTAG interface. In some special cases this reset does not work so
 that the programmer cannot connect to the board and the flashing is aborted
 with a timeout:
-```
+
+```text
 Serial port /dev/ttyACM0
 Connecting...
 ...
 serial.serialutil.SerialTimeoutException: Write timeout
 ```
+
 This can happen for example if the board is not yet flashed with RIOT or the
 USB interface is used for another purpose. In this case, restart the board
 manually in download mode by pressing and releasing the RESET button while
@@ -113,9 +90,7 @@ always available.
 For detailed information about ESP32-S3 as well as configuring and compiling
 RIOT for ESP32-S3 boards, see \ref esp32_riot.
 
-[Back to table of contents](#esp32s3_seeedstudio_toc)
-
-## Using STDIO {#esp32s3_seeedstudio_stdio}
+## Using STDIO
 
 Since the board does not have a USB-to-Serial chip, the USB Serial/JTAG
 interface is used by default for the STDIO (module `stdio_usb_serial_jtag`)
@@ -127,6 +102,7 @@ via the USB CDC ACM interface.
 
 Alternatively, the UART interface could be used with an external USB-to-Serial
 adapter. Simply add `stdio_uart` to the list of used modules for this purpose:
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+```shell
 BOARD=seeedstudio-xiao-esp32s3 USEMODULE=stdio_uart make flash ...
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+```

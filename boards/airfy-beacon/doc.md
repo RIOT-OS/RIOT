@@ -52,8 +52,8 @@ registers. Just follow these steps:
 3. type `nrf51 mass_erase` to reset the code memory
 4. all done, `make flash` should now work as expected.
 
+## Flashing and Debugging
 
-##  Flashing and Debugging
 The Airfy Beacon comes without any on-board programming and flashing
 capabilities. It supports however to be programmed using off-the-shelf
 programmers such as Segger's JLink or STM's STLink.
@@ -65,10 +65,12 @@ ST-Link adapter, you just simply have to alter the wiring to fit for your
 programmer, the software part is identical.
 
 ### Hardware
+
 First of all make sure the your ST-Link device is detected and can be
 accessed properly. In Linux you might have to adept your `udev` rules
 accordingly:
-```
+
+```text
 > cat 49-stlinkv2.rules
 # stm32 discovery boards, with onboard st/linkv2
 # ie, STM32L, STM32F4.
@@ -87,6 +89,7 @@ SUBSYSTEMS=="usb", ATTRS{idVendor}=="0483", ATTRS{idProduct}=="3748", \
 > sudo udevadm control --reload-rules
 > sudo udevadm trigger
 ```
+
 now replug the usb cable and flash.
 
 Have a look at the 'Setting up udev rules' section in the
@@ -101,7 +104,8 @@ the port and enables direct access through the pin-header `CN3`, also labeled
 This module supports the Serial Wire Debug (SWD) interface. To access the
 device the following four lines need to be connected with the STM32x-discovery
 board:
-```
+
+```text
                  Airfy Beacon    STM32Fx-discovery
 common ground:       GND <-----------> GND
 supply voltage:      VDD <-----------> 3V
@@ -114,6 +118,7 @@ The following image shows the wiring for an SWD flasher board:
 ![airfy-beacon-flash-connect](https://raw.githubusercontent.com/wiki/RIOT-OS/RIOT/images/airfy-beacon-flash-connect.jpg)
 
 ### Software
+
 Debugging and programming this module works well with
 [OpenOCD](http://openocd.org/).
 
@@ -123,50 +128,61 @@ Version `Open On-Chip Debugger 0.9.0-dev-00184-g885f438 (2014-10-19-14:49)`
 is reported to work.
 
 ### Programming the Device
+
 To program the Airfy Beacon, just go to your RIOT application and type:
+
+```shell
+BOARD=airfy-beacon make flash
 ```
-make flash
-```
+
 and voila, the new firmware should be flashed onto your device.
 
 ### Resetting the Device
+
 As the Airfy Beacon module does not provide a reset button, RIOT includes a
 target to reset the board. To do that, just type
+
+```shell
+BOARD=airfy-beacon make reset
 ```
-make reset
-```
+
 and your board will reboot.
 
 ### Debugging the Device
+
 The debugging setup comprises of two parts: a GDB server and a GDB client. To
 usual workflow is to start the GDB server first and then connect to it with some
 kind of front-end (e.g. command line, IDE, ...).
 
 To start the GDB server, just type
+
+```shell
+BOARD=airfy-beacon make debug-server
 ```
-make debug-server
-```
+
 This will start a local GDB server on `port 3333`.
 
 If you are fine with working with the GDB command line client, you can start
 debugging your device by just typing
+
+```shell
+BOARD=airfy-beacon make debug
 ```
-make debug
-```
+
 in a second terminal window. This will automatically connect to your
 previously opened GDB server and will also load your corresponding .elf file.
 
 Alternatively you can configure your IDE (e.g. eclipse or similar) to connect
 directly to the GDB server. [See here for more information on how to configure
-Eclipse](https://github.com/RIOT-OS/RIOT/wiki/Using-the-Eclipse-IDE-for-C-and-
+Eclipse](<https://github.com/RIOT-OS/RIOT/wiki/Using-the-Eclipse-IDE-for-C-and->
 CPP-Developers,-Howto)
 
-
 ### Program the device manually
-For OpenOCD to work correctly, you need the following configuration file
-(which you can also find in `RIOTDIR/boards/airfy-beacon/dist/openocd.cfg`:
 
-```
+For OpenOCD to work correctly, you need the following configuration file
+(which you can also find in `RIOTDIR/boards/airfy-beacon/dist/openocd.cfg`):
+
+```text
  $ cat RIOTDIR/boards/airfy-beacon/openocd.cfg
 # nRF51822 Target
 source [find interface/stlink-v2.cfg]
@@ -188,7 +204,7 @@ beacon/dist/openocd.cfg`
 3. do the following steps to flash (only use bank #0 starting from address
 0):
 
-```
+```text
 > flash banks
 #0 : nrf51.flash (nrf51) at 0x00000000, size 0x00040000, buswidth 1,
 chipwidth 1
@@ -213,7 +229,7 @@ First you have to start OpenOCD as described in the section above.
 
 Then enter the following in a new terminal:
 
-```
+```text
 $ arm-none-eabi-gdb -tui "<your binary ELF>"
 
 (gdb) target remote localhost:3333

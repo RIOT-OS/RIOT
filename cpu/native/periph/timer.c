@@ -43,6 +43,7 @@
 #define NATIVE_TIMER_SPEED 1000000
 
 static unsigned long time_null;
+static bool timer_is_running;
 
 static timer_cb_t _callback;
 static void *_cb_arg;
@@ -122,6 +123,8 @@ int timer_init(tim_t dev, uint32_t freq, timer_cb_t cb, void *arg)
         return -1;
     }
 
+    timer_is_running = true;
+
     return 0;
 }
 
@@ -157,7 +160,10 @@ int timer_set(tim_t dev, int channel, unsigned int offset)
     }
 
     do_timer_set(offset, false);
-    timer_start(dev);
+
+    if (timer_is_running) {
+        timer_start(dev);
+    }
 
     return 0;
 }
@@ -198,6 +204,8 @@ void timer_start(tim_t dev)
     (void)dev;
     DEBUG("%s\n", __func__);
 
+    timer_is_running = true;
+
     _native_syscall_enter();
     if (timer_settime(itimer_monotonic, 0, &its, NULL) == -1) {
         core_panic(PANIC_GENERAL_ERROR, "Failed to set monotonic timer");
@@ -209,6 +217,8 @@ void timer_stop(tim_t dev)
 {
     (void)dev;
     DEBUG("%s\n", __func__);
+
+    timer_is_running = false;
 
     _native_syscall_enter();
     struct itimerspec zero = {0};

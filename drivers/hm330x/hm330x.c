@@ -86,7 +86,11 @@ int hm330x_read(hm330x_t *dev, hm330x_data_t *data)
 
     uint8_t buf[HM330X_DATA_LENGTH] = { 0 };
 
-    if (i2c_read_bytes(dev->params.i2c, HM330X_I2C_ADDRESS, buf, HM330X_DATA_LENGTH, 0)) {
+    int res = i2c_read_bytes(dev->params.i2c, HM330X_I2C_ADDRESS, buf, HM330X_DATA_LENGTH, 0);
+
+    i2c_release(dev->params.i2c);
+
+    if (res) {
         return -EPROTO;
     }
 
@@ -100,8 +104,6 @@ int hm330x_read(hm330x_t *dev, hm330x_data_t *data)
     if (crc != buf[HM330X_DATA_LENGTH - 1]) {
         DEBUG("crc mismatch expected %02x got %02x\n", buf[HM330X_DATA_LENGTH - 1], crc);
     }
-
-    i2c_release(dev->params.i2c);
 
     hm330x_data_t tmp = {
         .mc_pm_1 = (buf[4] << 8) | buf[5],

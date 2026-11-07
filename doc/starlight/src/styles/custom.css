@@ -1,3 +1,9 @@
+/*
+ * SPDX-FileCopyrightText: 2026 Lasse Rosenow <Lasse.Rosenow@haw-hamburg.de>
+ * SPDX-FileCopyrightText: 2026 HAW Hamburg
+ * SPDX-License-Identifier: LGPL-2.1-only
+ */
+
 /* Dark mode colors. */
 :root {
   --sl-color-accent-low: #002c1c;

@@ -1,7 +1,9 @@
 #!/usr/bin/env python3
 """
-Command line utility to check if only a subset of board / application combinations
-need to be build in the CI
+Command line utility to check if a fast CI run is possible.
+
+A fast CI run is possible if only a subset of board / application combinations
+needs to be built in the CI.
 """
 import argparse
 import io
@@ -20,12 +22,13 @@ REGEX_GIT_DIFF_SINGLE_FILE = re.compile(r"^[0-9-]+\s+[0-9-]+\s+(.*)$")
 OTHER_CLASSIFIERS = [
     [re.compile(r"^(Makefile.*|sys\/Makefile.*|drivers\/Makefile.*|makefiles\/.*)$"), "build-system"],
     [re.compile(r"^(drivers\/include\/.*|sys\/include\/.*)$"), "public-headers"],
-    [re.compile(r"^(Kconfig|kconfigs\/.*|pkg\/Kconfig|sys\/Kconfig|drivers\/Kconfig)$"), "kconfig"],
-    [re.compile(r"^(.*\.cff|doc\/.*|.*\.md|.*\.txt)$"), "doc"],
-    [re.compile(r"^(CODEOWNERS|.mailmap|.gitignore|.github\/.*)$"), "git"],
+    [re.compile(r"^(Kconfig|boards\/Kconfig|kconfigs\/.*|pkg\/Kconfig|sys\/Kconfig|drivers\/Kconfig)$"), "kconfig"],
+    [re.compile(r"^(.*\.cff|doc\/.*|.*\.md|.*\.txt|VERSION)$"), "doc"],
+    [re.compile(r"^(CODEOWNERS|\.mailmap|\.gitignore|\.gitattributes)$"), "git"],
+    [re.compile(r"^\.github/.*$"), "github"],
     [re.compile(r"^(\.murdock|dist\/ls\/.*|\.drone.yml)$"), "ci-murdock"],
     [re.compile(r"^(\.bandit|\.drone.yml)$"), "ci-other"],
-    [re.compile(r"^(dist\/.*|Vagrantfile)$"), "tools"],
+    [re.compile(r"^(dist\/.*|\.clang-format|\.clang-tidy|\.vscode/.*)$"), "tools"],
 ]
 
 REGEX_MODULE = re.compile(r"^(boards\/common|core|cpu|drivers|sys)\/")
@@ -39,9 +42,7 @@ print_err = partial(print, file=sys.stderr)
 
 
 def print_change_set_section(name, contents):
-    """
-    Print the given change set section human reable
-    """
+    """Print the given change set section human readable."""
     if not contents:
         return
     print_err(name)
@@ -57,9 +58,8 @@ def print_change_set_section(name, contents):
 
 
 class ChangeSet:
-    """
-    Representation of the modules affected by a change set
-    """
+    """Representation of the modules affected by a change set."""
+
     def __init__(self, riotbase=os.getcwd()):
         self.apps = {}
         self.boards = {}
@@ -73,7 +73,6 @@ class ChangeSet:
         while module != "":
             makefile = os.path.join(self._riotbase, module, "Makefile")
             if os.path.isfile(makefile) or module in EXCEPTION_MODULES:
-
                 # map all tests/unittests/* to just tests/unittests
                 # workaround for #18987
                 if module.startswith("tests/unittests/"):
@@ -88,9 +87,7 @@ class ChangeSet:
         raise Exception("Module containing file \"{}\" not found".format(file))
 
     def add_file(self, file):
-        """
-        Add the given file to the change set
-        """
+        """Add the given file to the change set."""
         # normalize path
         file = os.path.normpath(file)
         if file.startswith('./'):
@@ -119,9 +116,7 @@ class ChangeSet:
             raise Exception("File \"{}\" doesn't match any known category".format(file))
 
     def print_files_and_classifications(self):
-        """
-        Print all files and their classification in human readable format
-        """
+        """Print all files and their classification in human readable format."""
         print_change_set_section("Other", self.other)
         print_change_set_section("Modules", self.modules)
         print_change_set_section("Packages", self.pkgs)
@@ -131,13 +126,13 @@ class ChangeSet:
 
 def classify_changes(riotbase=None, upstream_branch="master"):
     """
-    Runs the given compiler with -v -E on an no-op compilation unit and parses the built-in
-    include search directories and the GCC version from the output
+    Check if a fast CI run is possible for the changes in the current branch.
 
-    :param args: parse command line arguments
-    :type args: dict
-    :param pr_branch: name of the PR branch
-    :type pr_branch: str
+    The changes between `HEAD` and the upstream branch are classified into a
+    `ChangeSet`.
+
+    :param riotbase: path of the RIOT base directory
+    :type riotbase: str
     :param upstream_branch: name of the main upstream branch the PR should be merged into
     :type upstream_branch: str
 
@@ -234,10 +229,16 @@ if __name__ == "__main__":
     if args.debug:
         change_set.print_files_and_classifications()
 
+    # Some of the changes require a full build. However, when a full build is
+    # required, we still want to print changed boards (if there are any) to add
+    # them to the quickbuild list. Otherwise a combination of board and non-board
+    # changes might prevent the board to be built specifically.
+    postponed_return_value = 0
+
     if "kconfig" in change_set.other or "build-system" in change_set.other:
         if args.explain:
             print_err("General build system / KConfig changes require a full CI run")
-        sys.exit(1)
+        postponed_return_value = 1
 
     if "ci-murdock" in change_set.other:
         if args.explain:
@@ -246,22 +247,22 @@ if __name__ == "__main__":
         # only exit/error if MURDOCK_TEST_CHANGE_FILTER is not set.
         # useful for testing.
         if not os.environ.get("MURDOCK_TEST_CHANGE_FILTER"):
-            sys.exit(1)
+            postponed_return_value = 1
 
     if "public-headers" in change_set.other:
         if args.explain:
             print_err("Changes in public headers require a full CI run")
-        sys.exit(1)
+        postponed_return_value = 1
 
     if len(change_set.modules) > 0:
         if args.explain:
             print_err("Currently changing modules require a full CI run")
-        sys.exit(1)
+        postponed_return_value = 1
 
     if len(change_set.pkgs) > 0:
         if args.explain:
             print_err("Currently changing packages require a full CI run")
-        sys.exit(1)
+        postponed_return_value = 1
 
     if args.json or args.changed_boards or args.changed_apps:
         result = {
@@ -272,10 +273,14 @@ if __name__ == "__main__":
     if args.json:
         print(json.dumps(result, indent=2))
 
+    # always print changed boards
     if args.changed_boards:
         changed_boards = " ".join(result.get("boards", []))
         print(f"BOARDS_CHANGED=\"{changed_boards}\"")
 
-    if args.changed_apps:
+    # only print changed apps if everything succeeded
+    if args.changed_apps and postponed_return_value == 0:
         changed_apps = " ".join(result.get("apps", []))
         print(f"APPS_CHANGED=\"{changed_apps}\"")
+
+    sys.exit(postponed_return_value)

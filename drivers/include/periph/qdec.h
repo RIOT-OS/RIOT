@@ -1,9 +1,6 @@
 /*
- * Copyright (C) 2017 Gilles DOFFE <gdoffe@gmail.com>
- *
- * This file is subject to the terms and conditions of the GNU Lesser
- * General Public License v2.1. See the file LICENSE in the top level
- * directory for more details.
+ * SPDX-FileCopyrightText: 2017 Gilles DOFFE <gdoffe@gmail.com>
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
 
 #pragma once
@@ -62,7 +59,7 @@
  *  - X4 mode : signals A and B, rising and falling edges (all cases)
  *
  * The mapping/configuration of QDEC devices (timers) and the used pins has to be
- * done in the board configuration (the board's `periph_conf.h).
+ * done in the board configuration (the board's `periph_conf.h`).
  *
  * When using the QDEC interface, first thing you have to do is initialize the
  * QDEC device with the targeted mode. Once the device is initialized,
@@ -128,7 +125,7 @@ typedef void (*qdec_cb_t)(void *arg);
 /**
  * @brief   Default interrupt context entry holding callback and argument
  */
-#ifndef HAVE_TIMER_ISR_CTX_T
+#ifndef HAVE_QDEC_ISR_CTX_T
 typedef struct {
     qdec_cb_t cb;           /**< callback executed from qdec interrupt */
     void *arg;              /**< optional argument given to that callback */
@@ -147,6 +144,10 @@ typedef struct {
  *
  * On QDEC counter overflow, an interrupt is triggered.
  * The interruption calls the callback defined.
+ *
+ * @pre     The QDEC device must not be active when calling `qdec_init()`. It
+ *          must either not have been initialized before or it must be stopped
+ *          with @ref qdec_stop before calling `qdec_init()` again.
  *
  * @param[in] dev           QDEC device to initialize
  * @param[in] mode          QDEC mode : X1, X2 or X4

@@ -1,24 +1,7 @@
 /*
- * Copyright (c) 2007 - 2015 Joseph Gaeddert
- * Copyright (c) 2018        HAW Hamburg
- *
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- *
- * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
- * THE SOFTWARE.
+ * SPDX-FileCopyrightText: 2007-2015 Joseph Gaeddert
+ * SPDX-FileCopyrightText: 2018 HAW Hamburg
+ * SPDX-License-Identifier: MIT
  */
 
 /**
@@ -70,8 +53,7 @@ static const uint32_t golay2412_H[12] = {
 };
 
 /* print string of bits to standard output */
-static inline void liquid_print_bitstring(uint32_t _x,
-                                          uint32_t _n)
+static inline void liquid_print_bitstring(uint32_t _x, uint32_t _n)
 {
     uint32_t i;
 
@@ -111,12 +93,10 @@ static uint32_t block_get_enc_msg_len(uint32_t _dec_msg_len,
 
     return num_bytes_out;
 }
-#endif
+#endif /* NDEBUG */
 
 /* multiply input vector with parity check matrix, H */
-static uint32_t golay2412_matrix_mul(uint32_t _v,
-                                     const uint32_t *_A,
-                                     uint32_t _n)
+static uint32_t golay2412_matrix_mul(uint32_t _v, const uint32_t *_A, uint32_t _n)
 {
     uint32_t x = 0;
     uint32_t i;
@@ -134,6 +114,7 @@ static uint32_t golay2412_matrix_mul(uint32_t _v,
     }
     return x;
 }
+
 static uint32_t golay2412_encode_symbol(uint32_t _sym_dec, const uint32_t *_A)
 {
     /* validate input */
@@ -270,9 +251,9 @@ static uint32_t golay2412_decode_symbol(uint32_t _sym_enc,
     return m_hat;
 }
 
-void golay2412_encode(uint32_t _dec_msg_len,
-                      unsigned char *_msg_dec,
-                      unsigned char *_msg_enc)
+void golay2412_encode(uint32_t dec_msg_len,
+                      const uint8_t msg_dec[dec_msg_len],
+                      uint8_t msg_enc[2 * dec_msg_len])
 {
     uint32_t i = 0;         /* decoded byte counter */
     uint32_t j = 0;         /* encoded byte counter */
@@ -281,17 +262,17 @@ void golay2412_encode(uint32_t _dec_msg_len,
     unsigned char s0;       /* first 8-bit symbol */
 
     /* determine remainder of input length / 3 */
-    uint32_t r = _dec_msg_len % 3;
+    uint32_t r = dec_msg_len % 3;
 
-    for (i = 0; i < _dec_msg_len - r; i += 3) {
+    for (i = 0; i < dec_msg_len - r; i += 3) {
         uint32_t m1;            /* second 12-bit symbol (uncoded) */
         uint32_t v1;            /* second 24-bit symbol (encoded) */
         unsigned char s1, s2;   /* second and third 8-bit symbols */
 
         /* strip three input bytes (two uncoded symbols) */
-        s0 = _msg_dec[i + 0];
-        s1 = _msg_dec[i + 1];
-        s2 = _msg_dec[i + 2];
+        s0 = msg_dec[i + 0];
+        s1 = msg_dec[i + 1];
+        s2 = msg_dec[i + 2];
 
         /* pack into two 12-bit symbols */
         m0 = ((s0 << 4) & 0x0ff0) | ((s1 >> 4) & 0x000f);
@@ -303,20 +284,20 @@ void golay2412_encode(uint32_t _dec_msg_len,
 
         /* unpack two 24-bit symbols into six 8-bit bytes
          * retaining order of bits in output */
-        _msg_enc[j + 0] = (v0 >> 16) & 0xff;
-        _msg_enc[j + 1] = (v0 >>  8) & 0xff;
-        _msg_enc[j + 2] = (v0) & 0xff;
-        _msg_enc[j + 3] = (v1 >> 16) & 0xff;
-        _msg_enc[j + 4] = (v1 >>  8) & 0xff;
-        _msg_enc[j + 5] = (v1) & 0xff;
+        msg_enc[j + 0] = (v0 >> 16) & 0xff;
+        msg_enc[j + 1] = (v0 >>  8) & 0xff;
+        msg_enc[j + 2] = (v0) & 0xff;
+        msg_enc[j + 3] = (v1 >> 16) & 0xff;
+        msg_enc[j + 4] = (v1 >>  8) & 0xff;
+        msg_enc[j + 5] = (v1) & 0xff;
 
         j += 6;
     }
 
     /* if input length isn't divisible by 3, encode last 1 or two bytes */
-    for (i = _dec_msg_len - r; i < _dec_msg_len; i++) {
+    for (i = dec_msg_len - r; i < dec_msg_len; i++) {
         /* strip last input symbol */
-        s0 = _msg_dec[i];
+        s0 = msg_dec[i];
 
         /* extend as 12-bit symbol */
         m0 = s0;
@@ -326,20 +307,20 @@ void golay2412_encode(uint32_t _dec_msg_len,
 
         /* unpack one 24-bit symbol into three 8-bit bytes, and
          * append to output array */
-        _msg_enc[j + 0] = (v0 >> 16) & 0xff;
-        _msg_enc[j + 1] = (v0 >>  8) & 0xff;
-        _msg_enc[j + 2] = (v0) & 0xff;
+        msg_enc[j + 0] = (v0 >> 16) & 0xff;
+        msg_enc[j + 1] = (v0 >>  8) & 0xff;
+        msg_enc[j + 2] = (v0) & 0xff;
 
         j += 3;
     }
 
-    assert( j == block_get_enc_msg_len(_dec_msg_len, 12, 24));
-    assert( i == _dec_msg_len);
+    assert(j == block_get_enc_msg_len(dec_msg_len, 12, 24));
+    assert(i == dec_msg_len);
 }
 
-void golay2412_decode(uint32_t _dec_msg_len,
-                      unsigned char *_msg_enc,
-                      unsigned char *_msg_dec)
+void golay2412_decode(uint32_t dec_msg_len,
+                      const uint8_t msg_enc[2 * dec_msg_len],
+                      uint8_t msg_dec[dec_msg_len])
 {
     uint32_t i = 0;                     /* decoded byte counter */
     uint32_t j = 0;                     /* encoded byte counter */
@@ -348,20 +329,20 @@ void golay2412_decode(uint32_t _dec_msg_len,
     unsigned char r0, r1, r2;           /* first three 8-bit bytes */
 
     /* determine remainder of input length / 3 */
-    uint32_t r = _dec_msg_len % 3;
+    uint32_t r = dec_msg_len % 3;
 
-    for (i = 0; i < _dec_msg_len - r; i += 3) {
+    for (i = 0; i < dec_msg_len - r; i += 3) {
         uint32_t v1;                        /* second 24-bit encoded symbol */
         uint32_t m1_hat;                    /* second 12-bit decoded symbol */
         unsigned char r3, r4, r5;           /* last three 8-bit bytes */
 
         /* strip six input bytes (two encoded symbols) */
-        r0 = _msg_enc[j + 0];
-        r1 = _msg_enc[j + 1];
-        r2 = _msg_enc[j + 2];
-        r3 = _msg_enc[j + 3];
-        r4 = _msg_enc[j + 4];
-        r5 = _msg_enc[j + 5];
+        r0 = msg_enc[j + 0];
+        r1 = msg_enc[j + 1];
+        r2 = msg_enc[j + 2];
+        r3 = msg_enc[j + 3];
+        r4 = msg_enc[j + 4];
+        r5 = msg_enc[j + 5];
 
         /* pack six 8-bit symbols into two 24-bit symbols */
         v0 =  (((uint32_t)r0 << 16) & 0xff0000)
@@ -377,19 +358,19 @@ void golay2412_decode(uint32_t _dec_msg_len,
         m1_hat = golay2412_decode_symbol(v1, golay2412_P, golay2412_H);
 
         /* unpack two 12-bit symbols into three 8-bit bytes */
-        _msg_dec[i + 0] = ((m0_hat >> 4) & 0xff);
-        _msg_dec[i + 1] = ((m0_hat << 4) & 0xf0) | ((m1_hat >> 8) & 0x0f);
-        _msg_dec[i + 2] = ((m1_hat) & 0xff);
+        msg_dec[i + 0] = ((m0_hat >> 4) & 0xff);
+        msg_dec[i + 1] = ((m0_hat << 4) & 0xf0) | ((m1_hat >> 8) & 0x0f);
+        msg_dec[i + 2] = ((m1_hat) & 0xff);
 
         j += 6;
     }
 
     /* if input length isn't divisible by 3, decode last 1 or two bytes */
-    for (i = _dec_msg_len - r; i < _dec_msg_len; i++) {
+    for (i = dec_msg_len - r; i < dec_msg_len; i++) {
         /* strip last input symbol (three bytes) */
-        r0 = _msg_enc[j + 0];
-        r1 = _msg_enc[j + 1];
-        r2 = _msg_enc[j + 2];
+        r0 = msg_enc[j + 0];
+        r1 = msg_enc[j + 1];
+        r2 = msg_enc[j + 2];
 
         /* pack three 8-bit symbols into one 24-bit symbol */
         v0 =  (((uint32_t)r0 << 16) & 0xff0000)
@@ -400,11 +381,11 @@ void golay2412_decode(uint32_t _dec_msg_len,
         m0_hat = golay2412_decode_symbol(v0, golay2412_P, golay2412_H);
 
         /* retain last 8 bits of 12-bit symbol */
-        _msg_dec[i] = m0_hat & 0xff;
+        msg_dec[i] = m0_hat & 0xff;
 
         j += 3;
     }
 
-    assert( j == block_get_enc_msg_len(_dec_msg_len, 12, 24));
-    assert( i == _dec_msg_len);
+    assert(j == block_get_enc_msg_len(dec_msg_len, 12, 24));
+    assert(i == dec_msg_len);
 }

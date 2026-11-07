@@ -1,9 +1,6 @@
 /*
- * Copyright (C) 2020 Inria
- *
- * This file is subject to the terms and conditions of the GNU Lesser
- * General Public License v2.1. See the file LICENSE in the top level
- * directory for more details.
+ * SPDX-FileCopyrightText: 2020 Inria
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
 
 /**
@@ -40,6 +37,10 @@ void auto_init_screen(void)
         if (IS_USED(MODULE_U8G2_DISP_DEV)) {
             extern void auto_init_u8g2_display(void);
             auto_init_u8g2_display();
+        }
+        if (IS_USED(MODULE_GC9A01)) {
+            extern void auto_init_gc9a01(void);
+            auto_init_gc9a01();
         }
     }
 

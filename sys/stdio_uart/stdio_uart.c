@@ -1,12 +1,9 @@
 /*
- * Copyright (C) 2013 INRIA
- *               2015 Kaspar Schleiser <kaspar@schleiser.de>
- *               2016 Eistec AB
- *               2018 Freie Universität Berlin
- *
- * This file is subject to the terms and conditions of the GNU Lesser
- * General Public License v2.1. See the file LICENSE in the top level
- * directory for more details.
+ * SPDX-FileCopyrightText: 2013 INRIA
+ * SPDX-FileCopyrightText: 2015 Kaspar Schleiser <kaspar@schleiser.de>
+ * SPDX-FileCopyrightText: 2016 Eistec AB
+ * SPDX-FileCopyrightText: 2018 Freie Universität Berlin
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
 
 /**
@@ -39,22 +36,21 @@
 #define ENABLE_DEBUG 0
 #include "debug.h"
 
-static void _isrpipe_write_one_wrapper(void *arg, uint8_t value)
+static void _stdio_rx_write_one_wrapper(void *arg, uint8_t value)
 {
-    isrpipe_write_one(arg, value);
+    (void)arg;
+    stdio_rx_write_one(value);
 }
 
 static void _init(void)
 {
     uart_rx_cb_t cb = NULL;
-    void *arg = NULL;
 
     if (IS_USED(MODULE_STDIO_UART_RX)) {
-        cb = _isrpipe_write_one_wrapper;
-        arg = &stdin_isrpipe;
+        cb = _stdio_rx_write_one_wrapper;
     }
 
-    uart_init(STDIO_UART_DEV, STDIO_UART_BAUDRATE, cb, arg);
+    uart_init(STDIO_UART_DEV, STDIO_UART_BAUDRATE, cb, NULL);
 }
 
 static ssize_t _write(const void *buffer, size_t len)

@@ -11,3 +11,7 @@ RENODE_SYSBUS_UART ?= sysbus.uart2
 
 # openocd programmer is supported
 PROGRAMMERS_SUPPORTED += openocd
+
+# This needs to match the USART used for the UART stdio (first UART defined in
+# periph_conf.h). Note that `stdio_cdc_acm` is the default, not `stdio_uart`!
+RENODE_SYSBUS_UART := sysbus.usart2

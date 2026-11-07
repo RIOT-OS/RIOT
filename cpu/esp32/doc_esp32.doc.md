@@ -157,7 +157,7 @@ The GPIOs used by ESP32 for slot 1 are:
 The board-specific configuration is realized by defining the @ref sdmmc_config
 array, for example:
 
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~{.c}
+```c
 static const sdmmc_conf_t sdmmc_config[] = {
     {
         .slot = SDMMC_SLOT_1,
@@ -168,7 +168,7 @@ static const sdmmc_conf_t sdmmc_config[] = {
 };
 
 #define SDMMC_NUMOF 1
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+```
 
 Used data bus width has to be defined in sdmmc_conf_t::bus_width in addition
 to the slot, where 1 and 4 are valid values.

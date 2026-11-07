@@ -1,0 +1,16 @@
+# SPDX-FileCopyrightText: 2026 Technische Universität Hamburg
+# SPDX-License-Identifier: LGPL-2.1-only
+
+menu "QMI8658 driver"
+    depends on USEMODULE_QMI8658
+
+config QMI8658_PARAM_I2C
+    hex "Default I2C address"
+    range 0x6A 0x6B
+    default 0x6B
+    help
+        The address value depends on the state of SDO/SA0 pin.
+        SDO/SA0 low: 0x6B
+        SDO/SA0 high: 0x6A
+
+endmenu # QMI8658 driver

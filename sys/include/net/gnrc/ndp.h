@@ -1,9 +1,6 @@
 /*
- * Copyright (C) 2017 Freie Universität Berlin
- *
- * This file is subject to the terms and conditions of the GNU Lesser
- * General Public License v2.1. See the file LICENSE in the top level
- * directory for more details.
+ * SPDX-FileCopyrightText: 2017 Freie Universität Berlin
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
 
 #pragma once
@@ -22,6 +19,7 @@
 
 #include <stdint.h>
 
+#include "compiler_hints.h"
 #include "net/gnrc/pkt.h"
 #include "net/gnrc/netif.h"
 #include "net/ipv6/addr.h"
@@ -93,7 +91,7 @@ gnrc_pktsnip_t *gnrc_ndp_nbr_adv_build(const ipv6_addr_t *tgt, uint8_t flags,
 /**
  * @brief   Builds a router solicitation message for sending.
  *
- * @see `[RFC 4861, section 4.1](https://tools.ietf.org/html/rfc4861#section-4.1")
+ * @see [RFC 4861, section 4.1](https://tools.ietf.org/html/rfc4861#section-4.1")
  *
  * @param[in] options   Options to append to the router solicitation.
  *                      May be NULL for none.
@@ -106,7 +104,7 @@ gnrc_pktsnip_t *gnrc_ndp_rtr_sol_build(gnrc_pktsnip_t *options);
 /**
  * @brief   Builds a router advertisement message for sending.
  *
- * @see `[RFC 4861, section 4.2](https://tools.ietf.org/html/rfc4861#section-4.2")
+ * @see [RFC 4861, section 4.2](https://tools.ietf.org/html/rfc4861#section-4.2")
  *
  * @note    The source address for the packet MUST be the link-local address
  *          of the interface.
@@ -168,6 +166,7 @@ gnrc_pktsnip_t *gnrc_ndp_opt_build(uint8_t type, size_t size,
  * @return  The packet snip list of options, on success
  * @return  NULL, if packet buffer is full
  */
+ACCESS(read_only, 1, 2)
 gnrc_pktsnip_t *gnrc_ndp_opt_sl2a_build(const uint8_t *l2addr,
                                         uint8_t l2addr_len,
                                         gnrc_pktsnip_t *next);
@@ -191,6 +190,7 @@ gnrc_pktsnip_t *gnrc_ndp_opt_sl2a_build(const uint8_t *l2addr,
  * @return  The pkt snip list of options, on success
  * @return  NULL, if packet buffer is full
  */
+ACCESS(read_only, 1, 2)
 gnrc_pktsnip_t *gnrc_ndp_opt_tl2a_build(const uint8_t *l2addr,
                                         uint8_t l2addr_len,
                                         gnrc_pktsnip_t *next);
@@ -297,7 +297,9 @@ gnrc_pktsnip_t *gnrc_ndp_opt_mtu_build(uint32_t mtu, gnrc_pktsnip_t *next);
  * @return  @p next, if RDNSS is not supported
  * @return  NULL, if packet buffer is full
  */
-gnrc_pktsnip_t *gnrc_ndp_opt_rdnss_build(uint32_t lifetime, ipv6_addr_t *addrs,
+ACCESS(read_only, 2, 3)
+gnrc_pktsnip_t *gnrc_ndp_opt_rdnss_build(uint32_t lifetime,
+                                         const ipv6_addr_t *addrs,
                                          unsigned addrs_num,
                                          gnrc_pktsnip_t *next);
 

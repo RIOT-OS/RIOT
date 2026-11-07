@@ -31,7 +31,7 @@ while the source files in `folder` are considered part of the application itself
 
 At a minimum, each module in RIOT requires a `Makefile` with the following content:
 
-```Makefile
+```makefile
 include $(RIOTBASE)/Makefile.base
 ```
 
@@ -45,7 +45,7 @@ RIOT modules are also described in greater detail [in the documentation](https:/
 
 Two lines need to be added to the application's Makefile in order to compile and use the module:
 
-```Makefile
+```makefile
 EXTERNAL_MODULE_DIRS += $(CURDIR)/external_modules/
 USEMODULE += module
 ```
@@ -61,7 +61,7 @@ Compared to the module approach, no additional Makefile is needed in the subfold
 The application's Makefile needs to add _all_ source files explicitly,
 including the ones residing directly in the application directory:
 
-```Makefile
+```makefile
 SRC += main.c
 SRC += folder/a.c folder/subfolder/b.c
 ```
@@ -69,7 +69,7 @@ SRC += folder/a.c folder/subfolder/b.c
 To avoid listing all source files individually, it is of course possible
 to use normal GNU make functions such as `wildcard`:
 
-```Makefile
+```makefile
 SRC += $(wildcard *.c folder/*.c folder/**/*.c)
 ```
 

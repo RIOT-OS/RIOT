@@ -8,20 +8,20 @@ which comes with the necessary compilers and toolchains and is fully managed by
 the build system. It can be enabled by passing `BUILD_IN_DOCKER=1` to make.
 
 ```shell
-$ BUILD_IN_DOCKER=1 make
+BUILD_IN_DOCKER=1 make
 ```
 
 If your user does not have permissions to access the Docker daemon:
 
 ```shell
-$ BUILD_IN_DOCKER=1 DOCKER="sudo docker" make
+BUILD_IN_DOCKER=1 DOCKER="sudo docker" make
 ```
 
 To always use Docker for building, set `BUILD_IN_DOCKER=1` (and if necessary
 `DOCKER="sudo docker"`) in the environment:
 
-```console
-$ export BUILD_IN_DOCKER=1
+```shell
+export BUILD_IN_DOCKER=1
 ```
 
 The used Docker image defaults to a pinned version of [riot/riotbuild] for a
@@ -29,7 +29,7 @@ given commit in the RIOT repository. It can be overwritten via the environment
 variable `DOCKER_IMAGE`, for example:
 
 ```shell
-$ BUILD_IN_DOCKER=1 DOCKER_IMAGE="local/tinybuild-native64:latest" make
+BUILD_IN_DOCKER=1 DOCKER_IMAGE="local/tinybuild-native64:latest" make
 ```
 
 ## Targets run in Docker: DOCKER_MAKECMDGOALS_POSSIBLE

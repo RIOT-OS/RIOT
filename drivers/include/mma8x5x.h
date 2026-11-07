@@ -1,10 +1,7 @@
 /*
- * Copyright (C) 2014 PHYTEC Messtechnik GmbH
- *               2016 Freie Universität Berlin
- *
- * This file is subject to the terms and conditions of the GNU Lesser
- * General Public License v2.1. See the file LICENSE in the top level
- * directory for more details.
+ * SPDX-FileCopyrightText: 2014 PHYTEC Messtechnik GmbH
+ * SPDX-FileCopyrightText: 2016 Freie Universität Berlin
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
 
 #pragma once
@@ -210,7 +207,7 @@ void mma8x5x_set_motiondetect(const mma8x5x_t *dev, uint8_t int_pin, uint8_t thr
  * Acknowledges (clears) a motion detection interrupt.
  * See @ref mma8x5x_set_motiondetect().
  *
- * @warning: this does incur an I2C write, thus should not be done from within
+ * @warning  this does incur an I2C write, thus should not be done from within
  *           the ISR.
  *
  * @param[in]   dev         device descriptor of accelerometer

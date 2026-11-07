@@ -1,5 +1,6 @@
 /*
  * SPDX-FileCopyrightText: 2013 RIOT OS, All Rights Reserved.
+ * SPDX-License-Identifier: LicenseRef-RIOT-branding
  */
 
 #pragma once

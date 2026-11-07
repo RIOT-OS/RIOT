@@ -10,16 +10,7 @@ SPDX-License-Identifier: LGPL-2.1-only
 
 \section esp32c6_devkit ESP32-C6-DevKit
 
-## Table of Contents {#esp32c6_devkit_toc}
-
--# [Overview](#esp32c6_devkit_overview)
--# [Hardware](#esp32c6_devkit_hardware)
-    -# [MCU](#esp32c6_devkit_mcu)
-    -# [Board Configuration](#esp32c6_devkit_board_configuration)
-    -# [Board Pinout](#esp32c6_devkit_pinout)
--# [Flashing the Device](#esp32c6_devkit_flashing)
-
-## Overview {#esp32c6_devkit_overview}
+## Overview
 
 The Espressif ESP32-C6-DevKit boards are a couple of boards that use one of
 the following modules:
@@ -32,30 +23,17 @@ limited, the ESP32-C6-DevKit should also work for most other ESP32-C6 boards.
 Any modifications required for specific applications could be overridden by
 \ref esp32_application_specific_configurations "application-specific board configuration".
 
-\image html "https://docs.espressif.com/projects/esp-dev-kits/en/latest/esp32c6/_images/esp32-c6-devkitm-1-v1-annotated-photo.png" "Espressif ESP32-C6-DevKitM-1" width=800px
+<img src="https://docs.espressif.com/projects/esp-dev-kits/en/latest/esp32c6/_images/esp32-c6-devkitm-1-v1-annotated-photo.png" alt="Espressif ESP32-C6-DevKitM-1" width=800px />
 
-[Back to table of contents](#esp32c6_devkit_toc)
+## Hardware
 
-## Hardware {#esp32c6_devkit_hardware}
-
-This section describes
-
-- the [MCU](#esp32c6_devkit_mcu),
-- the default [board configuration](#esp32c6_devkit_board_configuration),
-- [optional hardware configurations](#esp32c6_devkit_optional_hardware),
-- the [board pinout](#esp32c6_devkit_pinout).
-
-[Back to table of contents](#esp32c6_devkit_toc)
-
-### MCU {#esp32c6_devkit_mcu}
+### MCU
 
 Most features of the board are provided by the ESP32-C6 SoC. For detailed
 information about the ESP32-C6 variant (family) and ESP32x SoCs,
 see section \ref esp32_mcu_esp32 "ESP32 SoC Series".
 
-[Back to table of contents](#esp32c6_devkit_toc)
-
-### Board Configuration {#esp32c6_devkit_board_configuration}
+### Board Configuration
 
 ESP32-C6-DevKit boards have no special hardware on board with the exception
 of a WS2812-compatible RGB-LED.
@@ -114,7 +92,7 @@ UART_DEV(0):RxD | GPIO17 | Console (configuration is fixed) | \ref esp32_uart_in
 USB D-          | GPIO12 | | |
 USB D+          | GPIO13 | | |
 </center>
-\n
+<br>
 @note
 - The configuration of ADC channels contains all ESP32-C6 GPIOs that could
   be used as ADC channels.
@@ -126,32 +104,28 @@ USB D+          | GPIO13 | | |
 For detailed information about the peripheral configurations of ESP32-C6
 boards, see section \ref esp32_peripherals "Common Peripherals".
 
-[Back to table of contents](#esp32c6_devkit_toc)
-
-### Board Pinout {#esp32c6_devkit_pinout}
+### Board Pinout
 
 The following figures show the pinouts as configured by default board
 definition.
 
-@image html https://docs.espressif.com/projects/esp-dev-kits/en/latest/esp32c6/_images/esp32-c6-devkitm-1-pin-layout.png "EPS32-C6-DevKitM-1x Pinout"
-@image html https://docs.espressif.com/projects/esp-dev-kits/en/latest/esp32c6/_images/esp32-c6-devkitc-1-pin-layout.png "EPS32-C6-DevKitC-1x Pinout"
+<img src="https://docs.espressif.com/projects/esp-dev-kits/en/latest/esp32c6/_images/esp32-c6-devkitm-1-pin-layout.png" alt="EPS32-C6-DevKitM-1x Pinout" />
+<img src="https://docs.espressif.com/projects/esp-dev-kits/en/latest/esp32c6/_images/esp32-c6-devkitc-1-pin-layout.png" alt="EPS32-C6-DevKitC-1x Pinout" />
 
 The corresponding board schematics can be found:
 
 - [ESP32-C6-DevKitM-1](https://dl.espressif.com/dl/schematics/esp32-c6-devkitm-1-schematics.pdf)
 - [ESP32-C6-DevKitC-1](https://dl.espressif.com/dl/schematics/esp32-c6-devkitc-1-schematics_v1.4.pdf)
 
-[Back to table of contents](#esp32c6_devkit_toc)
-
-## Flashing the Device {#esp32c6_devkit_flashing}
+## Flashing the Device
 
 Flashing RIOT is quite easy. The board has a Micro-USB connector with
 reset/boot/flash logic. Just connect the board to your host computer
 using the programming port and execute command:
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+```shell
 BOARD=esp32c6-devkit make flash ...
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+```
+
 For detailed information about ESP32-C6 as well as configuring and compiling
 RIOT for ESP32-C6 boards, see \ref esp32_riot.
-
-[Back to table of contents](#esp32c6_devkit_toc)

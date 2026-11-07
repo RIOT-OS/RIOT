@@ -83,6 +83,16 @@ typedef struct {
     uint8_t pinsel_af;      /**< Alternate function of the PINSEL# register */
 } uart_conf_t;
 
+/**
+ * @brief   Ethernet peripheral configuration
+ */
+typedef struct {
+    gpio_t phy_en_pin;      /**< PHY / RMII clock enable, @p GPIO_UNDEF if unused */
+    gpio_t phy_rst_pin;     /**< PHY reset, @p GPIO_UNDEF if unused */
+    uint16_t speed;         /**< Link speed selection */
+    uint8_t phy_addr;       /**< MIIM address */
+} eth_conf_t;
+
 #ifdef __cplusplus
 }
 #endif

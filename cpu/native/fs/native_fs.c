@@ -18,6 +18,7 @@
 #include "mutex.h"
 #include "native_internal.h"
 #include "fs/native_fs.h"
+#include "string_utils.h"
 #include "vfs.h"
 
 #define ENABLE_DEBUG 0
@@ -85,8 +86,10 @@ static int _mount(vfs_mount_t *mountp)
         real_mkdir(parent, 0777);
     }
 
-    real_mkdir(_prefix_path(mountp, ""), 0777);
-    res = errno == EEXIST ? 0 : -errno;
+    res = real_mkdir(_prefix_path(mountp, ""), 0777);
+    if (res < 0) {
+        res = (errno == EEXIST) ? 0 : -errno;
+    }
 
     mutex_unlock(&_lock);
     return res;
@@ -239,7 +242,7 @@ static int _readdir(vfs_DIR *dirp, vfs_dirent_t *entry)
     }
 
     entry->d_ino = dirent->d_ino;
-    strncpy(entry->d_name, (char *)dirent->d_name, sizeof(entry->d_name));
+    strscpy(entry->d_name, dirent->d_name, sizeof(entry->d_name));
 
     return 1;
 }

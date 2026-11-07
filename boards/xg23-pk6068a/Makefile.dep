@@ -1,4 +1,5 @@
 ifneq (,$(filter saul_default,$(USEMODULE)))
+  USEMODULE += efm32_coretemp
   USEMODULE += saul_gpio
 endif
 

@@ -1,9 +1,6 @@
 /*
- * Copyright (C) 2018-2021 Freie Universität Berlin
- *
- * This file is subject to the terms and conditions of the GNU Lesser
- * General Public License v2.1. See the file LICENSE in the top level
- * directory for more details.
+ * SPDX-FileCopyrightText: 2018-2021 Freie Universität Berlin
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
 
 /**
@@ -290,6 +287,8 @@ static netdev_t _nimble_netdev_dummy = {
 
 static void _on_data(nimble_netif_conn_t *conn, struct ble_l2cap_event *event)
 {
+    int res;
+
     struct os_mbuf *rxb = event->receive.sdu_rx;
     size_t rx_len = (size_t)OS_MBUF_PKTLEN(rxb);
 
@@ -301,8 +300,16 @@ static void _on_data(nimble_netif_conn_t *conn, struct ble_l2cap_event *event)
         goto end;
     }
 
+    gnrc_netif_hdr_t *netif_hdr = if_snip->data;
     /* we need to add the device PID to the netif header */
-    gnrc_netif_hdr_set_netif(if_snip->data, &_netif);
+    gnrc_netif_hdr_set_netif(netif_hdr, &_netif);
+
+    /* add RSSI to netif header */
+    int8_t rssi;
+    res = ble_gap_conn_rssi(conn->gaphandle, &rssi);
+    if (res == 0) {
+        netif_hdr->rssi = rssi;
+    }
 
     /* allocate space in the pktbuf to store the packet */
     gnrc_pktsnip_t *payload = gnrc_pktbuf_add(if_snip, NULL, rx_len, _nettype);
@@ -312,7 +319,7 @@ static void _on_data(nimble_netif_conn_t *conn, struct ble_l2cap_event *event)
     }
 
     /* copy payload from mbuf into pktbuffer */
-    int res = os_mbuf_copydata(rxb, 0, rx_len, payload->data);
+    res = os_mbuf_copydata(rxb, 0, rx_len, payload->data);
     if (res != 0) {
         gnrc_pktbuf_release(payload);
         goto end;
@@ -477,7 +484,7 @@ static void _on_gap_param_update(int handle, nimble_netif_conn_t *conn)
 {
     struct ble_gap_conn_desc desc;
     int res = ble_gap_conn_find(conn->gaphandle, &desc);
-    assert(res == 0) ;
+    assert(res == 0);
     (void)res;
 
     conn->itvl = desc.conn_itvl;

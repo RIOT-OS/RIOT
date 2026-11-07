@@ -1,10 +1,8 @@
 /*
- * Copyright (C) 2020 HAW Hamburg
- *
- * This file is subject to the terms and conditions of the GNU Lesser
- * General Public License v2.1. See the file LICENSE in the top level
- * directory for more details.
+ * SPDX-FileCopyrightText: 2020 HAW Hamburg
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
+
 /**
  * @ingroup     sys_uri_parser
  * @{
@@ -172,9 +170,10 @@ static const char *_consume_authority(uri_parser_result_t *result, const char *u
     const char *ipv6_end = NULL;
     /* validate IPv6 form */
     if (result->host[0] == '[') {
-        ipv6_end = _strchrb(result->host, uri_end, ']');
-        /* found end marker of IPv6 form beyond authority part */
-        if (ipv6_end >= authority_end) {
+        ipv6_end = _strchrb(result->host, authority_end, ']');
+
+        /* no closing ']' within authority part */
+        if (!ipv6_end) {
             return NULL;
         }
 

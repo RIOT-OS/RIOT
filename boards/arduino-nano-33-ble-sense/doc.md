@@ -17,8 +17,9 @@ This board provides 802.15.4 and BLE connectivity.
 
 Use `BOARD=arduino-nano-33-ble-sense` with the `make` command.<br/>
 Example with `hello-world` application:
-```
-    make BOARD=arduino-nano-33-ble-sense -C examples/basic/hello-world flash
+
+```shell
+make BOARD=arduino-nano-33-ble-sense -C examples/basic/hello-world flash
 ```
 
 ### Accessing STDIO via UART
@@ -27,8 +28,9 @@ The STDIO is directly accessible via the USB port. On a Linux host, it's
 generally mapped to `/dev/ttyACM0`.
 
 Use the `term` target to connect to the board serial port<br/>
-```
-    make BOARD=arduino-nano-33-ble-sense -C examples/basic/hello-world term
+
+```shell
+make BOARD=arduino-nano-33-ble-sense -C examples/basic/hello-world term
 ```
 
 ### Internal devices
@@ -44,6 +46,6 @@ Use the `term` target to connect to the board serial port<br/>
 - LSM9DS1 (9-axis inertial module - Accelerometer)
 - MP34DT06JTR (Microphone)
 
-### Hardware reference
+###  Hardware reference
 
-- https://docs.arduino.cc/resources/pinouts/ABX00031-full-pinout.pdf
+- <https://docs.arduino.cc/resources/pinouts/ABX00031-full-pinout.pdf>

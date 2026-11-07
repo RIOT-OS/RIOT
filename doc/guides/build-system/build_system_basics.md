@@ -36,7 +36,7 @@ For a `FEATURE` to be provided by a `board` it must meet 2 criteria, and for
   - e.g.: `stm32l152re` has an SPI peripheral
     `riotboot` needs to be able to link and flash at an offset
 - Needs support in RIOT, an implementation of an api to interact with the _hw_
-  - e.g.: `cpu/stm32_common/periph/spi.c` is implemented for `stm32l1`
+  - e.g.: `cpu/stm32/periph/spi.c` is implemented for `stm32l1`
     `riotboot` needs an implementation of `cpu_jump_to_image`
 - Wiring between the _cpu/soc_(system on a chip) a _bus_ and other _cpu_/_hw_ components.
   - e.g.: `nucleo-l152re/include/periph_conf.h` specified wiring between `PORT_Ax`
@@ -128,14 +128,79 @@ A `nucleo-*` with a `SX1272MB2xA` is a different board in RIOT sense.
 
 _note_: if `devicetree` is implemented this concept will change.
 
-# Variables declaration guidelines
+## Printing Infos, Warnings and Error Messages
 
-This page contains basic guidelines about `make` variable declaration, it
+Many Makefiles perform checks of parameters, variables and other settings
+during the build process to ensure a proper operation. To inform and help the
+user, these messages are printed to the terminal.
+
+The CI (Continuous Integration) and other scripts used during build process and
+deployment of RIOT interpret the output of Make printed to `stdout`.
+This output is used to determine if a compilation was successful or how big the
+compiled binary file is.
+To avoid confusing these scripts, informative messages and colored warnings and
+errors should be printed to `stderr` instead.
+
+To make printing colored messages easy, the helper functions defined in
+`$(RIOTBASE)/makefiles/color.inc.mk` can and should be used.
+Generally you have to distinguish between two function types: One can be used
+during the initial phase of the Make process and the other one can be used in
+recipes. The latter has to be prefixed with `sh_`.
+
+```makefile
+# Remember to include the Makefile that defines the helpers!
+include $(RIOTBASE)/makefiles/color.inc.mk
+
+# During the execution of the Makefile, you have to use `echoinfo`, `echowarn`,
+# ...
+ifeq (,$(filter periph_spi,$(FEATURES_USED)))
+  $(call echoerr,("Can\'t proceed with the build!"\
+                  "The feature \"periph_spi\" is required for this"\
+                  "operation. \(You can add it to FEATURES_REQUIRED.\)"))
+endif
+
+# You can colorize parts of your text with the `c_red`, `c_yellow`, `c_green`
+# and `c_purple` functions, but be aware that this can become difficult to write.
+# If you want to have white text, always start with `echoinfo`.
+ifneq (,$(DEPRECATED_MODULES_USED))
+  $(call echoinfo,($(call c_red,"Deprecated modules are in use:")\
+                   "$(DEPRECATED_MODULES_USED)"))
+endif
+
+# In recipes you have to use the `sh_` prefixed functions.
+clean:
+  $(call sh_echowarn,("Deleting all your data now!"))
+```
+
+:::note
+You can not use `\n` or other control sequences in your text!
+
+Apostrophes `'`, quotation marks `"` and brackets `()` have to be escaped:
+`\'`, `\"`, `\(`, `\)`.
+:::
+
+### Available Functions
+ - `echoinfo` - Prints information in white text to the terminal.
+ - `echowarn` - Prints warnings in yellow text to the terminal. Warnings should
+  be used for everything that does not break the build.
+ - `echoerr`  - Prints errors in red text to the terminal. Errors should be
+  used for everything that compromises the build process or the resulting binary.
+ - `echored`  - Prints in red text.
+ - `echoyellow` - Prints in yellow text.
+ - `echogreen` - Prints in green text.
+ - `echopurple` - Prints in purple text.
+ - `sh_echoinfo` - Same as `echoinfo`, but to be used in recipes.
+ - `sh_...`
+ - `c_red`, `c_yellow`, `c_green`, `c_purple` - Colorize part of a message.
+
+## Variables Declaration Guidelines
+
+This section contains basic guidelines about `make` variable declaration, it
 summarizes some of the pros and cons as well as specifies good and bad patterns
 in our build system. You might want to refer to `gnu make` documentation
 regarding these subjects.
 
-## Avoid Unnecessary Export
+### Avoid Unnecessary Export
 
 ```makefile
 export OUTPUT = $(shell some-command)
@@ -155,9 +220,44 @@ This is why global variables need clear documentation.
 
 [gnumake doc](https://www.gnu.org/software/make/manual/html_node/Variables_002fRecursion.html)
 
-## Use Memoized for Variables Referencing a Function or Command
+### Prefer Built-in Alternatives Over $(shell)
 
-### Recursively Expanded Variable
+Every `$(shell ...)` call spawns a subprocess. This is slow compared to `make`
+built-in functions. The cost multiplies quickly when the call is placed in a
+recursively expanded variable (`=`) that gets expanded many times, or in a
+variable that is evaluated during parsing rather than only when its result is
+actually needed.
+
+Before using a `$(shell ...)` call, check whether one of the following
+alternatives already covers the case:
+
+- Use `$(notdir ...)` instead of `$(shell basename ...)` to strip the
+  directory part of a path. Both produce the same result for the paths used
+  in the build system, but `$(notdir)` does not spawn a subprocess. Use
+  `$(basename $(notdir ...))` if you also need to strip the suffix.
+
+- Use `command -v` instead of `which` inside a `$(shell ...)` call, e.g.
+  `$(shell command -v $(TOOL) 2> /dev/null)`. `command -v` is a shell
+  built-in, so this avoids spawning an additional process for `which`, and it
+  works on systems where `which` is not installed. A `$(shell ...)` call is
+  still required, since `make` has no built-in way to search the file system
+  for an executable.
+
+- Use the string and version helper functions defined in
+  `makefiles/utils/strings.mk`, such as `lowercase`, `uppercase`, `chars_from`,
+  `chars_upto`, `split_chars`, `version_is_greater`,
+  `version_is_greater_or_equal` and `max_number`. These helper functions
+  replace the need of piping a value through `tr`, `sed`, `awk`, or `cut`.
+  These functions are implemented with `make` built-ins only  (`$(subst)`,
+  `$(filter)`, `$(sort)`, etc.).
+
+If a `$(shell ...)` call cannot be avoided, for example because it needs to
+run an external tool or the actual file system, follow the memoization
+guidance below to prevent it from being executed more than once.
+
+### Use Memoized for Variables Referencing a Function or Command
+
+#### Recursively Expanded Variable
 
 ```makefile
 OUTPUT = $(shell some-command $(ANOTHER_VARIABLE))
@@ -176,7 +276,7 @@ OUTPUT = $(shell some-command $(ANOTHER_VARIABLE))
 - If the variable expansion doesn't involve evaluating a function the overhead
   is none.
 
-### Simply Expanded Variable
+#### Simply Expanded Variable
 
 ```makefile
 OUTPUT := $(shell some-command $(ANOTHER_VARIABLE))
@@ -194,7 +294,7 @@ OUTPUT := $(shell some-command $(ANOTHER_VARIABLE))
 
 - The values of variables declared with `:=` depend on the order of definition.
 
-### Memoized
+#### Memoized
 
 ```makefile
 OUTPUT = $(call memoized,OUTPUT,$(shell some-command))
@@ -209,7 +309,7 @@ OUTPUT = $(call memoized,OUTPUT,$(shell some-command))
 
 [gnumake doc](https://www.gnu.org/software/make/manual/html_node/Flavors.html)
 
-## Additional Documentation
+### Additional Documentation
 
 - Deferred vs. simple expansion: http://make.mad-scientist.net/deferred-simple-variable-expansion/
 - Tracking issue: [#10850](https://github.com/RIOT-OS/RIOT/issues/10850)

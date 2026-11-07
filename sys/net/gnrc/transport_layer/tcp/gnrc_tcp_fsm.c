@@ -1,9 +1,6 @@
 /*
- * Copyright (C) 2015-2017 Simon Brummer
- *
- * This file is subject to the terms and conditions of the GNU Lesser
- * General Public License v2.1. See the file LICENSE in the top level
- * directory for more details.
+ * SPDX-FileCopyrightText: 2015-2017 Simon Brummer
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
 
 /**
@@ -174,8 +171,23 @@ static int _transition_to(gnrc_tcp_tcb_t *tcb, _gnrc_tcp_fsm_state_t state)
             break;
 
         case FSM_STATE_LISTEN:
+            /* A listening TCB can be reused from a passive open, where the
+             * event_timeout was already scheduled by FSM_STATE_SYN_RCVD. In
+             * that state, the TCB waits for an ACK, but an unexpected RST or
+             * SYN will cause the TCB to transition back to LISTEN, so the
+             * event_timeout must be unscheduled first. */
+            if (tcb->status & STATUS_LISTENING) {
+                _gnrc_tcp_eventloop_unsched(&tcb->event_timeout);
+            }
+
             /* Clear Accepted Status */
             tcb->status &= ~(STATUS_ACCEPTED);
+
+            /* Clear receive buffer, if already allocated */
+            _gnrc_tcp_rcvbuf_clear_buffer(tcb);
+
+            /* Restore receive window size */
+            tcb->rcv_wnd = CONFIG_GNRC_TCP_DEFAULT_WINDOW;
 
             /* Clear address info */
 #ifdef MODULE_GNRC_IPV6

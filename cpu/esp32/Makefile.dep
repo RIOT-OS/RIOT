@@ -41,6 +41,10 @@ ifneq (,$(filter esp_ieee802154,$(USEMODULE)))
   ifneq (,$(filter netdev,$(USEMODULE)))
     USEMODULE += netdev_ieee802154_submac
   endif
+  ifneq (,$(filter ieee802154_submac,$(USEMODULE)))
+    USEMODULE += ieee802154_submac_soft_csma_ca
+    USEMODULE += ieee802154_submac_soft_frame_retrans
+  endif
 endif
 
 ifneq (,$(filter esp_eth,$(USEMODULE)))
@@ -196,7 +200,6 @@ ifneq (,$(filter shell,$(USEMODULE)))
 endif
 
 ifneq (,$(filter stdio_usb_serial_jtag, $(USEMODULE)))
-  USEMODULE += tsrb
   ifneq (,$(filter stdin,$(USEMODULE)))
     USEMODULE += stdio_usb_serial_jtag_rx
   endif

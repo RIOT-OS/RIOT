@@ -1,10 +1,7 @@
 #!/usr/bin/env python3
 
-# Copyright (C) 2022 Freie Universität Berlin
-#
-# This file is subject to the terms and conditions of the GNU Lesser
-# General Public License v2.1. See the file LICENSE in the top level
-# directory for more details.
+# SPDX-FileCopyrightText: 2022 Freie Universität Berlin
+# SPDX-License-Identifier: LGPL-2.1-only
 
 import os
 import sys
@@ -43,6 +40,7 @@ class InputMixin:
             input_hex = input_hex[self.MAX:]
 
     def input_reset(self):
+        self.flush_spawn(expect_timeout=0.1)
         self.spawn.sendline("input reset")
 
     def expect_od_dump_of(self, byts):
@@ -216,7 +214,7 @@ class TestSelfTest(PexpectTestCase, InputMixin):
         self.spawn.sendline("compress down 4")
         self.spawn.expect_exact("Unable to compress (maybe wrong device ID 4?)")
 
-    def test_compress_success(self):
+    def _common_test_compress_success(self):
         pkt = (
             IPv6(src="2001:db8:1::1", dst="2001:db8:1::2", hlim=56)
             / UDP(sport=0x1F42, dport=0x1F42)
@@ -245,6 +243,9 @@ class TestSelfTest(PexpectTestCase, InputMixin):
         self.spawn.sendline("output")
         self.expect_od_dump_of(exp_pkt)
         return exp_pkt
+
+    def test_compress_success(self):
+        self._common_test_compress_success()
 
     def test_decompress_usage(self):
         self.spawn.sendline("decompress")
@@ -363,7 +364,7 @@ class TestSelfTest(PexpectTestCase, InputMixin):
         self.spawn.expect_exact("Fragmenter initialized")
 
     def test_fragment_success_no_frag(self):
-        pkt = self.test_compress_success()
+        pkt = self._common_test_compress_success()
         self.spawn.sendline("output copy")
         self.spawn.expect_exact("Successfully copied output buffer to input buffer.")
         self.spawn.sendline("fragment init")

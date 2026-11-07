@@ -87,12 +87,12 @@ static const uart_conf_t uart_config[] = {
     },
     {
         .dev        = USART2,
-        .rcc_mask   = RCC_APB2ENR_USART1EN,
+        .rcc_mask   = RCC_APB1ENR_USART2EN,
         .rx_pin     = GPIO_PIN(PORT_D, 6),
         .tx_pin     = GPIO_PIN(PORT_D, 5),
         .rx_af      = GPIO_AF7,
         .tx_af      = GPIO_AF7,
-        .bus        = APB2,
+        .bus        = APB1,
         .irqn       = USART2_IRQn,
 #ifdef MODULE_PERIPH_DMA
         .dma        = DMA_STREAM_UNDEF,

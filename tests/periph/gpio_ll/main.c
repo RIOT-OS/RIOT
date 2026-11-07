@@ -87,7 +87,7 @@ static void expect_impl(int val, unsigned line)
     if (!val) {
         printf("expect failed at line %u\n", line);
         fflush(stdout);
-        while(1) {}
+        while (1) {};
     }
 }
 

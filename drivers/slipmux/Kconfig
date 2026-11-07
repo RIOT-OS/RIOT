@@ -1,0 +1,18 @@
+# SPDX-FileCopyrightText: 2020 Freie Universität Berlin
+# SPDX-FileCopyrightText: 2021 HAW Hamburg
+# SPDX-License-Identifier: LGPL-2.1-only
+
+menu "SLIPDEV driver"
+    depends on USEMODULE_SLIPMUX
+
+config SLIPDEV_BUFSIZE_EXP
+    int "Buffer size (as exponent of 2^n)"
+    default 11
+    range 0 31
+    help
+        UART buffer size used for TX and RX buffers.
+        Reduce this value if your expected traffic does
+        not include full IPv6 MTU.
+        Value represents the exponent n of 2^n.
+
+endmenu # SLIPDEV driver

@@ -194,12 +194,12 @@ void IRAM_ATTR thread_yield_higher(void)
     else {
         /* otherwise trigger a software interrupt for context switch */
         WRITE_PERI_REG(SYSTEM_CPU_INTR_FROM_CPU_0_REG, SYSTEM_CPU_INTR_FROM_CPU_0);
-        /* small delay of 3-4 instructions required here before we return */
-        __asm__ volatile ( "nop" );
-        __asm__ volatile ( "nop" );
-        __asm__ volatile ( "nop" );
-        __asm__ volatile ( "nop" );
-        __asm__ volatile ( "nop" );
+        /* If IRQs are enabled, wait until `thread_yield_isr` has been taken the
+         * interrupt and cleared the request. With IRQs disabled, the context
+         * switch then happens on `irq_restore`. */
+        if (irq_is_enabled()) {
+            while (READ_PERI_REG(SYSTEM_CPU_INTR_FROM_CPU_0_REG) != 0) {}
+        }
     }
 }
 

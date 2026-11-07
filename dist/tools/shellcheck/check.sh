@@ -1,15 +1,11 @@
 #!/usr/bin/env bash
-#
-# Copyright (C) 2018 Freie Universität Berlin
-#                    Inria
-#
-# This file is subject to the terms and conditions of the GNU Lesser
-# General Public License v2.1. See the file LICENSE in the top level
-# directory for more details.
-#
+
+# SPDX-FileCopyrightText: 2018 Freie Universität Berlin
+# SPDX-FileCopyrightText: 2018 Inria
+# SPDX-License-Identifier: LGPL-2.1-only
 
 SHELLCHECK_CMD="$(command -v shellcheck)"
-export SHELLCHECK_OPTS="-e SC1090"
+export SHELLCHECK_OPTS="-x" # allow shellcheck to follow sourced files
 
 if tput colors &> /dev/null && [ "$(tput colors)" -ge 8 ]; then
     CERROR=$'\e[1;31m'
@@ -19,9 +15,16 @@ else
     CRESET=
 fi
 
+: "${RIOTBASE:=$(cd "$(dirname "$0")"/../../../ || exit 1; pwd)}"
 : "${RIOTTOOLS:=${PWD}/dist/tools}"
+
+# shellcheck source=dist/tools/ci/changed_files.sh
 . "${RIOTTOOLS}"/ci/changed_files.sh
+# shellcheck source=dist/tools/ci/github_annotate.sh
 . "${RIOTTOOLS}"/ci/github_annotate.sh
+
+# RIOTBASE should be the starting point for all sourced file paths
+SHELLCHECK_OPTS=${SHELLCHECK_OPTS}" --source-path=${RIOTBASE}"
 
 FILES=$(FILEREGEX='(.*\.sh$)' changed_files)
 

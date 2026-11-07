@@ -1,9 +1,6 @@
 /*
- * Copyright (C) 2022 HAW Hamburg
- *
- * This file is subject to the terms and conditions of the GNU Lesser General
- * Public License v2.1. See the file LICENSE in the top level directory for
- * more details.
+ * SPDX-FileCopyrightText: 2022 HAW Hamburg
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
 
 /**
@@ -203,7 +200,7 @@ void netdev_register_signal(struct netdev *dev, netdev_type_t type, uint8_t inde
 {
     (void) type;
 
-    if (index > NETDEV_IEEE802154_MINIMAL_NUMOF) {
+    if (index >= NETDEV_IEEE802154_MINIMAL_NUMOF) {
         return;
     }
     printf("Device %d registered (type: %d)\n", index, type);

@@ -1,10 +1,7 @@
 #! /bin/bash
-#
-# random_port.sh
-# Copyright (C) 2018 Martine Lenders <m.lenders@fu-berlin.de>
-#
-# Distributed under terms of the MIT license.
-#
+
+# SPDX-FileCopyrightText: 2018 Martine Lenders <m.lenders@fu-berlin.de>
+# SPDX-License-Identifier: MIT
 
 if ! command -v kea-dhcp6 > /dev/null; then
   echo -e "\033[31;1mCommand kea-dhcp6 required\033[0m" >&2

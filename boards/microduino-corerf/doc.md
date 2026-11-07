@@ -3,6 +3,7 @@
 @brief       Support for the Microduino CoreRF board
 
 # Hardware
+
 ## Pinout
 
 ![corerf-pinout](https://wiki.microduinoinc.com/images/d/df/RF%E5%BC%95%E8%84%9A.jpg)
@@ -15,9 +16,11 @@
             to a 5V supply voltage.
 
 ## Board
+
 The board is just a breakout for the ATmega128RFA1 MCU.
 
 ## MCU Details
+
 | MCU                           | ATmega128RFA1                     |
 |:------------------------------|:----------------------------------|
 | Family                        | ATmega                            |
@@ -43,8 +46,8 @@ Atmel AT86RF23x line of transceivers with the only difference being that it is
 not being accessed over an SPI bus, but instead the radio registers are directly
 mapped into memory.
 
-
 ## Peripheral interfaces SPI and I2C
+
 According to the wiki, SPI and I2C pins are the following:
 
 | SPI  | Original Pin Name | Map Pin Name |
@@ -60,6 +63,7 @@ According to the wiki, SPI and I2C pins are the following:
 | SCL  | PD0               | D19          |
 
 # Flashing RIOT
+
 Flashing RIOT on the CoreRF is done using the SPI method.
 Using a cheap FT232H breakout board, connect the board as follows:
 
@@ -100,6 +104,7 @@ More pins can be used for hardware interrupts using the Pin Change
 Interrupt feature. See @ref boards_common_atmega for details.
 
 ## Debugging
+
 The ATmega128RFR1 supports JTAG debugging. To use the JTAG debugging an external
 JTAG debugger is required. There are several options for this MCU/board:
 
@@ -118,7 +123,6 @@ compatible with almost every AVR MCU.
             export `AVR_DEBUGDEVICE=--edbg`. If the debug device is not
             connected via USB, you also need to export `AVR_DEBUGINTERFACE` to
             the correct value.
-
 
 ### JTAG Pin Mapping
 
@@ -149,13 +153,13 @@ Microduino CoreRF for ISP programming.
 The default fuse settings of the Microduino CoreRF are: `E:F5, H:DA, L:FF`.
 These settings can be restored via from the OCD settings via:
 
-```
+```shell
 avrdude -c dragon_isp -p m128rfa1 -U hfuse:w:0xda:m
 ```
 
 If you touched other fuse settings, you can restore the fuse settings using:
 
-```
+```shell
 avrdude -c dragon_isp -p m128rfa1 -U efuse:w:0xf5:m -U hfuse:w:0xda:m -U lfuse:w:0xff:m
 ```
 
@@ -165,6 +169,6 @@ To enable on-chip debugging, the `JTAGEN` (enable JTAG) and the `OCDEN` (enable
 on-chip debugging) bits should be set: `E:F5, H:1A, L:FF`. This can be done
 (when starting with the default settings) via:
 
-```
+```shell
 avrdude -c dragon_isp -p m128rfa1 -U hfuse:w:0x1a:m
 ```

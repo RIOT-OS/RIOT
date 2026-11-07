@@ -69,7 +69,8 @@ typedef struct {
     const char *text;
 } custom_event_t;
 
-static custom_event_t custom_event = { .super.handler = custom_callback, .text = "CUSTOM CALLBACK" };
+static custom_event_t custom_event = { .super.handler = custom_callback,
+                                       .text = "CUSTOM CALLBACK" };
 static event_callback_t* event_callback_ptr;
 static event_callback_t noevent_callback = EVENT_CALLBACK_INIT(forbidden_callback, 0);
 

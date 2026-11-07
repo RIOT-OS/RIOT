@@ -1,0 +1,854 @@
+/*
+ * SPDX-FileCopyrightText: 2024-2026 Carl Seifert
+ * SPDX-FileCopyrightText: 2024-2026 TU Dresden
+ * SPDX-License-Identifier: LGPL-2.1-only
+ */
+
+#pragma once
+
+#include <stdbool.h>
+#include <stdint.h>
+#include "iolist.h"
+
+#include "timex.h"
+#include "uri_parser.h"
+#include "modules.h"
+
+#include "net/sock.h"
+#include "net/sock/udp.h"
+
+#if IS_USED(MODULE_UNICOAP_SOCK_SUPPORT) || defined(DOXYGEN)
+#  include "net/sock/async/event.h"
+#  include "net/sock/util.h"
+#  include "net/sock/tcp.h"
+#endif
+
+#if IS_USED(MODULE_UNICOAP_DRIVER_DTLS) || defined(DOXYGEN)
+#  include "net/sock/dtls.h"
+#endif
+
+#if IS_USED(MODULE_UNICOAP_DRIVER_SLIPMUX) || defined(DOXYGEN)
+#  include "slipdev.h"
+#endif
+
+/* MARK: unicoap_driver_extension_point */
+
+#include "net/unicoap/message.h"
+#include "net/unicoap/options.h"
+
+/**
+ * @defgroup net_unicoap_transport Transport Protocol Abstractions
+ * @ingroup  net_unicoap
+ * @brief    CoAP endpoint, resource identifiers, and schemes
+ * @{
+ */
+
+/**
+ * @file
+ * @brief  CoAP transport protocol abstraction layer
+ * @author Carl Seifert <carl.seifert@tu-dresden.de>
+ */
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+/* MARK: - CoAP URI schemes */
+/**
+ * @name CoAP URI schemes
+ * @{
+ * The goal for CoAP is to have `coap` as the only scheme, with the underlying transport being
+ * inferred using
+ * [CoAP Transport Indication](https://datatracker.ietf.org/doc/draft-ietf-core-transport-indication).
+ */
+/**
+ * @brief Default CoAP URI scheme
+ */
+#define UNICOAP_SCHEME                        "coap"
+
+/**
+ * @brief URI scheme for CoAP over UDP
+ */
+#define UNICOAP_SCHEME_UDP                    "coap"
+
+/**
+ * @brief URI scheme for CoAP over DTLS
+ */
+#define UNICOAP_SCHEME_DTLS                   "coaps"
+
+/**
+ * @brief URI scheme for CoAP over TCP
+ */
+#define UNICOAP_SCHEME_TCP                    "coap+tcp"
+
+/**
+ * @brief URI scheme for CoAP over TLS
+ */
+#define UNICOAP_SCHEME_TLS                    "coaps+tcp"
+
+/**
+ * @brief URI scheme for CoAP over WebSockets
+ */
+#define UNICOAP_SCHEME_WEBSOCKET              "coap+ws"
+
+/**
+ * @brief URI scheme for CoAP over secure WebSockets (over TLS)
+ */
+#define UNICOAP_SCHEME_WEBSOCKET_TLS          "coaps+ws"
+
+/**
+ * @brief URI scheme for CoAP over GATT over Bluetooth Low Energy (BLE)
+ */
+#define UNICOAP_SCHEME_BLE_GATT               "coap"
+
+/**
+ * @brief URI scheme for CoAP over Slipmux
+ */
+#define UNICOAP_SCHEME_SLIPMUX                "coap+uart"
+
+/**
+ * @brief Domain for for CoAP over GATT over Bluetooth Low Energy (BLE)
+ *
+ * Example URI: `coap://001122334455.ble.arpa/.well-known/core`,
+ * with `001122334455` being the MAC address of the BLE device.
+ */
+#define UNICOAP_DOMAIN_BLE                    ".ble.arpa"
+
+/* MARK: unicoap_driver_extension_point */
+/** @}  */
+
+/* MARK: - Endpoints */
+/**
+ * @name Endpoints
+ * @{
+ */
+/**
+ * @brief Unspecified protocol number
+ *
+ * Use this protocol number to mark endpoints uninitialized.
+ */
+#define UNICOAP_PROTO_UNSPECIFIED             (0)
+
+/**
+ * @brief Protocol number flag indicating the transport is considered reliable on its own.
+ */
+#define UNICOAP_PROTO_FLAG_RELIABLE_TRANSPORT (1)
+
+/**
+ * @brief Transport protocol CoAP is used over.
+ *
+ * The LSB is used to check if the transport is inherently reliable.
+ */
+typedef enum {
+    /** @brief CoAP over UDP endpoint */
+    UNICOAP_PROTO_UDP = 1 << 1,
+
+    /** @brief CoAP over DTLS over UDP endpoint */
+    UNICOAP_PROTO_DTLS = 2 << 1,
+
+    /** @brief CoAP over Slipmux endpoint */
+    UNICOAP_PROTO_SLIPMUX = 3 << 1,
+
+    /* MARK: unicoap_driver_extension_point */
+} __attribute__((__packed__)) unicoap_proto_t;
+
+/**
+ * @brief Determines whether the given transport protocol is reliable
+ *
+ * Used for enabling the Block-wise Extension for Reliable Transports (BERT).
+ *
+ * @param proto Protocol number for transport
+ * @returns A boolean value determining whether the transport is considered reliable
+ *
+ * @note BERT allows multiple blocks of size 1024 bytes to be included in a single CoAP message.
+ */
+static inline bool unicoap_transport_is_reliable(unicoap_proto_t proto)
+{
+    return proto & UNICOAP_PROTO_FLAG_RELIABLE_TRANSPORT;
+}
+
+/**
+ * @brief Determines whether the given transport driver uses a transport layer socket in RIOT
+ *
+ * @param proto Protocol number for transport
+ * @returns A boolean value indicating whether the transport uses a transport layer socket in RIOT
+ *
+ * Used when parsing URIs and when printing an endpoint. If true, the socket endpoint can be
+ * casted to `struct _sock_tl_ep*`.
+ *
+ * ### Examples
+ * - @ref sock_udp
+ * - @ref sock_dtls
+ * - @ref sock_tcp
+ *
+ */
+static inline bool unicoap_transport_uses_sock_tl_ep(unicoap_proto_t proto)
+{
+    switch (proto) {
+    case UNICOAP_PROTO_UDP:
+    case UNICOAP_PROTO_DTLS:
+        return true;
+    case UNICOAP_PROTO_SLIPMUX:
+        return false;
+    /* If a new transport driver does not use RIOT's socket API,
+     * such as CoAP over GATT, return false here. */
+    /* MARK: unicoap_driver_extension_point */
+    default:
+        return false;
+    }
+}
+
+/**
+ * @brief A CoAP endpoint
+ */
+typedef struct {
+    /** @brief Protocol number */
+    unicoap_proto_t proto;
+
+    union {
+        /* union members are guaranteed to start at offset zero */
+
+#if IS_USED(MODULE_UNICOAP_SOCK_SUPPORT) || defined(DOXYGEN)
+        /** @brief Transport layer endpoint */
+        struct _sock_tl_ep _tl_ep;
+
+        /* _tl_ep acts as a view on both udp_ep and dtls_ep. */
+
+        /** @brief RIOT sock UDP endpoint */
+        sock_udp_ep_t udp_ep;
+
+        /** @brief RIOT sock DTLS endpoint */
+        sock_udp_ep_t dtls_ep;
+#endif /* IS_USED(MODULE_UNICOAP_SOCK_SUPPORT) || defined(DOXYGEN) */
+#if IS_USED(MODULE_UNICOAP_DRIVER_SLIPMUX) || defined(DOXYGEN)
+        slipdev_t *slipmux_ep;
+#endif /* IS_USED(MODULE_UNICOAP_DRIVER_SLIPMUX) || defined(DOXYGEN) */
+        /* MARK: unicoap_driver_extension_point */
+    };
+} unicoap_endpoint_t;
+
+/**
+ * @brief Retrieves UDP endpoint from CoAP endpoint
+ * @pre @p endpoint is a CoAP over UDP endpoint (proto == @ref UNICOAP_PROTO_UDP)
+ *
+ * @memberof unicoap_endpoint_t
+ *
+ * @param[in,out] endpoint CoAP over UDP endpoint
+ *
+ * @returns @ref sock_udp_ep_t
+ */
+static inline sock_udp_ep_t* unicoap_endpoint_get_udp(unicoap_endpoint_t* endpoint)
+{
+    (void)endpoint;
+#if IS_USED(MODULE_UNICOAP_SOCK_SUPPORT)
+    return &endpoint->udp_ep;
+#else
+    return NULL;
+#endif
+}
+
+/**
+ * @brief Retrieves DTLS endpoint from CoAP endpoint
+ * @pre @p endpoint is a CoAP over DTLS endpoint (proto == @ref UNICOAP_PROTO_DTLS)
+ *
+ * @memberof unicoap_endpoint_t
+ *
+ * @param[in,out] endpoint CoAP over DTLS endpoint
+ *
+ * @returns @ref sock_udp_ep_t
+ */
+static inline sock_udp_ep_t* unicoap_endpoint_get_dtls(unicoap_endpoint_t* endpoint)
+{
+    (void)endpoint;
+#if IS_USED(MODULE_UNICOAP_SOCK_SUPPORT)
+    return &endpoint->dtls_ep;
+#else
+    return NULL;
+#endif
+}
+
+#ifndef DOXYGEN
+/**
+ * @brief Private API. Retrieves transport layer endpoint from CoAP endpoint
+ *
+ * @memberof unicoap_endpoint_t
+ *
+ * @param[in,out] endpoint CoAP endpoint, pre-allocated
+ *
+ * @returns @ref _sock_tl_ep
+ */
+static inline struct _sock_tl_ep* _unicoap_endpoint_get_tl(unicoap_endpoint_t* endpoint)
+{
+    (void)endpoint;
+#  if IS_USED(MODULE_UNICOAP_SOCK_SUPPORT)
+    return &endpoint->_tl_ep;
+#  else
+    return NULL;
+#  endif
+}
+#endif /* !defined(DOXYGEN) */
+
+/**
+ * @brief Retrieves IPv6 address from endpoint, if present and supported by endpoint type
+ * @param endpoint Endpoint
+ * @return IPv6 address if present and supported, `NULL` otherwise
+ */
+static inline ipv6_addr_t* unicoap_endpoint_get_ipv6_addr(unicoap_endpoint_t* endpoint) {
+    (void)endpoint;
+#if IS_USED(MODULE_UNICOAP_SOCK_SUPPORT)
+    if (unicoap_transport_uses_sock_tl_ep(endpoint->proto) &&
+        (_unicoap_endpoint_get_tl(endpoint)->family == AF_INET6 ||
+         _unicoap_endpoint_get_tl(endpoint)->family == AF_UNSPEC)) {
+        return (ipv6_addr_t*)_unicoap_endpoint_get_tl(endpoint)->addr.ipv6;
+    }
+    else {
+        return NULL;
+    }
+#else
+    return NULL;
+#endif
+    /* Other drivers may also use IPv6 addresses but not sock_tl... */
+    /* MARK: unicoap_driver_extension_point */
+}
+
+/**
+ * @brief Retrieves IPv4 address from endpoint, if present and supported by endpoint type
+ * @param endpoint Endpoint
+ * @return IPv4 address if present and supported, `NULL` otherwise
+ */
+static inline ipv4_addr_t* unicoap_endpoint_get_ipv4_addr(unicoap_endpoint_t* endpoint) {
+    (void)endpoint;
+#if IS_USED(MODULE_UNICOAP_SOCK_SUPPORT)
+    if (unicoap_transport_uses_sock_tl_ep(endpoint->proto) &&
+        (_unicoap_endpoint_get_tl(endpoint)->family == AF_INET ||
+         _unicoap_endpoint_get_tl(endpoint)->family == AF_UNSPEC)) {
+        return (ipv4_addr_t*)_unicoap_endpoint_get_tl(endpoint)->addr.ipv4;
+    }
+    else {
+        return NULL;
+    }
+#else
+    return NULL;
+#endif
+    /* Other drivers may also use IPv4 addresses but not sock_tl... */
+    /* MARK: unicoap_driver_extension_point */
+}
+
+/**
+ * @brief Retrieves address family from endpoint, if present and supported by endpoint type
+ * @param endpoint Endpoint
+ * @return Application address reference if present and supported, `NULL` otherwise
+ */
+static inline int* unicoap_endpoint_get_address_family(unicoap_endpoint_t* endpoint) {
+    (void)endpoint;
+#if IS_USED(MODULE_UNICOAP_SOCK_SUPPORT)
+    if (unicoap_transport_uses_sock_tl_ep(endpoint->proto)) {
+        return &_unicoap_endpoint_get_tl(endpoint)->family;
+    } else {
+        return NULL;
+    }
+#else
+    return NULL;
+#endif
+    /* Other drivers may also use 16-bit ports but not sock_tl... */
+    /* MARK: unicoap_driver_extension_point */
+}
+
+/**
+ * @brief Retrieves port from endpoint, if present and supported by endpoint type
+ * @param endpoint Endpoint
+ * @return Port reference if present and supported, `NULL` otherwise
+ */
+static inline uint16_t* unicoap_endpoint_get_port(unicoap_endpoint_t* endpoint) {
+    (void)endpoint;
+#if IS_USED(MODULE_UNICOAP_SOCK_SUPPORT)
+    if (unicoap_transport_uses_sock_tl_ep(endpoint->proto)) {
+        return &_unicoap_endpoint_get_tl(endpoint)->port;
+    } else {
+        return NULL;
+    }
+#else
+    return NULL;
+#endif
+    /* Other drivers may also use 16-bit ports but not sock_tl... */
+    /* MARK: unicoap_driver_extension_point */
+}
+
+/**
+ * @brief Retrieves network interface ID from endpoint, if present and supported by endpoint type
+ * @param endpoint Endpoint
+ * @return Network interface ID reference if present and supported, `NULL` otherwise
+ */
+static inline uint16_t* unicoap_endpoint_get_netif_id(unicoap_endpoint_t* endpoint) {
+    (void)endpoint;
+#if IS_USED(MODULE_UNICOAP_SOCK_SUPPORT)
+    if (unicoap_transport_uses_sock_tl_ep(endpoint->proto)) {
+        return &_unicoap_endpoint_get_tl(endpoint)->netif;
+    } else {
+        return NULL;
+    }
+#else
+    return NULL;
+#endif
+    /* Other drivers may also use 16-bit ports but not sock_tl... */
+    /* MARK: unicoap_driver_extension_point */
+}
+/** @} */
+
+/* MARK: - Request destinations */
+/**
+ * @name Request destinations
+ * @{
+ */
+
+/**
+ * @brief Resource identifier type
+ */
+typedef enum {
+    /** @brief Endpoint */
+    UNICOAP_DESTINATION_ENDPOINT = 0,
+
+    /** @brief Hostname */
+    UNICOAP_DESTINATION_HOST = 1,
+
+    /** @brief URI (Uniform Resource Identifier) */
+    UNICOAP_DESTINATION_URI = 2,
+} __attribute__((__packed__)) unicoap_destination_type_t;
+
+/**
+ * @brief A type abstracting over CoAP resource identifiers
+ */
+typedef struct {
+    /** @brief Representation data */
+    union {
+        /** @brief Endpoint itself, if identified by @ref UNICOAP_DESTINATION_ENDPOINT  */
+        unicoap_endpoint_t* endpoint;
+
+        /** @brief URI string, if identified by @ref UNICOAP_DESTINATION_URI  */
+        const char* uri;
+
+        /** @brief Hostname, if identified by @ref UNICOAP_DESTINATION_HOST */
+        const char* host;
+    } remote;
+
+    /* Note that the string length is placed here rather than being in a union with uri and one
+     * one with host inside the remote union above. This way, the string length would be considered
+     * a separate bitfield; but the goal is to utilise the trailing 2 bytes (at least). */
+
+    /** @brief Number of ASCII code units (bytes) */
+    uint16_t _string_length : 10;
+
+#if !defined(DOXYGEN)
+    /* Placeholder for wider type field below and future flags. */
+    uint8_t _rfu : 3;
+#endif
+
+    /** @brief The type of this identifier */
+    unicoap_destination_type_t type : 3;
+} unicoap_destination_t;
+
+/**
+ * @brief Creates destination identifier from endpoint
+ *
+ * @memberof unicoap_destination_t
+ *
+ * @param[in] endpoint Endpoint.
+ *                     Must remain valid for as long as the returned
+ *                     destination is used (pointer stored, not copied).
+ *
+ * @returns New resource identifier from endpoint
+ */
+static inline unicoap_destination_t unicoap_destination_endpoint(unicoap_endpoint_t* endpoint)
+{
+    return (unicoap_destination_t){ .type = UNICOAP_DESTINATION_ENDPOINT,
+                                    .remote.endpoint = endpoint };
+}
+
+#if !defined(DOXYGEN)
+#  define _UNICOAP_DESTINATION_STRING_LENGTH_MAX ((1 << 10) - 1)
+#endif
+
+/**
+ * @brief Creates destination identifier from hostname string
+ *
+ * @memberof unicoap_destination_t
+ *
+ * @param[in] host Host name or address string.
+ *                 Must remain valid for as long as the returned
+ *                 destination is used (pointer stored, not copied).
+ *
+ * @param length Number of ASCII code units (bytes) in @p host, excluding potential null-terminator
+ *
+ * @pre @p length must not be greater than 1023
+ *
+ * @returns New resource identifier from endpoint
+ */
+static inline unicoap_destination_t unicoap_destination_host(const char* host, size_t length)
+{
+    assert(length < _UNICOAP_DESTINATION_STRING_LENGTH_MAX);
+    return (unicoap_destination_t){ .type = UNICOAP_DESTINATION_HOST,
+                                    .remote.host = host,
+                                    ._string_length = (uint16_t)length };
+}
+
+/**
+ * @brief Creates destination identifier from null-terminated hostname string
+ *
+ * @memberof unicoap_destination_t
+ *
+ * @param[in] host Null-terminated host name or address string.
+ *                 Must remain valid for as long as the returned
+ *                 destination is used (pointer stored, not copied).
+ *
+ * @returns New resource identifier from endpoint
+ */
+static inline unicoap_destination_t unicoap_destination_host_string(const char* host)
+{
+    return (unicoap_destination_t){ .type = UNICOAP_DESTINATION_HOST,
+                                    .remote.host = host,
+                                    ._string_length = strlen(host) };
+}
+
+/**
+ * @brief Creates destination identifier from URI string
+ *
+ * @memberof unicoap_destination_t
+ *
+ * @param[in] uri Uniform Resource Identifier (URI).
+ *                Must remain valid for as long as the returned
+ *                destination is used (pointer stored, not copied).
+ *
+ * @param length Number of ASCII code units (bytes) in @p uri, excluding potential null-terminator
+ *
+ * @pre @p length must not be greater than 1023
+ *
+ * @returns New resource identifier from URI
+ */
+static inline unicoap_destination_t unicoap_destination_uri(const char* uri, size_t length)
+{
+    assert(length < _UNICOAP_DESTINATION_STRING_LENGTH_MAX);
+    return (unicoap_destination_t){ .type = UNICOAP_DESTINATION_URI,
+                                    .remote.uri = uri,
+                                    ._string_length = (uint16_t)length };
+}
+
+/**
+ * @brief Creates destination identifier from URI string
+ *
+ * @memberof unicoap_destination_t
+ *
+ * @param[in] uri Null-terminated Uniform Resource Identifier (URI).
+ *                Must remain valid for as long as the returned
+ *                destination is used (pointer stored, not copied).
+ *
+ * @returns New resource identifier from URI
+ */
+static inline unicoap_destination_t unicoap_destination_uri_string(const char* uri)
+{
+    return (unicoap_destination_t){ .type = UNICOAP_DESTINATION_URI,
+                                    .remote.uri = uri,
+                                    ._string_length = strlen(uri) };
+}
+/** @} */
+
+/* MARK: - Conversions and Tools */
+/**
+ * @name Conversions and Tools
+ * @{
+ */
+
+/**
+ * @brief Converts a given scheme string like `coap+tcp` to the corresponding
+ *        protocol identifier.
+ *
+ * @param[in] scheme    Scheme string
+ * @param scheme_length Length of scheme string
+ * @param[in] host      Optional Host string
+ * @param[in] length    Scheme string length, must be zero if @p host is `NULL`
+ *                      or empty (i.e., points to 0x00)
+ *
+ * @retval 0 for valid schemes
+ * @retval -1 if the scheme is invalid or unknown
+ */
+int unicoap_proto_from_scheme_and_host(const char* scheme, size_t scheme_length,
+                                       const char* host, size_t length);
+
+/**
+ * @brief Converts a given null-terminated scheme string like `coap+tcp` to the
+ *        corresponding protocol identifier.
+ *
+ * @param[in] scheme    Null-terminated scheme string
+ * @param[in] host      Null-terminated host string
+ *
+ * @retval 0 for valid schemes
+ * @retval -1 if the scheme is invalid or unknown
+ */
+static inline int unicoap_transport_proto_from_scheme_and_host_string(
+    const char* scheme, const char* host)
+{
+    return unicoap_proto_from_scheme_and_host(scheme, strlen(scheme), host, strlen(host));
+}
+
+/**
+ * @brief Returns scheme from protocol number
+ *
+ * @param proto Protocol number
+ *
+ * @retval Null-terminated transport scheme string
+ * @retval NULL if protocol number is unknown
+ */
+const char* unicoap_scheme_from_proto(unicoap_proto_t proto);
+
+/**
+ * @brief Returns scheme from protocol number
+ *
+ * @param proto Protocol number
+ * @returns Null-terminated transport description, or `NULL` if there is no such protocol number
+ */
+const char* unicoap_string_from_proto(unicoap_proto_t proto);
+
+/**
+ * @brief Compares two endpoints
+ *
+ * @param[in] source Endpoint 1
+ * @param[in] destination Endpoint 2
+ * @returns A boolean value indicating whether the two endpoints are considered identical
+ * semantically
+ */
+bool unicoap_endpoint_is_equal(const unicoap_endpoint_t* source,
+                               const unicoap_endpoint_t* destination);
+
+/**
+ * @brief Determines whether the given endpoint is a multicast endpoint
+ *
+ * @param[in] endpoint Endpoint to check
+ * @returns A boolean value indicating whether the endpoint is considered a multicast endpoint
+ */
+bool unicoap_endpoint_is_multicast(const unicoap_endpoint_t* endpoint);
+
+/**
+ * @brief Prints the given transport layer endpoint
+ *
+ * @param[in] ep Transport layer endpoint
+ */
+#if IS_USED(MODULE_UNICOAP_SOCK_SUPPORT) || defined(DOXYGEN)
+void unicoap_print_sock_tl_ep(const struct _sock_tl_ep* ep);
+#else
+static inline void unicoap_print_sock_tl_ep(const void* ep)
+{
+    (void)ep;
+    assert(false);
+}
+#endif
+/**
+ * @brief Prints the given CoAP endpoint
+ *
+ * @param[in] endpoint Endpoint
+ */
+void unicoap_print_endpoint(const unicoap_endpoint_t* endpoint);
+/** @} */
+/** @} */
+
+/**
+ * @addtogroup net_unicoap_drivers_udp
+ * @{
+ */
+/* MARK: - Sockets */
+/**
+ * @name Sockets
+ * @{
+ */
+/** @brief Returns the internal UDP socket */
+#if IS_USED(MODULE_UNICOAP_DRIVER_UDP) || defined(DOXYGEN)
+sock_udp_t* unicoap_transport_udp_get_socket(void);
+#else
+static inline
+void* unicoap_transport_udp_get_socket(void)
+{
+    return NULL;
+}
+#endif
+
+#if IS_USED(MODULE_UNICOAP_SOCK_SUPPORT) || defined(DOXYGEN)
+/* sock_udp_t requires an implementation which is not present if someone uses unicoap
+ * without a driver, i.e., just message APIs. In this case, unicoap_sock_support is not imported. */
+
+/**
+ * @brief Adds UDP socket for client and server functionality
+ * @pre @p socket must be pre-allocated and must remain allocated until the UDP driver has been
+ * deinitialized or the socket is closed by you.
+ *
+ * @param[in,out] socket Pre-allocated socket to use
+ * @param[in]     local  Initialized endpoint, does not need to outlive this function call
+ *
+ * You can call this function at any time after `unicoap` has been initialized.
+ *
+ * @returns `0` on success or negative error value otherwise.
+ */
+#  if IS_USED(MODULE_UNICOAP_DRIVER_UDP) || defined(DOXYGEN)
+int unicoap_transport_udp_add_socket(sock_udp_t* socket, sock_udp_ep_t* local);
+#  else
+static inline
+int unicoap_transport_udp_add_socket(sock_udp_t* socket, sock_udp_ep_t* local)
+{
+    (void)socket;
+    (void)local;
+    return 0;
+}
+#  endif
+
+/**
+ * @brief Removes UDP socket previously added manually
+ *
+ * @param[in,out] socket The socket pointer you have previously passed to
+ *                       @ref unicoap_transport_udp_add_socket
+ *
+ * @returns `0`, indicating a success. Future versions of this API may return a negative error.
+ */
+#  if IS_USED(MODULE_UNICOAP_DRIVER_UDP) || defined(DOXYGEN)
+int unicoap_transport_udp_remove_socket(sock_udp_t* socket);
+#  else
+static inline
+int unicoap_transport_udp_remove_socket(sock_udp_t* socket)
+{
+    (void)socket;
+    return 0;
+}
+#  endif
+#endif /* IS_USED(MODULE_UNICOAP_SOCK_SUPPORT) || defined(DOXYGEN) */
+/** @} */
+/** @} */
+
+/**
+ * @addtogroup net_unicoap_drivers_dtls
+ * @{
+ */
+/* MARK: - Sockets */
+/**
+ * @name Sockets
+ * @{
+ */
+/** @brief Returns the internal DTLS socket */
+#if IS_USED(MODULE_UNICOAP_DRIVER_DTLS) || defined(DOXYGEN)
+sock_dtls_t* unicoap_transport_dtls_get_socket(void);
+#else
+static inline
+void* unicoap_transport_dtls_get_socket(void)
+{
+    return NULL;
+}
+#endif
+
+#if IS_USED(MODULE_UNICOAP_SOCK_SUPPORT) || defined(DOXYGEN)
+/* sock_udp_t requires an implementation which is not present if someone uses unicoap
+ * without a driver, i.e., just message APIs. In this case, unicoap_sock_support is not imported. */
+
+/**
+ * @brief Adds DTLS socket for client and server functionality
+ * @pre Sockets must be pre-allocated and must remain allocated until the DTLS driver has been
+ * deinitialized or the socket is closed by you.
+ *
+ * @param[in,out] socket      Pre-allocated socket to use
+ * @param[in,out] base_socket Pre-allocated UDP base socket to use
+ * @param[in]     local       Initialized endpoint, does not need to outlive this function call
+ *
+ * You can call this function at any time after `unicoap` has been initialized.
+ *
+ * @warning Not fully supported yet.
+ *
+ * @returns `0` on success or negative error value otherwise. The error value depends on the
+ * DTLS implementation.
+ */
+#  if IS_USED(MODULE_UNICOAP_DRIVER_DTLS) || defined(DOXYGEN)
+int unicoap_transport_dtls_add_socket(sock_dtls_t* socket, sock_udp_t* base_socket,
+                                      sock_udp_ep_t* local);
+#  else
+static inline
+int unicoap_transport_dtls_add_socket(void* socket, void* base_socket, void* local)
+{
+    (void) socket;
+    (void) base_socket;
+    (void) local;
+    return 0;
+}
+#  endif
+
+/**
+ * @brief Removes DTLS socket previously added manually
+ *
+ * @param[in,out] socket The socket pointer you have previously passed to
+ *                       @ref unicoap_transport_dtls_add_socket
+ *
+ * @warning Not fully supported yet.
+ *
+ * @returns `0`, indicating a success. Future versions of this API may return a negative error.
+ *
+ */
+#  if IS_USED(MODULE_UNICOAP_DRIVER_DTLS) || defined(DOXYGEN)
+int unicoap_transport_dtls_remove_socket(sock_dtls_t* socket);
+#  else
+static inline
+int unicoap_transport_dtls_remove_socket(void* socket)
+{
+    (void) socket;
+    return 0;
+}
+#  endif
+#endif /* IS_USED(MODULE_UNICOAP_SOCK_SUPPORT) || defined(DOXYGEN) */
+/** @} */
+
+/* MARK: - Utils */
+/**
+ * @name Utils
+ * @{
+ */
+/**
+ * @brief Auxiliary exchange information
+ */
+typedef struct {
+    /**
+     * @brief The remote CoAP endpoint in this exchange
+     */
+    const unicoap_endpoint_t* remote;
+
+    /**
+     * @brief The local CoAP endpoint in this exchange
+     */
+    const unicoap_endpoint_t* local;
+
+    /**
+     * @brief Message properties
+     */
+    const unicoap_message_properties_t* properties;
+} unicoap_aux_t;
+/** @} */
+
+/** @} */
+
+/**
+ * @addtogroup net_unicoap_client_uri
+ * @{
+ */
+/* MARK: - Manually parsing a CoAP URI */
+/**
+ * @name Manually parsing a CoAP URI
+ * @{
+ */
+/**
+ * @brief Populates endpoint and CoAP options with URI parser result
+ *
+ * @param[in,out] parsed Parser result (port will be set based on scheme, if unspecified)
+ * @param[in,out] endpoint Pre-allocated endpoint
+ * @param[in,out] options Pre-initialized options (nullable). If `NULL`, no options will be extracted from URI
+ *
+ * @returns `0` on success
+ * @return `-1` or negative errno on error
+ */
+int unicoap_uri_populate(uri_parser_result_t* parsed, unicoap_endpoint_t* endpoint,
+                         unicoap_options_t* options);
+/** @} */
+/** @} */
+
+#ifdef __cplusplus
+}
+#endif

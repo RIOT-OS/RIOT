@@ -4,7 +4,7 @@
 
 ### General Information
 
-@image html "https://lv.farnell.com/productimages/large/en_GB/2775176-40.jpg" "Top View of the QN9080DK V1.2" width=80%
+<img src="https://lv.farnell.com/productimages/large/en_GB/2775176-40.jpg" alt="Top View of the QN9080DK V1.2" width=80% />
 
 The QN9080DK is the developer board reference from NXP for the QN908x CPUs.
 The developer kit comes with two boards: a larger PCB with a QFN "module"
@@ -14,6 +14,7 @@ This board module supports the "base board" only, including the definitions
 of the gpio, buttons and LEDs specific to this board.
 
 This board packs a few peripherals and many GPIOs:
+
 - MMA8652FC, a 12-bit accelerometer
 
 The board also features a dedicated programmer hardware implemented using NXP's
@@ -29,14 +30,13 @@ Guide.
 
 ### Pinout
 
-#### Buttons:
+#### Buttons
 
 | Label | RIOT OS macro | MCU PIN  | Function  |
 |:----- |:------------- |:-------- |:--------- |
 | SW1   | BTN1_PIN      | PA24     | User defined |
 | SW2   | BTN2_PIN      | PA19     | User defined |
 | SW3   |               | nRESET   | QN9080 reset |
-
 
 #### One RGB led, controlled by three GPIOs
 
@@ -101,21 +101,22 @@ recommended.
 
 In the application directory, run:
 
-```
-make BOARD=qn9080dk flash
+```shell
+BOARD=qn9080dk make flash
 ```
 
 OpenOCD support for the QN908x flash is as of June 2023 not yet part of any
 release, but has been merged upstream. It is expected to be included first in
 the 0.13 release of OpenOCD. Until then, compiling a version from the current
 git source is the needed.
+Refer to <https://doc.riot-os.org/misc/openocd/> for building and installing OpenOCD.
 
 #### Using the Internal Programmer with J-Link Firmware
 
 In the application directory, run:
 
-```
-make BOARD=qn9080dk QN9080DK_JLINK=1 flash
+```shell
+BOARD=qn9080dk make QN9080DK_JLINK=1 flash
 ```
 
 @note Instead of passing `QN9080DK_JLINK=1` every time, it can also be exported

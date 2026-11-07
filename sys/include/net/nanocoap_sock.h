@@ -1,11 +1,8 @@
 /*
- * Copyright (C) 2017 Kaspar Schleiser <kaspar@schleiser.de>
- *               2018 Inria
- *               2018 Freie Universität Berlin
- *
- * This file is subject to the terms and conditions of the GNU Lesser
- * General Public License v2.1. See the file LICENSE in the top level
- * directory for more details.
+ * SPDX-FileCopyrightText: 2017 Kaspar Schleiser <kaspar@schleiser.de>
+ * SPDX-FileCopyrightText: 2018 Inria
+ * SPDX-FileCopyrightText: 2018 Freie Universität Berlin
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
 
 #pragma once
@@ -139,13 +136,15 @@
 #include <stdint.h>
 #include <unistd.h>
 
-#include "random.h"
+#include "event/thread.h"
 #include "net/nanocoap.h"
 #include "net/sock/udp.h"
 #include "net/sock/util.h"
+#include "random.h"
+
 #if IS_USED(MODULE_NANOCOAP_DTLS)
-#include "net/credman.h"
-#include "net/sock/dtls.h"
+#  include "net/credman.h"
+#  include "net/sock/dtls.h"
 #endif
 
 #ifdef __cplusplus
@@ -916,8 +915,8 @@ int nanocoap_sock_get_blockwise(nanocoap_sock_t *sock, const char *path,
  * @param[in]   dst        Target buffer
  * @param[in]   len        Target buffer length
  *
- * @returns     <0 on error
- * @returns     -EINVAL    if an invalid url is provided
+ * @retval      <0         error
+ * @retval      -EINVAL    if an invalid url is provided or @p blksize is invalid
  * @returns     size of the response payload on success
  */
 int nanocoap_sock_get_slice(nanocoap_sock_t *sock, const char *path,

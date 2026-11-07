@@ -117,7 +117,7 @@ If the Border Router is already set up when opening the terminal you should get
 
     ...
 
-    Iface  6  HWaddr: 0D:96  Channel: 26  Page: 0  NID: 0x23
+    Iface  6  HWaddr: 0D:96  Channel: 26  NID: 0x23
             Long HWaddr: 79:7E:32:55:13:13:8D:96
              TX-Power: 0dBm  State: IDLE  max. Retrans.: 3  CSMA Retries: 4
             AUTOACK  ACK_REQ  CSMA  L2-PDU:102 MTU:1280  HL:64  RTR
@@ -337,7 +337,7 @@ If it was setup as a wireless device it will be reachable via its global
 address, e.g:
 
 
-    Iface  6  HWaddr: 0D:96  Channel: 26  Page: 0  NID: 0x23
+    Iface  6  HWaddr: 0D:96  Channel: 26  NID: 0x23
             Long HWaddr: 79:7E:32:55:13:13:8D:96
              TX-Power: 0dBm  State: IDLE  max. Retrans.: 3  CSMA Retries: 4
             AUTOACK  ACK_REQ  CSMA  L2-PDU:102 MTU:1280  HL:64  RTR

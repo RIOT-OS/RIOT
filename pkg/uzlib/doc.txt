@@ -10,7 +10,7 @@
  *
  * # License
  *
- * Licensed under zlib.
+ * Licensed under Zlib and MIT.
  *
  * @see      https://github.com/pfalcon/uzlib
  */

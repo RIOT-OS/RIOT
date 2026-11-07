@@ -61,8 +61,8 @@ gpio_t spi_pin_mosi(spi_t spi)
 static void _poweron(spi_t spi)
 {
     uint32_t reset_bit_mask = (spi_config[spi].dev == SPI0)
-        ? RESETS_RESET_spi0_Msk
-        : RESETS_RESET_spi1_Msk;
+        ? RESETS_RESET_SPI0_BITS
+        : RESETS_RESET_SPI1_BITS;
 
     periph_reset(reset_bit_mask);
     periph_reset_done(reset_bit_mask);
@@ -71,8 +71,8 @@ static void _poweron(spi_t spi)
 static void _poweroff(spi_t spi)
 {
     uint32_t reset_bit_mask = (spi_config[spi].dev == SPI0)
-        ? RESETS_RESET_spi0_Msk
-        : RESETS_RESET_spi1_Msk;
+        ? RESETS_RESET_SPI0_BITS
+        : RESETS_RESET_SPI1_BITS;
 
     periph_reset(reset_bit_mask);
 }
@@ -269,28 +269,28 @@ void spi_acquire(spi_t spi, spi_cs_t cs, spi_mode_t mode, spi_clk_t clk)
     SPI0_Type *dev = spi_config[spi].dev;
 
     io_reg_write_dont_corrupt(&dev->SSPCR0,
-                              0x7 << SPI0_SSPCR0_DSS_Pos,
-                              SPI0_SSPCR0_DSS_Msk);
+                              0x7 << SPI_SSPCR0_DSS_LSB,
+                              SPI_SSPCR0_DSS_BITS);
     /* uncomment the following line for debug loopback mode */
-    /* io_reg_atomic_set(&dev->SSPCR1, SPI0_SSPCR1_LBM_Msk); */
+    /* io_reg_atomic_set(&dev->SSPCR1, SPI_SSPCR1_LBM_BITS); */
 
     /* set SPI mode */
     switch (mode) {
     case SPI_MODE_0:
-        io_reg_atomic_clear(&dev->SSPCR0, SPI0_SSPCR0_SPO_Msk);
-        io_reg_atomic_clear(&dev->SSPCR0, SPI0_SSPCR0_SPH_Msk);
+        io_reg_atomic_clear(&dev->SSPCR0, SPI_SSPCR0_SPO_BITS);
+        io_reg_atomic_clear(&dev->SSPCR0, SPI_SSPCR0_SPH_BITS);
         break;
     case SPI_MODE_1:
-        io_reg_atomic_clear(&dev->SSPCR0, SPI0_SSPCR0_SPO_Msk);
-        io_reg_atomic_set(&dev->SSPCR0, SPI0_SSPCR0_SPH_Msk);
+        io_reg_atomic_clear(&dev->SSPCR0, SPI_SSPCR0_SPO_BITS);
+        io_reg_atomic_set(&dev->SSPCR0, SPI_SSPCR0_SPH_BITS);
         break;
     case SPI_MODE_2:
-        io_reg_atomic_set(&dev->SSPCR0, SPI0_SSPCR0_SPO_Msk);
-        io_reg_atomic_clear(&dev->SSPCR0, SPI0_SSPCR0_SPH_Msk);
+        io_reg_atomic_set(&dev->SSPCR0, SPI_SSPCR0_SPO_BITS);
+        io_reg_atomic_clear(&dev->SSPCR0, SPI_SSPCR0_SPH_BITS);
         break;
     case SPI_MODE_3:
-        io_reg_atomic_set(&dev->SSPCR0, SPI0_SSPCR0_SPO_Msk);
-        io_reg_atomic_set(&dev->SSPCR0, SPI0_SSPCR0_SPH_Msk);
+        io_reg_atomic_set(&dev->SSPCR0, SPI_SSPCR0_SPO_BITS);
+        io_reg_atomic_set(&dev->SSPCR0, SPI_SSPCR0_SPH_BITS);
         break;
     }
 
@@ -299,14 +299,14 @@ void spi_acquire(spi_t spi, spi_cs_t cs, spi_mode_t mode, spi_clk_t clk)
         _calc_pl022_clk(&pl022_clk[spi], clk);
     }
     io_reg_write_dont_corrupt(&dev->SSPCPSR,
-                              pl022_clk[spi].cpsdvsr << SPI0_SSPCPSR_CPSDVSR_Pos,
-                              SPI0_SSPCPSR_CPSDVSR_Msk);
+                              pl022_clk[spi].cpsdvsr << SPI_SSPCPSR_CPSDVSR_LSB,
+                              SPI_SSPCPSR_CPSDVSR_BITS);
     io_reg_write_dont_corrupt(&dev->SSPCR0,
-                              pl022_clk[spi].scr << SPI0_SSPCR0_SCR_Pos,
-                              SPI0_SSPCR0_SCR_Msk);
+                              pl022_clk[spi].scr << SPI_SSPCR0_SCR_LSB,
+                              SPI_SSPCR0_SCR_BITS);
 
     /* enable SPI */
-    io_reg_atomic_set(&dev->SSPCR1, SPI0_SSPCR1_SSE_Msk);
+    io_reg_atomic_set(&dev->SSPCR1, SPI_SSPCR1_SSE_BITS);
 }
 
 void spi_release(spi_t spi)
@@ -318,7 +318,7 @@ void spi_release(spi_t spi)
     SPI0_Type *dev = spi_config[spi].dev;
 
     /* disable SPI */
-    io_reg_atomic_clear(&dev->SSPCR1, SPI0_SSPCR1_SSE_Msk);
+    io_reg_atomic_clear(&dev->SSPCR1, SPI_SSPCR1_SSE_BITS);
 
     _poweroff(spi);
 
@@ -330,8 +330,8 @@ static inline void _wait_for_end(spi_t spi)
     DEBUG("[rpx0xx] Call _wait_for_end(spi=%" PRIdFAST8 ")\n", spi);
     SPI0_Type *dev = spi_config[spi].dev;
 
-    while (!(dev->SSPSR & SPI0_SSPSR_TFE_Msk)) {}
-    while (dev->SSPSR & SPI0_SSPSR_BSY_Msk) {}
+    while (!(dev->SSPSR & SPI_SSPSR_TFE_BITS)) {}
+    while (dev->SSPSR & SPI_SSPSR_BSY_BITS) {}
 }
 
 static void _transfer_no_dma(spi_t spi, const void *out, void *in, size_t len)
@@ -347,29 +347,29 @@ static void _transfer_no_dma(spi_t spi, const void *out, void *in, size_t len)
     /* transfer data, use shortpath if only sending data */
     if (!inbuf) {
         for (size_t i = 0; i < len; i++) {
-            while (!(dev->SSPSR & SPI0_SSPSR_TFE_Msk)) {}
+            while (!(dev->SSPSR & SPI_SSPSR_TFE_BITS)) {}
             dev->SSPDR = outbuf[i];
         }
         /* wait until everything is finished and empty the receive buffer */
-        while (!(dev->SSPSR & SPI0_SSPSR_TFE_Msk)) {}
-        while (dev->SSPSR & SPI0_SSPSR_BSY_Msk) {}
-        while (dev->SSPSR & SPI0_SSPSR_RNE_Msk) {
+        while (!(dev->SSPSR & SPI_SSPSR_TFE_BITS)) {}
+        while (dev->SSPSR & SPI_SSPSR_BSY_BITS) {}
+        while (dev->SSPSR & SPI_SSPSR_RNE_BITS) {
             dev->SSPDR;
         }
     }
     else if (!outbuf) {
         for (size_t i = 0; i < len; i++) {
-            while (!(dev->SSPSR & SPI0_SSPSR_TFE_Msk)) {}
+            while (!(dev->SSPSR & SPI_SSPSR_TFE_BITS)) {}
             dev->SSPDR = 0;
-            while (!(dev->SSPSR & SPI0_SSPSR_RNE_Msk)) {}
+            while (!(dev->SSPSR & SPI_SSPSR_RNE_BITS)) {}
             inbuf[i] = dev->SSPDR & 0xffUL;
         }
     }
     else {
         for (size_t i = 0; i < len; i++) {
-            while (!(dev->SSPSR & SPI0_SSPSR_TFE_Msk)) {}
+            while (!(dev->SSPSR & SPI_SSPSR_TFE_BITS)) {}
             dev->SSPDR = outbuf[i];
-            while (!(dev->SSPSR & SPI0_SSPSR_RNE_Msk)) {}
+            while (!(dev->SSPSR & SPI_SSPSR_RNE_BITS)) {}
             inbuf[i] = dev->SSPDR & 0xffUL;
         }
     }

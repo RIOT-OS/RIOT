@@ -2,9 +2,11 @@
 
 # If the script is not sourced, the exported variables are not saved
 # in the environment.
-if [ "$(basename -- "$0")" = "export.sh" ]; then
+# zsh sets $0 to the script name even when sourced, $ZSH_ARGZERO
+# contains the name of the shell instead.
+if [ "$(basename -- "${ZSH_ARGZERO:-$0}")" = "export.sh" ]; then
     echo "Please run the script prefixed with a '.' followed by a space to source it." 1>&2
-    exit 1
+    return 1
 fi
 
 ESP32_GCC_RELEASE="esp-14.2.0_20241119"
@@ -36,6 +38,7 @@ export_checks()
     if [ ! -e "${TOOLS_DIR_INT}" ]; then
         echo "${TOOLS_DIR_INT} does not exist - please run"
         echo "\${RIOTBASE}/dist/tools/esptools/install.sh $TOOL"
+        unset TOOL TOOLS_DIR_INT TOOLS_VERSION TOOLS_DIR_IN_PATH TOOLS_DIR_BASE
         return 1
     fi
 
@@ -61,6 +64,7 @@ export_checks()
     unset TOOLS_DIR_INT
     unset TOOLS_VERSION
     unset TOOLS_DIR_IN_PATH
+    unset TOOLS_DIR_BASE
 
     return 0
 }
@@ -69,15 +73,15 @@ export_arch()
 {
     case $1 in
         esp8266)
-            TARGET_ARCH="xtensa-esp8266-elf"
+            ESP_TARGET_ARCH="xtensa-esp8266-elf"
             ESP_GCC_RELEASE="${ESP8266_GCC_RELEASE}"
             ;;
         esp32|esp32s2|esp32s3)
-            TARGET_ARCH="xtensa-esp-elf"
+            ESP_TARGET_ARCH="xtensa-esp-elf"
             ESP_GCC_RELEASE="${ESP32_GCC_RELEASE}"
             ;;
         esp32c3|esp32c6|esp32h2)
-            TARGET_ARCH="riscv32-esp-elf"
+            ESP_TARGET_ARCH="riscv32-esp-elf"
             ESP_GCC_RELEASE="${ESP32_GCC_RELEASE}"
             ;;
         *)
@@ -85,7 +89,7 @@ export_arch()
             return
     esac
 
-    TOOLS_DIR="${TOOLS_PATH}/${TARGET_ARCH}/${ESP_GCC_RELEASE}/${TARGET_ARCH}"
+    TOOLS_DIR="${TOOLS_PATH}/${ESP_TARGET_ARCH}/${ESP_GCC_RELEASE}/${ESP_TARGET_ARCH}"
     export_checks "$1" "$TOOLS_DIR" "$ESP_GCC_RELEASE"
     unset TOOLS_DIR
 }
@@ -95,8 +99,7 @@ export_openocd()
     TOOLS_DIR="${TOOLS_PATH}/openocd-esp32/${ESP32_OPENOCD_VERSION}"
     OPENOCD_DIR="${TOOLS_DIR}/openocd-esp32"
 
-    export_checks "openocd" "$OPENOCD_DIR" "$ESP32_OPENOCD_VERSION"
-    if [ $? -eq 0 ]; then
+    if export_checks "openocd" "$OPENOCD_DIR" "$ESP32_OPENOCD_VERSION"; then
        export OPENOCD="${OPENOCD_DIR}/bin/openocd -s ${OPENOCD_DIR}/share/openocd/scripts"
     fi
 
@@ -171,8 +174,7 @@ if [ -z "$1" ]; then
     echo "         esp8266 | esp32 | esp32c3 | esp32c6 | esp32h2 | esp32s2 | esp32s3"
     echo "<platform> = xtensa | riscv"
 elif [ "$1" = "all" ]; then
-    ARCH_ALL="esp8266 esp32 esp32c3 esp32c6 esp32h2 esp32s2 esp32s3"
-    for arch in ${ARCH_ALL}; do
+    for arch in esp8266 esp32 esp32c3 esp32c6 esp32h2 esp32s2 esp32s3; do
         export_arch "$arch"
     done
     export_gdb xtensa
@@ -180,8 +182,6 @@ elif [ "$1" = "all" ]; then
     export_openocd
     export_qemu xtensa
     export_qemu riscv
-    export_gdb xtensa
-    export_gdb riscv
 elif [ "$1" = "gdb" ]; then
     if [ -z "$2" ]; then
         echo "platform required: xtensa | riscv"
@@ -197,10 +197,22 @@ else
 fi
 
 unset ESP32_GCC_RELEASE
-unset ESP32_GCC_VERSION_DOWNLOAD
-unset ESP32_GCC_VERSION_DIR
+unset ESP8266_GCC_RELEASE
+unset ESP_GCC_RELEASE
+unset ESP_TARGET_ARCH
+unset arch
 
 unset ESP32_OPENOCD_VERSION
-unset ESP32_OPENOCD_VERSION_FILE
 
 unset ESP32_QEMU_VERSION
+unset QEMU_ARCH
+unset PLATFORM
+unset PLATFORM_SYSTEM
+unset PLATFORM_MACHINE
+
+unset GDB_VERSION
+unset GDB_ARCH
+
+unset TOOLS_PATH
+
+unset -f export_checks export_arch export_openocd export_qemu export_gdb

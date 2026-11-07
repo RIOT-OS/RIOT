@@ -276,7 +276,7 @@ static void _ev_rx_handler(event_t *event)
 {
     gnrc_netif_ieee802154_mac_dev_t *dev =
         container_of(event, gnrc_netif_ieee802154_mac_dev_t, ev_rx);
-    (void)ieee802154_set_rx(&dev->mac.submac);
+    ieee802154_mac_rx_request_process(&dev->mac);
 }
 
 static void _ev_tick_handler(event_t *event)
@@ -317,12 +317,6 @@ static void _ev_assoc_res_handler(event_t *event)
     }
 }
 
-static void _ev_bh_request_handler(event_t *event)
-{
-    gnrc_netif_ieee802154_mac_dev_t *dev =
-        container_of(event, gnrc_netif_ieee802154_mac_dev_t, ev_bh_request);
-    ieee802154_mac_bh_process(&dev->mac);
-}
 
 static void _ev_poll_handler(event_t *event)
 {
@@ -481,12 +475,6 @@ static void _mac_tick_request(void *arg)
     event_post(&dev->netif->evq[GNRC_NETIF_EVQ_INDEX_PRIO_HIGH], &dev->ev_tick);
 }
 
-static void _mac_bh_request(void *arg)
-{
-    ieee802154_mac_t *mac = (ieee802154_mac_t *)arg;
-    gnrc_netif_ieee802154_mac_dev_t *dev = _dev_from_mac(mac);
-    event_post(&dev->netif->evq[GNRC_NETIF_EVQ_INDEX_PRIO_HIGH], &dev->ev_bh_request);
-}
 
 static void _mac_ack_timeout(void *arg)
 {
@@ -817,7 +805,6 @@ static int _netdev_init(netdev_t *dev)
     mdev->ev_scan_timer.handler = _ev_scan_timer_handler;
     mdev->ev_ack_timeout.handler = _ev_ack_timeout_handler;
     mdev->ev_assoc_res.handler = _ev_assoc_res_handler;
-    mdev->ev_bh_request.handler = _ev_bh_request_handler;
     mdev->ev_radio.handler = _ev_radio_handler;
     mdev->ev_poll.handler = _ev_poll_handler;
     mdev->scan_cb = NULL;
@@ -849,7 +836,6 @@ static int _netdev_init(netdev_t *dev)
         .mlme_associate_indication = _mac_associate_indication,
         .mlme_associate_confirm = _mac_associate_confirm,
         .ack_timeout = _mac_ack_timeout,
-        .bh_request = _mac_bh_request,
         .radio_cb_request = _mac_radio_cb,
         .scan_timer_request = _mac_scan_timer_request,
         .tick_request = _mac_tick_request,
@@ -1188,7 +1174,6 @@ static int _netdev_set(netdev_t *dev, netopt_t opt, const void *value, size_t le
 
                 ieee802154_phy_conf_t phy_conf = {
                     .channel = mdev->mac.submac.channel_num,
-                    .page = mdev->mac.submac.channel_page,
                     .pow = mdev->mac.submac.tx_pow,
                     .phy_mode = mdev->mac.submac.phy_mode,
                 };

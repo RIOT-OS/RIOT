@@ -1,10 +1,7 @@
 /*
- * Copyright (C) 2017 Fundación Inria Chile
- * Copyright (C) 2019 HAW Hamburg
- *
- * This file is subject to the terms and conditions of the GNU Lesser
- * General Public License v2.1. See the file LICENSE in the top level
- * directory for more details.
+ * SPDX-FileCopyrightText: 2017 Fundación Inria Chile
+ * SPDX-FileCopyrightText: 2019 HAW Hamburg
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
 
 #pragma once
@@ -23,6 +20,7 @@
  * @author  Francisco Molina <femolina@uc.cl>
  */
 
+#include "compiler_hints.h"
 #include "gnrc_lorawan_internal.h"
 #include "assert.h"
 
@@ -243,6 +241,7 @@ void gnrc_lorawan_mcps_request(gnrc_lorawan_t *mac,
  *            not successful.
  * @param[in] size size of the PSDU
  */
+ACCESS(read_write, 2, 3)
 void gnrc_lorawan_radio_rx_done_cb(gnrc_lorawan_t *mac, uint8_t *data,
                                    size_t size);
 

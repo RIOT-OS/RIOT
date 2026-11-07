@@ -135,9 +135,16 @@ static void _timer_init(tim_t dev, uint32_t freq)
      */
     TIMER_TopSet(tim, _is_wtimer(dev) ? 0xffffffff : 0xffff);
 
-    /* enable interrupts for the channels */
+    /* a spurious compare match can occur when a channel is changed to output
+     * compare mode while the counter is already past the compare value, so
+     * put all channels into output compare mode now and never change it
+     * again */
+    for (unsigned i = 0; i < timer_config[dev].channel_numof; i++) {
+        tim->CC[i].CTRL = TIMER_CC_CTRL_MODE_OUTPUTCOMPARE;
+    }
+
+    TIMER_IntDisable(tim, TIMER_IEN_CC0 | TIMER_IEN_CC1 | TIMER_IEN_CC2);
     TIMER_IntClear(tim, TIMER_IFC_CC0 | TIMER_IFC_CC1 | TIMER_IFC_CC2);
-    TIMER_IntEnable(tim, TIMER_IEN_CC0 | TIMER_IEN_CC1 | TIMER_IEN_CC2);
 }
 
 int timer_init(tim_t dev, uint32_t freq, timer_cb_t callback, void *arg)
@@ -179,7 +186,12 @@ int timer_set_absolute(tim_t dev, int channel, unsigned int value)
         }
 
         tim->CC[channel].CCV = (uint32_t) value;
-        tim->CC[channel].CTRL = TIMER_CC_CTRL_MODE_OUTPUTCOMPARE;
+
+        /* a direct CCV write to an already-enabled channel can still latch a
+         * spurious compare match, so the flag is discarded before the
+         * interrupt is re-enabled */
+        tim->IFC = (TIMER_IFC_CC0 << channel);
+        tim->IEN |= (TIMER_IEN_CC0 << channel);
     }
     else {
 #if LETIMER_COUNT
@@ -213,7 +225,8 @@ int timer_clear(tim_t dev, int channel)
 {
     if (!_is_letimer(dev)) {
         TIMER_TypeDef *tim = timer_config[dev].timer.dev;
-        tim->CC[channel].CTRL = _TIMER_CC_CTRL_MODE_OFF;
+        tim->IEN &= ~(TIMER_IEN_CC0 << channel);
+        tim->IFC = (TIMER_IFC_CC0 << channel);
     }
     else {
 #if LETIMER_COUNT
@@ -297,8 +310,7 @@ static void _timer_isr(tim_t dev)
         LETIMER_TypeDef *tim = timer_config[dev].timer.dev;
 
         for (int i = 0; i < timer_config[dev].channel_numof; i++) {
-            if (tim->IF & (LETIMER_IF_COMP0 << i))
-            {
+            if (tim->IF & (LETIMER_IF_COMP0 << i) && (tim->IEN & (LETIMER_IEN_COMP0 << i))) {
                 LETIMER_IntDisable(tim, LETIMER_IEN_COMP0 << i);
                 LETIMER_IntClear(tim, LETIMER_IFC_COMP0 << i);
                 isr_ctx[dev].cb(isr_ctx[dev].arg, i);
@@ -310,8 +322,8 @@ static void _timer_isr(tim_t dev)
         TIMER_TypeDef *tim = timer_config[dev].timer.dev;
 
         for (int i = 0; i < timer_config[dev].channel_numof; i++) {
-            if (tim->IF & (TIMER_IF_CC0 << i)) {
-                tim->CC[i].CTRL = _TIMER_CC_CTRL_MODE_OFF;
+            if ((tim->IF & (TIMER_IF_CC0 << i)) && (tim->IEN & (TIMER_IEN_CC0 << i))) {
+                tim->IEN &= ~(TIMER_IEN_CC0 << i);
                 tim->IFC = (TIMER_IFC_CC0 << i);
                 isr_ctx[dev].cb(isr_ctx[dev].arg, i);
             }

@@ -27,6 +27,7 @@ BOARD_INSUFFICIENT_MEMORY := \
     feather-m0-wifi \
     firefly \
     frdm-kl43z \
+    gba_cartridge \
     generic-cc2538-cc2592-dk \
     hamilton \
     i-nucleo-lrwan1 \
@@ -53,6 +54,7 @@ BOARD_INSUFFICIENT_MEMORY := \
     nucleo-f303k8 \
     nucleo-f334r8 \
     nucleo-f410rb \
+    nucleo-g031k8 \
     nucleo-g070rb \
     nucleo-g071rb \
     nucleo-g431rb \

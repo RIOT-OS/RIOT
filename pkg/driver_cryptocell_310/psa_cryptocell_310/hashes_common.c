@@ -1,9 +1,6 @@
 /*
- * Copyright (C) 2021 HAW Hamburg
- *
- * This file is subject to the terms and conditions of the GNU Lesser
- * General Public License v2.1. See the file LICENSE in the top level
- * directory for more details.
+ * SPDX-FileCopyrightText: 2021 HAW Hamburg
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
 
 /**
@@ -106,8 +103,8 @@ psa_status_t cryptocell_310_common_hash_update(CRYS_HASHUserContext_t *ctx,
     return PSA_SUCCESS;
 }
 
-psa_status_t cryptocell_310_common_hash_finish(CRYS_HASHUserContext_t *ctx, uint8_t *hash, size_t hash_size,
-                                size_t *hash_length)
+psa_status_t cryptocell_310_common_hash_finish(CRYS_HASHUserContext_t *ctx, uint8_t *hash,
+                                               size_t hash_size, size_t *hash_length)
 {
     cryptocell_310_enable();
     CRYSError_t ret = CRYS_HASH_Finish(ctx, (uint32_t *)hash);

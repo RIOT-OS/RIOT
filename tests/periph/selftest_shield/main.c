@@ -995,7 +995,8 @@ static bool periph_spi_test(void)
     return failed;
 }
 
-static bool periph_pwm_test_chan(pwm_t pwm_dev, uint8_t pwm_chan, pwm_mode_t pwm_mode, adc_t adc_line)
+static bool periph_pwm_test_chan(pwm_t pwm_dev, uint8_t pwm_chan, pwm_mode_t pwm_mode,
+                                 adc_t adc_line)
 {
     bool failed = false;
     print_start("PWM", "duty cycle (via ADC)");

@@ -16,6 +16,7 @@ when you're ready to integrate the Core into your product, you can.
 Link to [product website](http://docs.spark.io/hardware/).
 
 ### MCU
+
 | MCU        | STM32F103CB       |
 |:------------- |:--------------------- |
 | Family | ARM Cortex-M3     |
@@ -35,13 +36,13 @@ Link to [product website](http://docs.spark.io/hardware/).
 | Programming Manual | [Programming Manual](xxx) |
 | Board Manual   | [Board Manual](http://docs.spark.io/hardware/)|
 
-# Hardware connection
+## Hardware connection
 
 First of all make sure the your spark core device is detected and can be
 accessed properly. In Linux you might have to adept your udev rules accordingly:
 
-```
-$ cat 50-openmoko.rules
+```shell
+cat 50-openmoko.rules
 #Bus 001 Device 022: ID 1d50:607f OpenMoko, Inc.
 
 SUBSYSTEMS=="usb", ATTRS{idVendor}=="1d50", ATTRS{idProduct}=="607f", \
@@ -60,7 +61,7 @@ sudo udevadm trigger
 
 now replug the usb cable and flash.
 
-# Flashing
+## Flashing
 
 To flash RIOT to the spark core you need to install `dfu-util` (tested with
 0.7 and 0.8).
@@ -68,13 +69,13 @@ To flash RIOT to the spark core you need to install `dfu-util` (tested with
 Power the device and press the `mode` button until the LED flashes
 yellow/orange: now the device is ready to get flashed.
 
-# Firmware upgrade
+## Firmware upgrade
 
 To run RIOT it is required that you run the newest spark bootloader on your
 core:
-from https://community.spark.io/t/replace-core-firmware-with-riot-os/7007/7
+from <https://community.spark.io/t/replace-core-firmware-with-riot-os/7007/7>
 
-```
+```text
 Here is the core-firmware branch for this:
 https://github.com/spark/core-firmware/tree/bootloader-patch-update1
 However care should be taken not to disturb the patch update process by
@@ -92,23 +93,20 @@ normal core-firmware should start executing.
 going through ST-Link JTAG programming
 ```
 
-Build and flash
-===============
+## Build and flash
 
 1. clone RIOT-OS
 2. cd to e.g. `examples/basic/hello-world`
 3. enter `BOARD=spark-core make clean all flash`
 
-Use the UART
-============
+## Use the UART
 
 1. RIOT is using the UART PINs on the board, they are labeled as `RT` and
 `TX`.
 2. Connect your TTY to them and `BOARD=spark-core make term`.
 3. In a different terminal enter `BOARD=spark-core make reset`
 
-Pin mapping in RIOT
-===================
+## Pin mapping in RIOT
 
 The following image shows RIOT's static pin mapping chosen for this board.
 This mapping is completely arbitrary, it can be adjusted in

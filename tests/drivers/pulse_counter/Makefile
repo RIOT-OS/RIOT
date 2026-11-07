@@ -1,6 +1,6 @@
 include ../Makefile.drivers_common
 
-BOARD_BLACKLIST := msb-430 msb-430h telosb z1
+BOARDS_UNSUPPORTED := msb-430 msb-430h telosb z1
 
 USEMODULE += pulse_counter
 

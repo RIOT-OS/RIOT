@@ -1,9 +1,6 @@
 /*
- * Copyright (C) 2022 HAW Hamburg
- *
- * This file is subject to the terms and conditions of the GNU Lesser
- * General Public License v2.1. See the file LICENSE in the top level
- * directory for more details.
+ * SPDX-FileCopyrightText: 2022 HAW Hamburg
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
 
 /**
@@ -601,7 +598,6 @@ bool DSMEPlatform::setChannelNumber(uint8_t channel)
     ieee802154_phy_conf_t conf = {
         .phy_mode = IEEE802154_PHY_OQPSK,
         .channel = channel,
-        .page = 0,
         .pow = CONFIG_IEEE802154_DEFAULT_TXPOWER,
     };
     int res;

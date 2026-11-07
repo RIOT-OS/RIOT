@@ -6,8 +6,8 @@ PKG_LICENSE=BSD-3-Clause
 
 include $(RIOTBASE)/pkg/pkg.mk
 
-LWIP_MODULES         = lwip_api lwip_core lwip_ipv4 lwip_ipv6 \
-                       lwip_netif lwip_netif_ppp lwip_polarssl
+LWIP_MODULES         = lwip_api lwip_app_lwiperf lwip_core lwip_ipv4 \
+                       lwip_ipv6 lwip_netif lwip_netif_ppp lwip_polarssl
 LWIP_USEMODULE       = $(filter $(LWIP_MODULES),$(USEMODULE))
 LWIP_MODULE_MAKEFILE = $(RIOTBASE)/Makefile.base
 
@@ -29,6 +29,9 @@ lwip: $(LWIP_USEMODULE)
 
 lwip_api:
 	$(call make_module,$@,$(PKG_SOURCE_DIR)/src/api)
+
+lwip_app_lwiperf:
+	$(call make_module,$@,$(PKG_SOURCE_DIR)/src/apps/lwiperf)
 
 lwip_core:
 	$(call make_module,$@,$(PKG_SOURCE_DIR)/src/core)

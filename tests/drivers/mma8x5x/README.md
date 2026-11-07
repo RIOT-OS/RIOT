@@ -11,7 +11,7 @@ defines in your build environment, e.g.
 ```bash
 CFLAGS=-DMMA8X5X_PARAM_ADDR=0x1d make ...
 ```
-See RIOT/drivers/mma8x5x_params.h for the default configuration.
+See RIOT/drivers/mma8x5x/include/mma8x5x_params.h for the default configuration.
 
 After initialization, the sensor reads the x-, y-, z-axis values every 100ms
 and prints them to STDOUT.

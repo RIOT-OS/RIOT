@@ -13,6 +13,7 @@ from functools import partial
 from traceback import print_tb
 import pexpect
 
+from .spawn import flush_child   # noqa, F401 expose to users
 from .spawn import find_exc_origin, setup_child, teardown_child
 from .unittest import PexpectTestCase   # noqa, F401 expose to users
 from .utils import test_utils_interactive_sync # noqa, F401 expose to users
@@ -48,10 +49,11 @@ def run(testfunc, timeout=TIMEOUT, echo=True, traceback=False):
 
 
 def check_unittests(child, timeout=TIMEOUT, nb_tests=None):
-    """ Check the number of unit tests that passed, and return the amount.
+    """
+    Check the number of unit tests that passed, and return the amount.
 
-        If the amount of expected tests to pass is known, nd_tests can be set
-        to perform an exact match against that number.
+    If the amount of expected tests to pass is known, `nb_tests` can be set
+    to perform an exact match against that number.
     """
     if nb_tests is None:
         child.expect(r'OK \((\d+) tests\)', timeout=timeout)

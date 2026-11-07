@@ -45,6 +45,17 @@ static void test_read_timeout(void)
     TEST_ASSERT_EQUAL_INT(1, res);
 }
 
+static void test_read_timeout_zero(void)
+{
+    uint8_t buffer[2] = {0};
+    isrpipe_t pipe;
+
+    isrpipe_init(&pipe, buffer, ARRAY_SIZE(buffer));
+
+    /* reading zero bytes is a no-op and should not time-out */
+    TEST_ASSERT_EQUAL_INT(0, isrpipe_read_timeout(&pipe, NULL, 0, 1));
+}
+
 static void test_read_all_timeout(void)
 {
     uint8_t buffer[2] = {0};
@@ -79,11 +90,24 @@ static void test_read_all_timeout(void)
     TEST_ASSERT_EQUAL_INT(-ETIMEDOUT, res);
 }
 
+static void test_read_all_timeout_zero(void)
+{
+    uint8_t buffer[2] = {0};
+    isrpipe_t pipe;
+
+    isrpipe_init(&pipe, buffer, ARRAY_SIZE(buffer));
+
+    /* reading zero bytes is a no-op and should not time-out */
+    TEST_ASSERT_EQUAL_INT(0, isrpipe_read_all_timeout(&pipe, NULL, 0, 1));
+}
+
 Test *tests_isrpipe_read_timeout_tests(void)
 {
     EMB_UNIT_TESTFIXTURES(fixtures) {
         new_TestFixture(test_read_timeout),
+        new_TestFixture(test_read_timeout_zero),
         new_TestFixture(test_read_all_timeout),
+        new_TestFixture(test_read_all_timeout_zero),
     };
 
     EMB_UNIT_TESTCALLER(isrpipe_tests, NULL, NULL, fixtures);

@@ -1,9 +1,6 @@
 /*
- * Copyright (C) 2021 ML!PA Consulting GmbH
- *
- * This file is subject to the terms and conditions of the GNU Lesser
- * General Public License v2.1. See the file LICENSE in the top level
- * directory for more details.
+ * SPDX-FileCopyrightText: 2021 ML!PA Consulting GmbH
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
 
 /**
@@ -11,23 +8,23 @@
  * @{
  *
  * @file
- * @brief       SAUL adaption for lm75 compatible device
+ * @brief       SAUL adaption for LM75 compatible temperature sensors
  *
  * @author      Benjamin Valentin <benjamin.valentin@ml-pa.com>
  *
  * @}
  */
 
-#include <string.h>
-
 #include "saul.h"
 #include "lm75.h"
 
 static int read_temperature(const void *dev, phydat_t *res)
 {
-    int temperature;
+    int32_t temperature;
 
-    lm75_get_temperature((lm75_t *)dev, &temperature);
+    if (lm75_get_temperature(dev, &temperature)) {
+        return -ECANCELED;
+    }
     res->val[0] = temperature / 10; /* phydat_t is 16 bit */
     res->unit = UNIT_TEMP_C;
     res->scale = -2;

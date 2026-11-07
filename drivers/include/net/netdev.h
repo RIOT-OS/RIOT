@@ -1,12 +1,9 @@
 /*
- * Copyright (C) 2015 Kaspar Schleiser <kaspar@schleiser.de>
- *               2015 Ell-i open source co-operative
- *               2015-2017 Freie Universität Berlin
- *               2014 Martine Lenders <mlenders@inf.fu-berlin.de>
- *
- * This file is subject to the terms and conditions of the GNU Lesser General
- * Public License v2.1. See the file LICENSE in the top level directory for
- * more details.
+ * SPDX-FileCopyrightText: 2015 Kaspar Schleiser <kaspar@schleiser.de>
+ * SPDX-FileCopyrightText: 2015 Ell-i open source co-operative
+ * SPDX-FileCopyrightText: 2015-2017 Freie Universität Berlin
+ * SPDX-FileCopyrightText: 2014 Martine Lenders <mlenders@inf.fu-berlin.de>
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
 
 #pragma once
@@ -336,6 +333,9 @@ typedef enum {
     NETDEV_TINYUSB,
     NETDEV_W5500,
     NETDEV_ESP_IEEE802154,
+    NETDEV_LPC1768_ETH,
+    NETDEV_GRETH,
+    NETDEV_EFM32_ETH,
     /* add more if needed */
 } netdev_type_t;
 /** @} */

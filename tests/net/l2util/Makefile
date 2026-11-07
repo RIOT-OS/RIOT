@@ -5,17 +5,14 @@ include ../Makefile.net_common
 USEMODULE += embunit
 USEMODULE += l2util
 
-# defining the "module" path defines this way in the hopes to make it more
-#clearer.
-CHECKED_IFDEF_PATHS = cc110x \
-                      esp_now \
-                      netdev_eth \
-                      netdev_ieee802154 \
-                      xbee \
-                      nrfmin \
-                      nimble_netif
-
-CFLAGS += $(foreach path,$(CHECKED_IFDEF_PATHS),\
-            -DMODULE_$(shell echo $(path) | tr a-z A-Z))
+# enable all code paths in l2util without pulling in the actual
+# drivers
+CFLAGS += -DMODULE_CC110X \
+          -DMODULE_ESP_NOW \
+          -DMODULE_NETDEV_ETH \
+          -DMODULE_NETDEV_IEEE802154 \
+          -DMODULE_NIMBLE_NETIF \
+          -DMODULE_NRFMIN \
+          -DMODULE_XBEE
 
 include $(RIOTBASE)/Makefile.include

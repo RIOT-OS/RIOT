@@ -1,9 +1,6 @@
 /*
- * Copyright (C) 2017 Freie Universität Berlin
- *
- * This file is subject to the terms and conditions of the GNU Lesser
- * General Public License v2.1. See the file LICENSE in the top level
- * directory for more details.
+ * SPDX-FileCopyrightText: 2017 Freie Universität Berlin
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
 
 /**
@@ -25,6 +22,15 @@
 
 #define ENABLE_DEBUG 0
 #include "debug.h"
+
+#if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_6LN) && !IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_6LR) && \
+    !IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_6LBR) && !IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_ARSM)
+#  pragma message \
+    "\nWarning: You are using pure RFC6775-compatible Neighbor Discovery.\n" \
+    "Some other network stacks (Linux, lwip) do not implement RFC6775 and\n" \
+    "might encounter problems reaching this node.\n" \
+    "You can enable compatibility with such stacks with CONFIG_GNRC_IPV6_NIB_ARSM."
+#endif
 
 #if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_6LN)
 
@@ -327,7 +333,9 @@ uint32_t _handle_6co(const icmpv6_hdr_t *icmpv6,
     }
 #endif  /* CONFIG_GNRC_IPV6_NIB_MULTIHOP_P6C */
 #else   /* MODULE_GNRC_SIXLOWPAN_CTX */
+#if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_MULTIHOP_P6C)
     (void)abr;
+#endif  /* CONFIG_GNRC_IPV6_NIB_MULTIHOP_P6C */
 #endif  /* MODULE_GNRC_SIXLOWPAN_CTX */
     return ltime * SEC_PER_MIN * MS_PER_SEC;
 }

@@ -1,0 +1,5 @@
+USEMODULE += lcd
+USEMODULE += ztimer
+USEMODULE += ztimer_msec
+FEATURES_REQUIRED += periph_gpio
+FEATURES_REQUIRED += periph_spi

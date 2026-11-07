@@ -60,7 +60,7 @@ static const spi_conf_t spi_config[] = {
         .num      = 1,
         .mosi_pin = GPIO_PIN(2, 7),
         .miso_pin = GPIO_PIN(0, 4),
-        .sck_pin  = GPIO_PIN(1 ,5),
+        .sck_pin  = GPIO_PIN(1, 5),
         .cs_pin   = SPI_CS_UNDEF,
     }
 };

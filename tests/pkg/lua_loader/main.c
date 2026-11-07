@@ -29,17 +29,11 @@
 
 #include "test_utils/expect.h"
 
-static const uint8_t pure_module_1[] = "\n\
-return {a='Quando uma lua'}\n\
-";
+static const uint8_t pure_module_1[] = "\nreturn {a='Quando uma lua'}\n";
 
-static const uint8_t pure_module_2[] = "\n\
-return {a='chega de repente'}\n\
-";
+static const uint8_t pure_module_2[] = "\nreturn {a='chega de repente'}\n";
 
-static const uint8_t test_script[] = "\n\
-print'I am a module, hi!'\n\
-";
+static const uint8_t test_script[] = "\nprint'I am a module, hi!'\n";
 
 /* The -1 is because the final '\0' is not part of the source code that should
  * be read by lua.

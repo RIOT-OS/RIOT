@@ -9,7 +9,7 @@ ESP32x WiFi interface simultaneously.
 Compile and flash the application with command
 ```
 CFLAGS='-DWIFI_SSID=\"myssid\" -DWIFI_PASS=\"mypass\"'
-BOARD=esp32-wroom-32 make -C tests/nimble_esp_wifi_coexist flash term
+BOARD=esp32-wroom-32 make -C tests/pkg/nimble_esp_wifi_coexist flash term
 ```
 Once the test application is flashed and the WiFi connection is established,
 ping the node from the host with command

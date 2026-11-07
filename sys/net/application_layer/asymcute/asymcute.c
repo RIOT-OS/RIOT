@@ -1,9 +1,6 @@
 /*
- * Copyright (C) 2018 Freie Universität Berlin
- *
- * This file is subject to the terms and conditions of the GNU Lesser
- * General Public License v2.1. See the file LICENSE in the top level
- * directory for more details.
+ * SPDX-FileCopyrightText: 2018 Freie Universität Berlin
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
 
 /**
@@ -682,7 +679,9 @@ int asymcute_topic_init(asymcute_topic_t *topic, const char *topic_name,
         memcpy(topic->name, "..\0", 3);
     }
     else {
-        strncpy(topic->name, topic_name, sizeof(topic->name));
+        /* the length is checked above, so the name including its terminator
+         * fits */
+        memcpy(topic->name, topic_name, len + 1);
         if (len == 2) {
             memcpy(&topic->id, topic_name, 2);
             topic->flags = MQTTSN_TIT_SHORT;
@@ -737,7 +736,9 @@ int asymcute_connect(asymcute_con_t *con, asymcute_req_t *req,
     event_timeout_init(&con->keepalive_timer, &_queue, &con->keepalive_evt.super);
     con->user_cb = callback;
     con->state = CONNECTING;
-    strncpy(con->cli_id, cli_id, sizeof(con->cli_id));
+    /* the length is checked above, so the client ID including its
+     * terminator fits */
+    memcpy(con->cli_id, cli_id, id_len + 1);
 
     /* create a socket for this listener, using an ephemeral port */
     sock_udp_ep_t local = SOCK_IPV6_EP_ANY;

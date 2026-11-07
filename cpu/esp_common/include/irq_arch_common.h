@@ -47,7 +47,7 @@ extern volatile uint32_t irq_interrupt_nesting;
 /**
  * @name   Macros to enter and exit a critical region
  *
- * @note: since they use a local variable they can be used only in same function
+ * @note   since they use a local variable they can be used only in same function
  *
  * @{
  */

@@ -1,9 +1,6 @@
 /*
- * Copyright (C) 2017 Fundacion Inria Chile
- *
- * This file is subject to the terms and conditions of the GNU Lesser
- * General Public License v2.1. See the file LICENSE in the top level
- * directory for more details.
+ * SPDX-FileCopyrightText: 2017 Inria
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
 
 #pragma once
@@ -73,9 +70,11 @@ extern "C" {
 /** @brief   sizeof in bytes the two first members of she serial structure */
 #define OPENTHREAD_SIZEOF_LENGTH_AND_FREEBUFF               (4U)
 /** @brief   sizeof the serial buffer */
-#define OPENTHREAD_SERIAL_BUFFER_SIZE                       OPENTHREAD_SIZEOF_LENGTH_AND_FREEBUFF + 100
+#define OPENTHREAD_SERIAL_BUFFER_SIZE                       OPENTHREAD_SIZEOF_LENGTH_AND_FREEBUFF \
+                                                            + 100
 /** @brief   sizeof the spinel payload data */
-#define OPENTHREAD_SERIAL_BUFFER__PAYLOAD_SIZE              OPENTHREAD_SERIAL_BUFFER_SIZE - OPENTHREAD_SIZEOF_LENGTH_AND_FREEBUFF
+#define OPENTHREAD_SERIAL_BUFFER__PAYLOAD_SIZE              OPENTHREAD_SERIAL_BUFFER_SIZE \
+                                                            - OPENTHREAD_SIZEOF_LENGTH_AND_FREEBUFF
 /** @brief   error when no more buffer available */
 #define OPENTHREAD_ERROR_NO_EMPTY_SERIAL_BUFFER             -1
 /** @brief   serial buffer ready to use */
@@ -156,7 +155,8 @@ void openthread_radio_init(netdev_t *dev, uint8_t *tb, uint8_t *rb);
  * @return  PID of OpenThread thread
  * @return  -EINVAL if there was an error creating the thread
  */
-int openthread_netdev_init(char *stack, int stacksize, char priority, const char *name, netdev_t *netdev);
+int openthread_netdev_init(char *stack, int stacksize, char priority, const char *name,
+                           netdev_t *netdev);
 
 /**
  * @brief   Init OpenThread random

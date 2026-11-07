@@ -1,13 +1,14 @@
-# Copyright 2020 Martine S. Lenders <m.lenders@fu-berlin.sh>
-#
-# This file is subject to the terms and conditions of the GNU Lesser
-# General Public License v2.1. See the file LICENSE in the top level
-# directory for more details.
+# shellcheck shell=bash # this script is only sourced, so no shebang
 
-LOG=cat
+# SPDX-FileCopyrightText: 2020 Martine S. Lenders <m.lenders@fu-berlin.de>
+# SPDX-License-Identifier: LGPL-2.1-only
+
+# docs: https://docs.github.com/en/actions/reference/workflows-and-actions/workflow-commands
+
+LOG="cat"
 LOGFILE=
 OUTFILE=github_annotate_outfile.log
-ECHO_ESC=echo
+ECHO_ESC="echo"
 
 if [ -n "${BASH_VERSION}" ]; then
     # workaround when included in bash to escape newlines and carriage returns
@@ -18,6 +19,7 @@ fi
 github_annotate_setup() {
     if [ -n "${GITHUB_RUN_ID}" ]; then
         LOGFILE=run-${GITHUB_RUN_ID}.log
+        # shellcheck disable=SC2034  # LOG can be used by the sourcing script
         LOG="tee -a ${LOGFILE}"
     fi
 }
@@ -38,6 +40,13 @@ _github_annotate() {
     LEVEL="${2:-error}"
     OPTS="${3:-}"
     echo "::${LEVEL} ${OPTS}::${MESSAGE}" >> ${OUTFILE}
+}
+
+# expose _github_annotate()
+github_annotate() {
+   if [[ -n "${GITHUB_RUN_ID}" ]]; then
+        _github_annotate "$@"
+   fi
 }
 
 github_annotate_error() {
@@ -78,7 +87,7 @@ github_annotate_parse_log_default() {
     if github_annotate_is_on; then
         PATTERN='^.\+:[0-9]\+:'
 
-        grep "${PATTERN}" "${LOGFILE}" | while read line; do
+        grep "${PATTERN}" "${LOGFILE}" | while read -r line; do
             FILENAME=$(echo "${line}" | cut -d: -f1)
             LINENUM=$(echo "${line}" | cut -d: -f2)
             DETAILS=$(echo "${line}" | cut -d: -f3- |
@@ -90,13 +99,13 @@ github_annotate_parse_log_default() {
 
 github_annotate_teardown() {
     if [ -n "${LOGFILE}" ]; then
-        rm -f ${LOGFILE}
+        rm -f "${LOGFILE}"
         LOGFILE=
     fi
 }
 
 github_annotate_report_last_run() {
-    if [ -n "${GITHUB_RUN_ID}" -a -f "${OUTFILE}" ]; then
+    if [ -n "${GITHUB_RUN_ID}" ] && [ -f "${OUTFILE}" ]; then
         # de-duplicate errors
         sort -u ${OUTFILE} >&2
     fi

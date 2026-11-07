@@ -79,10 +79,10 @@ static inline void rmutex_init(rmutex_t *rmutex)
  * @brief Tries to get a recursive mutex, non-blocking.
  *
  * @param[in] rmutex Recursive mutex object to lock. Has to be
- *                  initialized first. Must not be NULL.
+ *                   initialized first. Must not be NULL.
  *
- * @return 1 if mutex was unlocked, now it is locked.
- * @return 0 if the mutex was locked.
+ * @retval 1 if the mutex was unlocked or locked by same thread, it is locked now.
+ * @retval 0 if the mutex was locked by another thread.
  */
 int rmutex_trylock(rmutex_t *rmutex);
 
@@ -90,9 +90,35 @@ int rmutex_trylock(rmutex_t *rmutex);
  * @brief Locks a recursive mutex, blocking.
  *
  * @param[in] rmutex Recursive mutex object to lock. Has to be
- *                 initialized first. Must not be NULL.
+ *                   initialized first. Must not be NULL.
  */
 void rmutex_lock(rmutex_t *rmutex);
+
+/**
+ * @brief Tries to get a recursive mutex without exceeding a maximum recursion depth,
+ *        non-blocking.
+ *
+ * @param[in] rmutex Recursive mutex object to lock. Has to be
+ *                   initialized first. Must not be NULL.
+ * @param[in] max    maximum recursion depth, must be > 0.
+ *
+ * @retval 1 if the mutex was unlocked, now it is locked.
+ * @retval 0 if the mutex was locked or the recursion depth has been exceeded.
+ */
+int rmutex_trylock_max(rmutex_t *rmutex, uint16_t max);
+
+/**
+ * @brief Tries to get a recursive mutex without exceeding a maximum recursion depth,
+ *        blocking.
+ *
+ * @param[in] rmutex Recursive mutex object to lock. Has to be
+ *                   initialized first. Must not be NULL.
+ * @param[in] max    maximum recursion depth.
+ *
+ * @retval 1 if the mutex was unlocked, now it is locked.
+ * @retval 0 if recursion depth was exceeded.
+ */
+int rmutex_lock_max(rmutex_t *rmutex, uint16_t max);
 
 /**
  * @brief Unlocks the recursive mutex.

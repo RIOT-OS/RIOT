@@ -16,7 +16,6 @@
  *
  * @author      Fabian Hüßler <fabian.huessler@ovgu.de>
  */
-#ifdef MODULE_NRF24L01P_NG
 
 #include "nrf24l01p_ng.h"
 #include "nrf24l01p_ng_params.h"
@@ -82,8 +81,4 @@ void auto_init_nrf24l01p_ng(void)
                                        &_nrf24l01p_ng_devs[i].netdev);
     }
 }
-
-#else
-typedef int dont_be_pedantic;
-#endif /* MODULE_NRF24L01P_NG */
 /** @} */

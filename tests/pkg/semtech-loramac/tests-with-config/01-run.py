@@ -1,10 +1,7 @@
 #!/usr/bin/env python3
 
-# Copyright (C) 2019 Inria
-#
-# This file is subject to the terms and conditions of the GNU Lesser
-# General Public License v2.1. See the file LICENSE in the top level
-# directory for more details.
+# SPDX-FileCopyrightText: 2019 Inria
+# SPDX-License-Identifier: LGPL-2.1-only
 
 import os
 import sys
@@ -177,7 +174,7 @@ def testfunc(child):
 
     run(test_task02)
     run(test_task03)
-    if(_check_eeprom(child)):
+    if _check_eeprom(child):
         run(test_task04)
 
     print("TEST PASSED")

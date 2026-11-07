@@ -66,7 +66,7 @@ featrures:
 By default, flashing is done via OpenOCD using the GD-Link programmer/debugger
 using:
 
-```
+```shell
 make BOARD=gd32vf103c-start -C path/to/app flash
 ```
 
@@ -88,7 +88,7 @@ cable to the connector labeled "USART". In addition a jumper needs to be
 placed on JP2 in the "Usart" position; otherwise RIOT's TXD is not connected
 to the RXD of the integrated USB UART bridge. Afterwards just run:
 
-```
+```shell
 make BOARD=gd32vf103c-start -C path/to/app term
 ```
 

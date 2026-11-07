@@ -1,9 +1,6 @@
 /*
- * Copyright (C) 2021 Gunar Schorcht
- *
- * This file is subject to the terms and conditions of the GNU Lesser
- * General Public License v2.1. See the file LICENSE in the top level
- * directory for more details.
+ * SPDX-FileCopyrightText: 2021 Gunar Schorcht
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
 
 #pragma once
@@ -39,7 +36,7 @@
  * - Ranging and ambient light sensing (ALS) in single-shot or
  *   continuous mode with polling for new sensor data
  * - Fixed configuration of the sensor by a default parameter set of
- *   type #vl6180x_params_t as defined in the file `vl6180x_params.h
+ *   type #vl6180x_params_t as defined in the file `vl6180x_params.h`
  * - SAUL sensor interface
  *
  * The following pseudomodules are used to enable additional functionalities:
@@ -342,7 +339,7 @@
  * command, for example:
  *
  * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
- * USEMODULE='vl6180x_rng vl6180x_als vl6180x_irq` \
+ * USEMODULE=`vl6180x_rng vl6180x_als vl6180x_irq` \
  * CLFAGS='-DVL6180X_PARAM_INT_PIN=GPIO_PIN\(0,5\)' \
  * BOARD=... make -C tests/drivers/vl6180x
  * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -370,7 +367,7 @@
  * line. For example to configure a measurement period of 500 ms and a maximum
  * convergence time for ranging of 60 ms, the following command could be used:
  * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
- * USEMODULE='vl6180x_rng vl6180x_als` \
+ * USEMODULE=`vl6180x_rng vl6180x_als` \
  * CLFAGS='-DCONFIG_VL6180X_MEAS_PERIOD=50 -DCONFIG_VL6180X_RNG_MAX_TIME=60' \
  * BOARD=... make -C tests/drivers/vl6180x
  * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

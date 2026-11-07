@@ -20,6 +20,7 @@
 #include <stdio.h>
 
 #include "cpu_conf.h"
+#include "mutex.h"
 #include "thread.h"
 
 #define THREAD1_STACKSIZE   (THREAD_STACKSIZE_MAIN)
@@ -36,6 +37,8 @@ static kernel_pid_t thread1_pid, thread2_pid;
 
 static int counter1 = 0;
 static int counter2 = 0;
+
+static mutex_t _mtx = MUTEX_INIT_LOCKED;
 
 static void *thread1(void *args)
 {
@@ -60,7 +63,7 @@ static void *thread1(void *args)
     }
 
     if (success) {
-        puts("Test successful.");
+        mutex_unlock(&_mtx);
     }
     else {
         puts("Test failed.");
@@ -93,9 +96,44 @@ static void *thread2(void *args)
 
 int main(void)
 {
+    msg_t msg = { 0 };
+
+    /* Test lower PID boundary */
+    int res = msg_send_receive(&msg, &msg, KERNEL_PID_FIRST - 1);
+    if (res != -1) {
+        puts("msg_send_receive() did not return -1 for invalid PID.");
+        return -1;
+    }
+
+    /* Test upper PID boundary */
+    res = msg_send_receive(&msg, &msg, KERNEL_PID_LAST + 1);
+    if (res != -1) {
+        puts("msg_send_receive() did not return -1 for invalid PID.");
+        return -1;
+    }
+
+    /* Check that this thread was not put to @ref STATUS_REPLY_BLOCKED by accident */
+    thread_yield();
+
     thread2_pid = thread_create(thread2_stack, THREAD2_STACKSIZE, THREAD_PRIORITY_MAIN - 2,
                                 0, thread2, NULL, "thread2");
     thread1_pid = thread_create(thread1_stack, THREAD1_STACKSIZE, THREAD_PRIORITY_MAIN - 1,
                                 0, thread1, NULL, "thread1");
+
+    /* Wait for thread1 to unlock the mutex on success */
+    mutex_lock(&_mtx);
+
+    /* Test PID of stopped thread */
+    res = msg_send_receive(&msg, &msg, thread1_pid);
+    if (res != -1) {
+        puts("msg_send_receive() did not return -1 for invalid PID.");
+        return -1;
+    }
+
+    /* Check that this thread was not put to @ref STATUS_REPLY_BLOCKED by accident */
+    thread_yield();
+
+    puts("Test successful.");
+
     return 0;
 }

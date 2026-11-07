@@ -12,6 +12,7 @@ STM32F103RB microcontroller with 20Kb of SRAM and 128Kb of ROM Flash.
 ![Olimexino STM32](https://www.olimex.com/Products/Duino/STM32/OLIMEXINO-STM32/images/thumbs/310x230/OLIMEXINO-STM32-01.jpg)
 
 ### MCU
+
 | MCU        | STM32F103RB       |
 |:---------- |:----------------- |
 | Family     | ARM Cortex-M3     |
@@ -35,6 +36,7 @@ STM32F103RB microcontroller with 20Kb of SRAM and 128Kb of ROM Flash.
 | Board Manual | [Board Manual](https://www.olimex.com/Products/Duino/STM32/OLIMEXINO-STM32/resources/OLIMEXINO-STM32.pdf) |
 
 ## Implementation Status
+
 | Device | ID        | Supported | Comments  |
 |:------------- |:------------- |:------------- |:------------- |
 | MCU        | STM32F103RB   | partly    | Energy saving modes not fully utilized |
@@ -48,18 +50,18 @@ STM32F103RB microcontroller with 20Kb of SRAM and 128Kb of ROM Flash.
 |        | Timer     | 3 16 bit timers (TIM2, TIM3 and TIM4)       | |
 
 ## Flashing the device
+
 The Olimexino-stm32 needs to be flashed using stm32flash (repo [here](https://github.com/stm32duino/stm32flash)).
 Once you have installed the program, you can flash the board like this:
 
+```shell
+BOARD=olimexino-stm32 make flash
 ```
-make BOARD=olimexino-stm32 flash
-```
+
 and open a terminal using:
-```
-make BOARD=olimexino-stm32 term
+
+```shell
+BOARD=olimexino-stm32 make term
 ```
 
 USART1 is used for flashing the board whereas USART2 is the serial Output.
-
-## Supported Toolchains
-For using the OLIMEXINO STM32 board you need to use ```arm-none-eabi```.

@@ -23,11 +23,13 @@ endif
 _OBJDUMP         := $(or $(shell command -v $(PREFIX)objdump || command -v gobjdump),objdump)
 OBJDUMP   ?= $(_OBJDUMP)
 
-GCC_VERSION := $(shell command -v $(CC) > /dev/null && $(CC) -dumpversion | cut -d . -f 1)
+# Parse only the major version of GCC
+GCC_VERSION := $(firstword $(subst ., ,$(shell command -v $(CC) > /dev/null && $(CC) -dumpversion)))
 
 # -fmacro-prefix-map requires GCC 8
-ifneq (8, $(firstword $(shell echo 8 $(GCC_VERSION) | tr ' ' '\n' | sort -n)))
+ifneq (1,$(call version_is_greater_or_equal,$(GCC_VERSION),8))
   OPTIONAL_CFLAGS_BLACKLIST += -fmacro-prefix-map=$(RIOTBASE)/=
+  OPTIONAL_CFLAGS_BLACKLIST += -fdebug-prefix-map=$(RIOTBASE)/=
 endif
 
 # GCC does not warn about documentation (yet)
@@ -40,7 +42,7 @@ include $(RIOTMAKE)/tools/gdb.inc.mk
 CFLAGS_STATIC_ANALYSIS := -fanalyzer
 
 # this needs to be recursively evaluated
-RCFLAGS_WRITE_SARIF = -fdiagnostics-set-output=sarif:file='$$@.sarif'
+RCFLAGS_WRITE_SARIF = -fdiagnostics-add-output=sarif:file='$$@.sarif'
 
 # Data address spaces starts at zero for all supported architectures. This fixes
 # compilation at least on MSP430 and AVR.

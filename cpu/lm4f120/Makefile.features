@@ -3,4 +3,9 @@ CPU_FAM = lm4f120
 
 FEATURES_PROVIDED += cortexm_mpu
 
+# C2Rust does not correctly resolve pointers to register addresses with the
+# datatype that is used by the vender headers.
+# This needs an upstream fix: https://github.com/immunant/c2rust/pull/2025
+FEATURES_BLACKLIST += rust_target
+
 include $(RIOTCPU)/cortexm_common/Makefile.features

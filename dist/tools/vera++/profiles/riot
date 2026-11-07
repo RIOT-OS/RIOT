@@ -15,7 +15,6 @@
 # T007: Semicolons should not be isolated by spaces or comments from the rest of the code
 # T008: Keywords catch, for, if and while should be followed by a single space
 # T009: Comma should not be preceded by whitespace, but should be followed by one
-# T010: Identifiers should not be composed of 'l' and 'O' characters only
 # T013: Source files should contain the copyright notice
 # T015: HTML links in comments and string literals should be correct
 # T017: Unnamed namespaces are not allowed in header files
@@ -38,7 +37,6 @@ set rules {
   T007
   T008
   T009
-  T010
   T013
   T015
   T017

@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!/usr/bin/env -S pipx run
 
 # Copyright (C) 2018 Freie Universitat Berlin
 # Copyright (C) 2018 Inria
@@ -8,6 +8,14 @@
 # directory for more details.
 #
 # @author   Koen Zandberg <koen@bergzand.net>
+
+# /// script
+# requires-python = ">=3.10"
+# dependencies = [
+#   "agithub==2.2.2",
+#   "GitPython==3.2.1",
+# ]
+# ///
 
 """Script used to backport PRs."""
 
@@ -36,6 +44,8 @@ BACKPORT_BRANCH = "backport/{release}/{origbranch}"
 
 def _get_labels(pull_request):
     """
+    Return the sorted labels for the backport of the given pull request.
+
     >>> _get_labels({'labels': [{'name': 'test'}, {'name': 'abcd'}]})
     ['Process: release backport', 'abcd', 'test']
     >>> _get_labels({'labels': [{'name': 'Reviewed: what'}, \
@@ -56,7 +66,8 @@ def _get_labels(pull_request):
 
 
 def _branch_name_strip(branch_name, prefix=RELEASE_PREFIX, suffix=RELEASE_SUFFIX):
-    """Strip suffix and prefix.
+    """
+    Strip suffix and prefix.
 
     >>> _branch_name_strip('2018.10-branch')
     '2018.10'
@@ -70,7 +81,8 @@ def _branch_name_strip(branch_name, prefix=RELEASE_PREFIX, suffix=RELEASE_SUFFIX
 
 
 def _get_latest_release(branches):
-    """Get latest release from a list of branches.
+    """
+    Get latest release from a list of branches.
 
     >>> _get_latest_release([{'name': '2018.10-branch'}, \
         {'name': '2020.10-branch'}])
@@ -119,7 +131,7 @@ def _delete_worktree(repo, workdir):
 
 def main():
     # pylint:disable=too-many-locals,too-many-branches,too-many-statements
-    """Main function of this script."""
+    """Run the main function of this script."""
     keyfile = os.path.join(os.environ["HOME"], GITHUBTOKEN_FILE)
     parser = argparse.ArgumentParser()
     parser.add_argument(
@@ -133,19 +145,20 @@ def main():
         "-c",
         "--comment",
         action="store_true",
-        help="Put a comment with a reference under" "the original PR",
+        help="Put a comment with a reference under the original PR",
     )
     parser.add_argument(
         "-n",
         "--noop",
         action="store_true",
-        help="Limited noop mode, creates branch, but doesn't" "push and create the PR",
+        help="Limited no-op mode. Creates the branch, but does not push and "
+        "create the PR",
     )
     parser.add_argument(
         "-r",
         "--release-branch",
         type=str,
-        help="Base the backport on this branch, " "default is the latest",
+        help="Base the backport on this branch, default is the latest",
     )
     parser.add_argument(
         "--backport-branch-fmt",

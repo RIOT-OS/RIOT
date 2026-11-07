@@ -1,7 +1,7 @@
-add_insufficient_memory_board.sh
+update_insufficient_memory_board.sh
 ------------------
 
-Usage: `add_insufficient_memory_board.sh <board_name>`
+Usage: `update_insufficient_memory_board.sh <board_name>`
 
 Updates `Makefile.ci` to include `<board_name>` if the memory of the board is not sufficient for the test/example.
 

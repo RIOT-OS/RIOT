@@ -229,6 +229,11 @@ typedef struct {
  */
 #define RTT_FREQUENCY       (312500UL)
 #define RTT_MAX_VALUE       (0xFFFFFFFFUL)
+
+/**
+ * @brief   RTT minimum offset for ESP8266
+ */
+#define RTT_MIN_OFFSET      (2U)
 /** @} */
 
 /**

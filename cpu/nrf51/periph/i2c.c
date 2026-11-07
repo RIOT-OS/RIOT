@@ -115,7 +115,7 @@ void i2c_init(i2c_t dev)
 
     /* pin configuration */
     NRF_GPIO->PIN_CNF[i2c_config[dev].pin_scl] = (GPIO_PIN_CNF_DRIVE_S0D1 << GPIO_PIN_CNF_DRIVE_Pos);
-    NRF_GPIO->PIN_CNF[i2c_config[dev].pin_scl] = (GPIO_PIN_CNF_DRIVE_S0D1 << GPIO_PIN_CNF_DRIVE_Pos);
+    NRF_GPIO->PIN_CNF[i2c_config[dev].pin_sda] = (GPIO_PIN_CNF_DRIVE_S0D1 << GPIO_PIN_CNF_DRIVE_Pos);
 
     i2c(dev)->PSELSCL = i2c_config[dev].pin_scl;
     i2c(dev)->PSELSDA = i2c_config[dev].pin_sda;

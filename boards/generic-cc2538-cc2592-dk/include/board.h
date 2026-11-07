@@ -28,28 +28,40 @@ extern "C" {
  * @{
  */
 #define LED_GREEN_PIN       GPIO_PIN(PORT_C, 0) /**< GPIO pin for green LED */
-#define LED_GREEN_PORT      GPIO_C              /**< GPIO port register to used to control green LED */
+/**
+ * @brief GPIO port register to used to control green LED
+ */
+#define LED_GREEN_PORT      GPIO_C
 #define LED_GREEN_BIT       (1U << 0)           /**< Bitmask to write to @ref LED_GREEN_PORT */
 #define LED0_PIN            LED_GREEN_PIN       /**< Alias for LED_GREEN_PIN */
 #define LED0_PORT           LED_GREEN_PORT      /**< Alias for LED_GREEN_PORT */
 #define LED0_BIT            LED_GREEN_BIT       /**< Alias for LED_GREEN_BIT */
 
 #define LED_RED_PIN         GPIO_PIN(PORT_C, 1) /**< GPIO pin for red LED */
-#define LED_RED_PORT        GPIO_C              /**< GPIO port register to used to control red LED */
+/**
+ * @brief GPIO port register to used to control red LED
+ */
+#define LED_RED_PORT        GPIO_C
 #define LED_RED_BIT         (1U << 1)           /**< Bitmask to write to @ref LED_RED_PORT */
 #define LED1_PIN            LED_RED_PIN         /**< Alias for LED_RED_PIN */
 #define LED1_PORT           LED_RED_PORT        /**< Alias for LED_RED_PORT */
 #define LED1_BIT            LED_RED_BIT         /**< Alias for LED_RED_BIT */
 
 #define LED_YELLOW_PIN      GPIO_PIN(PORT_B, 1) /**< GPIO pin for yellow LED */
-#define LED_YELLOW_PORT     GPIO_B              /**< GPIO port register to used to control yellow LED */
+/**
+ * @brief GPIO port register to used to control yellow LED
+ */
+#define LED_YELLOW_PORT     GPIO_B
 #define LED_YELLOW_BIT      (1U << 1)           /**< Bitmask to write to @ref LED_YELLOW_PORT */
 #define LED2_PIN            LED_YELLOW_PIN      /**< Alias for LED_YELLOW_PIN */
 #define LED2_PORT           LED_YELLOW_PORT     /**< Alias for LED_YELLOW_PORT */
 #define LED2_BIT            LED_YELLOW_BIT      /**< Alias for LED_YELLOW_BIT */
 
 #define LED_BLUE_PIN        GPIO_PIN(PORT_B, 0) /**< GPIO pin for blue LED */
-#define LED_BLUE_PORT       GPIO_B              /**< GPIO port register to used to control blue LED */
+/**
+ * @brief GPIO port register to used to control blue LED
+ */
+#define LED_BLUE_PORT       GPIO_B
 #define LED_BLUE_BIT        (1U << 0)           /**< Bitmask to write to @ref LED_BLUE_PORT */
 #define LED3_PIN            LED_BLUE_PIN        /**< Alias for LED_BLUE_PIN */
 #define LED3_PORT           LED_BLUE_PORT       /**< Alias for LED_BLUE_PORT */

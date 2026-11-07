@@ -10,21 +10,12 @@ SPDX-License-Identifier: LGPL-2.1-only
 
 \section esp32s3_box ESP32-S3-Box
 
-## Table of Contents {#esp32s3_box_toc}
-
-1. [Overview](#esp32s3_box_overview)
-2. [Hardware](#esp32s3_box_hardware)
-    1. [MCU](#esp32s3_box_mcu)
-    2. [Board Configuration](#esp32s3_box_board_configuration)
-    3. [Board Pinout](#esp32s3_box_pinout)
-3. [Flashing the Device](#esp32s3_box_flashing)
-
-## Overview {#esp32s3_box_overview}
+## Overview
 
 The Espressif ESP32-S3-Box is a AIoT development platform for the ESP32-S3 SoC.
 
-\image html https://raw.githubusercontent.com/espressif/esp-box/master/docs/_static/esp32_s3_box.png "ESP32-S2-Box" width=400px
-\image html https://obrazki.elektroda.pl/4333131800_1637933077_bigthumb.jpg "Hardware Overview" width=700px
+<img src="https://raw.githubusercontent.com/espressif/esp-box/master/docs/_static/esp32_s3_box.png" alt="ESP32-S2-Box" width=400px />
+<img src="https://obrazki.elektroda.pl/4333131800_1637933077_bigthumb.jpg" alt="Hardware Overview" width=700px />
 
 The ESP32-S3-Box has following main features:
 
@@ -47,27 +38,15 @@ The ESP32-S3-Box has following main features:
 The Espressif ESP32-S3-Box is shipped with a Dock which exposes the
 2 x Digilent Pmod(TM) Connectors.
 
-[Back to table of contents](#esp32s3_box_toc)
+## Hardware
 
-## Hardware {#esp32s3_box_hardware}
-
-This section describes
-
-- the [MCU](#esp32s3_box_mcu),
-- the default [board configuration](#esp32s3_box_board_configuration),
-- the [board pinout](#esp32s3_box_pinout).
-
-[Back to table of contents](#esp32s3_box_toc)
-
-### MCU {#esp32s3_box_mcu}
+### MCU
 
 Most features of the ESP32-S3-Box are provided by the ESP32-S3 SoC. For detailed
 information about the ESP32-S3 SoC variant (family) and ESP32x SoCs,
 see section \ref esp32_mcu_esp32 "ESP32 SoC Series".
 
-[Back to table of contents](#esp32s3_box_toc)
-
-### Board Configuration {#esp32s3_box_board_configuration}
+### Board Configuration
 
 The following table shows the default ESP32-S3-Box configuration, which is
 sorted according to the defined functionality of GPIOs. This configuration can
@@ -91,44 +70,43 @@ SPI_DEV(1) CS0  | GPIO5  | LCD CS, SPI3_HOST is used | \ref esp32_spi_interfaces
 UART_DEV(0) TxD | GPIO43 | PMOD2 | \ref esp32_uart_interfaces "UART interfaces"
 UART_DEV(0) RxD | GPIO44 | PMOD2 | \ref esp32_uart_interfaces "UART interfaces"
 </center>
-\n
+<br>
 
-[Back to table of contents](#esp32s3_box_toc)
-
-### Board Pinout {#esp32s3_box_pinout}
+### Board Pinout
 
 The following figures show the pinouts as configured by default board
 definition.
 
-@image html https://raw.githubusercontent.com/espressif/esp-box/master/docs/_static/previous_get_started_fig/hardware_pmod.png "ESP32-S3-BoxC-1 Pinout" width=900px
+<img src="https://raw.githubusercontent.com/espressif/esp-box/master/docs/_static/previous_get_started_fig/hardware_pmod.png" alt="ESP32-S3-BoxC-1 Pinout" width=900px />
 
 The corresponding schematics can be found:
 
 - [ESP32-S3-Box](https://github.com/espressif/esp-box/blob/master/hardware/esp32_s3_box_v2.5/schematic/SCH_ESP32-S3-BOX_V2.5_20211011.pdf)
 - [ESP32-S3-Box Dock](https://github.com/espressif/esp-box/blob/master/hardware/esp32_s3_box_dock_v1.0/schematic/ESP32-S3-BOX-DOCK_V1D0_20210922.pdf)
 
-[Back to table of contents](#esp32s3_box_toc)
-
-## Flashing the Device {#esp32s3_box_flashing}
+## Flashing the Device
 
 Since the ESP32-S3-Box does not have a USB-to-Serial chip, the easiest way to
 flash it is using the USB Serial/JTAG interface. Just connect the ESP32-S3-Box
 to your host computer and use the following command:
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+```shell
 BOARD=esp32s3-box make flash ...
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+```
 
 Usually the make system resets the ESP32-S3-Box before flashing to enable the
 USB Serial/JTAG controller and to reboot the ESP32-S3 in download mode.
 
 In some very special cases this reset does not work and the programmer cannot
 connect to the card, so the flashing is aborted with a timeout:
-```
+
+```text
 Serial port /dev/ttyACM0
 Connecting...
 ...
 serial.serialutil.SerialTimeoutException: Write timeout
 ```
+
 This can happen either if RIOT is not yet installed or if the USB port was
 previously used with the USB OTG controller, for example with USBUS or tinyUSB.
 In this case, restart the ESP32-S3-Box manually into download mode by pressing
@@ -140,5 +118,3 @@ In download mode, the USB Serial/JTAG interface is always available.
       possible. In this case the ESP32-S3-Box must be reset manually using the RESET
       button. In all other cases the ESP32-S3 automatically restarts with
       the flashed application.
-
-[Back to table of contents](#esp32s3_box_toc)

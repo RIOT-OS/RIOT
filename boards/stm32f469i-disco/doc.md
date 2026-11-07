@@ -2,15 +2,8 @@
 @ingroup     boards
 @brief       Support for the STM32F469I-DISCO board
 
-## Table of Contents:
-
-1. Overview
-2. Hardware
-3. Connectors and Pinout
-4. Buttons, LEDS and other devices
-5. Working with this Dev-Kit.
-
 ## Overview
+
 The STM32F469I Discovery kit is a complete development platform for powered by ARM Cortex-M4 core-based
 STM32F469NIH6 MCU.
 The MCU presents a large list of peripherals available, but specifically this development board exposes:
@@ -82,36 +75,8 @@ Also provides some system signals and power.
 - 3 Digital microphones
 - 1 LCD Color 4 inches
 
-## Working with this Dev-Kit
+## Flashing the Board
 
-To start the **gcc-arm-embedded** toolchain have to be installed,
-we can follow the usual process [here](https://github.com/RIOT-OS/RIOT/wiki/Family:-ARM).
-
-## Flashing the device
-
-### Flashing the Board using OpenOCD
-
-The start install **OpenOCD**, also we can follow the usual process
-[here](https://github.com/RIOT-OS/RIOT/wiki/OpenOCD)
-
-Once everything is installed and ready to work just connect the board through
-the USB Mini-B connector try to compile and flash some code, type:
-
-```
-make flash BOARD=stm32f469i-disco
-```
-
-### Flashing the Board Using ST-LINK Removable Media
-
-On-board ST-LINK programmer provides via composite USB device removable media.
-Copying the HEX file causes reprogramming of the board. This task
-could be performed manually; however, the cpy2remed (copy to removable
-media) PROGRAMMER script does this automatically. To program board in
-this manner, use the command:
-```
-make BOARD=stm32f469i-disco PROGRAMMER=cpy2remed flash
-```
-@note This PROGRAMMER was tested using ST-LINK firmware 2.37.26. Firmware update
-s
-could be found on [this STM webpage](https://www.st.com/en/development-tools/sts
-w-link007.html).
+A detailed description about the flashing process can be found on the
+[guides page](https://guide.riot-os.org/board_specific/stm32/).
+The board name for the STM32F469I Discovery is `stm32f469i-disco`.

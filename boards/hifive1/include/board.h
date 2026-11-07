@@ -6,9 +6,7 @@
 #pragma once
 
 /**
- * @defgroup    boards_hifive1 SiFive HiFive1 RISC-V board
- * @ingroup     boards
- * @brief       Support for the SiFive HiFive1 RISC-V board
+ * @ingroup     boards_hifive1
  * @{
  *
  * @file

@@ -25,7 +25,7 @@
 
 /* TinyDTLS WARNING check */
 #ifdef WITH_RIOT_SOCKETS
-#error TinyDTLS is set to use sockets but the app is configured for socks.
+#  error TinyDTLS is set to use sockets but the app is configured with socks.
 #endif
 
 #define MAIN_QUEUE_SIZE     (8)

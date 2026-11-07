@@ -3,14 +3,17 @@
 @brief      Support for the Seeeduino Arch Pro board
 
 ## Overview
+
 The Seeeduino Arch Pro is an 32-bit ARM Cortex M3 microprocessor development
 board, featuring an Arduino-compatible shield interface and a RJ-45 network
 interface.
 
 ## Hardware
+
 ![Seeeduino Arch Pro Development Kit](https://statics3.seeedstudio.com/images/product/arch%20pro.jpg)
 
 ### MCU
+
 | MCU             | LPC1768                                  |
 |-----------------|------------------------------------------|
 | Family          | ARM Cortex-M3                            |
@@ -26,6 +29,7 @@ interface.
 | UARTs           | 3x USART                                 |
 | SPIs            | 2x USART                                 |
 | I2Cs            | 2x                                       |
+| Ethernet        | 1                                        |
 | Vcc             | 2.4V - 3.6V                              |
 | Datasheet       | [Datasheet](https://www.nxp.com/docs/en/data-sheet/LPC1769_68_67_66_65_64_63.pdf)|
 | Manual          | [Manual](http://www.nxp.com/documents/user_manual/UM10360.pdf)|
@@ -35,6 +39,7 @@ interface.
 ### Pinout
 
 ### User interface
+
 | Peripheral | Mapped to | Hardware | Pin   | Comments   |
 |------------|-----------|----------|-------|------------|
 | LED        | LED0      | LED1     | P1_18 | Green LED  |
@@ -45,6 +50,7 @@ interface.
 ## Board configuration
 
 ### Virtual serial port
+
 The first UART device is mapped to stdout.
 
 Note: the board controller always configures the virtual serial port at
@@ -55,27 +61,31 @@ Note: to use the virtual serial port, ensure you have the latest board
 controller firmware installed.
 
 ## Flashing the device
-To flash, the [OpenOCD Software](http://openocd.org/) is required.
+
+To flash the board, `openocd` is required. Refer to
+<https://doc.riot-os.org/misc/openocd/> for more information about
+building and installing OpenOCD.
 
 Flashing is supported by RIOT-OS by the command below:
 
-```
-make flash
+```shell
+BOARD=seeeduino_arch-pro make flash
 ```
 
 To run the GDB debugger, use the command:
 
-```
-make debug
+```shell
+BOARD=seeeduino_arch-pro make debug
 ```
 
 Or, to connect with your own debugger:
 
-```
-make debug-server
+```shell
+BOARD=seeeduino_arch-pro make debug-server
 ```
 
 ## Image checksum
+
 LPC ARM Cortext MCUs need a [flash image checksum](https://community.nxp.com/thread/389046). When running `make flash`,
 this checksum is automatically generated and inserted into the firmware image
 right before flashing.
@@ -85,9 +95,6 @@ command-line utility, which can be installed using using `pip install
 lpc_checksum` or `pip3 install lpc_checksum`. After installing this utility, it
 should be available on your command-line.
 
-## Supported toolchains
-For using the Seeeduino Arch Pro development kit we strongly recommend the
-usage of the [GNU Tools for ARM Embedded Processors](https://launchpad.net/gcc-arm-embedded) toolchain.
-
 ## License information
+
 Image: taken from Seeeduino website.

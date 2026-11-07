@@ -46,6 +46,12 @@ MTD_EMULATED_DEV(0, SECTOR_COUNT, PAGE_PER_SECTOR, PAGE_SIZE);
 
 #endif /* MTD_0 */
 
+/* Name of exactly VFS_NAME_MAX characters, which is the longest name SPIFFS
+ * can store (SPIFFS_OBJ_NAME_LEN - 1). SPIFFS stores the leading slash as
+ * part of the name. */
+#define LONG_NAME   "/abcdefghijklmnopqrstuvwxyz0123"
+#define LONG_PATH   "/test-spiffs/abcdefghijklmnopqrstuvwxyz0123"
+
 static struct spiffs_desc spiffs_desc = {
     .lock = MUTEX_INIT,
 };
@@ -70,6 +76,7 @@ static void test_spiffs_teardown(void)
     vfs_unlink("/test-spiffs/test0.txt");
     vfs_unlink("/test-spiffs/test1.txt");
     vfs_unlink("/test-spiffs/a/test2.txt");
+    vfs_unlink(LONG_PATH);
     vfs_umount(&_test_spiffs_mount, false);
 
     spiffs_desc.base_addr = 0;
@@ -237,6 +244,44 @@ static void tests_spiffs_readdir(void)
     TEST_ASSERT_EQUAL_INT(0, res);
 }
 
+static void tests_spiffs_readdir_long_name(void)
+{
+    int res;
+    int fd = vfs_open(LONG_PATH, O_CREAT | O_RDWR, 0);
+    TEST_ASSERT(fd >= 0);
+
+    res = vfs_close(fd);
+    TEST_ASSERT_EQUAL_INT(0, res);
+
+    vfs_DIR dirp;
+    res = vfs_opendir(&dirp, "/test-spiffs");
+    TEST_ASSERT_EQUAL_INT(0, res);
+
+    vfs_dirent_t entry;
+    int nb_files = 0;
+    do {
+        /* Fill the entry with garbage, such that a missing terminating zero
+         * is detected. */
+        memset(&entry, 'X', sizeof(entry));
+        res = vfs_readdir(&dirp, &entry);
+        if (res == 1) {
+            TEST_ASSERT_NOT_NULL(memchr(entry.d_name, '\0', sizeof(entry.d_name)));
+            if (strcmp(LONG_NAME, entry.d_name) == 0) {
+                nb_files++;
+            }
+        }
+    } while (res == 1);
+
+    TEST_ASSERT_EQUAL_INT(1, nb_files);
+    TEST_ASSERT_EQUAL_INT(0, res);
+
+    res = vfs_closedir(&dirp);
+    TEST_ASSERT_EQUAL_INT(0, res);
+
+    res = vfs_unlink(LONG_PATH);
+    TEST_ASSERT_EQUAL_INT(0, res);
+}
+
 static void tests_spiffs_rename(void)
 {
     const char buf[] = "TESTSTRING";
@@ -374,6 +419,7 @@ Test *tests_spiffs(void)
         new_TestFixture(tests_spiffs_write),
         new_TestFixture(tests_spiffs_unlink),
         new_TestFixture(tests_spiffs_readdir),
+        new_TestFixture(tests_spiffs_readdir_long_name),
         new_TestFixture(tests_spiffs_rename),
         new_TestFixture(tests_spiffs_statvfs),
         new_TestFixture(tests_spiffs_partition),

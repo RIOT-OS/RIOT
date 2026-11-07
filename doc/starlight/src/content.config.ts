@@ -1,14 +1,45 @@
+/*
+ * SPDX-FileCopyrightText: 2026 Lasse Rosenow <Lasse.Rosenow@haw-hamburg.de>
+ * SPDX-FileCopyrightText: 2026 Tom Hert <git@annsann.eu>
+ * SPDX-FileCopyrightText: 2026 HAW Hamburg
+ * SPDX-License-Identifier: LGPL-2.1-only
+ */
+
 import { defineCollection } from "astro:content";
 import { type Loader } from "astro/loaders";
 import { docsSchema } from "@astrojs/starlight/schema";
 import { promises as fs } from "node:fs";
 import { glob } from "astro/loaders";
 import { z } from "astro/zod";
+import path from "node:path";
+import {
+  extractDoxygenGroupFromDoxygen,
+  extractDoxygenGroupTitleFromDoxygen,
+  transformDoxygenMarkdown,
+} from "./lib/doxygen_filter";
+
+const DoxygenDocSchema = z.object({
+  title: z.string(),
+  description: z.string().nullish(),
+  doxygenGroup: z.string(),
+  githubFolder: z.string(),
+  editUrl: z.string(),
+  includeInOverview: z.boolean(),
+  parentId: z.string().nullable(),
+});
 
 export const collections = {
   docs: defineCollection({
     loader: glob({ pattern: "**/*.(md|mdx)", base: "../guides" }),
     schema: docsSchema(),
+  }),
+  boards: defineCollection({
+    loader: doxygenDocLoader("../../boards", "boards"),
+    schema: DoxygenDocSchema
+  }),
+  cpus: defineCollection({
+    loader: doxygenDocLoader("../../cpu", "cpu"),
+    schema: DoxygenDocSchema
   }),
   changelog: defineCollection({
     loader: changelogLoader(),
@@ -22,6 +53,103 @@ export const collections = {
     }),
   }),
 };
+
+/**
+ * Load documentation from doc*.md files in the specified directory.
+ * Each subdirectory may contain one or more files matching the pattern
+ * `doc*.md` (e.g. `doc.md`, `doc-extra.md`). Extracts titles from
+ * `@defgroup` directives like riot-index does.
+ *
+ * @param dir The folder from which to load the doc*.md files.
+ * @param doxygenGroupPrefix The prefix with which the doxygen group of these docs starts
+ */
+function doxygenDocLoader(dir: string, doxygenGroupPrefix: string): Loader {
+  return {
+    name: `${doxygenGroupPrefix}-loader`,
+    load: async (context): Promise<void> => {
+      try {
+        // Read all directories in the `dir` folder
+        const entries = await fs.readdir(dir, { withFileTypes: true });
+        const docDirs = entries.filter((entry) => entry.isDirectory());
+
+        for (const docDir of docDirs) {
+          const docName = docDir.name;
+          const docDirPath = path.join(dir, docName);
+
+          // Find all doc*.md files in this directory
+          let docFiles: string[];
+          try {
+            const dirEntries = await fs.readdir(docDirPath, {
+              withFileTypes: true,
+            });
+            docFiles = dirEntries
+              .filter(
+                (entry) => entry.isFile() && entry.name.endsWith("doc.md"),
+              )
+              .map((entry) => entry.name)
+              // Sort so iteration order is deterministic across platforms
+              .sort();
+          } catch (error) {
+            console.debug(
+              `Failed to read directory for ${doxygenGroupPrefix} "${docName}", skipping...`,
+            );
+            continue;
+          }
+
+          if (docFiles.length === 0) {
+            console.debug(
+              `Tried to load documentation for ${doxygenGroupPrefix} "${docName}" but it doesn't contain any doc*.md files, skipping...`,
+            );
+            continue;
+          }
+
+          for (const docFile of docFiles) {
+            const docPath = path.join(docDirPath, docFile);
+            const baseName = path.basename(docFile, ".md");
+            const isParent = baseName === "doc";
+            const id = isParent ? docName : `${docName}/${baseName}`;
+
+            const docContent = await fs.readFile(docPath, "utf-8");
+
+            // Parse frontmatter out of the markdown content if it exists
+            const markdown = docContent;
+            const fallbackTitle = docName.replace(/-/g, " ");
+            const title = extractDoxygenGroupTitleFromDoxygen(
+              docContent,
+              doxygenGroupPrefix,
+              fallbackTitle,
+            );
+            const filteredMarkdown = transformDoxygenMarkdown(markdown);
+
+            // Parse @brief directives for description (take the first one as description)
+            const descriptionMatch = docContent.match(/@brief\s+(.+)/);
+            const description = descriptionMatch?.[1].trim();
+
+            // Add entry to content collection
+            context.store.set({
+              id: id,
+              filePath: docPath.replaceAll("../", ""),
+              data: {
+                title: title,
+                description: description,
+                doxygenGroup: extractDoxygenGroupFromDoxygen(docContent, doxygenGroupPrefix),
+                githubFolder: docDirPath.replaceAll("../", ""),
+                // Only the parent appears in the overview; children are hidden
+                // and reached via their parent's childrenIds.
+                includeInOverview: isParent,
+                parentId: isParent ? null : docName,
+              },
+              body: filteredMarkdown,
+              rendered: await context.renderMarkdown(filteredMarkdown),
+            });
+          }
+        }
+      } catch (error) {
+        console.error(`Error loading ${doxygenGroupPrefix}:`, error);
+      }
+    },
+  };
+}
 
 /**
  * Generate a content collection containing the release notes of each release as an entry.
@@ -93,8 +221,8 @@ export function changelogLoader(): Loader {
             const date = new Date(release);
 
             // Extract the release code name from the heading if it exists
-            const codeName =
-              currentReleaseHeading.match(/"([^"]+)"/)?.[1] || null;
+            const codeName = currentReleaseHeading.match(/"([^"]+)"/)?.[1] ||
+              null;
 
             // Extract current release content
             const currentReleaseContent = lines

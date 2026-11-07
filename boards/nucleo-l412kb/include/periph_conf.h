@@ -133,7 +133,7 @@ static const spi_conf_t spi_config[] = {
  * [Y] - describes used channel - indexed from 1,
  * for example ADC1_IN10 is channel 10
  *
- * For Nucleo-L431KB this information is in board manual,
+ * For Nucleo-L412KB this information is in board manual,
  * Table 15 or STM32L412KB MCU datasheet - Table 14.
  *
  * VBAT is connected ADC1_IN18 internal line and a voltage divider

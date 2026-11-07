@@ -1,9 +1,6 @@
 /*
- * Copyright (C) 2016 Freie Universität Berlin
- *
- * This file is subject to the terms and conditions of the GNU Lesser
- * General Public License v2.1. See the file LICENSE in the top level
- * directory for more details.
+ * SPDX-FileCopyrightText: 2016 Freie Universität Berlin
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
 
 /**
@@ -237,7 +234,7 @@ int sock_tcp_accept(sock_tcp_queue_t *queue, sock_tcp_t **sock,
     if (queue->used < queue->len) {
 #if LWIP_SO_RCVTIMEO
         if ((timeout != 0) && (timeout != SOCK_NO_TIMEOUT)) {
-            netconn_set_recvtimeout(queue->base.conn, timeout / US_PER_MS);
+            netconn_set_recvtimeout(queue->base.conn, lwip_sock_timeout_ms(timeout));
         }
         else
 #endif
@@ -329,7 +326,7 @@ ssize_t sock_tcp_read(sock_tcp_t *sock, void *data, size_t max_len,
 
 #if LWIP_SO_RCVTIMEO
     if ((timeout != 0) && (timeout != SOCK_NO_TIMEOUT)) {
-        netconn_set_recvtimeout(sock->base.conn, timeout / US_PER_MS);
+        netconn_set_recvtimeout(sock->base.conn, lwip_sock_timeout_ms(timeout));
     }
     else
 #endif

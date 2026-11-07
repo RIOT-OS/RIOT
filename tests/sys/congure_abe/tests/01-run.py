@@ -1,10 +1,7 @@
 #! /usr/bin/env python3
 
-# Copyright (C) 2021 Freie Universität Berlin
-#
-# This file is subject to the terms and conditions of the GNU Lesser
-# General Public License v2.1. See the file LICENSE in the top level
-# directory for more details.
+# SPDX-FileCopyrightText: 2021 Freie Universität Berlin
+# SPDX-License-Identifier: LGPL-2.1-only
 
 import logging
 import sys
@@ -16,7 +13,7 @@ from riotctrl.shell.json import RapidJSONShellInteractionParser, rapidjson
 
 from riotctrl_shell.congure_test import CongureTest
 
-from testrunner.spawn import MAKE_TERM_CONNECT_DELAY
+from testrunner.spawn import flush_child, MAKE_TERM_CONNECT_DELAY
 
 
 class TestCongUREBase(unittest.TestCase):
@@ -32,6 +29,7 @@ class TestCongUREBase(unittest.TestCase):
         cls.ctrl.start_term()
         if cls.DEBUG:
             cls.ctrl.term.logfile = sys.stdout
+        flush_child(cls.ctrl.term)
         cls.shell = CongureTest(cls.ctrl)
         cls.json_parser = RapidJSONShellInteractionParser()
         cls.json_parser.set_parser_args(
@@ -47,6 +45,7 @@ class TestCongUREBase(unittest.TestCase):
 
     def setUp(self):
         self.shell.clear()
+        flush_child(self.ctrl.term)
 
     def tearDown(self):
         self.shell.msgs_reset()
@@ -65,6 +64,8 @@ class TestCongUREBase(unittest.TestCase):
         # pylint: disable=invalid-name
         # trying to be in line with `unittest`
         """
+        Assert that the congestion state is in slow start.
+
         > The slow start algorithm is used when cwnd < ssthresh, while the
         > congestion avoidance algorithm is used when cwnd > ssthresh.  When
         > cwnd and ssthresh are equal, the sender may use either slow start or
@@ -76,6 +77,8 @@ class TestCongUREBase(unittest.TestCase):
         # pylint: disable=invalid-name
         # trying to be in line with `unittest`
         """
+        Assert that the congestion state is in fast retransmit.
+
         > The TCP sender SHOULD use the "fast retransmit" algorithm to detect
         > and repair loss, based on incoming duplicate ACKs.  The fast
         > retransmit algorithm uses the arrival of 3 duplicate ACKs [...] as
@@ -86,7 +89,7 @@ class TestCongUREBase(unittest.TestCase):
     def assertNotInFastRetransmit(self, state):
         # pylint: disable=invalid-name
         # trying to be in line with `unittest`
-        """Reverse of self.assertInFastRetransmit()"""
+        """Reverse of `assertInFastRetransmit()`."""
         self.assertLess(state['dup_acks'], state['consts']['frthresh'])
 
     def get_ff_calls(self):
@@ -156,7 +159,7 @@ class TestCongUREABEDefaultInitTests(TestCongUREBase):
         self.assertEqual(state['consts']['cwnd_upper'], 2190)
         self.assertEqual(state['consts']['init_ssthresh'], 0xffff)
         self.assertEqual(state['consts']['frthresh'], 3)
-        # https://tools.ietf.org/html/rfc8511#section-3.1
+        # https://www.rfc-editor.org/info/rfc8511/#section-3.1
         beta_ecn = (state['consts']['abe_multiplier_numerator'] /
                     state['consts']['abe_multiplier_denominator'])
         self.assertAlmostEqual(beta_ecn, 0.8)
@@ -164,10 +167,12 @@ class TestCongUREABEDefaultInitTests(TestCongUREBase):
 
     def test_init(self):
         """
+        Test the initial congestion state.
+
         This is inherited from `congure_reno`, so it should be the same as
         in `tests/congure_reno`.
 
-        https://tools.ietf.org/html/rfc5681#section-3.1
+        See: https://www.rfc-editor.org/info/rfc5681/#section-3.1
 
         > IW, the initial value of cwnd, MUST be set using the following
         > guidelines as an upper bound.
@@ -196,10 +201,13 @@ class TestCongUREABEDefaultInitTests(TestCongUREBase):
 
 class TestCongUREABE(TestCongUREBase):
     """
+    Test cases for `congure_abe`.
+
     Most functionality should be the same as for `congure_reno`, except
     for the behavior of `report_ecn_ce`. So only test some basics from
-    `tests/congure_reno` and focus testing on `report_ecn_ce`
+    `tests/congure_reno` and focus testing on `report_ecn_ce`.
     """
+
     def setUp(self):
         super().setUp()
         res = self.shell.setup(0)
@@ -230,7 +238,13 @@ class TestCongUREABE(TestCongUREBase):
         # pylint: disable=invalid-name
         # name chosen to be in line with RFC
         """
-        See test_slow_start_increase_large_N() from `tests/congure_reno`
+        Test the slow start increase with N larger than SMSS.
+
+        This is inherited from `congure_reno`. During slow start, the
+        congestion window is increased by at most SMSS bytes per ACK, even
+        if the number of newly acknowledged bytes N exceeds SMSS.
+
+        See: https://www.rfc-editor.org/info/rfc5681/#section-3.1
         """
         state = self.cong_state()
         init_cwnd = state['cwnd']
@@ -252,8 +266,13 @@ class TestCongUREABE(TestCongUREBase):
 
     def test_enter_fast_retransmit(self):
         """
-        See self.test_enter_fast_retransmit_all_check_true() from
-        `tests/congure_reno`
+        Check that fast retransmit is entered if all conditions are true.
+
+        This is inherited from `congure_reno`. After three duplicate ACKs
+        that fulfill all conditions for a duplicate ACK, the fast retransmit
+        callback is expected to be called exactly once.
+
+        See: https://www.rfc-editor.org/info/rfc5681/#section-2
         """
         state = self.cong_state()
         self.assertEqual(0, self.get_ff_calls())
@@ -280,7 +299,9 @@ class TestCongUREABE(TestCongUREBase):
 
     def test_ecn_ce_small_flight_size(self):
         """
-        https://tools.ietf.org/html/rfc8511#section-3
+        Test the reaction to an ECN-CE with a small flight size.
+
+        See: https://www.rfc-editor.org/info/rfc8511/#section-3
 
         > As permitted by RFC 8311, this document specifies a sender-side
         > change to TCP where receipt of a packet with the ECN-Echo flag SHOULD
@@ -309,8 +330,10 @@ class TestCongUREABE(TestCongUREBase):
 
     def test_ecn_ce_large_flight_size(self):
         """
+        Test the reaction to an ECN-CE with a large flight size.
+
         Same as test_ecn_ce_small_flight_size, but with flight size
-        larger than (2 * SMSS / 0.8)
+        larger than (2 * SMSS / 0.8).
         """
         state = self.cong_state()
         beta_ecn = (state['consts']['abe_multiplier_numerator'] /

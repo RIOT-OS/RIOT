@@ -137,7 +137,6 @@ typedef struct gnrc_netif_ieee802154_mac_dev {
     event_t ev_tick;
     event_t ev_scan_timer;
     event_t ev_ack_timeout;
-    event_t ev_bh_request;
     event_t ev_radio;
     event_t ev_poll;
     event_t ev_assoc_res;

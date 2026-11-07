@@ -1,10 +1,8 @@
 /*
- * Copyright (C) 2020 chrysn
- *
- * This file is subject to the terms and conditions of the GNU Lesser
- * General Public License v2.1. See the file LICENSE in the top level
- * directory for more details.
+ * SPDX-FileCopyrightText: 2020 chrysn
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
+
 /**
  * @{
  *
@@ -158,6 +156,9 @@ static size_t _error_handler(coap_pkt_t *pdu, uint8_t *buf, size_t len, int err)
             case -ENOENT:
                 code = COAP_CODE_PATH_NOT_FOUND;
                 break;
+            case -EBADMSG:
+                code = COAP_CODE_BAD_REQUEST;
+                break;
             default:
                 code = COAP_CODE_INTERNAL_SERVER_ERROR;
         };
@@ -209,7 +210,7 @@ static ssize_t _get_file(coap_pkt_t *pdu, uint8_t *buf, size_t len,
     int err;
     uint32_t etag, size_total;
 
-    coap_block1_t block2 = { .szx = CONFIG_NANOCOAP_BLOCK_SIZE_EXP_MAX };
+    coap_block1_t block2 = { .szx = CONFIG_NANOCOAP_BLOCK_SIZE_MAX };
     {
         struct stat stat;
         if ((err = vfs_stat(request->namebuf, &stat)) < 0) {
@@ -218,7 +219,7 @@ static ssize_t _get_file(coap_pkt_t *pdu, uint8_t *buf, size_t len,
         size_total = stat.st_size;
         stat_etag(&stat, &etag);
     }
-    if (request->options.exists.block2 && !coap_get_block2(pdu, &block2)) {
+    if (request->options.exists.block2 && (coap_get_block2(pdu, &block2) < 0)) {
         return _error_handler(pdu, buf, len, COAP_CODE_BAD_OPTION);
     }
     if (request->options.exists.if_match &&
@@ -227,7 +228,9 @@ static ssize_t _get_file(coap_pkt_t *pdu, uint8_t *buf, size_t len,
     }
     if (request->options.exists.etag &&
         !memcmp(&etag, &request->options.etag, sizeof(etag))) {
-        _resp_init(pdu, buf, len, COAP_CODE_VALID);
+        if (_resp_init(pdu, buf, len, COAP_CODE_VALID)) {
+            return -1;
+        }
         coap_opt_add_opaque(pdu, COAP_OPT_ETAG, &etag, sizeof(etag));
         return coap_opt_finish(pdu, COAP_OPT_FINISH_NONE);
     }
@@ -237,13 +240,19 @@ static ssize_t _get_file(coap_pkt_t *pdu, uint8_t *buf, size_t len,
         return _error_handler(pdu, buf, len, fd);
     }
 
-    _resp_init(pdu, buf, len, COAP_CODE_CONTENT);
+    if (_resp_init(pdu, buf, len, COAP_CODE_CONTENT)) {
+        vfs_close(fd);
+        return -1;
+    }
     coap_opt_add_opaque(pdu, COAP_OPT_ETAG, &etag, sizeof(etag));
     coap_block_slicer_t slicer;
     _calc_szx2(pdu,
                5 + 1 + 1 /* reserve BLOCK2 size + payload marker + more */,
                &block2);
-    coap_block_slicer_init(&slicer, block2.blknum, coap_szx2size(block2.szx));
+    err = coap_block_slicer_init(&slicer, block2.blknum, coap_szx2size(block2.szx));
+    if (err) {
+        return _error_handler(pdu, buf, len, err);
+    }
     coap_opt_add_block2(pdu, &slicer, true);
 
     if (request->options.exists.block2) {
@@ -318,7 +327,7 @@ static ssize_t _put_file(coap_pkt_t *pdu, uint8_t *buf, size_t len,
         memmove(file + 2, file + 1, strlen(file + 1));
         *(file + 1) = '.';
     }
-    if (request->options.exists.block1 && !coap_get_block1(pdu, &block1)) {
+    if (request->options.exists.block1 && (coap_get_block1(pdu, &block1) < 0)) {
         ret = COAP_CODE_BAD_OPTION;
         goto unlink_on_error;
     }
@@ -394,11 +403,15 @@ static ssize_t _put_file(coap_pkt_t *pdu, uint8_t *buf, size_t len,
         _event_file(NANOCOAP_FILESERVER_PUT_FILE_END, request);
 
         stat_etag(&stat, &etag); /* Etag after write */
-        _resp_init(pdu, buf, len, create ? COAP_CODE_CREATED : COAP_CODE_CHANGED);
+        if (_resp_init(pdu, buf, len, create ? COAP_CODE_CREATED : COAP_CODE_CHANGED)) {
+            return -1;
+        }
         coap_opt_add_opaque(pdu, COAP_OPT_ETAG, &etag, sizeof(etag));
     }
     else {
-        _resp_init(pdu, buf, len, COAP_CODE_CONTINUE);
+        if (_resp_init(pdu, buf, len, COAP_CODE_CONTINUE)) {
+            return -1;
+        }
         block1.more = true; /* resource is created atomically */
         coap_opt_add_block1_control(pdu, &block1);
     }
@@ -436,7 +449,9 @@ static ssize_t _delete_file(coap_pkt_t *pdu, uint8_t *buf, size_t len,
     if ((ret = vfs_unlink(request->namebuf)) < 0) {
         return _error_handler(pdu, buf, len, ret);
     }
-    _resp_init(pdu, buf, len, COAP_CODE_DELETED);
+    if (_resp_init(pdu, buf, len, COAP_CODE_DELETED)) {
+        return -1;
+    }
     return coap_opt_finish(pdu, COAP_OPT_FINISH_NONE);
 }
 #endif
@@ -467,9 +482,9 @@ static ssize_t _get_directory(coap_pkt_t *pdu, uint8_t *buf, size_t len,
     int err;
     vfs_DIR dir;
     coap_block_slicer_t slicer;
-    coap_block1_t block2 = { .szx = CONFIG_NANOCOAP_BLOCK_SIZE_EXP_MAX };
-    if (request->options.exists.block2 && !coap_get_block2(pdu, &block2)) {
-        return _error_handler(pdu, buf, len, COAP_OPT_FINISH_NONE);
+    coap_block1_t block2 = { .szx = CONFIG_NANOCOAP_BLOCK_SIZE_MAX };
+    if (request->options.exists.block2 && (coap_get_block2(pdu, &block2) < 0)) {
+        return _error_handler(pdu, buf, len, COAP_CODE_BAD_OPTION);
     }
     if ((err = vfs_opendir(&dir, request->namebuf)) < 0) {
         return _error_handler(pdu, buf, len, err);
@@ -479,12 +494,18 @@ static ssize_t _get_directory(coap_pkt_t *pdu, uint8_t *buf, size_t len,
     }
     DEBUG("nanocoap_fileserver: Serving directory listing\n");
 
-    _resp_init(pdu, buf, len, COAP_CODE_CONTENT);
+    if (_resp_init(pdu, buf, len, COAP_CODE_CONTENT)) {
+        vfs_closedir(&dir);
+        return -1;
+    }
     coap_opt_add_format(pdu, COAP_FORMAT_LINK);
     _calc_szx2(pdu,
                5 + 1 /* reserve BLOCK2 size + payload marker */,
                &block2);
-    coap_block_slicer_init(&slicer, block2.blknum, coap_szx2size(block2.szx));
+    err = coap_block_slicer_init(&slicer, block2.blknum, coap_szx2size(block2.szx));
+    if (err) {
+        return _error_handler(pdu, buf, len, err);
+    }
     coap_opt_add_block2(pdu, &slicer, true);
 
     size_t root_len = root ? strlen(root) : 0;
@@ -535,7 +556,9 @@ static ssize_t _put_directory(coap_pkt_t *pdu, uint8_t *buf, size_t len,
         if (request->options.exists.if_match && request->options.if_match_len) {
             return _error_handler(pdu, buf, len, COAP_CODE_PRECONDITION_FAILED);
         }
-        _resp_init(pdu, buf, len, COAP_CODE_CHANGED);
+        if (_resp_init(pdu, buf, len, COAP_CODE_CHANGED)) {
+            return -1;
+        }
     }
     else {
         if (request->options.exists.if_match) {
@@ -545,7 +568,9 @@ static ssize_t _put_directory(coap_pkt_t *pdu, uint8_t *buf, size_t len,
         if ((err = vfs_mkdir(request->namebuf, 0777)) < 0) {
             return _error_handler(pdu, buf, len, err);
         }
-        _resp_init(pdu, buf, len, COAP_CODE_CREATED);
+        if (_resp_init(pdu, buf, len, COAP_CODE_CREATED)) {
+            return -1;
+        }
     }
     return coap_opt_finish(pdu, COAP_OPT_FINISH_NONE);
 }
@@ -571,7 +596,9 @@ static ssize_t _delete_directory(coap_pkt_t *pdu, uint8_t *buf, size_t len,
             return _error_handler(pdu, buf, len, err);
         }
     }
-    _resp_init(pdu, buf, len, COAP_CODE_DELETED);
+    if (_resp_init(pdu, buf, len, COAP_CODE_DELETED)) {
+        return -1;
+    }
     return coap_opt_finish(pdu, COAP_OPT_FINISH_NONE);
 }
 #endif

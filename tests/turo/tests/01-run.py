@@ -1,10 +1,7 @@
 #! /usr/bin/env python3
 
-# Copyright (C) 2021 HAW Hamburg
-#
-# This file is subject to the terms and conditions of the GNU Lesser
-# General Public License v2.1. See the file LICENSE in the top level
-# directory for more details.
+# SPDX-FileCopyrightText: 2021 HAW Hamburg
+# SPDX-License-Identifier: LGPL-2.1-only
 
 import logging
 import sys
@@ -13,6 +10,8 @@ import unittest
 from riotctrl.ctrl import RIOTCtrl
 from riotctrl.shell import ShellInteraction
 from riotctrl.shell.json import RapidJSONShellInteractionParser
+
+from testrunner.spawn import flush_child
 
 
 class TestTuroBase(unittest.TestCase):
@@ -25,6 +24,7 @@ class TestTuroBase(unittest.TestCase):
         cls.ctrl.start_term()
         if cls.DEBUG:
             cls.ctrl.term.logfile = sys.stdout
+        flush_child(cls.ctrl.term)
         cls.shell = ShellInteraction(cls.ctrl)
         cls.json_parser = RapidJSONShellInteractionParser()
         cls.logger = logging.getLogger(cls.__name__)

@@ -1,7 +1,7 @@
 include ../Makefile.pkg_common
 
 # The following boards are known to fail or have not been tested.
-BOARD_BLACKLIST :=  arduino-duemilanove \
+BOARDS_UNSUPPORTED :=  arduino-duemilanove \
                     arduino-leonardo \
                     arduino-mega2560 \
                     arduino-nano \

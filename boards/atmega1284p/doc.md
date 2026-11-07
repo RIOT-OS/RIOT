@@ -10,6 +10,7 @@ it. (An ISP programmer will be needed to program it; or to program a bootloader
 to subsequently allow programming via UART.)
 
 ### MCU
+
 | MCU           | ATmega1284p                            |
 |:------------- |:-------------------------------------- |
 | Family        | AVR/ATmega                             |
@@ -28,8 +29,9 @@ to subsequently allow programming via UART.)
 
 ### Pinout
 
-\htmlonly<style>div.image img[src="http://i.imgur.com/ayagBbM.png"]{width:50%;}</style>\endhtmlonly
-@image html "http://i.imgur.com/ayagBbM.png" "Pinout of the ATmega1284P"<br>
+<img src="http://i.imgur.com/ayagBbM.png" width="50%" />
+<img src="http://i.imgur.com/ayagBbM.png" alt="Pinout of the ATmega1284P" />
+<br>
 
 The pinout image was posted in the
 [Arduino Forum](https://forum.arduino.cc/index.php?topic=322745.0).
@@ -44,9 +46,9 @@ fuse is set, so that the clock is divided down to 1MHz. By disabling the
 `CKDIV8` fuse the clock will operate at 8MHz. This is highly encouraged, and
 can be done with:
 
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+```shell
 avrdude -c atmelice -p m1284p -B 32 -U lfuse:w:0xc2:m
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+```
 
 (Replace `atmelice` with the programmer you are using. The -B 32 might be
 needed for some programmers to successfully communicate with ATmegas clocked at
@@ -82,17 +84,23 @@ needed. Connect the programmer as follows:
 The tool `avrdude` needs to be installed. When using the Atmel ICE for
 connected via JTAG for programming, running
 
-    make BOARD=atmega1284p flash
+```shell
+make BOARD=atmega1284p flash
+```
 
 will take care of everything. To use the programmer `<FOOBAR>` instead, run
 
-    make BOARD=atmega1284p PROGRAMMER=<FOOBAR> flash
+```shell
+make BOARD=atmega1284p PROGRAMMER=<FOOBAR> flash
+```
 
 ## Serial Terminal
 
 Connect a TTL adapter with pins 14/RXD0 and 15/TXD0 an run
 
-    make BOARD=atmega1284p term
+```shell
+make BOARD=atmega1284p term
+```
 
 Please note that the supply voltage should be compatible with the logic level of
 the TTL adapter. Usually everything between 3.3 V and 5 V should work.
@@ -107,7 +115,9 @@ Once the Atmel ICE is correctly connected, the ATmega1284P has the JTAG
 interface enabled, and the required software is installed, debugging can be
 started using
 
-    make debug
+```shell
+BOARD=atmega1284p make debug
+```
 
 @note       If you are using a different debugger than the Atmel ICE, you have
             to export the `AVR_DEBUGDEVICE` environment variable to the required
@@ -116,7 +126,7 @@ started using
             connected via USB, you also need to export `AVR_DEBUGINTERFACE` to
             the correct value.
 
-#### Software Requirements
+### Software Requirements
 
 In order to debug you'll need an GDB version with AVR support and
 [AVaRICE](https://github.com/avrdudes/avarice).

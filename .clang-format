@@ -1,10 +1,9 @@
 # SPDX-License-Identifier: GPL-2.0
 #
-# clang-format configuration file. Intended for clang-format >= 11.
+# clang-format configuration file. Intended for clang-format >= 18.
 #
 # For more information, see:
 #
-#   Documentation/dev-tools/clang-format.rst
 #   https://clang.llvm.org/docs/ClangFormat.html
 #   https://clang.llvm.org/docs/ClangFormatStyleOptions.html
 #
@@ -13,26 +12,33 @@
 ---
 AccessModifierOffset: -4
 AlignAfterOpenBracket: Align
-AlignConsecutiveAssignments:
-  PadOperators: true
-  AlignCompound: true
+AlignConsecutiveAssignments: false
 AlignConsecutiveDeclarations: false
 AlignConsecutiveMacros: AcrossEmptyLinesAndComments
-AlignEscapedNewlines: Left
+# escaped newlines are not aligned (a `\` directly follows the expression)
+AlignEscapedNewlines: DontAlign
 AlignOperands: true
 AlignTrailingComments: true
 AllowAllParametersOfDeclarationOnNextLine: false
-AllowShortBlocksOnASingleLine: false
+# "Indentation and braces": empty `{}` braces stay on the same line
+# (e.g. `while (HW_STATUS != STATUS_OK) {}`), non-empty blocks are never
+# merged
+AllowShortBlocksOnASingleLine: Empty
 AllowShortCaseLabelsOnASingleLine: false
 AllowShortFunctionsOnASingleLine: None
 AllowShortIfStatementsOnASingleLine: Never
-AllowShortLoopsOnASingleLine: false
+# "Indentation and braces": braces are added to single-statement bodies of
+# if/else/for/while/do by InsertBraces below, so this only affects empty
+# statements (`while (x);`) and one-line blocks that already have braces
+AllowShortLoopsOnASingleLine: true
 AlwaysBreakAfterDefinitionReturnType: None
 AlwaysBreakAfterReturnType: None
 AlwaysBreakBeforeMultilineStrings: false
 AlwaysBreakTemplateDeclarations: false
 BinPackArguments: true
 BinPackParameters: true
+# "Bit fields": space before and after the colon (e.g. `uint8_t a : 1`)
+BitFieldColonSpacing: Both
 BraceWrapping:
   AfterClass: false
   AfterControlStatement: false
@@ -56,8 +62,17 @@ BreakBeforeTernaryOperators: false
 BreakConstructorInitializersBeforeComma: false
 BreakConstructorInitializers: BeforeComma
 BreakAfterJavaFieldAnnotations: false
+# do not break between adjacent string literals: an intra-argument break makes
+# clang-format force every following argument onto its own line;
+# the trade-off is that a concatenation that
+# does not fit is kept on one line and may exceed the column limit
+BreakAdjacentStringLiterals: false
 BreakStringLiterals: false
-ColumnLimit: 0
+# "Line length": the coding conventions aim for 80 characters per line with an
+# absolute maximum of 100. clang-format can only enforce the hard maximum, so
+# set the limit to 100 and leave lines up to 100 characters untouched (the
+# 80 character target is a soft guideline for humans, not the formatter)
+ColumnLimit: 100
 CommentPragmas: '^ IWYU pragma:'
 CompactNamespaces: false
 ConstructorInitializerAllOnOneLineOrOnePerLine: false
@@ -69,41 +84,67 @@ DisableFormat: false
 ExperimentalAutoDetectBinPacking: false
 FixNamespaceComments: false
 
-IncludeBlocks: Preserve
+IncludeBlocks: Regroup
 IncludeCategories:
-  - Regex: '.*'
+  - Regex: '^<.*>$'
     Priority: 1
-IncludeIsMainRegex: '(Test)?$'
+  - Regex: '^".*"'
+    Priority: 2
+IncludeIsMainRegex: '^$'
 IndentCaseLabels: false
 IndentGotoLabels: false
 IndentPPDirectives: AfterHash
 PPIndentWidth: 2
 IndentWidth: 4
 IndentWrappedFunctionNames: false
+# "Indentation and braces": always use curly braces, even for one-line
+# blocks
+InsertBraces: true
+# all files end with exactly one newline
+InsertNewlineAtEOF: true
 JavaScriptQuotes: Leave
 JavaScriptWrapImports: true
 KeepEmptyLinesAtTheStartOfBlocks: false
+# "Line endings": all line endings shall be LF
+LineEnding: LF
 MacroBlockBegin: ''
 MacroBlockEnd: ''
 MaxEmptyLinesToKeep: 1
 NamespaceIndentation: None
 
-# Taken from git's rules
-PenaltyBreakAssignment: 10
-PenaltyBreakBeforeFirstCallParameter: 30
+# Adapted from git's rules
+PenaltyBreakAssignment: 100
+PenaltyBreakBeforeFirstCallParameter: 100
 PenaltyBreakComment: 10
 PenaltyBreakFirstLessLess: 0
 PenaltyBreakString: 10
+# penalty for exceeding the column limit; a low value lets clang-format
+# overflow ColumnLimit instead of wrapping, so keep it high enough that the
+# 100 character hard maximum is actually enforced (lines up to 100 characters
+# are left untouched)
 PenaltyExcessCharacter: 100
 PenaltyReturnTypeOnItsOwnLine: 60
 
 PointerAlignment: Right
-ReflowComments: false
-SortIncludes: false
+# re-wrap/indent comments so that multi-line trailing comments (e.g. enum
+# members with `/**< ... */`) stay aligned when the code next to them is
+# re-formatted; clang-format still does not add leading `*` or fix `*/`
+ReflowComments: true
+# remove superfluous semicolons (e.g. after an empty brace block)
+RemoveSemicolon: true
+# do not format macro definition bodies: clang-format would expand brace
+# initializer macros (e.g. `#define FOO { 1, 2 }`) into multi-line backslash
+# continuations and would also split `do { ... } while (0)` bodies, which
+# destroys the intended one-line form
+SkipMacroDefinitionBody: true
+SortIncludes: true
 SortUsingDeclarations: false
 SpaceAfterCStyleCast: false
 SpaceAfterTemplateKeyword: true
 SpaceBeforeAssignmentOperators: true
+# This results in consistently having no space after a
+# type cast, even when a braced initializer list comes
+SpaceBeforeCpp11BracedList: false
 SpaceBeforeCtorInitializerColon: true
 SpaceBeforeInheritanceColon: true
 SpaceBeforeParens: ControlStatementsExceptForEachMacros
@@ -118,4 +159,3 @@ SpacesInSquareBrackets: false
 Standard: Cpp03
 TabWidth: 4
 UseTab: Never
-QualifierAlignment: Left

@@ -1,9 +1,6 @@
 /*
- * Copyright (C) 2019 Freie Universität Berlin
- *
- * This file is subject to the terms and conditions of the GNU Lesser
- * General Public License v2.1. See the file LICENSE in the top level
- * directory for more details.
+ * SPDX-FileCopyrightText: 2019 Freie Universität Berlin
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
 
 /**
@@ -171,11 +168,11 @@ static const struct ble_gatt_svc_def _gatt_svr_svcs[] =
 
 static void _purge_buffer(void)
 {
-    tsrb_clear(&stdin_isrpipe.tsrb);
+    stdio_clear_stdin();
 
 #if IS_USED(MODULE_SHELL)
     /* send Ctrl-C to the shell to reset the input */
-    isrpipe_write_one(&stdin_isrpipe, '\x03');
+    stdio_rx_write_one('\x03');
 #endif
 
     tsrb_clear(&_tsrb_stdout);
@@ -290,7 +287,7 @@ static int gatt_svr_chr_access_stdin(
     /* read sent data */
     int rc = ble_hs_mbuf_to_flat(ctxt->om, _stdin_read_buf, sizeof(_stdin_read_buf), &om_len);
 
-    isrpipe_write(&stdin_isrpipe, _stdin_read_buf, om_len);
+    stdio_rx_write(_stdin_read_buf, om_len);
 
     return rc;
 }

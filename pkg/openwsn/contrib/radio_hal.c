@@ -1,9 +1,6 @@
 /*
- * Copyright (C) 2020 Inria
- *
- * This file is subject to the terms and conditions of the GNU Lesser
- * General Public License v2.1. See the file LICENSE in the top level
- * directory for more details.
+ * SPDX-FileCopyrightText: 2020 Inria
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
 
 /**
@@ -17,7 +14,6 @@
  * @}
  */
 #include <stdint.h>
-#include <stdatomic.h>
 #include <sys/uio.h>
 
 #include "leds.h"
@@ -27,6 +23,7 @@
 #include "eui64.h"
 
 #include "byteorder.h"
+#include "atomic_utils.h"
 
 #include "luid.h"
 #include "net/ieee802154.h"
@@ -43,7 +40,7 @@ openwsn_radio_t openwsn_radio;
 /* stores the event capture time */
 static PORT_TIMER_WIDTH _txrx_event_capture_time = 0;
 /* set if frame with valid CRC is received, false otherwise */
-static atomic_bool _valid_crc = true;
+static uint32_t _valid_crc = true;
 
 void _idmanager_addr_override(void)
 {
@@ -96,13 +93,13 @@ static void _hal_radio_cb(ieee802154_dev_t *dev, ieee802154_trx_ev_t status)
         openwsn_radio.endFrame_cb(_txrx_event_capture_time);
         break;
     case IEEE802154_RADIO_INDICATION_CRC_ERROR:
-        _valid_crc = false;
+        atomic_store_u32(&_valid_crc, false);
         ieee802154_radio_request_set_idle(openwsn_radio.dev, true);
         while (ieee802154_radio_confirm_set_idle(openwsn_radio.dev) == -EAGAIN) {}
         openwsn_radio.endFrame_cb(_txrx_event_capture_time);
         break;
     case IEEE802154_RADIO_INDICATION_RX_DONE:
-        _valid_crc = true;
+        atomic_store_u32(&_valid_crc, true);
         ieee802154_radio_request_set_idle(openwsn_radio.dev, true);
         while (ieee802154_radio_confirm_set_idle(openwsn_radio.dev) == -EAGAIN) {}
         openwsn_radio.endFrame_cb(_txrx_event_capture_time);
@@ -153,8 +150,8 @@ int openwsn_radio_init(void *radio_dev)
 
     /* Configure PHY settings (channel, TX power) */
     ieee802154_phy_conf_t conf =
-    { .channel = CONFIG_IEEE802154_DEFAULT_CHANNEL,
-      .page = CONFIG_IEEE802154_DEFAULT_CHANNEL,
+    { .phy_mode = CONFIG_IEEE802154_DEFAULT_PHY_MODE,
+      .channel = CONFIG_IEEE802154_DEFAULT_CHANNEL,
       .pow = CONFIG_IEEE802154_DEFAULT_TXPOWER };
 
     ieee802154_radio_config_phy(dev, &conf);
@@ -187,8 +184,8 @@ void radio_setFrequency(uint8_t frequency, radio_freq_t tx_or_rx)
     (void)tx_or_rx;
 
     ieee802154_phy_conf_t conf =
-    { .channel = frequency,
-      .page = CONFIG_IEEE802154_DEFAULT_CHANNEL,
+    { .phy_mode = CONFIG_IEEE802154_DEFAULT_PHY_MODE,
+      .channel = frequency,
       .pow = CONFIG_IEEE802154_DEFAULT_TXPOWER };
 
     ieee802154_radio_config_phy(openwsn_radio.dev, &conf);
@@ -226,7 +223,7 @@ void radio_rfOff(void)
 void radio_loadPacket(uint8_t *packet, uint16_t len)
 {
     /* OpenWSN `len` accounts for the FCS field which is set by default by
-       netdev, so remove from the actual packet `len` */
+       the Radio HAL, so remove from the actual packet `len` */
     iolist_t pkt = {
         .iol_base = (void *)packet,
         .iol_len = (size_t)(len - IEEE802154_FCS_LEN),
@@ -318,5 +315,5 @@ void radio_getReceivedFrame(uint8_t *bufRead,
     /* get rssi, lqi & crc */
     *rssi = ieee802154_rssi_to_dbm(rx_info.rssi);
     *lqi = rx_info.lqi;
-    *crc = _valid_crc ? 1 : 0;
+    *crc = atomic_load_u32(&_valid_crc) ? 1 : 0;
 }

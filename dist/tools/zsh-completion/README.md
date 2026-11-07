@@ -10,18 +10,11 @@ the CI are (intentionally) not added.
 
 1. Copy the `zsh-riot.zsh` script where you can find it,
    e.g. `cp zsh-riot.zsh ~/.zsh-riot.zsh`
-2. Hook up the custom RIOT specific make completion in `.zshrc` and use that
-   instead of the default `make` completion if and only if the working
-   directory is inside a RIOT repository. This can be done by adding the
-   following snippet:
+2. Source it after the completion definition of `make` is loaded, e.g. at the
+   end of your `~/.zshrc`:
 
 ``` sh
+# ~/.zsh
+# [...]
 source ~/.zsh-riot.zsh
-compdef '
-if git rev-parse --is-inside-work-tree &> /dev/null && [[ -e "$(git rev-parse --show-toplevel)/.murdock" ]]; then
-  _riot
-else
-  _make
-fi
-' make
 ```

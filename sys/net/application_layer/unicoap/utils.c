@@ -1,30 +1,235 @@
 /*
- * Copyright (C) 2024-2025 Carl Seifert
- * Copyright (C) 2024-2025 TU Dresden
- *
- * This file is subject to the terms and conditions of the GNU Lesser General
- * Public License v2.1. See the file LICENSE in the top level directory for
- * more details.
+ * SPDX-FileCopyrightText: 2024-2026 Carl Seifert
+ * SPDX-FileCopyrightText: 2024-2026 TU Dresden
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
 
 /**
  * @file
  * @ingroup net_unicoap
  * @brief   Buffer and string tools
- * @author  Carl Seifert <carl.seifert1@mailbox.tu-dresden.de>
+ * @author  Carl Seifert <carl.seifert@tu-dresden.de>
  */
 
+#include <stdlib.h>
 #include <errno.h>
 #include <stdbool.h>
 
 #include "iolist.h"
-
-#include "net/unicoap/options.h"
 #include "net/unicoap/message.h"
+#include "net/unicoap/options.h"
 
 #define ENABLE_DEBUG CONFIG_UNICOAP_DEBUG_LOGGING
 #include "debug.h"
 #include "private.h"
+
+size_t unicoap_path_component_count(const unicoap_pathspec_t* path)
+{
+    size_t count = 0;
+    assert(path);
+    if (!path->_components) {
+        /* Root */
+        return 0;
+    }
+
+    /* Disallow first component to be NULL. For empty path (root), _components is supposed to
+     * be NULL. */
+    assert(path->_components[0]);
+
+    for (const char** p = path->_components; *p; p += 1) {
+        count += 1;
+    }
+    return count;
+}
+
+void unicoap_print_path(const unicoap_pathspec_t* path)
+{
+    assert(path);
+    if (!path->_components) {
+        printf("/");
+        return;
+    }
+
+    /* Disallow first component to be NULL. For empty path (root), _components is supposed to
+     * be NULL. */
+    assert(path->_components[0]);
+
+    for (const char** p = path->_components; *p; p += 1) {
+        printf("/%s", *p);
+    }
+}
+
+ssize_t unicoap_path_stringify(const unicoap_pathspec_t* path, char* buffer, size_t capacity)
+{
+    if (capacity == 0) {
+        return -ENOBUFS;
+    }
+    if (!path->_components) {
+        *buffer = '/';
+        return 1;
+    }
+
+    /* Disallow first component to be NULL. For empty path (root), _components is supposed to
+     * be NULL. */
+    assert(path->_components[0]);
+
+    size_t og_capacity = capacity;
+    for (const char** component = path->_components; *component; component += 1) {
+        size_t length = strlen(*component);
+        if (capacity < (length + 1)) {
+            return -ENOBUFS;
+        }
+        capacity -= length + 1;
+        *buffer = '/';
+        buffer += 1;
+        memcpy(buffer, *component, length);
+        buffer += length;
+    }
+
+    return og_capacity - capacity;
+}
+
+bool unicoap_path_is_equal(const unicoap_pathspec_t* lhs, const unicoap_pathspec_t* rhs)
+{
+    assert(lhs);
+    assert(rhs);
+
+    /* If one is a root path, the other must be, too. */
+    if ((!lhs->_components && !rhs->_components)) {
+        return true;
+    }
+    /* If just one of them is a root path, they cannot be equal. */
+    if (!lhs->_components || !rhs->_components) {
+        return false;
+    }
+
+    const char** l = lhs->_components;
+    const char** r = rhs->_components;
+
+    while (*l && *r) {
+        if (strcmp(*l, *r) != 0) {
+            break;
+        }
+        l += 1;
+        r += 1;
+    }
+
+    /* If we reached the end of both paths simultaneously (NULL), they are equal. */
+    return !*l && !*r;
+}
+
+bool unicoap_path_matches_string(const unicoap_pathspec_t* path,
+                                 const char* string, size_t string_length, bool match_subtree)
+{
+    assert(path);
+    assert(string);
+
+    char* cursor = (char*)string;
+
+    if (path->_components) {
+        /* Disallow first component to be NULL. For empty path (root), _components is supposed to
+         * be NULL. */
+        assert(path->_components[0]);
+
+        for (const char** component = path->_components; *component; component += 1) {
+            size_t path_component_length = strlen(*component);
+
+            /* Ignore duplicate slashes */
+            while (*cursor == '/') {
+                cursor += 1;
+                string_length -= 1;
+            }
+
+            if (string_length == 0) {
+                return false;
+            }
+
+            /* Find end of string component */
+            size_t string_component_length = string_length;
+            for (size_t i = 0; i < string_length; i += 1) {
+                if (cursor[i] == '/') {
+                    string_component_length = i;
+                    break;
+                }
+            }
+
+            if (path_component_length != string_component_length) {
+                return false;
+            }
+
+            if (strncmp(*component, cursor, path_component_length) != 0) {
+                return false;
+            }
+
+            cursor += string_component_length;
+            string_length -= string_component_length;
+        }
+    }
+
+    if (match_subtree) {
+        /* There may be more path components in the string options.
+         * But this is fine as subpaths are allowed. */
+        return true;
+    }
+    else {
+        /* Make sure we read all path components in the string, i.e., the actual path is not longer
+         * than the given path's. */
+        for (size_t i = 0; i < string_length; i += 1) {
+            if (cursor[i] != '/') {
+                return false;
+            }
+        }
+        return true;
+    }
+}
+
+bool unicoap_path_matches_options(const unicoap_pathspec_t* path,
+                                  const unicoap_options_t* options, bool match_subtree)
+{
+    assert(path);
+    assert(options);
+    assert(options->entries->data);
+    unicoap_options_iterator_t iterator;
+    /* Disqualifying the const here is fine as the iterator is only used locally and options
+     * are not manipulated. As we only have one iterator concept for both mutable and read-only
+     * borrowing access patterns, this is the only way to go. */
+    unicoap_options_iterator_init(&iterator, (unicoap_options_t*)options);
+
+    const char* uri_component = NULL;
+
+    if (path->_components) {
+        /* Disallow first component to be NULL. For empty path (root), _components is supposed to
+         * be NULL. */
+        assert(path->_components[0]);
+
+        for (const char** component = path->_components; *component; component += 1) {
+            size_t path_component_length = strlen(*component);
+
+            int res = -1;
+            if ((res = unicoap_options_get_next_uri_path_component(&iterator, &uri_component)) < 0) {
+                return false;
+            }
+
+            if (path_component_length != (size_t)res) {
+                return false;
+            }
+
+            if (strncmp(*component, uri_component, path_component_length) != 0) {
+                return false;
+            }
+        }
+    }
+
+    if (match_subtree) {
+        /* There may be more Uri-Path options. But this is fine as subpaths are allowed. */
+        return true;
+    }
+    else {
+        /* Make sure we read all options, i.e., the actual path is not longer than the given
+         * paths's. */
+        return unicoap_options_get_next_uri_path_component(&iterator, &uri_component) == -1;
+    }
+}
 
 static inline void iolist_init(iolist_t* iolist, uint8_t* buffer, size_t size, iolist_t* next)
 {
@@ -156,7 +361,7 @@ int unicoap_pdu_buildv_options_and_payload(uint8_t* header, size_t header_size,
     iolist_init(iolists, header, header_size, NULL);
 
     iolist_t* element = iolists;
-    if (message->options && message->options->option_count > 0) {
+    if (message->options && unicoap_message_options_size(message) > 0) {
         element->iol_next = element + 1;
         element += 1;
         iolist_init(element, unicoap_message_options_data(message),
@@ -181,7 +386,7 @@ ssize_t unicoap_pdu_build_options_and_payload(uint8_t* pdu, size_t capacity,
     assert(pdu);
     assert(message);
 
-    if (message->options && message->options->option_count > 0) {
+    if (message->options && unicoap_message_options_size(message) > 0) {
         if (capacity < unicoap_message_options_size(message)) {
             return -ENOBUFS;
         }
@@ -207,7 +412,7 @@ ssize_t unicoap_pdu_build_options_and_payload(uint8_t* pdu, size_t capacity,
     }
 }
 
-bool unicoap_message_is_response(uint8_t code)
+bool unicoap_message_code_is_response(uint8_t code)
 {
     switch (unicoap_code_class(code)) {
     case UNICOAP_CODE_CLASS_RESPONSE_SUCCESS:
@@ -217,6 +422,29 @@ bool unicoap_message_is_response(uint8_t code)
 
     default:
         return false;
+    }
+}
+
+unicoap_status_t unicoap_response_status_from_errno(int error) {
+    int e = abs(error);
+    if (e == ENOTSUP || e == EOPNOTSUPP) {
+        return UNICOAP_STATUS_NOT_IMPLEMENTED;
+    } else if (e == EBADMSG || e == EINVAL || e == ERANGE) {
+        return UNICOAP_STATUS_BAD_REQUEST;
+    } else if (e == ENOMSG) {
+        return UNICOAP_STATUS_REQUEST_ENTITY_INCOMPLETE;
+    } else if (e == EACCES) {
+        return UNICOAP_STATUS_FORBIDDEN;
+    } else if (e == EFAULT || e == ENOENT || e == ENODEV || e == ENXIO) {
+        return UNICOAP_STATUS_PATH_NOT_FOUND;
+    } else if (e == EMSGSIZE) {
+        return UNICOAP_STATUS_REQUEST_ENTITY_TOO_LARGE;
+    } else if (e == EADDRNOTAVAIL || e == EAGAIN || e == EBUSY || e == ENETDOWN ||
+        e == ETIMEDOUT || e == EWOULDBLOCK
+    ) {
+        return UNICOAP_STATUS_SERVICE_UNAVAILABLE;
+    } else {
+        return UNICOAP_STATUS_INTERNAL_SERVER_ERROR;
     }
 }
 
@@ -428,10 +656,10 @@ const char* unicoap_string_from_option_number(unicoap_option_number_t number)
     }
 }
 
-int unicoap_print_code(uint8_t code, char* string)
+int unicoap_print_code(uint8_t code)
 {
-    return sprintf(string, UNICOAP_CODE_CLASS_DETAIL_FORMAT, unicoap_code_class(code),
-                   unicoap_code_detail(code));
+    return printf(UNICOAP_CODE_CLASS_DETAIL_FORMAT, unicoap_code_class(code),
+                  unicoap_code_detail(code));
 }
 
 bool unicoap_response_is_optional(unicoap_options_t* options, unicoap_status_t status)
@@ -466,5 +694,112 @@ void unicoap_options_dump_all(const unicoap_options_t* options)
             printf("%02X", value[i]);
         }
         printf(">\n");
+    }
+}
+
+void unicoap_options_print_uri_path(const unicoap_options_t* options)
+{
+    assert(options);
+    unicoap_options_iterator_t iterator;
+    /* Disqualifying the const here is fine as the iterator is only used locally and options
+     * are not manipulated. As we only have one iterator concept for both mutable and read-only
+     * borrowing access patterns, this is the only way to go. */
+    unicoap_options_iterator_init(&iterator, (unicoap_options_t*)options);
+
+    const char* uri_component = NULL;
+    int res = -2;
+    while ((res = unicoap_options_get_next_uri_path_component(&iterator, &uri_component)) >= 0) {
+        printf("/%.*s", (int)res, uri_component);
+    }
+
+    if (res == -2) {
+        /* Root path, so no Uri-Path options. */
+        printf("/");
+    }
+}
+
+void unicoap_print_protocols(unicoap_proto_set_t protocols)
+{
+    if (likely(protocols == UNICOAP_PROTOCOLS_ALLOW_ALL)) {
+        printf("<all>");
+    }
+    else {
+        printf("[ ");
+        for (unicoap_proto_t p = 1; p < (sizeof(unicoap_proto_t) * 8); p += 1) {
+            if (protocols & UNICOAP_PROTOCOL_FLAG(p)) {
+                printf("%s ", unicoap_string_from_proto(p));
+            }
+        }
+        printf("]");
+    }
+}
+
+void unicoap_print_methods(unicoap_method_set_t methods)
+{
+    printf("[ ");
+    for (unicoap_method_t m = 1; m < (sizeof(unicoap_method_t) * 8); m += 1) {
+        if (methods & UNICOAP_METHOD_FLAG(m)) {
+            printf("%s ", unicoap_string_from_method(m));
+        }
+    }
+    printf("]");
+}
+
+void unicoap_print_resource_flags(unicoap_resource_flags_t flags)
+{
+    printf("[ ");
+    if (flags & UNICOAP_RESOURCE_FLAG_RELIABLE) {
+        printf("RELIABLE ");
+    }
+    if (flags & UNICOAP_RESOURCE_FLAG_MATCH_SUBTREE) {
+        printf("MATCH_SUBTREE ");
+    }
+    printf("]");
+}
+
+void unicoap_print_resource(const unicoap_resource_t* resource)
+{
+    printf("<");
+    unicoap_print_path(&resource->path);
+    printf(" methods=");
+    unicoap_print_methods(resource->methods);
+    printf(" protocols=");
+    unicoap_print_protocols(resource->protocols);
+    printf(" flags=");
+    unicoap_print_resource_flags(resource->flags);
+    printf(">");
+}
+
+void unicoap_print_request_flags(unicoap_request_flags_t flags)
+{
+    printf("[ ");
+    if (flags & UNICOAP_REQUEST_FLAG_RELIABLE) {
+        printf("RELIABLE ");
+    }
+    printf("]");
+}
+
+void unicoap_assist_emit_diagnostic_missing_driver(unicoap_proto_t proto)
+{
+    if (IS_ACTIVE(CONFIG_UNICOAP_ASSIST)) {
+        switch (proto) {
+        case UNICOAP_PROTO_UDP:
+            unicoap_assist(API_ERROR("CoAP over UDP driver missing")
+                               FIXIT("USEMODULE += unicoap_driver_udp"));
+            break;
+
+        case UNICOAP_PROTO_DTLS:
+            unicoap_assist(API_ERROR("CoAP over DTLS driver missing")
+                               FIXIT("USEMODULE += unicoap_driver_dtls"));
+            break;
+
+        case UNICOAP_PROTO_SLIPMUX:
+            unicoap_assist(API_ERROR("CoAP over Slipmux driver missing")
+                               FIXIT("USEMODULE += unicoap_driver_slipmux"));
+            break;
+
+        default:
+            break;
+        }
     }
 }

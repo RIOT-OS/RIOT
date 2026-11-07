@@ -6,11 +6,15 @@
 
 The STM32F030C8 based Bluepill is a very cheap breakout board for the STM32F030C8 MCU.
 
+\warning Be aware that *a lot* of these boards have fake STM32 chips,
+which may or may not work with RIOT.
+
 ## Hardware
 
 ![STM32F030C8 based Bluepill](https://camo.githubusercontent.com/f33ec5f4068e1dcc4c549dbe3dc70d2ed784c19abf1c177f9640835180f88005/68747470733a2f2f696d616765732d6e612e73736c2d696d616765732d616d617a6f6e2e636f6d2f696d616765732f492f3631474765592532424c306a4c2e5f41435f534c313030305f2e6a7067)
 
 ### MCU
+
 | MCU        | STM32F030C8T6         |
 |:---------- |:--------------------- |
 | Family     | ARM Cortex-M0         |
@@ -30,7 +34,7 @@ The STM32F030C8 based Bluepill is a very cheap breakout board for the STM32F030C
 | Reference Manual | [Reference Manual](https://www.st.com/resource/en/datasheet/stm32f030f4.pdf) |
 | Programming Manual | [Programming Manual](http://www.st.com/resource/en/programming_manual/dm00051352.pdf) |
 
-## Flashing the device
+## Flashing the Board
 
 The STM32F030C8 based Bluepill board does not include a programmer.
 You have to connect a separate ST-Link programmer to the (SW)DIO, (SW)CLK and GND
@@ -39,17 +43,9 @@ pins on the board.
 If you want a serial terminal, you have to connect a separate USB-Serial adapter to
 the PA09 (TX) and PA10 (RX) pins on the board.
 
-The easiest way to program the board is to use OpenOCD. Once you have installed
-OpenOCD (look [here](https://github.com/RIOT-OS/RIOT/wiki/OpenOCD) for
-installation instructions), you can flash the board simply by typing
-
-```
-make BOARD=bluepill-stm32f030c8 flash
-```
-and debug via GDB by simply typing
-```
-make BOARD=bluepill-stm32f030c8 debug
-```
+A detailed description about the flashing process can be found on the
+[guides page](https://guide.riot-os.org/board_specific/stm32/).
+The board name for the STM32F030C8 based Bluepill is `bluepill-stm32f030c8`.
 
 ## Known Issues
 

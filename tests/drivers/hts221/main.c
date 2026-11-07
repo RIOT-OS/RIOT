@@ -41,7 +41,7 @@ int main(void)
         return 3;
     }
 
-    while(1) {
+    while (1) {
         uint16_t hum = 0;
         int16_t temp = 0;
         if (hts221_read_humidity(&dev, &hum) != HTS221_OK) {

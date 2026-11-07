@@ -51,6 +51,10 @@
 #include "esp_wifi_params.h"
 #include "esp_wifi_netdev.h"
 
+#ifdef MODULE_ESP_NOW
+#  include "esp_now_netdev.h"
+#endif
+
 #include "log.h"
 #include "board.h"
 
@@ -98,6 +102,10 @@
 #include "lwip/pbuf.h"
 
 #endif /* CPU_ESP8266 */
+
+#if IS_USED(MODULE_ESP_IEEE802154) && IS_ACTIVE(CONFIG_ESP_COEX_SW_COEXIST_ENABLE)
+#  include "esp_coexist.h"
+#endif
 
 #define ENABLE_DEBUG_HEXDUMP    0
 #define ENABLE_DEBUG            0
@@ -535,7 +543,7 @@ static esp_err_t IRAM_ATTR _esp_system_event_handler(void *ctx, system_event_t *
             result = esp_wifi_connect();
             if (result != ESP_OK) {
                 ESP_WIFI_LOG_ERROR("esp_wifi_connect failed with return "
-                                   "value %d", result);
+                                   "value %d", (int)result);
             }
             break;
 
@@ -554,7 +562,6 @@ static esp_err_t IRAM_ATTR _esp_system_event_handler(void *ctx, system_event_t *
                               event->event_info.connected.channel);
             _esp_wifi_channel = event->event_info.connected.channel;
 #ifdef MODULE_ESP_NOW
-            extern void esp_now_set_channel(uint8_t channel);
             esp_now_set_channel(_esp_wifi_channel);
 #endif
             /* register RX callback function */
@@ -579,19 +586,26 @@ static esp_err_t IRAM_ATTR _esp_system_event_handler(void *ctx, system_event_t *
             _esp_wifi_dev.event_disc++;
             netdev_trigger_event_isr(&_esp_wifi_dev.netdev);
 
-            if (reason != WIFI_REASON_ASSOC_LEAVE) {
+            /* Reconnect only if the disconnect was not caused by ourselves.
+             * Otherwise, the WiFi driver would end in an infinite
+             * disconnect/reconnect loop. */
+            if ((reason != WIFI_REASON_ASSOC_LEAVE)
+#ifndef CPU_ESP8266
+                && (reason != WIFI_REASON_STA_LEAVING)
+#endif
+               ) {
                 /* call disconnect to reset internal state */
                 result = esp_wifi_disconnect();
                 if (result != ESP_OK) {
                     ESP_WIFI_LOG_ERROR("esp_wifi_disconnect failed with "
-                                       "return value %d", result);
+                                       "return value %d", (int)result);
                     return result;
                 }
 
                 /* try to reconnect */
                 if (_esp_wifi_started && ((result = esp_wifi_connect()) != ESP_OK)) {
                    ESP_WIFI_LOG_ERROR("esp_wifi_connect failed with "
-                                      "return value %d", result);
+                                      "return value %d", (int)result);
                 }
             }
 
@@ -826,6 +840,14 @@ static int _esp_wifi_init(netdev_t *netdev)
 {
     ESP_WIFI_DEBUG("%p", netdev);
 
+#ifdef MODULE_ESP_WIFI_AP
+    /* The SoftAP interface does not generate any link events, so signal
+     * link UP here. Otherwise the network stack would never be notified that
+     * the interface is up and, e.g., GNRC would not configure an IPv6
+     * link-local address. */
+    netdev->event_callback(netdev, NETDEV_EVENT_LINK_UP);
+#endif
+
     return 0;
 }
 
@@ -928,7 +950,7 @@ void esp_wifi_setup (esp_wifi_netdev_t* dev)
 #if CONFIG_ESP_WIFI_NVS_ENABLED
     result = nvs_flash_init();
     if (result != ESP_OK) {
-        ESP_WIFI_LOG_ERROR("nfs_flash_init failed with return value %d", result);
+        ESP_WIFI_LOG_ERROR("nfs_flash_init failed with return value %d", (int)result);
         return;
     }
 #endif /* CONFIG_ESP_WIFI_NVS_ENABLED */
@@ -936,7 +958,7 @@ void esp_wifi_setup (esp_wifi_netdev_t* dev)
     wifi_init_config_t cfg = WIFI_INIT_CONFIG_DEFAULT();
     result = esp_wifi_init(&cfg);
     if (result != ESP_OK) {
-        ESP_WIFI_LOG_ERROR("esp_wifi_init failed with return value %d", result);
+        ESP_WIFI_LOG_ERROR("esp_wifi_init failed with return value %d", (int)result);
         return;
     }
 
@@ -962,7 +984,7 @@ void esp_wifi_setup (esp_wifi_netdev_t* dev)
     result = esp_wifi_set_mode(WIFI_MODE_STA);
 #endif /* defined(CPU_ESP8266) */
     if (result != ESP_OK) {
-        ESP_WIFI_LOG_ERROR("esp_wifi_set_mode failed with return value %d", result);
+        ESP_WIFI_LOG_ERROR("esp_wifi_set_mode failed with return value %d", (int)result);
         return;
     }
 
@@ -977,7 +999,7 @@ void esp_wifi_setup (esp_wifi_netdev_t* dev)
     /* set the SoftAP configuration */
     result = esp_wifi_set_config(WIFI_IF_AP, &wifi_config_ap);
     if (result != ESP_OK) {
-        ESP_WIFI_LOG_ERROR("esp_wifi_set_config softap failed with return value %d", result);
+        ESP_WIFI_LOG_ERROR("esp_wifi_set_config softap failed with return value %d", (int)result);
         return;
     }
 #endif /* defined(CPU_ESP8266) || defined(MODULE_ESP_WIFI_AP) */
@@ -988,7 +1010,7 @@ void esp_wifi_setup (esp_wifi_netdev_t* dev)
     /* set the Station configuration */
     result = esp_wifi_set_config(WIFI_IF_STA, &wifi_config_sta);
     if (result != ESP_OK) {
-        ESP_WIFI_LOG_ERROR("esp_wifi_set_config station failed with return value %d", result);
+        ESP_WIFI_LOG_ERROR("esp_wifi_set_config station failed with return value %d", (int)result);
         return;
     }
 #endif /* MODULE_ESP_WIFI_AP */
@@ -1027,9 +1049,14 @@ void esp_wifi_setup (esp_wifi_netdev_t* dev)
     /* start the WiFi driver */
     result = esp_wifi_start();
     if (result != ESP_OK) {
-        ESP_WIFI_LOG_ERROR("esp_wifi_start failed with return value %d", result);
+        ESP_WIFI_LOG_ERROR("esp_wifi_start failed with return value %d", (int)result);
         return;
     }
+
+#if IS_USED(MODULE_ESP_IEEE802154) && IS_ACTIVE(CONFIG_ESP_COEX_SW_COEXIST_ENABLE)
+    /* enable the coexistence of WiFi and IEEE 802.15.4 */
+    esp_coex_wifi_i154_enable();
+#endif
 
     /* set the netdev driver */
     dev->netdev.driver = &_esp_wifi_driver;

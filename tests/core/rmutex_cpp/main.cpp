@@ -1,9 +1,6 @@
 /*
- * Copyright (C) 2016 Theobroma Systems Design & Consulting GmbH
- *
- * This file is subject to the terms and conditions of the GNU Lesser
- * General Public License v2.1. See the file LICENSE in the top level
- * directory for more details.
+ * SPDX-FileCopyrightText: 2016 Theobroma Systems Design & Consulting GmbH
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
 
 /**
@@ -43,8 +40,9 @@ static void lock_recursive(char n, char depth)
     printf("T%i (prio %i, depth %i): locked rmutex now\n",
            (int)t->pid, (int)t->priority, (int)n);
 
-    if (n + 1 < depth)
+    if (n + 1 < depth) {
         lock_recursive(n + 1, depth);
+    }
 
     thread_yield();
 
