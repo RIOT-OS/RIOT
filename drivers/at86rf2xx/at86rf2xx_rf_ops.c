@@ -215,9 +215,11 @@ static int _read(ieee802154_dev_t *hal, void *buf, size_t size, ieee802154_rx_in
         at86rf2xx_fb_read(dev, &ed, 1);
         at86rf2xx_fb_stop(dev);
 #endif
-        info->rssi = RSSI_BASE_VAL + ed;
-        DEBUG("[at86rf2xx] LQI:%d high is good, RSSI:%d high is either good or "
-              "too much interference.\n", info->lqi, info->rssi);
+        int16_t rssi_dbm = RSSI_BASE_VAL + ed;
+        /* the Radio HAL expects the RSSI relative to IEEE802154_RADIO_RSSI_OFFSET */
+        info->rssi = ieee802154_dbm_to_rssi(rssi_dbm);
+        DEBUG("[at86rf2xx] LQI:%d high is good, RSSI:%d dBm high is either good or "
+              "too much interference.\n", info->lqi, rssi_dbm);
 #if AT86RF2XX_IS_PERIPH && IS_USED(MODULE_IEEE802154_RX_TIMESTAMP)
         /* AT86RF2XX_IS_PERIPH means the MCU is ATmegaRFR2 that has symbol counter */
         {
