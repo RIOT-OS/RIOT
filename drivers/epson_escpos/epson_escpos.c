@@ -22,13 +22,17 @@
 #include <string.h>
 
 #include "container.h"
+#include "macros/utils.h"
 #include "epson_escpos.h"
 #include "epson_escpos_constants.h"
 
 #define ENABLE_DEBUG 0
 #include "debug.h"
 
-static const uint8_t _density[] = ESCPOS_DENSITY_VALUES;
+/* GS | n values for density 0-8 (-50% ... +50%) */
+static const uint8_t _density[] = {
+    0x00, 0x01, 0x02, 0x03, 0x04, 0x08, 0x07, 0x06, 0x05
+};
 
 void epson_escpos_init(epson_escpos_t *dev,
                        const epson_escpos_transport_t *transport, void *ctx,
@@ -98,26 +102,21 @@ int epson_escpos_raw(epson_escpos_t *dev, const void *data, size_t len)
 {
     assert(dev && (data || !len));
 
-    if (len > sizeof(dev->buf) - dev->buf_len) {
-        int res = epson_escpos_flush(dev);
-        if (res < 0) {
-            return res;
-        }
-    }
+    const uint8_t *pos = data;
 
-    /* data does not fit into the buffer, send it directly */
-    if (len > sizeof(dev->buf)) {
-        if (!dev->is_open) {
-            int res = epson_escpos_open(dev);
+    while (len) {
+        if (dev->buf_len == sizeof(dev->buf)) {
+            int res = epson_escpos_flush(dev);
             if (res < 0) {
                 return res;
             }
         }
-        return dev->transport->write(dev->transport_ctx, data, len);
+        size_t chunk = MIN(len, sizeof(dev->buf) - dev->buf_len);
+        memcpy(&dev->buf[dev->buf_len], pos, chunk);
+        dev->buf_len += chunk;
+        pos += chunk;
+        len -= chunk;
     }
-
-    memcpy(&dev->buf[dev->buf_len], data, len);
-    dev->buf_len += len;
     return 0;
 }
 
@@ -181,13 +180,6 @@ static int _check_style(const epson_escpos_t *dev,
 
 static int _set_size(epson_escpos_t *dev, const epson_escpos_style_t *style)
 {
-    static const uint8_t modes[] = {
-        [EPSON_ESCPOS_SIZE_NORMAL] = ESCPOS_MODE_NORMAL,
-        [EPSON_ESCPOS_SIZE_2H] = ESCPOS_MODE_2H,
-        [EPSON_ESCPOS_SIZE_2W] = ESCPOS_MODE_2W,
-        [EPSON_ESCPOS_SIZE_2X] = ESCPOS_MODE_2X,
-    };
-
     if (style->size == EPSON_ESCPOS_SIZE_CUSTOM) {
         const uint8_t cmd[] = {
             ESCPOS_GS, ESCPOS_CMD_CHAR_SIZE,
@@ -198,8 +190,10 @@ static int _set_size(epson_escpos_t *dev, const epson_escpos_style_t *style)
 
     /* ESC ! also selects font A, so the cached font is no longer valid */
     dev->font = -1;
+    /* bit 4 of n selects double height, bit 5 double width, which matches
+     * the values of EPSON_ESCPOS_SIZE_2H (1), _2W (2) and _2X (3) */
     const uint8_t cmd[] = {
-        ESCPOS_ESC, ESCPOS_CMD_PRINT_MODE, modes[style->size]
+        ESCPOS_ESC, ESCPOS_CMD_PRINT_MODE, style->size << 4
     };
     return epson_escpos_raw(dev, cmd, sizeof(cmd));
 }
@@ -311,25 +305,13 @@ int epson_escpos_print_and_feed(epson_escpos_t *dev, uint8_t n)
     return epson_escpos_raw(dev, cmd, sizeof(cmd));
 }
 
-/* true if the profile has at least one of the features */
-static bool _has_feature(const epson_escpos_t *dev, uint16_t features)
-{
-    return dev->profile->features & features;
-}
-
 int epson_escpos_cut(epson_escpos_t *dev, epson_escpos_cut_t mode, bool feed)
 {
-    bool part;
-
+    uint16_t features = dev->profile->features;
+    bool full = features & EPSON_ESCPOS_FEATURE_PAPER_FULL_CUT;
     /* fall back to the other mode if the requested one is not supported */
-    if (mode == EPSON_ESCPOS_CUT_PART) {
-        part = _has_feature(dev, EPSON_ESCPOS_FEATURE_PAPER_PART_CUT) ||
-               !_has_feature(dev, EPSON_ESCPOS_FEATURE_PAPER_FULL_CUT);
-    }
-    else {
-        part = !_has_feature(dev, EPSON_ESCPOS_FEATURE_PAPER_FULL_CUT) &&
-               _has_feature(dev, EPSON_ESCPOS_FEATURE_PAPER_PART_CUT);
-    }
+    bool part = (features & EPSON_ESCPOS_FEATURE_PAPER_PART_CUT) &&
+                ((mode == EPSON_ESCPOS_CUT_PART) || !full);
 
     if (!feed) {
         const uint8_t cmd[] = {
@@ -343,8 +325,7 @@ int epson_escpos_cut(epson_escpos_t *dev, epson_escpos_cut_t mode, bool feed)
     if (res < 0) {
         return res;
     }
-    if (!_has_feature(dev, EPSON_ESCPOS_FEATURE_PAPER_FULL_CUT |
-                      EPSON_ESCPOS_FEATURE_PAPER_PART_CUT)) {
+    if (!full && !part) {
         return 0;
     }
     const uint8_t cmd[] = {
@@ -447,12 +428,6 @@ int epson_escpos_print_speed(epson_escpos_t *dev, unsigned speed)
     return epson_escpos_raw(dev, cmd, sizeof(cmd));
 }
 
-/* A status byte has the format 0xx1xx10 */
-static bool _check_valid_response(uint8_t resp)
-{
-    return ((resp & 0x81) == 0x00) && ((resp & 0x12) == 0x12);
-}
-
 int epson_escpos_query_status(epson_escpos_t *dev, uint8_t mode,
                               uint8_t *status)
 {
@@ -478,7 +453,8 @@ int epson_escpos_query_status(epson_escpos_t *dev, uint8_t mode,
         DEBUG("[epson_escpos] reading status failed: %d\n", (int)len);
         return len;
     }
-    if ((len != 1) || !_check_valid_response(resp[0])) {
+    /* a status byte has the format 0xx1xx10 */
+    if ((len != 1) || ((resp[0] & 0x93) != 0x12)) {
         DEBUG("[epson_escpos] invalid status response (%d bytes)\n", (int)len);
         return -EBADMSG;
     }

@@ -47,6 +47,11 @@ extern "C" {
 /** @} */
 
 /**
+ * @brief   Profile of the Epson TM-T20II
+ */
+extern const epson_escpos_profile_t epson_escpos_profile_tm_t20ii;
+
+/**
  * @brief   Profile of the Epson TM-T88III
  */
 extern const epson_escpos_profile_t epson_escpos_profile_tm_t88iii;

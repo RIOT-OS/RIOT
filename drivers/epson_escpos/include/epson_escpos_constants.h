@@ -28,12 +28,8 @@ extern "C" {
  */
 #define ESCPOS_NUL              (0x00)  /**< null */
 #define ESCPOS_EOT              (0x04)  /**< end of transmission */
-#define ESCPOS_ENQ              (0x05)  /**< enquiry */
 #define ESCPOS_DLE              (0x10)  /**< data link escape */
-#define ESCPOS_DC4              (0x14)  /**< device control 4 */
-#define ESCPOS_CAN              (0x18)  /**< cancel */
 #define ESCPOS_ESC              (0x1b)  /**< escape */
-#define ESCPOS_FS               (0x1c)  /**< field separator */
 #define ESCPOS_GS               (0x1d)  /**< group separator */
 /** @} */
 
@@ -44,7 +40,6 @@ extern "C" {
 #define ESCPOS_CTL_LF           (0x0a)  /**< print and line feed */
 #define ESCPOS_CTL_FF           (0x0c)  /**< form feed */
 #define ESCPOS_CTL_CR           (0x0d)  /**< carriage return */
-#define ESCPOS_CTL_HT           (0x09)  /**< horizontal tab */
 #define ESCPOS_CTL_VT           (0x0b)  /**< vertical tab */
 #define ESCPOS_CMD_SET_HT       'D'     /**< ESC D: set horizontal tab positions */
 /** @} */
@@ -89,34 +84,13 @@ extern "C" {
 /** @} */
 
 /**
- * @name    Print mode bits (ESC ! n)
- * @{
- */
-#define ESCPOS_MODE_NORMAL      (0x00)  /**< normal text */
-#define ESCPOS_MODE_2H          (0x10)  /**< double height */
-#define ESCPOS_MODE_2W          (0x20)  /**< double width */
-#define ESCPOS_MODE_2X          (0x30)  /**< double width and height */
-/** @} */
-
-/**
- * @name    Print density values (GS | n), index 0-8 = -50% ... +50%
- * @{
- */
-/** @brief GS | n values for density 0-8 */
-#define ESCPOS_DENSITY_VALUES   { 0x00, 0x01, 0x02, 0x03, 0x04, \
-                                  0x08, 0x07, 0x06, 0x05 }
-/** @} */
-
-/**
  * @name    Real time status (DLE EOT n)
  * @{
  */
 #define ESCPOS_CMD_RT_STATUS    ESCPOS_EOT /**< DLE EOT n */
 #define ESCPOS_RT_STATUS_ONLINE (0x01)     /**< printer status */
 #define ESCPOS_RT_STATUS_PAPER  (0x04)     /**< paper roll sensor status */
-#define ESCPOS_RT_MASK_ONLINE   (18)       /**< online */
 #define ESCPOS_RT_MASK_OFFLINE  (26)       /**< offline */
-#define ESCPOS_RT_MASK_PAPER    (18)       /**< paper adequate */
 #define ESCPOS_RT_MASK_LOWPAPER (30)       /**< paper near end */
 #define ESCPOS_RT_MASK_NOPAPER  (114)      /**< paper end */
 /** @} */

@@ -20,6 +20,7 @@
 
 #include "epson_escpos.h"
 #include "isrpipe/read_timeout.h"
+#include "macros/utils.h"
 #include "time_units.h"
 #include "ztimer.h"
 
@@ -78,15 +79,17 @@ static int _write(void *ctx, const void *data, size_t len)
     const epson_escpos_uart_params_t *p = uart->params;
     const uint8_t *pos = data;
 
+    if (!gpio_is_valid(p->busy_pin)) {
+        uart_write(p->uart, data, len);
+        return 0;
+    }
+
     while (len) {
-        size_t chunk = gpio_is_valid(p->busy_pin) && (len > BUSY_CHUNK_SIZE)
-                     ? BUSY_CHUNK_SIZE : len;
-        if (gpio_is_valid(p->busy_pin)) {
-            /* wait until the printer is ready */
-            while (!!gpio_read(p->busy_pin) == p->busy_level) {
-                ztimer_sleep(ZTIMER_MSEC, 1);
-            }
+        /* wait until the printer is ready */
+        while (!!gpio_read(p->busy_pin) == p->busy_level) {
+            ztimer_sleep(ZTIMER_MSEC, 1);
         }
+        size_t chunk = MIN(len, BUSY_CHUNK_SIZE);
         uart_write(p->uart, pos, chunk);
         pos += chunk;
         len -= chunk;
