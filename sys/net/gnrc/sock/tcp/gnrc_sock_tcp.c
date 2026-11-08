@@ -17,6 +17,21 @@
 #include "net/gnrc/tcp.h"
 #include "net/sock/tcp.h"
 #include "sock_types.h"
+#include "timex.h"
+
+/* sock timeouts are in us, gnrc_tcp ones in ms: round up so that a timeout
+ * below 1 ms does not become 0 (non blocking). Not DIV_ROUND_UP(), which
+ * overflows close to UINT32_MAX. */
+static uint32_t _convert_sock_timeout_to_gnrc(uint32_t timeout)
+{
+    if (timeout == SOCK_NO_TIMEOUT) {
+        return GNRC_TCP_NO_TIMEOUT;
+    }
+    if (timeout == 0) {
+        return 0;
+    }
+    return (timeout - 1) / US_PER_MS + 1;
+}
 
 int sock_tcp_connect(sock_tcp_t *sock, const sock_tcp_ep_t *remote,
                      uint16_t local_port, uint16_t flags)
@@ -104,15 +119,10 @@ int sock_tcp_accept(sock_tcp_queue_t *queue, sock_tcp_t **sock, uint32_t timeout
     assert(queue != NULL);
     assert(sock != NULL);
 
-    /* Map SOCK_NO_TIMEOUT to GNRC_TCP_NO_TIMEOUT */
-    if (timeout == SOCK_NO_TIMEOUT) {
-        timeout = GNRC_TCP_NO_TIMEOUT;
-    }
-
     /* Forward call to gnrc_tcp_accept.
      * NOTE: Errorcodes -ECONNABORTED, -EPERM are not returned by
      * gnrc_tcp_accept. All other error codes share the same semantics. */
-    return gnrc_tcp_accept(queue, sock, timeout);
+    return gnrc_tcp_accept(queue, sock, _convert_sock_timeout_to_gnrc(timeout));
 }
 
 ssize_t sock_tcp_read(sock_tcp_t *sock, void *data, size_t max_len, uint32_t timeout)
@@ -121,13 +131,8 @@ ssize_t sock_tcp_read(sock_tcp_t *sock, void *data, size_t max_len, uint32_t tim
     assert(sock != NULL);
     assert(data != NULL);
 
-    /* Map SOCK_NO_TIMEOUT to GNRC_TCP_NO_TIMEOUT */
-    if (timeout == SOCK_NO_TIMEOUT) {
-        timeout = GNRC_TCP_NO_TIMEOUT;
-    }
-
     /* Forward call to gnrc_tcp_recv: All error codes share the same semantics */
-    return gnrc_tcp_recv(sock, data, max_len, timeout);
+    return gnrc_tcp_recv(sock, data, max_len, _convert_sock_timeout_to_gnrc(timeout));
 }
 
 ssize_t sock_tcp_write(sock_tcp_t *sock, const void *data, size_t len)
