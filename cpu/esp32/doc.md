@@ -777,7 +777,7 @@ want to use these memory areas as heap, you have to use the heap implementation
 from the ESP-IDF SDK. ESP-IDF heap is not used by default. To use it, it has to
 be enabled by the makefile of the application:
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-USEMODULE += esp_heap
+USEMODULE += esp_idf_heap
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 @note
