@@ -17,9 +17,6 @@
 
 #include "kernel_defines.h"
 #include "board.h"
-#if IS_USED(MODULE_LV_DRIVERS_SDL)
-#include "lv_drv_conf.h"
-#endif
 
 #ifdef __cplusplus
 extern "C" {
@@ -48,18 +45,6 @@ extern "C" {
  * With -Os data might not be aligned to a boundary by default.
  */
 #define LV_ATTRIBUTE_MEM_ALIGN  __attribute__((aligned(4)))
-
-/** Type of coordinates
- *
- * Should be `int16_t` (or `int32_t` for extreme cases).
- */
-typedef int16_t lv_coord_t;
-
-#define LV_TICK_CUSTOM     1        /**< use a custom tick implementation */
-#define LV_TICK_CUSTOM_INCLUDE  "ztimer.h"       /**< Header for the sys time function */
-
-/** Expression evaluating to current systime in ms */
-#define LV_TICK_CUSTOM_SYS_TIME_EXPR (ztimer_now(ZTIMER_MSEC))
 
 #ifdef __cplusplus
 }

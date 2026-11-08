@@ -8,10 +8,8 @@ menu "LVGL RIOT configuration"
         int "Inactivity period before blocking the LVGL thread (in ms)"
         default 5000
 
-    config LVGL_TASK_HANDLER_DELAY_US
-        int "Delay between calls to the lvgl task handler (in us)"
-        default 5000
+    config LVGL_TASK_HANDLER_DELAY_MS
+        int "Delay between calls to the lvgl task handler (in ms)"
+        default 5
 
 endmenu
-
-osource "$(PKGDIRBASE)/lvgl/Kconfig"
