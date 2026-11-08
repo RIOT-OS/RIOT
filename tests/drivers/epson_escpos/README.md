@@ -70,6 +70,7 @@ tested with the driver are included:
 
 | Profile                          | Printer         |
 |----------------------------------|-----------------|
+| `epson_escpos_profile_tm_t20ii`  | Epson TM-T20II  |
 | `epson_escpos_profile_tm_t88iii` | Epson TM-T88III |
 | `epson_escpos_profile_tm_t88iv`  | Epson TM-T88IV  |
 

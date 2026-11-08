@@ -114,10 +114,10 @@ SHELL_COMMAND(text, "print text without newline", _cmd_text);
 
 static int _cmd_print(int argc, char **argv)
 {
-    int res = _cmd_text(argc, argv);
-    if (res == 0) {
-        res = epson_escpos_ln(&_dev, 1);
+    if (_cmd_text(argc, argv)) {
+        return 1;
     }
+    int res = epson_escpos_ln(&_dev, 1);
     if (res == 0) {
         res = epson_escpos_flush(&_dev);
     }
@@ -282,7 +282,6 @@ static int _cmd_style(int argc, char **argv)
         style.density = atoi(val);
     }
     else if (val_bool < 0) {
-        printf("val_bool: %d\n", val_bool);
         goto invalid;
     }
     else if (!strcmp(key, "bold")) {
@@ -374,6 +373,12 @@ static int _cmd_demo(int argc, char **argv)
         .fields = EPSON_ESCPOS_STYLE_ALIGN, .align = EPSON_ESCPOS_ALIGN_RIGHT,
     };
 
+    /* separator over the full width of font A */
+    char line[UINT8_MAX + 1];
+    unsigned columns = _dev.profile->columns[EPSON_ESCPOS_FONT_A];
+    memset(line, '-', columns);
+    line[columns] = '\0';
+
     int res = 0;
     res += epson_escpos_hw(&_dev, EPSON_ESCPOS_HW_INIT);
     res += epson_escpos_set(&_dev, &title);
@@ -382,7 +387,7 @@ static int _cmd_demo(int argc, char **argv)
     res += epson_escpos_set(&_dev, &center);
     res += epson_escpos_textln(&_dev, "ESC/POS driver test");
     res += epson_escpos_set_default(&_dev);
-    res += epson_escpos_textln(&_dev, "------------------------------------------");
+    res += epson_escpos_textln(&_dev, line);
     res += epson_escpos_text(&_dev, "You are running RIOT on a(n) ");
     res += epson_escpos_set(&_dev, &bold);
     res += epson_escpos_text(&_dev, RIOT_BOARD);
@@ -393,7 +398,7 @@ static int _cmd_demo(int argc, char **argv)
     res += epson_escpos_text(&_dev, RIOT_CPU);
     res += epson_escpos_set_default(&_dev);
     res += epson_escpos_textln(&_dev, " CPU.");
-    res += epson_escpos_textln(&_dev, "------------------------------------------");
+    res += epson_escpos_textln(&_dev, line);
     res += epson_escpos_textln(&_dev, "normal text");
     res += epson_escpos_set(&_dev, &bold);
     res += epson_escpos_textln(&_dev, "bold text");
