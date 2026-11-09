@@ -128,68 +128,11 @@ void unicoap_assist_emit_diagnostic_missing_driver(unicoap_proto_t proto);
 extern kernel_pid_t _unicoap_pid;
 /** @} */
 
-/* MARK: - State and initialization */
+/* MARK: - Initialization and Tear-Down */
 /**
- * @name State and initialization
+ * @name Initialization and Tear-Down
  * @{
  */
-/**
- * @brief Container the unicoap stack keeps state in
- */
-typedef struct {
-#if IS_USED(MODULE_UNICOAP_SERVER) || defined(DOXYGEN)
-    /** @brief Groups of resources */
-    unicoap_listener_t* listeners;
-#endif
-
-#if UNICOAP_HAVE_CLIENT_STATE
-    /** @ref unicoap_memo_t */
-    unicoap_client_memo_t client_memos[CONFIG_UNICOAP_CLIENT_MEMOS_CAPACITY];
-#endif
-
-    /* TODO: Client and advanced server features: Exchange-layer state objects */
-} unicoap_state_t;
-
-/** @brief Sets listener array on @p state object to @p listeners */
-static inline void unicoap_set_listeners(unicoap_state_t* state, unicoap_listener_t* listeners) {
-#if IS_USED(MODULE_UNICOAP_SERVER)
-    state->listeners = listeners;
-#else
-    (void)state;
-    (void)listeners;
-#endif
-}
-
-/** @brief Gets listener array from @p state object */
-static inline unicoap_listener_t* unicoap_get_listeners(unicoap_state_t* state) {
-#if IS_USED(MODULE_UNICOAP_SERVER)
-    return state->listeners;
-#else
-    (void)state;
-    return NULL;
-#endif
-}
-
-/** @brief Gets client memo array from @p state object */
-static inline unicoap_client_memo_t *unicoap_state_get_client_memos(unicoap_state_t* state) {
-#if UNICOAP_HAVE_CLIENT_STATE
-    return state->client_memos;
-#else
-    (void)state;
-    return NULL;
-#endif
-}
-
-/** @brief Gets length of client memo array from @p state object */
-static inline size_t unicoap_state_get_client_memos_capacity(unicoap_state_t* state) {
-#if UNICOAP_HAVE_CLIENT_STATE
-    return ARRAY_SIZE(state->client_memos);
-#else
-    (void)state;
-    return 0;
-#endif
-}
-
 /** @brief Initializes the CoAP over UDP driver on the given @p queue */
 int unicoap_init_udp(event_queue_t* queue);
 
@@ -215,6 +158,12 @@ int unicoap_init_rfc7252_common(event_queue_t* queue);
 int unicoap_deinit_rfc7252_common(event_queue_t* queue);
 
 /* MARK: unicoap_driver_extension_point */
+
+/** @brief Initializes the unicoap server state on the given @p queue */
+int unicoap_init_server(event_queue_t* queue);
+
+/** @brief Initializes the unicoap client state on the given @p queue */
+int unicoap_init_client(event_queue_t* queue);
 /** @} */
 
 /* MARK: - Private Server Utils */

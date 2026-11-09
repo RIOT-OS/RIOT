@@ -25,6 +25,17 @@
 #include "debug.h"
 #include "private.h"
 
+void unicoap_generate_token(uint8_t* token)
+{
+    for (size_t i = 0; i < CONFIG_UNICOAP_GENERATED_TOKEN_LENGTH; i += 4) {
+        uint32_t _random = random_uint32_range(1, UINT32_MAX);
+        memcpy(&token[i], &_random,
+               (CONFIG_UNICOAP_GENERATED_TOKEN_LENGTH - i >= 4) ?
+                   4 :
+                   CONFIG_UNICOAP_GENERATED_TOKEN_LENGTH - i);
+    }
+}
+
 static void _on_response_timeout(unicoap_scheduled_event_t* timeout)
 {
     unicoap_client_callback_failure(unicoap_client_memo_of_timeout(timeout), -ETIMEDOUT);
@@ -66,6 +77,44 @@ void unicoap_client_callback_failure(unicoap_client_memo_t* memo, int error)
 }
 
 /* TODO: Block-wise processing */
+
+int unicoap_client_preprocess_response(unicoap_packet_t* packet,
+                                       unicoap_messaging_flags_t* flags,
+                                       unicoap_exchange_arg_t* arg,
+                                       bool truncated)
+{
+    const unicoap_endpoint_t* remote = packet->remote;
+    if (packet->local && unicoap_endpoint_is_multicast(packet->local)) {
+        _CLIENT_DEBUG("(weird) multicast response\n");
+        remote = NULL;
+    }
+    unicoap_client_memo_t* memo = unicoap_client_memo_find_token(remote,
+                                                                 packet->properties.token,
+                                                                 packet->properties.token_length);
+
+    if (!memo) {
+        if (unicoap_options_contains(packet->message->options, UNICOAP_OPTION_OBSERVE)) {
+            /* We are no longer interested in notifications */
+            _CLIENT_DEBUG("received unknown NON notification\n");
+            return UNICOAP_PREPROCESSING_ERROR_NOTIFICATION_UNEXPECTED;
+        }
+        else {
+            _CLIENT_DEBUG("received unknown response\n");
+            return UNICOAP_PREPROCESSING_ERROR_RESPONSE_UNEXPECTED;
+        }
+    }
+
+    if (truncated) {
+        _CLIENT_DEBUG("truncated, not processing\n");
+        unicoap_client_callback_failure(memo, -ENOBUFS);
+        unicoap_client_memo_free(memo, 0);
+        return UNICOAP_PREPROCESSING_ERROR_TRUNCATED;
+    }
+    unicoap_event_cancel(&memo->super.exchange.timeout);
+    arg->client = memo;
+    *flags = _messaging_flags_client(memo->flags);
+    return UNICOAP_PREPROCESSING_SUCCESS_RESPONSE;
+}
 
 int unicoap_client_process_response(unicoap_packet_t* packet, unicoap_client_memo_t* memo)
 {

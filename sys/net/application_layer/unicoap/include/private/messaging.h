@@ -366,6 +366,24 @@ static inline unicoap_messaging_flags_t _messaging_flags_client(
  * @{
  */
 /**
+ * @brief Informs the unicoap server a new packet has been received and should be preprocessed.
+ *
+ * This function handles block-wise transfers.
+ *
+ * see @ref unicoap_preprocess_message
+ *
+ * @param[in,out] packet Packet that will be preprocessed by the server
+ * @param[in,out] resource Resource
+ *
+ * @retval `0` on success
+ * @retval Negative errno on failure
+ */
+int unicoap_server_preprocess_request(unicoap_packet_t* packet,
+                                      unicoap_messaging_flags_t* flags,
+                                      unicoap_exchange_arg_t* arg,
+                                      bool truncated);
+
+/**
  * @brief Informs the unicoap server a new packet has been preprocessed and can be handled.
  *
  * This function handles block-wise transfers.
@@ -395,6 +413,22 @@ int unicoap_server_send_response_body(unicoap_packet_t* packet,
  * @name Client
  * @{
  */
+/**
+ * @brief Informs the unicoap client a new packet has been received and should be preprocessed.
+ *
+ * see @ref unicoap_preprocess_message
+ *
+ * @param[in,out] packet Packet that will be preprocessed by the server
+ * @param[in,out] resource Resource
+ *
+ * @retval `0` on success
+ * @retval Negative errno on failure
+ */
+int unicoap_client_preprocess_response(unicoap_packet_t* packet,
+                                       unicoap_messaging_flags_t* flags,
+                                       unicoap_exchange_arg_t* arg,
+                                       bool truncated);
+
 /**
  * @brief Informs the unicoap client a new packet has been preprocessed and can be handled.
  *

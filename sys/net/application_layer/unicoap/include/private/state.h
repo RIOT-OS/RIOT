@@ -380,6 +380,28 @@ void unicoap_exchange_notify(void* state, unicoap_layer_notification_t type, voi
  * Usually called from messaging layer.
  */
 void unicoap_exchange_notify_all(const unicoap_endpoint_t* endpoint, unicoap_layer_notification_t type, void* arg);
+
+/**
+ * @brief Informs exchange layer of event that applies to all client exchange state objects associated
+ * with given endpoint
+ * @param endpoint Endpoint
+ * @param type Event type
+ * @param[in] arg Optional opaque state object in this (sending) layer the notification relates to.
+ *
+ * See @ref unicoap_exchange_notify_all
+ */
+void unicoap_exchange_notify_all_client(const unicoap_endpoint_t* endpoint, unicoap_layer_notification_t type, void* arg);
+
+/**
+ * @brief Informs exchange layer of event that applies to all server exchange state objects associated
+ * with given endpoint
+ * @param endpoint Endpoint
+ * @param type Event type
+ * @param[in] arg Optional opaque state object in this (sending) layer the notification relates to.
+ *
+ * See @ref unicoap_exchange_notify_all
+ */
+void unicoap_exchange_notify_all_server(const unicoap_endpoint_t* endpoint, unicoap_layer_notification_t type, void* arg);
 /** @} */
 
 /* MARK: - Client state */
@@ -434,6 +456,13 @@ typedef struct {
      */
     unicoap_request_flags_t flags;
 } unicoap_client_memo_t;
+
+/**
+ * @brief Returns client memo of common memo state object
+ * @param[in] memo Superclass memo
+ * @returns Client memo state object
+ */
+bool unicoap_memo_is_client(unicoap_memo_t* memo);
 
 /**
  * @brief Returns client memo of common memo state object
