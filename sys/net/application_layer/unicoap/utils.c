@@ -706,14 +706,16 @@ void unicoap_options_print_uri_path(const unicoap_options_t* options)
      * borrowing access patterns, this is the only way to go. */
     unicoap_options_iterator_init(&iterator, (unicoap_options_t*)options);
 
+    bool root = true;
     const char* uri_component = NULL;
-    int res = -2;
+    int res;
     while ((res = unicoap_options_get_next_uri_path_component(&iterator, &uri_component)) >= 0) {
         printf("/%.*s", (int)res, uri_component);
+        /* Found at least one Uri-Path option, so no root path. */
+        root = false;
     }
 
-    if (res == -2) {
-        /* Root path, so no Uri-Path options. */
+    if (root) {
         printf("/");
     }
 }
