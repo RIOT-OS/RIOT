@@ -28,6 +28,21 @@ else
   FFLAGS += 0x8000 $(BINDIR)/partitions.bin
   FFLAGS += $(FLASHFILE_POS) $(FLASHFILE)
   FLASHDEPS += esptool
+
+  # ESP32-S2 with usb_board_reset: the chip is already in download mode and
+  # can only be reset via USB-OTG after flashing by espflash_usb_otg.py
+  ifeq (esp32s2-esptool,$(CPU_FAM)-$(PROGRAMMER))
+    ifneq (,$(filter usb_board_reset,$(USEMODULE)))
+      FLASHER = $(ESPTOOL_VENV)/bin/python
+      FFLAGS = $(RIOTTOOLS)/esptools/espflash_usb_otg.py
+      FFLAGS += --chip $(FLASH_CHIP) --port $(PROG_DEV)
+      FFLAGS += --flash-mode $(FLASH_MODE) --flash-freq $(FLASH_FREQ)
+      FFLAGS += --flash-size detect
+      FFLAGS += $(BOOTLOADER_POS) $(BOOTLOADER_BIN)
+      FFLAGS += 0x8000 $(BINDIR)/partitions.bin
+      FFLAGS += $(FLASHFILE_POS) $(FLASHFILE)
+    endif
+  endif
 endif
 
 .PHONY: esp-qemu esptool
