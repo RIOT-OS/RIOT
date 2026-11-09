@@ -3,6 +3,8 @@
  * SPDX-License-Identifier: LGPL-2.1-only
  */
 
+#include <errno.h>
+#include <inttypes.h>
 #include <stdio.h>
 #include <string.h>
 
@@ -10,6 +12,9 @@
 #include "msg.h"
 #include "net/sock/tcp.h"
 #include "net/gnrc/tcp.h"
+#include "timex.h"
+#include "ztimer.h"
+#include "ztimer/stopwatch.h"
 
 #define MAIN_QUEUE_SIZE (8)
 #define SOCK_TCP_QUEUE_SIZE (1)
@@ -86,10 +91,20 @@ int sock_tcp_accept_cmd(int argc, char **argv)
 {
     dump_args(argc, argv);
     sock_tcp_t *tmp = NULL;
-    uint16_t timeout = atol(argv[1]);
+    /* the timeout argument is in ms, the sock API uses us */
+    uint32_t timeout = atol(argv[1]) * US_PER_MS;
+    ztimer_stopwatch_t stopwatch;
 
+    ztimer_stopwatch_init(ZTIMER_MSEC, &stopwatch);
+    ztimer_stopwatch_start(&stopwatch);
     int err = sock_tcp_accept(&sock_queue, &tmp, timeout);
+    uint32_t waited = ztimer_stopwatch_measure(&stopwatch);
+    ztimer_stopwatch_stop(&stopwatch);
+
     print_result(argv[0], err);
+    if (err == -ETIMEDOUT) {
+        printf("%s: waited %" PRIu32 " ms\n", argv[0], waited);
+    }
 
     if (tmp) {
         sock = tmp;
@@ -102,15 +117,24 @@ int sock_tcp_read_cmd(int argc, char **argv)
     dump_args(argc, argv);
 
     unsigned to_receive = atol(argv[1]);
-    int timeout = (argc > 2) ? atol(argv[1]) : 0;
+    /* the timeout argument is in ms, the sock API uses us */
+    uint32_t timeout = (argc > 2) ? atol(argv[2]) * US_PER_MS : 0;
     unsigned rcvd = 0;
+    ztimer_stopwatch_t stopwatch;
 
+    ztimer_stopwatch_init(ZTIMER_MSEC, &stopwatch);
     while (rcvd < to_receive) {
+        ztimer_stopwatch_start(&stopwatch);
         int ret = sock_tcp_read(sock, buffer + rcvd, to_receive - rcvd, timeout);
+        uint32_t waited = ztimer_stopwatch_measure(&stopwatch);
+        ztimer_stopwatch_stop(&stopwatch);
         if (ret > 0) {
             rcvd += ret;
         } else {
             print_result(argv[0], ret);
+            if (ret == -ETIMEDOUT) {
+                printf("%s: waited %" PRIu32 " ms\n", argv[0], waited);
+            }
             if (ret == -EAGAIN) {
                 continue;
             } else {
