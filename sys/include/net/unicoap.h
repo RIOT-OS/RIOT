@@ -6,6 +6,7 @@
 
 #pragma once
 
+#include "mutex.h"
 #include "net/unicoap/constants.h" /* IWYU pragma: export */
 #include "net/unicoap/config.h" /* IWYU pragma: export */
 #include "net/unicoap/message.h" /* IWYU pragma: export */
@@ -83,6 +84,13 @@ typedef struct {
      * @internal
      */
     event_t super;
+
+    /**
+     * @brief Mutex to synchronously wait for job completion on the calling thread
+     * @warning Do not read or write.
+     * @internal
+     */
+    mutex_t roadblock;
 } unicoap_job_t;
 
 /**
@@ -94,8 +102,12 @@ typedef struct {
 #define UNICOAP_JOB(func) { \
     .super = { \
         .handler = _UNICOAP_TRY_TYPECHECK_JOB_FUNC(func) \
-    } \
+    }, \
+    .roadblock = MUTEX_INIT_LOCKED \
 }
+
+// TODO: docs
+#define UNICOAP_JOB_FINISH(job) (mutex_unlock(&(job)->roadblock))
 
 /**
  * @brief Schedules @p event to be run in the internal processing loop
@@ -118,6 +130,9 @@ typedef struct {
  * ```
  */
 int unicoap_loop_enqueue(unicoap_job_t* job);
+
+// TODO: docs
+int unicoap_loop_enqueue_and_wait(unicoap_job_t* job);
 /** @} */
 
 /** @} */

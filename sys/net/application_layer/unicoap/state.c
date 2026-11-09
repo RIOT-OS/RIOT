@@ -15,6 +15,7 @@
 
 #include "container.h"
 #include "event.h"
+#include "mutex.h"
 #include "random.h"
 #include "sched.h"
 #include "thread.h"
@@ -425,6 +426,21 @@ int unicoap_loop_enqueue(unicoap_job_t* job)
     return 0;
 }
 
+int unicoap_loop_enqueue_and_wait(unicoap_job_t* job)
+{
+    if (thread_getpid() == _unicoap_pid) {
+        // /* Disarm blocking if on unicoap thread. */
+        // mutex_unlock(&job->roadblock);
+        /* Call function directly if on unicoap thread. */
+        job->super.handler(&job->super);
+        return 0;
+    }
+    event_post(&_queue, &job->super);
+    /* Block until callback calls unlock. */
+    mutex_lock(&job->roadblock);
+    return 0;
+}
+
 kernel_pid_t unicoap_init(void)
 {
     if (_unicoap_pid != KERNEL_PID_UNDEF) {
@@ -480,7 +496,6 @@ typedef struct {
     unicoap_job_t job;
     unicoap_listener_t *listener;
     int res;
-    mutex_t roadblock;
 } _listener_args_t;
 
 static void _listener_register(unicoap_job_t* job)
@@ -511,8 +526,6 @@ static void _listener_register(unicoap_job_t* job)
             /* TODO: Advanced features: emit warnings */
         }
     }
-
-    mutex_unlock(&a->roadblock);
 }
 
 void unicoap_listener_register(unicoap_listener_t* listener)
@@ -525,15 +538,13 @@ void unicoap_listener_register(unicoap_listener_t* listener)
     _listener_args_t args = {
         .job = UNICOAP_JOB(_listener_register),
         .listener = listener,
-        .roadblock = MUTEX_INIT_LOCKED,
     };
-    if (thread_getpid() == _unicoap_pid || _unicoap_pid == KERNEL_PID_UNDEF) {
+
+    if (_unicoap_pid == KERNEL_PID_UNDEF) {
         _listener_register(&args.job);
     }
     else {
         unicoap_loop_enqueue(&args.job);
-        /* Block until callback calls unlock. */
-        mutex_lock(&args.roadblock);
     }
 }
 
@@ -557,7 +568,7 @@ static void _listener_deregister(unicoap_job_t* job)
     }
     a->res = -ENOENT;
 
-    mutex_unlock(&a->roadblock);
+    UNICOAP_JOB_FINISH(job);
 }
 
 int unicoap_listener_deregister(unicoap_listener_t* listener)
@@ -567,16 +578,8 @@ int unicoap_listener_deregister(unicoap_listener_t* listener)
     _listener_args_t args = {
         .job = UNICOAP_JOB(_listener_deregister),
         .listener = listener,
-        .roadblock = MUTEX_INIT_LOCKED,
     };
-    if (thread_getpid() == _unicoap_pid  || _unicoap_pid == KERNEL_PID_UNDEF) {
-        _listener_deregister(&args.job);
-    }
-    else {
-        unicoap_loop_enqueue(&args.job);
-        /* Block until callback calls unlock. */
-        mutex_lock(&args.roadblock);
-    }
+    unicoap_loop_enqueue_and_wait(&args.job);
     return args.res;
 }
 
