@@ -45,11 +45,11 @@ int main(void)
         lpsxxx_read_pres(&dev, &pres);
         lpsxxx_disable(&dev);
 
-        int temp_abs = temp / 100;
-        temp -= temp_abs * 100;
+        /* the sign apart: the fraction of -1.50 would print as -1.-50 */
+        unsigned temp_abs = (temp < 0) ? -temp : temp;
 
-        printf("Pressure value: %ihPa - Temperature: %2i.%02i°C\n",
-               pres, temp_abs, temp);
+        printf("Pressure value: %ihPa - Temperature: %s%u.%02u°C\n",
+               pres, (temp < 0) ? "-" : "", temp_abs / 100, temp_abs % 100);
     }
 
     return 0;
