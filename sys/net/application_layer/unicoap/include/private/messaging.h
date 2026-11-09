@@ -370,18 +370,20 @@ static inline unicoap_messaging_flags_t _messaging_flags_client(
  *
  * This function handles block-wise transfers.
  *
- * see @ref unicoap_preprocess_message
+ * see @ref unicoap_exchange_preprocess
  *
- * @param[in,out] packet Packet that will be preprocessed by the server
- * @param[in,out] resource Resource
+ * @param[in,out] packet Packet received
+ * @param[out] flags Messaging flags associated with server exchange
+ * @param[out] arg Argument to be passed to the processor
+ * @param truncated A boolean value indicating whether the given PDU was truncated, but could still
+ *                  be parsed (i.e., a valid message)
  *
- * @retval `0` on success
- * @retval Negative errno on failure
+ * @returns @ref unicoap_preprocessing_result_t
  */
-int unicoap_server_preprocess_request(unicoap_packet_t* packet,
-                                      unicoap_messaging_flags_t* flags,
-                                      unicoap_exchange_arg_t* arg,
-                                      bool truncated);
+unicoap_preprocessing_result_t unicoap_server_preprocess_request(unicoap_packet_t* packet,
+                                                                 unicoap_messaging_flags_t* flags,
+                                                                 unicoap_exchange_arg_t* arg,
+                                                                 bool truncated);
 
 /**
  * @brief Informs the unicoap server a new packet has been preprocessed and can be handled.
@@ -416,18 +418,20 @@ int unicoap_server_send_response_body(unicoap_packet_t* packet,
 /**
  * @brief Informs the unicoap client a new packet has been received and should be preprocessed.
  *
- * see @ref unicoap_preprocess_message
+ * see @ref unicoap_exchange_preprocess
  *
- * @param[in,out] packet Packet that will be preprocessed by the server
- * @param[in,out] resource Resource
+ * @param[in,out] packet Packet received
+ * @param[out] flags Messaging flags associated with client exchange
+ * @param[out] arg Argument to be passed to the processor
+ * @param truncated A boolean value indicating whether the given PDU was truncated, but could still
+ *                  be parsed (i.e., a valid message)
  *
- * @retval `0` on success
- * @retval Negative errno on failure
+ * @returns @ref unicoap_preprocessing_result_t
  */
-int unicoap_client_preprocess_response(unicoap_packet_t* packet,
-                                       unicoap_messaging_flags_t* flags,
-                                       unicoap_exchange_arg_t* arg,
-                                       bool truncated);
+unicoap_preprocessing_result_t unicoap_client_preprocess_response(unicoap_packet_t* packet,
+                                                                  unicoap_messaging_flags_t* flags,
+                                                                  unicoap_exchange_arg_t* arg,
+                                                                  bool truncated);
 
 /**
  * @brief Informs the unicoap client a new packet has been preprocessed and can be handled.
