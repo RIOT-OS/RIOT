@@ -65,12 +65,12 @@ static inline _server_state_t *_state(void)
     return &_state;
 }
 
-/** @brief Sets listener array on @p state object to @p listeners */
+/** @brief Sets listener array to @p listeners */
 static inline void _state_set_listeners(unicoap_listener_t* listeners) {
     _state()->listeners = listeners;
 }
 
-/** @brief Gets listener array from @p state object */
+/** @brief Gets listener array */
 static inline unicoap_listener_t* _state_get_listeners(void) {
     return _state()->listeners;
 }
@@ -80,12 +80,11 @@ int unicoap_init_server(event_queue_t *queue)
     (void)queue;
 #if IS_USED(MODULE_UNICOAP_SERVER_RESOURCE_DECLARATIONS)
     /* add CoAP resources from XFA */
-    XFA_USE_CONST(unicoap_resource_t, unicoap_resources_xfa);
     static unicoap_listener_t _xfa_listener = {
         .resources = unicoap_resources_xfa,
     };
-
     _xfa_listener.resource_count = XFA_LEN(unicoap_resource_t, unicoap_resources_xfa);
+
     unicoap_listener_register(&_xfa_listener);
     _SERVER_DEBUG("registered %" PRIuSIZE " XFA resources\n", _xfa_listener.resource_count);
 #endif /* UNICOAP_SERVER_RESOURCE_DECLARATIONS */
@@ -251,65 +250,63 @@ int unicoap_resource_find(const unicoap_packet_t* packet, const unicoap_resource
     assert(packet);
     int ret = UNICOAP_STATUS_PATH_NOT_FOUND;
 
-    if (IS_USED(MODULE_UNICOAP_SERVER)) {
-        for (unicoap_listener_t* listener = _state_get_listeners(); listener; listener = listener->next) {
-            const unicoap_resource_t* resource;
-            int res;
+    for (unicoap_listener_t* listener = _state_get_listeners(); listener; listener = listener->next) {
+        const unicoap_resource_t* resource;
+        int res;
 
-            if (!unicoap_match_proto(listener->protocols, unicoap_packet_proto(packet))) {
-                _SERVER_DEBUG("ignoring listener, proto %s not in set\n",
-                              unicoap_string_from_proto(unicoap_packet_proto(packet)));
-                continue;
-            }
-
-            res = listener->request_matcher(listener, &resource, packet->message, packet->remote);
-            switch (res) {
-            case UNICOAP_STATUS_PATH_NOT_FOUND:
-                /* check next resource on mismatch */
-                continue;
-            case UNICOAP_STATUS_METHOD_NOT_ALLOWED:
-                *resource_ptr = resource;
-                *listener_ptr = listener;
-                ret = res;
-                /* found a resource, but method/proto do not match */
-                continue;
-            case 0:
-                *resource_ptr = resource;
-                *listener_ptr = listener;
-
-                if (IS_ACTIVE(ENABLE_DEBUG)) {
-                    _SERVER_DEBUG("<");
-                    unicoap_print_path(&resource->path);
-                    DEBUG("%s>: found\n",
-                          (*resource_ptr)->flags & UNICOAP_RESOURCE_FLAG_MATCH_SUBTREE ? "/**" : "");
-                }
-
-                return 0;
-            default:
-                _SERVER_DEBUG("error: resource matcher failed\n");
-                /* res is probably UNICOAP_RESOURCE_ERROR or some other
-                     * unhandled error */
-                return res;
-            }
+        if (!unicoap_match_proto(listener->protocols, unicoap_packet_proto(packet))) {
+            _SERVER_DEBUG("ignoring listener, proto %s not in set\n",
+                            unicoap_string_from_proto(unicoap_packet_proto(packet)));
+            continue;
         }
 
-        if (IS_ACTIVE(ENABLE_DEBUG)) {
-            switch (ret) {
-            case UNICOAP_STATUS_METHOD_NOT_ALLOWED:
+        res = listener->request_matcher(listener, &resource, packet->message, packet->remote);
+        switch (res) {
+        case UNICOAP_STATUS_PATH_NOT_FOUND:
+            /* check next resource on mismatch */
+            continue;
+        case UNICOAP_STATUS_METHOD_NOT_ALLOWED:
+            *resource_ptr = resource;
+            *listener_ptr = listener;
+            ret = res;
+            /* found a resource, but method/proto do not match */
+            continue;
+        case 0:
+            *resource_ptr = resource;
+            *listener_ptr = listener;
+
+            if (IS_ACTIVE(ENABLE_DEBUG)) {
                 _SERVER_DEBUG("<");
-                unicoap_print_path(&(*resource_ptr)->path);
-                DEBUG("%s>: method %s not allowed\n",
-                      (*resource_ptr)->flags & UNICOAP_RESOURCE_FLAG_MATCH_SUBTREE ? "/**" : "",
-                      unicoap_string_from_method(unicoap_request_get_method(packet->message)));
-                break;
-            case UNICOAP_STATUS_PATH_NOT_FOUND:
-                _SERVER_DEBUG("<");
-                unicoap_options_print_uri_path(packet->message->options);
-                DEBUG(">: resource not found\n");
-                break;
-            default:
-                break;
+                unicoap_print_path(&resource->path);
+                DEBUG("%s>: found\n",
+                        (*resource_ptr)->flags & UNICOAP_RESOURCE_FLAG_MATCH_SUBTREE ? "/**" : "");
             }
+
+            return 0;
+        default:
+            _SERVER_DEBUG("error: resource matcher failed\n");
+            /* res is probably UNICOAP_RESOURCE_ERROR or some other
+                    * unhandled error */
+            return res;
+        }
+    }
+
+    if (IS_ACTIVE(ENABLE_DEBUG)) {
+        switch (ret) {
+        case UNICOAP_STATUS_METHOD_NOT_ALLOWED:
+            _SERVER_DEBUG("<");
+            unicoap_print_path(&(*resource_ptr)->path);
+            DEBUG("%s>: method %s not allowed\n",
+                    (*resource_ptr)->flags & UNICOAP_RESOURCE_FLAG_MATCH_SUBTREE ? "/**" : "",
+                    unicoap_string_from_method(unicoap_request_get_method(packet->message)));
+            break;
+        case UNICOAP_STATUS_PATH_NOT_FOUND:
+            _SERVER_DEBUG("<");
+            unicoap_options_print_uri_path(packet->message->options);
+            DEBUG(">: resource not found\n");
+            break;
+        default:
+            break;
         }
     }
 
@@ -319,52 +316,50 @@ int unicoap_resource_find(const unicoap_packet_t* packet, const unicoap_resource
 // todo: not in any header
 void unicoap_print_listeners(void)
 {
-    if (IS_USED(MODULE_UNICOAP_SERVER)) {
-        printf("\n\t- listeners:\n");
-        size_t i = 0;
-        for (const unicoap_listener_t* listener = _state_get_listeners(); listener;
-             listener = listener->next) {
-            printf("\t\t- listener #%" PRIuSIZE "\n", i);
+    printf("\n\t- listeners:\n");
+    size_t i = 0;
+    for (const unicoap_listener_t* listener = _state_get_listeners(); listener;
+            listener = listener->next) {
+        printf("\t\t- listener #%" PRIuSIZE "\n", i);
 
-            printf("\t\t\t- request_matcher=");
-            if (listener->request_matcher == unicoap_resource_match_request_default) {
-                printf("<default>\n");
-            }
-            else {
-                printf("<func at %p>\n", listener->request_matcher);
-            }
+        printf("\t\t\t- request_matcher=");
+        if (listener->request_matcher == unicoap_resource_match_request_default) {
+            printf("<default>\n");
+        }
+        else {
+            printf("<func at %p>\n", listener->request_matcher);
+        }
 
-            printf("\t\t\t- link_encoder=<func at %p>\n", listener->link_encoder);
+        printf("\t\t\t- link_encoder=<func at %p>\n", listener->link_encoder);
 
-            printf("\t\t\t- protocols=");
-            unicoap_print_protocols(listener->protocols);
+        printf("\t\t\t- protocols=");
+        unicoap_print_protocols(listener->protocols);
+        printf("\n");
+
+        printf("\t\t\t- resources (%" PRIuSIZE "):\n", listener->resource_count);
+        for (size_t k = 0; k < listener->resource_count; k += 1) {
+            const unicoap_resource_t* resource = &listener->resources[k];
+
+            printf("\t\t\t\t- resource #%" PRIuSIZE " ", k);
+            unicoap_print_path(&resource->path);
             printf("\n");
 
-            printf("\t\t\t- resources (%" PRIuSIZE "):\n", listener->resource_count);
-            for (size_t k = 0; k < listener->resource_count; k += 1) {
-                const unicoap_resource_t* resource = &listener->resources[k];
+            printf("\t\t\t\t\t- flags=");
+            unicoap_print_resource_flags(resource->flags);
+            printf("\n");
 
-                printf("\t\t\t\t- resource #%" PRIuSIZE " ", k);
-                unicoap_print_path(&resource->path);
-                printf("\n");
+            printf("\t\t\t\t\t- methods=");
+            unicoap_print_methods(resource->methods);
+            printf("\n");
 
-                printf("\t\t\t\t\t- flags=");
-                unicoap_print_resource_flags(resource->flags);
-                printf("\n");
+            printf("\t\t\t\t\t- protocols=");
+            unicoap_print_protocols(resource->protocols);
+            printf("\n");
 
-                printf("\t\t\t\t\t- methods=");
-                unicoap_print_methods(resource->methods);
-                printf("\n");
-
-                printf("\t\t\t\t\t- protocols=");
-                unicoap_print_protocols(resource->protocols);
-                printf("\n");
-
-                printf("\t\t\t\t\t- handler=<fn at %p>\n", resource->handler);
-                printf("\t\t\t\t\t- argument=<obj at %p>\n", resource->handler_arg);
-            }
-
-            i += 1;
+            printf("\t\t\t\t\t- handler=<fn at %p>\n", resource->handler);
+            printf("\t\t\t\t\t- argument=<obj at %p>\n", resource->handler_arg);
         }
+
+        i += 1;
     }
 }
