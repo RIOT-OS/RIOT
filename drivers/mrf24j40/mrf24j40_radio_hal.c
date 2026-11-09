@@ -222,7 +222,9 @@ static int _confirm_op(ieee802154_dev_t *hal, ieee802154_hal_op_t op, void *ctx)
                                    : TX_STATUS_NO_ACK;
                 }
                 else {
-                    info->status = TX_STATUS_SUCCESS;
+                    bool frame_pending = mrf24j40_reg_read_short(dev, MRF24J40_REG_TXNCON) &
+                                         MRF24J40_TXNCON_FPSTAT;
+                    info->status = frame_pending ? TX_STATUS_FRAME_PENDING : TX_STATUS_SUCCESS;
                 }
                 info->retrans = txstat >> MRF24J40_TXSTAT_MAX_FRAME_RETRIES_SHIFT;
             }

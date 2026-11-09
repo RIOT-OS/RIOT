@@ -257,6 +257,9 @@ void kw2xrf_radio_hal_irq_handler(void *arg)
 
                 kw_dev->ack_rcvd = !(dregs[MKW2XDM_IRQSTS3] &
                                      MKW2XDM_IRQSTS3_TMR3IRQ);
+                if (kw_dev->ack_rcvd) {
+                    kw_dev->ack_pending_bit = dregs[MKW2XDM_IRQSTS1] & MKW2XDM_IRQSTS1_RX_FRM_PEND;
+                }
 
                 /* Disallow TMR3IRQ to cancel RX operation */
                 kw2xrf_timer3_seq_abort_off(kw_dev);
@@ -443,9 +446,13 @@ static int _confirm_op(ieee802154_dev_t *dev, ieee802154_hal_op_t op, void *ctx)
             if (!kw_dev->ch_clear) {
                 info->status = TX_STATUS_MEDIUM_BUSY;
             }
-            else if (kw_dev->ack_rcvd || !kw_dev->ack_requested) {
+            else if (kw_dev->ack_rcvd) {
+                info->status = kw_dev->ack_pending_bit ? TX_STATUS_FRAME_PENDING : TX_STATUS_SUCCESS;
+            }
+            else if (!kw_dev->ack_requested) {
                 info->status = TX_STATUS_SUCCESS;
-            } else {
+            }
+            else {
                 info->status = TX_STATUS_NO_ACK;
             }
         }
