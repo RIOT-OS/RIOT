@@ -40,14 +40,16 @@
 /**
  * @brief temperature base value and divider for norming temperature output
  *
- * @details temperature base is given in centi-degree-celsius
+ * @details temperature base is given in centi-degree-celsius. Both are
+ *          signed: the raw value is negative below the base temperature, an
+ *          unsigned divider would make the division unsigned.
  */
 #if MODULE_LPS331AP || MODULE_LPS25HB
-#define TEMP_BASE           (4250U) /* = 42.5 C */
-#define TEMP_DIVIDER        (480U)
+#define TEMP_BASE           (4250) /* = 42.5 C */
+#define TEMP_DIVIDER        (480)
 #else
-#define TEMP_BASE           (0U)
-#define TEMP_DIVIDER        (100U)
+#define TEMP_BASE           (0)
+#define TEMP_DIVIDER        (100)
 #endif
 
 #define DEV_I2C      (dev->params.i2c)
@@ -129,7 +131,7 @@ int lpsxxx_read_temp(const lpsxxx_t *dev, int16_t *temp)
 {
     uint8_t tmp;
     int16_t val;
-    uint16_t res = TEMP_BASE;      /* reference value -> see datasheet */
+    int32_t res = TEMP_BASE;       /* reference value -> see datasheet */
 
     i2c_acquire(DEV_I2C);
     if (i2c_read_reg(DEV_I2C, DEV_ADDR, LPSXXX_REG_TEMP_OUT_L, &tmp, 0) < 0) {
