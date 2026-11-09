@@ -11,6 +11,7 @@
 #include "log.h"
 #include "net/ieee802154/radio.h"
 #include "ztimer.h"
+#include "time_units.h"
 
 #define ENABLE_DEBUG 0
 #include "debug.h"
@@ -173,6 +174,10 @@ static int _read(ieee802154_dev_t *dev, void *buf, size_t size, ieee802154_rx_in
         if (info) {
             info->rssi = ieee802154_dbm_to_rssi(_rx_frame_info->rssi);
             info->lqi = _rx_frame_info->lqi;
+#if IS_USED(MODULE_IEEE802154_RX_TIMESTAMP)
+            /* this is actually a software timestamp taken by ESP-IDF with esp_timer_get() */
+            info->timestamp = _rx_frame_info->timestamp * NS_PER_US;
+#endif
         }
         memcpy(buf, &_rx_frame[1], len);
         res = len;
@@ -625,7 +630,8 @@ static const ieee802154_radio_ops_t esp_ieee802154_driver = {
           | IEEE802154_CAP_IRQ_TX_START
 #endif
           | IEEE802154_CAP_IRQ_TX_DONE
-          | IEEE802154_CAP_IRQ_ACK_TIMEOUT,
+          | IEEE802154_CAP_IRQ_ACK_TIMEOUT
+          | IEEE802154_CAP_RX_TIMESTAMP,
     .write = _write,
     .read = _read,
     .request_on = _request_on,

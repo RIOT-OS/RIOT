@@ -112,7 +112,7 @@ int kw41zrf_reset_hardware(kw41zrf_t *dev)
                            ZLL_RX_FRAME_FILTER_DATA_FT_MASK;
 
     /* Set prescaler to obtain 1 symbol (16us) timebase */
-    kw41zrf_timer_init(dev, KW41ZRF_TIMEBASE_62500HZ);
+    kw41zrf_timer_init(dev, CONFIG_KW41ZRF_TIMEBASE);
 
     /* Set CCA threshold to KW41ZRF_DEFAULT_CCA_THRESHOLD dBm */
     /* The hardware default for this register is +75 dBm (0x4b), which is nonsense */
