@@ -234,8 +234,8 @@ static int toggle_ack_pending_bit(int argc, char **argv)
     (void)argv;
     static bool ack_pending;
     ack_pending = !ack_pending;
-    int res = ieee802154_submac_config_src_address_match(
-        &submac, IEEE802154_SRC_MATCH_EN, &ack_pending);
+    int res = ieee802154_submac_config_src_address_match(&submac, IEEE802154_SRC_MATCH_EN,
+                                                         &ack_pending);
     if (res < 0) {
         printf("toggle_ack_pending failed: %d\n", res);
         return 0;
