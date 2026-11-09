@@ -132,6 +132,7 @@ typedef struct {
     bool    waiting_for_cca;            /**< Indicate whether CCA is still ongoing */
     bool    tx_done;                    /**< Indicate whether TX completed */
     bool    ack_rcvd;                   /**< Indicate if ACK was received for last transmission */
+    bool    ack_pending_bit;            /**< Whether received ACK has Frame Pending bit set or not */
     bool    cca_before_tx;              /**< true if CCA shall be performed before TX */
     bool    tx_cca_pending;             /**< true a manual CCA was started and a TX should be triggered on channel clear indication */
     /** @} */
