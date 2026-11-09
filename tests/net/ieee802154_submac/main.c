@@ -41,7 +41,6 @@ mutex_t lock;                                   /**< lock used to synchronize Su
 ztimer_t ack_timer;                             /**< required for the ACK timer */
 eui64_t long_addr;                              /**< SubMAC extended address */
 network_uint16_t short_addr;                    /**< SubMAC short address */
-static bool ack_pending;                        /**< whether Frame Pending bit is set in SW ACKs */
 
 static void _ev_tx_done_handler(event_t *event);        /**< TX Done event handler */
 static void _ev_rx_done_handler(event_t *event);        /**< RX Done event handler */
@@ -233,6 +232,7 @@ static int toggle_ack_pending_bit(int argc, char **argv)
 {
     (void)argc;
     (void)argv;
+    static bool ack_pending;
     ack_pending = !ack_pending;
     int res = ieee802154_submac_config_src_address_match(
         &submac, IEEE802154_SRC_MATCH_EN, &ack_pending);
