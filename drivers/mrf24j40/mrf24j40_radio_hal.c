@@ -122,7 +122,9 @@ static int _read(ieee802154_dev_t *hal, void *buf, size_t size, ieee802154_rx_in
             /* Read LQI and RSSI values from the RX fifo */
             mrf24j40_rx_fifo_read(dev, phr + 1, &(info->lqi), 1);
             mrf24j40_rx_fifo_read(dev, phr + 2, &(rssi_scalar), 1);
-            info->rssi = mrf24j40_dbm_from_reg(rssi_scalar);
+            /* the Radio HAL expects the RSSI relative to
+             * IEEE802154_RADIO_RSSI_OFFSET */
+            info->rssi = ieee802154_dbm_to_rssi(mrf24j40_dbm_from_reg(rssi_scalar));
         }
         res = pkt_len;
     }

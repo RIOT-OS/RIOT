@@ -157,7 +157,9 @@ static int _read(ieee802154_dev_t *hal, void *buf, size_t size, ieee802154_rx_in
 
     if (info) {
         info->lqi = kw41zrf_get_lqi_value(&intern_dev);
-        info->rssi = kw41zrf_get_rssi_value(&intern_dev);
+        /* the RSSI register is in dBm, the Radio HAL expects the RSSI
+         * relative to IEEE802154_RADIO_RSSI_OFFSET */
+        info->rssi = ieee802154_dbm_to_rssi(kw41zrf_get_rssi_value(&intern_dev));
     }
 
     return pkt_len;
