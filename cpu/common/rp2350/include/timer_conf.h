@@ -16,10 +16,9 @@
  * @author          Tom Hert <git@annsann.eu>
  */
 
+#include <stdint.h>
+
 #include "RP2350.h"
-#include "periph_cpu.h"
-#include "regs/ticks.h"
-#include "regs/resets.h"
 
 /** Number of alarm channels per timer block */
 #define TIMER_CHANNEL_NUMOF 4u

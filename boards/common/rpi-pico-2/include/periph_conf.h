@@ -70,11 +70,11 @@ static const timer_conf_t timer_config[] = {
     {
         .dev = TIMER1,
         .irqn_base = TIMER1_IRQ_0_IRQn,
-        .ch_numof = TIMER_CHANNEL_NUMOF
+        .ch_numof = TIMER_CHANNEL_NUMOF,
     }
 };
 
-#define TIMER_NUMOF      2
+#define TIMER_NUMOF      ARRAY_SIZE(timer_config)
 
 #ifdef __cplusplus
 }

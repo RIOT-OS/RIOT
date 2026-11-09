@@ -25,6 +25,9 @@
 
 #include "periph/timer.h"
 
+#include "regs/ticks.h"
+#include "regs/resets.h"
+
 #define ENABLE_DEBUG 0
 #include "debug.h"
 
@@ -36,27 +39,43 @@ static void *ctx_arg[TIMER_NUMOF];
 static uint8_t _flag_periodic[TIMER_NUMOF];
 static uint8_t _flag_reset[TIMER_NUMOF];
 
-static void _timer_reset(tim_t dev)
+/**
+ * @brief   Reset the counter and arm an alarm without the counter being able
+ *          to run past the alarm value in between (alarms only fire on an
+ *          exact match, a missed match would only occur after a wrap-around),
+ */
+static void _timer_reset_and_arm(tim_t dev, int channel, uint32_t value)
 {
     unsigned state = irq_disable();
-    /* Always write TIMELW before TIMEHW, the value is only copied to the
-     * counter once TIMEHW is written (see table 1229) */
+    uint32_t paused = DEV(dev)->PAUSE;
+    atomic_set(&DEV(dev)->PAUSE, 1u);
+    /* Always write TIMELW before TIMEHW, as TIMEHW latches both */
     DEV(dev)->TIMELW = 0;
     DEV(dev)->TIMEHW = 0;
+    *ALARM(dev, channel) = value;
+    if (!paused) {
+        atomic_clear(&DEV(dev)->PAUSE, 1u);
+    }
     irq_restore(state);
 }
 
 static void _timer_isr(tim_t dev, int channel)
 {
+    /* The IRQ may have been latched before timer_clear() was called -> skip callback */
+    if (!(DEV(dev)->INTS & (1u << channel))) {
+        return;
+    }
     /* The latched interrupt flags are write-1-clear (see table 1243) */
     DEV(dev)->INTR = 1u << channel;
 
     if (_flag_periodic[dev] & (1u << channel)) {
         if (_flag_reset[dev] & (1u << channel)) {
-            _timer_reset(dev);
+            _timer_reset_and_arm(dev, channel, *ALARM(dev, channel));
         }
-        /* Bomb has been planted */
-        *ALARM(dev, channel) = *ALARM(dev, channel);
+        else {
+            /* re-arm the alarm with the same target value */
+            *ALARM(dev, channel) = *ALARM(dev, channel);
+         }
     }
 
     if (ctx_cb[dev]) {
@@ -66,14 +85,13 @@ static void _timer_isr(tim_t dev, int channel)
 
 int timer_init(tim_t dev, uint32_t freq, timer_cb_t cb, void *arg)
 {
-    (void)freq;
-
     if (dev >= TIMER_NUMOF) {
         return -ENODEV;
     }
     /* TICKS blocks are designed to generate 1 us ticks, so we can only support that frequency */
-    assert(freq == US_PER_SEC);
-    assert((CLOCK_XOSC % freq) == 0);
+    if (freq != US_PER_SEC) {
+        return -EINVAL;
+    }
 
     ctx_cb[dev] = cb;
     ctx_arg[dev] = arg;
@@ -83,21 +101,9 @@ int timer_init(tim_t dev, uint32_t freq, timer_cb_t cb, void *arg)
     /* Reset the timer block, so we can be sure it is in a known state */
     uint32_t reset_bit;
     reset_bit = (DEV(dev) == TIMER0) ? RESETS_RESET_TIMER0_BITS : RESETS_RESET_TIMER1_BITS;
+    atomic_set(&RESETS->RESET, reset_bit);
     reset_component(reset_bit, reset_bit);
 
-    /* Generate one tick per microsecond from clk_ref, which runs from xosc.
-     * The tick generator has to be stopped while its cycle count is changed
-     * (see section 8.5.1) */
-    if (DEV(dev) == TIMER0) {
-        TICKS->TIMER0_CTRL = 0;
-        TICKS->TIMER0_CYCLES = CLOCK_XOSC / MHZ(1);
-        TICKS->TIMER0_CTRL = TICKS_TIMER0_CTRL_ENABLE_BITS;
-    }
-    else {
-        TICKS->TIMER1_CTRL = 0;
-        TICKS->TIMER1_CYCLES = CLOCK_XOSC / MHZ(1);
-        TICKS->TIMER1_CTRL = TICKS_TIMER1_CTRL_ENABLE_BITS;
-    }
 
     for (uint8_t i = 0; i < timer_config[dev].ch_numof; i++) {
         rp_irq_enable(timer_config[dev].irqn_base + i);
@@ -157,9 +163,6 @@ int timer_set_periodic(tim_t dev, int channel, unsigned int value, uint8_t flags
     if (flags & TIM_FLAG_SET_STOPPED) {
         timer_stop(dev);
     }
-    if (flags & TIM_FLAG_RESET_ON_SET) {
-        _timer_reset(dev);
-    }
 
     unsigned state = irq_disable();
     _flag_periodic[dev] |= (1u << channel);
@@ -169,7 +172,12 @@ int timer_set_periodic(tim_t dev, int channel, unsigned int value, uint8_t flags
     else {
         _flag_reset[dev] &= ~(1u << channel);
     }
-    *ALARM(dev, channel) = (uint32_t)value;
+    if (flags & TIM_FLAG_RESET_ON_SET) {
+        _timer_reset_and_arm(dev, channel, value);
+    }
+    else {
+        *ALARM(dev, channel) = (uint32_t)value;
+    }
     irq_restore(state);
 
     return 0;
@@ -187,6 +195,7 @@ int timer_clear(tim_t dev, int channel)
     unsigned state = irq_disable();
     /* The ARMED bits are write-1-clear (table 1236) */
     DEV(dev)->ARMED = 1u << channel;
+    DEV(dev)->INTR = 1u << channel;
     _flag_periodic[dev] &= ~(1u << channel);
     irq_restore(state);
 
