@@ -77,7 +77,6 @@ static struct {
     bool cca_send   : 1;    /**< whether the next transmission uses CCA or not */
     bool ack_filter : 1;    /**< whether the ACK filter is activated or not */
     bool promisc    : 1;    /**< whether the device is in promiscuous mode or not */
-    bool pending    : 1;    /**< whether there pending bit should be set in the ACK frame or not */
 } cfg = {
     .cca_send   = true,
     .ack_filter = true,
@@ -654,20 +653,6 @@ static int _config_addr_filter(ieee802154_dev_t *dev, ieee802154_af_cmd_t cmd, c
     return 0;
 }
 
-static int _config_src_addr_match(ieee802154_dev_t *dev, ieee802154_src_match_t cmd,
-                                  const void *value)
-{
-    (void)dev;
-    switch (cmd) {
-        case IEEE802154_SRC_MATCH_EN:
-            cfg.pending = *((const bool*) value);
-            break;
-        default:
-            return -ENOTSUP;
-    }
-    return 0;
-}
-
 static int _set_frame_filter_mode(ieee802154_dev_t *dev, ieee802154_filter_mode_t mode)
 {
     (void)dev;
@@ -762,7 +747,6 @@ static const ieee802154_radio_ops_t nrf802154_ops = {
     .config_phy = _config_phy,
     .set_csma_params = _set_csma_params,
     .config_addr_filter = _config_addr_filter,
-    .config_src_addr_match = _config_src_addr_match,
     .set_frame_filter_mode = _set_frame_filter_mode,
     .get_frame_filter_mode = _get_frame_filter_mode,
 };
