@@ -31,6 +31,7 @@ USEMODULE += gnrc_netif_single          # Only one interface used and it makes
 USEMODULE += shell
 USEMODULE += shell_cmds_default
 USEMODULE += od
+USEMODULE += ztimer_msec
 
 # Export used tap device to environment
 export TAPDEV = $(TAP)

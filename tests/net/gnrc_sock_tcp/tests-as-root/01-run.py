@@ -143,6 +143,26 @@ def test_connection_listen_accept_cycle(child, iterations=10):
                     sock_srv.disconnect()
 
 
+@Runner(timeout=5)
+def test_accept_timeout(child):
+    """sock_tcp_accept() waits for the given timeout without connection."""
+    with SockTcpServer(child, generate_port_number()):
+        child.sendline('sock_tcp_accept 500')
+        child.expect(r'sock_tcp_accept: waited (\d+) ms')
+        assert 500 <= int(child.match.group(1)) < 1000
+
+
+@Runner(timeout=5)
+def test_read_timeout(child):
+    """sock_tcp_read() waits for the given timeout without data."""
+    with SockTcpServer(child, generate_port_number()) as sock_srv:
+        with HostTcpClient(sock_srv):
+            sock_srv.accept(timeout_ms=1000)
+            child.sendline('sock_tcp_read 1 500')
+            child.expect(r'sock_tcp_read: waited (\d+) ms')
+            assert 500 <= int(child.match.group(1)) < 1000
+
+
 if __name__ == '__main__':
     sudo_guard()
 
