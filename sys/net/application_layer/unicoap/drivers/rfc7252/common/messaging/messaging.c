@@ -83,7 +83,7 @@ typedef struct {
     /**
      * @brief Size of @ref unicoap_messaging_state_udp_dtls_t.carbon_copy
      */
-    size_t carbon_copy_size;
+    size_t carbon_copy_length;
 
     /** @brief Message ID */
     uint16_t id;
@@ -616,7 +616,7 @@ static int _send_carbon_copy(_transmission_t* transmission)
                              transmission->remaining_retransmissions + 1, duration);
     }
 
-    iolist_t list = __IOLIST(transmission->carbon_copy->pdu, transmission->carbon_copy_size, NULL);
+    iolist_t list = __IOLIST(transmission->carbon_copy->pdu, transmission->carbon_copy_length, NULL);
     if ((res = _sendv(&list,
                       _transmission_get_endpoint(transmission), NULL,
                       _transmission_get_session(transmission))) < 0) {
@@ -636,7 +636,7 @@ static void _on_ack_timeout(unicoap_scheduled_event_t* _event)
     _transmission_t* transmission = container_of(_event, _transmission_t, ack_timeout);
     assert(transmission);
     assert(transmission->carbon_copy);
-    assert(transmission->carbon_copy_size > 0);
+    assert(transmission->carbon_copy_length > 0);
     int res = 0;
 
     if (transmission->remaining_retransmissions == 0) {
@@ -1033,7 +1033,7 @@ int unicoap_messaging_send_rfc7252(unicoap_packet_t* packet, unicoap_messaging_f
         /* Only set PDU size and notify exchange layer if sending went well. */
         if (transmission->carbon_copy) {
             MESSAGING_7252_DEBUG("created <carbon_copy size=%i>\n", res);
-            transmission->carbon_copy_size = res;
+            transmission->carbon_copy_length = res;
         }
         transmission->exchange = exchange;
         if (exchange) {
@@ -1071,8 +1071,8 @@ void unicoap_messaging_print_rfc7252_state(void)
 
         printf("\t\t\t- MID=%" PRIu16 "\n", transmission->id);
         printf("\t\t\t- remaining_retransmissions=%u\n", transmission->remaining_retransmissions);
-        printf("\t\t\t- pdu=<carbon_copy at %p>\n", transmission->pdu);
-        printf("\t\t\t- pdu_size=%" PRIuSIZE "\n", transmission->pdu_size);
+        printf("\t\t\t- carbon_copy=<at %p>\n", transmission->carbon_copy);
+        printf("\t\t\t- carbon_copy_length=%" PRIuSIZE "\n", transmission->carbon_copy_length);
         printf("\t\t\t- exchange=%p\n", transmission->exchange);
     }
 
@@ -1082,7 +1082,7 @@ void unicoap_messaging_print_rfc7252_state(void)
     _carbon_copy_t *carbon_copies = _state_get_carbon_copies();
     for (size_t i = 0; i < _state_get_carbon_copies_capacity(); i += 1) {
         printf("\t\t- carbon_copy #%" PRIuSIZE " capacity=%" PRIuSIZE "B used=%u\n", i,
-               sizeof(carbon_copies[i]), *carbon_copies[i] != 0);
+               sizeof(carbon_copies[i]), *carbon_copies[i].pdu != 0);
     }
 #endif   /* ENABLE_DEBUG */
 }
