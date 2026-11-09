@@ -499,7 +499,8 @@ static int _read(ieee802154_dev_t *dev, void *buf, size_t size, ieee802154_rx_in
 
     if (info != NULL) {
         info->lqi = kw2xrf_read_dreg(kw_dev, MKW2XDM_LQI_VALUE);
-        info->rssi = kw2xrf_get_rssi(info->lqi);
+        /* the Radio HAL expects the RSSI relative to IEEE802154_RADIO_RSSI_OFFSET */
+        info->rssi = ieee802154_dbm_to_rssi(kw2xrf_get_rssi(info->lqi));
     }
 
     return rxlen;
