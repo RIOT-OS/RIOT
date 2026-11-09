@@ -5,6 +5,7 @@ include ../Makefile.net_common
 # Other boards should still work when running with CONTINUE_ON_EXPECTED_ERRORS=1
 
 BOARDS_SUPPORTED += adafruit-clue \
+                   adafruit-feather-nrf52840-sense \
                    adafruit-itsybitsy-nrf52 \
                    arduino-nano-33-ble \
                    atmega256rfr2-xpro \
