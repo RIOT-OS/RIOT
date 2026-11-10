@@ -817,7 +817,7 @@ void isr_sdmmc1(void)
 #endif
 
 #if defined(SDMMC2)
-void _isr_sdmmc2(void)
+void isr_sdmmc2(void)
 {
     _isr(SDMMC2);
 }
