@@ -42,8 +42,14 @@ export default defineConfig({
   integrations: [
     starlight({
       title: "RIOT Documentation",
+      // Board and CPU documentation is deeply structured, show h2..h4
+      // in the "On this page" sidebar
+      tableOfContents: { minHeadingLevel: 2, maxHeadingLevel: 4 },
       markdown: {
-        processedDirs: ["../guides"],
+        // Board and CPU documentation is loaded from the doc*.md files in
+        // the source tree. Starlight's Markdown plugins (asides, heading
+        // links) are only applied to files in these directories.
+        processedDirs: ["../guides", "../../boards", "../../cpu"],
       },
       routeMiddleware: "./src/routeData.ts",
       head: [

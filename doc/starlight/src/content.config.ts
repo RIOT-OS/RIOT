@@ -12,7 +12,11 @@ import { promises as fs } from "node:fs";
 import { glob } from "astro/loaders";
 import { z } from "astro/zod";
 import path from "node:path";
+import { pathToFileURL } from "node:url";
 import {
+  type AnchorIndex,
+  collectDoxygenAnchors,
+  extractDoxygenBrief,
   extractDoxygenGroupFromDoxygen,
   extractDoxygenGroupTitleFromDoxygen,
   transformDoxygenMarkdown,
@@ -34,11 +38,11 @@ export const collections = {
     schema: docsSchema(),
   }),
   boards: defineCollection({
-    loader: doxygenDocLoader("../../boards", "boards"),
+    loader: doxygenDocLoader("../../boards", "boards", "boards"),
     schema: DoxygenDocSchema
   }),
   cpus: defineCollection({
-    loader: doxygenDocLoader("../../cpu", "cpu"),
+    loader: doxygenDocLoader("../../cpu", "cpu", "cpus"),
     schema: DoxygenDocSchema
   }),
   changelog: defineCollection({
@@ -54,95 +58,139 @@ export const collections = {
   }),
 };
 
+/** One doc*.md file that is rendered as a page. */
+interface DoxygenDocFile {
+  id: string;
+  docPath: string;
+  docDirPath: string;
+  docName: string;
+  isParent: boolean;
+  groupPrefix: string;
+  pageUrl: string;
+  content: string;
+}
+
+/**
+ * Find all doc*.md files of boards (`../../boards`) or CPUs (`../../cpu`).
+ */
+async function findDoxygenDocs(
+  dir: string,
+  groupPrefix: string,
+  routePrefix: string,
+): Promise<DoxygenDocFile[]> {
+  const result: DoxygenDocFile[] = [];
+  const entries = await fs.readdir(dir, { withFileTypes: true });
+
+  for (const docDir of entries.filter((entry) => entry.isDirectory())) {
+    const docName = docDir.name;
+    const docDirPath = path.join(dir, docName);
+    const docFiles = (await fs.readdir(docDirPath, { withFileTypes: true }))
+      .filter((entry) => entry.isFile() && entry.name.endsWith("doc.md"))
+      .map((entry) => entry.name)
+      .sort();
+
+    for (const docFile of docFiles) {
+      const baseName = path.basename(docFile, ".md");
+      const isParent = baseName === "doc";
+      const id = isParent ? docName : `${docName}/${baseName}`;
+      const docPath = path.join(docDirPath, docFile);
+      result.push({
+        id,
+        docPath,
+        docDirPath,
+        docName,
+        isParent,
+        groupPrefix,
+        pageUrl: `/${routePrefix}/${id}/`,
+        content: await fs.readFile(docPath, "utf-8"),
+      });
+    }
+  }
+  return result;
+}
+
+/**
+ * Global index of all Doxygen anchors of boards *and* CPUs. Board documents
+ * reference sections of CPU documents (e.g. `\ref esp32_riot`) and vice
+ * versa, so the index has to be built from both trees before any page is
+ * transformed. The promise is shared between both collection loaders.
+ */
+let anchorIndexPromise: Promise<AnchorIndex> | undefined;
+
+function getAnchorIndex(): Promise<AnchorIndex> {
+  anchorIndexPromise ??= (async () => {
+    const index: AnchorIndex = new Map();
+    const docs = [
+      ...(await findDoxygenDocs("../../boards", "boards", "boards")),
+      ...(await findDoxygenDocs("../../cpu", "cpu", "cpus")),
+    ];
+    for (const doc of docs) {
+      collectDoxygenAnchors(doc.content, doc.groupPrefix, doc.pageUrl, index);
+    }
+    return index;
+  })();
+  return anchorIndexPromise;
+}
+
 /**
  * Load documentation from doc*.md files in the specified directory.
  * Each subdirectory may contain one or more files matching the pattern
- * `doc*.md` (e.g. `doc.md`, `doc-extra.md`). Extracts titles from
- * `@defgroup` directives like riot-index does.
+ * `doc*.md` (e.g. `doc.md`, `doc_esp32.doc.md`).
  *
  * @param dir The folder from which to load the doc*.md files.
  * @param doxygenGroupPrefix The prefix with which the doxygen group of these docs starts
+ * @param routePrefix The first path segment of the generated pages (`boards`, `cpus`)
  */
-function doxygenDocLoader(dir: string, doxygenGroupPrefix: string): Loader {
+function doxygenDocLoader(
+  dir: string,
+  doxygenGroupPrefix: string,
+  routePrefix: string,
+): Loader {
   return {
     name: `${doxygenGroupPrefix}-loader`,
     load: async (context): Promise<void> => {
       try {
-        // Read all directories in the `dir` folder
-        const entries = await fs.readdir(dir, { withFileTypes: true });
-        const docDirs = entries.filter((entry) => entry.isDirectory());
+        const anchors = await getAnchorIndex();
+        const docs = await findDoxygenDocs(dir, doxygenGroupPrefix, routePrefix);
 
-        for (const docDir of docDirs) {
-          const docName = docDir.name;
-          const docDirPath = path.join(dir, docName);
-
-          // Find all doc*.md files in this directory
-          let docFiles: string[];
-          try {
-            const dirEntries = await fs.readdir(docDirPath, {
-              withFileTypes: true,
-            });
-            docFiles = dirEntries
-              .filter(
-                (entry) => entry.isFile() && entry.name.endsWith("doc.md"),
-              )
-              .map((entry) => entry.name)
-              // Sort so iteration order is deterministic across platforms
-              .sort();
-          } catch (error) {
-            console.debug(
-              `Failed to read directory for ${doxygenGroupPrefix} "${docName}", skipping...`,
+        for (const doc of docs) {
+          const unresolved = new Set<string>();
+          const filteredMarkdown = transformDoxygenMarkdown(doc.content, {
+            groupPrefix: doxygenGroupPrefix,
+            pageUrl: doc.pageUrl,
+            anchors,
+            onUnresolved: (id) => unresolved.add(id),
+          });
+          if (unresolved.size) {
+            context.logger.debug(
+              `${doc.docPath}: references resolved to API documentation: ${[...unresolved].join(", ")}`,
             );
-            continue;
           }
 
-          if (docFiles.length === 0) {
-            console.debug(
-              `Tried to load documentation for ${doxygenGroupPrefix} "${docName}" but it doesn't contain any doc*.md files, skipping...`,
-            );
-            continue;
-          }
-
-          for (const docFile of docFiles) {
-            const docPath = path.join(docDirPath, docFile);
-            const baseName = path.basename(docFile, ".md");
-            const isParent = baseName === "doc";
-            const id = isParent ? docName : `${docName}/${baseName}`;
-
-            const docContent = await fs.readFile(docPath, "utf-8");
-
-            // Parse frontmatter out of the markdown content if it exists
-            const markdown = docContent;
-            const fallbackTitle = docName.replace(/-/g, " ");
-            const title = extractDoxygenGroupTitleFromDoxygen(
-              docContent,
-              doxygenGroupPrefix,
-              fallbackTitle,
-            );
-            const filteredMarkdown = transformDoxygenMarkdown(markdown);
-
-            // Parse @brief directives for description (take the first one as description)
-            const descriptionMatch = docContent.match(/@brief\s+(.+)/);
-            const description = descriptionMatch?.[1].trim();
-
-            // Add entry to content collection
-            context.store.set({
-              id: id,
-              filePath: docPath.replaceAll("../", ""),
-              data: {
-                title: title,
-                description: description,
-                doxygenGroup: extractDoxygenGroupFromDoxygen(docContent, doxygenGroupPrefix),
-                githubFolder: docDirPath.replaceAll("../", ""),
-                // Only the parent appears in the overview; children are hidden
-                // and reached via their parent's childrenIds.
-                includeInOverview: isParent,
-                parentId: isParent ? null : docName,
-              },
-              body: filteredMarkdown,
-              rendered: await context.renderMarkdown(filteredMarkdown),
-            });
-          }
+          context.store.set({
+            id: doc.id,
+            filePath: doc.docPath.replaceAll("../", ""),
+            data: {
+              title: extractDoxygenGroupTitleFromDoxygen(
+                doc.content,
+                doxygenGroupPrefix,
+                doc.docName.replace(/-/g, " "),
+              ),
+              description: extractDoxygenBrief(doc.content, doxygenGroupPrefix),
+              doxygenGroup: extractDoxygenGroupFromDoxygen(doc.content, doxygenGroupPrefix),
+              githubFolder: doc.docDirPath.replaceAll("../", ""),
+              // Only the parent appears in the overview; children are hidden
+              // and reached via their parent's childrenIds.
+              includeInOverview: doc.isParent,
+              parentId: doc.isParent ? null : doc.docName,
+            },
+            body: filteredMarkdown,
+            // The file URL is required, otherwise Starlight doesn't apply its
+            // Markdown plugins and `:::note` etc. are not rendered as asides.
+            rendered: await context.renderMarkdown(filteredMarkdown, {
+              fileURL: pathToFileURL(path.resolve(doc.docPath)),
+            }),
+          });
         }
       } catch (error) {
         console.error(`Error loading ${doxygenGroupPrefix}:`, error);

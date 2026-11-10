@@ -72,3 +72,21 @@ main {
     font-size: calc(var(--font-scale) * var(--sl-text-h6)) !important;
   }
 }
+
+/*
+ * Starlight limits the content column to 45rem, which makes the wide
+ * configuration tables of board and CPU documentation hard to read.
+ * Use the available width on large screens and let tables scroll
+ * horizontally instead of squeezing them.
+ */
+@media (min-width: 72rem) {
+  :root {
+    --sl-content-width: 64rem;
+  }
+}
+
+.sl-markdown-content table {
+  display: block;
+  max-width: 100%;
+  overflow-x: auto;
+}
