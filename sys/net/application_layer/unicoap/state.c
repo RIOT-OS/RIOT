@@ -196,17 +196,15 @@ int unicoap_loop_enqueue(unicoap_job_t* job)
     return 0;
 }
 
-int unicoap_loop_enqueue_and_wait(unicoap_job_t* job)
+int unicoap_loop_enqueue_and_block(unicoap_blocking_job_t* job)
 {
     if (thread_getpid() == _unicoap_pid) {
-        // /* Disarm blocking if on unicoap thread. */
-        // mutex_unlock(&job->roadblock);
         /* Call function directly if on unicoap thread. */
-        job->super.handler(&job->super);
-        return 0;
+        job->super.super.handler(&job->super.super);
+        return job->res;
     }
-    event_post(&_queue, &job->super);
+    event_post(&_queue, &job->super.super);
     /* Block until callback calls unlock. */
     mutex_lock(&job->roadblock);
-    return 0;
+    return job->res;
 }

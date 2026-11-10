@@ -16,6 +16,7 @@
 
 #include "mutex.h"
 #include "net/netif.h"
+#include "net/unicoap.h"
 
 #if IS_USED(MODULE_DNS)
 #  include "net/dns.h"
@@ -512,21 +513,20 @@ int unicoap_send_request_sync(unicoap_message_t* request,
 }
 
 typedef struct {
-    unicoap_job_t job;
+    unicoap_blocking_job_t job;
     unicoap_message_t* request;
     unicoap_destination_t* destination;
     unicoap_response_callback_t callback;
     unicoap_request_parameters_t* parameters;
     unicoap_request_flags_t flags;
-    int res;
 } _async_args_t;
 
-static void _async_callback(unicoap_job_t* job)
+static unicoap_blocking_job_res_t _async_callback(unicoap_blocking_job_t* job)
 {
     _async_args_t* a = container_of(job, _async_args_t, job);
-    a->res = _open_request(a->request, a->destination,
+    int res = _open_request(a->request, a->destination,
                            (unicoap_callback_t){ .response = a->callback }, a->parameters, a->flags);
-    UNICOAP_JOB_FINISH(job);
+    return unicoap_blocking_job_finish(job, res);
 }
 
 int unicoap_send_request_async(unicoap_message_t* request,
@@ -536,13 +536,12 @@ int unicoap_send_request_async(unicoap_message_t* request,
                                unicoap_request_flags_t flags)
 {
     _async_args_t args = {
-        .job = UNICOAP_JOB(_async_callback),
+        .job = UNICOAP_BLOCKING_JOB(_async_callback),
         .request = request,
         .destination = destination,
         .callback = callback,
         .parameters = parameters,
         .flags = flags,
     };
-    unicoap_loop_enqueue_and_wait(&args.job);
-    return args.res;
+    return unicoap_loop_enqueue_and_block(&args.job);
 }

@@ -103,12 +103,11 @@ void unicoap_exchange_notify_all_server(const unicoap_endpoint_t* endpoint, unic
 // MARK: - Listeners
 
 typedef struct {
-    unicoap_job_t job;
+    unicoap_blocking_job_t job;
     unicoap_listener_t *listener;
-    int res;
 } _listener_args_t;
 
-static void _listener_register(unicoap_job_t* job)
+static unicoap_blocking_job_res_t _listener_register(unicoap_blocking_job_t* job)
 {
     _listener_args_t* a = container_of(job, _listener_args_t, job);
     unicoap_listener_t* listener = a->listener;
@@ -136,6 +135,8 @@ static void _listener_register(unicoap_job_t* job)
             /* TODO: Advanced features: emit warnings */
         }
     }
+
+    return unicoap_blocking_job_finish(job, 0);
 }
 
 void unicoap_listener_register(unicoap_listener_t* listener)
@@ -146,7 +147,7 @@ void unicoap_listener_register(unicoap_listener_t* listener)
     assert(listener->next == NULL);
 
     _listener_args_t args = {
-        .job = UNICOAP_JOB(_listener_register),
+        .job = UNICOAP_BLOCKING_JOB(_listener_register),
         .listener = listener,
     };
 
@@ -154,31 +155,32 @@ void unicoap_listener_register(unicoap_listener_t* listener)
         _listener_register(&args.job);
     }
     else {
-        unicoap_loop_enqueue(&args.job);
+        unicoap_loop_enqueue_and_block(&args.job);
     }
 }
 
-static void _listener_deregister(unicoap_job_t* job)
+static unicoap_blocking_job_res_t _listener_deregister(unicoap_blocking_job_t* job)
 {
     _listener_args_t* a = container_of(job, _listener_args_t, job);
     unicoap_listener_t* listener = a->listener;
 
+    int res;
     unicoap_listener_t* current = _state_get_listeners();
     if (current == listener) {
         _state_set_listeners(listener->next);
-        a->res = 0;
+        res = 0;
     }
 
     while (current) {
         if (current->next == listener) {
             current->next = listener->next;
-            a->res = 0;
+            res = 0;
         }
         current = current->next;
     }
-    a->res = -ENOENT;
+    res = -ENOENT;
 
-    UNICOAP_JOB_FINISH(job);
+    return unicoap_blocking_job_finish(job, res);
 }
 
 int unicoap_listener_deregister(unicoap_listener_t* listener)
@@ -186,11 +188,10 @@ int unicoap_listener_deregister(unicoap_listener_t* listener)
     assert(listener);
 
     _listener_args_t args = {
-        .job = UNICOAP_JOB(_listener_deregister),
+        .job = UNICOAP_BLOCKING_JOB(_listener_deregister),
         .listener = listener,
     };
-    unicoap_loop_enqueue_and_wait(&args.job);
-    return args.res;
+    return unicoap_loop_enqueue_and_block(&args.job);
 }
 
 ssize_t unicoap_resource_core_link_format_build(char* buffer, size_t capacity,

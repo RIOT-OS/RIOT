@@ -84,13 +84,6 @@ typedef struct {
      * @internal
      */
     event_t super;
-
-    /**
-     * @brief Mutex to synchronously wait for job completion on the calling thread
-     * @warning Do not read or write.
-     * @internal
-     */
-    mutex_t roadblock;
 } unicoap_job_t;
 
 /**
@@ -106,8 +99,48 @@ typedef struct {
     .roadblock = MUTEX_INIT_LOCKED \
 }
 
+typedef struct {} unicoap_blocking_job_res_t;
+
+/** @brief A job that can be enqueued and executed by the `unicoap` message processing loop. */
+typedef struct {
+    /**
+     * @brief Event that is posted on internal queue
+     * @warning Do not read or write.
+     * @internal
+     */
+    unicoap_job_t super;
+
+    /**
+     * @brief Mutex to synchronously wait for job completion on the calling thread
+     * @warning Do not read or write.
+     * @internal
+     */
+    mutex_t roadblock;
+
+    int res;
+} unicoap_blocking_job_t;
+
+/**
+ * @brief Initializes a @ref unicoap_blocking_job_t.
+ *
+ * @param func A function that must be of type `unicoap_blocking_job_t (unicoap_blocking_job_t *job)`.
+ * @returns Designated initializer for @ref unicoap_blocking_job_t
+ */
+#define UNICOAP_BLOCKING_JOB(func) (unicoap_blocking_job_t){ \
+    .super.super = { \
+        .handler = _UNICOAP_TRY_TYPECHECK_BLOCKING_JOB_FUNC(func) \
+    }, \
+    .roadblock = MUTEX_INIT_LOCKED, \
+    .res = 0, \
+}
+
 // TODO: docs
-#define UNICOAP_JOB_FINISH(job) (mutex_unlock(&(job)->roadblock))
+static inline unicoap_blocking_job_res_t unicoap_blocking_job_finish(unicoap_blocking_job_t *job, int res)
+{
+    job->res = res;
+    mutex_unlock(&job->roadblock);
+    return (unicoap_blocking_job_res_t){};
+}
 
 /**
  * @brief Schedules @p event to be run in the internal processing loop
@@ -132,7 +165,7 @@ typedef struct {
 int unicoap_loop_enqueue(unicoap_job_t* job);
 
 // TODO: docs
-int unicoap_loop_enqueue_and_wait(unicoap_job_t* job);
+int unicoap_loop_enqueue_and_block(unicoap_blocking_job_t* job);
 /** @} */
 
 /** @} */
