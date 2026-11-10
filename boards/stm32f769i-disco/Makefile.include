@@ -7,6 +7,10 @@ PROGRAMMER ?= openocd
 # this board has an on-board ST-link adapter
 OPENOCD_DEBUG_ADAPTER ?= stlink
 
+# connect under reset, so the board can be flashed even if the running
+# firmware has disabled the debug port or entered in a low-power mode
+OPENOCD_RESET_USE_CONNECT_ASSERT_SRST ?= 1
+
 # openocd programmer is supported
 PROGRAMMERS_SUPPORTED += openocd
 

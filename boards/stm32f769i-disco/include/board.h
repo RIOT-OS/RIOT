@@ -25,6 +25,9 @@ extern "C" {
 
 /**
  * @name Macros for controlling the on-board LEDs.
+ *
+ * LED0 is the red user LED LD1 and LED1 is the green user LED LD2. LED2 is
+ * the green LED LD3 on Arduino D13 (PA12), which is shared with SPI2 SCK.
  * @{
  */
 #define LED0_PIN_NUM        13
@@ -38,10 +41,6 @@ extern "C" {
 #define LED2_PIN_NUM        12
 #define LED2_PORT           GPIO_PORT_A /**< GPIO port of LED 2 */
 #define LED2_PORT_NUM       PORT_A
-
-#define LED3_PIN_NUM        4
-#define LED3_PORT           GPIO_PORT_D /**< GPIO port of LED 3 */
-#define LED3_PORT_NUM       PORT_D
 /** @} */
 
 /**
@@ -50,6 +49,30 @@ extern "C" {
  */
 #define BTN0_PIN            GPIO_PIN(PORT_A, 0)
 #define BTN0_MODE           GPIO_IN
+/** @} */
+
+/**
+ * @name DSI display panel signals
+ *
+ * The reset line is shared between the panel and the FT6x06 touch
+ * controller, which does not respond on I2C while in reset.
+ * @{
+ */
+#define LCD_RST_PIN         GPIO_PIN(PORT_J, 15)    /**< Panel and touch reset (low active) */
+/** @} */
+
+/**
+ * @name FT6x06 touch panel configuration
+ *
+ * The controller responds at the driver's default address 0x38 (verified on
+ * the MB1166-A09 panel).
+ * @{
+ */
+#define FT5X06_PARAM_I2C_DEV    I2C_DEV(1)              /**< I2C device */
+#define FT5X06_PARAM_INT_PIN    GPIO_PIN(PORT_I, 13)    /**< Interrupt pin */
+#define FT5X06_PARAM_XMAX       (800)                   /**< Max width */
+#define FT5X06_PARAM_YMAX       (480)                   /**< Max height */
+#define FT5X06_PARAM_TYPE       FT5X06_TYPE_FT6X06      /**< Device type */
 /** @} */
 
 #ifdef __cplusplus
