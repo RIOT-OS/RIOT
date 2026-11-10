@@ -12,7 +12,6 @@
  */
 
 #include <errno.h>
-#include <stdatomic.h>
 #include <stdint.h>
 
 #include "container.h"
@@ -105,11 +104,8 @@ typedef struct {
 typedef struct {
     /**
      * @brief Message ID unicoap is going to use for the next outbound request or response
-     *
-     * May be accessed from user thread (client request) or thread running unicoap processing loop
-     * for inbound messages.
      */
-    atomic_uint next_message_id;
+    uint16_t next_message_id;
 
 #if CONFIG_UNICOAP_CARBON_COPIES_MAX > 0
     /** @brief Copy of PDU sent, used for retransmission and deduplication */
@@ -191,7 +187,7 @@ static inline _state_t *_state(void)
     return &_state;
 }
 
-static inline atomic_uint *_state_get_next_message_id(void)
+static inline uint16_t *_state_get_next_message_id(void)
 {
     return &_state()->next_message_id;
 }
@@ -231,7 +227,7 @@ static inline size_t _state_get_transmissions_capacity(void)
 int unicoap_init_rfc7252_common(event_queue_t* queue)
 {
     (void)queue;
-    atomic_init(_state_get_next_message_id(), (unsigned int)random_uint32());
+    *_state_get_next_message_id() = random_uint32_range(0, UINT16_MAX);
     return 0;
 }
 
@@ -244,7 +240,9 @@ int unicoap_deinit_rfc7252_common(event_queue_t* queue)
 
 static uint16_t _generate_message_id(void)
 {
-    return (uint16_t)atomic_fetch_add(_state_get_next_message_id(), 1);
+    uint16_t id = *_state_get_next_message_id();
+    *_state_get_next_message_id() += 1;
+    return id;
 }
 
 /* MARK: - (Re-)Transmissions */
