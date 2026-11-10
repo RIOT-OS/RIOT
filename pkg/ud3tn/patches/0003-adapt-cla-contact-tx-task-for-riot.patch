@@ -1,0 +1,25 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: RIOT uD3TN port <buildsystem@riot>
+Date: Tue, 10 Nov 2026 14:00:00 +0100
+Subject: [PATCH] Adapt CLA contact TX task creation for RIOT
+
+---
+ components/cla/cla_contact_tx_task.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
+
+diff --git a/components/cla/cla_contact_tx_task.c b/components/cla/cla_contact_tx_task.c
+--- a/components/cla/cla_contact_tx_task.c
++++ b/components/cla/cla_contact_tx_task.c
+@@ -178,7 +178,9 @@ enum ud3tn_result cla_launch_contact_tx_task(struct cla_link *link)
+ 
+ 	const enum ud3tn_result res = hal_task_create(
+ 		cla_contact_tx_task,
+-		link
++		link,
++		true,
++		NULL
+ 	);
+ 
+ 	// Not launched, no need to wait for exit.
+-- 
+2.39.0

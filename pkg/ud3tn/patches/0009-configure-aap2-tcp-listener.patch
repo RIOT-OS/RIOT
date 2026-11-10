@@ -1,0 +1,25 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: RIOT uD3TN port <buildsystem@riot>
+Date: Tue, 10 Nov 2026 14:16:00 +0100
+Subject: [PATCH] Configure the RIOT AAP2 TCP listener
+
+---
+ components/ud3tn/init.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/components/ud3tn/init.c b/components/ud3tn/init.c
+--- a/components/ud3tn/init.c
++++ b/components/ud3tn/init.c
+@@ -133,8 +133,8 @@ void start_tasks(const struct ud3tn_cmdline_options *const opt)
+ 	aa2_cfg = aap2_agent_setup(
+ 		&bundle_agent_interface,
+ 		opt->aap2_socket,
+-		NULL,
+-		NULL,
++		"::",
++		"4242",
+ 		opt->bundle_version,
+ 		opt->lifetime_s * 1000
+ 	);
+-- 
+2.39.0

@@ -195,11 +195,11 @@ void advertise_route(const char *peer_ip, const char *peer_port, const char *pee
     snprintf(dest_eid, sizeof(dest_eid), "%s%s", peer_eid, peer_sink_id);
     snprintf(advertise_dest_eid, sizeof(advertise_dest_eid), "%s%s", advertise_eid,
              advertise_sink_id);
-    snprintf(advertise_cla, sizeof(advertise_cla), "tcpclv3_riot:[%s]:%s", advertise_ip,
+    snprintf(advertise_cla, sizeof(advertise_cla), "tcpclv3-riot:[%s]:%s", advertise_ip,
              advertise_port);
 
     /* Example resulting command:
-     * (dtn://node-c.dtn/):(tcpclv3_riot:[fd12:dead:beef:1:88f5:d9ff:fe8d:21f]:4557):[(dtn://node-c.dtn/chat)]:[{0,4102444800,100000}];
+     * (dtn://node-c.dtn/):(tcpclv3-riot:[fd12:dead:beef:1:88f5:d9ff:fe8d:21f]:4557):[(dtn://node-c.dtn/chat)]:[{0,4102444800,100000}];
      */
     snprintf(config_cmd, sizeof(config_cmd), "(%s):(%s):[(%s)]:[{0,4102444800,100000}];",
              advertise_eid, advertise_cla, advertise_dest_eid);
@@ -235,7 +235,7 @@ void add_route(const char *sink_id, const char *peer_ip, const char *peer_port,
         char peer_cla[64];
         char config_cmd[320];
 
-        snprintf(peer_cla, sizeof(peer_cla), "tcpclv3_riot:[%s]:%s", peer_ip, peer_port);
+        snprintf(peer_cla, sizeof(peer_cla), "tcpclv3-riot:[%s]:%s", peer_ip, peer_port);
         snprintf(config_cmd, sizeof(config_cmd), "(%s):(%s):[(%s)]:[{0,4102444800,100000}];",
                  peer_eid, peer_cla, dest_eid);
 
@@ -305,14 +305,14 @@ int main(void)
     argv[3] = "-c";
 
 #if defined(NODE_A) || defined(NODE_A_ESP32)
-    argv[4] = "tcpclv3_riot:*,4556";
+    argv[4] = "tcpclv3-riot:*,4556";
 #endif
 #if defined(NODE_B) || defined(NODE_B_ESP32)
-    argv[4] = "tcpclv3_riot:*,4557";
+    argv[4] = "tcpclv3-riot:*,4557";
 #endif
 
 #if defined(NODE_C) || defined(NODE_C_ESP32)
-    argv[4] = "tcpclv3_riot:*,4558";
+    argv[4] = "tcpclv3-riot:*,4558";
 #endif
 #ifdef CLA_OPTS_OVERRIDE
     argv[4] = CLA_OPTS_OVERRIDE; /* only for tests */
