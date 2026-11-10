@@ -339,6 +339,11 @@ static void _handle_in(usbus_cdcacm_device_t *cdcacm,
         }
     }
     irq_restore(old);
+    if (cdcacm->occupied == 0) {
+        /* nothing to send */
+        return;
+    }
+    cdcacm->in_busy = true;
     usbdev_ep_xmit(ep, cdcacm->in_buf, cdcacm->occupied);
 }
 
@@ -362,9 +367,17 @@ static void _transfer_handler(usbus_t *usbus, usbus_handler_t *handler,
         usbdev_ep_xmit(ep, cdcacm->out_buf, CONFIG_USBUS_CDC_ACM_BULK_EP_SIZE);
     }
     else if (ep->dir == USB_EP_DIR_IN) {
+        size_t sent = cdcacm->occupied;
         cdcacm->occupied = 0;
+        cdcacm->in_busy = false;
         if (!tsrb_empty(&cdcacm->tsrb)) {
             return _handle_in(cdcacm, ep);
+        }
+        if (sent == CONFIG_USBUS_CDC_ACM_BULK_EP_SIZE) {
+            /* terminate the transfer by a zero-length packet, otherwise
+             * the host may wait for more data */
+            cdcacm->in_busy = true;
+            usbdev_ep_xmit(ep, cdcacm->in_buf, 0);
         }
     }
 }
@@ -373,7 +386,7 @@ static void _handle_flush(event_t *ev)
 {
     usbus_cdcacm_device_t *cdcacm = container_of(ev, usbus_cdcacm_device_t,
                                                  flush);
-    if (cdcacm->occupied == 0) {
+    if (!cdcacm->in_busy) {
         _handle_in(cdcacm, cdcacm->iface_data.ep->next->ep);
     }
 }
@@ -384,6 +397,9 @@ static void _handle_reset(usbus_handler_t *handler)
     DEBUG("CDC ACM: Reset notification received\n");
 
     cdcacm->state = USBUS_CDC_ACM_LINE_STATE_DISCONNECTED;
+    /* a USB reset aborts a pending IN transfer */
+    cdcacm->occupied = 0;
+    cdcacm->in_busy = false;
 }
 
 static void _event_handler(usbus_t *usbus, usbus_handler_t *handler, usbus_event_usb_t event)
