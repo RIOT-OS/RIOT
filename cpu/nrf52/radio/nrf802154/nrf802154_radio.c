@@ -584,7 +584,7 @@ static int _request_on(ieee802154_dev_t *dev)
         /* EVENTS_FRAMESTART marks the end of the SFD.
          * https://docs.nordicsemi.com/r/bundle/ps_nrf52840/page/radio.html?
          * section=register.EVENTS_FRAMESTART */
-        NRF_PPI->CH[CONFIG_NRF802154_TIMESTAMP_PPI_CH].EEP = (uint32_t)&NRF_RADIO->EVENTS_ADDRESS;
+        NRF_PPI->CH[CONFIG_NRF802154_TIMESTAMP_PPI_CH].EEP = (uint32_t)&NRF_RADIO->EVENTS_FRAMESTART;
         NRF_PPI->CH[CONFIG_NRF802154_TIMESTAMP_PPI_CH].TEP =
             (uint32_t)&MAC_TIMER_DEV->TASKS_CAPTURE[MAC_TIMER_CHAN_TS];
         NRF_PPI->CHENSET = (1UL << CONFIG_NRF802154_TIMESTAMP_PPI_CH);
