@@ -9,7 +9,7 @@ endif
 # module) to stdout, provided that logging to stdout is enabled and the log
 # level of the 'gba.debug' category includes the debug level (16).
 MGBA_LOG_LEVEL ?= 16
-MGBA_FLAGS ?= -C logToStdout=1 -C logLevel.gba.debug=$(MGBA_LOG_LEVEL)
+MGBA_FLAGS += -C logToStdout=1 -C logLevel.gba.debug=$(MGBA_LOG_LEVEL)
 
 # mGBA GUI (there is no headless flag).
 MGBA_SHOW_GUI ?= 1
