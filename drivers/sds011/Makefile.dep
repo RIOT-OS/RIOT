@@ -1,1 +1,2 @@
 FEATURES_REQUIRED += periph_uart
+FEATURES_OPTIONAL += periph_gpio

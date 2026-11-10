@@ -189,10 +189,16 @@ int sds011_init(sds011_t *dev, const sds011_params_t *params)
 {
     assert((dev != NULL) && (params != NULL) && (params->uart < UART_NUMOF));
 
+#ifdef MODULE_PERIPH_GPIO
     if ((gpio_is_valid(params->pwr_pin)) &&
         (gpio_init(params->pwr_pin, GPIO_OUT) != 0)) {
         return SDS011_ERROR;
     }
+#else
+    if (params->pwr_pin != GPIO_UNDEF) {
+        return SDS011_ERROR;
+    }
+#endif
 
     memcpy(&dev->params, params, sizeof(sds011_params_t));
 
@@ -227,17 +233,21 @@ int sds011_register_callback(sds011_t *dev, sds011_callback_t cb, void *ctx)
 void sds011_power_on(const sds011_t *dev)
 {
     assert(dev != NULL);
+#ifdef MODULE_PERIPH_GPIO
     if(gpio_is_valid(dev->params.pwr_pin)) {
         gpio_write(dev->params.pwr_pin, dev->params.pwr_ah);
     }
+#endif
 }
 
 void sds011_power_off(const sds011_t *dev)
 {
     assert(dev != NULL);
+#ifdef MODULE_PERIPH_GPIO
     if(gpio_is_valid(dev->params.pwr_pin)) {
         gpio_write(dev->params.pwr_pin, !dev->params.pwr_ah);
     }
+#endif
 }
 
 int sds011_get_reporting_mode(sds011_t *dev, sds011_reporting_mode_t *mode)
