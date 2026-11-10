@@ -49,16 +49,16 @@
 .text
 .arm
 .section .init
-.global _startup
-.func   _startup
 
+/* Global start up, the cartridge header jumps here */
+.global _startup
 _startup:
                 ldr    pc, =reset_handler
 
-/*.func reset_handler */
-reset_handler:
-
 .section .init0
+.func
+/* Reset function, actual start of RIOT */
+reset_handler:
                 /* Disable interrupts using the GBA control reg */
                 ldr r0, =REG_IME
                 mov r1, #0
@@ -77,7 +77,7 @@ reset_handler:
                 ldr   sp, =__stack_irq_start
                 msr   CPSR_c, #MODE_SVC|I_BIT|F_BIT     /* Supervisor Mode */
                 ldr   sp, =__stack_svc_start
-                msr   CPSR_c, #MODE_SYS|I_BIT|F_BIT     /* User Mode */
+                msr   CPSR_c, #MODE_SYS|I_BIT|F_BIT     /* Sys Mode (we use it as User Mode) */
                 ldr   sp, =__stack_usr_start
 
                 /* call the cpu-bring-up helper from arm7_common/arm7_init.c */
@@ -87,7 +87,7 @@ reset_handler:
 
                 /* Infinite Loop */
 .section .fini0
-__main_exit:    B   __main_exit
+__main_exit:    b   __main_exit
 
 
 .endfunc
