@@ -15,5 +15,4 @@ ifneq (,$(filter stdio_default,$(USEMODULE)))
   # for example, to reset the board if stdio_cdc_acm or stdio_tinyusb_cdc_acm
   # was previously used.
   USEMODULE += usb_board_reset
-  include $(RIOTMAKE)/tools/usb_board_reset.mk
 endif
