@@ -38,7 +38,7 @@ DRIVER=l3gd20h USEMODULE=l3gxxxx_spi BOARD=... make -C tests/drivers/l3gxxxx
 The application is configurable by using different pseudomodules to test
 most of the functionalities of the L3Gxxxx driver.
 
-- Module `l3gxxxx_irq_drdy`:
+- Module `l3gxxxx_irq_data`:
   Instead of polling the sensor regularly for data, the data ready interrupt
   on signal `INT2/DRDY` is used to read the data. If module `l3gxxxx_fifo`
   is used at the same time, the FIFO status interrupts are enabled instead
@@ -46,7 +46,7 @@ most of the functionalities of the L3Gxxxx driver.
   can be overridden, for example:
 
     ```
-    DRIVER=l3gd20h USEMODULE=l3gxxxx_irq_drdy \
+    DRIVER=l3gd20h USEMODULE=l3gxxxx_irq_data \
     CFLAGS='-DL3GXXXX_INT2_PIN=GPIO_PIN\(0,5\) BOARD=... make -C tests/drivers/l3gxxxx
     ```
 
@@ -64,7 +64,7 @@ most of the functionalities of the L3Gxxxx driver.
 
 - Module `l3gxxxx_fifo`:
   Instead of fetching single data samples from the sensor, the FIFO of
-  the sensor is enabled. Depending on the use of module `l3gxxxx_irq_drdy`,
+  the sensor is enabled. Depending on the use of module `l3gxxxx_irq_data`,
   the FIFO state is either polled regularly or FIFO status interrupts on
   signal `INT2/DRDY` are used. All available data samples are read from
   the FIFO with a single burst access.

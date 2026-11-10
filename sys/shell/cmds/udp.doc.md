@@ -14,7 +14,7 @@ interface. Examples include @ref net_gnrc and @ref pkg_lwip.
 
 Module. Add `USEMODULE += shell_cmd_udp` to your application Makefile.
 
-It is automatically selected with `USEMODULE += sys_shell_cmds_default`
+It is automatically selected with `USEMODULE += shell_cmds_default`
 if @ref net_sock_udp (`USEMODULE += sock_udp`) is available in your build.
 
 ## Send UDP Datagrams
