@@ -214,7 +214,7 @@ class GNRCIPv6NIBPrefixShowParser(ShellInteractionParser):
             r"(?P<prefix_len>\d+)\s+"
             r"dev\s+#(?P<iface>\d+)"
             r"(\s+expires (?P<valid_sec>\d+) sec)?"
-            r"(\s+deprecates (?P<pref_sec>\d+) sec)?$"
+            r"(\s+deprecates (?P<pref_sec>\d+) sec)?"
         )
 
     def parse(self, cmd_output):
