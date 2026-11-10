@@ -60,6 +60,13 @@ extern "C" {
 #define CONFIG_ZTIMER_USEC_ADJUST_SLEEP (312)                /**< Overhead for ztimer_sleep */
 /** @} */
 
+/**
+ * @name    UART configuration
+ * @{
+ */
+#define UART_NUMOF (1)
+/** @} */
+
 #ifdef __cplusplus
 }
 #endif

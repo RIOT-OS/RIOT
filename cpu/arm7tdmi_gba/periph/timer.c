@@ -2,6 +2,20 @@
  * SPDX-FileCopyrightText: 2026 HAW Hamburg
  * SPDX-License-Identifier: LGPL-2.1-only
  */
+
+/**
+ * @ingroup     cpu_arm7tdmi_gba
+ * @ingroup     drivers_periph_timer
+ * @{
+ *
+ * @file
+ * @brief       GBA periph/timer driver
+ *
+ * @author      Bennet Hattesen <bennet.hattesen@haw-hamburg.de>
+ *
+ * @}
+ */
+
 #include <stddef.h>
 
 #include "cpu.h"

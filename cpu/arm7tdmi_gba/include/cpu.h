@@ -20,6 +20,11 @@ extern "C" {
  */
 void gba_timer_isr(uint16_t interrupt_flags_timer);
 
+/**
+ * @brief   The interrupt service routine for the uart interrupts
+ */
+void gba_uart_isr(void);
+
 #ifdef __cplusplus
 }
 #endif
