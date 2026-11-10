@@ -429,7 +429,7 @@ void cc2538_irq_handler(void)
         handled_f0 |= SFD;
         switch(cc2538_state) {
         case CC2538_STATE_READY:
-            if(IS_USED(MODULE_IEEE802154_RX_TIMESTAMP)) {
+            if (IS_USED(MODULE_IEEE802154_RX_TIMESTAMP)) {
                 _rx_timestamp_ticks = _sfd_capture_ticks();
             }
             cc2538_rf_hal->cb(cc2538_rf_hal, IEEE802154_RADIO_INDICATION_RX_START);
