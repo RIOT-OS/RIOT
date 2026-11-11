@@ -339,6 +339,21 @@ static bool _has_retrans_left(ieee802154_submac_t *submac)
     return _get_retrans(submac) < CONFIG_IEEE802154_DEFAULT_MAX_FRAME_RETRANS;
 }
 
+static inline void _handle_csma_ca(ieee802154_submac_t *submac)
+{
+#if IS_USED(MODULE_IEEE802154_SUBMAC_SOFT_CSMA_CA)
+    /* delay for an adequate random backoff period */
+    uint32_t bp = (random_uint32() & submac->backoff_mask) * submac->csma_backoff_us;
+
+    ztimer_sleep(ZTIMER_USEC, bp);
+    /* Prepare for next iteration */
+    uint8_t curr_be = (submac->backoff_mask + 1) >> 1;
+    if (curr_be < submac->be.max) {
+        submac->backoff_mask = (submac->backoff_mask << 1) | 1;
+    }
+#endif
+}
+
 static ieee802154_submac_fsm_return_t _tx_end(ieee802154_submac_t *submac, int status,
                                               ieee802154_tx_info_t *info)
 {
@@ -565,19 +580,9 @@ static ieee802154_submac_fsm_return_t _fsm_state_prepare(ieee802154_submac_t *su
     case IEEE802154_FSM_EV_ENTRY: {
         ieee802154_fsm_state_cb_t tx_state = _fsm_state_tx;
 
-        if (submac->tx_ftype != IEEE802154_FCF_TYPE_ACK && !_does_handle_csma(dev)) {
-#if IS_USED(MODULE_IEEE802154_SUBMAC_SOFT_CSMA_CA)
-            /* delay for an adequate random backoff period */
-            uint32_t bp = (random_uint32() & submac->backoff_mask) *
-                          submac->csma_backoff_us;
-
-            ztimer_sleep(ZTIMER_USEC, bp);
-            /* Prepare for next iteration */
-            uint8_t curr_be = (submac->backoff_mask + 1) >> 1;
-            if (curr_be < submac->be.max) {
-                submac->backoff_mask = (submac->backoff_mask << 1) | 1;
-            }
-#endif
+        if (submac->tx_ftype != IEEE802154_FCF_TYPE_ACK &&
+            !_does_handle_csma(dev)) {
+            _handle_csma_ca(submac);
         }
         else if (submac->tx_ftype == IEEE802154_FCF_TYPE_ACK && !_does_send_ack(dev)) {
             /* no backoff for ACK frames but wait for SIFSPeriod */
