@@ -51,8 +51,7 @@ make BOARD=frdm-k64f flash
 #### Over MSD
 Simply mount the mbed Mass Storage Device und copy new RIOT firmware.
 See also the ARMmbed
-[instructions](https://developer.mbed.org/platforms/FRDM-K64F/#getting-started-
-with-mbed).
+[instructions](https://developer.mbed.org/platforms/FRDM-K64F/#getting-started-with-mbed).
 
 ## Updating the Bootloader
 A update of CMSIS-DAP firmware is necessary to using the board with OpenOCD.

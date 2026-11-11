@@ -104,8 +104,8 @@ set to ON.
 
 To flash and debug using OpenOCD, the precompiled version of OpenOCD for
 ESP32 has to be installed using the install script while being in RIOT's
-root directory, see also section [Using Local Toolchain Installation]
-(#esp32_local_toolchain_installation).
+root directory, see also section
+[Using Local Toolchain Installation](#esp32_local_toolchain_installation).
 
 ```shell
 dist/tools/esptool/install.sh openocd
