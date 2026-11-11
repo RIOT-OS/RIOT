@@ -472,6 +472,18 @@ uint8_t sx127x_get_bandwidth(const sx127x_t *dev);
 void sx127x_set_bandwidth(sx127x_t *dev, uint8_t bandwidth);
 
 /**
+ * @brief   Checks if a LoRa bandwidth is supported
+ *
+ * The SX1272 supports 125, 250 and 500 kHz, the SX1276 also supports
+ * 62.5 kHz.
+ *
+ * @param[in] bandwidth             The bandwidth, LORA_BW_*
+ *
+ * @return true if the bandwidth is supported
+ */
+bool sx127x_bandwidth_is_supported(uint8_t bandwidth);
+
+/**
  * @brief   Gets the SX127X LoRa spreading factor
  *
  * @param[in] dev                      The sx127x device descriptor

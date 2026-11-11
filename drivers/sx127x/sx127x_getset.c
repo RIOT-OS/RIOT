@@ -145,23 +145,7 @@ uint32_t sx127x_get_time_on_air(const sx127x_t *dev, uint8_t pkt_len)
         break;
     case SX127X_MODEM_LORA:
     {
-        double bw = 0.0;
-
-        /* Note: When using LoRa modem only bandwidths 125, 250 and 500 kHz are supported. */
-        switch (dev->settings.lora.bandwidth) {
-        case LORA_BW_125_KHZ:
-            bw = 125e3;
-            break;
-        case LORA_BW_250_KHZ:
-            bw = 250e3;
-            break;
-        case LORA_BW_500_KHZ:
-            bw = 500e3;
-            break;
-        default:
-            DEBUG("Invalid bandwidth: %d\n", dev->settings.lora.bandwidth);
-            break;
-        }
+        double bw = lora_bw_to_hz(dev->settings.lora.bandwidth);
 
         /* Symbol rate : time for one symbol [secs] */
         double rs = bw / (1 << dev->settings.lora.datarate);
@@ -258,6 +242,9 @@ void sx127x_set_rx(sx127x_t *dev)
                              sx127x_reg_read(dev, SX127X_REG_LR_DETECTOPTIMIZE) & 0x7F);
             sx127x_reg_write(dev, SX127X_REG_LR_TEST30, 0x00);
             switch (dev->settings.lora.bandwidth) {
+            case LORA_BW_62_5_KHZ:        /* 62.5 kHz */
+                sx127x_reg_write(dev, SX127X_REG_LR_TEST2F, 0x40);
+                break;
             case LORA_BW_125_KHZ:         /* 125 kHz */
                 sx127x_reg_write(dev, SX127X_REG_LR_TEST2F, 0x40);
                 break;
@@ -474,13 +461,33 @@ uint8_t sx127x_get_bandwidth(const sx127x_t *dev)
     return dev->settings.lora.bandwidth;
 }
 
+bool sx127x_bandwidth_is_supported(uint8_t bandwidth)
+{
+    switch (bandwidth) {
+    case LORA_BW_125_KHZ:
+    case LORA_BW_250_KHZ:
+    case LORA_BW_500_KHZ:
+        return true;
+#if defined(MODULE_SX1276)
+    /* The SX1276 also supports 62.5 kHz. Its narrower bandwidths, from 7.8 to
+     * 41.7 kHz, require a shift of the RF frequency for the errata 2.3, which
+     * the driver doesn't implement */
+    case LORA_BW_62_5_KHZ:
+        return true;
+#endif
+    default:
+        return false;
+    }
+}
+
 static void _low_datarate_optimize(sx127x_t *dev)
 {
-    if (((dev->settings.lora.bandwidth == LORA_BW_125_KHZ) &&
-         ((dev->settings.lora.datarate == LORA_SF11) ||
-          (dev->settings.lora.datarate == LORA_SF12))) ||
-        ((dev->settings.lora.bandwidth == LORA_BW_250_KHZ) &&
-         (dev->settings.lora.datarate == LORA_SF12))) {
+    /* The low data rate optimization is required when a symbol lasts at
+     * least 16 ms */
+    uint32_t symbol_len_ms = ((1UL << dev->settings.lora.datarate) * MS_PER_SEC) /
+                             lora_bw_to_hz(dev->settings.lora.bandwidth);
+
+    if (symbol_len_ms >= 16) {
         dev->settings.lora.flags |= SX127X_LOW_DATARATE_OPTIMIZE_FLAG;
     }
     else {
@@ -531,6 +538,9 @@ static void _update_bandwidth(const sx127x_t *dev)
         break;
     case LORA_BW_500_KHZ:
         config1_reg |=  SX1276_RF_LORA_MODEMCONFIG1_BW_500_KHZ;
+        break;
+    case LORA_BW_62_5_KHZ:
+        config1_reg |=  SX1276_RF_LORA_MODEMCONFIG1_BW_62_50_KHZ;
         break;
     default:
         DEBUG("[sx127x] Unsupported bandwidth, %d\n",

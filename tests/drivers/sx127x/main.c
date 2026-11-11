@@ -54,7 +54,7 @@ int lora_setup_cmd(int argc, char **argv)
 
     if (argc < 4) {
         puts("usage: setup "
-             "<bandwidth (125, 250, 500)> "
+             "<bandwidth (62.5, 125, 250, 500)> "
              "<spreading factor (7..12)> "
              "<code rate (5..8)>");
         return -1;
@@ -65,6 +65,11 @@ int lora_setup_cmd(int argc, char **argv)
     uint8_t lora_bw;
 
     switch (bw) {
+    case 62:
+        puts("setup: setting 62.5KHz bandwidth");
+        lora_bw = LORA_BW_62_5_KHZ;
+        break;
+
     case 125:
         puts("setup: setting 125KHz bandwidth");
         lora_bw = LORA_BW_125_KHZ;
@@ -82,7 +87,7 @@ int lora_setup_cmd(int argc, char **argv)
 
     default:
         puts("[Error] setup: invalid bandwidth value given, "
-             "only 125, 250 or 500 allowed.");
+             "only 62.5, 125, 250 or 500 allowed.");
         return -1;
     }
 
