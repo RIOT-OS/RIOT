@@ -381,6 +381,8 @@ static inline void _handle_csma_ca(ieee802154_submac_t *submac)
     if (curr_be < submac->be.max) {
         submac->backoff_mask = (submac->backoff_mask << 1) | 1;
     }
+#else
+    (void) submac;
 #endif
 }
 
