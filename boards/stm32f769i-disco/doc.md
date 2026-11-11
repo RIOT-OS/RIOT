@@ -28,7 +28,7 @@ The kit includes the MB1225 main board and the MB1166 display daughterboard
 | UARTs             | 4                                 |
 | SPIs              | 6                                 |
 | I2Cs              | 4                                 |
-| SAIs              | 2                                 |
+| SAI               | 2                                 |
 | CANs              | 3                                 |
 | USBs              | 1 Full Speed, 1 High Speed (ULPI) |
 | Ethernet MAC      | Yes                               |

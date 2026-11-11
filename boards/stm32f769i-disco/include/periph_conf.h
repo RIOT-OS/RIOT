@@ -489,6 +489,10 @@ static const pwm_conf_t pwm_config[] = {
  * detect signal on PI15 (low is active)
  * @{
  */
+
+/**
+ * @brief   SDIO/SDMMC static configuration struct
+ */
 static const sdmmc_conf_t sdmmc_config[] = {
     {
         .dev = SDMMC2,
