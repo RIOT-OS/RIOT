@@ -244,6 +244,13 @@ enum {
     LORA_BW_400_KHZ,                   /**< 400 kHz bandwidth, only 2.4Ghz */
     LORA_BW_800_KHZ,                   /**< 800 kHz bandwidth, only 2.4Ghz  */
     LORA_BW_1600_KHZ,                  /**< 1600 kHz bandwidth, only 2.4Ghz  */
+    LORA_BW_7_8_KHZ,                   /**< 7.8 kHz bandwidth, only sub-GHz */
+    LORA_BW_10_4_KHZ,                  /**< 10.4 kHz bandwidth, only sub-GHz */
+    LORA_BW_15_6_KHZ,                  /**< 15.6 kHz bandwidth, only sub-GHz */
+    LORA_BW_20_8_KHZ,                  /**< 20.8 kHz bandwidth, only sub-GHz */
+    LORA_BW_31_25_KHZ,                 /**< 31.25 kHz bandwidth, only sub-GHz */
+    LORA_BW_41_7_KHZ,                  /**< 41.7 kHz bandwidth, only sub-GHz */
+    LORA_BW_62_5_KHZ,                  /**< 62.5 kHz bandwidth, only sub-GHz */
 };
 
 /**
@@ -273,6 +280,50 @@ enum {
     LORA_CR_LI_4_8                     /**< coding rate long interleaving 4/8 */
 };
 /** @} */
+
+/**
+ * @brief   Returns the frequency of a LoRa modulation bandwidth
+ *
+ * @param[in] bw    LoRa modulation bandwidth, LORA_BW_*
+ *
+ * @return  the bandwidth in Hz
+ * @return  0 if @p bw is unknown
+ */
+static inline uint32_t lora_bw_to_hz(uint8_t bw)
+{
+    switch (bw) {
+    case LORA_BW_7_8_KHZ:
+        return 7812;
+    case LORA_BW_10_4_KHZ:
+        return 10417;
+    case LORA_BW_15_6_KHZ:
+        return 15625;
+    case LORA_BW_20_8_KHZ:
+        return 20833;
+    case LORA_BW_31_25_KHZ:
+        return 31250;
+    case LORA_BW_41_7_KHZ:
+        return 41667;
+    case LORA_BW_62_5_KHZ:
+        return 62500;
+    case LORA_BW_125_KHZ:
+        return 125000;
+    case LORA_BW_200_KHZ:
+        return 203125;
+    case LORA_BW_250_KHZ:
+        return 250000;
+    case LORA_BW_400_KHZ:
+        return 406250;
+    case LORA_BW_500_KHZ:
+        return 500000;
+    case LORA_BW_800_KHZ:
+        return 812500;
+    case LORA_BW_1600_KHZ:
+        return 1625000;
+    default:
+        return 0;
+    }
+}
 
 #ifdef __cplusplus
 }
