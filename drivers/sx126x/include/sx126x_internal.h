@@ -32,7 +32,7 @@ extern "C" {
  * @retval    true if the device is sx1261
  * @retval    false otherwise
  */
-static inline bool sx126x_is_sx1261(sx126x_t *dev)
+static inline bool sx126x_is_sx1261(const sx126x_t *dev)
 {
     assert(dev);
     if (SX126X_SINGLE) {
@@ -51,7 +51,7 @@ static inline bool sx126x_is_sx1261(sx126x_t *dev)
  * @retval    true if the device is sx1262
  * @retval    false otherwise
  */
-static inline bool sx126x_is_sx1262(sx126x_t *dev)
+static inline bool sx126x_is_sx1262(const sx126x_t *dev)
 {
     assert(dev);
     if (SX126X_SINGLE) {
@@ -70,7 +70,7 @@ static inline bool sx126x_is_sx1262(sx126x_t *dev)
  * @retval    true if the device is llcc68
  * @retval    false otherwise
  */
-static inline bool sx126x_is_llcc68(sx126x_t *dev)
+static inline bool sx126x_is_llcc68(const sx126x_t *dev)
 {
     assert(dev);
     if (SX126X_SINGLE) {
@@ -89,7 +89,7 @@ static inline bool sx126x_is_llcc68(sx126x_t *dev)
  * @retval    true if the device is sx1268
  * @retval    false otherwise
  */
-static inline bool sx126x_is_sx1268(sx126x_t *dev)
+static inline bool sx126x_is_sx1268(const sx126x_t *dev)
 {
     assert(dev);
     if (SX126X_SINGLE) {
@@ -108,7 +108,7 @@ static inline bool sx126x_is_sx1268(sx126x_t *dev)
  * @retval    true if the device is stm32wl
  * @retval    false otherwise
  */
-static inline bool sx126x_is_stm32wl(sx126x_t *dev)
+static inline bool sx126x_is_stm32wl(const sx126x_t *dev)
 {
     assert(dev);
     if (SX126X_SINGLE) {

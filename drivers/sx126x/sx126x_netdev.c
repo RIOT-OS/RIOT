@@ -371,7 +371,7 @@ static int _set(netdev_t *netdev, netopt_t opt, const void *val, size_t len)
     case NETOPT_BANDWIDTH:
         assert(len <= sizeof(uint8_t));
         uint8_t bw = *((const uint8_t *)val);
-        if (bw > LORA_BW_500_KHZ) {
+        if (!sx126x_bandwidth_is_supported(dev, bw)) {
             res = -EINVAL;
             break;
         }

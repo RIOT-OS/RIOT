@@ -189,14 +189,7 @@ int sx126x_init(sx126x_t *dev);
  *
  * @return Time for symbol(s) in milliseconds
  */
-static inline int sx126x_symbol_to_msec(sx126x_t *dev, uint16_t symbols)
-{
-    assert(dev && (dev->mod_params.bw <= SX126X_LORA_BW_500) && \
-           (dev->mod_params.bw >= SX126X_LORA_BW_125));
-
-    /* Refer section 6.1.4 LoRa Time-on-Air in SX1268 datasheet */
-    return (symbols * (1 << (dev->mod_params.sf + 7 - dev->mod_params.bw)) / 1000);
-}
+int sx126x_symbol_to_msec(sx126x_t *dev, uint16_t symbols);
 
 /**
  * @brief   Gets the channel RF frequency.
@@ -223,6 +216,16 @@ void sx126x_set_channel(sx126x_t *dev, uint32_t freq);
  * @return the bandwidth
  */
 uint8_t sx126x_get_bandwidth(const sx126x_t *dev);
+
+/**
+ * @brief   Checks if a LoRa bandwidth is supported by the device
+ *
+ * @param[in] dev                      Device descriptor of the driver
+ * @param[in] bandwidth                The bandwidth, LORA_BW_*
+ *
+ * @return true if the bandwidth is supported
+ */
+bool sx126x_bandwidth_is_supported(const sx126x_t *dev, uint8_t bandwidth);
 
 /**
  * @brief   Sets the LoRa bandwidth
