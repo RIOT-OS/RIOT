@@ -679,7 +679,7 @@ class TestNetifGNRC(riotctrl_shell_tests.testcase_base.TestBase):
             if match := c_802154_pid.match(line):
                 self.ieee802154_pid = int(match[1])
         assert self.eth_pid is not None, "Could not identify Ethernet PID"
-        assert self.ieee802154_pid is not None, "Could not identify Ethernet PID"
+        assert self.ieee802154_pid is not None, "Could not identify IEEE 802.15.4 PID"
         self.set_exp = {
             self.eth_pid: self.ETH_SET_EXP,
             self.ieee802154_pid: self.IEEE802154_SET_EXP,
