@@ -128,6 +128,7 @@ Here is a quick overview of the examples available in the RIOT:
 | Example | Description |
 |---------|-------------|
 | [lorawan](./networking/misc/lorawan/README.md) | This application shows a basic LoRaWAN use-case with RIOT. |
+| [meshcore](./networking/misc/meshcore/README.md) | This application runs a MeshCore node, which repeats the packets of the mesh and exchanges text messages over LoRa. |
 | [openthread](./networking/misc/openthread/README.md) | This example demonstrates the usage of the OpenThread stack in RIOT. |
 | [lwm2m](./networking/misc/lwm2m/README.md) | Example of a LWM2M client on RIOT |
 | [ccn-lite-relay](./networking/misc/ccn-lite-relay/README.md) | This application demonstrates how to use the Content-Centric Networking stack from [CCN-Lite](http://www.ccn-lite.net/) on RIOT |
