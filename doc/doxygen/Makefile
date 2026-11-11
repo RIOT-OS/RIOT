@@ -33,6 +33,11 @@ DOXYGEN_TGZ_SHA512 = 0e99fb9a65f9fada2fe90ea0d1f940b8e58d62801f880614b440b9f3a9f
 # Set the Doxygen binary if not already set
 DOXYGEN ?= doxygen
 
+# The tag file is the index of the HTML documentation. It is deployed together
+# with the HTML output and is used by the guides (doc/starlight) to link to the
+# API documentation.
+TAGFILE ?= html/riot.tag
+
 # Strip the commit hash that is sometimes present after the
 # version number.
 DOXYGEN_CUR_VERSION = $(shell $(DOXYGEN) --version | cut -d ' ' -f1)
@@ -86,7 +91,8 @@ doc-ci: $(RIOTTOOLS)/doxygen/Makefile
 # by marking html as phony we force make to re-run Doxygen even if the directory exists.
 .PHONY: html
 html: src/changelog.md
-	( cat riot.doxyfile ; echo "GENERATE_HTML = yes" ) | $(DOXYGEN) -
+	( cat riot.doxyfile ; echo "GENERATE_HTML = yes" ; \
+	  echo "GENERATE_TAGFILE = $(TAGFILE)" ) | $(DOXYGEN) -
 	@echo ""
 	@echo "RIOT documentation successfully generated at file://$(RIOTBASE)/doc/doxygen/html/index.html"
 
