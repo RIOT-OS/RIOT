@@ -14,6 +14,8 @@
  */
 
 #include <assert.h>
+#include <climits>
+#include <cstddef>
 #include <errno.h>
 #include <string.h>
 
@@ -261,7 +263,15 @@ static int _isotp_rcv_sf(struct isotp *isotp, can_frame_t *frame, size_t ae)
     }
 
     size_t len = (frame->data[ae] & 0x0F);
-    if (len > frame->len - (SF_PCI_SZ + ae)) {
+    size_t pos = ae + SF_PCI_SZ;
+
+    /* extended SF */
+    if (len == 0) {
+        len = frame->data[pos++];
+    }
+
+
+    if (len > frame->len - pos) {
         return 1;
     }
 
@@ -272,8 +282,9 @@ static int _isotp_rcv_sf(struct isotp *isotp, can_frame_t *frame, size_t ae)
     isotp->rx.snip = snip;
 
     isotp->rx.idx = 0;
-    for (size_t i = SF_PCI_SZ + ae; i < isotp->rx.snip->size + ae + SF_PCI_SZ; i++) {
-        ((uint8_t *)isotp->rx.snip->data)[isotp->rx.idx++] = frame->data[i];
+
+    while (isotp->rx.idx < isotp->rx.snip->size){
+        ((uint8_t *)isotp->rx.snip->data)[isotp->rx.idx++] = frame->data[pos++];
     }
 
     return _isotp_dispatch_rx(isotp);
@@ -283,14 +294,37 @@ static int _isotp_rcv_ff(struct isotp *isotp, can_frame_t *frame, size_t ae)
 {
     isotp->rx.state = ISOTP_IDLE;
 
-    if (ae + FF_PCI_SZ > frame->len) {
+    /* the first frame must be a 8 bytes (classic) or longer (CAN_FD) */
+    if (8 > frame->len) {
         return 1;
     }
-
     size_t len = (frame->data[ae] & 0x0F) << 8;
     len += frame->data[ae + 1];
+    size_t pos = ae + FF_PCI_SZ;
 
-    if (len > frame->len - (FF_PCI_SZ + ae)) {
+    /* extended FF handling */
+    if (len == 0) {
+        /* temporary explicit 32 bit uint to cover for 16 bit platforms */
+        uint32_t l = frame->data[pos++];
+        l <<= 8;
+        l = frame->data[pos++];
+        l <<=8;
+        l = frame->data[pos++];
+        l <<=8;
+        l = frame->data[pos++];
+        if ( l > SIZE_MAX ) {
+            if (!(isotp->opt.flags & CAN_ISOTP_LISTEN_MODE)) {
+                _isotp_send_fc(isotp, ae, ISOTP_FC_OVFLW);
+            }
+            return 1;
+        }
+        len = l;
+    }
+
+    /* the message must be longer than just the data in the first frame
+     * (else it should have been a single frame)
+     */
+    if (len <= frame->len - (FF_PCI_SZ + ae)) {
         return 1;
     }
 
@@ -316,8 +350,8 @@ static int _isotp_rcv_ff(struct isotp *isotp, can_frame_t *frame, size_t ae)
     isotp->rx.snip = snip;
 
     isotp->rx.idx = 0;
-    for (size_t i = ae + FF_PCI_SZ; i < frame->len; i++) {
-        ((uint8_t *)isotp->rx.snip->data)[isotp->rx.idx++] = frame->data[i];
+    while( pos < frame->len){
+        ((uint8_t *)isotp->rx.snip->data)[isotp->rx.idx++] = frame->data[pos];
     }
 
     if (IS_ACTIVE(ENABLE_DEBUG)) {
