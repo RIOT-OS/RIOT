@@ -1085,7 +1085,7 @@ int ieee802154_submac_init(ieee802154_submac_t *submac, const network_uint16_t *
     memcpy(&submac->short_addr, short_addr, sizeof(network_uint16_t));
     submac->panid = CONFIG_IEEE802154_DEFAULT_PANID;
 
-    _set_ack_pending_bit(submac, 0);
+    _set_frame_pending(submac, false);
 
     submac->tx_pow = CONFIG_IEEE802154_DEFAULT_TXPOWER;
 
