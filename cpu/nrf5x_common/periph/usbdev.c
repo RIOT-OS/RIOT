@@ -20,17 +20,19 @@
 #define USB_H_USER_IS_RIOT_INTERNAL
 
 #include <assert.h>
+#include <errno.h>
+#include <stdbool.h>
 #include <stdint.h>
 #include <stdlib.h>
-#include <errno.h>
 
 #include "architecture.h"
+#include "bitarithm.h"
 #include "cpu.h"
+#include "irq.h"
 #include "nrfusb.h"
 #include "periph/usbdev.h"
 #include "usb.h"
 #include "usb/descriptor.h"
-#include "bitarithm.h"
 
 #define ENABLE_DEBUG 0
 #include "debug.h"
@@ -41,6 +43,10 @@
 #endif
 
 static nrfusb_t _usbdevs[NRF_USB_NUM_PERIPH];
+
+static bool _out_primed[NRF_USB_NUM_EP];  /**< SIZE.EPOUT written once since endpoint init. */
+static bool _out_armed[NRF_USB_NUM_EP];   /**< A buffer is ready to receive the next packet. */
+static uint16_t _out_len[NRF_USB_NUM_EP]; /**< Latched length of the last received packet. */
 
 static void _init(usbdev_t *usbdev);
 static int _get(usbdev_t *usbdev, usbopt_t opt, void *value, size_t max_len);
@@ -221,6 +227,9 @@ static size_t _ep_get_available(usbdev_ep_t *ep)
     nrfusb_t *usbdev = (nrfusb_t *)ep->dev;
 
     if (ep->dir == USB_EP_DIR_OUT) {
+        if (ep->num != 0) {
+            return _out_len[ep->num]; /* latched before the DMA */
+        }
         return usbdev->device->SIZE.EPOUT[ep->num];
     }
     else {
@@ -421,6 +430,7 @@ static void _ep_init(usbdev_ep_t *ep)
     if (ep->dir == USB_EP_DIR_OUT) {
         usbdev->device->EVENTS_ENDEPOUT[ep->num] = 0;
         usbdev->device->EPDATASTATUS = 1 << ep->num;
+        _out_primed[ep->num] = false;
     }
     else {
         usbdev->device->EPDATASTATUS = 1 << ep->num;
@@ -533,8 +543,20 @@ static int _ep_xmit(usbdev_ep_t *ep, uint8_t *buf, size_t len)
         /* Pre-Setup the EasyDMA settings */
         usbdev->device->EPOUT[ep->num].PTR = (uint32_t)(intptr_t)buf;
         usbdev->device->EPOUT[ep->num].MAXCNT = (uint32_t)(intptr_t)len;
-        /* Write nonzero value to EPOUT to indicate ready */
-        usbdev->device->SIZE.EPOUT[ep->num] = 1;
+        /* Arm (see _out_primed/_out_armed above): SIZE.EPOUT only the first
+         * time; if a packet is already waiting in the USBD buffer, have the
+         * thread DMA it into this buffer now. */
+        unsigned state = irq_disable();
+        _out_armed[ep->num] = true;
+        if (!_out_primed[ep->num]) {
+            _out_primed[ep->num] = true;
+            usbdev->device->SIZE.EPOUT[ep->num] = 1;
+        }
+        bool pending = usbdev->device->EPDATASTATUS & (1 << (ep->num + 16));
+        irq_restore(state);
+        if (pending) {
+            usbdev->usbdev.epcb(ep, USBDEV_EVENT_ESR);
+        }
     }
     return len;
 }
@@ -568,7 +590,7 @@ static void _esr(usbdev_t *dev)
 static signed _ep0_esr(usbdev_ep_t *ep)
 {
     nrfusb_t *usbdev = (nrfusb_t *)ep->dev;
-    signed event = -1;
+    signed event = 0; /* nothing to report */
 
     if (ep->dir == USB_EP_DIR_OUT) {
         if (usbdev->sstate == NRFUSB_SETUP_ACKOUT) {
@@ -606,7 +628,7 @@ static signed _ep0_esr(usbdev_ep_t *ep)
 static void _ep_esr(usbdev_ep_t *ep)
 {
     nrfusb_t *usbdev = (nrfusb_t *)ep->dev;
-    signed event = -1;
+    signed event = 0; /* nothing to report */
 
     if (ep->num == 0) {
         event = _ep0_esr(ep);
@@ -622,11 +644,18 @@ static void _ep_esr(usbdev_ep_t *ep)
             }
         }
         else {
-            if (usbdev->device->EPDATASTATUS & 1 << (ep->num + 16)) {
+            uint32_t status_bit = 1UL << (ep->num + 16);
+            if ((usbdev->device->EPDATASTATUS & status_bit) && _out_armed[ep->num]) {
+                _out_armed[ep->num] = false;
+                /* Latch the length before the DMA; SIZE.EPOUT may already describe
+                 * the next packet once ENDEPOUT has fired. */
+                _out_len[ep->num] = usbdev->device->SIZE.EPOUT[ep->num];
+                /* Clear the status bit before starting the DMA; the USBD may accept
+                 * the next packet as soon as the DMA ends, and a later clear would
+                 * erase its bit. */
+                usbdev->device->EPDATASTATUS = status_bit;
                 /* start dma to transfer payload to memory */
                 _ep_dma_out(ep);
-
-                usbdev->device->EPDATASTATUS = 1 << (ep->num + 16);
                 event = USBDEV_EVENT_TR_COMPLETE;
             }
         }
@@ -694,6 +723,11 @@ void isr_usbd(void)
                 }
                 epdatastatus &= ~(1 << epnum);
             }
+        }
+        else if (usbdev->device->EVENTS_EPDATA && (usbdev->device->INTEN & USBD_INTEN_EPDATA_Msk)) {
+            /* EPDATASTATUS already cleared and nothing to dispatch,
+             * just clear the irq. */
+            usbdev->device->EVENTS_EPDATA = 0;
         }
     }
     cortexm_isr_end();
