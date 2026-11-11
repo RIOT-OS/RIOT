@@ -246,8 +246,8 @@ struct ieee802154_submac {
 /**
  * @brief Transmit an IEEE 802.15.4 PSDU
  *
- * This function performs an IEEE 802.15.4 transmission, including CSMA-CA and
- * retransmissions (if ACK Request bit is set).  When the transmission finishes
+ * This function performs an IEEE 802.15.4 transmission, including configured CSMA-CA and
+ * retransmissions (if ACK Request bit is set) settings. When the transmission finishes
  * an @ref ieee802154_submac_cb_t::tx_done event is issued.
  *
  * @param[in] submac pointer to the SubMAC descriptor
