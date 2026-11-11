@@ -283,14 +283,18 @@ static int _isotp_rcv_ff(struct isotp *isotp, can_frame_t *frame, size_t ae)
 {
     isotp->rx.state = ISOTP_IDLE;
 
-    if (ae + FF_PCI_SZ > frame->len) {
+    /* the first frame must be a 8 bytes (classic) or longer (CAN_FD) -- no extended FF support */
+    if (CAN_MAX_DLEN > frame->len) {
         return 1;
     }
 
     size_t len = (frame->data[ae] & 0x0F) << 8;
     len += frame->data[ae + 1];
 
-    if (len > frame->len - (FF_PCI_SZ + ae)) {
+    /* the message must be longer than just the data in the first frame
+     * (else it should have been a single frame) */
+    if ((len <= CAN_MAX_DLEN - SF_PCI_SZ - ae) ||
+        (len <= frame->len - (FF_PCI_SZ + ae))) {
         return 1;
     }
 
