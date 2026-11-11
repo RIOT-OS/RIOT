@@ -19,7 +19,7 @@ To run the site locally, you need to have [Node.js](https://nodejs.org/) install
 We highly recommend to use a version manager such as [NVM](https://github.com/nvm-sh/nvm) to manage your Node.js versions.
 
 Please make sure to use a fairly recent version of Node.js, some distributions (such as Ubuntu) ship with a very old version of Node.js that is not compatible with Starlight.
-Generally, the latest LTS version should work fine (As of writing v22), as specified in the [Astro documentation](https://docs.astro.build/en/install-and-setup/#prerequisites).
+You need Node.js 22.22.0 or later, so the latest LTS version works.
 
 Once installed you should be able to install the dependencies and run the site locally with the following command, making sure to be within the root of the repository:
 
