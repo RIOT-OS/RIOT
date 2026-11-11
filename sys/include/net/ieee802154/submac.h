@@ -223,7 +223,7 @@ struct ieee802154_submac {
 #if IS_USED(MODULE_IEEE802154_SUBMAC_SOFT_CSMA_CA)
     ieee802154_csma_be_t be;            /**< CSMA-CA backoff exponent params */
     uint16_t csma_backoff_us;           /**< CSMA sender backoff period in µs */
-    uint8_t csma_retries;               /**< maximum number of CSMA-CA retries */
+    int8_t csma_retries;                /**< maximum number of CSMA-CA retries */
     uint8_t backoff_mask;               /**< internal value used for random backoff calculation */
     uint8_t csma_retries_nb;            /**< current number of CSMA-CA retries */
 #endif
@@ -593,6 +593,24 @@ static inline int ieee802154_set_rx(ieee802154_submac_t *submac)
 {
     return ieee802154_submac_process_ev(submac, IEEE802154_FSM_EV_REQUEST_SET_RX_ON);
 }
+
+/**
+ * @brief Set the CSMA-CA parameters.
+ *
+ * @param[in] submac pointer to the SubMAC descriptor
+ * @param[in] bd parameters of the exponential backoff. If NULL, the
+ *               parameters are not altered.
+ * @param[in] retries number of CSMA-CA retries. If @p retries < 0,
+ *                    retransmissions with CSMA-CA will be disabled.
+ *                    If @p retries == 0, the @ref ieee802154_send function
+ *                    will only perform CCA before transmitting the frame.
+ *
+ * @retval 0 on success
+ * @retval -EINVAL if the settings are not supported.
+ * @retval negative errno on error
+ */
+int ieee802154_submac_set_csma_params(ieee802154_submac_t *submac, const ieee802154_csma_be_t *bd,
+                                       int8_t retries);
 
 #ifdef __cplusplus
 }
