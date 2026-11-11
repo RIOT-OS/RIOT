@@ -253,7 +253,7 @@ void sx127x_set_rx(sx127x_t *dev)
 
 #if defined(MODULE_SX1276)
         /* ERRATA 2.3 - Receiver Spurious Reception of a LoRa Signal */
-        if (dev->settings.lora.bandwidth < 9) {
+        if (dev->settings.lora.bandwidth != LORA_BW_500_KHZ) {
             sx127x_reg_write(dev, SX127X_REG_LR_DETECTOPTIMIZE,
                              sx127x_reg_read(dev, SX127X_REG_LR_DETECTOPTIMIZE) & 0x7F);
             sx127x_reg_write(dev, SX127X_REG_LR_TEST30, 0x00);
