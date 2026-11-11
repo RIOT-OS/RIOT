@@ -155,7 +155,7 @@ Module                                              | Default   | Short descript
 [esp_log_startup](#esp32_esp_log_module)            | not used  | enable additional startup information
 [esp_log_tagged](#esp32_esp_log_module)             | not used  | add additional information to the log output
 [esp_now](#esp32_esp_now_network_interface)         | not used  | enable the ESP-NOW network device
-[esp_qemu](#esp32_esp_qemu)                         | not used  | build QEMU for ESP32 application image
+[esp_qemu](#esp32_qemu_mode_and_gdb)                | not used  | build QEMU for ESP32 application image
 [esp_spi_oct](#esp32_spi_ram)                       | not used  | enable SPI RAM in Octal SPI Mode
 [esp_rtc_timer_32k](#esp32_rtt_counter)             | not used  | use RTC timer with external 32.768 kHz crystal as RTT
 [esp_spi_ram](#esp32_spi_ram)                       | not used  | enable SPI RAM
@@ -1974,7 +1974,7 @@ documentation for the GPIOs recommended for the ENC28J60.
 
 @note The reset signal of the ENC28J60 based network device can be connected
 with the ESP32x RESET/EN pin  which is broken out on most boards. This keeps the
-GPIO free defined by `#ENC28J60_PARAM_RESET` free for other purposes.
+GPIO free defined by `ENC28J60_PARAM_RESET` free for other purposes.
 
 [Back to table of contents](#esp32_toc)
 

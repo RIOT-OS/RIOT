@@ -25,7 +25,7 @@ and improvements on various peripherals.
 @note The actual flash size is the flash size minus 88 bytes, these 88 bytes are
 reserved for the CCFG, see also [Flashing the CCFG](#cc26xx_cc13xx_ccfg).
 
-# Flashing the CCFG
+# Flashing the CCFG {#cc26xx_cc13xx_ccfg}
 
 @warning Setting an incorrect CCFG configuration may lock out yourself
 out of the device.
@@ -124,7 +124,7 @@ XDS110 that TI's development boards use is not compatible, an external
 programmer has to be used. The upside is that flashing appears to be reliable
 with that.
 
-### Using Uniflash
+### Using Uniflash {#cc26xx_cc13xx_uniflash}
 
 The TI's Code Composer Studio provides the necessary tools to use the debug
 features of the XDS110; Uniflash provides flashing tools. Both programs can
