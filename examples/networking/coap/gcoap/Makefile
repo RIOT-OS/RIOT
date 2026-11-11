@@ -77,8 +77,9 @@ ifneq (,$(filter test,$(MAKECMDGOALS)))
   # for the `riotctrl_shell_tests` module to be used in the
   # tests of this application.
   PYTHONPATH += $(RIOTBASE)/tests/riotctrl_shell
-  export TEST_EXECUTOR=pytest
-  export TEST_EXECUTOR_FLAGS="-s -vv"
+  # export TEST_EXECUTOR=pytest
+  # export TEST_EXECUTOR_FLAGS="-s -vv"
+  export DEBUG_TEST=1
 endif
 
 # set the ZEP port for native
