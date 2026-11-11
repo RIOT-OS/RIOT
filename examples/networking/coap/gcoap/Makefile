@@ -69,6 +69,16 @@ QUIET ?= 1
 # an IEEE 802.15.4 radio using ZEP
 USE_ZEP ?= 0
 
+ifneq (,$(filter test,$(MAKECMDGOALS)))
+  # Use socket_zep instead of native_tap so the test can be run in CI
+  USE_ZEP := 1
+
+  # Include `tests/riotctrl_shell` to Python path
+  # for the `riotctrl_shell_tests` module to be used in the
+  # tests of this application.
+  PYTHONPATH += $(RIOTBASE)/tests/riotctrl_shell
+endif
+
 # set the ZEP port for native
 ZEP_PORT_BASE ?= 17754
 ifeq (1,$(USE_ZEP))
