@@ -188,6 +188,15 @@ static inline bool _does_handle_csma(ieee802154_dev_t *dev)
            ieee802154_radio_has_auto_csma(dev);
 }
 
+static inline bool _does_handle_frame_retrans(ieee802154_dev_t *dev)
+{
+    if (!IS_USED(MODULE_IEEE802154_SUBMAC_SOFT_FRAME_RETRANS)) {
+        return true;
+    }
+
+    return ieee802154_radio_has_frame_retrans(dev);
+}
+
 /**
  * @brief   Enable/disable CCA before the next transmission.
  */
@@ -217,6 +226,26 @@ static inline uint8_t _get_retrans(ieee802154_submac_t *submac)
 #else
     (void)submac;
     return 0;
+#endif
+}
+
+static inline uint8_t _get_retrans_nb(ieee802154_submac_t *submac)
+{
+#if IS_USED(MODULE_IEEE802154_SUBMAC_SOFT_FRAME_RETRANS)
+    return submac->retrans_nb;
+#else
+    (void)submac;
+    return 0;
+#endif
+}
+
+static inline void _set_retrans_nb(ieee802154_submac_t *submac, uint8_t retrans_nb)
+{
+#if IS_USED(MODULE_IEEE802154_SUBMAC_SOFT_FRAME_RETRANS)
+    submac->retrans_nb = retrans_nb;
+#else
+    (void)submac;
+    (void)retrans_nb;
 #endif
 }
 
@@ -337,7 +366,7 @@ static bool _has_retrans_left(ieee802154_submac_t *submac)
         return false;
     }
 
-    return _get_retrans(submac) < CONFIG_IEEE802154_DEFAULT_MAX_FRAME_RETRANS;
+    return _get_retrans_nb(submac) < _get_retrans(submac);
 }
 
 static inline void _handle_csma_ca(ieee802154_submac_t *submac)
@@ -395,7 +424,7 @@ static ieee802154_submac_fsm_return_t _handle_tx_no_ack(ieee802154_submac_t *sub
     /* In case of ACK Timeout, either trigger retransmissions or end
      * the TX procedure */
     if (_has_retrans_left(submac)) {
-        _set_retrans(submac, _get_retrans(submac) + 1);
+        _set_retrans_nb(submac, _get_retrans_nb(submac) + 1);
         res = ieee802154_radio_set_idle(&submac->dev, true);
         assert(res >= 0);
         return _state_transition(&submac->fsm, _fsm_state_prepare);
@@ -433,7 +462,7 @@ static ieee802154_submac_fsm_return_t _handle_fsm_ev_tx_ack(ieee802154_submac_t 
         .iol_next = NULL
     };
     _set_wait_for_ack(submac, false);
-    _set_retrans(submac, 0);
+    _set_retrans_nb(submac, 0);
     _set_csma_retries_nb(submac, 0);
     _set_csma_backoff_mask(submac, (1 << _get_csma_be_min(submac)) - 1);
     submac->tx_ftype = IEEE802154_FCF_TYPE_ACK;
@@ -721,7 +750,7 @@ static ieee802154_submac_fsm_return_t _fsm_state_wait_for_ack(ieee802154_submac_
             (ack[0] & IEEE802154_FCF_TYPE_MASK) == IEEE802154_FCF_TYPE_ACK) {
             ieee802154_submac_ack_timer_cancel(submac);
             ieee802154_tx_info_t tx_info;
-            tx_info.retrans = _get_retrans(submac);
+            tx_info.retrans = _get_retrans_nb(submac);
             bool fp = (ack[0] & IEEE802154_FCF_FRAME_PEND);
             ieee802154_radio_set_frame_filter_mode(&submac->dev, IEEE802154_FILTER_ACCEPT);
             return _tx_end(submac, fp ? TX_STATUS_FRAME_PENDING : TX_STATUS_SUCCESS,
@@ -837,7 +866,7 @@ int ieee802154_send(ieee802154_submac_t *submac, const iolist_t *iolist)
     bool cnf = buf[0] & IEEE802154_FCF_ACK_REQ;
 
     _set_wait_for_ack(submac, cnf);
-    _set_retrans(submac, 0);
+    _set_retrans_nb(submac, 0);
     submac->psdu = iolist;
     _set_csma_retries_nb(submac, 0);
     _set_csma_backoff_mask(submac, (1 << _get_csma_be_min(submac)) - 1);
@@ -1160,10 +1189,7 @@ int ieee802154_submac_init(ieee802154_submac_t *submac, const network_uint16_t *
     ieee802154_radio_set_cca_threshold(dev,
                                        CONFIG_IEEE802154_CCA_THRESH_DEFAULT);
 
-    if (ieee802154_radio_has_frame_retrans(&submac->dev)) {
-        ieee802154_radio_set_frame_retrans(&submac->dev,
-                CONFIG_IEEE802154_DEFAULT_MAX_FRAME_RETRANS);
-    }
+    ieee802154_submac_set_frame_retrans(submac, CONFIG_IEEE802154_DEFAULT_MAX_FRAME_RETRANS);
 
     const ieee802154_csma_be_t be = {
         .min = CONFIG_IEEE802154_DEFAULT_CSMA_CA_MIN_BE,
@@ -1251,6 +1277,18 @@ int ieee802154_submac_set_csma_params(ieee802154_submac_t *submac, const ieee802
     ieee802154_radio_set_csma_params(dev, NULL, 0);
     _set_csma_retries(submac, retries);
 
+    return 0;
+}
+
+int ieee802154_submac_set_frame_retrans(ieee802154_submac_t *submac, uint8_t retrans)
+{
+    ieee802154_dev_t *dev = &submac->dev;
+
+    if (_does_handle_frame_retrans(dev)) {
+        return ieee802154_radio_set_frame_retrans(dev, retrans);
+    }
+
+    _set_retrans(submac, retrans);
     return 0;
 }
 

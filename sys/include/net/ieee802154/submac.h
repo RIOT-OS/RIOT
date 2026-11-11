@@ -228,7 +228,8 @@ struct ieee802154_submac {
     uint8_t csma_retries_nb;            /**< current number of CSMA-CA retries */
 #endif
 #if IS_USED(MODULE_IEEE802154_SUBMAC_SOFT_FRAME_RETRANS)
-    uint8_t retrans;                    /**< current number of retransmissions */
+    uint8_t retrans;                    /**< max number of retransmissions */
+    uint8_t retrans_nb;                 /**< current number of retransmissions */
     bool wait_for_ack;                  /**< SubMAC is waiting for an ACK frame */
 #endif
     uint16_t ack_timeout_us;            /**< ACK timeout in µs */
@@ -611,6 +612,17 @@ static inline int ieee802154_set_rx(ieee802154_submac_t *submac)
  */
 int ieee802154_submac_set_csma_params(ieee802154_submac_t *submac, const ieee802154_csma_be_t *bd,
                                        int8_t retries);
+
+/**
+ * @brief Set number of frame retransmissions
+ *
+ * @param[in] submac pointer to the SubMAC descriptor
+ * @param[in] retrans the number of retransmissions attempts.
+ *
+ * @retval 0 on success
+ * @retval negative errno on error
+ */
+int ieee802154_submac_set_frame_retrans(ieee802154_submac_t *submac, uint8_t retrans);
 
 #ifdef __cplusplus
 }
