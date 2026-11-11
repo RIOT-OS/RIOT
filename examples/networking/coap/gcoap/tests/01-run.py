@@ -49,6 +49,14 @@ class TestCoAPGET(riotctrl_shell_tests.testcase_base.TestBase):
         super().setUpClass()
 
     @classmethod
+    def reset_board(cls):
+        # rebuild application so that ZEP is used
+        cls.ctrl.env = {
+          "USE_ZEP": "1",
+        }
+        cls.ctrl.make_run(("flash", "-j", "reset"))
+
+    @classmethod
     def init_shell_interaction(cls):
         cls.shell = Shell(cls.ctrl)
 
