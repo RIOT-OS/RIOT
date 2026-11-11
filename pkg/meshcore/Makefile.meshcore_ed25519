@@ -1,0 +1,15 @@
+MODULE = meshcore_ed25519
+
+# seed.c relies on the random generator of the host OS
+SRC = add_scalar.c fe.c ge.c key_exchange.c keypair.c sc.c sha512.c sign.c verify.c
+
+CFLAGS += -Wno-unused-parameter
+
+# The SHA-512 functions of the library have the same names as the functions of
+# the RIOT hashes module
+CFLAGS += -Dsha512_init=meshcore_sha512_init
+CFLAGS += -Dsha512_update=meshcore_sha512_update
+CFLAGS += -Dsha512_final=meshcore_sha512_final
+CFLAGS += -Dsha512=meshcore_sha512
+
+include $(RIOTBASE)/Makefile.base

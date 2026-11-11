@@ -1,0 +1,13 @@
+# Headers replacing the Arduino and Crypto libraries used by MeshCore, and the
+# RIOT integration of MeshCore
+INCLUDES += -I$(RIOTPKG)/meshcore/include
+
+# Using -isystem instead of -I to prevent warnings for the following headers
+INCLUDES += -isystem$(PKGDIRBASE)/meshcore/src
+INCLUDES += -isystem$(PKGDIRBASE)/meshcore/lib/ed25519
+
+DIRS += $(RIOTPKG)/meshcore/contrib
+
+ifneq (,$(filter meshcore_node,$(USEMODULE)))
+  DIRS += $(RIOTPKG)/meshcore/contrib/node
+endif
