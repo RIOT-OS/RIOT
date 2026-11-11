@@ -35,7 +35,7 @@ extern "C"
 #define THREAD_EXTRA_STACKSIZE_PRINTF (512)
 
 #ifndef THREAD_STACKSIZE_DEFAULT
-#define THREAD_STACKSIZE_DEFAULT (1024)
+#  define THREAD_STACKSIZE_DEFAULT (1024)
 #endif
 
 #ifndef THREAD_STACKSIZE_IDLE
@@ -46,12 +46,12 @@ extern "C"
 /**
  * @brief   Stack size used for the undefined instruction interrupt stack
  */
-#define UND_STACKSIZE (64)
+#define UND_STACKSIZE (16)
 
 /**
  * @brief   Stack size used for the abort interrupt stack
  */
-#define ABT_STACKSIZE (64)
+#define ABT_STACKSIZE (16)
 
 /**
  * @brief   Stack size used for the interrupt (ISR) stack
@@ -63,7 +63,7 @@ extern "C"
 /**
  * @brief   Stack size used for the fast interrupt (FIQ) stack
  */
-#define FIQ_STACKSIZE (64)
+#define FIQ_STACKSIZE (16)
 
 /**
  * @brief   Stack size used for the supervisor mode (SVC) stack
@@ -73,7 +73,7 @@ extern "C"
 /**
  * @brief   Stack size used for the user mode/kernel init stack
  */
-#define USR_STACKSIZE (4096)
+#define USR_STACKSIZE (64)
 
 /**
  * @brief   The CPU has 2 blocks of SRAM at different addresses.

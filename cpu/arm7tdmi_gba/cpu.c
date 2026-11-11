@@ -107,7 +107,7 @@ void gba_irq_init(void)
 }
 
 /**
- * @brief Initialize the CPU, set IRQ priorities, clocks.
+ * @brief Initialize the CPU
  */
 void cpu_init(void)
 {
