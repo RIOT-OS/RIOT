@@ -9,36 +9,14 @@ import { defineConfig } from "astro/config";
 import starlight from "@astrojs/starlight";
 import starlightImageZoom from "starlight-image-zoom";
 import starlightSidebarTopics from "starlight-sidebar-topics";
-import { satteri, type SatteriProcessorOptions } from '@astrojs/markdown-satteri';
-import * as emoji from 'node-emoji'
+import { markdownProcessor } from "./src/lib/markdown_processor.ts";
 import { SOURCE_TREE_URL } from "./config.ts";
-
-type SatteriMdastPlugin = Extract<
-  NonNullable<SatteriProcessorOptions["mdastPlugins"]>[number],
-  { name: string }
->;
-
-function satteriEmoji(): SatteriMdastPlugin {
-  return {
-    name: 'satteri-emoji',
-    text(node, ctx) {
-      if (node.value && node.value.includes(':')) {
-        const emojified = emoji.emojify(node.value)
-        if (emojified !== node.value) {
-          ctx.setProperty(node, 'value', emojified)
-        }
-      }
-    }
-  }
-}
 
 // https://astro.build/config
 export default defineConfig({
   site: "https://guide.riot-os.org",
   markdown: {
-    processor: satteri({
-      mdastPlugins: [satteriEmoji],
-    })
+    processor: markdownProcessor,
   },
   integrations: [
     starlight({
