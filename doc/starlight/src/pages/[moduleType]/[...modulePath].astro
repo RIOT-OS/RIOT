@@ -23,8 +23,8 @@ export async function getStaticPaths() {
           // Find related modules such as parents or children
           const relatedModules = modules.filter(
             (item) =>
-              item.data.parentId === module.id ||
-              item.id === module.data.parentId,
+              item.data.parentIds.includes(module.id) ||
+              module.data.parentIds.includes(item.id),
           );
 
           switch (moduleType) {

@@ -136,6 +136,34 @@ test("the paths of a file are relative to the root of the repository", async () 
   });
 });
 
+test("pages are related by further files, groups and directories", async () => {
+  await withTree(
+    {
+      "cpu/foo/doc.md": group("cpu_foo", "Foo", "cpu"),
+      // a further file of the directory
+      "cpu/foo/doc_x.doc.md": group("cpu_foo_x", "Foo X", "cpu"),
+      // a sub-directory without a relation by group
+      "cpu/foo/periph/doc.md": group("cpu_foo_periph", "Foo Peripherals", "cpu"),
+      // a relation by group, also to a page that is not the parent directory
+      "cpu/bar/doc.md": group("cpu_bar", "Bar", "cpu_foo_periph"),
+      // the second group of the file is in the first one: not a relation
+      "cpu/foo/drivers/doc.md":
+        group("cpu_foo_drivers", "Foo Drivers", "cpu") + group("cpu_foo_drivers_adc", "ADC", "cpu_foo_drivers"),
+    },
+    async (root) => {
+      const docs = await findDoxygenDocs(cpus(root));
+      const parents = Object.fromEntries(docs.map((doc) => [doc.id, doc.parentIds]));
+      assert.deepEqual(parents, {
+        bar: ["foo/periph"],
+        foo: [],
+        "foo/doc_x.doc": ["foo"],
+        "foo/drivers": ["foo"],
+        "foo/periph": ["foo"],
+      });
+    },
+  );
+});
+
 test("a page links to the pages of all source trees and to the API documentation", async () => {
   const tagFile = `<?xml version='1.0' encoding='UTF-8' standalone='yes' ?>
 <tagfile doxygen_version="1.14.0">

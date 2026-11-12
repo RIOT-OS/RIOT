@@ -344,6 +344,7 @@ describe("group metadata", () => {
       "@defgroup boards_stdio STDIO abstraction\n@ingroup sys\n\n@brief STDIO for RIOT\n\n# Abstract\n\nBody text.";
     assert.equal(parse(input).title, "STDIO abstraction");
     assert.deepEqual(parse(input).groups, ["boards_stdio"]);
+    assert.deepEqual(parse(input).ingroups, ["sys"]);
     assert.match(parse(input).brief ?? "", /^STDIO for RIOT\.?$/);
     const out = await convert(input);
     assert.match(out, /^## Abstract$/m);
@@ -360,6 +361,7 @@ describe("group metadata", () => {
     };
     const child =
       "@defgroup boards_stdio_null STDIO null driver\n@ingroup boards_stdio\n@brief Dummy stdio.\n\nSee \\ref boards_stdio.\n";
+    assert.deepEqual(parse(child).ingroups, ["boards_stdio"]);
     assert.equal(parse(child).title, "STDIO null driver");
     const out = await convert(child, { pageUrl: "/boards/stdio_null/", others: [parent] });
     assertIncludes(out, "See [STDIO abstraction](/boards/stdio/).");
@@ -368,6 +370,7 @@ describe("group metadata", () => {
   test("@defgroup, @ingroup, @brief and @{ … @} are metadata, not body", async () => {
     const input = "@defgroup boards_periph_gpio GPIO\n@ingroup periph\n@brief Pins.\n@{\n\nBody.\n\n@}\n";
     assert.equal(parse(input).title, "GPIO");
+    assert.deepEqual(parse(input).ingroups, ["periph"]);
     assert.equal(parse(input).brief, "Pins.");
     assert.equal((await convert(input)).trim(), "Body.");
   });
@@ -411,6 +414,7 @@ describe("group metadata", () => {
       "@defgroup stdio_usb_serial_jtag USB Serial/JTAG\n@ingroup sys_stdio\n@brief Foreign brief.\n\nForeign body.\n\n" +
       "@defgroup boards_x X board\n@ingroup boards_esp32\n@brief Own brief.\n\nOwn body.\n";
     assert.deepEqual(parse(input).groups, ["boards_x"]);
+    assert.deepEqual(parse(input).ingroups, ["boards_esp32"]);
     assert.equal(parse(input).brief, "Own brief.");
     assert.equal(parse(input).title, "X board");
     const out = await convert(input);
@@ -418,9 +422,16 @@ describe("group metadata", () => {
     assertExcludes(out, "Foreign");
   });
 
+  test("an @ingroup written before the @defgroup binds to it", async () => {
+    const input = "@ingroup boards_parent\n@defgroup boards_child Child\n@brief B\n";
+    assert.deepEqual(parse(input).ingroups, ["boards_parent"]);
+    assertExcludes(await convert(input), "@ingroup");
+  });
+
   test("a wrapped @brief does not swallow the following @ingroup", () => {
     const input = "@defgroup boards_g Group\n@brief A brief that wraps\n          onto a second line\n@ingroup parent\n@{\n";
     assert.equal(parse(input).brief, "A brief that wraps onto a second line");
+    assert.deepEqual(parse(input).ingroups, ["parent"]);
   });
 
   test("@brief continuation lines join with one space", () => {
@@ -457,6 +468,7 @@ describe("group metadata", () => {
     const doc = parse(input);
     // the description is plain text
     assert.equal(doc.brief, "Support for cpu_bar based boards");
+    assert.deepEqual(doc.ingroups, ["boards"]);
     assert.equal((await convert(input)).trim(), "Body.");
   });
 });

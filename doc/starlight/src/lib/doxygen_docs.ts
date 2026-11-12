@@ -82,6 +82,8 @@ export interface DoxygenDocFile {
   pageUrl: string;
   /** The parsed file */
   parsed: DoxygenDoc;
+  /** Ids of the related pages, see `findRelatedPages()` */
+  parentIds: string[];
 }
 
 /** Directories that never contain documentation of a board or CPU. */
@@ -151,6 +153,7 @@ export async function findDoxygenDocs(source: DoxygenDocSource): Promise<Doxygen
             isModulePage: isParent && !isNested && isModule,
             pageUrl: `/${source.routePrefix}/${id}/`,
             parsed,
+            parentIds: [],
           };
         }),
     );
@@ -162,7 +165,57 @@ export async function findDoxygenDocs(source: DoxygenDocSource): Promise<Doxygen
 
   // only the sub-directories contain documentation
   const dirs = (await fs.readdir(source.dir, { withFileTypes: true })).filter(isDocDir).sort(byName);
-  return (await Promise.all(dirs.map((entry) => scan(entry.name)))).flat();
+  const result = (await Promise.all(dirs.map((entry) => scan(entry.name)))).flat();
+  findRelatedPages(result);
+  return result;
+}
+
+/**
+ * Pages are related to each other (and shown as related pages) if
+ *
+ * - a file is a further `doc*.md` of a board or CPU directory, e.g.
+ *   `cpu/esp32/doc_esp32.doc.md` is related to `cpu/esp32/doc.md`,
+ * - a group of one page is in a group of the other page (`@ingroup`), e.g.
+ *   the Nucleo-64 boards and `boards/common/nucleo64`,
+ * - a page in a sub-directory has no such parent, but a parent directory has
+ *   a page, e.g. `cpu/stm32/periph` is related to `cpu/stm32`.
+ *
+ * The relation is stored in `parentIds` of the child.
+ */
+function findRelatedPages(docs: DoxygenDocFile[]): void {
+  const pageOfGroup = new Map<string, string>();
+  for (const doc of docs) {
+    for (const group of doc.parsed.groups) {
+      pageOfGroup.set(group, doc.id);
+    }
+  }
+  const ids = new Set(docs.map((doc) => doc.id));
+
+  for (const doc of docs) {
+    const parents = new Set<string>();
+    if (!doc.isParent) {
+      parents.add(doc.id.slice(0, doc.id.lastIndexOf("/")));
+    }
+    for (const group of doc.parsed.ingroups) {
+      const page = pageOfGroup.get(group);
+      if (page) {
+        parents.add(page);
+      }
+    }
+    // a group of the page that is in another group of the same page is not
+    // a relation to another page
+    parents.delete(doc.id);
+    if (doc.isNested && doc.isParent && !parents.size) {
+      let dir = doc.id;
+      while (dir.includes("/") && !parents.size) {
+        dir = dir.slice(0, dir.lastIndexOf("/"));
+        if (ids.has(dir)) {
+          parents.add(dir);
+        }
+      }
+    }
+    doc.parentIds = [...parents].filter((id) => ids.has(id));
+  }
 }
 
 /* -------------------------------------------------------------------------- */

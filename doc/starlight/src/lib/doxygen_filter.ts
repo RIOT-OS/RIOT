@@ -439,6 +439,8 @@ interface GroupBlock {
   title: string;
   brief?: string;
   authors: string[];
+  /** Parent groups (`@ingroup`) */
+  ingroups: string[];
   body: string;
 }
 
@@ -510,6 +512,8 @@ function splitGroups(content: string): GroupBlock[] {
   const preamble: string[] = [];
   let block: GroupBlock | undefined;
   let body = preamble;
+  /** `@ingroup` lines in front of the first `@defgroup` belong to it */
+  let leadingIngroups: string[] = [];
 
   const finish = () => {
     if (block) {
@@ -531,8 +535,10 @@ function splitGroups(content: string): GroupBlock[] {
           // a title is plain text, `\ref foo` in a title shows `foo`
           title: stripAsterisksAndQuotes(title.join(" ").replace(/[@\\]ref\s+/g, "")),
           authors: [],
+          ingroups: leadingIngroups,
           body: "",
         };
+        leadingIngroups = [];
         body = [];
         break;
       }
@@ -560,6 +566,11 @@ function splitGroups(content: string): GroupBlock[] {
         block?.authors.push((command[2] ?? "").replace(/<[^>]*@[^>]*>/, "").trim());
         break;
       case "ingroup":
+        // `@ingroup a b` adds the group to several parents
+        (block?.ingroups ?? leadingIngroups).push(
+          ...(command[2] ?? "").trim().split(/\s+/).filter(Boolean),
+        );
+        break;
       case "addtogroup":
       case "name":
       case "{":
@@ -577,6 +588,7 @@ function splitGroups(content: string): GroupBlock[] {
       name: "",
       title: "",
       authors: [],
+      ingroups: leadingIngroups,
       body: preamble.join("\n"),
     });
   }
@@ -662,6 +674,8 @@ export interface DoxygenDoc {
   brief?: string;
   /** Names of the Doxygen groups that are rendered on the page */
   groups: string[];
+  /** Parent groups (`@ingroup`) of the groups that are rendered on the page */
+  ingroups: string[];
   /**
    * True if the groups have a body, i.e. more than `@defgroup`, `@brief` and
    * a title section. Groups without a body (e.g. most of `boards/common/*`)
@@ -689,6 +703,7 @@ export function parseDoxygenDoc(content: string, groupPrefix: string): DoxygenDo
     // a description is plain text, `\ref foo` in it shows `foo`
     brief: blocks[0].brief?.replace(/[@\\]ref\s+/g, ""),
     groups: blocks.map((block) => block.name).filter(Boolean),
+    ingroups: [...new Set(blocks.flatMap((block) => block.ingroups))],
     hasContent: parts.some((part, n) => (n === 0 ? part.body : part.block.body).trim() !== ""),
     parts,
   };

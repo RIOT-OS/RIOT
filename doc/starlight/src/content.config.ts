@@ -65,7 +65,8 @@ const DoxygenDocSchema = z.object({
   githubFolder: z.string(),
   editUrl: z.string(),
   includeInOverview: z.boolean(),
-  parentId: z.string().nullable(),
+  /** Pages that are shown as related pages */
+  parentIds: z.array(z.string()),
   /** Value of `BOARD` for the pages of boards, `null` for all other pages */
   board: z.string().nullable(),
 });
@@ -168,10 +169,10 @@ function doxygenDocLoader(source: DoxygenDocSource): Loader {
               githubFolder: doc.sourceDir,
               editUrl: `${SOURCE_TREE_URL}/${doc.sourcePath}`,
               // Only boards and CPUs appear in the overview. Further pages
-              // (`doc_*.doc.md`, `common/...`) are hidden and reached via
-              // their parent and references.
+              // (`doc_*.doc.md`, `common/...`) are hidden and reached via the
+              // related pages and references.
               includeInOverview: doc.isModulePage,
-              parentId: doc.isParent ? null : doc.id.slice(0, doc.id.lastIndexOf("/")),
+              parentIds: doc.parentIds,
               board: source === BOARDS && doc.isModulePage ? doc.docName : null,
             },
             body: page.markdown,
