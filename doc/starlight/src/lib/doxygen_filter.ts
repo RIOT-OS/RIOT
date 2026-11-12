@@ -27,14 +27,18 @@
  * Both passes need the ids of the headings. The caller renders
  * `headingMarkdown()` with the Markdown processor to get them.
  *
- * References to groups that are not rendered on this site are linked to the
- * group page of the API documentation that their name implies. Any other
- * reference that is not found on this site is rendered as plain code.
+ * References to anything that is not rendered on this site (functions, macros,
+ * other groups) are resolved with the tag file of the API documentation, see
+ * `doxygen_tagfile.ts`. Without a tag file, references to groups are linked to
+ * the group page their name implies, and everything else is rendered as plain
+ * code.
  *
- * Anything inside code blocks and code spans is left untouched.
+ * Anything inside code blocks and code spans is left untouched. Only a code
+ * span of a known symbol (`` `#GPIO_PIN` ``, `` `gpio_init()` ``) becomes a
+ * link as a whole.
  */
 
-import { doxygenGroupFile } from "./doxygen_tagfile.ts";
+import { type ApiIndex, doxygenGroupFile } from "./doxygen_tagfile.ts";
 
 /** Target of a Doxygen anchor. */
 export interface AnchorTarget {
@@ -97,17 +101,23 @@ export class AnchorIndex {
 export interface TransformContext {
   /** Absolute URL of the page that is generated from the file, e.g. `/boards/esp32-wroom-32/` */
   pageUrl: string;
+  /**
+   * Repository relative path of the file, e.g. `boards/esp32-wroom-32/doc.md`.
+   * A symbol that is defined by many boards or CPUs is resolved to the
+   * definition that is nearest to this file.
+   */
+  sourcePath?: string;
   /** Global anchor index created by `collectDoxygenAnchors()` */
   anchors: AnchorIndex;
-  /** Base URL of the Doxygen API documentation used for unresolved references */
-  apiBaseUrl?: string;
+  /** Index of the API documentation, read from its Doxygen tag file */
+  api?: ApiIndex;
+  /** Base URL of the Doxygen API documentation, without a trailing `/` */
+  apiBaseUrl: string;
   /** Ids of the headings of the page, from the Markdown processor */
   headingIds: string[];
   /** Callback for references that cannot be resolved (for build warnings) */
   onUnresolved?: (id: string) => void;
 }
-
-const DEFAULT_API_BASE_URL = "https://api.riot-os.org";
 
 /* -------------------------------------------------------------------------- */
 /* Helpers                                                                    */
@@ -743,8 +753,9 @@ function pageHeadings(prose: string, headingIds: string[], pageUrl: string): Pag
  * Record all anchors defined in a file. Must be called for every file before
  * the first call of `transformDoxygenMarkdown()`.
  *
- * Only the groups that are rendered on the site are indexed, e.g. not
- * `stdio_usb_serial_jtag` in `cpu/esp32/doc.md`.
+ * Only the groups that are rendered on the site are indexed. References to
+ * anchors of other groups (e.g. `stdio_usb_serial_jtag` in `cpu/esp32/doc.md`)
+ * are resolved with the tag file of the API documentation.
  *
  * @param headingIds Ids of the headings. Not needed for the index of
  *                   `headingMarkdown()`.
@@ -788,6 +799,14 @@ function localize(url: string, ctx: TransformContext): string {
   return url.startsWith(`${ctx.pageUrl}#`) ? url.slice(ctx.pageUrl.length) : url;
 }
 
+interface ResolvedRef {
+  url: string;
+  /** Link text if the reference has no explicit text */
+  title: string;
+  /** True if the title is a code symbol */
+  code: boolean;
+}
+
 /**
  * Names of groups of the API documentation (`drivers_periph_gpio`,
  * `boards_common_nucleo`). Functions, types and section anchors don't use
@@ -798,12 +817,13 @@ const API_GROUP_RE = /^(?:boards|cpu|drivers|net|pkg|sys)_[a-z0-9_-]+$/;
 /**
  * Resolve a `\ref` target. Order:
  * 1. anchors and groups rendered on this site (global anchor index)
- * 2. the group page of the API documentation implied by a group name
+ * 2. the API documentation (tag file)
+ * 3. without a tag file only: the group page implied by a group name
  *
  * Anything else is unresolved. Other names are not guessed, because a wrong
  * guess results in a dead link.
  */
-function resolveRef(id: string, ctx: TransformContext): AnchorTarget | undefined {
+function resolveRef(id: string, ctx: TransformContext): ResolvedRef | undefined {
   const target = lookupRef(id, ctx);
   if (!target) {
     ctx.onUnresolved?.(id);
@@ -812,13 +832,20 @@ function resolveRef(id: string, ctx: TransformContext): AnchorTarget | undefined
 }
 
 /** `resolveRef()` without reporting unresolved references. */
-function lookupRef(id: string, ctx: TransformContext): AnchorTarget | undefined {
+function lookupRef(id: string, ctx: TransformContext): ResolvedRef | undefined {
   const local = ctx.anchors.lookup(id, ctx.pageUrl);
   if (local) {
-    return { url: localize(local.url, ctx), title: local.title };
+    return { url: localize(local.url, ctx), title: local.title, code: false };
   }
-  const api = ctx.apiBaseUrl ?? DEFAULT_API_BASE_URL;
-  return API_GROUP_RE.test(id) ? { url: `${api}/${doxygenGroupFile(id)}`, title: id } : undefined;
+  if (!ctx.api) {
+    return API_GROUP_RE.test(id)
+      ? { url: `${ctx.apiBaseUrl}/${doxygenGroupFile(id)}`, title: id, code: false }
+      : undefined;
+  }
+  const api = ctx.api.lookup(id.replace(/\(\)$/, ""), ctx.sourcePath);
+  return api
+    ? { url: `${ctx.apiBaseUrl}/${api.url}`, title: api.title ?? id, code: api.symbol }
+    : undefined;
 }
 
 /**
@@ -842,7 +869,8 @@ function transformRefs(text: string, ctx: TransformContext): string {
       if (!target) {
         return label ?? `\`${id}\``;
       }
-      return `[${label ?? target.title}](${target.url})`;
+      const linkText = label ?? (target.code ? `\`${target.title}\`` : target.title);
+      return `[${linkText}](${target.url})`;
     },
   );
 }
@@ -872,11 +900,11 @@ function transformFragmentLinks(text: string, ctx: TransformContext, slugs: Set<
 }
 
 /**
- * The references in the label of a Markdown link (`[see \ref foo](url)`) are
- * converted to links like all others. But a link can't contain a link, the
- * Markdown processor shows the brackets and the URL of the outer link as text
- * then. The outer link is kept, and a link in its label is replaced by the
- * label of that link. An image in a label stays.
+ * The references in the label of a Markdown link (`[see \ref foo](url)`,
+ * `[the #FOO macro](url)`) are converted to links like all others. But a link
+ * can't contain a link, the Markdown processor shows the brackets and the URL
+ * of the outer link as text then. The outer link is kept, and a link in its
+ * label is replaced by the label of that link. An image in a label stays.
  */
 function unnestLinks(text: string): string {
   return text.replace(/\[((?:[^[\]]|\[[^[\]]*\])*)\](?=\()/g, (_m, label: string) => {
@@ -1234,12 +1262,90 @@ function transformInlineCommands(text: string): string {
     );
 }
 
+/** Argument list of a call: `()`, `(0)` or `(PORT_A, 3)`. */
+const CALL_ARGS = String.raw`\((?:[\w,:*&[\] \t]|\.\.\.)*\)`;
+
 /**
- * Doxygen auto-links symbols prefixed by `#` (e.g. `#PWM_CH_NUMOF_MAX`).
- * Without a tag file they are rendered as code.
+ * Doxygen auto-links symbols prefixed by `#` (e.g. `#PWM_CH_NUMOF_MAX`,
+ * `#adc_init`). In prose the `#` is only the link marker and is not shown.
+ *
+ * They are linked to the API documentation if the tag file knows them.
+ * Otherwise an upper case name (a macro) is rendered as code, and any other
+ * name is left unchanged, because `#define`, `#include` or `#1` are not
+ * references. The target of a Markdown link `[text](#ID)` is not a symbol.
+ *
+ * The arguments of a macro are part of the link (`#PWM_DEV(0)`).
+ *
+ * Inside a code span (`` `#SPI_DEV(0)` ``) Doxygen links the symbol, too, but
+ * keeps the `#`, see `transformSymbolCodeSpans()`.
  */
-function transformSymbolLinks(text: string): string {
-  return text.replace(/(^|[\s(])#([A-Z][A-Z0-9_]{2,})\b/g, "$1`$2`");
+function transformSymbolLinks(text: string, ctx: TransformContext): string {
+  const isMacro = (symbol: string) => /^[A-Z][A-Z0-9_]{2,}$/.test(symbol);
+  return text.replace(
+    new RegExp(String.raw`(?<=^|[\s(])(?<!\]\()#([A-Za-z_]\w*)(${CALL_ARGS})?(?![\w-])`, "gm"),
+    (m, symbol: string, args = "") => {
+      const url = apiSymbolUrl(symbol, ctx);
+      if (!url) {
+        return isMacro(symbol) ? `\`${symbol}${args}\`` : m;
+      }
+      // function arguments stay text
+      const linked = apiCallUrl(symbol, args, ctx) ? args : "";
+      return `[\`${symbol}${linked}\`](${url})${args.slice(linked.length)}`;
+    },
+  );
+}
+
+/**
+ * A call in prose, not inside a word, path, URL or quoted string. Code
+ * spans and HTML tags are matched first, so that nothing in them is a call.
+ */
+const CALL_RE = new RegExp(
+  String.raw`${CODE_SPAN_RE.source}|<[A-Za-z/][^<>\n]*>|` +
+    String.raw`(?<![\w$#@\\.:/~+=&?%"'-])(?<name>[A-Za-z_]\w*)(?<args>${CALL_ARGS})`,
+  "g",
+);
+
+/**
+ * Doxygen also auto-links calls without `#` (`gpio_init()`, `SPI_DEV(0)`).
+ * Unknown calls are left unchanged.
+ */
+function transformCallLinks(text: string, ctx: TransformContext): string {
+  return text.replace(CALL_RE, (m, ...groups) => {
+    const { name, args } = groups.at(-1) as { name?: string; args?: string };
+    const url = name && apiCallUrl(name, args!, ctx);
+    return url ? `[\`${m}\`](${url})` : m;
+  });
+}
+
+/**
+ * A code span with a `#` symbol (`` `#SPI_DEV(0)` ``) or a call
+ * (`` `gpio_init()` ``) is linked as a whole if the tag file knows the
+ * symbol. Unknown symbols in code spans are left unchanged.
+ */
+function transformSymbolCodeSpans(text: string, ctx: TransformContext): string {
+  return text.replace(
+    /(?<!`)`(#?)([A-Za-z_]\w*)((?:\([^`()]*\))?)`(?!`)/g,
+    (m, hash: string, symbol: string, args: string) => {
+      // without `#`, only a call is linked
+      const url = hash ? apiSymbolUrl(symbol, ctx) : args && apiCallUrl(symbol, args, ctx);
+      return url ? `[${m}](${url})` : m;
+    },
+  );
+}
+
+/** URL of a code symbol in the API documentation. */
+function apiSymbolUrl(symbol: string, ctx: TransformContext): string | undefined {
+  const api = ctx.api?.lookup(symbol, ctx.sourcePath);
+  return api?.symbol ? `${ctx.apiBaseUrl}/${api.url}` : undefined;
+}
+
+/**
+ * URL of a symbol that is written as a call. As in Doxygen, `()` matches
+ * any symbol, an argument list only a macro (`SPI_DEV(0)`).
+ */
+function apiCallUrl(symbol: string, args: string, ctx: TransformContext): string | undefined {
+  const api = ctx.api?.lookup(symbol, ctx.sourcePath);
+  return api?.symbol && (api.macro || args === "()") ? `${ctx.apiBaseUrl}/${api.url}` : undefined;
 }
 
 // Images
@@ -1284,7 +1390,7 @@ function transformImages(text: string): string {
 
 /** Convert the text of `pageProse()`. The headings stay as `## Title {#id}`. */
 function transformProse(prose: string, ctx: TransformContext, slugs: Set<string>): string {
-  const result = mapOutsideCodeSpans(prose, (text) => {
+  const result = mapOutsideCodeSpans(transformSymbolCodeSpans(prose, ctx), (text) => {
     text = transformHtmlBlocks(text);
     text = transformTables(text);
     text = transformCallouts(text, ctx);
@@ -1293,7 +1399,8 @@ function transformProse(prose: string, ctx: TransformContext, slugs: Set<string>
     text = transformRefs(text, ctx);
     text = transformAnchors(text);
     text = transformInlineCommands(text);
-    text = transformSymbolLinks(text);
+    text = transformSymbolLinks(text, ctx);
+    text = transformCallLinks(text, ctx);
     text = transformImages(text);
     text = unnestLinks(text);
     return text;

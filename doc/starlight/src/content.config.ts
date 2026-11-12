@@ -12,8 +12,9 @@ import { promises as fs } from "node:fs";
 import { glob } from "astro/loaders";
 import { z } from "astro/zod";
 import path from "node:path";
-import { pathToFileURL } from "node:url";
+import { fileURLToPath, pathToFileURL } from "node:url";
 import {
+  type ApiDocLocation,
   convertDoxygenDoc,
   type DoxygenDocSource,
   type DoxygenSite,
@@ -36,6 +37,22 @@ const CPUS: DoxygenDocSource = {
   routePrefix: "cpus",
 };
 
+/**
+ * The API documentation that the board and CPU documentation links to.
+ *
+ * Environment variables:
+ * - `RIOT_API_BASE_URL`: base URL of the API documentation
+ * - `RIOT_DOXYGEN_TAGFILE`: path or URL of its Doxygen tag file. An empty
+ *   value disables the tag file. If the variable is not set, the tag file of
+ *   a local build of the API documentation is used if there is one, and
+ *   else the tag file of the published API documentation.
+ */
+const API_DOC: ApiDocLocation = {
+  baseUrl: (process.env.RIOT_API_BASE_URL ?? "https://api.riot-os.org").replace(/\/+$/, ""),
+  tagFile: process.env.RIOT_DOXYGEN_TAGFILE,
+  localTagFile: "../doxygen/html/riot.tag",
+};
+
 /* -------------------------------------------------------------------------- */
 /* Collections                                                                */
 /* -------------------------------------------------------------------------- */
@@ -43,7 +60,8 @@ const CPUS: DoxygenDocSource = {
 const DoxygenDocSchema = z.object({
   title: z.string(),
   description: z.string().nullish(),
-  doxygenGroup: z.string(),
+  /** URL of the page of the group in the API documentation */
+  apiUrl: z.string(),
   githubFolder: z.string(),
   editUrl: z.string(),
   includeInOverview: z.boolean(),
@@ -96,12 +114,16 @@ let doxygenSite: { promise: Promise<DoxygenSite>; consumers: Set<DoxygenDocSourc
  */
 function getDoxygenSite(consumer: DoxygenDocSource, context: LoaderContext): Promise<DoxygenSite> {
   if (!doxygenSite || doxygenSite.consumers.has(consumer)) {
+    // The copy of a downloaded tag file is kept with the other generated
+    // files of Astro. The cache directory of Astro is in `node_modules`,
+    // which `make build` and `make dev` install from scratch.
+    const tagFileCache = fileURLToPath(new URL(".astro/riot.tag", context.config.root));
     const renderHeadingIds = async (markdown: string): Promise<string[]> => {
       const { metadata } = await context.renderMarkdown(markdown);
       return metadata?.headings?.map((heading) => heading.slug) ?? [];
     };
     doxygenSite = {
-      promise: loadDoxygenSite([BOARDS, CPUS], renderHeadingIds),
+      promise: loadDoxygenSite([BOARDS, CPUS], { ...API_DOC, tagFileCache }, renderHeadingIds),
       consumers: new Set(),
     };
   }
@@ -129,7 +151,7 @@ function doxygenDocLoader(source: DoxygenDocSource): Loader {
         for (const doc of site.docs.get(source) ?? []) {
           const page = convertDoxygenDoc(doc, site);
           if (page.unresolved.length) {
-            context.logger.debug(
+            context.logger.warn(
               `${doc.docPath}: unresolved references: ${page.unresolved.join(", ")}`,
             );
           }
@@ -140,7 +162,7 @@ function doxygenDocLoader(source: DoxygenDocSource): Loader {
             data: {
               title: page.title,
               description: page.description,
-              doxygenGroup: page.doxygenGroup,
+              apiUrl: page.apiUrl,
               githubFolder: doc.sourceDir,
               editUrl: `${SOURCE_TREE_URL}/${doc.sourcePath}`,
               // Only the parent appears in the overview; children are hidden

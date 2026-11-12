@@ -25,6 +25,7 @@ import {
   type DoxygenDoc,
   type TransformContext,
 } from "./doxygen_filter.ts";
+import { parseDoxygenTagFile } from "./doxygen_tagfile.ts";
 import { markdownProcessor } from "./markdown_processor.ts";
 
 /* -------------------------------------------------------------------------- */
@@ -35,7 +36,117 @@ const API = "https://api.example.org";
 const PAGE_URL = "/boards/foo/";
 
 const GPIO_PAGE = `${API}/group__drivers__periph__gpio.html`;
+const GPIO_INIT = `${GPIO_PAGE}#ga_init`;
+const GPIO_READ = `${GPIO_PAGE}#ga_read`;
+const GPIO_WRITE = `${GPIO_PAGE}#ga_write`;
+const GPIO_T = `${GPIO_PAGE}#ga_t`;
+const GPIO_PIN = `${GPIO_PAGE}#ga_pin`;
+const PHYDAT_MIN = `${API}/group__sys__phydat.html#ga_min`;
+const PHYDAT_MAX = `${API}/group__sys__phydat.html#ga_max`;
+const EXPECT_EQ = `${API}/group__unittests.html#ga_eq`;
+const LL_DIVIDER = `${API}/group__cpu__stm32.html#ga_div`;
 const UNICOAP_DRIVERS = `${API}/group__net__unicoap__drivers.html`;
+
+/** A tiny tag file in Doxygen's one-element-per-line layout. */
+const TAGFILE = `<?xml version='1.0' encoding='UTF-8' standalone='yes' ?>
+<tagfile doxygen_version="1.9.8">
+  <compound kind="file">
+    <name>gpio.h</name>
+    <path>drivers/include/periph/</path>
+    <filename>periph_2gpio_8h.html</filename>
+    <member kind="function">
+      <type>int</type>
+      <name>gpio_init</name>
+      <anchorfile>group__drivers__periph__gpio.html</anchorfile>
+      <anchor>ga_init</anchor>
+      <arglist>(gpio_t pin, gpio_mode_t mode)</arglist>
+    </member>
+    <member kind="function">
+      <type>bool</type>
+      <name>gpio_read</name>
+      <anchorfile>group__drivers__periph__gpio.html</anchorfile>
+      <anchor>ga_read</anchor>
+      <arglist>(gpio_t pin)</arglist>
+    </member>
+    <member kind="function">
+      <type>void</type>
+      <name>gpio_write</name>
+      <anchorfile>group__drivers__periph__gpio.html</anchorfile>
+      <anchor>ga_write</anchor>
+      <arglist>(gpio_t pin, bool value)</arglist>
+    </member>
+    <member kind="typedef">
+      <type>unsigned int</type>
+      <name>gpio_t</name>
+      <anchorfile>group__drivers__periph__gpio.html</anchorfile>
+      <anchor>ga_t</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="define">
+      <type>#define</type>
+      <name>GPIO_PIN</name>
+      <anchorfile>group__drivers__periph__gpio.html</anchorfile>
+      <anchor>ga_pin</anchor>
+      <arglist>(x, y)</arglist>
+    </member>
+  </compound>
+  <compound kind="file">
+    <name>phydat.h</name>
+    <path>sys/include/</path>
+    <filename>phydat_8h.html</filename>
+    <member kind="define">
+      <type>#define</type>
+      <name>PHYDAT_MIN</name>
+      <anchorfile>group__sys__phydat.html</anchorfile>
+      <anchor>ga_min</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="define">
+      <type>#define</type>
+      <name>PHYDAT_MAX</name>
+      <anchorfile>group__sys__phydat.html</anchorfile>
+      <anchor>ga_max</anchor>
+      <arglist></arglist>
+    </member>
+  </compound>
+  <compound kind="file">
+    <name>embUnit.h</name>
+    <path>sys/include/embUnit/</path>
+    <filename>embUnit_8h.html</filename>
+    <member kind="define">
+      <type>#define</type>
+      <name>EXPECT_EQ</name>
+      <anchorfile>group__unittests.html</anchorfile>
+      <anchor>ga_eq</anchor>
+      <arglist>(expected, actual, msg)</arglist>
+    </member>
+  </compound>
+  <compound kind="file">
+    <name>ll_rcc.h</name>
+    <path>cpu/stm32/include/</path>
+    <filename>ll__rcc_8h.html</filename>
+    <member kind="function">
+      <type>uint32_t</type>
+      <name>LL_Divider</name>
+      <anchorfile>group__cpu__stm32.html</anchorfile>
+      <anchor>ga_div</anchor>
+      <arglist>(void)</arglist>
+    </member>
+  </compound>
+  <compound kind="group">
+    <name>drivers_periph_gpio</name>
+    <title>GPIO</title>
+    <filename>group__drivers__periph__gpio.html</filename>
+  </compound>
+  <compound kind="group">
+    <name>net_unicoap_drivers</name>
+    <title>Drivers</title>
+    <filename>group__net__unicoap__drivers.html</filename>
+  </compound>
+</tagfile>
+`;
+
+const API_INDEX = parseDoxygenTagFile(TAGFILE);
 
 const processor = await markdownProcessor.createRenderer({ syntaxHighlight: false });
 
@@ -76,6 +187,8 @@ interface ConvertOptions {
   others?: PageFixture[];
   /** Leave out the standard `OTHER_PAGES` */
   isolated?: boolean;
+  /** Set to `false` to transform without a tag file */
+  api?: boolean;
   /** Collects the ids reported as unresolved */
   unresolved?: string[];
 }
@@ -94,7 +207,8 @@ async function makeCtx(input: string, options: ConvertOptions = {}): Promise<Tra
     ...(options.others ?? []),
     { content: input, pageUrl },
   ];
-  const site = { apiBaseUrl: API };
+  const site = { api: options.api === false ? undefined : API_INDEX, apiBaseUrl: API };
+  const sourcePath = (url: string) => `${url.replace(/^\//, "")}doc.md`;
   const draft = new AnchorIndex();
   for (const page of pages) {
     collectDoxygenAnchors(parse(page.content), page.pageUrl, draft);
@@ -102,13 +216,14 @@ async function makeCtx(input: string, options: ConvertOptions = {}): Promise<Tra
   const anchors = new AnchorIndex();
   let headingIds: string[] = [];
   for (const page of pages) {
-    const ctx = { ...site, pageUrl: page.pageUrl, anchors: draft };
+    const ctx = { ...site, pageUrl: page.pageUrl, sourcePath: sourcePath(page.pageUrl), anchors: draft };
     headingIds = await renderHeadingIds(headingMarkdown(parse(page.content), ctx));
     collectDoxygenAnchors(parse(page.content), page.pageUrl, anchors, headingIds);
   }
   return {
     ...site,
     pageUrl,
+    sourcePath: sourcePath(pageUrl),
     anchors,
     headingIds,
     onUnresolved: (id: string) => {
@@ -557,8 +672,8 @@ describe("code blocks", () => {
     assertIncludes(out, "       #USEMODULE += stdio_cdc_acm\n       @note not a note\n       <center>kept</center>");
     assert.deepEqual(asides(out), []);
     // the text of the list items is transformed
-    assertIncludes(out, "2. Use `GPIO_PIN`.");
-    assertIncludes(out, "   A paragraph of the item with `GPIO_PIN`.");
+    assertIncludes(out, `2. Use [\`GPIO_PIN\`](${GPIO_PIN}).`);
+    assertIncludes(out, `   A paragraph of the item with [\`GPIO_PIN\`](${GPIO_PIN}).`);
   });
 
   test("the indentation of code in a nested list item counts from that item", async () => {
@@ -566,7 +681,7 @@ describe("code blocks", () => {
       "- outer\n  - inner\n\n    Text of the inner item, #GPIO_PIN.\n\n        code of the inner item, #GPIO_PIN\n\n" +
       "  Text of the outer item.\n\n      code of the outer item, #GPIO_PIN\n\nText.\n\n    code, #GPIO_PIN\n";
     const out = await convert(input);
-    assertIncludes(out, "    Text of the inner item, `GPIO_PIN`.");
+    assertIncludes(out, `    Text of the inner item, [\`GPIO_PIN\`](${GPIO_PIN}).`);
     for (const code of [
       "        code of the inner item, #GPIO_PIN",
       "      code of the outer item, #GPIO_PIN",
@@ -607,13 +722,13 @@ describe("code blocks", () => {
   test("a fence in a @code block does not end the block", async () => {
     const out = await convert("@code{.md}\nExample:\n```\n\\ref boards_other\n```\n@endcode\n\nAfter #GPIO_PIN.\n");
     assertIncludes(out, "````md\nExample:\n```\n\\ref boards_other\n```\n````");
-    assertIncludes(out, "After `GPIO_PIN`.");
+    assertIncludes(out, `After [\`GPIO_PIN\`](${GPIO_PIN}).`);
   });
 
   test("indented code directly below a heading is code", async () => {
     const out = await convert("## Example\n    make flash #GPIO_PIN\n\nText with #GPIO_PIN.\n");
     assertIncludes(out, "## Example\n    make flash #GPIO_PIN");
-    assertIncludes(out, "Text with `GPIO_PIN`.");
+    assertIncludes(out, `Text with [\`GPIO_PIN\`](${GPIO_PIN}).`);
   });
 });
 
@@ -871,6 +986,29 @@ describe("anchors", () => {
 /* -------------------------------------------------------------------------- */
 
 describe("references", () => {
+  test("@ref and \\ref become links, no command survives as text", async () => {
+    const out = await convert("This guide covers @ref gpio_init and \\ref gpio_init in prose, plus @b bold words.");
+    assert.equal(
+      out.trim(),
+      `This guide covers [\`gpio_init\`](${GPIO_INIT}) and [\`gpio_init\`](${GPIO_INIT}) in prose, plus **bold** words.`,
+    );
+  });
+
+  test("a multi-line @note with a @ref is one aside with a link", async () => {
+    const out = await convert("@note Pins are configured before the start\nof the thread; see @ref gpio_init.\n\nAfter.");
+    assert.deepEqual(asides(out), [
+      { type: "note", title: undefined, body: `Pins are configured before the start\nof the thread; see [\`gpio_init\`](${GPIO_INIT}).` },
+    ]);
+  });
+
+  test("@ref with parens links the function, @p is code, @a is emphasis", async () => {
+    const out = await convert("See @ref gpio_init() and pass @p pin; emphasis @a here.");
+    assert.match(
+      out,
+      new RegExp(`^See \\[\`gpio_init(?:\\(\\))?\`\\]\\(${GPIO_INIT.replace(/[.?]/g, "\\$&")}\\) and pass \`pin\`; emphasis \\*here\\*\\.$`, "m"),
+    );
+  });
+
   test("a hyphenated group id is one \\ref target", async () => {
     const out = await convert("See @ref boards_arduino-due and @ref boards_samr21-xpro.");
     assert.equal(
@@ -879,8 +1017,8 @@ describe("references", () => {
     );
   });
 
-  test("a hyphenated group id that is not on the site links to its API group page", async () => {
-    const out = await convert("See @ref boards_unknown-board and @ref gpio_init.", { isolated: true });
+  test("without a tag file, a hyphenated group id links to its API group page", async () => {
+    const out = await convert("See @ref boards_unknown-board and @ref gpio_init.", { isolated: true, api: false });
     assert.deepEqual(linkTargets(out), [`${API}/group__boards__unknown-board.html`]);
     assertIncludes(out, "`gpio_init`");
   });
@@ -899,9 +1037,28 @@ describe("references", () => {
     assert.equal(out.trim(), "[Arduino Due](/boards/arduino-due/).[Atmel SAM R21 Xplained Pro](/boards/samr21-xpro/)");
   });
 
+  test("a @ref inside prose parentheses links", async () => {
+    const out = await convert("Use @ref gpio_init (see @ref GPIO_PIN).");
+    assert.equal(out.trim(), `Use [\`gpio_init\`](${GPIO_INIT}) (see [\`GPIO_PIN\`](${GPIO_PIN})).`);
+  });
+
+  test("a @ref inside prose brackets (an interval) links", async () => {
+    const out = await convert("Clamps to [@ref PHYDAT_MIN, @ref PHYDAT_MAX] and more.");
+    assert.deepEqual(linkTargets(out), [PHYDAT_MIN, PHYDAT_MAX]);
+    assertExcludes(out, "@ref");
+  });
+
   test("a @ref inside the text of a Markdown link does not nest a link", async () => {
     const out = await convert("Read [see @ref gpio_init](https://e.com) first.");
     assert.deepEqual(linkTargets(out), ["https://e.com"]);
+  });
+
+  test("an inline command opens after any non-word character", async () => {
+    const out = await convert("Increments *\\p ctry; ex: (HSE_VALUE,@ref LL_Divider() done.");
+    assertIncludes(out, "*`ctry`;");
+    assert.deepEqual(linkTargets(out), [LL_DIVIDER]);
+    assertExcludes(out, "\\p ");
+    assertExcludes(out, "@ref");
   });
 
   test("a command glued to a word stays text", async () => {
@@ -924,6 +1081,13 @@ describe("references", () => {
     assert.equal((await convert("x @ref nope y", { unresolved })).trim(), "x `nope` y");
     assert.equal((await convert('x @ref nope2 "Nope text" y', { unresolved })).trim(), "x Nope text y");
     assert.deepEqual(unresolved, ["nope", "nope2"]);
+  });
+
+  test("references resolve inside emphasis, list items and block quotes", async () => {
+    const out = await convert("a *@ref gpio_init* b\n\n- see \\ref gpio_init\n\n> ref @ref gpio_init");
+    assertIncludes(out, `a *[\`gpio_init\`](${GPIO_INIT})* b`);
+    assertIncludes(out, `- see [\`gpio_init\`](${GPIO_INIT})`);
+    assertIncludes(out, `> ref [\`gpio_init\`](${GPIO_INIT})`);
   });
 
   test("ordinary links and links in fenced code are left alone", async () => {
@@ -983,7 +1147,7 @@ describe("references", () => {
       "[see `gpio_init`](https://e.com), [see the GPIO API](https://e.com) and [see `nope`](https://e.com)",
     );
     assert.deepEqual(linkTargets(out), ["https://e.com", "https://e.com", "https://e.com"]);
-    assert.deepEqual(unresolved, ["gpio_init", "nope"]);
+    assert.deepEqual(unresolved, ["nope"]);
   });
 
   test("a link to an anchor that does not exist is reported", async () => {
@@ -1018,6 +1182,12 @@ describe("code spans", () => {
       ],
       async (input) => (await convert(input)).trim(),
     );
+  });
+
+  test("autolinking skips code spans that are not a known #symbol or call", async () => {
+    const input =
+      "Call `#include <stdio.h>`, `#FOO_UNKNOWN`, `GPIO_PIN`, `foo_unknown()` and `gpio_init(pin, mode)` directly.";
+    assert.equal((await convert(input)).trim(), input);
   });
 });
 
@@ -1121,10 +1291,53 @@ describe("callouts", () => {
 /* -------------------------------------------------------------------------- */
 
 describe("see also", () => {
+  /** Link targets of all "See also" asides of `md`. */
+  const seeTargets = (md: string) =>
+    asides(md)
+      .filter((a) => a.title === "See also")
+      .flatMap((a) => linkTargets(a.body));
+
+  test("a bare @see / @sa reference list autolinks each name", async () => {
+    const out = await convert("@see gpio_read(), gpio_write\n@sa gpio_t");
+    assert.deepEqual(seeTargets(out), [GPIO_READ, GPIO_WRITE, GPIO_T]);
+    assertExcludes(out, "@ref");
+  });
+
+  test("the period after a @see name ends the sentence, not the name", async () => {
+    const out = await convert("@see gpio_read.");
+    assert.deepEqual(asides(out), [{ type: "note", title: "See also", body: `[\`gpio_read\`](${GPIO_READ}).` }]);
+  });
+
+  test("a trailing comma does not demote the reference list", async () => {
+    assert.deepEqual(seeTargets(await convert("@see gpio_read, gpio_write,")), [GPIO_READ, GPIO_WRITE]);
+  });
+
+  test("@sa #MACRO(a, b, c) is one reference, not one per argument", async () => {
+    assert.deepEqual(seeTargets(await convert("@sa #EXPECT_EQ(expected, actual, msg)")), [EXPECT_EQ]);
+  });
+
+  test("a @sa joined by prose links each call and keeps the words", async () => {
+    const out = await convert("@sa gpio_read() and gpio_write()");
+    assert.deepEqual(seeTargets(out), [GPIO_READ, GPIO_WRITE]);
+    assertIncludes(out, ") and [");
+  });
+
   test("a bare URL after @see is kept verbatim", async () => {
     assert.deepEqual(asides(await convert("@see https://example.com/a/b")), [
       { type: "note", title: "See also", body: "https://example.com/a/b" },
     ]);
+  });
+
+  test("@see is an aside in place; @see @ref X links X without a stray @ref", async () => {
+    const out = await convert("Before.\n\n@see gpio_read, gpio_write\n@see @ref boards_other\n\nAfter.");
+    assert.deepEqual(seeTargets(out), [GPIO_READ, GPIO_WRITE, "/boards/other/"]);
+    assertExcludes(out, "@ref");
+    assertOrder(out, "Before.", ":::note[See also]", "After.");
+  });
+
+  test("see also: a Markdown link stays as it is", async () => {
+    const out = await convert("@see [the gpio_init docs](https://e.com), gpio_init\n");
+    assert.equal(asides(out)[0].body, `[the gpio_init docs](https://e.com), [\`gpio_init\`](${GPIO_INIT})`);
   });
 });
 
@@ -1259,6 +1472,136 @@ describe("inline commands", () => {
       ],
       async (input) => (await convert(input)).trim(),
     );
+  });
+});
+
+/* -------------------------------------------------------------------------- */
+/* Symbol autolinks                                                           */
+/* -------------------------------------------------------------------------- */
+
+describe("#symbol autolinks", () => {
+  test("#SYMBOL known to the tag file links, a bare #include / #42 / #define does not", async () => {
+    const out = await convert("Set #GPIO_PIN and #gpio_init() here. Do not touch #include or #42 or #define.");
+    assert.equal(
+      out.trim(),
+      `Set [\`GPIO_PIN\`](${GPIO_PIN}) and [\`gpio_init()\`](${GPIO_INIT}) here. Do not touch #include or #42 or #define.`,
+    );
+    assert.equal((await convert("Unknown #FOO_BAR macro.")).trim(), "Unknown `FOO_BAR` macro.");
+    assert.equal((await convert("A [pins](#GPIO_PIN) link.")).trim(), "A [pins](#GPIO_PIN) link.");
+  });
+
+  test("a #SYMBOL inside the text of a Markdown link does not nest a link", async () => {
+    const out = await convert("See [the #GPIO_PIN helper](http://x) docs.");
+    assert.deepEqual(linkTargets(out), ["http://x"]);
+  });
+
+  test("a bare URL is one token, also with a #fragment", async () => {
+    const input =
+      "Copied from https://www.arduino.cc/en/Reference/Wire. See (www.wemos.cc/d1) or <http://x.org/a.h> " +
+      "and https://example.com/page#GPIO_PIN.";
+    assert.equal((await convert(input)).trim(), input);
+  });
+
+  test("a symbol in the label of a link is not linked again", async () => {
+    const out = await convert(
+      "[see #GPIO_PIN here](https://e.com), [`#GPIO_PIN`](https://e.com) and [![pins of #GPIO_PIN](pins.png)](https://e.com)\n",
+    );
+    assertIncludes(out, "[see `GPIO_PIN` here](https://e.com), [`#GPIO_PIN`](https://e.com) and [![pins of `GPIO_PIN`](");
+    assertExcludes(out, GPIO_PIN);
+  });
+
+  test("the arguments of a #MACRO are part of its link, those of a function are text", async () => {
+    await assertCases(
+      [
+        ["Use #GPIO_PIN(0, 1) here.", `Use [\`GPIO_PIN(0, 1)\`](${GPIO_PIN}) here.`],
+        ["Use #gpio_init(pin, mode) here.", `Use [\`gpio_init\`](${GPIO_INIT})(pin, mode) here.`],
+        ["Unknown #FOO_BAR(0) macro.", "Unknown `FOO_BAR(0)` macro."],
+      ],
+      async (input) => (await convert(input)).trim(),
+    );
+  });
+});
+
+describe("call autolinks", () => {
+  test("a call of a known function or macro links without #", async () => {
+    await assertCases(
+      [
+        ["Call gpio_init() first.", `Call [\`gpio_init()\`](${GPIO_INIT}) first.`],
+        ["The pin GPIO_PIN(0, 1) is used.", `The pin [\`GPIO_PIN(0, 1)\`](${GPIO_PIN}) is used.`],
+        ["(see gpio_read(), gpio_write())", `(see [\`gpio_read()\`](${GPIO_READ}), [\`gpio_write()\`](${GPIO_WRITE}))`],
+        ["**gpio_init()** is required.", `**[\`gpio_init()\`](${GPIO_INIT})** is required.`],
+      ],
+      async (input) => (await convert(input)).trim(),
+    );
+  });
+
+  test("a call in a table cell links up to its closing parenthesis", async () => {
+    const out = await convert("Pin | Function\n:---|:---\nPA5 |GPIO_PIN(0, 5):CLK\n");
+    assertIncludes(out, `PA5 |[\`GPIO_PIN(0, 5)\`](${GPIO_PIN}):CLK`);
+  });
+
+  test("a name without parentheses is not a call", async () => {
+    const input = "Call gpio_init first, then set GPIO_PIN and LL_Divider.";
+    assert.equal((await convert(input)).trim(), input);
+  });
+
+  test("the arguments of a function are not a reference, an unknown call is text", async () => {
+    const unresolved: string[] = [];
+    const input = "Call gpio_init(pin, mode) from main() and foo_unknown(0).";
+    assert.equal((await convert(input, { unresolved })).trim(), input);
+    assert.deepEqual(unresolved, []);
+  });
+
+  test("a name in a longer word, in a path or in a URL is not a call", async () => {
+    const input =
+      "Not my-gpio_init(), dev.gpio_init(), drivers/gpio_init(), x=gpio_init(), \"gpio_init()\" " +
+      "or https://example.com/gpio_init() and https://example.com/?q=gpio_init().";
+    assert.equal((await convert(input)).trim(), input);
+  });
+
+  test("a code span with a call becomes a link", async () => {
+    const out = await convert("Call `gpio_init()` for `GPIO_PIN(0, 1)`.\n");
+    assertIncludes(out, `Call [\`gpio_init()\`](${GPIO_INIT}) for [\`GPIO_PIN(0, 1)\`](${GPIO_PIN}).`);
+  });
+
+  test("a call that is a link or code already is not linked again", async () => {
+    await assertCases(
+      [
+        ["See \\ref gpio_init() here.", `See [\`gpio_init()\`](${GPIO_INIT}) here.`],
+        ["See #gpio_init() here.", `See [\`gpio_init()\`](${GPIO_INIT}) here.`],
+        ["See \\c gpio_init() here.", "See `gpio_init()` here."],
+        ["See \\c (gpio_init()) here.", "See `(gpio_init())` here."],
+        ["See [`gpio_init()`](https://e.com) here.", "See [`gpio_init()`](https://e.com) here."],
+      ],
+      async (input) => (await convert(input)).trim(),
+    );
+  });
+
+  test("a call in the label of a link does not nest a link", async () => {
+    const out = await convert("See [the gpio_init() helper](http://x) docs.");
+    assert.deepEqual(linkTargets(out), ["http://x"]);
+    assertIncludes(out, "[the `gpio_init()` helper](http://x)");
+  });
+
+  test("a call in an HTML tag is not linked", async () => {
+    const input = '<img src="/img/timing.png" alt="Timing of gpio_init() and GPIO_PIN(0, 1)">';
+    assert.equal((await convert(input)).trim(), input);
+  });
+
+  test("a @see list links a macro call with its arguments", async () => {
+    const out = await convert("@see gpio_read(), GPIO_PIN(0, 1)");
+    assert.deepEqual(asides(out), [
+      {
+        type: "note",
+        title: "See also",
+        body: `[\`gpio_read()\`](${GPIO_READ}), [\`GPIO_PIN(0, 1)\`](${GPIO_PIN})`,
+      },
+    ]);
+  });
+
+  test("without a tag file, a call stays text", async () => {
+    const input = "Call gpio_init() and `gpio_init()` for GPIO_PIN(0, 1).";
+    assert.equal((await convert(input, { api: false })).trim(), input);
   });
 });
 
@@ -1442,6 +1785,12 @@ describe("edge cases", () => {
     assertIncludes(out, "Use `\\ref boards_other` and `\\c foo` and `@note x` here.");
   });
 
+  test("a code span of a known symbol becomes a link", async () => {
+    const out = await convert("Set `#GPIO_PIN` and #GPIO_PIN.\n");
+    assertIncludes(out, `Set [\`#GPIO_PIN\`](${GPIO_PIN})`);
+    assertIncludes(out, `and [\`GPIO_PIN\`](${GPIO_PIN}).`);
+  });
+
   test("indented code blocks are not transformed", async () => {
     const out = await convert("Run:\n\n    #GPIO_PIN \\ref boards_other\n\nDone.\n");
     assert.match(out, /^ {4}#GPIO_PIN \\ref boards_other$/m);
@@ -1456,10 +1805,15 @@ describe("edge cases", () => {
     assert.equal(await convert("    make flash\n"), "    make flash\n");
   });
 
-  test("groups of the API documentation are linked to their group page", async () => {
-    const out = await convert("Uses \\ref drivers_periph_gpio and \\ref gpio_init.\n");
+  test("without a tag file, groups are linked to their group page", async () => {
+    const out = await convert("Uses \\ref drivers_periph_gpio and \\ref gpio_init.\n", { api: false });
     assertIncludes(out, `[drivers_periph_gpio](${GPIO_PAGE})`);
     assertIncludes(out, "and `gpio_init`.");
+  });
+
+  test("with a tag file, unknown names are not guessed", async () => {
+    const out = await convert("Uses \\ref drivers_foo.\n");
+    assertIncludes(out, "Uses `drivers_foo`.");
   });
 
   test("a rule in the first line is not front matter", async () => {

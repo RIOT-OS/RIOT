@@ -26,6 +26,8 @@ import {
 } from "./doxygen_docs.ts";
 import { markdownProcessor } from "./markdown_processor.ts";
 
+const API = "https://api.example.org";
+
 const processor = await markdownProcessor.createRenderer({ syntaxHighlight: false });
 
 /** The heading ids of `markdown`. */
@@ -90,7 +92,21 @@ test("the paths of a file are relative to the root of the repository", async () 
   });
 });
 
-test("a page links to the pages of all source trees", async () => {
+test("a page links to the pages of all source trees and to the API documentation", async () => {
+  const tagFile = `<?xml version='1.0' encoding='UTF-8' standalone='yes' ?>
+<tagfile doxygen_version="1.14.0">
+  <compound kind="group">
+    <name>boards_foo</name>
+    <title>Foo</title>
+    <filename>group__boards__foo__from__tagfile.html</filename>
+  </compound>
+  <compound kind="group">
+    <name>drivers_periph_gpio</name>
+    <title>GPIO</title>
+    <filename>group__drivers__periph__gpio.html</filename>
+  </compound>
+</tagfile>
+`;
   await withTree(
     {
       "boards/foo/doc.md": group(
@@ -99,33 +115,44 @@ test("a page links to the pages of all source trees", async () => {
         "boards",
         "See \\ref cpu_bar_flashing, \\ref drivers_periph_gpio and \\ref unknown_thing.",
       ),
+      "boards/foo/Makefile.features": "",
       // without a group the title is the name of the directory
       "boards/my-board/doc.md": "Just text.\n",
       "cpu/bar/doc.md": group("cpu_bar", "Bar", "cpu", "# Flashing {#cpu_bar_flashing}\n\nSee \\ref boards_foo."),
+      "riot.tag": tagFile,
     },
     async (root) => {
       const sources = [boards(root), cpus(root)];
+      const apiDoc = { baseUrl: API, localTagFile: path.join(root, "riot.tag") };
 
-      const site = await loadDoxygenSite(sources, renderHeadingIds);
+      const site = await loadDoxygenSite(sources, apiDoc, renderHeadingIds);
       const boardDocs = site.docs.get(sources[0])!;
       const foo = convertDoxygenDoc(byId(boardDocs, "foo"), site);
       assert.equal(foo.title, "Foo Board");
       assert.equal(foo.description, "Support for Foo Board.");
-      assert.equal(foo.doxygenGroup, "boards__foo");
+      assert.equal(foo.apiUrl, `${API}/group__boards__foo__from__tagfile.html`);
       assert.equal(
         foo.markdown.trim(),
-        "See [Flashing](/cpus/bar/#cpu_bar_flashing), " +
-          "[drivers_periph_gpio](https://api.riot-os.org/group__drivers__periph__gpio.html) and `unknown_thing`.",
+        `See [Flashing](/cpus/bar/#cpu_bar_flashing), [GPIO](${API}/group__drivers__periph__gpio.html) and \`unknown_thing\`.`,
       );
       assert.deepEqual(foo.unresolved, ["unknown_thing"]);
 
       const myBoard = convertDoxygenDoc(byId(boardDocs, "my-board"), site);
       assert.equal(myBoard.title, "my board");
       assert.equal(myBoard.description, undefined);
-      assert.equal(myBoard.doxygenGroup, undefined);
+      assert.equal(myBoard.apiUrl, `${API}/`);
 
       const bar = convertDoxygenDoc(byId(site.docs.get(sources[1])!, "bar"), site);
       assert.match(bar.markdown, /See \[Foo Board\]\(\/boards\/foo\/\)\./);
+
+      // Without a tag file the page of a group is derived from its name, and
+      // nothing is reported as unresolved.
+      const offline = await loadDoxygenSite(sources, { ...apiDoc, tagFile: "" }, renderHeadingIds);
+      assert.equal(offline.api, undefined);
+      const offlineFoo = convertDoxygenDoc(byId(offline.docs.get(sources[0])!, "foo"), offline);
+      assert.equal(offlineFoo.apiUrl, `${API}/group__boards__foo.html`);
+      assert.match(offlineFoo.markdown, /\[drivers_periph_gpio\]\(https:\/\/api\.example\.org\/group__drivers__periph__gpio\.html\)/);
+      assert.deepEqual(offlineFoo.unresolved, []);
     },
   );
 });
@@ -144,7 +171,7 @@ test("the ids of the headings come from the Markdown processor", async () => {
     },
     async (root) => {
       const sources = [boards(root), cpus(root)];
-      const site = await loadDoxygenSite(sources, renderHeadingIds);
+      const site = await loadDoxygenSite(sources, { baseUrl: API, localTagFile: "", tagFile: "" }, renderHeadingIds);
 
       const bar = byId(site.docs.get(sources[1])!, "bar");
       assert.deepEqual(site.headingIds.get(bar), ["flashing", "programming", "pins-of-foo-board"]);

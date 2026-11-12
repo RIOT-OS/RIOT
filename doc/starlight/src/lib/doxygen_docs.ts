@@ -13,13 +13,15 @@
  * module makes the pages of the site from these files, in two steps:
  *
  * 1. `loadDoxygenSite()` finds the files of all source trees
- *    (`findDoxygenDocs()`). A file refers to other files, so this step also
- *    loads what the conversion of one file needs to know about everything
- *    else: the index of all anchors and the ids of the headings.
+ *    (`findDoxygenDocs()`). A file refers to other files and to the API
+ *    documentation, so this step also loads what the conversion of one file
+ *    needs to know about everything else: the index of all anchors, the
+ *    index of the API documentation and the ids of the headings.
  *
  * 2. `convertDoxygenDoc()` converts one file into a page.
  *
- * The conversion of the Markdown is in `doxygen_filter.ts`. This module does
+ * The conversion of the Markdown is in `doxygen_filter.ts`, the reader of the
+ * index of the API documentation is in `doxygen_tagfile.ts`. This module does
  * not depend on Astro, `content.config.ts` puts the pages into content
  * collections.
  */
@@ -34,6 +36,7 @@ import {
   parseDoxygenDoc,
   transformDoxygenMarkdown,
 } from "./doxygen_filter.ts";
+import { type ApiIndex, doxygenGroupFile, loadDoxygenTagFile } from "./doxygen_tagfile.ts";
 
 /* -------------------------------------------------------------------------- */
 /* The files of a source tree                                                 */
@@ -116,12 +119,86 @@ export async function findDoxygenDocs(source: DoxygenDocSource): Promise<Doxygen
 }
 
 /* -------------------------------------------------------------------------- */
+/* The API documentation                                                      */
+/* -------------------------------------------------------------------------- */
+
+/** Where the API documentation and its Doxygen tag file are. */
+export interface ApiDocLocation {
+  /** Base URL of the published API documentation, without a trailing `/` */
+  baseUrl: string;
+  /**
+   * Path or URL of the tag file to use. An empty value disables the tag
+   * file. If it is not set, the tag file is `localTagFile` if that file
+   * exists, and else the one of the published API documentation.
+   */
+  tagFile?: string;
+  /** Tag file of a local build of the API documentation (`make doc`) */
+  localTagFile: string;
+  /**
+   * Path for the copy of a downloaded tag file, so that the download is only
+   * repeated if the published tag file has changed
+   */
+  tagFileCache?: string;
+}
+
+/** Name of the tag file in the published API documentation. */
+const TAGFILE_NAME = "riot.tag";
+
+/**
+ * Load the index of the API documentation from its Doxygen tag file, see
+ * `ApiDocLocation` for where the tag file is taken from.
+ *
+ * Without a tag file the pages are still generated. References to the API
+ * documentation are then rendered as code instead of links, and references
+ * to groups link to the page that the name of the group implies. This is
+ * also the case if the source is not a complete tag file, e.g. the error
+ * page of a server.
+ */
+async function loadApiIndex(apiDoc: ApiDocLocation): Promise<ApiIndex | undefined> {
+  const source =
+    apiDoc.tagFile ??
+    (await fs.access(apiDoc.localTagFile).then(
+      () => apiDoc.localTagFile,
+      () => `${apiDoc.baseUrl}/${TAGFILE_NAME}`,
+    ));
+  if (!source) {
+    return undefined;
+  }
+  try {
+    return await loadDoxygenTagFile(source, apiDoc.tagFileCache, (reason) =>
+      console.warn(
+        `Doxygen tag file "${source}" is not available (${reason}). ` +
+          "Its copy in the cache is used, which may be outdated.",
+      ),
+    );
+  } catch (error) {
+    console.warn(
+      `Doxygen tag file "${source}" is not available (${error instanceof Error ? error.message : error}). ` +
+        "References to the API documentation are rendered without links.",
+    );
+    return undefined;
+  }
+}
+
+/**
+ * URL of the page of a group in the API documentation. Without a tag file
+ * the file name is derived from the group name. A page without a group links
+ * to the start page.
+ */
+function apiGroupUrl(group: string | undefined, site: DoxygenSite): string {
+  if (!group) {
+    return `${site.apiBaseUrl}/`;
+  }
+  return `${site.apiBaseUrl}/${site.api?.lookup(group)?.url ?? doxygenGroupFile(group)}`;
+}
+
+/* -------------------------------------------------------------------------- */
 /* The site                                                                   */
 /* -------------------------------------------------------------------------- */
 
 /**
  * The documentation of boards and CPUs: all files, and what the conversion
- * of a file needs to know about the other files.
+ * of a file needs to know about the other files and the API documentation.
  */
 export interface DoxygenSite {
   /** The doc*.md files of each source tree */
@@ -130,6 +207,10 @@ export interface DoxygenSite {
   anchors: AnchorIndex;
   /** Ids of the headings of each page, from the Markdown processor */
   headingIds: Map<DoxygenDocFile, string[]>;
+  /** Index of the API documentation, if its tag file is available */
+  api: ApiIndex | undefined;
+  /** Base URL of the API documentation, without a trailing `/` */
+  apiBaseUrl: string;
 }
 
 /** Render Markdown with the processor of the site, return its heading ids. */
@@ -144,8 +225,10 @@ export type HeadingIdRenderer = (markdown: string) => Promise<string[]>;
  */
 export async function loadDoxygenSite(
   sources: DoxygenDocSource[],
+  apiDoc: ApiDocLocation,
   renderHeadingIds: HeadingIdRenderer,
 ): Promise<DoxygenSite> {
+  const apiPromise = loadApiIndex(apiDoc);
   const docs = new Map<DoxygenDocSource, DoxygenDocFile[]>();
 
   const trees = await Promise.all(sources.map(findDoxygenDocs));
@@ -153,6 +236,7 @@ export async function loadDoxygenSite(
     docs.set(source, trees[n]);
   }
   const files = trees.flat();
+  const api = await apiPromise;
 
   // a heading can contain a reference, so it is converted with a draft index
   const draft = new AnchorIndex();
@@ -162,7 +246,13 @@ export async function loadDoxygenSite(
   const headingIds = new Map<DoxygenDocFile, string[]>();
   const anchors = new AnchorIndex();
   for (const doc of files) {
-    const headings = headingMarkdown(doc.parsed, { pageUrl: doc.pageUrl, anchors: draft });
+    const headings = headingMarkdown(doc.parsed, {
+      pageUrl: doc.pageUrl,
+      sourcePath: doc.sourcePath,
+      anchors: draft,
+      api,
+      apiBaseUrl: apiDoc.baseUrl,
+    });
     const ids = headings ? await renderHeadingIds(headings) : [];
     headingIds.set(doc, ids);
     collectDoxygenAnchors(doc.parsed, doc.pageUrl, anchors, ids);
@@ -173,7 +263,7 @@ export async function loadDoxygenSite(
         "A reference to it from another page links to the first definition.",
     );
   }
-  return { docs, anchors, headingIds };
+  return { docs, anchors, headingIds, api, apiBaseUrl: apiDoc.baseUrl };
 }
 
 /* -------------------------------------------------------------------------- */
@@ -186,11 +276,15 @@ export interface DoxygenPage {
   title: string;
   /** Description of the page, the `@brief` of its group */
   description: string | undefined;
-  /** Doxygen group of the page, in Doxygen's URL encoding */
-  doxygenGroup: string | undefined;
+  /** URL of the page of the group in the API documentation */
+  apiUrl: string;
   /** Content of the page as Markdown */
   markdown: string;
-  /** The references of the file that could not be resolved */
+  /**
+   * The references of the file that could not be resolved. Empty without a
+   * tag file: nothing of the API documentation can be resolved then, which
+   * is reported once by `loadApiIndex()`.
+   */
   unresolved: string[];
 }
 
@@ -199,15 +293,18 @@ export function convertDoxygenDoc(doc: DoxygenDocFile, site: DoxygenSite): Doxyg
   const unresolved = new Set<string>();
   const markdown = transformDoxygenMarkdown(doc.parsed, {
     pageUrl: doc.pageUrl,
+    sourcePath: doc.sourcePath,
     anchors: site.anchors,
+    api: site.api,
+    apiBaseUrl: site.apiBaseUrl,
     headingIds: site.headingIds.get(doc) ?? [],
     onUnresolved: (id) => unresolved.add(id),
   });
   return {
     title: doc.parsed.title || doc.docName.replace(/-/g, " "),
     description: doc.parsed.brief,
-    doxygenGroup: doc.parsed.groups[0]?.replaceAll("_", "__"),
+    apiUrl: apiGroupUrl(doc.parsed.groups[0], site),
     markdown,
-    unresolved: [...unresolved],
+    unresolved: site.api ? [...unresolved] : [],
   };
 }
