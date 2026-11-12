@@ -9,6 +9,7 @@
 import StarlightPage from "@astrojs/starlight/components/StarlightPage.astro";
 import { LinkCard, Code, Aside, CardGrid } from "@astrojs/starlight/components";
 import { getCollection, render } from "astro:content";
+import { REPOSITORY_URL, SOURCE_TREE_URL } from "../../../config";
 
 export async function getStaticPaths() {
   const moduleTypes = ["boards", "cpus"] as const;
@@ -73,14 +74,14 @@ const { Content, headings } = await render(module);
   frontmatter={{
     title: module.data.title,
     description: module.data.description || descriptionFallback,
-    editUrl: `https://github.com/RIOT-OS/RIOT/tree/master/${module.filePath}`,
+    editUrl: module.data.editUrl,
   }}
   headings={headings}
 >
   <Aside type="caution">
     This page is automatically generated from RIOT doxygen documentation. If you
     find any issues or have suggestions for improvement, please report them
-    on <a href="https://github.com/RIOT-OS/RIOT/issues/22203">GitHub</a>.
+    on <a href={`${REPOSITORY_URL}/issues/22203`}>GitHub</a>.
   </Aside>
 
   <CardGrid>
@@ -92,7 +93,7 @@ const { Content, headings } = await render(module);
 
     <LinkCard
       title="View on GitHub"
-      href={`https://github.com/RIOT-OS/RIOT/tree/master/${module.data.githubFolder}`}
+      href={`${SOURCE_TREE_URL}/${module.data.githubFolder}`}
       description="View this source code on GitHub."
     />
   </CardGrid>

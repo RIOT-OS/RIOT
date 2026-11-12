@@ -11,6 +11,7 @@ import starlightImageZoom from "starlight-image-zoom";
 import starlightSidebarTopics from "starlight-sidebar-topics";
 import { satteri, type SatteriProcessorOptions } from '@astrojs/markdown-satteri';
 import * as emoji from 'node-emoji'
+import { SOURCE_TREE_URL } from "./config.ts";
 
 type SatteriMdastPlugin = Extract<
   NonNullable<SatteriProcessorOptions["mdastPlugins"]>[number],
@@ -312,7 +313,7 @@ export default defineConfig({
       }),
       ],
       editLink: {
-        baseUrl: "https://github.com/RIOT-OS/RIOT/tree/master/doc/guides",
+        baseUrl: `${SOURCE_TREE_URL}/doc/guides`,
       },
     }),
   ],

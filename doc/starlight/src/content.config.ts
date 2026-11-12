@@ -21,6 +21,7 @@ import {
   extractDoxygenGroupTitleFromDoxygen,
   transformDoxygenMarkdown,
 } from "./lib/doxygen_filter";
+import { REPOSITORY_URL, SOURCE_TREE_URL } from "../config";
 
 const DoxygenDocSchema = z.object({
   title: z.string(),
@@ -179,6 +180,7 @@ function doxygenDocLoader(
               description: extractDoxygenBrief(doc.content, doxygenGroupPrefix),
               doxygenGroup: extractDoxygenGroupFromDoxygen(doc.content, doxygenGroupPrefix),
               githubFolder: doc.docDirPath.replaceAll("../", ""),
+              editUrl: `${SOURCE_TREE_URL}/${doc.docPath.replaceAll("../", "")}`,
               // Only the parent appears in the overview; children are hidden
               // and reached via their parent's childrenIds.
               includeInOverview: doc.isParent,
@@ -281,7 +283,7 @@ export function changelogLoader(): Loader {
             // Github treats both PRs and Issues the same way regarding links
             const contentWithGithubLinks = currentReleaseContent.replace(
               /#(\d+)/g,
-              "[#$1](https://github.com/RIOT-OS/RIOT/issues/$1)",
+              `[#$1](${REPOSITORY_URL}/issues/$1)`,
             );
 
             // Add entry to content collection
