@@ -662,6 +662,13 @@ export interface DoxygenDoc {
   brief?: string;
   /** Names of the Doxygen groups that are rendered on the page */
   groups: string[];
+  /**
+   * True if the groups have a body, i.e. more than `@defgroup`, `@brief` and
+   * a title section. Groups without a body (e.g. most of `boards/common/*`)
+   * only collect header files, their API documentation page is more useful
+   * than a page with a title only.
+   */
+  hasContent: boolean;
   /** The parts of the page, input of both passes of the conversion */
   parts: PagePart[];
 }
@@ -682,6 +689,7 @@ export function parseDoxygenDoc(content: string, groupPrefix: string): DoxygenDo
     // a description is plain text, `\ref foo` in it shows `foo`
     brief: blocks[0].brief?.replace(/[@\\]ref\s+/g, ""),
     groups: blocks.map((block) => block.name).filter(Boolean),
+    hasContent: parts.some((part, n) => (n === 0 ? part.body : part.block.body).trim() !== ""),
     parts,
   };
 }

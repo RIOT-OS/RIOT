@@ -26,7 +26,7 @@
  * collections.
  */
 
-import { promises as fs } from "node:fs";
+import { type Dirent, promises as fs } from "node:fs";
 import path from "node:path";
 import {
   AnchorIndex,
@@ -55,8 +55,9 @@ export interface DoxygenDocSource {
 /** One doc*.md file that is rendered as a page. */
 export interface DoxygenDocFile {
   /**
-   * Id of the page: the name of the directory of the file, e.g. `esp32`. A
-   * further file of a directory adds its name, e.g. `esp32/doc_esp32.doc`.
+   * Id of the page: the path of the directory of the file in the source
+   * tree, e.g. `esp32` or `common/blxxxpill`. A further file of a directory
+   * adds its name, e.g. `esp32/doc_esp32.doc`.
    */
   id: string;
   /** Path of the file, relative to the working directory */
@@ -65,14 +66,38 @@ export interface DoxygenDocFile {
   sourcePath: string;
   /** Directory of the file, relative to the root of the repository */
   sourceDir: string;
-  /** Name of the directory of the file, e.g. `esp32-wroom-32` */
+  /** Name of the directory of the file, e.g. `esp32-wroom-32` or `blxxxpill` */
   docName: string;
   /** True for the `doc.md` of a directory, false for its further files */
   isParent: boolean;
+  /** True for files in sub-directories (`boards/common/<name>/doc.md`) */
+  isNested: boolean;
+  /**
+   * True for the page of a board or CPU: the `doc.md` of a directory of the
+   * source tree that has a `Makefile.features`. Directories that only
+   * collect common code (`boards/common`, `cpu/sam_common`) don't have one.
+   */
+  isModulePage: boolean;
   /** Absolute URL of the page, e.g. `/boards/esp32-wroom-32/` */
   pageUrl: string;
   /** The parsed file */
   parsed: DoxygenDoc;
+}
+
+/** Directories that never contain documentation of a board or CPU. */
+const SKIPPED_DIRS = new Set(["vendor", "node_modules", "bin", "dist"]);
+
+/** True for a directory that can contain documentation. */
+function isDocDir(entry: Dirent): boolean {
+  return entry.isDirectory() && !entry.name.startsWith(".") && !SKIPPED_DIRS.has(entry.name);
+}
+
+/**
+ * Order of directory entries by code unit, which does not depend on the
+ * locale of the host (unlike `localeCompare()`).
+ */
+function byName(a: Dirent, b: Dirent): number {
+  return a.name < b.name ? -1 : a.name > b.name ? 1 : 0;
 }
 
 /**
@@ -84,38 +109,60 @@ function repoPath(file: string): string {
 }
 
 /**
- * Find all doc*.md files of boards (`../../boards`) or CPUs (`../../cpu`).
+ * Find all doc*.md files of a source tree, also in sub-directories such as
+ * `boards/common/<name>/` or `cpu/esp32/esp-eth/`. The page id is the path of
+ * the directory, e.g. `common/blxxxpill`.
+ *
+ * Every board and CPU directory gets a page. A file in a sub-directory only
+ * gets a page if it has content, see `DoxygenDoc.hasContent`. References to
+ * the groups of the other files are resolved to the API documentation.
+ *
+ * The directories are read in parallel. The result is in a fixed order: the
+ * files of a directory, followed by the files of its sub-directories, each
+ * sorted by name.
  */
 export async function findDoxygenDocs(source: DoxygenDocSource): Promise<DoxygenDocFile[]> {
-  const result: DoxygenDocFile[] = [];
-  const entries = await fs.readdir(source.dir, { withFileTypes: true });
+  const scan = async (relDir: string): Promise<DoxygenDocFile[]> => {
+    const docDirPath = path.join(source.dir, relDir);
+    const entries = (await fs.readdir(docDirPath, { withFileTypes: true })).sort(byName);
 
-  for (const docDir of entries.filter((entry) => entry.isDirectory())) {
-    const docName = docDir.name;
-    const docDirPath = path.join(source.dir, docName);
-    const docFiles = (await fs.readdir(docDirPath, { withFileTypes: true }))
-      .filter((entry) => entry.isFile() && entry.name.endsWith("doc.md"))
-      .map((entry) => entry.name)
-      .sort();
+    const isNested = relDir.includes("/");
+    const isModule = entries.some((e) => e.isFile() && e.name === "Makefile.features");
+    const files = await Promise.all(
+      entries
+        .filter((entry) => entry.isFile() && entry.name.endsWith("doc.md"))
+        .map(async (entry): Promise<DoxygenDocFile | undefined> => {
+          const baseName = path.basename(entry.name, ".md");
+          const isParent = baseName === "doc";
+          const docPath = path.join(docDirPath, entry.name);
+          const parsed = parseDoxygenDoc(await fs.readFile(docPath, "utf-8"), source.groupPrefix);
+          if (isNested && !parsed.hasContent) {
+            return undefined;
+          }
+          const id = isParent ? relDir : `${relDir}/${baseName}`;
+          return {
+            id,
+            docPath,
+            sourcePath: repoPath(docPath),
+            sourceDir: repoPath(docDirPath),
+            docName: path.basename(relDir),
+            isParent,
+            isNested,
+            isModulePage: isParent && !isNested && isModule,
+            pageUrl: `/${source.routePrefix}/${id}/`,
+            parsed,
+          };
+        }),
+    );
+    const subDirs = await Promise.all(
+      entries.filter(isDocDir).map((entry) => scan(`${relDir}/${entry.name}`)),
+    );
+    return [...files.filter((file) => file !== undefined), ...subDirs.flat()];
+  };
 
-    for (const docFile of docFiles) {
-      const baseName = path.basename(docFile, ".md");
-      const isParent = baseName === "doc";
-      const id = isParent ? docName : `${docName}/${baseName}`;
-      const docPath = path.join(docDirPath, docFile);
-      result.push({
-        id,
-        docPath,
-        sourcePath: repoPath(docPath),
-        sourceDir: repoPath(docDirPath),
-        docName,
-        isParent,
-        pageUrl: `/${source.routePrefix}/${id}/`,
-        parsed: parseDoxygenDoc(await fs.readFile(docPath, "utf-8"), source.groupPrefix),
-      });
-    }
-  }
-  return result;
+  // only the sub-directories contain documentation
+  const dirs = (await fs.readdir(source.dir, { withFileTypes: true })).filter(isDocDir).sort(byName);
+  return (await Promise.all(dirs.map((entry) => scan(entry.name)))).flat();
 }
 
 /* -------------------------------------------------------------------------- */

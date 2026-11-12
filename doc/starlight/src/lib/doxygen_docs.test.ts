@@ -76,6 +76,50 @@ function group(name: string, title: string, ingroup: string, body = "Text."): st
   return `@defgroup ${name} ${title}\n@ingroup ${ingroup}\n@brief Support for ${title}.\n\n${body}\n`;
 }
 
+test("the files of a source tree are found in a fixed order", async () => {
+  await withTree(
+    {
+      "boards/foo/doc.md": group("boards_foo", "Foo", "boards"),
+      "boards/foo/doc_extra.doc.md": group("boards_foo_extra", "Foo Extra", "boards_foo"),
+      "boards/foo/Makefile.features": "",
+      "boards/bar/doc.md": group("boards_bar", "Bar", "boards"),
+      "boards/bar/Makefile.features": "",
+      "boards/bar/README.md": "not documentation",
+      // a directory of common code
+      "boards/common/doc.md": group("boards_common", "Common", "boards"),
+      "boards/common/nucleo/doc.md": group("boards_common_nucleo", "Nucleo", "boards"),
+      "boards/common/nucleo/Makefile.features": "",
+      // a group without a body only gets a page as a board
+      "boards/common/empty/doc.md": "@defgroup boards_common_empty Empty\n@ingroup boards\n@brief No body.\n",
+      "boards/baz/doc.md": "@defgroup boards_baz Baz\n@ingroup boards\n@brief No body.\n",
+      "boards/baz/Makefile.features": "",
+      // not documentation of a board
+      "boards/vendor/x/doc.md": group("boards_x", "X", "boards"),
+      "boards/.hidden/doc.md": group("boards_hidden", "Hidden", "boards"),
+      "boards/doc.md": group("boards", "Boards", "config"),
+    },
+    async (root) => {
+      const docs = await findDoxygenDocs(boards(root));
+      assert.deepEqual(
+        docs.map((doc) => doc.id),
+        ["bar", "baz", "common", "common/nucleo", "foo", "foo/doc_extra.doc"],
+      );
+      // only the `doc.md` of a board is the page of a board
+      assert.deepEqual(
+        docs.filter((doc) => doc.isModulePage).map((doc) => doc.id),
+        ["bar", "baz", "foo"],
+      );
+
+      const extra = byId(docs, "foo/doc_extra.doc");
+      assert.equal(extra.pageUrl, "/boards/foo/doc_extra.doc/");
+      assert.equal(extra.docPath, path.join(root, "boards/foo/doc_extra.doc.md"));
+      assert.equal(extra.docName, "foo");
+      assert.equal(extra.parsed.title, "Foo Extra");
+      assert.equal(byId(docs, "common/nucleo").docName, "nucleo");
+    },
+  );
+});
+
 test("the paths of a file are relative to the root of the repository", async () => {
   await withTree({ "doc/starlight/.keep": "", "boards/foo/doc.md": group("boards_foo", "Foo", "boards") }, async (root) => {
     // the source trees are given relative to `doc/starlight`

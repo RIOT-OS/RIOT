@@ -66,6 +66,8 @@ const DoxygenDocSchema = z.object({
   editUrl: z.string(),
   includeInOverview: z.boolean(),
   parentId: z.string().nullable(),
+  /** Value of `BOARD` for the pages of boards, `null` for all other pages */
+  board: z.string().nullable(),
 });
 
 export const collections = {
@@ -165,10 +167,12 @@ function doxygenDocLoader(source: DoxygenDocSource): Loader {
               apiUrl: page.apiUrl,
               githubFolder: doc.sourceDir,
               editUrl: `${SOURCE_TREE_URL}/${doc.sourcePath}`,
-              // Only the parent appears in the overview; children are hidden
-              // and reached via their parent's childrenIds.
-              includeInOverview: doc.isParent,
-              parentId: doc.isParent ? null : doc.docName,
+              // Only boards and CPUs appear in the overview. Further pages
+              // (`doc_*.doc.md`, `common/...`) are hidden and reached via
+              // their parent and references.
+              includeInOverview: doc.isModulePage,
+              parentId: doc.isParent ? null : doc.id.slice(0, doc.id.lastIndexOf("/")),
+              board: source === BOARDS && doc.isModulePage ? doc.docName : null,
             },
             body: page.markdown,
             // The file URL is required, otherwise Starlight doesn't apply its

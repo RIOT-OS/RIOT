@@ -133,10 +133,11 @@ const tocHeadings = isLeadingOverview(listed[0]) ? listed.slice(1) : listed;
   }
 
   {
-    moduleType === "boards" && (
+    /* Only for the page of a board, not for common or further pages */
+    module.data.board && (
       <Aside type="tip">
         When using this board with RIOT, set the <code>BOARD</code> variable to{" "}
-        <code>{module.id}</code> in your Makefile. If you follow the standard
+        <code>{module.data.board}</code> in your Makefile. If you follow the standard
         RIOT project structure, your Makefile should look like this:
         <Code
           lang="sh"
@@ -145,7 +146,7 @@ const tocHeadings = isLeadingOverview(listed[0]) ? listed.slice(1) : listed;
 APPLICATION = hello-world
 
 # Change this to your board if you want to build for a different board
-BOARD ?= ${module.id}
+BOARD ?= ${module.data.board}
 
 # This has to be the absolute path to the RIOT base directory:
 RIOTBASE ?= $(CURDIR)/RIOT
@@ -154,7 +155,7 @@ include $(RIOTBASE)/Makefile.include
 `}
           title="./Makefile"
           frame="code"
-          mark={[module.id]}
+          mark={[module.data.board]}
         />
       </Aside>
     )
