@@ -588,8 +588,9 @@ void stmclk_init_sysclk(void)
 #endif
 
 #if defined(RCC_DCKCFGR2_CK48MSEL)
-    if (IS_ACTIVE(CLOCK_ENABLE_PLLI2S) || IS_ACTIVE(CLOCK_ENABLE_PLLSAI)) {
-        /* Use PLLSAI_P or PLLI2S_Q clock source */
+    /* Use PLLSAI_P or PLLI2S_Q clock source only when PLLQ cannot provide the
+     * 48MHz clock: PLLSAI is also enabled for the LTDC, and PLLI2S for MCO2 */
+    if (IS_ACTIVE(CLOCK_REQUIRE_PLLI2SR) || IS_ACTIVE(CLOCK_REQUIRE_PLLSAIP)) {
         RCC->DCKCFGR2 |= RCC_DCKCFGR2_CK48MSEL;
     }
 #endif
