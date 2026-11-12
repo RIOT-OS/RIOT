@@ -19,6 +19,8 @@
 .extern __stack_end
 .extern __fiq_handler
 
+.extern ctx_switch_from_swi
+
 /* Stack Positions */
 .extern __stack_usr_start
 .extern __stack_abt_start
@@ -55,6 +57,39 @@
 _startup:
                 ldr    pc, =reset_handler
 
+/* Will be copied to RAM at 0x02002040 by setup_swi */
+/* This is the first code during a swi where we are in possesion over the control flow */
+swi_interceptor:
+                /* decodes to ldr pc, [pc] */
+                .word 0xe59ff000
+                /* pc is 8 bytes ahead, so we skip 4 bytes */
+                .word 0
+                /* These are the 4 bytes that [pc] will read, it's the address of our handler */
+                .word swi_pre_handler
+
+/* copies swi_interceptor into RAM */
+setup_swi:
+                /* Magic address the GBA jumps to when using (invalid) svc 0xd4000 */
+                ldr r0, =0x02002040
+                /* Address of our interceptor routine */
+                adr r1, swi_interceptor
+
+                ldm r1, {r1 - r3}
+                stm r0, {r1 - r3}
+                bx lr
+
+/* The swi_interceptor (when in RAM) jumps here */
+swi_pre_handler:
+                /* un-do the garbage the bios did */
+                /* https://github.com/camthesaxman/gba_bios/blob/master/asm/bios.s#L153 */
+                pop {r2, lr}
+                eor r11, r11, #0x0c
+                msr cpsr, r11
+                pop {r11}
+                msr spsr, r11
+                pop {r11,r12,lr}
+                b ctx_switch_from_swi
+
 .section .init0
 .func
 /* Reset function, actual start of RIOT */
@@ -63,6 +98,9 @@ reset_handler:
                 ldr r0, =REG_IME
                 mov r1, #0
                 strh r1, [r0]
+
+                /* Setup the swi hack to enable SVC for RIOT */
+                bl setup_swi
 
                 /* Setup a stack for each mode - note that this only sets up a usable stack
                 for User mode.   Also each mode is setup with interrupts initially disabled. */

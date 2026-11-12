@@ -8,7 +8,8 @@
  */
 
 MEMORY {
-    ewram : ORIGIN = 0x2000000, LENGTH = 256K /* on board ram, slower */
+    ewram (w!rx) : ORIGIN = 0x2000000, LENGTH = 256K /* on board ram, slower */
+    nogo (!wrx) : ORIGIN = 0x2002040, LENGTH = 12 /* no go for threading hack */
     ram (w!rx) : ORIGIN = 0x3000000, LENGTH = 32K /* on chip ram, faster */
     rom (rx)  : ORIGIN = 0x8000000, LENGTH = 32M /* on cartridge */
 }
