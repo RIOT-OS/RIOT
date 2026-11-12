@@ -87,6 +87,35 @@ def detect_libstdcxx_includes(compiler, includes, version):
             break
 
 
+def detect_gcc_internal_includes(compiler, flags):
+    """
+    Detect the compiler-internal include directories of GCC.
+
+    These directories contain compiler-specific headers such as arm_acle.h.
+    They must not be passed to clang, as clang has its own versions of these
+    headers and the GCC ones can shadow them (and then fail to parse).
+
+    :param compiler: Name or path of the compiler
+    :type compiler: str
+    :param flags: additional flags affecting the include search directories
+    :type flags: list of str
+
+    :return: Set of compiler-internal include directories
+    :rtype: set
+    """
+    includes = set()
+    for name in ('include', 'include-fixed'):
+        try:
+            output = subprocess.check_output(
+                [compiler, *flags, f'-print-file-name={name}'],
+                stderr=subprocess.DEVNULL, text=True).strip()
+        except (FileNotFoundError, subprocess.CalledProcessError):
+            continue
+        if os.path.isabs(output):
+            includes.add(os.path.abspath(output))
+    return includes
+
+
 def detect_built_in_includes(compiler, args, flags):
     """
     Try to detect the built-in include search directories of the given compiler.
@@ -100,11 +129,12 @@ def detect_built_in_includes(compiler, args, flags):
     :return: List of built-in include directories
     :rtype: list of str
     """
-    if compiler.endswith('-gcc'):
+    if compiler.endswith(('-gcc', '-g++')):
         includes, version = detect_includes_and_version_gcc(compiler, flags)
-    elif compiler.endswith('-g++'):
-        includes, version = detect_includes_and_version_gcc(compiler, flags)
-        if args.add_libstdcxx_includes:
+        if args.clangd:
+            internal = detect_gcc_internal_includes(compiler, flags)
+            includes = [i for i in includes if i not in internal]
+        if compiler.endswith('-g++') and args.add_libstdcxx_includes:
             detect_libstdcxx_includes(compiler, includes, version)
     elif compiler in ('clang', 'clang++', 'gcc', 'g++'):
         # clang / clang++ doesn't have any magic include search dirs built in,
