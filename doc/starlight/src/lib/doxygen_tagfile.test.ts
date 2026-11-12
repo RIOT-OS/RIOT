@@ -5,7 +5,7 @@
  */
 
 /**
- * Tests of the tag file reader. Run with `npm test`.
+ * Tests of the tag file reader. Run with `make test`.
  */
 
 import { test } from "node:test";

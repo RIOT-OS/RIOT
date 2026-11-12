@@ -1,0 +1,163 @@
+/*
+ * SPDX-FileCopyrightText: 2026 Lasse Rosenow <Lasse.Rosenow@haw-hamburg.de>
+ * SPDX-FileCopyrightText: 2026 HAW Hamburg
+ * SPDX-License-Identifier: LGPL-2.1-only
+ */
+
+/**
+ * Tests of the documentation of boards and CPUs as a whole, see
+ * `doxygen_docs.ts`. Run with `make test`.
+ *
+ * The tests work on small source trees in a temporary directory.
+ * The heading ids come from the Markdown processor.
+ */
+
+import { test } from "node:test";
+import assert from "node:assert/strict";
+import { promises as fs } from "node:fs";
+import os from "node:os";
+import path from "node:path";
+import {
+  convertDoxygenDoc,
+  type DoxygenDocFile,
+  type DoxygenDocSource,
+  findDoxygenDocs,
+  loadDoxygenSite,
+} from "./doxygen_docs.ts";
+import { markdownProcessor } from "./markdown_processor.ts";
+
+const processor = await markdownProcessor.createRenderer({ syntaxHighlight: false });
+
+/** The heading ids of `markdown`. */
+async function renderHeadingIds(markdown: string): Promise<string[]> {
+  const { metadata } = await processor.render(markdown);
+  return metadata.headings.map((heading) => heading.slug);
+}
+
+/**
+ * Run `run` with a directory that contains `files` (path → content) and is
+ * removed afterwards.
+ */
+async function withTree(
+  files: Record<string, string>,
+  run: (root: string) => Promise<void>,
+): Promise<void> {
+  const root = await fs.mkdtemp(path.join(os.tmpdir(), "doxygen-docs-"));
+  try {
+    for (const [file, content] of Object.entries(files)) {
+      await fs.mkdir(path.dirname(path.join(root, file)), { recursive: true });
+      await fs.writeFile(path.join(root, file), content);
+    }
+    await run(root);
+  } finally {
+    await fs.rm(root, { recursive: true, force: true });
+  }
+}
+
+function boards(root: string): DoxygenDocSource {
+  return { dir: path.join(root, "boards"), groupPrefix: "boards", routePrefix: "boards" };
+}
+
+function cpus(root: string): DoxygenDocSource {
+  return { dir: path.join(root, "cpu"), groupPrefix: "cpu", routePrefix: "cpus" };
+}
+
+/** The file with the page id `id`. */
+function byId(docs: DoxygenDocFile[], id: string): DoxygenDocFile {
+  const doc = docs.find((d) => d.id === id);
+  assert.ok(doc, `no page "${id}" in ${docs.map((d) => d.id).join(", ")}`);
+  return doc;
+}
+
+/** A file with a group and a body. */
+function group(name: string, title: string, ingroup: string, body = "Text."): string {
+  return `@defgroup ${name} ${title}\n@ingroup ${ingroup}\n@brief Support for ${title}.\n\n${body}\n`;
+}
+
+test("the paths of a file are relative to the root of the repository", async () => {
+  await withTree({ "doc/starlight/.keep": "", "boards/foo/doc.md": group("boards_foo", "Foo", "boards") }, async (root) => {
+    // the source trees are given relative to `doc/starlight`
+    const cwd = process.cwd();
+    process.chdir(path.join(root, "doc/starlight"));
+    try {
+      const [doc] = await findDoxygenDocs({ ...boards(root), dir: "../../boards" });
+      assert.equal(doc.docPath, "../../boards/foo/doc.md");
+      assert.equal(doc.sourcePath, "boards/foo/doc.md");
+      assert.equal(doc.sourceDir, "boards/foo");
+    } finally {
+      process.chdir(cwd);
+    }
+  });
+});
+
+test("a page links to the pages of all source trees", async () => {
+  await withTree(
+    {
+      "boards/foo/doc.md": group(
+        "boards_foo",
+        "Foo Board",
+        "boards",
+        "See \\ref cpu_bar_flashing, \\ref drivers_periph_gpio and \\ref unknown_thing.",
+      ),
+      // without a group the title is the name of the directory
+      "boards/my-board/doc.md": "Just text.\n",
+      "cpu/bar/doc.md": group("cpu_bar", "Bar", "cpu", "# Flashing {#cpu_bar_flashing}\n\nSee \\ref boards_foo."),
+    },
+    async (root) => {
+      const sources = [boards(root), cpus(root)];
+
+      const site = await loadDoxygenSite(sources, renderHeadingIds);
+      const boardDocs = site.docs.get(sources[0])!;
+      const foo = convertDoxygenDoc(byId(boardDocs, "foo"), site);
+      assert.equal(foo.title, "Foo Board");
+      assert.equal(foo.description, "Support for Foo Board.");
+      assert.equal(foo.doxygenGroup, "boards__foo");
+      assert.equal(
+        foo.markdown.trim(),
+        "See [Flashing](/cpus/bar/#cpu_bar_flashing), " +
+          "[drivers_periph_gpio](https://api.riot-os.org/group__drivers__periph__gpio.html) and `unknown_thing`.",
+      );
+      assert.deepEqual(foo.unresolved, ["unknown_thing"]);
+
+      const myBoard = convertDoxygenDoc(byId(boardDocs, "my-board"), site);
+      assert.equal(myBoard.title, "my board");
+      assert.equal(myBoard.description, undefined);
+      assert.equal(myBoard.doxygenGroup, undefined);
+
+      const bar = convertDoxygenDoc(byId(site.docs.get(sources[1])!, "bar"), site);
+      assert.match(bar.markdown, /See \[Foo Board\]\(\/boards\/foo\/\)\./);
+    },
+  );
+});
+
+test("the ids of the headings come from the Markdown processor", async () => {
+  await withTree(
+    {
+      // `flashing` is also the slug of the first heading
+      "cpu/bar/doc.md": group(
+        "cpu_bar",
+        "Bar",
+        "cpu",
+        "## Flashing\n\nText.\n\n## Programming {#flashing}\n\nText.\n\n## Pins of \\ref boards_foo {#pins-of-foo-board}",
+      ),
+      "boards/foo/doc.md": group("boards_foo", "Foo Board", "boards", 'See \\ref flashing and \\ref pins-of-foo-board "the pins".'),
+    },
+    async (root) => {
+      const sources = [boards(root), cpus(root)];
+      const site = await loadDoxygenSite(sources, renderHeadingIds);
+
+      const bar = byId(site.docs.get(sources[1])!, "bar");
+      assert.deepEqual(site.headingIds.get(bar), ["flashing", "programming", "pins-of-foo-board"]);
+      const markdown = convertDoxygenDoc(bar, site).markdown;
+      assert.match(markdown, /^## <a id="flashing-1"><\/a>Programming$/m);
+      // no anchor, the heading has this id already
+      assert.match(markdown, /^## Pins of \[Foo Board\]\(\/boards\/foo\/\)$/m);
+
+      const foo = convertDoxygenDoc(byId(site.docs.get(sources[0])!, "foo"), site);
+      assert.equal(
+        foo.markdown.trim(),
+        "See [Programming](/cpus/bar/#flashing-1) and [the pins](/cpus/bar/#pins-of-foo-board).",
+      );
+    },
+  );
+});
