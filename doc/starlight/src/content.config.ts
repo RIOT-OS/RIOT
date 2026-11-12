@@ -14,14 +14,31 @@ import { z } from "astro/zod";
 import path from "node:path";
 import { pathToFileURL } from "node:url";
 import {
-  type AnchorIndex,
-  collectDoxygenAnchors,
-  extractDoxygenBrief,
-  extractDoxygenGroupFromDoxygen,
-  extractDoxygenGroupTitleFromDoxygen,
-  transformDoxygenMarkdown,
-} from "./lib/doxygen_filter";
+  convertDoxygenDoc,
+  type DoxygenDocSource,
+  type DoxygenSite,
+  loadDoxygenSite,
+} from "./lib/doxygen_docs";
 import { REPOSITORY_URL, SOURCE_TREE_URL } from "../config";
+
+/* -------------------------------------------------------------------------- */
+/* Sources of the board and CPU documentation                                 */
+/* -------------------------------------------------------------------------- */
+
+const BOARDS: DoxygenDocSource = {
+  dir: "../../boards",
+  groupPrefix: "boards",
+  routePrefix: "boards",
+};
+const CPUS: DoxygenDocSource = {
+  dir: "../../cpu",
+  groupPrefix: "cpu",
+  routePrefix: "cpus",
+};
+
+/* -------------------------------------------------------------------------- */
+/* Collections                                                                */
+/* -------------------------------------------------------------------------- */
 
 const DoxygenDocSchema = z.object({
   title: z.string(),
@@ -39,11 +56,11 @@ export const collections = {
     schema: docsSchema(),
   }),
   boards: defineCollection({
-    loader: doxygenDocLoader("../../boards", "boards", "boards"),
+    loader: doxygenDocLoader(BOARDS),
     schema: DoxygenDocSchema
   }),
   cpus: defineCollection({
-    loader: doxygenDocLoader("../../cpu", "cpu", "cpus"),
+    loader: doxygenDocLoader(CPUS),
     schema: DoxygenDocSchema
   }),
   changelog: defineCollection({
@@ -59,143 +76,69 @@ export const collections = {
   }),
 };
 
-/** One doc*.md file that is rendered as a page. */
-interface DoxygenDocFile {
-  id: string;
-  docPath: string;
-  docDirPath: string;
-  docName: string;
-  isParent: boolean;
-  groupPrefix: string;
-  pageUrl: string;
-  content: string;
-}
+/* -------------------------------------------------------------------------- */
+/* Loaders                                                                    */
+/* -------------------------------------------------------------------------- */
 
 /**
- * Find all doc*.md files of boards (`../../boards`) or CPUs (`../../cpu`).
+ * The board and the CPU documentation refer to each other, so both
+ * collection loaders work on the same data, see `loadDoxygenSite()`.
+ * The promise is shared between both collection loaders.
  */
-async function findDoxygenDocs(
-  dir: string,
-  groupPrefix: string,
-  routePrefix: string,
-): Promise<DoxygenDocFile[]> {
-  const result: DoxygenDocFile[] = [];
-  const entries = await fs.readdir(dir, { withFileTypes: true });
+let doxygenSite: Promise<DoxygenSite> | undefined;
 
-  for (const docDir of entries.filter((entry) => entry.isDirectory())) {
-    const docName = docDir.name;
-    const docDirPath = path.join(dir, docName);
-    const docFiles = (await fs.readdir(docDirPath, { withFileTypes: true }))
-      .filter((entry) => entry.isFile() && entry.name.endsWith("doc.md"))
-      .map((entry) => entry.name)
-      .sort();
-
-    for (const docFile of docFiles) {
-      const baseName = path.basename(docFile, ".md");
-      const isParent = baseName === "doc";
-      const id = isParent ? docName : `${docName}/${baseName}`;
-      const docPath = path.join(docDirPath, docFile);
-      result.push({
-        id,
-        docPath,
-        docDirPath,
-        docName,
-        isParent,
-        groupPrefix,
-        pageUrl: `/${routePrefix}/${id}/`,
-        content: await fs.readFile(docPath, "utf-8"),
-      });
-    }
-  }
-  return result;
+function getDoxygenSite(): Promise<DoxygenSite> {
+  doxygenSite ??= loadDoxygenSite([BOARDS, CPUS]);
+  return doxygenSite;
 }
 
 /**
- * Global index of all Doxygen anchors of boards *and* CPUs. Board documents
- * reference sections of CPU documents (e.g. `\ref esp32_riot`) and vice
- * versa, so the index has to be built from both trees before any page is
- * transformed. The promise is shared between both collection loaders.
- */
-let anchorIndexPromise: Promise<AnchorIndex> | undefined;
-
-function getAnchorIndex(): Promise<AnchorIndex> {
-  anchorIndexPromise ??= (async () => {
-    const index: AnchorIndex = new Map();
-    const docs = [
-      ...(await findDoxygenDocs("../../boards", "boards", "boards")),
-      ...(await findDoxygenDocs("../../cpu", "cpu", "cpus")),
-    ];
-    for (const doc of docs) {
-      collectDoxygenAnchors(doc.content, doc.groupPrefix, doc.pageUrl, index);
-    }
-    return index;
-  })();
-  return anchorIndexPromise;
-}
-
-/**
- * Load documentation from doc*.md files in the specified directory.
+ * Load documentation from doc*.md files of a source tree.
  * Each subdirectory may contain one or more files matching the pattern
  * `doc*.md` (e.g. `doc.md`, `doc_esp32.doc.md`).
  *
- * @param dir The folder from which to load the doc*.md files.
- * @param doxygenGroupPrefix The prefix with which the doxygen group of these docs starts
- * @param routePrefix The first path segment of the generated pages (`boards`, `cpus`)
+ * The files are found and converted by `lib/doxygen_docs.ts`. This loader
+ * puts the pages into the collection.
  */
-function doxygenDocLoader(
-  dir: string,
-  doxygenGroupPrefix: string,
-  routePrefix: string,
-): Loader {
+function doxygenDocLoader(source: DoxygenDocSource): Loader {
   return {
-    name: `${doxygenGroupPrefix}-loader`,
+    name: `${source.groupPrefix}-loader`,
     load: async (context): Promise<void> => {
       try {
-        const anchors = await getAnchorIndex();
-        const docs = await findDoxygenDocs(dir, doxygenGroupPrefix, routePrefix);
+        const site = await getDoxygenSite();
 
-        for (const doc of docs) {
-          const unresolved = new Set<string>();
-          const filteredMarkdown = transformDoxygenMarkdown(doc.content, {
-            groupPrefix: doxygenGroupPrefix,
-            pageUrl: doc.pageUrl,
-            anchors,
-            onUnresolved: (id) => unresolved.add(id),
-          });
-          if (unresolved.size) {
+        for (const doc of site.docs.get(source) ?? []) {
+          const page = convertDoxygenDoc(doc, site);
+          if (page.unresolved.length) {
             context.logger.debug(
-              `${doc.docPath}: references resolved to API documentation: ${[...unresolved].join(", ")}`,
+              `${doc.docPath}: references resolved to API documentation: ${page.unresolved.join(", ")}`,
             );
           }
 
           context.store.set({
             id: doc.id,
-            filePath: doc.docPath.replaceAll("../", ""),
+            filePath: doc.sourcePath,
             data: {
-              title: extractDoxygenGroupTitleFromDoxygen(
-                doc.content,
-                doxygenGroupPrefix,
-                doc.docName.replace(/-/g, " "),
-              ),
-              description: extractDoxygenBrief(doc.content, doxygenGroupPrefix),
-              doxygenGroup: extractDoxygenGroupFromDoxygen(doc.content, doxygenGroupPrefix),
-              githubFolder: doc.docDirPath.replaceAll("../", ""),
-              editUrl: `${SOURCE_TREE_URL}/${doc.docPath.replaceAll("../", "")}`,
+              title: page.title,
+              description: page.description,
+              doxygenGroup: page.doxygenGroup,
+              githubFolder: doc.sourceDir,
+              editUrl: `${SOURCE_TREE_URL}/${doc.sourcePath}`,
               // Only the parent appears in the overview; children are hidden
               // and reached via their parent's childrenIds.
               includeInOverview: doc.isParent,
               parentId: doc.isParent ? null : doc.docName,
             },
-            body: filteredMarkdown,
+            body: page.markdown,
             // The file URL is required, otherwise Starlight doesn't apply its
             // Markdown plugins and `:::note` etc. are not rendered as asides.
-            rendered: await context.renderMarkdown(filteredMarkdown, {
+            rendered: await context.renderMarkdown(page.markdown, {
               fileURL: pathToFileURL(path.resolve(doc.docPath)),
             }),
           });
         }
       } catch (error) {
-        console.error(`Error loading ${doxygenGroupPrefix}:`, error);
+        console.error(`Error loading ${source.groupPrefix}:`, error);
       }
     },
   };
