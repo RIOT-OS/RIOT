@@ -6,7 +6,7 @@
  */
 
 import { defineCollection } from "astro:content";
-import { type Loader } from "astro/loaders";
+import { type Loader, type LoaderContext } from "astro/loaders";
 import { docsSchema } from "@astrojs/starlight/schema";
 import { promises as fs } from "node:fs";
 import { glob } from "astro/loaders";
@@ -83,13 +83,30 @@ export const collections = {
 /**
  * The board and the CPU documentation refer to each other, so both
  * collection loaders work on the same data, see `loadDoxygenSite()`.
- * The promise is shared between both collection loaders.
+ *
+ * The files are read once per build and shared between both loaders. A
+ * loader that runs again (e.g. in `astro dev`) gets freshly read files
+ * instead of the data of its previous run.
  */
-let doxygenSite: Promise<DoxygenSite> | undefined;
+let doxygenSite: { promise: Promise<DoxygenSite>; consumers: Set<DoxygenDocSource> } | undefined;
 
-function getDoxygenSite(): Promise<DoxygenSite> {
-  doxygenSite ??= loadDoxygenSite([BOARDS, CPUS]);
-  return doxygenSite;
+/**
+ * @param consumer The source tree of the loader that asks for the data
+ * @param context  Context of this loader
+ */
+function getDoxygenSite(consumer: DoxygenDocSource, context: LoaderContext): Promise<DoxygenSite> {
+  if (!doxygenSite || doxygenSite.consumers.has(consumer)) {
+    const renderHeadingIds = async (markdown: string): Promise<string[]> => {
+      const { metadata } = await context.renderMarkdown(markdown);
+      return metadata?.headings?.map((heading) => heading.slug) ?? [];
+    };
+    doxygenSite = {
+      promise: loadDoxygenSite([BOARDS, CPUS], renderHeadingIds),
+      consumers: new Set(),
+    };
+  }
+  doxygenSite.consumers.add(consumer);
+  return doxygenSite.promise;
 }
 
 /**
@@ -105,13 +122,15 @@ function doxygenDocLoader(source: DoxygenDocSource): Loader {
     name: `${source.groupPrefix}-loader`,
     load: async (context): Promise<void> => {
       try {
-        const site = await getDoxygenSite();
+        const site = await getDoxygenSite(source, context);
 
+        // the pages of files that are gone must not stay in the collection
+        context.store.clear();
         for (const doc of site.docs.get(source) ?? []) {
           const page = convertDoxygenDoc(doc, site);
           if (page.unresolved.length) {
             context.logger.debug(
-              `${doc.docPath}: references resolved to API documentation: ${page.unresolved.join(", ")}`,
+              `${doc.docPath}: unresolved references: ${page.unresolved.join(", ")}`,
             );
           }
 
@@ -139,6 +158,7 @@ function doxygenDocLoader(source: DoxygenDocSource): Loader {
         }
       } catch (error) {
         console.error(`Error loading ${source.groupPrefix}:`, error);
+        throw error;
       }
     },
   };

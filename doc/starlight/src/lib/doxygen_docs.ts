@@ -15,7 +15,7 @@
  * 1. `loadDoxygenSite()` finds the files of all source trees
  *    (`findDoxygenDocs()`). A file refers to other files, so this step also
  *    loads what the conversion of one file needs to know about everything
- *    else: the index of all anchors.
+ *    else: the index of all anchors and the ids of the headings.
  *
  * 2. `convertDoxygenDoc()` converts one file into a page.
  *
@@ -27,11 +27,11 @@
 import { promises as fs } from "node:fs";
 import path from "node:path";
 import {
-  type AnchorIndex,
+  AnchorIndex,
   collectDoxygenAnchors,
-  extractDoxygenBrief,
-  extractDoxygenGroupFromDoxygen,
-  extractDoxygenGroupTitleFromDoxygen,
+  type DoxygenDoc,
+  headingMarkdown,
+  parseDoxygenDoc,
   transformDoxygenMarkdown,
 } from "./doxygen_filter.ts";
 
@@ -66,12 +66,10 @@ export interface DoxygenDocFile {
   docName: string;
   /** True for the `doc.md` of a directory, false for its further files */
   isParent: boolean;
-  /** The prefix with which the Doxygen groups of the file start */
-  groupPrefix: string;
   /** Absolute URL of the page, e.g. `/boards/esp32-wroom-32/` */
   pageUrl: string;
-  /** Content of the file */
-  content: string;
+  /** The parsed file */
+  parsed: DoxygenDoc;
 }
 
 /**
@@ -109,9 +107,8 @@ export async function findDoxygenDocs(source: DoxygenDocSource): Promise<Doxygen
         sourceDir: repoPath(docDirPath),
         docName,
         isParent,
-        groupPrefix: source.groupPrefix,
         pageUrl: `/${source.routePrefix}/${id}/`,
-        content: await fs.readFile(docPath, "utf-8"),
+        parsed: parseDoxygenDoc(await fs.readFile(docPath, "utf-8"), source.groupPrefix),
       });
     }
   }
@@ -131,7 +128,12 @@ export interface DoxygenSite {
   docs: Map<DoxygenDocSource, DoxygenDocFile[]>;
   /** Global index of the Doxygen anchors of all source trees */
   anchors: AnchorIndex;
+  /** Ids of the headings of each page, from the Markdown processor */
+  headingIds: Map<DoxygenDocFile, string[]>;
 }
+
+/** Render Markdown with the processor of the site, return its heading ids. */
+export type HeadingIdRenderer = (markdown: string) => Promise<string[]>;
 
 /**
  * Read the documentation of all source trees.
@@ -140,7 +142,10 @@ export interface DoxygenSite {
  * and vice versa, so the anchor index has to be built from all trees before
  * any page is converted.
  */
-export async function loadDoxygenSite(sources: DoxygenDocSource[]): Promise<DoxygenSite> {
+export async function loadDoxygenSite(
+  sources: DoxygenDocSource[],
+  renderHeadingIds: HeadingIdRenderer,
+): Promise<DoxygenSite> {
   const docs = new Map<DoxygenDocSource, DoxygenDocFile[]>();
 
   const trees = await Promise.all(sources.map(findDoxygenDocs));
@@ -149,11 +154,26 @@ export async function loadDoxygenSite(sources: DoxygenDocSource[]): Promise<Doxy
   }
   const files = trees.flat();
 
-  const anchors: AnchorIndex = new Map();
+  // a heading can contain a reference, so it is converted with a draft index
+  const draft = new AnchorIndex();
   for (const doc of files) {
-    collectDoxygenAnchors(doc.content, doc.groupPrefix, doc.pageUrl, anchors);
+    collectDoxygenAnchors(doc.parsed, doc.pageUrl, draft);
   }
-  return { docs, anchors };
+  const headingIds = new Map<DoxygenDocFile, string[]>();
+  const anchors = new AnchorIndex();
+  for (const doc of files) {
+    const headings = headingMarkdown(doc.parsed, { pageUrl: doc.pageUrl, anchors: draft });
+    const ids = headings ? await renderHeadingIds(headings) : [];
+    headingIds.set(doc, ids);
+    collectDoxygenAnchors(doc.parsed, doc.pageUrl, anchors, ids);
+  }
+  for (const [id, urls] of anchors.duplicates()) {
+    console.warn(
+      `The anchor "${id}" is defined more than once (${urls.join(", ")}). ` +
+        "A reference to it from another page links to the first definition.",
+    );
+  }
+  return { docs, anchors, headingIds };
 }
 
 /* -------------------------------------------------------------------------- */
@@ -170,27 +190,23 @@ export interface DoxygenPage {
   doxygenGroup: string | undefined;
   /** Content of the page as Markdown */
   markdown: string;
-  /** The references of the file that are not on the site */
+  /** The references of the file that could not be resolved */
   unresolved: string[];
 }
 
 /** Convert a file into its page. */
 export function convertDoxygenDoc(doc: DoxygenDocFile, site: DoxygenSite): DoxygenPage {
   const unresolved = new Set<string>();
-  const markdown = transformDoxygenMarkdown(doc.content, {
-    groupPrefix: doc.groupPrefix,
+  const markdown = transformDoxygenMarkdown(doc.parsed, {
     pageUrl: doc.pageUrl,
     anchors: site.anchors,
+    headingIds: site.headingIds.get(doc) ?? [],
     onUnresolved: (id) => unresolved.add(id),
   });
   return {
-    title: extractDoxygenGroupTitleFromDoxygen(
-      doc.content,
-      doc.groupPrefix,
-      doc.docName.replace(/-/g, " "),
-    ),
-    description: extractDoxygenBrief(doc.content, doc.groupPrefix),
-    doxygenGroup: extractDoxygenGroupFromDoxygen(doc.content, doc.groupPrefix),
+    title: doc.parsed.title || doc.docName.replace(/-/g, " "),
+    description: doc.parsed.brief,
+    doxygenGroup: doc.parsed.groups[0]?.replaceAll("_", "__"),
     markdown,
     unresolved: [...unresolved],
   };
