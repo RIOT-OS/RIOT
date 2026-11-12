@@ -76,17 +76,13 @@ main {
 /*
  * Starlight limits the content column to 45rem, which makes the wide
  * configuration tables of board and CPU documentation hard to read.
- * Use the available width on large screens and let tables scroll
- * horizontally instead of squeezing them.
+ * On these generated pages (marked with `.doxygen-doc`) the available width
+ * is used on large screens. Hand-written guides keep the default layout.
+ * Tables that are still too wide scroll horizontally, which Starlight does
+ * for all tables.
  */
 @media (min-width: 72rem) {
-  :root {
+  :root:has(.doxygen-doc) {
     --sl-content-width: 64rem;
   }
-}
-
-.sl-markdown-content table {
-  display: block;
-  max-width: 100%;
-  overflow-x: auto;
 }

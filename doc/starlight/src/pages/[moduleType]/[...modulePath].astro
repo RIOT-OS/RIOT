@@ -68,6 +68,13 @@ const { moduleType } = Astro.params;
 const { module, relatedModules, descriptionFallback, relatedModulesTitle } =
   Astro.props;
 const { Content, headings } = await render(module);
+
+// Starlight adds its own "Overview" entry, so skip a leading "Overview" or
+// hand-written "Table of Contents" headings in the TOC
+const isLeadingOverview = (heading?: { depth: number; text: string }) =>
+  heading?.depth === 2 && heading.text.trim().toLowerCase() === "overview";
+const listed = headings.filter((h) => h.text.trim().toLowerCase() !== "table of contents");
+const tocHeadings = isLeadingOverview(listed[0]) ? listed.slice(1) : listed;
 ---
 
 <StarlightPage
@@ -76,8 +83,14 @@ const { Content, headings } = await render(module);
     description: module.data.description || descriptionFallback,
     editUrl: module.data.editUrl,
   }}
-  headings={headings}
+  headings={tocHeadings}
 >
+  {
+    /* Marker for the styles in custom.css that only apply to the generated
+       board and CPU documentation. */
+  }
+  <span class="doxygen-doc" hidden></span>
+
   <Aside type="caution">
     This page is automatically generated from RIOT doxygen documentation. If you
     find any issues or have suggestions for improvement, please report them
