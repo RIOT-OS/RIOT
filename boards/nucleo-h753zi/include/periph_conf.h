@@ -197,6 +197,7 @@ static const pwm_conf_t pwm_config[] = {
  * @{
  */
 /**< Available CAN interfaces */
+#if MODULE_PERIPH_CAN
 static const can_conf_t candev_conf[] = {
     {
         .can = FDCAN1,
@@ -215,6 +216,7 @@ static const can_conf_t candev_conf[] = {
         .txfp = 0,
     },
 };
+#endif
 /** @} */
 
 #ifdef __cplusplus
