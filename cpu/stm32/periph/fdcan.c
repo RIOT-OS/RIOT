@@ -30,6 +30,12 @@
 
 #define CAN_MAX_WAIT_CHANGE (10000U)
 
+#if defined(CPU_FAM_STM32H7)
+#  define FDCAN_STM32_KERNEL_CLOCK (CLOCK_PLL1_Q_OUT * 1000000UL)
+#else
+#  define FDCAN_STM32_KERNEL_CLOCK CLOCK_APB1
+#endif
+
 typedef enum {
     MODE_NORMAL,
     MODE_SLEEP,
@@ -239,14 +245,14 @@ void can_init(can_t *dev, const can_conf_t *conf)
     /* Compute bittiming values for classic CAN */
     struct can_bittiming timing = { .bitrate = FDCANDEV_STM32_DEFAULT_BITRATE,
                                     .sample_point = FDCANDEV_STM32_DEFAULT_SPT };
-    can_device_calc_bittiming(CLOCK_APB1, &bittiming_const, &timing);
-    timing.tq = (timing.brp * NS_PER_SEC) / CLOCK_APB1;
+    can_device_calc_bittiming(FDCAN_STM32_KERNEL_CLOCK, &bittiming_const, &timing);
+    timing.tq = (timing.brp * NS_PER_SEC) / FDCAN_STM32_KERNEL_CLOCK;
 
     /* Compute bittiming values for FDCAN data stream */
     struct can_bittiming fd_data_timing = { .bitrate = FDCANDEV_STM32_DEFAULT_FD_DATA_BITRATE,
                                     .sample_point = FDCANDEV_STM32_DEFAULT_SPT };
-    can_device_calc_bittiming(CLOCK_APB1, &fd_data_bittiming_const, &fd_data_timing);
-    fd_data_timing.tq = (fd_data_timing.brp * NS_PER_SEC) / CLOCK_APB1;
+    can_device_calc_bittiming(FDCAN_STM32_KERNEL_CLOCK, &fd_data_bittiming_const, &fd_data_timing);
+    fd_data_timing.tq = (fd_data_timing.brp * NS_PER_SEC) / FDCAN_STM32_KERNEL_CLOCK;
 
     /* Save the calculated bittimings */
     memcpy(&dev->candev.bittiming, &timing, sizeof(timing));
@@ -1379,6 +1385,14 @@ uint32_t* rx_fifo_element_r0;
     frame->len = dlc_to_len((*rx_fifo_element_r1 & FDCAN_SRAM_RXFIFO_R1_DLC)
                  >> FDCAN_SRAM_RXFIFO_R1_DLC_Pos);
 
+    /* The receive buffer is a classic can_frame_t (CAN_MAX_DLEN bytes). Guard
+        * against a frame reporting a longer payload - a CAN FD frame, or a classic
+        * frame carrying a DLC > 8 (which is legal on the wire and still means 8
+        * data bytes) - so the copy loop below cannot overflow frame->data. */
+    if (frame->len > CAN_MAX_DLEN) {
+        frame->len = CAN_MAX_DLEN;
+    }
+
     /* Get Data */
     for (uint8_t byte = 0; byte < frame->len && !(frame->can_id & CAN_RTR_FLAG); byte++) {
         DEBUG("%s: FDCAN%u rx_fifo_element_data = %p\n",
@@ -1703,7 +1717,7 @@ static int _get(candev_t *candev, canopt_t opt, void *value, size_t max_len)
                 res = -EOVERFLOW;
             }
             else {
-                *((uint32_t *)value) = CLOCK_APB1;
+                *((uint32_t *)value) = FDCAN_STM32_KERNEL_CLOCK;
                 res = sizeof(uint32_t);
             }
             break;
@@ -1961,8 +1975,8 @@ static void rx_isr(can_t *dev)
 
         dev->rx_mailbox.read_idx++;
 #if CPU_FAM_STM32H7
-        if (dev->rx_mailbox.write_idx == FDCAN_STM32_RX_BUFFERS) {
-            dev->rx_mailbox.write_idx = 0;
+        if (dev->rx_mailbox.read_idx == FDCAN_STM32_RX_BUFFERS) {
+            dev->rx_mailbox.read_idx = 0;
         }
 #else
         if (dev->rx_mailbox.read_idx == FDCAN_STM32_RX_MAILBOXES) {
@@ -2005,7 +2019,7 @@ static void rx_irq_handler(can_t *dev)
     /* FIFO 1 */
     if ((can->IR & FDCAN_IR_RF1L) == FDCAN_IR_RF1L) {
         DEBUG("%s: FDCAN%u RF1L: Rx FIFO 1 message lost\n", __func__, get_channel_id(can));
-        can->IR |= FDCAN_IR_RF0L;
+        can->IR |= FDCAN_IR_RF1L;
         if (dev->candev.event_callback) {
             dev->candev.event_callback(candev, CANDEV_EVENT_RX_ERROR, NULL);
         }
