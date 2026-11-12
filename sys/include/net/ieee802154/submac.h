@@ -614,6 +614,24 @@ int ieee802154_submac_set_csma_params(ieee802154_submac_t *submac, const ieee802
                                        int8_t retries);
 
 /**
+ * @brief Shortcut for enable/disable CSMA-CA.
+ *
+ * @param[in] submac pointer to the SubMAC descriptor
+ * @param[in] retries number of CSMA-CA retries. If @p retries < 0,
+ *                    retransmissions with CSMA-CA will be disabled.
+ *                    If @p retries == 0, the @ref ieee802154_send function
+ *                    will only perform CCA before transmitting the frame.
+
+ * @retval 0 on success
+ * @retval -EINVAL if the settings are not supported.
+ * @retval negative errno on error
+ */
+static inline int ieee802154_submac_csma_enable(ieee802154_submac_t *submac, int8_t retries)
+{
+    return ieee802154_submac_set_csma_params(submac, NULL, retries);
+}
+
+/**
  * @brief Set number of frame retransmissions
  *
  * @param[in] submac pointer to the SubMAC descriptor
