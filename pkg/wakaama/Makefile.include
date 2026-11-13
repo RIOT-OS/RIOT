@@ -29,3 +29,5 @@ endif
 
 PSEUDOMODULES += wakaama
 PSEUDOMODULES += wakaama_client_dtls
+
+$(call echowarn,("pkg/wakaama is deprecated, see the package docs, and will be removed after the 2027.04 Release!"))
