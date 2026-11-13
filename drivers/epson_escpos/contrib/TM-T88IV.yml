@@ -1,0 +1,38 @@
+# SPDX-FileCopyrightText: escpos-printer-db contributors
+# SPDX-License-Identifier: CC-BY-4.0
+# Source: https://github.com/receipt-print-hq/escpos-printer-db/blob/e5bd45da2ae535d3874f9da94f355b4db4733344/data/profile/TM-T88IV.yml
+---
+# More info on this printer is posted at
+# https://files.support.epson.com/pdf/pos/bulk/tm-t88iv_eng_trg_revc_02.pdf
+TM-T88IV:
+  name: TM-T88IV
+  vendor: "Epson"
+  inherits: default
+  notes: >
+      Epson TM-T88IV profile
+  media:
+    width:
+      mm: 80
+      pixels: 512
+    # @page 24
+    dpi: 180
+  fonts:
+    0:
+      name: Font A
+      columns: 42
+    1:
+      name: Font B
+      columns: 56
+  codePages:
+    0: CP437
+    1: CP932
+    2: CP850
+    3: CP860
+    4: CP863
+    5: CP865
+    16: CP1252
+    17: CP866
+    18: CP852
+    19: CP858
+    255: Unknown
+...
