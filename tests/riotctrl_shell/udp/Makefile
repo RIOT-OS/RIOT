@@ -1,4 +1,5 @@
 USEMODULE += shell_cmd_udp
+USEMODULE += shell_cmd_udp_send_len
 USEMODULE += shell_cmd_udp_server
 
 USEMODULE += fmt
