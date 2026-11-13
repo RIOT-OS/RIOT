@@ -154,19 +154,22 @@ static int _add_socket(event_queue_t* queue, sock_udp_t* socket, sock_udp_ep_t* 
 
 int unicoap_init_udp(event_queue_t* queue)
 {
-    sock_udp_ep_t local = {
-    /* FIXME: Once the problems with IPv4/IPv6 dual stack use in RIOT are fixed, adapt these lines
-     *        (and e.g. use AF_UNSPEC) */
-#if defined(SOCK_HAS_IPV6)
-        .family = AF_INET6,
-#elif defined(SOCK_HAS_IPV4)
-        .family = AF_INET,
-#endif
-        .netif = SOCK_ADDR_ANY_NETIF,
-        .port = CONFIG_UNICOAP_UDP_PORT
-    };
+    if (IS_USED(MODULE_UNICOAP_DRIVER_UDP_INIT_DEFAULT) && CONFIG_UNICOAP_UDP_PORT > 0) {
+        sock_udp_ep_t local = {
+        /* FIXME: Once the problems with IPv4/IPv6 dual stack use in RIOT are fixed, adapt these lines
+        *        (and e.g. use AF_UNSPEC) */
+    #if defined(SOCK_HAS_IPV6)
+            .family = AF_INET6,
+    #elif defined(SOCK_HAS_IPV4)
+            .family = AF_INET,
+    #endif
+            .netif = SOCK_ADDR_ANY_NETIF,
+            .port = CONFIG_UNICOAP_UDP_PORT
+        };
 
-    return _add_socket(queue, &_udp_socket, &local);
+        return _add_socket(queue, &_udp_socket, &local);
+    }
+    return 0;
 }
 
 sock_udp_t* unicoap_transport_udp_get_socket(void)

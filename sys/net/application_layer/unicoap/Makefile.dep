@@ -85,6 +85,16 @@ ifneq (,$(filter unicoap_driver_rfc7252_common,$(USEMODULE)))
 endif
 
 ifneq (,$(filter unicoap_driver_udp,$(USEMODULE)))
+  USEMODULE += unicoap_driver_udp_transport
+  DEFAULT_MODULE += unicoap_driver_udp_init_default
+endif
+
+ifneq (,$(filter unicoap_driver_dtls,$(USEMODULE)))
+  USEMODULE += unicoap_driver_dtls_transport
+  DEFAULT_MODULE += unicoap_driver_dtls_init_default
+endif
+
+ifneq (,$(filter unicoap_driver_udp_transport,$(USEMODULE)))
   # CoAP over UDP uses RFC 7252 messaging layer
   USEMODULE += unicoap_driver_rfc7252_common
 
@@ -98,7 +108,7 @@ ifneq (,$(filter unicoap_driver_udp,$(USEMODULE)))
   USEMODULE += ipv4_addr
 endif
 
-ifneq (,$(filter unicoap_driver_dtls,$(USEMODULE)))
+ifneq (,$(filter unicoap_driver_dtls_transport,$(USEMODULE)))
   # CoAP over DTLS uses RFC 7252 messaging layer
   USEMODULE += unicoap_driver_rfc7252_common
 
