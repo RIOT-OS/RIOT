@@ -20,13 +20,11 @@ if @ref net_sock_udp (`USEMODULE += sock_udp`) is available in your build.
 ## Send UDP Datagrams
 
 ```
-> udp send [-b] <addr>:<port> {-d <data-len>|<data>} [<num> [<delay>]]
+> udp send [-b] <addr>:<port> <data> [<num> [<delay>]]
 ```
 
 Send `<num>` UDP datagrams to `<addr>:<port>` at the interval specified in `<delay>`
 (in microseconds).
-If the optional parameter `-d` is given, a generated number of `<data-len>` bytes is sent and
-`<data>` is not needed.
 If the optional parameter `-b` is given, `<data>` is interpreted as hexadecimal digits,
 otherwise `<data>` is interpreted as a text string.
 `-d` and `-b` are mutually exclusive.
@@ -37,6 +35,19 @@ otherwise `<data>` is interpreted as a text string.
 Note that the shell buffer size may limit the input length (`SHELL_DEFAULT_BUFSIZE`
 defaults to 128 bytes).
 
+
+## Generate UDP Payload
+
+Add `USEMODULE += shell_cmd_udp_send_len` to your application Makefile.
+
+With that, the `udp send` command can be provided with the optional parameter `-d`.
+
+```
+> udp send [-b] <addr>:<port> {-d <data-len>|<data>} [<num> [<delay>]]
+```
+
+If the optional parameter `-d` is given, a generated number of `<data-len>` bytes is sent and
+`<data>` is not needed.
 
 # UDP Server
 

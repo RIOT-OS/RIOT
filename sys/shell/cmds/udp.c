@@ -18,8 +18,8 @@
  * @}
  */
 
-#include <stdio.h>
 #include <inttypes.h>
+#include <stdio.h>
 
 #include "fmt.h"
 #include "net/sock/udp.h"
@@ -39,7 +39,11 @@
 #endif
 
 #ifndef CONFIG_SHELL_CMD_UDP_BUFSIZE
-#define CONFIG_SHELL_CMD_UDP_BUFSIZE    1024U
+#  ifdef MODULE_SHELL_CMD_UDP_SEND_LEN
+#    define CONFIG_SHELL_CMD_UDP_BUFSIZE    1024U
+#  else
+#    define CONFIG_SHELL_CMD_UDP_BUFSIZE    SHELL_DEFAULT_BUFSIZE / 2U
+#  endif
 #endif
 
 #define SERVER_PRIO             (THREAD_PRIORITY_MAIN - 1)
@@ -148,8 +152,8 @@ static void _start_server(const char *port_str)
     /* init event queue to be used by server thread */
     event_queue_init_detached(&queue);
     /* start server */
-    server_pid = thread_create(server_stack, sizeof(server_stack), SERVER_PRIO,
-                                0, _server_thread, (void *)(uintptr_t)server_port, "UDP server");
+    server_pid = thread_create(server_stack, sizeof(server_stack), SERVER_PRIO, 0, _server_thread,
+                               (void *)(uintptr_t)server_port, "UDP server");
     if (server_pid <= KERNEL_PID_UNDEF) {
         puts("Error: can not start server thread");
         return;
@@ -241,9 +245,15 @@ static int _udp_cmd(int argc, char **argv)
         uint32_t num = 1;
         uint32_t delay = 1 * US_PER_SEC;
         if (argc < 4) {
-            printf(
-                "usage: %s send [-b] <addr>:<port> {-d <data_len>|<data>} [<num> [<delay in us>]]\n",
-                argv[0]);
+            if (IS_USED(MODULE_SHELL_CMD_UDP_SEND_LEN)) {
+                printf(
+                    "usage: %s send [-b] <addr>:<port> {-d <data_len>|<data>} [<num> [<delay in us>]]\n",
+                    argv[0]);
+            }
+            else {
+                printf("usage: %s send [-b] <addr>:<port> <data> [<num> [<delay in us>]]\n",
+                       argv[0]);
+            }
             return 1;
         }
 
@@ -256,7 +266,7 @@ static int _udp_cmd(int argc, char **argv)
 
         const char *addr_str = argv[2];
 
-        bool generate_data = strcmp(argv[3], "-d") == 0;
+        bool generate_data = IS_USED(MODULE_SHELL_CMD_UDP_SEND_LEN) && (strcmp(argv[3], "-d") == 0);
         if (generate_data && data_is_hex) {
             puts("Error: -b and -d are mutually exclusive");
             return 1;
@@ -301,8 +311,8 @@ static int _udp_cmd(int argc, char **argv)
 
         if (argc > 4) {
             if (!IS_USED(MODULE_ZTIMER)) {
-                puts("Error: retransmission requires ztimer. "
-                     "Add ztimer_msec or ztimer_usec to USEMODULE.");
+                puts(
+                    "Error: retransmission requires ztimer. Add ztimer_msec or ztimer_usec to USEMODULE.");
                 return 1;
             }
             num = atoi(argv[4]);
@@ -314,8 +324,8 @@ static int _udp_cmd(int argc, char **argv)
     }
     else if (strcmp(argv[1], "server") == 0) {
         if (!IS_USED(MODULE_SHELL_CMD_UDP_SERVER)) {
-            puts("Error: server command not supported in this build. "
-                 "Add shell_cmd_udp_server to USEMODULE.");
+            puts(
+                "Error: server command not supported in this build. Add shell_cmd_udp_server to USEMODULE.");
             return 1;
         }
         if (argc < 3) {

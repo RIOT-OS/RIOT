@@ -561,6 +561,7 @@ PSEUDOMODULES += shell_cmd_sntp
 PSEUDOMODULES += shell_cmd_suit
 PSEUDOMODULES += shell_cmd_sys
 PSEUDOMODULES += shell_cmd_udp
+PSEUDOMODULES += shell_cmd_udp_send_len
 PSEUDOMODULES += shell_cmd_udp_server
 PSEUDOMODULES += shell_cmd_udptty
 PSEUDOMODULES += shell_cmd_vfs
