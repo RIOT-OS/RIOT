@@ -1,0 +1,10 @@
+USEMODULE += walltime
+USEMODULE += periph_cpuid
+USEMODULE += board
+USEMODULE += shell
+USEMODULE += shell_cmds_default
+USEMODULE += ps
+# include and auto-initialize all available sensors
+USEMODULE += ztimer
+USEMODULE += ztimer_msec
+USEMODULE += ztimer_sec
