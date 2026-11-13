@@ -333,8 +333,8 @@ class TestUDPServer(riotctrl_shell_tests.testcase_base.TestBase):
             self.shell.udp_server_start(0)
         assert "Error: invalid port specified" in str(ctx.exception)
 
-    def _test_udp_server_start(self):
-        res = self.shell.udp_server_start(5683)
+    def _test_udp_server_start(self, summarize=False):
+        res = self.shell.udp_server_start(5683, summarize=summarize)
         assert "Success: started UDP server on port 5683" in res
 
     def test_udp_server_start(self):
@@ -356,9 +356,7 @@ class TestUDPServer(riotctrl_shell_tests.testcase_base.TestBase):
         res = self.shell.udp_server_stop()
         assert "Success: stopped UDP server" in res
 
-    def test_udp_server_check_output(self):
-        self._test_udp_server_start()
-
+    def _test_udp_server_check_output(self, summarize=False):
         self.shell.preload_payload(b"abcdef")
         self.shell.payload_remote("[2001:db8::1]:12345")
 
@@ -394,9 +392,27 @@ class TestUDPServer(riotctrl_shell_tests.testcase_base.TestBase):
         self.shell.preload_payload(b"let's emulate loss")
         self.shell.payload_remote("[2001:db8::5]:12362")
 
+        # restart server for last test to at least visually check if conditions
+        # for output after restart apply (e.g. counter reset); the parser itself
+        # does not care.
+        res = self.shell.udp_server_stop()
+        assert "Success: stopped UDP server" in res
+        self._test_udp_server_start(summarize=summarize)
+
         self.shell.trigger_receive(count=7, delay_us=100000)
         lost_perc = self.shell.udp_server_check_output(10, 100000)
         assert lost_perc == (10 - 7) * 10
+
+    def test_udp_server_check_output_full(self):
+        self._test_udp_server_start()
+        self._test_udp_server_check_output()
+
+    def test_udp_server_check_output_summarized(self):
+        self._test_udp_server_start(summarize=True)
+        # check output only counts the received packets so we
+        # can use the same method without modification for
+        # summarize=True
+        self._test_udp_server_check_output(summarize=True)
 
 
 if __name__ == "__main__":
