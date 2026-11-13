@@ -11,6 +11,7 @@
 #include <stddef.h>
 #include <string.h>
 
+#include "compiler_hints.h"
 #include "iolist.h"
 
 #include "net/unicoap/constants.h"
@@ -1283,7 +1284,22 @@ static inline ssize_t unicoap_pdu_parse_rfc7252_result(uint8_t* pdu, size_t size
  * @{
  */
 /**
- * @brief Writes RFC 7252 PDU header in the given buffer
+ * @brief Writes RFC 7252 PDU header in the given buffer and a message code
+ *
+ * @param[in,out] header Buffer the header will be written into
+ * @param capacity Number of usable bytes in the @p header buffer
+ * @param[in] properties Message properties to serialize into the header
+ * @param[in] code Message code
+ *
+ * @returns Header size
+ * @retval `-ENOBUFS` Buffer too small
+ */
+ssize_t unicoap_pdu_build_header_rfc7252_with_code(uint8_t* header, size_t capacity,
+                                                   const unicoap_message_properties_t* properties,
+                                                   uint8_t code);
+
+/**
+ * @brief Writes RFC 7252 PDU header in the given buffer and an entire message
  *
  * @param[in,out] header Buffer the header will be written into
  * @param capacity Number of usable bytes in the @p header buffer
@@ -1293,9 +1309,14 @@ static inline ssize_t unicoap_pdu_parse_rfc7252_result(uint8_t* pdu, size_t size
  * @returns Header size
  * @retval `-ENOBUFS` Buffer too small
  */
+static inline
 ssize_t unicoap_pdu_build_header_rfc7252(uint8_t* header, size_t capacity,
                                          const unicoap_message_t* message,
-                                         const unicoap_message_properties_t* properties);
+                                         const unicoap_message_properties_t* properties)
+{
+    return unicoap_pdu_build_header_rfc7252_with_code(header, capacity, properties, 
+        likely(message) ? message->code : UNICOAP_CODE_EMPTY);
+}
 
 /**
  * @brief Writes RFC 7252 PDU into buffer
@@ -1314,8 +1335,10 @@ static inline ssize_t unicoap_pdu_build_rfc7252(uint8_t* pdu, size_t capacity,
                                                 const unicoap_message_properties_t* properties)
 {
     ssize_t res = 0;
-
-    if ((res = unicoap_pdu_build_header_rfc7252(pdu, capacity, message, properties)) < 0) {
+    if ((res = unicoap_pdu_build_header_rfc7252(pdu, capacity, message, properties)) < 0 ||
+        unlikely(!message)
+    ) {
+        /* If failed, return. Also, if no message, there're no options and no payload, so return. */
         return res;
     }
     return unicoap_pdu_build_options_and_payload(pdu + res, capacity - res, message) + res;
