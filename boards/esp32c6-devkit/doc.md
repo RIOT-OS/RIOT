@@ -128,4 +128,4 @@ BOARD=esp32c6-devkit make flash ...
 ```
 
 For detailed information about ESP32-C6 as well as configuring and compiling
-RIOT for ESP32-C6 boards, see \ref esp32_riot.
+RIOT for ESP32-C6 boards, see \ref cpu_esp32.

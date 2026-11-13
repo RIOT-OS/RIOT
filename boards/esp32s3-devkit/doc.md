@@ -171,4 +171,4 @@ BOARD=esp32s3-devkit make flash ...
 ```
 
 For detailed information about ESP32-S3 as well as configuring and compiling
-RIOT for ESP32-S3 boards, see \ref esp32_riot.
+RIOT for ESP32-S3 boards, see \ref cpu_esp32.

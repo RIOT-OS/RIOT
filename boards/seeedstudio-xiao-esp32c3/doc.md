@@ -137,4 +137,4 @@ After flashing the board, it will still be in download mode. You have to press
 the RESET button to start your application.
 
 For detailed information about ESP32-C3 as well as configuring and compiling
-RIOT for ESP32-C3 boards, see \ref esp32_riot.
+RIOT for ESP32-C3 boards, see \ref cpu_esp32.

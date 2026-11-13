@@ -204,4 +204,4 @@ BOARD=esp32-heltec-lora32-v2 make flash ...
 ```
 
 For detailed information about ESP32 as well as configuring and compiling RIOT
-for ESP32 boards, see \ref esp32_riot.
+for ESP32 boards, see \ref cpu_esp32.

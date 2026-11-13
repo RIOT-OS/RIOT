@@ -150,4 +150,4 @@ BOARD=esp32-wemos-lolin-d32-pro make flash ...
 ```
 
 For detailed information about ESP32 as well as configuring and compiling
-RIOT for ESP32 boards, see \ref esp32_riot.
+RIOT for ESP32 boards, see \ref cpu_esp32.

@@ -60,4 +60,4 @@ PROGRAMMER=openocd BOARD=cc1352p-launchpad make flash
 
 For detailed information about CC1352P MCUs as well as configuring, compiling
 RIOT and installation of flashing tools for CC1352P boards,
-see \ref cc26xx_cc13xx_riot.
+see \ref cpu_cc26xx_cc13xx.

@@ -5,8 +5,6 @@
 This module contains code common to all cc26xx/cc13xx cpus
 supported by RIOT: @ref cpu_cc26x0_cc13x0, @ref cpu_cc26x2_cc13x2
 
-\section cc26xx_cc13xx_riot RIOT-OS on CC26xx/CC13xx boards
-
 # Overview
 
 The CC26xx/C13xx is a family of micro controllers fabricated by Texas Instruments

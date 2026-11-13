@@ -56,7 +56,7 @@ Technical Reference | [Technical Reference](https://www.espressif.com/sites/defa
 Board Schematic | [Board Schematic](https://github.com/OLIMEX/ESP8266/blob/master/HARDWARE/MOD-WIFI-ESP8266-DEV/MOD-WiFi-ESP8266-DEV%20revision%20B1/MOD-WiFi-ESP8266-DEV_Rev_B1.pdf)
 </center>
 
-@note For detailed information about ESP8266, see \ref esp8266_riot.
+@note For detailed information about ESP8266, see \ref cpu_esp8266.
 
 ### RIOT Pin Mapping
 
@@ -70,7 +70,7 @@ pin holes to RIOT pins.
 Since GPIOs 6, 7, 8, and 11 are used for flash memory, they cannot be used
 for other purposes. Furthermore, when flash mode `qout` or `qio` is used for
 flash memory, GPIOs 9 and 10 are used for flash memory additionally and cannot
-be used for other purposes, see section Flash Modes in \ref esp8266_riot.
+be used for other purposes, see section Flash Modes in \ref cpu_esp8266.
 
 ## Flashing the Device
 
@@ -95,4 +95,4 @@ BOARD=esp8266-olimex-mod make flash ...
 ```
 
 For detailed information about ESP8266 as well as configuring and compiling
-RIOT for ESP8266 boards, see \ref esp8266_riot.
+RIOT for ESP8266 boards, see \ref cpu_esp8266.

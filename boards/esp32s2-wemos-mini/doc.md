@@ -35,4 +35,4 @@ it into bootloader mode by pressing the Reset (RST) button while holding the BOO
 button.
 
 For detailed information about ESP32-S2 as well as configuring and compiling
-RIOT for ESP32-S2 boards, see \ref esp32_riot.
+RIOT for ESP32-S2 boards, see \ref cpu_esp32.

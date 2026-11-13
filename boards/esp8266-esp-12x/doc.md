@@ -59,7 +59,7 @@ BOARD=esp8266-esp-12x make flash ...
 ```
 
 For detailed information about ESP8266 as well as configuring and compiling
-RIOT for ESP8266 boards, see \ref esp8266_riot.
+RIOT for ESP8266 boards, see \ref cpu_esp8266.
 
 ## WEMOS LOLIN D1 mini {#esp8266_wemos_lolin_d1_mini}
 

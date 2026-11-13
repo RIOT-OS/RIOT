@@ -34,7 +34,7 @@ ESP32-Ethernet-Kit v1.1 has the following on-board components
 - USB bridge with JTAG interface
 
 For detailed information about the configuration of ESP32 boards, see
-section Peripherals in \ref esp32_riot.
+section Peripherals in \ref cpu_esp32.
 
 @note Only a few GPIOs are broken out and available for external hardware on ESP32-Ethernet-Kit boards. Which GPIOs are available as peripherals depends on used modules.
 

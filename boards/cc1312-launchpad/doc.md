@@ -55,4 +55,4 @@ PROGRAMMER=openocd BOARD=cc1312-launchpad make flash
 
 For detailed information about CC1312 MCUs as well as configuring, compiling
 RIOT and installation of flashing tools for CC1312 boards,
-see \ref cc26xx_cc13xx_riot.
+see \ref cpu_cc26xx_cc13xx.
