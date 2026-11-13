@@ -14,6 +14,7 @@
  *              See https://github.com/RIOT-OS/Release-Specs/
  */
 
+#include <inttypes.h>
 #include <stdatomic.h>
 #include <stdio.h>
 #include <stdlib.h>
