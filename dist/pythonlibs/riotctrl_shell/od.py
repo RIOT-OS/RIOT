@@ -32,7 +32,7 @@ class OdParser(ShellInteractionParser):
                     assert output_offset == (offset + i), (
                         f"Offset 0x{output_offset:08x} != 0x{offset + i:08x}, "
                         "you might need to set the `offset` parameter of the "
-                        "parse() method to a different value."
+                        "parse() method to a different value or set multiple=True."
                     )
                 byts = bytes.fromhex(match["bytes"])
                 if multiple and output_offset < (offset + i):
