@@ -1,5 +1,9 @@
 PSEUDOMODULES += esp32_ttgo_t_beam_v1_0
 
+# configure the serial interface
+PORT_LINUX ?= /dev/ttyUSB0
+PORT_DARWIN ?= $(firstword $(sort $(wildcard /dev/cu.usbserial*)))
+
 # Only consider TTYs matching the following filter when auto-selecting the TTY
 # with `MOST_RECENT_PORT=1`.
 TTY_BOARD_FILTER := --driver 'cp210x' --vendor 'Silicon Labs' --model 'CP2104 USB to UART Bridge Controller'

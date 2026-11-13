@@ -100,8 +100,8 @@ On Linux and macOS, devices will appear under `/dev/`.
 
 On macOS:
 
-* XDS backchannel: `tty.usbserial-<serial number>`
-* EM in CDC-ACM: `tty.usbmodemf<X><ABC>` (X a letter, ABC a number e.g. `tty.usbmodemfd121`)
+* XDS backchannel: `cu.usbserial-<serial number>`
+* EM in CDC-ACM: `cu.usbmodemf<X><ABC>` (X a letter, ABC a number e.g. `cu.usbmodemfd121`)
 
 On Linux:
 
