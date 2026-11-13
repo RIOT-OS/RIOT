@@ -175,7 +175,7 @@ static int _read(ieee802154_dev_t *dev, void *buf, size_t size, ieee802154_rx_in
             info->rssi = ieee802154_dbm_to_rssi(_rx_frame_info->rssi);
             info->lqi = _rx_frame_info->lqi;
 #if IS_USED(MODULE_IEEE802154_RX_TIMESTAMP)
-            /* this is actually a software timestamp taken by ESP-IDF with esp_timer_get() */
+            /* this is actually a software timestamp taken by ESP-IDF with esp_timer_get_time() */
             info->timestamp = _rx_frame_info->timestamp * NS_PER_US;
 #endif
         }
