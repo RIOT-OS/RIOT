@@ -221,11 +221,12 @@ static void _send(const char *addr_str, const char *_data, size_t num,
         }
         printf("Success: sent %u byte over UDP to %s\n", res, addr_str);
         if (num) {
-#if IS_USED(MODULE_ZTIMER_USEC)
-            ztimer_sleep(ZTIMER_USEC, delay);
-#elif IS_USED(MODULE_ZTIMER_MSEC)
-            ztimer_sleep(ZTIMER_MSEC, (delay + US_PER_MS - 1) / US_PER_MS);
-#endif
+            if (IS_USED(MODULE_ZTIMER_USEC)) {
+                ztimer_sleep(ZTIMER_USEC, delay);
+            }
+            else if (IS_USED(MODULE_ZTIMER_MSEC)) {
+                ztimer_sleep(ZTIMER_MSEC, (delay + US_PER_MS - 1) / US_PER_MS);
+            }
         }
     }
 
