@@ -1,0 +1,25 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: RIOT uD3TN port <buildsystem@riot>
+Date: Tue, 10 Nov 2026 14:08:00 +0100
+Subject: [PATCH] Adapt bundle processor task creation for RIOT
+
+---
+ components/ud3tn/init.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
+
+diff --git a/components/ud3tn/init.c b/components/ud3tn/init.c
+--- a/components/ud3tn/init.c
++++ b/components/ud3tn/init.c
+@@ -93,7 +93,9 @@ void start_tasks(const struct ud3tn_cmdline_options *const opt)
+ 
+ 	const enum ud3tn_result bp_task_result = hal_task_create(
+ 		bundle_processor_task,
+-		bundle_processor_task_params
++		bundle_processor_task_params,
++		true,
++		NULL
+ 	);
+ 
+ 	if (bp_task_result != UD3TN_OK) {
+-- 
+2.39.0

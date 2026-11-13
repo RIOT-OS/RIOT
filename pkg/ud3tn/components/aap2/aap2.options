@@ -1,0 +1,10 @@
+# SPDX-License-Identifier: BSD-3-Clause OR Apache-2.0
+# Nanopb options for aap2.proto
+
+aap2.ConnectionConfig.endpoint_id         type:FT_POINTER
+aap2.ConnectionConfig.secret              type:FT_POINTER
+aap2.Welcome.node_id                      type:FT_POINTER
+aap2.BundleADU.dst_eid                    type:FT_POINTER
+aap2.BundleADU.src_eid                    type:FT_POINTER
+aap2.Bundle.dst_eid                       type:FT_POINTER
+aap2.Bundle.src_eid                       type:FT_POINTER

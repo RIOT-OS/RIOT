@@ -1,0 +1,23 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: RIOT uD3TN port <buildsystem@riot>
+Date: Tue, 10 Nov 2026 14:16:00 +0100
+Subject: [PATCH] Expose the bundle agent interface
+
+---
+ components/ud3tn/init.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/components/ud3tn/init.c b/components/ud3tn/init.c
+--- a/components/ud3tn/init.c
++++ b/components/ud3tn/init.c
+@@ -22,7 +22,7 @@
+ #include <stdint.h>
+ #include <string.h>
+ 
+-static struct bundle_agent_interface bundle_agent_interface;
++struct bundle_agent_interface bundle_agent_interface;
+ uint8_t LOG_LEVEL = DEFAULT_LOG_LEVEL;
+ 
+ // References kept for program runtime
+-- 
+2.39.0

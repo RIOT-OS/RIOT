@@ -1,0 +1,51 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: RIOT uD3TN port <buildsystem@riot>
+Date: Tue, 10 Nov 2026 13:50:00 +0100
+Subject: [PATCH] Adapt contact manager to RIOT port interfaces
+
+---
+ components/ud3tn/contact_manager.c | 10 ++++++----
+ 1 file changed, 6 insertions(+), 4 deletions(-)
+
+diff --git a/components/ud3tn/contact_manager.c b/components/ud3tn/contact_manager.c
+--- a/components/ud3tn/contact_manager.c
++++ b/components/ud3tn/contact_manager.c
+@@ -106,14 +106,14 @@ static int add_contact_to_current(struct contact_manager_context *ctx,
+ 		c->node->eid
+ 	);
+ 	if (!ctx->current_contacts[ctx->current_contact_count].eid) {
+-		LOG_ERROR("ContactManager: Failed to copy EID");
++		UD3TN_LOG_ERROR("ContactManager: Failed to copy EID");
+ 		return 0;
+ 	}
+ 	ctx->current_contacts[ctx->current_contact_count].cla_addr = strdup(
+ 		c->node->cla_addr
+ 	);
+ 	if (!ctx->current_contacts[ctx->current_contact_count].cla_addr) {
+-		LOG_ERROR("ContactManager: Failed to copy CLA address");
++		UD3TN_LOG_ERROR("ContactManager: Failed to copy CLA address");
+ 		free(ctx->current_contacts[ctx->current_contact_count].eid);
+ 		return 0;
+ 	}
+@@ -396,7 +396,7 @@ static void contact_manager_task(void *param)
+ 	};
+ 
+ 	if (!parameters) {
+-		LOG_ERROR("ContactManager: Cannot start, parameters not defined");
++		UD3TN_LOG_ERROR("ContactManager: Cannot start, parameters not defined");
+ 		abort();
+ 	}
+ 	for (;;) {
+@@ -466,7 +466,9 @@ struct contact_manager_start_result contact_manager_start(
+ 	cmt_params->contact_list_ptr = clistptr;
+ 	ret.task_creation_result = hal_task_create(
+ 		contact_manager_task,
+-		cmt_params
++		cmt_params,
++		true,
++		NULL
+ 	);
+ 	if (ret.task_creation_result == UD3TN_OK) {
+ 		ret.semaphore = semaphore;
+-- 
+2.39.0

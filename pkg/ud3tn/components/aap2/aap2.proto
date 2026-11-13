@@ -1,0 +1,193 @@
+// SPDX-License-Identifier: BSD-3-Clause OR Apache-2.0
+
+// This file defines the µD3TN Application Agent Protocol version 2.0.
+// For an in-depth description of the protocol, the motivation and vision behind
+// it, and usage examples, refer to the AAP 2.0 documentation.
+
+syntax = "proto3";
+
+package aap2;
+
+// -----------------------------------------------------------------------------
+// Message (unsolicited - Info/Request/Call)
+// -----------------------------------------------------------------------------
+
+// The outer AAP 2.0 message type that is always sent by the Initiator (the
+// Client if configured with `is_subscriber == false`, otherwise the Server).
+message AAPMessage {
+  oneof msg {
+    // Message sent by the Server at the start of a connection to
+    // communicate basic parameters.
+    Welcome welcome = 1;
+
+    // Message sent by the Client to authenticate itself and configure the
+    // connection.
+    ConnectionConfig config = 2;
+
+    // Message transmitting a bundle ADU into either direction.
+    BundleADU adu = 3;
+
+    // Call issued regularly to ensure the connection is still alive.
+    Keepalive keepalive = 6;
+  }
+}
+
+// Message sent by the Server at the start of a connection to
+// communicate basic parameters.
+message Welcome {
+  // The local node ID, i.e., the (primary) EID identifying the local node.
+  // This may become a repeated element in the future.
+  // This value shall be used for deriving the (requested) application EIDs.
+  string node_id = 1;
+}
+
+// The type of actions requested to be enabled for an AAP 2.0 connection.
+enum AuthType {
+  // Only allow to register free endpoints or agent IDs for which the same
+  // secret can be provided.
+  AUTH_TYPE_DEFAULT = 0;
+}
+
+// Message sent by the Client to authenticate itself and configure the
+// connection.
+message ConnectionConfig {
+  // If `true`, the direction of control is switched after positive
+  // confirmation, i.e., the Server becomes the Initiator of all following
+  // communication and also takes over sending the Keepalive messages.
+  bool is_subscriber = 1;
+
+  // Controls the actions allowed and data provided over the connection.
+  AuthType auth_type = 2;
+
+  // A secret to authorize the configuration. Required for already-registered
+  // endpoints and if `auth_type != 0`. When creating a new registration, this
+  // field is optional, but only if it is set, the same registration can be
+  // claimed by other connections (that need to specify the same secret).
+  // If `auth_type != 0`, the secret must be equal to the configured
+  // pre-shared key for allowing the requested access.
+  string secret = 3;
+
+  // The endpoint to be registered for the app. This is required to be a full
+  // EID as the local node may have multiple node IDs that can be used for
+  // registering applications. Optional when `auth_type != 0` and the app.
+  // only intends to control the FIB or dispatch bundles.
+  string endpoint_id = 4;
+
+  // The maximum time interval between messages, should be zero, or between
+  // 30 sec and 600 sec. The Initiator SHALL send `KEEPALIVE` messages after
+  // this amount of time has elapsed. 0 disables the feature (see RFC 9174),
+  // which is useful e.g. for local sockets. Default = 0 (disabled).
+  uint32 keepalive_seconds = 5;
+}
+
+// Flags defining specific behavior for the bundle ADU, e.g., for BIBE.
+enum BundleADUFlags {
+  // No flags set - normal transmission request.
+  BUNDLE_ADU_NORMAL = 0;
+
+  // The bundle ADU is a BIBE protocol data unit - request BIBE transmission.
+  BUNDLE_ADU_BPDU = 1;
+}
+
+// Message transmitting a bundle ADU into either direction.
+message BundleADU {
+  // The bundle source EID. Optional when sending the bundle from the only
+  // registered endpoint associated with the connection.
+  // NOTE: FUTURE EXTENSION: Specifies the used local endpoint if multiple
+  // endpoints can be registered (and have been registered).
+  string src_eid = 1;
+  // The bundle destination EID.
+  string dst_eid = 2;
+
+  // The bundle creation time in milliseconds since the DTN epoch as defined
+  // in RFC 9171. Optional when sending bundles (will be assigned by µD3TN).
+  uint64 creation_timestamp_ms = 3;
+  // The bundle sequence number as defined in RFC 9171.
+  // Optional when sending bundles (will be assigned by µD3TN).
+  uint64 sequence_number = 4;
+
+  // The number of bytes contained in the bundle payload, which MUST be
+  // enclosed immediately _after_ the Protobuf message.
+  uint64 payload_length = 5;
+
+  // Flags defining specific behavior for the bundle ADU, e.g., for BIBE.
+  BundleADUFlags adu_flags = 6;
+}
+
+// Message informing a BDM Client about a received or newly-created
+// bundle.
+message Bundle {
+  // The bundle source EID.
+  string src_eid = 1;
+  // The bundle destination EID.
+  string dst_eid = 2;
+
+  // The bundle creation time in milliseconds since the DTN epoch as defined
+  // in RFC 9171.
+  uint64 creation_timestamp_ms = 3;
+  // The bundle sequence number as defined in RFC 9171.
+  uint64 sequence_number = 4;
+
+  // The payload length as defined in RFC 9171.
+  uint64 payload_length = 5;
+
+  // The fragment offset as defined in RFC 9171.
+  // Only set if the bundle is a fragment.
+  uint64 fragment_offset = 6;
+  // The total ADU length as defined in RFC 9171.
+  // Only set if the bundle is a fragment.
+  uint64 total_adu_length = 7;
+
+  // The bundle lifetime as defined in RFC 9171.
+  uint64 lifetime_ms = 8;
+
+  // NOTE: FUTURE EXTENSION: Further bundle metadata fields, potentially
+  // extension blocks.
+}
+
+// A message that should be regularly sent by the current Initiator and must be
+// acknowledged with an `AAPResponse` specifying `RESPONSE_STATUS_ACK`.
+message Keepalive {
+}
+
+// -----------------------------------------------------------------------------
+// Response
+// -----------------------------------------------------------------------------
+
+// The response to every AAPMessage, sent by the peer that received the message.
+message AAPResponse {
+  // The result of the received call/request represented as a single value.
+  ResponseStatus response_status = 1;
+
+  // Headers of the created bundle (present when sending a bundle).
+  Bundle bundle_headers = 3;
+}
+
+// Definition of the status codes for an AAPResponse to be associated with.
+enum ResponseStatus {
+  // Invalid.
+  RESPONSE_STATUS_UNSPECIFIED = 0;
+
+  // Success.
+  RESPONSE_STATUS_SUCCESS = 1;
+
+  // Data received (neither success nor failure can be indicated).
+  RESPONSE_STATUS_ACK = 2;
+
+  // Failure status: all values >= 8.
+  // An unspecified failure.
+  RESPONSE_STATUS_ERROR = 8;
+
+  // A timeout occurred when performing the requested action.
+  RESPONSE_STATUS_TIMEOUT = 9;
+
+  // The received request is considered invalid and, thus, is not processed.
+  RESPONSE_STATUS_INVALID_REQUEST = 10;
+
+  // A resource required for processing the request was not found.
+  RESPONSE_STATUS_NOT_FOUND = 11;
+
+  // The Client is not authorized to perform the requested action or a provided
+  // credential value is not valid for the requested authorization.
+  RESPONSE_STATUS_UNAUTHORIZED = 12;
+}
