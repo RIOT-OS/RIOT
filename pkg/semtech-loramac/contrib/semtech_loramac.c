@@ -49,9 +49,9 @@
 #define ENABLE_DEBUG 0
 #include "debug.h"
 
-#define LORAMAC_RX_BUFFER_SIZE                      (256U)
-#define SEMTECH_LORAMAC_MSG_QUEUE                   (4U)
-#define SEMTECH_LORAMAC_LORAMAC_STACKSIZE           (THREAD_STACKSIZE_DEFAULT)
+#define LORAMAC_RX_BUFFER_SIZE                  (256U)
+#define SEMTECH_LORAMAC_MSG_QUEUE               (4U)
+#define SEMTECH_LORAMAC_LORAMAC_STACKSIZE       (THREAD_STACKSIZE_DEFAULT+256)
 static msg_t _semtech_loramac_msg_queue[SEMTECH_LORAMAC_MSG_QUEUE];
 static char _semtech_loramac_stack[SEMTECH_LORAMAC_LORAMAC_STACKSIZE];
 kernel_pid_t semtech_loramac_pid;
