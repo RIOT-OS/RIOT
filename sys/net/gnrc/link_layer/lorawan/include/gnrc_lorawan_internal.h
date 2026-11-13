@@ -166,6 +166,7 @@ typedef struct {
     iolist_t *pkt;          /**< packet of the request */
     uint8_t port;           /**< port of the request */
     uint8_t dr;             /**< datarate of the request */
+    void *context;         /**< optional handle to the gnrc_pktsnip_t of the request */
 } mcps_data_t;
 
 /**
@@ -184,6 +185,7 @@ typedef struct {
     int waiting_for_ack;                /**< true if the MAC layer is waiting for an ACK */
     uint8_t redundancy;                 /**< unconfirmed uplink redundancy */
     char mhdr_mic[MHDR_MIC_BUF_SIZE];   /**< internal retransmissions buffer */
+    void *context;                      /**< optional handle to the gnrc_pktsnip_t of the MSDU */
 } gnrc_lorawan_mcps_t;
 
 /**
