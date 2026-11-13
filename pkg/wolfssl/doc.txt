@@ -140,7 +140,7 @@
  * ```makefile
  * cd <path-to>/RIOT/tests/pkg/wolfcrypt-ed25519-verify
  * make
- * ./bin/native/wolfcrypt-ed25519-verify.elf # execute native port
+ * ./bin/native64/tests_wolfcrypt-ed25519-verify.elf # execute native port
  * ```
  *
  *
