@@ -95,7 +95,7 @@ class UDPClient(ShellInteraction):
         if count is not None:
             if delay_us is None or delay_us == 0:
                 # wait 1 sec per message (+ .1 sec slack)
-                timeout = count * 1.1
+                timeout = count * 1.5
                 delay_str = f" {count}"
             else:
                 # wait .5 sec more per message
