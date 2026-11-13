@@ -181,7 +181,7 @@ class TestUDP(riotctrl_shell_tests.testcase_base.TestBase):
         res = self.shell.udp_client_send("2001:db8::1", 5683, "abcd", count)
         stop = time.time()
         stats = self.udp_parser.parse(res)
-        byts = self.od_parser.parse(res, multiple=True)
+        byts = self.od_parser.parse_multiple(res)
         assert len(byts) == count
         assert len(stats) == count
         for i in range(count):
@@ -198,7 +198,7 @@ class TestUDP(riotctrl_shell_tests.testcase_base.TestBase):
         res = self.shell.udp_client_send("2001:db8::1", 5683, "abcd", count, timeout)
         stop = time.time()
         stats = self.udp_parser.parse(res)
-        byts = self.od_parser.parse(res, multiple=True)
+        byts = self.od_parser.parse_multiple(res)
         assert len(byts) == count
         assert len(stats) == count
         for i in range(count):
