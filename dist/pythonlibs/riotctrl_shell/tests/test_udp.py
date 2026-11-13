@@ -89,7 +89,7 @@ def test_udp_server_check_output(expect_sequence, count, delay, expected):
 
 
 @pytest.mark.parametrize(
-    "dest_addr,port,payload,count,delay_ms,expected",
+    "dest_addr,port,payload,count,delay_us,expected",
     [
         (
             "ff02::1",
@@ -127,10 +127,10 @@ def test_udp_server_check_output(expect_sequence, count, delay, expected):
         ("fe80::1", 52, 1000, 1000, 10, 'udp send [fe80::1]:52 "1000" 1000 10'),
     ],
 )
-def test_udp_client_send(dest_addr, port, payload, count, delay_ms, expected):
+def test_udp_client_send(dest_addr, port, payload, count, delay_us, expected):
     ctrl = init_ctrl()
     shell = riotctrl_shell.udp.UDPClient(ctrl)
-    res = shell.udp_client_send(dest_addr, port, payload, count, delay_ms)
+    res = shell.udp_client_send(dest_addr, port, payload, count, delay_us)
     # mock just returns last input
     assert res == expected
 
@@ -140,3 +140,50 @@ def test_udp_client_send_error():
     shell = riotctrl_shell.udp.UDPClient(ctrl)
     with pytest.raises(RuntimeError):
         shell.udp_client_send("ff02::1", 1337, 10, 1000, 1000)
+
+
+@pytest.mark.parametrize(
+    "dest_addr,port,payload,count,delay_us,expected",
+    [
+        (
+            "ff02::1",
+            1337,
+            "Hallo World",
+            None,
+            None,
+            'udp send [ff02::1]:1337 "Hallo World"',
+        ),
+        (
+            "ff02::1",
+            1337,
+            "Hallo World",
+            1000,
+            None,
+            'udp send [ff02::1]:1337 "Hallo World" 1000',
+        ),
+        (
+            "ff02::1",
+            1337,
+            "Hallo World",
+            1000,
+            1000000,
+            'udp send [ff02::1]:1337 "Hallo World" 1000 1000000',
+        ),
+        (
+            "ff02::1",
+            1337,
+            b"\xab\xcd\xef",
+            1000,
+            1000000,
+            'udp send -b [ff02::1]:1337 "abcdef" 1000 1000000',
+        ),
+        ("affe::1", 61616, 15, 1000, 0, "udp send [affe::1]:61616 -d 15 1000"),
+        ("fe80::1", 52, 1000, 1000, 10, "udp send [fe80::1]:52 -d 1000 1000 10"),
+    ],
+)
+def test_udp_client_send_len(dest_addr, port, payload, count, delay_us, expected):
+    ctrl = init_ctrl()
+    shell = riotctrl_shell.udp.UDPClientSendGenerated(ctrl)
+    res = shell.udp_client_send(dest_addr, port, payload, count, delay_us)
+    # mock just returns last input
+    assert res == expected

@@ -80,6 +80,11 @@ class UDPClient(ShellInteraction):
 
     ADDR_PORT_PAIR_FMT = "[{addr}]:{port}"
 
+    def _fmt_payload(self, payload: Union[str, bytes]) -> tuple[str, str]:
+        if isinstance(payload, bytes):
+            return "-b ", f'"{payload.hex()}"'
+        return "", f'"{payload}"'
+
     @ShellInteraction.check_term
     def udp_client_send(
         self,
@@ -90,7 +95,6 @@ class UDPClient(ShellInteraction):
         delay_us: Optional[int] = None,
         async_: bool = False,
     ):
-        flags = ""
         delay_str = ""
         if count is not None:
             if delay_us is None or delay_us == 0:
@@ -104,18 +108,45 @@ class UDPClient(ShellInteraction):
         else:
             # wait 1 sec for output
             timeout = 1
-        if isinstance(payload, bytes):
-            flags = "-b "
-            payload = payload.hex()
         addr_port = self.ADDR_PORT_PAIR_FMT.format(addr=dest_addr, port=port)
+        flags, payload = self._fmt_payload(payload)
         res = self.cmd(
-            f'udp send {flags}{addr_port} "{payload}"{delay_str}',
+            f"udp send {flags}{addr_port} {payload}{delay_str}",
             timeout=timeout,
             async_=async_,
         )
         if "error:" in res.lower() or "usage:" in res:
             raise RuntimeError(res)
         return res
+
+
+class UDPClientSendGenerated(UDPClient):
+    """
+    Shell interaction for `shell_cmd_udp_send_generated`
+    """
+
+    def _fmt_payload(self, payload: Union[str, bytes, int]) -> tuple[str, str]:
+        if isinstance(payload, int):
+            return "", f"-d {payload:d}"
+        return super()._fmt_payload(payload)
+
+    def udp_client_send(
+        self,
+        dest_addr: str,
+        port: Union[str, int],
+        payload: Union[str, int, bytes],
+        count: Optional[int] = None,
+        delay_us: Optional[int] = None,
+        async_: bool = False,
+    ):
+        return super().udp_client_send(
+            dest_addr,
+            port,
+            payload,
+            count,
+            delay_us,
+            async_=async_,
+        )
 
 
 class UDPServer(ShellInteraction):
