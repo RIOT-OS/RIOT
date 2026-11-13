@@ -358,10 +358,10 @@ typedef enum {
     defined(__AVR_ATxmega128A1__)  || \
     defined(__AVR_ATxmega64A1U__)  || \
     defined(__AVR_ATxmega128A1U__) || \
-    defined(Doxygen)
+    defined(DOXYGEN)
 /**
  * @brief   EBI (External Bus Interface)
- * {@
+ * @{
  */
 
 /**
