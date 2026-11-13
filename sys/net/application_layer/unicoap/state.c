@@ -12,10 +12,14 @@
  */
 
 #include <errno.h>
+#include <string.h>
 
+#include "assert.h"
 #include "container.h"
 #include "event.h"
 #include "net/unicoap/config.h"
+#include "net/unicoap/server.h"
+#include "private/state.h"
 #include "random.h"
 #include "sched.h"
 #include "thread.h"
@@ -47,6 +51,17 @@ static unicoap_listener_t _default_listener = {
 
 #if IS_USED(MODULE_UNICOAP_SERVER_RESOURCE_DECLARATIONS)
 XFA_INIT_CONST(unicoap_resource_t, unicoap_resources_xfa);
+
+unicoap_listener_t* unicoap_listener_for_resource_declarations(void) {
+    /* Currently, unicoap does not differentiate between a 'default' listener
+     * and the listener 'for resource declarations'. This may change, i.e.,
+     * we may have a separate default listener and one exclusively for
+     * declared resources. Hence, this API is not called, e.g.,
+     * unicoap_listener_default(), although we may introduce such an API if
+     * necessary. Until then, we do not expose this 'default listener'
+     * implementation detail on unicoap's public API surface.*/
+    return IS_USED(MODULE_UNICOAP_SERVER_RESOURCE_DECLARATIONS) ? &_default_listener : NULL;
+}
 #endif
 
 static unicoap_state_t _state = {
@@ -79,6 +94,8 @@ void unicoap_state_unlock(void)
 {
     _unlock();
 }
+
+/* MARK: - Client state */
 
 static unicoap_client_memo_t* _alloc_client(void)
 {
@@ -197,7 +214,8 @@ unicoap_client_memo_t* unicoap_client_memo_find_token(const unicoap_endpoint_t* 
 
         if ((!endpoint || unicoap_endpoint_is_equal(&memo->super.endpoint, endpoint)) &&
             token_length == sizeof(memo->token) &&
-            memcmp(memo->token, token, token_length) == 0) {
+            (sizeof(memo->token) == 0 ||
+             memcmp(memo->token, token, token_length) == 0)) {
             return memo;
         }
     }
@@ -251,6 +269,186 @@ int unicoap_client_memo_assign_refno(unicoap_client_memo_t* memo)
     return 0;
 #endif
 }
+
+/* MARK: - Server memos */
+
+static unicoap_server_memo_t* _alloc_server(void)
+{
+#if UNICOAP_HAVE_SERVER_STATE
+    /* Find empty slot in list of transactions */
+    for (int i = 0; i < (int)ARRAY_SIZE(_state.server_memos); i += 1) {
+        if (_state.server_memos[i].super.endpoint.proto == UNICOAP_PROTO_UNSPECIFIED) {
+            return &_state.server_memos[i];
+        }
+    }
+#endif
+    _STATE_DEBUG("[server] no space to alloc\n");
+    return NULL;
+}
+
+static inline bool _is_server(const unicoap_memo_t* memo) {
+    (void)memo;
+#if UNICOAP_HAVE_SERVER_STATE
+    return (uintptr_t)memo >= (uintptr_t)&_state.server_memos[0] &&
+        (uintptr_t)memo <= (uintptr_t)&_state.server_memos[ARRAY_SIZE(_state.server_memos) - 1];
+#else
+    return false;
+#endif
+}
+
+static inline size_t _server_index(unicoap_server_memo_t* memo) {
+    /* debugging-only */
+#if UNICOAP_HAVE_SERVER_STATE
+    return ((uintptr_t)memo - (uintptr_t)_state.server_memos) / sizeof(*_state.server_memos);
+#else
+    (void)memo;
+    assert(false);
+    return 0;
+#endif
+}
+
+static void _deinit_server(unicoap_server_memo_t* memo) {
+    if (!UNICOAP_HAVE_SERVER_STATE) {
+        return;
+    }
+    _STATE_DEBUG("[server #%" PRIuSIZE "] release\n", _server_index(memo));
+    memo->resource = NULL;
+}
+
+unicoap_server_memo_t* unicoap_server_memo_create(const unicoap_endpoint_t* endpoint, 
+                                                  const unicoap_resource_t* resource) {
+    if (!UNICOAP_HAVE_SERVER_STATE) {
+        return NULL;
+    }
+    assert(endpoint);
+    assert(endpoint->proto != UNICOAP_PROTO_UNSPECIFIED);
+    _lock();
+    unicoap_server_memo_t* memo = _alloc_server();
+    if (memo) {
+        _STATE_DEBUG("[server #%" PRIuSIZE "] alloc\n", _server_index(memo));
+        memo->super.endpoint = *endpoint;
+        memo->resource = resource;
+    }
+    _unlock();
+    return memo;
+}
+
+unicoap_server_memo_t* unicoap_server_memo_with_token(const unicoap_endpoint_t* endpoint,
+                                                      const unicoap_resource_t* resource,
+                                                      const uint8_t* token, size_t token_length,
+                                                      bool allocate)
+{
+    (void)endpoint;
+    (void)token;
+    (void)token_length;
+    (void)resource;
+    assert(endpoint);
+    assert(resource);
+    assert(token);
+    unicoap_server_memo_t* memo = NULL;
+
+    if (token_length > sizeof(memo->token)) {
+        _STATE_DEBUG("[server] token of size %"PRIdSIZE" will never fit memo\n", token_length);
+        return NULL;
+    }
+
+    /* Look for memo. If not found, we'd have to go over the array again. We can avoid
+     * that second iteration by consolidating searching and allocating into a single function.
+     * We simply remember the last seen free spot. */
+
+#if UNICOAP_HAVE_SERVER_STATE
+    _lock();
+    unicoap_server_memo_t* end = (unicoap_server_memo_t*)_state.server_memos + ARRAY_SIZE(_state.server_memos);
+    for (unicoap_server_memo_t* _memo = _state.server_memos; _memo < end; _memo += 1) {
+        if (_memo->super.endpoint.proto == UNICOAP_PROTO_UNSPECIFIED) {
+            /* Keep track of free memo */
+            memo = _memo;
+        }
+        /* Resources are identified by reference, hence comparing the pointer here is okay. */
+        else if (resource == memo->resource &&
+            unicoap_endpoint_is_equal(&memo->super.endpoint, endpoint) &&
+            token_length == _memo->token_length &&
+            memcmp(_memo->token, token, token_length) == 0
+        ) {
+            memo = _memo;
+            _STATE_DEBUG("[server #%" PRIuSIZE "] found\n", _server_index(memo));
+            break;
+        }
+    }
+
+    if (allocate && memo && memo->super.endpoint.proto == UNICOAP_PROTO_UNSPECIFIED) {
+        _STATE_DEBUG("[server #%" PRIuSIZE "] alloc\n", _server_index(memo));
+        memo->super.endpoint = *endpoint;
+        memo->resource = resource;
+        memcpy(memo->token, token, token_length);
+        memo->token_length = token_length;
+    }
+    _unlock();
+#endif
+    return memo;
+}
+
+void unicoap_server_memo_advance_with_resource(const unicoap_resource_t* resource, unicoap_server_memo_t** memo)
+{
+    (void)resource;
+    (void)memo;
+    assert(memo);
+
+#if UNICOAP_HAVE_SERVER_STATE
+    _lock();
+    unicoap_server_memo_t* end = (unicoap_server_memo_t*)_state.server_memos + ARRAY_SIZE(_state.server_memos);
+    if (!*memo) {
+        /* Initial call. */
+        *memo = _state.server_memos;
+    } else {
+        *memo += 1;
+    }
+    for (; *memo < end; *memo += 1) {
+        if ((*memo)->super.endpoint.proto != UNICOAP_PROTO_UNSPECIFIED &&
+            (*memo)->resource == resource
+        ) {
+            break;
+        }
+    }
+    _unlock();
+    if (*memo == end) {
+        /* Loop above never broken, so no memo found. Caller is expected to stop calling this
+         * this function once *memo is NULL. */
+        *memo = NULL;
+    }
+#endif
+}
+
+void unicoap_server_memo_free(unicoap_server_memo_t* memo, int error)
+{
+    if (!UNICOAP_HAVE_SERVER_STATE) {
+        return;
+    }
+    _lock();
+    /* Mark as unused, such that all the logic below can run without a lock.
+      * The messaging layer may need the lock too. */
+    unicoap_proto_t proto = memo->super.endpoint.proto;
+    (void)proto;
+    memo->super.endpoint.proto = UNICOAP_PROTO_UNSPECIFIED;
+    _unlock();
+    _deinit_server(memo);
+    (void)error;
+#if UNICOAP_HAVE_MESSAGING_STATE
+    /* On the exchange layer, we're hiding the actual reason from the driver. It should
+     * not matter to the messaging layer whether we release state because of an error or because
+     * the state object is released as usual. Should the messaging layer rely on this
+     * information, the exchange-messaging abstraction has a design flaw. */
+    if (unicoap_memo_messaging_state(&memo->super)) {
+        unicoap_messaging_notify(
+            unicoap_memo_messaging_state(&memo->super),
+            error ? unicoap_layer_notification_async_failure_from_errno(error) : UNICOAP_LAYER_NOTIFICATION_STATE_RELEASE,
+            NULL, proto);
+    }
+#endif
+    _free(&memo->super);
+}
+
+/* MARK: - Layers */
 
 void unicoap_exchange_notify(void* state, unicoap_layer_notification_t type, void* arg)
 {
@@ -313,6 +511,15 @@ void unicoap_exchange_notify_all(const unicoap_endpoint_t* endpoint, unicoap_lay
         }
     }
 #endif
+
+#if UNICOAP_HAVE_SERVER_STATE
+    for (int i = 0; i < CONFIG_UNICOAP_SERVER_MEMOS_CAPACITY; i += 1) {
+        memo = &_state.server_memos[i].super;
+        if (unicoap_endpoint_is_equal(endpoint, &memo->endpoint)) {
+            unicoap_exchange_notify(memo, type, arg);
+        }
+    }
+#endif
 }
 
 void unicoap_messaging_notify(void* state, unicoap_layer_notification_t type, void* arg, unicoap_proto_t proto)
@@ -347,32 +554,36 @@ static void _scheduled_event_callback(void* scheduled_event)
     event_post(&_queue, (event_t*)scheduled_event);
 }
 
-void unicoap_event_schedule(unicoap_scheduled_event_t* event, unicoap_event_callback_t callback,
-                            uint32_t duration, const char* name)
+void unicoap_event_init(unicoap_scheduled_event_t* event, unicoap_event_callback_t callback,
+                        uint32_t duration, const char* name)
 {
     (void)name;
 #if DEVELHELP
     assert(name);
     event->name = name;
 #endif
-    if (IS_ACTIVE(DEVELHELP)) {
-        _STATE_EVENT_DEBUG("%s in %" PRIu32 "ms\n", unicoap_scheduled_event_name(event), duration);
-    }
+
     event->ztimer.callback = _scheduled_event_callback;
     event->ztimer.arg = (void*)event;
     /* This cast is fine because (a) the return types are identical and the function argument is
      * a pointer to a struct, too. */
     event->super = (event_t){ .handler = (event_handler_t)callback };
-    ztimer_set(UNICOAP_CLOCK, &event->ztimer, duration);
+    event->ztimer.base.offset = duration;
 }
 
-void unicoap_event_reschedule(unicoap_scheduled_event_t* event, uint32_t duration)
+void unicoap_event_schedule(unicoap_scheduled_event_t* event)
 {
+    assert(unicoap_event_is_initialized(event));
+    assert(!unicoap_event_is_scheduled(event));
+
     if (IS_ACTIVE(DEVELHELP)) {
-        _STATE_EVENT_DEBUG("%s in %" PRIu32 "ms (rescheduled)\n",
-                           unicoap_scheduled_event_name(event), duration);
+        _STATE_EVENT_DEBUG("%s in %" PRIu32 "ms\n", unicoap_scheduled_event_name(event),
+                           event->ztimer.base.offset);
     }
-    ztimer_set(UNICOAP_CLOCK, &event->ztimer, duration);
+    /* The ztimer event does not distinguish between setting the duration and arming the timer,
+     * it only let's us do that in one go. So we use ztimer_t::base.offset as the place to store
+     * the duration, and pass it to the set-duration-and-arm function called ztimer_set. */
+    ztimer_set(UNICOAP_CLOCK, &event->ztimer, event->ztimer.base.offset);
 }
 
 void unicoap_event_cancel(unicoap_scheduled_event_t* event)
@@ -384,6 +595,7 @@ void unicoap_event_cancel(unicoap_scheduled_event_t* event)
         _STATE_EVENT_DEBUG("%s cancelled\n", unicoap_scheduled_event_name(event));
     }
     bool triggered = !ztimer_remove(UNICOAP_CLOCK, &event->ztimer);
+    event->ztimer.base.offset = 0;
     if (triggered) {
         /* event cancel runs in O(n), so we really only want to call
          * event_cancel if the event has already been posted */
@@ -697,7 +909,7 @@ unicoap_preprocessing_result_t unicoap_exchange_preprocess(unicoap_packet_t* pac
             }
             unicoap_event_cancel(&memo->super.exchange.timeout);
             arg->client = memo;
-            *flags = _messaging_flags_client(memo->flags);
+            *flags = _messaging_flags_request(memo->flags);
             return UNICOAP_PREPROCESSING_SUCCESS_RESPONSE;
         }
         else {

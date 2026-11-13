@@ -11,11 +11,15 @@
  * @author  Carl Seifert <carl.seifert@tu-dresden.de>
  */
 
+#include <alloca.h>
+#include <assert.h>
 #include <errno.h>
 #include <string.h>
+#include <sys/errno.h>
 
 #include "mutex.h"
 #include "net/netif.h"
+#include "compiler_hints.h"
 
 #if IS_USED(MODULE_DNS)
 #  include "net/dns.h"
@@ -74,7 +78,15 @@ int unicoap_client_process_response(unicoap_packet_t* packet, unicoap_client_mem
     /* TODO: Block-wise */
     res = unicoap_client_callback_success(memo, packet, UNICOAP_BLOCK_OPTION_NONE);
 
-    unicoap_client_memo_free(memo, 0);
+    bool is_observing =
+        IS_USED(MODULE_UNICOAP_CLIENT_OBSERVATION) && memo->flags & UNICOAP_REQUEST_FLAG_OBSERVE;
+
+    if (unlikely(is_observing)) {
+        /* Keep using same memo, avoid copy hehe. */
+        unicoap_client_memo_realloc(memo);
+    } else {
+        unicoap_client_memo_free(memo, 0);
+    }
     return res;
 }
 
@@ -83,15 +95,27 @@ int unicoap_client_send_request_part(unicoap_packet_t* packet, unicoap_client_me
 {
     int res = 0;
 
-    if (memo) {
-        // Instead of a temporary buffer, it's fine to reference the memo token buffer
-        // as the memo outlives or lives as long as the packet.
-        packet->properties.token = memo->token;
+    if (likely(!packet->properties.token)) {
+        if (CONFIG_UNICOAP_GENERATED_TOKEN_LENGTH > 0) {
+            if (likely(memo)) {
+                packet->properties.token = memo->token;
+            } else {
+                /* This is the slow path: No memo is unlikely: NON and no callback.
+                * So token buffer will most likely every time the one in the memo.
+                * Thus, no reason to always make a stack allocation for the token buffer. */
+                if (!(packet->properties.token = alloca(CONFIG_UNICOAP_GENERATED_TOKEN_LENGTH))) {
+                    _CLIENT_DEBUG("failed to alloca token buf\n");
+                    return -ENOMEM;
+                }
+            }
+            unicoap_generate_token(packet->properties.token);
+            packet->properties.token_length = CONFIG_UNICOAP_GENERATED_TOKEN_LENGTH;
+        } else {
+            packet->properties.token_length = 0;
+        }
     }
-    assert(packet->properties.token);
-    unicoap_generate_token(packet->properties.token);
-    packet->properties.token_length = CONFIG_UNICOAP_GENERATED_TOKEN_LENGTH;
-    unicoap_messaging_flags_t messaging_flags = _messaging_flags_client(request_flags);
+
+    unicoap_messaging_flags_t messaging_flags = _messaging_flags_request(request_flags);
     if (memo) {
         /* State has been allocated, instruct the messaging layer to track success/failures
          * with this transmission. If a NON is sent, this flag tells the RFC 7252 driver
@@ -99,7 +123,7 @@ int unicoap_client_send_request_part(unicoap_packet_t* packet, unicoap_client_me
         messaging_flags |= UNICOAP_MESSAGING_FLAG_TRACK;
     }
     /* TODO: OSCORE */
-    if ((res = unicoap_messaging_send(packet, messaging_flags, &memo->super)) < 0) {
+    if ((res = unicoap_messaging_send(packet, messaging_flags, memo ? &memo->super : NULL)) < 0) {
         _CLIENT_DEBUG("error: could not send message\n");
         return res;
     }
@@ -118,14 +142,26 @@ int unicoap_client_send_request_body(unicoap_message_t* request,
     unicoap_client_memo_t* memo = NULL;
 
     /* TODO: Block-wise */
-    /* TODO: Observe */
-    uint8_t token[CONFIG_UNICOAP_GENERATED_TOKEN_LENGTH];
+
+    if (IS_USED(MODULE_UNICOAP_CLIENT_OBSERVATION)) {
+        if (IS_ACTIVE(CONFIG_UNICOAP_ASSIST) && (flags & UNICOAP_REQUEST_FLAG_OBSERVE)) {
+            if (!callback._any) {
+                unicoap_assist(API_MISUSE("OBSERVE flag, but missing callback"));
+            }
+        }
+
+        assert(!(flags & UNICOAP_REQUEST_FLAG_OBSERVE) || callback._any);
+
+        if (flags & UNICOAP_REQUEST_FLAG_OBSERVE) {
+            if ((res = unicoap_options_set_observe(request->options, UNICOAP_OBSERVE_OPTION_REGISTER)) < 0) {
+                _CLIENT_DEBUG("could not set Observe option\n");
+                goto error;
+            }
+        }
+    }
+
     unicoap_packet_t packet = { .remote = endpoint,
-                                .message = request,
-                                .properties = {
-                                    .token = token,
-                                    .token_length = sizeof(token),
-                                } };
+                                .message = request };
 
     if (unicoap_callback_is_present(callback)) {
         _CLIENT_DEBUG("need a memo\n");
@@ -136,11 +172,27 @@ int unicoap_client_send_request_body(unicoap_message_t* request,
         memo->callback_arg = parameters ? parameters->callback_arg : NULL;
         memo->flags = flags;
 
-        unicoap_event_schedule(&memo->super.exchange.timeout, _on_response_timeout,
-                               (parameters && parameters->timeout_ms > 0) ?
-                                   parameters->timeout_ms :
-                                   CONFIG_UNICOAP_TIMEOUT_CLIENT_RESPONSE_MS,
-                               "client.resp-timeout");
+        if (IS_USED(MODULE_UNICOAP_CLIENT_OBSERVATION) &&
+            IS_USED(MODULE_UNICOAP_CLIENT_CANCELLATION) && 
+            (flags & UNICOAP_REQUEST_FLAG_OBSERVE)
+        ) {
+            /* If we ever need to cancel, we must send same options, but RFC says without ETag. */
+            *unicoap_client_memo_options(memo) = *request->options;
+            if ((res = unicoap_options_swap_storage(unicoap_client_memo_options(memo),
+                                                    unicoap_client_memo_options_storage(memo),
+                                                    CONFIG_UNICOAP_OPTIONS_BUFFER_CLIENT_MEMO_CAPACITY
+            )) < 0) {
+                _CLIENT_DEBUG("could not copy options as per RFC 7641 (%i, %s)\n", res, strerror(-res));
+                return res;
+            }
+            unicoap_options_remove(unicoap_client_memo_options(memo), UNICOAP_OPTION_ETAG);
+        }
+
+        unicoap_event_init_and_schedule(&memo->super.exchange.timeout, _on_response_timeout,
+                                        (parameters && parameters->timeout_ms > 0) ?
+                                            parameters->timeout_ms :
+                                            CONFIG_UNICOAP_TIMEOUT_CLIENT_RESPONSE_MS,
+                                        "client.resp-timeout");
     }
     /* TODO: OSCORE */
     if ((res = unicoap_client_send_request_part(&packet, memo, flags)) < 0) {
@@ -374,6 +426,17 @@ int unicoap_send_request_sync_copy(unicoap_message_t* request,
         _CLIENT_DEBUG("Attempted to open request on unicoap thread, not blocking.");
         assert(false);
         return -1;
+    }
+
+    if (IS_USED(MODULE_UNICOAP_CLIENT_OBSERVATION)) {
+        if (IS_ACTIVE(CONFIG_UNICOAP_ASSIST)) {
+            if (flags & UNICOAP_REQUEST_FLAG_OBSERVE) {
+                unicoap_assist(API_MISUSE("cannot receive notifications in sync client mode")
+                               FIXIT("remove remove OBSERVE flag"));
+            }
+        }
+        assert(!(flags & UNICOAP_REQUEST_FLAG_OBSERVE));
+        return -EINVAL;
     }
 
     _sync_copy_args_t args = (_sync_copy_args_t){

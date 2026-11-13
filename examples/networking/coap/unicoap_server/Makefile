@@ -49,6 +49,9 @@ USEMODULE += unicoap_server
 # Cross-file CoAP resource definitions
 USEMODULE += unicoap_server_resource_declarations
 
+# Observation support
+USEMODULE += unicoap_observation
+
 # This module is needed for CoAP over UDP
 USEMODULE += unicoap_driver_udp
 
