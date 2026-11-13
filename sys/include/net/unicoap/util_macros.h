@@ -126,8 +126,13 @@
 #    define _UNICOAP_TRY_TYPECHECK_JOB_FUNC(func) _Generic((func), \
         void (*)(unicoap_job_t*): (void (*)(event_t*))func \
      )
+/* casting through (void *) is fine, we are not interested in the return type anyways */
+#    define _UNICOAP_TRY_TYPECHECK_BLOCKING_JOB_FUNC(func) _Generic((func), \
+        unicoap_blocking_job_res_t (*)(unicoap_blocking_job_t*): (void (*)(event_t*))(void *)func \
+     )
 #  else
 #    define _UNICOAP_TRY_TYPECHECK_JOB_FUNC(func) (void (*)(event_t*))func
+#    define _UNICOAP_TRY_TYPECHECK_SYNC_JOB_FUNC(func) (void (*)(event_t*))(void *)func
 #  endif
 #endif
 

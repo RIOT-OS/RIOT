@@ -9,16 +9,14 @@
 #include <stdint.h>
 #include <alloca.h>
 
-#include "mutex.h"
-#include "bitfield.h"
+#include "container.h"
 #include "architecture.h"
-#include "random.h"
 
 #include "net/unicoap.h"
 
-#include "private/state.h"
-#include "private/packet.h"
-#include "private/messaging.h"
+#include "private/state.h"      /* IWYU pragma: export */
+#include "private/packet.h"     /* IWYU pragma: export */
+#include "private/messaging.h"  /* IWYU pragma: export */
 
 /**
  * @defgroup net_unicoap_private Private API
@@ -126,63 +124,15 @@ void unicoap_assist_emit_diagnostic_missing_driver(unicoap_proto_t proto);
 /** @brief Name of background thread spawned upon calls to @ref unicoap_init */
 #define UNICOAP_THREAD_IDENTIFIER "unicoap"
 
-/** @brief Locks internal state lock */
-void unicoap_state_lock(void);
-
-/** @brief Unlocks internal state lock */
-void unicoap_state_unlock(void);
-
 /** @brief PID of `unicoap` thread */
 extern kernel_pid_t _unicoap_pid;
 /** @} */
 
-/* MARK: - State and initialization */
+/* MARK: - Initialization and Tear-Down */
 /**
- * @name State and initialization
+ * @name Initialization and Tear-Down
  * @{
  */
-/**
- * @brief Container the unicoap stacks keeps state in
- */
-typedef struct {
-    /**
-     * @brief Used when allocating listener, transaction, carbon copy, observer, or registration
-     */
-    mutex_t lock;
-
-#if IS_USED(MODULE_UNICOAP_SERVER) || defined(DOXYGEN)
-    /** @brief Groups of resources */
-    unicoap_listener_t* listeners;
-#endif
-
-#if UNICOAP_HAVE_CLIENT_STATE
-    /** @ref unicoap_memo_t */
-    unicoap_client_memo_t client_memos[CONFIG_UNICOAP_CLIENT_MEMOS_CAPACITY];
-#endif
-
-    /* TODO: Client and advanced server features: Exchange-layer state objects */
-} unicoap_state_t;
-
-/** @brief Sets listener array on @p state object to @p listeners */
-static inline void unicoap_set_listeners(unicoap_state_t* state, unicoap_listener_t* listeners) {
-#if IS_USED(MODULE_UNICOAP_SERVER)
-    state->listeners = listeners;
-#else
-    (void)state;
-    (void)listeners;
-#endif
-}
-
-/** @brief Gets listener array from @p state object */
-static inline unicoap_listener_t* unicoap_get_listeners(unicoap_state_t* state) {
-#if IS_USED(MODULE_UNICOAP_SERVER)
-    return state->listeners;
-#else
-    (void)state;
-    return NULL;
-#endif
-}
-
 /** @brief Initializes the CoAP over UDP driver on the given @p queue */
 int unicoap_init_udp(event_queue_t* queue);
 
@@ -208,6 +158,12 @@ int unicoap_init_rfc7252_common(event_queue_t* queue);
 int unicoap_deinit_rfc7252_common(event_queue_t* queue);
 
 /* MARK: unicoap_driver_extension_point */
+
+/** @brief Initializes the unicoap server state on the given @p queue */
+int unicoap_init_server(event_queue_t* queue);
+
+/** @brief Initializes the unicoap client state on the given @p queue */
+int unicoap_init_client(event_queue_t* queue);
 /** @} */
 
 /* MARK: - Private Server Utils */
@@ -261,6 +217,32 @@ int unicoap_resource_match_request_default(const unicoap_listener_t* listener,
  */
 int unicoap_resource_handle_well_known_core(unicoap_message_t* message, const unicoap_aux_t* aux,
                                             unicoap_request_context_t* ctx, void* arg);
+
+/**
+ * @brief Builds a string in Constrained RESTful Environments (CoRE) Link Format
+ *
+ * You use this method to build a stringified list of resources registered with `unicoap`.
+ * To register a resource, use @ref unicoap_listener_register or @ref net_unicoap_server_resource_declarations.
+ * The string generated contains only resources available using the specified transport. When
+ * handling a request destined for `/.well-known/core`, you should call this method with the
+ * transport you received the request over.
+ *
+ * **Example**:
+ * ```
+ * </sensors/temp>;rt="temperature-c",
+ * </sensors/light>;rt="light-lux"
+ * ```
+ *
+ * @see [Constrained RESTful Environments (CoRE) Link Format](https://datatracker.ietf.org/doc/html/rfc6690)
+ *
+ * @param[in,out] buffer The buffer that will contain the built string in CoRE Link Format
+ * @param capacity The capacity @p buffer in bytes
+ * @param proto The `unicoap` protocol number of the transport
+ *
+ * @returns Length of encoded resource list in bytes or negative integer on error
+ */
+ssize_t unicoap_resource_core_link_format_build(char* buffer, size_t capacity,
+                                                unicoap_proto_t proto);
 /** @} */
 
 /* MARK: - Private message and option helpers */

@@ -16,6 +16,7 @@
 
 #include "mutex.h"
 #include "net/netif.h"
+#include "net/unicoap.h"
 
 #if IS_USED(MODULE_DNS)
 #  include "net/dns.h"
@@ -24,6 +25,17 @@
 #define ENABLE_DEBUG CONFIG_UNICOAP_DEBUG_LOGGING
 #include "debug.h"
 #include "private.h"
+
+void unicoap_generate_token(uint8_t* token)
+{
+    for (size_t i = 0; i < CONFIG_UNICOAP_GENERATED_TOKEN_LENGTH; i += 4) {
+        uint32_t _random = random_uint32_range(1, UINT32_MAX);
+        memcpy(&token[i], &_random,
+               (CONFIG_UNICOAP_GENERATED_TOKEN_LENGTH - i >= 4) ?
+                   4 :
+                   CONFIG_UNICOAP_GENERATED_TOKEN_LENGTH - i);
+    }
+}
 
 static void _on_response_timeout(unicoap_scheduled_event_t* timeout)
 {
@@ -66,6 +78,44 @@ void unicoap_client_callback_failure(unicoap_client_memo_t* memo, int error)
 }
 
 /* TODO: Block-wise processing */
+
+int unicoap_client_preprocess_response(unicoap_packet_t* packet,
+                                       unicoap_messaging_flags_t* flags,
+                                       unicoap_exchange_arg_t* arg,
+                                       bool truncated)
+{
+    const unicoap_endpoint_t* remote = packet->remote;
+    if (packet->local && unicoap_endpoint_is_multicast(packet->local)) {
+        _CLIENT_DEBUG("(weird) multicast response\n");
+        remote = NULL;
+    }
+    unicoap_client_memo_t* memo = unicoap_client_memo_find_token(remote,
+                                                                 packet->properties.token,
+                                                                 packet->properties.token_length);
+
+    if (!memo) {
+        if (unicoap_options_contains(packet->message->options, UNICOAP_OPTION_OBSERVE)) {
+            /* We are no longer interested in notifications */
+            _CLIENT_DEBUG("received unknown NON notification\n");
+            return UNICOAP_PREPROCESSING_ERROR_NOTIFICATION_UNEXPECTED;
+        }
+        else {
+            _CLIENT_DEBUG("received unknown response\n");
+            return UNICOAP_PREPROCESSING_ERROR_RESPONSE_UNEXPECTED;
+        }
+    }
+
+    if (truncated) {
+        _CLIENT_DEBUG("truncated, not processing\n");
+        unicoap_client_callback_failure(memo, -ENOBUFS);
+        unicoap_client_memo_free(memo, 0);
+        return UNICOAP_PREPROCESSING_ERROR_TRUNCATED;
+    }
+    unicoap_event_cancel(&memo->super.exchange.timeout);
+    arg->client = memo;
+    *flags = _messaging_flags_client(memo->flags);
+    return UNICOAP_PREPROCESSING_SUCCESS_RESPONSE;
+}
 
 int unicoap_client_process_response(unicoap_packet_t* packet, unicoap_client_memo_t* memo)
 {
@@ -463,22 +513,20 @@ int unicoap_send_request_sync(unicoap_message_t* request,
 }
 
 typedef struct {
-    unicoap_job_t job;
+    unicoap_blocking_job_t job;
     unicoap_message_t* request;
     unicoap_destination_t* destination;
     unicoap_response_callback_t callback;
     unicoap_request_parameters_t* parameters;
     unicoap_request_flags_t flags;
-    int res;
-    mutex_t roadblock;
 } _async_args_t;
 
-static void _async_callback(unicoap_job_t* job)
+static unicoap_blocking_job_res_t _async_callback(unicoap_blocking_job_t* job)
 {
     _async_args_t* a = container_of(job, _async_args_t, job);
-    a->res = _open_request(a->request, a->destination,
+    int res = _open_request(a->request, a->destination,
                            (unicoap_callback_t){ .response = a->callback }, a->parameters, a->flags);
-    mutex_unlock(&a->roadblock);
+    return unicoap_blocking_job_finish(job, res);
 }
 
 int unicoap_send_request_async(unicoap_message_t* request,
@@ -487,23 +535,13 @@ int unicoap_send_request_async(unicoap_message_t* request,
                                unicoap_request_parameters_t* parameters,
                                unicoap_request_flags_t flags)
 {
-    /* Perform direct request sending only from unicoap thread */
-    if (thread_getpid() == _unicoap_pid) {
-        return _open_request(request, destination,
-                             (unicoap_callback_t){ .response = callback }, parameters, flags);
-    }
-
     _async_args_t args = {
-        .job = UNICOAP_JOB(_async_callback),
+        .job = UNICOAP_BLOCKING_JOB(_async_callback),
         .request = request,
         .destination = destination,
         .callback = callback,
         .parameters = parameters,
         .flags = flags,
-        .roadblock = MUTEX_INIT_LOCKED,
     };
-    unicoap_loop_enqueue(&args.job);
-    /* Block until callback calls unlock. */
-    mutex_lock(&args.roadblock);
-    return args.res;
+    return unicoap_loop_enqueue_and_block(&args.job);
 }
