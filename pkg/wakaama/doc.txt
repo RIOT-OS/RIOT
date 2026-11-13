@@ -15,6 +15,12 @@
  * [Wakaama project](https://github.com/eclipse/wakaama)
  *
  *
+ * @deprecated Wakaama has been officially terminated, see
+ *             https://gitlab.eclipse.org/eclipsefdn/emo-team/emo/-/work_items/1191.
+ *             Therefore, this package is deprecated and will be removed after
+ *             the 2027.04 release. If you still use LwM2M with RIOT, please
+ *             reach out to us.
+ *
  * ## Usage
  * A LwM2M Client organizes resources as object instances. The LwM2M engine is independent of the
  * objects that the client exposes, but it needs at least 3 mandatory ones:
