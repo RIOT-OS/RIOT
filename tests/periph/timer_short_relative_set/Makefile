@@ -1,6 +1,7 @@
 include ../Makefile.periph_common
 
 FEATURES_REQUIRED = periph_timer
+FEATURES_OPTIONAL = periph_timer_query_freqs
 
 USEMODULE += core_thread_flags
 

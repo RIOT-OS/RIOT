@@ -25,10 +25,12 @@ extern "C" {
  * @name   Timer configuration
  * @{
  */
+#define TIMER_0_MAX_VALUE   (0xffffffff) /**< max value */
+
 static const timer_conf_t timer_config[] = {
     {
         .dev      = TIM5,
-        .max      = 0xffffffff,
+        .max      = TIMER_0_MAX_VALUE,
 #if defined(RCC_APB1ENR1_TIM5EN)
         .rcc_mask = RCC_APB1ENR1_TIM5EN,
 #else
