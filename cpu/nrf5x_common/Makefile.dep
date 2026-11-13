@@ -18,3 +18,8 @@ endif
 ifneq (,$(filter nrfmin,$(USEMODULE)))
   USEMODULE += netdev_legacy_api
 endif
+
+# Always fetch the headers by default, can be overriden by selecting
+# USEPKG += nrfx, which implicitly selects USEMODULE += nrfx_full in
+# $(RIOTMAKE)/defaultmodules_deps.inc.mk.
+USEMODULE += nrfx_headers_only
