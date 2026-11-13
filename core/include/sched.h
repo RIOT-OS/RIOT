@@ -96,7 +96,7 @@ extern "C" {
  *          suggest.
  */
 #ifndef MAXTHREADS
-#  if defined(MODULE_CORE_THREAD) || DOXYGEN
+#  if defined(MODULE_CORE_THREAD) || defined(DOXYGEN)
 #    define MAXTHREADS 32
 #  else
 #    define MAXTHREADS 0
@@ -183,9 +183,10 @@ typedef enum {
  * @name Helpers to work with thread states
  * @{
  */
-#define STATUS_ON_RUNQUEUE      STATUS_RUNNING  /**< to check if on run queue:
-                                                   `st >= STATUS_ON_RUNQUEUE`   */
-#define STATUS_NOT_FOUND ((thread_status_t)~0)  /**< Describes an illegal thread status */
+/** to check if on run queue: `st >= STATUS_ON_RUNQUEUE` */
+#define STATUS_ON_RUNQUEUE      STATUS_RUNNING
+/** Describes an illegal thread status */
+#define STATUS_NOT_FOUND ((thread_status_t) ~0)
 /** @} */
 
 /**
