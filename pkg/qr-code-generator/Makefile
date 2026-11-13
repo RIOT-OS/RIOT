@@ -1,7 +1,7 @@
 PKG_NAME=qr-code-generator
 PKG_URL=https://github.com/nayuki/QR-Code-generator
-# v1.7.0
-PKG_VERSION=4d13c303dc878ffae8df6d0e0a7513fe860a092c
+# v1.8.0
+PKG_VERSION=720f62bddb7226106071d4728c292cb1df519ceb
 PKG_LICENSE=MIT
 
 include $(RIOTBASE)/pkg/pkg.mk
