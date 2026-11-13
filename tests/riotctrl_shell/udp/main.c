@@ -14,9 +14,8 @@
  *              See https://github.com/RIOT-OS/Release-Specs/
  */
 
-#include <inttypes.h>
-#include <stdatomic.h>
 #include <stdio.h>
+#include <stdint.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -43,7 +42,7 @@ static sock_udp_ep_t _payload_remote;
 static sock_udp_cb_t _udp_cb;
 static void *_udp_cb_arg;
 static sock_udp_t *_server_sock = NULL;
-static atomic_int _trigger_running;
+static bool _trigger_running;
 static uint32_t _trigger_delay = 0;
 static uint16_t _trigger_count = 0;
 static kernel_pid_t _trigger_pid = KERNEL_PID_UNDEF;
@@ -142,7 +141,7 @@ static void *_trigger_thread(void *arg)
     (void)arg;
     while (true) {
         thread_flags_wait_any(0x1000);
-        _trigger_running = 1;
+        _trigger_running = true;
         ztimer_sleep(ZTIMER_USEC, 500000);
         for (unsigned c = 0; c < _trigger_count; c++) {
             _udp_cb(_server_sock, SOCK_ASYNC_MSG_RECV, _udp_cb_arg);
@@ -150,7 +149,7 @@ static void *_trigger_thread(void *arg)
                 ztimer_sleep(ZTIMER_USEC, _trigger_delay);
             }
         }
-        _trigger_running = 0;
+        _trigger_running = false;
     }
 
 
