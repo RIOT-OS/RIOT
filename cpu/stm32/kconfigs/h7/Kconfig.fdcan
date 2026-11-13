@@ -11,17 +11,17 @@ config FDCAN_SRAM_MESSAGE_RAM_OFFSET
 config FDCAN_STD_FILTERS_NUM
     int "Number of Standard ID Filters"
     range 0 128
-    default 0
+    default 4
 
 config FDCAN_EXT_FILTERS_NUM
     int "Number of Extended ID Filters"
     range 0 64
-    default 0
+    default 4
 
 config FDCAN_RX_FIFO0_ELEMENTS
     int "RX FIFO0 Elements"
     range 0 64
-    default 0
+    default 4
 
 config FDCAN_RX_FIFO0_ELEMENT_SIZE
     int "RX FIFO0 element size"
@@ -40,7 +40,7 @@ config FDCAN_RX_FIFO0_ELEMENT_SIZE
 config FDCAN_RX_FIFO1_ELEMENTS
     int "RX FIFO1 Elements"
     range 0 64
-    default 0
+    default 4
 
 config FDCAN_RX_FIFO1_ELEMENT_SIZE
     int "RX FIFO1 element size"
@@ -59,7 +59,7 @@ config FDCAN_RX_FIFO1_ELEMENT_SIZE
 config FDCAN_RX_BUFFERS_NUM
     int "Dedicated RX Buffers"
     range 0 64
-    default 0
+    default 4
 
 config FDCAN_RX_BUFFER_ELEMENT_SIZE
     int "RX BUFFER element size"
@@ -78,17 +78,17 @@ config FDCAN_RX_BUFFER_ELEMENT_SIZE
 config FDCAN_TX_EVENTS_NUM
     int "TX Event FIFO Elements"
     range 0 32
-    default 0
+    default 4
 
 config FDCAN_TX_BUFFERS_NUM
     int "Dedicated TX Buffers"
     range 0 32
-    default 0
+    default 4
 
 config FDCAN_TX_FIFO_QUEUE_ELEMENTS
     int "TX FIFO/Queue Elements"
     range 0 32
-    default 0
+    default 4
 
 config FDCAN_TX_FIFO_QUEUE_MODE
     int "TX mode"
