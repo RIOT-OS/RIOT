@@ -139,7 +139,6 @@ static const gpio_t dac_channels[] = DAC_GPIOS;
 static const i2c_conf_t i2c_config[] = {
 #if defined(I2C0_SCL) && defined(I2C0_SDA) && defined(I2C0_SPEED)
     {
-        .module = PERIPH_I2C0_MODULE,
         .speed = I2C0_SPEED,
         .scl = I2C0_SCL,
         .sda = I2C0_SDA,
@@ -149,7 +148,6 @@ static const i2c_conf_t i2c_config[] = {
 #endif
 #if (SOC_I2C_NUM > 1) && defined(I2C1_SCL) && defined(I2C1_SDA) && defined(I2C1_SPEED)
     {
-        .module = PERIPH_I2C1_MODULE,
         .speed = I2C1_SPEED,
         .scl = I2C1_SCL,
         .sda = I2C1_SDA,
@@ -211,7 +209,6 @@ static const pwm_config_t pwm_config[] =
 {
 #ifdef PWM0_GPIOS
     {
-        .module = PERIPH_LEDC_MODULE,
         .group = LEDC_LOW_SPEED_MODE,
         .timer = LEDC_TIMER_0,
         .ch_numof = ARRAY_SIZE(pwm0_gpios),
@@ -220,7 +217,6 @@ static const pwm_config_t pwm_config[] =
 #endif
 #ifdef PWM1_GPIOS
     {
-        .module = PERIPH_LEDC_MODULE,
 #ifdef SOC_LEDC_SUPPORT_HS_MODE
         .group = LEDC_HIGH_SPEED_MODE,
 #else
@@ -233,7 +229,6 @@ static const pwm_config_t pwm_config[] =
 #endif
 #ifdef PWM2_GPIOS
     {
-        .module = PERIPH_LEDC_MODULE,
         .group = LEDC_LOW_SPEED_MODE,
         .timer = LEDC_TIMER_2,
         .ch_numof = ARRAY_SIZE(pwm2_gpios),
@@ -242,7 +237,6 @@ static const pwm_config_t pwm_config[] =
 #endif
 #ifdef PWM3_GPIOS
     {
-        .module = PERIPH_LEDC_MODULE,
 #ifdef SOC_LEDC_SUPPORT_HS_MODE
         .group = LEDC_HIGH_SPEED_MODE,
 #else

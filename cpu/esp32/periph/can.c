@@ -27,6 +27,7 @@
 #include "esp_private/periph_ctrl.h"
 #include "esp_rom_gpio.h"
 #include "hal/twai_hal.h"
+#include "hal/twai_ll.h"
 #include "log.h"
 #include "rom/ets_sys.h"
 #include "soc/clk_tree_defs.h"
@@ -38,7 +39,6 @@
 #define CAN     TWAI
 
 #ifdef CPU_FAM_ESP32H2
-#  define PERIPH_TWAI_MODULE    PERIPH_TWAI0_MODULE
 #  define ETS_TWAI_INTR_SOURCE  ETS_TWAI0_INTR_SOURCE
 #endif
 
@@ -592,8 +592,10 @@ static void _esp_can_power_up(can_t *dev)
     critical_enter();
 
     /* power up the peripheral */
-    periph_module_reset(PERIPH_TWAI_MODULE);
-    periph_module_enable(PERIPH_TWAI_MODULE);
+    PERIPH_RCC_ATOMIC() {
+        twai_ll_enable_bus_clock(0, true);
+        twai_ll_reset_register(0);
+    }
 
     twai_hal_config_t config = { .controller_id = 0 };
 
@@ -646,7 +648,9 @@ static void _esp_can_power_down(can_t *dev)
     twai_hal_deinit(&hw);
 
     /* power down the CAN controller */
-    periph_module_disable(PERIPH_TWAI_MODULE);
+    PERIPH_RCC_ATOMIC() {
+        twai_ll_enable_bus_clock(0, false);
+    }
 
     dev->powered_up = false;
 }

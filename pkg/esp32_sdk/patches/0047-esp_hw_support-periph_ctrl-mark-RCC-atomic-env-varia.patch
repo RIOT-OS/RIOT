@@ -1,0 +1,33 @@
+From ea1f87b7dcf8091a8e18d31b0044ff29ebbef4e4 Mon Sep 17 00:00:00 2001
+From: Gunar Schorcht <gunar@schorcht.net>
+Date: Sun, 1 Nov 2026 17:42:05 +0100
+Subject: [PATCH] esp_hw_support/periph_ctrl: mark RCC atomic env variable as
+ unused
+
+On SoCs with independent RCC registers, e.g. ESP32-C6 and ESP32-H2, the LL bus clock and reset functions are not wrapped by macros that use the variable declared by `PERIPH_RCC_ATOMIC`. Using these functions inside `PERIPH_RCC_ATOMIC` therefore leads to an unused variable error with `-Werror=unused-variable`. The variable is marked as unused, as done in ESP-IDF v6.x.
+
+Assisted-by: Claude Code Opus 5.5
+---
+ components/esp_hw_support/include/esp_private/periph_ctrl.h | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/components/esp_hw_support/include/esp_private/periph_ctrl.h b/components/esp_hw_support/include/esp_private/periph_ctrl.h
+index a126750ba1..18d6fe9299 100644
+--- a/components/esp_hw_support/include/esp_private/periph_ctrl.h
++++ b/components/esp_hw_support/include/esp_private/periph_ctrl.h
+@@ -47,9 +47,9 @@ extern "C" {
+  *
+  * @note User code protected by this macro should be as short as possible, because it's a critical section
+  */
+-#define PERIPH_RCC_ATOMIC()                   \
+-    for (int _rc_cnt = 1, __DECLARE_RCC_ATOMIC_ENV; \
+-         _rc_cnt ? (periph_rcc_enter(), 1) : 0;     \
++#define PERIPH_RCC_ATOMIC()                                                 \
++    for (int _rc_cnt = 1, __DECLARE_RCC_ATOMIC_ENV __attribute__((unused)); \
++         _rc_cnt ? (periph_rcc_enter(), 1) : 0;                             \
+          periph_rcc_exit(), _rc_cnt--)
+ 
+ /** @cond */
+-- 
+2.43.0
+
