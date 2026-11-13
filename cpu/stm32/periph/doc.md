@@ -3,15 +3,16 @@
 @brief          Driver for the Peripheral STM32 Ethernet block used across
                 all families of STM32 MCUs
 
-Link Auto Negotiation
+Link Autonegotiation
 =====================
 
-To enable Link Auto Negotiation, use the (pseudo) module `stm32_eth_auto`
-by amending your applications `Makefile` as follows:
+To enable Link Autonegotiation, use the generic (pseudo) module
+`netdev_eth_autoneg`, which selects the `stm32_eth_auto` implementation of this
+driver automatically, by amending your applications `Makefile` as follows:
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # Add the following line to your Makefile
-USEMODULE += stm32_eth_auto
+USEMODULE += netdev_eth_autoneg
 
 # Note: Any addition of modules to USEMODULE must be done prior to the
 # following line:
@@ -21,10 +22,16 @@ include $(RIOTBASE)/Makefile.include
 In general, it is highly recommended to use auto-negotiation, as this can
 avoid various communication issues on the PHY layer due to configuration
 mismatch of the link partners. Note that this feature depends on the link
-state events feature.
+state monitoring feature. To force the `stm32_eth` specific implementation
+instead of the generic one, use the (pseudo) module `stm32_eth_auto` directly.
 
-Link State Events
-=================
+Link State Monitoring
+=====================
 
-To enable Link Events, use the (pseudo) module `stm32_eth_link_up` (as
-described above).
+To monitor the actual state of the link, use the generic (pseudo) module
+`netdev_eth_link_state` (as described above), which selects the
+`stm32_eth_link_up` implementation of this driver automatically. Without this
+module, the driver assumes the link is up and signals `NETDEV_EVENT_LINK_UP`
+once during initialization, and never signals `NETDEV_EVENT_LINK_DOWN`. To
+force the `stm32_eth` specific implementation instead of the generic one, use
+the (pseudo) module `stm32_eth_link_up` directly.
