@@ -1,7 +1,7 @@
-From 7517fc3cdf4913727dda1a1cad464927d24db7ec Mon Sep 17 00:00:00 2001
+From c5efc8ccd96a90902bd1d899d8e578a9822de372 Mon Sep 17 00:00:00 2001
 From: Gunar Schorcht <gunar@schorcht.net>
 Date: Sun, 2 Mar 2025 10:20:04 +0100
-Subject: [PATCH 19/28] heap: IRAM is not used as heap
+Subject: [PATCH 19/51] heap: IRAM is not used as heap
 
 RIOT only supports memory as a heap that allows byte access. IRAM only allows word-by-word access.
 ---
@@ -9,7 +9,7 @@ RIOT only supports memory as a heap that allows byte access. IRAM only allows wo
  1 file changed, 2 insertions(+)
 
 diff --git a/components/heap/port/esp32/memory_layout.c b/components/heap/port/esp32/memory_layout.c
-index b35d8c1b3e..b6c6d59010 100644
+index b35d8c1b3e..b89e03af7d 100644
 --- a/components/heap/port/esp32/memory_layout.c
 +++ b/components/heap/port/esp32/memory_layout.c
 @@ -95,6 +95,7 @@ const soc_memory_region_t soc_memory_regions[] = {
@@ -29,5 +29,5 @@ index b35d8c1b3e..b6c6d59010 100644
      { SOC_RTC_DRAM_LOW, 0x2000, SOC_MEMORY_TYPE_RTCRAM, 0, false}, //RTC Fast Memory
  #endif
 -- 
-2.34.1
+2.43.0
 

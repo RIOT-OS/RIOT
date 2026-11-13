@@ -1,15 +1,15 @@
-From 6a80d252810469dd3c6e0bbd4f27de02c90cb12e Mon Sep 17 00:00:00 2001
+From e3af3a28c316d9b52640bbf0aa2cc7b870f58ade Mon Sep 17 00:00:00 2001
 From: Gunar Schorcht <gunar@schorcht.net>
 Date: Tue, 11 Mar 2025 02:01:29 +0100
-Subject: [PATCH 28/28] heap: add prefix esp_ to tlsf to avoid conflicts with
+Subject: [PATCH 28/51] heap: add prefix esp_ to tlsf to avoid conflicts with
  tlsf package
 
 ---
- components/heap/multi_heap.c | 58 ++++++++++++++++++------------------
- 1 file changed, 29 insertions(+), 29 deletions(-)
+ components/heap/multi_heap.c | 60 ++++++++++++++++++------------------
+ 1 file changed, 30 insertions(+), 30 deletions(-)
 
 diff --git a/components/heap/multi_heap.c b/components/heap/multi_heap.c
-index d47a6c0a3a..78fc411b74 100644
+index bb58882ec0..5218c4414a 100644
 --- a/components/heap/multi_heap.c
 +++ b/components/heap/multi_heap.c
 @@ -15,8 +15,8 @@
@@ -23,7 +23,7 @@ index d47a6c0a3a..78fc411b74 100644
  
  /* Note: Keep platform-specific parts in this header, this source
     file should depend on libc only */
-@@ -110,7 +110,7 @@ void multi_heap_in_rom_init(void)
+@@ -117,7 +117,7 @@ void multi_heap_in_rom_init(void)
  /* Check a block is valid for this heap. Used to verify parameters. */
  __attribute__((noinline)) NOCLONE_ATTR static void assert_valid_block(const heap_t *heap, const multi_heap_block_handle_t block)
  {
@@ -32,7 +32,7 @@ index d47a6c0a3a..78fc411b74 100644
      void *ptr = block_to_ptr(block);
  
      MULTI_HEAP_ASSERT((ptr >= pool) &&
-@@ -125,7 +125,7 @@ void *multi_heap_get_block_address_impl(multi_heap_block_handle_t block)
+@@ -132,7 +132,7 @@ void *multi_heap_get_block_address_impl(multi_heap_block_handle_t block)
  
  size_t multi_heap_get_allocated_size_impl(multi_heap_handle_t heap, void *p)
  {
@@ -41,7 +41,7 @@ index d47a6c0a3a..78fc411b74 100644
  }
  
  multi_heap_handle_t multi_heap_register_impl(void *start_ptr, size_t size)
-@@ -142,13 +142,13 @@ multi_heap_handle_t multi_heap_register_impl(void *start_ptr, size_t size)
+@@ -149,13 +149,13 @@ multi_heap_handle_t multi_heap_register_impl(void *start_ptr, size_t size)
      /* Do not specify any maximum size for the allocations so that the default configuration is used */
      const size_t max_bytes = 0;
  
@@ -57,7 +57,7 @@ index d47a6c0a3a..78fc411b74 100644
      result->pool_size = size;
      result->minimum_free_bytes = result->free_bytes;
      return result;
-@@ -172,7 +172,7 @@ void multi_heap_internal_unlock(multi_heap_handle_t heap)
+@@ -179,7 +179,7 @@ void multi_heap_internal_unlock(multi_heap_handle_t heap)
  multi_heap_block_handle_t multi_heap_get_first_block(multi_heap_handle_t heap)
  {
      assert(heap != NULL);
@@ -66,7 +66,7 @@ index d47a6c0a3a..78fc411b74 100644
      multi_heap_block_handle_t block = offset_to_block(pool, -(int)block_header_overhead);
  
      return block;
-@@ -206,10 +206,10 @@ void *multi_heap_malloc_impl(multi_heap_handle_t heap, size_t size)
+@@ -213,10 +213,10 @@ void *multi_heap_malloc_impl(multi_heap_handle_t heap, size_t size)
  
  
      multi_heap_internal_lock(heap);
@@ -80,7 +80,7 @@ index d47a6c0a3a..78fc411b74 100644
          if (heap->free_bytes < heap->minimum_free_bytes) {
              heap->minimum_free_bytes = heap->free_bytes;
          }
-@@ -228,9 +228,9 @@ void multi_heap_free_impl(multi_heap_handle_t heap, void *p)
+@@ -235,9 +235,9 @@ void multi_heap_free_impl(multi_heap_handle_t heap, void *p)
      assert_valid_block(heap, block_from_ptr(p));
  
      multi_heap_internal_lock(heap);
@@ -93,7 +93,7 @@ index d47a6c0a3a..78fc411b74 100644
      multi_heap_internal_unlock(heap);
  }
  
-@@ -249,13 +249,13 @@ void *multi_heap_realloc_impl(multi_heap_handle_t heap, void *p, size_t size)
+@@ -256,13 +256,13 @@ void *multi_heap_realloc_impl(multi_heap_handle_t heap, void *p, size_t size)
      }
  
      multi_heap_internal_lock(heap);
@@ -111,7 +111,7 @@ index d47a6c0a3a..78fc411b74 100644
          if (heap->free_bytes < heap->minimum_free_bytes) {
              heap->minimum_free_bytes = heap->free_bytes;
          }
-@@ -282,10 +282,10 @@ void *multi_heap_aligned_alloc_impl_offs(multi_heap_handle_t heap, size_t size,
+@@ -289,10 +289,10 @@ void *multi_heap_aligned_alloc_impl_offs(multi_heap_handle_t heap, size_t size,
      }
  
      multi_heap_internal_lock(heap);
@@ -125,7 +125,7 @@ index d47a6c0a3a..78fc411b74 100644
          if(heap->free_bytes < heap->minimum_free_bytes) {
              heap->minimum_free_bytes = heap->free_bytes;
          }
-@@ -322,7 +322,7 @@ static bool g_print_errors = false;
+@@ -329,7 +329,7 @@ static bool g_print_errors = false;
   *
   * @return bool: true if the the memory is not corrupted, false if the memory if corrupted.
   */
@@ -134,7 +134,7 @@ index d47a6c0a3a..78fc411b74 100644
  {
      return multi_heap_internal_check_block_poisoning(start, size, is_free, g_print_errors);
  }
-@@ -341,11 +341,11 @@ bool multi_heap_check(multi_heap_handle_t heap, bool print_errors)
+@@ -348,11 +348,11 @@ bool multi_heap_check(multi_heap_handle_t heap, bool print_errors)
      (void) print_errors;
  #endif
  
@@ -148,7 +148,7 @@ index d47a6c0a3a..78fc411b74 100644
          valid = false;
      }
  
-@@ -366,7 +366,7 @@ void multi_heap_dump(multi_heap_handle_t heap)
+@@ -373,7 +373,7 @@ void multi_heap_dump(multi_heap_handle_t heap)
  
      multi_heap_internal_lock(heap);
      MULTI_HEAP_STDERR_PRINTF("Showing data for heap: %p \n", (void *)heap);
@@ -157,7 +157,7 @@ index d47a6c0a3a..78fc411b74 100644
      multi_heap_internal_unlock(heap);
  }
  
-@@ -417,14 +417,14 @@ void multi_heap_get_info_impl(multi_heap_handle_t heap, multi_heap_info_t *info)
+@@ -424,14 +424,14 @@ void multi_heap_get_info_impl(multi_heap_handle_t heap, multi_heap_info_t *info)
      }
  
      multi_heap_internal_lock(heap);
@@ -176,7 +176,7 @@ index d47a6c0a3a..78fc411b74 100644
      multi_heap_internal_unlock(heap);
  }
  
-@@ -433,7 +433,7 @@ void multi_heap_walk(multi_heap_handle_t heap, multi_heap_walker_cb_t walker_fun
+@@ -440,7 +440,7 @@ void multi_heap_walk(multi_heap_handle_t heap, multi_heap_walker_cb_t walker_fun
      assert(heap != NULL);
  
      multi_heap_internal_lock(heap);
@@ -185,6 +185,15 @@ index d47a6c0a3a..78fc411b74 100644
      multi_heap_internal_unlock(heap);
  }
  
+@@ -459,7 +459,7 @@ typedef struct containing_block_data {
+ 
+ void *multi_heap_find_containing_block_impl(multi_heap_handle_t heap, void *ptr)
+ {
+-    void *block_ptr = tlsf_find_containing_block(tlsf_get_pool(heap->heap_data), ptr);
++    void *block_ptr = esp_tlsf_find_containing_block(esp_tlsf_get_pool(heap->heap_data), ptr);
+     assert(block_ptr);
+     return block_ptr;
+ }
 -- 
-2.34.1
+2.43.0
 

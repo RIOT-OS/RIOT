@@ -31,7 +31,7 @@
 #include "esp_private/periph_ctrl.h"
 #include "esp_rom_gpio.h"
 #include "hal/ledc_hal.h"
-#include "soc/ledc_periph.h"
+#include "hal/ledc_periph.h"
 #include "soc/ledc_struct.h"
 #include "soc/rtc.h"
 
@@ -198,7 +198,8 @@ uint32_t pwm_init(pwm_t pwm, pwm_mode_t mode, uint32_t freq, uint16_t res)
 
         esp_rom_gpio_connect_out_signal(
             _CFG.gpios[i],
-            ledc_periph_signal[_CFG.group].sig_out0_idx + _DEV.ch[i].ch, 0, 0);
+            ledc_periph_signal[0].speed_mode[_CFG.group].sig_out_idx[_DEV.ch[i].ch],
+            0, 0);
 
     }
 
@@ -244,48 +245,71 @@ void pwm_set(pwm_t pwm, uint8_t channel, uint16_t value)
     unsigned ch = _DEV.ch[channel].ch;  /* internal channel mapping */
 
     critical_enter();
-    ledc_hal_set_duty_int_part(&_DEV.hw, ch, _DEV.ch[channel].duty);
-    ledc_hal_set_hpoint(&_DEV.hw, ch, _DEV.ch[channel].hpoint);
-    ledc_hal_set_sig_out_en(&_DEV.hw, ch, true);
-    ledc_hal_ls_channel_update(&_DEV.hw, ch);
-    ledc_hal_set_duty_start(&_DEV.hw, ch, true);
+    ledc_hal_set_duty_int_part(&_DEV.hw, _CFG.group, ch, _DEV.ch[channel].duty);
+    ledc_hal_set_hpoint(&_DEV.hw, _CFG.group, ch, _DEV.ch[channel].hpoint);
+    ledc_hal_set_sig_out_en(&_DEV.hw, _CFG.group, ch, true);
+    ledc_hal_ls_channel_update(&_DEV.hw, _CFG.group, ch);
+    ledc_hal_set_duty_start(&_DEV.hw, _CFG.group, ch);
     critical_exit();
+}
+
+/* check whether the LEDC module is used by any other PWM device */
+static bool _ledc_module_used_by_others(pwm_t pwm)
+{
+    for (unsigned i = 0; i < PWM_NUMOF; i++) {
+        if ((i != pwm) && _pwm_dev[i].enabled) {
+            return true;
+        }
+    }
+    return false;
 }
 
 void pwm_poweron(pwm_t pwm)
 {
     DEBUG("%s pwm=%u\n", __func__, pwm);
 
-    /* enable and init the module and select the right clock source */
-    periph_module_enable(_CFG.module);
-    ledc_hal_init(&_DEV.hw, _CFG.group);
-    ledc_ll_enable_clock(_DEV.hw.dev, true);
+    /* enable and reset the LEDC module if it is not yet used by another
+     * PWM device, the LEDC module is shared by all PWM devices */
+    if (!_ledc_module_used_by_others(pwm)) {
+        PERIPH_RCC_ATOMIC() {
+            ledc_ll_enable_bus_clock(0, true);
+            ledc_ll_reset_register(0);
+        }
+    }
+
+    /* init the module and select the right clock source */
+    ledc_hal_init(&_DEV.hw, 0);
+    ledc_ll_enable_clock(0, true);
     ledc_hal_set_slow_clk_sel(&_DEV.hw, (ledc_slow_clk_sel_t)LEDC_SCLK);
 #if SOC_LEDC_HAS_TIMER_SPECIFIC_MUX
-    ledc_hal_set_clock_source(&_DEV.hw, _CFG.timer, (ledc_clk_src_t)LEDC_SCLK);
+    ledc_hal_set_clock_source(&_DEV.hw, _CFG.group, _CFG.timer, (ledc_clk_src_t)LEDC_SCLK);
 #endif
 
     /* update the timer according to determined parameters */
-    ledc_hal_set_clock_divider(&_DEV.hw, _CFG.timer, _DEV.hw_clk_div);
-    ledc_hal_set_duty_resolution(&_DEV.hw, _CFG.timer, _DEV.hw_res_bit);
-    ledc_hal_ls_timer_update(&_DEV.hw, _CFG.timer);
-    ledc_hal_timer_rst(&_DEV.hw, _CFG.timer);
+    ledc_hal_set_clock_divider(&_DEV.hw, _CFG.group, _CFG.timer, _DEV.hw_clk_div);
+    ledc_hal_set_duty_resolution(&_DEV.hw, _CFG.group, _CFG.timer, _DEV.hw_res_bit);
+    ledc_hal_ls_timer_update(&_DEV.hw, _CFG.group, _CFG.timer);
+    ledc_hal_timer_rst(&_DEV.hw, _CFG.group, _CFG.timer);
 
     critical_enter();
     for (unsigned i = 0; i < _CFG.ch_numof; i++) {
         /* static configuration of the channel, no fading */
-        ledc_hal_set_fade_param(&_DEV.hw, _DEV.ch[i].ch, 0, 1, 1, 0, 1);
-        ledc_hal_set_fade_end_intr(&_DEV.hw, _DEV.ch[i].ch, 0);
+        ledc_hal_set_fade_param(&_DEV.hw, _CFG.group, _DEV.ch[i].ch, 0, 1, 1, 0, 1);
+        ledc_ll_enable_interrupt(_DEV.hw.dev,
+                                 LEDC_LL_EVENT_CHANNEL_MASK(_CFG.group, _DEV.ch[i].ch),
+                                 false);
 
         /* bind the channel to the timer and disable the output for now */
-        ledc_hal_bind_channel_timer(&_DEV.hw, _DEV.ch[i].ch, _CFG.timer);
+        ledc_hal_bind_channel_timer(&_DEV.hw, _CFG.group, _DEV.ch[i].ch, _CFG.timer);
 
         /* restore used parameters */
-        ledc_hal_set_duty_int_part(&_DEV.hw, _DEV.ch[i].ch, _DEV.ch[i].duty);
-        ledc_hal_set_hpoint(&_DEV.hw, _DEV.ch[i].ch, _DEV.ch[i].hpoint);
-        ledc_hal_set_sig_out_en(&_DEV.hw, _DEV.ch[i].ch, _DEV.ch[i].used);
-        ledc_hal_ls_channel_update(&_DEV.hw, _DEV.ch[i].ch);
-        ledc_hal_set_duty_start(&_DEV.hw, _DEV.ch[i].ch, _DEV.ch[i].used);
+        ledc_hal_set_duty_int_part(&_DEV.hw, _CFG.group, _DEV.ch[i].ch, _DEV.ch[i].duty);
+        ledc_hal_set_hpoint(&_DEV.hw, _CFG.group, _DEV.ch[i].ch, _DEV.ch[i].hpoint);
+        ledc_hal_set_sig_out_en(&_DEV.hw, _CFG.group, _DEV.ch[i].ch, _DEV.ch[i].used);
+        ledc_hal_ls_channel_update(&_DEV.hw, _CFG.group, _DEV.ch[i].ch);
+        if (_DEV.ch[i].used) {
+            ledc_hal_set_duty_start(&_DEV.hw, _CFG.group, _DEV.ch[i].ch);
+        }
     }
     _DEV.enabled = true;
     critical_exit();
@@ -304,24 +328,18 @@ void pwm_poweroff(pwm_t pwm)
     /* disable the signal of all channels */
     critical_enter();
     for (i = 0; i < _CFG.ch_numof; i++) {
-        ledc_hal_set_idle_level(&_DEV.hw, _DEV.ch[i].ch, 0);
-        ledc_hal_set_sig_out_en(&_DEV.hw, _DEV.ch[i].ch, false);
-        ledc_hal_set_duty_start(&_DEV.hw, _DEV.ch[i].ch, false);
-        ledc_hal_ls_channel_update(&_DEV.hw, _DEV.ch[i].ch);
+        ledc_hal_set_idle_level(&_DEV.hw, _CFG.group, _DEV.ch[i].ch, 0);
+        ledc_hal_set_sig_out_en(&_DEV.hw, _CFG.group, _DEV.ch[i].ch, false);
+        ledc_hal_ls_channel_update(&_DEV.hw, _CFG.group, _DEV.ch[i].ch);
     }
     _DEV.enabled = false;
     critical_exit();
 
-    /* check whether all devices of the same hardware module are disabled */
-    for (i = 0; i < PWM_NUMOF; i++) {
-        if ((_CFG.module == pwm_config[i].module) && _pwm_dev[i].enabled) {
-            break;
+    /* if all devices that share the LEDC module are disabled, it is powered off */
+    if (!_ledc_module_used_by_others(pwm)) {
+        PERIPH_RCC_ATOMIC() {
+            ledc_ll_enable_bus_clock(0, false);
         }
-    }
-
-    /* if all devices of the same hardware module are disable, it is powered off */
-    if (i == PWM_NUMOF) {
-        periph_module_disable(_CFG.module);
     }
 }
 
@@ -357,10 +375,10 @@ static bool _pwm_initialize(void)
 
     unsigned total_ch_numof = ch_numof[0] + ch_numof[1];
 
-    if (total_ch_numof > (SOC_LEDC_CHANNEL_NUM * ARRAY_SIZE(ledc_periph_signal))) {
+    if (total_ch_numof > (SOC_LEDC_CHANNEL_NUM * LEDC_SPEED_MODE_MAX)) {
         LOG_TAG_ERROR("pwm", "Total number of PWM channels is %d, only "
                       "%d channels are supported at maximum\n", total_ch_numof,
-                       PWM_CH_NUMOF_MAX * ARRAY_SIZE(ledc_periph_signal));
+                       PWM_CH_NUMOF_MAX * LEDC_SPEED_MODE_MAX);
         return false;
     }
 

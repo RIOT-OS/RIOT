@@ -1,19 +1,19 @@
-From 97e5f240e60ca9d7806f9e4ed53ac1c025e8ce87 Mon Sep 17 00:00:00 2001
+From 237222ab447c73d169bd6250d2a1572471924924 Mon Sep 17 00:00:00 2001
 From: Gunar Schorcht <gunar@schorcht.net>
 Date: Sat, 1 Mar 2025 17:55:31 +0100
-Subject: [PATCH 08/28] sdmmc: fix byte-wise writing to CMD register
+Subject: [PATCH 08/51] sdmmc: fix byte-wise writing to CMD register
 
 Writing the 32-bit CMD register using memcpy results in the register being written byte by byte in any order. If the start bit in the CMD register is set before all bytes have been written, a wrong command is executed. Writing to the 32-bit CMD register must be performed as a single word register copy instruction which is guaranteed by the assignment.
 ---
- components/hal/esp32/include/hal/sdmmc_ll.h   | 2 +-
- components/hal/esp32s3/include/hal/sdmmc_ll.h | 2 +-
+ components/esp_hal_sd/esp32/include/hal/sdmmc_ll.h   | 2 +-
+ components/esp_hal_sd/esp32s3/include/hal/sdmmc_ll.h | 2 +-
  2 files changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/components/hal/esp32/include/hal/sdmmc_ll.h b/components/hal/esp32/include/hal/sdmmc_ll.h
-index 0f5a62ea37..feecb231e5 100644
---- a/components/hal/esp32/include/hal/sdmmc_ll.h
-+++ b/components/hal/esp32/include/hal/sdmmc_ll.h
-@@ -491,7 +491,7 @@ static inline void sdmmc_ll_poll_demand(sdmmc_dev_t *hw)
+diff --git a/components/esp_hal_sd/esp32/include/hal/sdmmc_ll.h b/components/esp_hal_sd/esp32/include/hal/sdmmc_ll.h
+index 495fc65c8e..3dbf1ef3ee 100644
+--- a/components/esp_hal_sd/esp32/include/hal/sdmmc_ll.h
++++ b/components/esp_hal_sd/esp32/include/hal/sdmmc_ll.h
+@@ -571,7 +571,7 @@ static inline void sdmmc_ll_poll_demand(sdmmc_dev_t *hw)
   */
  static inline void sdmmc_ll_set_command(sdmmc_dev_t *hw, sdmmc_hw_cmd_t cmd)
  {
@@ -22,11 +22,11 @@ index 0f5a62ea37..feecb231e5 100644
  }
  
  /**
-diff --git a/components/hal/esp32s3/include/hal/sdmmc_ll.h b/components/hal/esp32s3/include/hal/sdmmc_ll.h
-index 2747905931..60cd5923bd 100644
---- a/components/hal/esp32s3/include/hal/sdmmc_ll.h
-+++ b/components/hal/esp32s3/include/hal/sdmmc_ll.h
-@@ -527,7 +527,7 @@ static inline void sdmmc_ll_poll_demand(sdmmc_dev_t *hw)
+diff --git a/components/esp_hal_sd/esp32s3/include/hal/sdmmc_ll.h b/components/esp_hal_sd/esp32s3/include/hal/sdmmc_ll.h
+index 87e63af3aa..c2cc4e3170 100644
+--- a/components/esp_hal_sd/esp32s3/include/hal/sdmmc_ll.h
++++ b/components/esp_hal_sd/esp32s3/include/hal/sdmmc_ll.h
+@@ -635,7 +635,7 @@ static inline void sdmmc_ll_poll_demand(sdmmc_dev_t *hw)
   */
  static inline void sdmmc_ll_set_command(sdmmc_dev_t *hw, sdmmc_hw_cmd_t cmd)
  {
@@ -36,5 +36,5 @@ index 2747905931..60cd5923bd 100644
  
  /**
 -- 
-2.34.1
+2.43.0
 
