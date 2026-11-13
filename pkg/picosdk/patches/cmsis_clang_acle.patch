@@ -1,0 +1,54 @@
+From c66553c4a3156aa22fd46a26bd3c511011fcd38a Mon Sep 17 00:00:00 2001
+From: AnnsAnn <git@annsann.eu>
+Date: Thu, 12 Nov 2026 16:33:08 +0100
+Subject: [PATCH] cmsis_clang: Declare missing ACLE hint and barrier functions
+
+---
+ .../stub/CMSIS/Core/Include/cmsis_clang.h     | 31 +++++++++++++++++++
+ 1 file changed, 31 insertions(+)
+
+diff --git a/src/rp2_common/cmsis/stub/CMSIS/Core/Include/cmsis_clang.h b/src/rp2_common/cmsis/stub/CMSIS/Core/Include/cmsis_clang.h
+index 364d18e1..a612a8fd 100644
+--- a/src/rp2_common/cmsis/stub/CMSIS/Core/Include/cmsis_clang.h
++++ b/src/rp2_common/cmsis/stub/CMSIS/Core/Include/cmsis_clang.h
+@@ -33,6 +33,37 @@
+ #error Compiler must support ACLE V2.0
+ #endif /* (__ARM_ACLE >= 200) */
+ 
++/* Clang 20's <arm_acle.h> only declares these functions when
++ * __has_builtin() reports the intrinsic as unavailable. When that header is
++ * parsed by a newer libclang, __has_builtin() reports it as available, but no
++ * callable declaration exists. Add the declarations explicitly. */
++#if defined(__clang__) && (__clang_major__ >= 21)
++#  if __has_builtin(__dmb) && !defined(__dmb)
++void __dmb(unsigned int);
++#  endif
++#  if __has_builtin(__dsb) && !defined(__dsb)
++void __dsb(unsigned int);
++#  endif
++#  if __has_builtin(__isb) && !defined(__isb)
++void __isb(unsigned int);
++#  endif
++#  if __has_builtin(__wfi) && !defined(__wfi)
++void __wfi(void);
++#  endif
++#  if __has_builtin(__wfe) && !defined(__wfe)
++void __wfe(void);
++#  endif
++#  if __has_builtin(__sev) && !defined(__sev)
++void __sev(void);
++#  endif
++#  if __has_builtin(__sevl) && !defined(__sevl)
++void __sevl(void);
++#  endif
++#  if __has_builtin(__yield) && !defined(__yield)
++void __yield(void);
++#  endif
++#endif
++
+ /* Fallback for __has_builtin */
+ #ifndef __has_builtin
+ #define __has_builtin(x) (0)
+-- 
+2.56.0
+
