@@ -20,13 +20,16 @@ if @ref net_sock_udp (`USEMODULE += sock_udp`) is available in your build.
 ## Send UDP Datagrams
 
 ```
-> udp send [-b] <addr>:<port> <data> [<num> [<delay>]]
+> udp send [-b] <addr>:<port> {-d <data-len>|<data>} [<num> [<delay>]]
 ```
 
 Send `<num>` UDP datagrams to `<addr>:<port>` at the interval specified in `<delay>`
 (in microseconds).
+If the optional parameter `-d` is given, a generated number of `<data-len>` bytes is sent and
+`<data>` is not needed.
 If the optional parameter `-b` is given, `<data>` is interpreted as hexadecimal digits,
 otherwise `<data>` is interpreted as a text string.
+`-d` and `-b` are mutually exclusive.
 
 `<num>` and `<delay>` are only supported if @ref sys_ztimer is available
 (e.g., via `USEMODULE += ztimer_usec` or `USEMODULE += ztimer_msec`).
