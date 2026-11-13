@@ -146,34 +146,34 @@ class TestUDP(riotctrl_shell_tests.testcase_base.TestBase):
         assert "Error: no port or illegal port value provided" in str(ctx.exception)
 
     def test_udp_client_send_text(self):
-        res = self.shell.udp_client_send("2001:db8::1", 5683, "Hello World!")
+        res = self.shell.udp_client_send("2001:db8::1", 5573, "Hello World!")
         stats = self.udp_parser.parse(res)
         byts = self.od_parser.parse(res)
         assert byts == b"Hello World!"
         assert len(stats) == 1
         assert stats[0]["payload_len"] == len("Hello World!")
         assert stats[0]["dst"] == "2001:db8::1"
-        assert stats[0]["dport"] == 5683
+        assert stats[0]["dport"] == 5573
 
     def test_udp_client_send_text_like_hex(self):
-        res = self.shell.udp_client_send("2001:db8::1", 5683, "abcd001122")
+        res = self.shell.udp_client_send("2001:db8::2", 5683, "abcd001122")
         stats = self.udp_parser.parse(res)
         byts = self.od_parser.parse(res)
         assert byts == b"abcd001122"
         assert len(stats) == 1
         assert stats[0]["payload_len"] == len("abcd001122")
-        assert stats[0]["dst"] == "2001:db8::1"
+        assert stats[0]["dst"] == "2001:db8::2"
         assert stats[0]["dport"] == 5683
 
     def test_udp_client_send_bytes(self):
-        res = self.shell.udp_client_send("2001:db8::1", 5683, b"\x00\x11\x22\x33\x44")
+        res = self.shell.udp_client_send("2001:db8::3", 1234, b"\x00\x11\x22\x33\x44")
         stats = self.udp_parser.parse(res)
         byts = self.od_parser.parse(res)
         assert byts == b"\x00\x11\x22\x33\x44"
         assert len(stats) == 1
         assert stats[0]["payload_len"] == len(b"\x00\x11\x22\x33\x44")
-        assert stats[0]["dst"] == "2001:db8::1"
-        assert stats[0]["dport"] == 5683
+        assert stats[0]["dst"] == "2001:db8::3"
+        assert stats[0]["dport"] == 1234
 
     def test_udp_client_only_count(self):
         count = 3

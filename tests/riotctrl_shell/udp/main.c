@@ -52,8 +52,10 @@ int sock_udp_create(sock_udp_t *sock, const sock_udp_ep_t *local, const sock_udp
 {
     (void)remote;
     (void)flags;
-    if (local && local->port == COAP_PORT) {
-        /* store server sock */
+    if (local) {
+        /* only server has local != NULL, so store as server sock,
+         * to be able to trigger SOCK_ASYNC_MSG_RECV in _trigger_thread below
+         * to mock UDP reception */
         _server_sock = sock;
     }
     return 0;
