@@ -156,9 +156,18 @@ class UDPServer(ShellInteraction):
 
     @ShellInteraction.check_term
     def udp_server_start(
-        self, port: Union[int, str], timeout: int = -1, async_: bool = False
+        self,
+        port: Union[int, str],
+        summarize: bool = False,
+        timeout: int = -1,
+        async_: bool = False,
     ):
-        res = self.cmd(f"udp server start {port}", timeout=timeout, async_=async_)
+        flags = ""
+        if summarize:
+            flags += " -s"
+        res = self.cmd(
+            f"udp server start {port}{flags}", timeout=timeout, async_=async_
+        )
         if "Success:" not in res:
             raise RuntimeError(res)
         return res
@@ -177,7 +186,6 @@ class UDPServer(ShellInteraction):
             exp = self.riotctrl.term.expect(
                 [
                     pexpect.TIMEOUT,
-                    # TODO: Remove, when tests/gnrc_udp uses `shell_cmd_udp_server`
                     r"Packets received:\s+\d",
                     # TODO: Add IPv4 support
                     r"Received UDP data from \[[0-9a-f:]+%.+\]:\d+",
