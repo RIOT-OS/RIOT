@@ -179,7 +179,7 @@ static void _stop_server(void)
 #endif /* MODULE_SHELL_CMD_UDP_SERVER*/
 
 static void _send(const char *addr_str, const char *_data, size_t num,
-                  unsigned int delay, bool data_is_hex)
+                  uint32_t delay, bool data_is_hex)
 {
     int res = -1;
 
