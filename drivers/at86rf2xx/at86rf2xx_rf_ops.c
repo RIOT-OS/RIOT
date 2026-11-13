@@ -823,7 +823,13 @@ int at86rf2xx_init_event(at86rf2xx_bhp_ev_t *bhp, const at86rf2xx_params_t *para
 }
 
 static const ieee802154_radio_ops_t at86rf2xx_ops = {
-    .caps =  IEEE802154_CAP_24_GHZ
+    .caps =
+#if AT86RF2XX_HAVE_SUBGHZ
+            IEEE802154_CAP_SUB_GHZ
+            | IEEE802154_CAP_PHY_BPSK
+#else
+            IEEE802154_CAP_24_GHZ
+#endif
             | IEEE802154_CAP_IRQ_CRC_ERROR
             | IEEE802154_CAP_IRQ_RX_START
             | IEEE802154_CAP_IRQ_TX_DONE
