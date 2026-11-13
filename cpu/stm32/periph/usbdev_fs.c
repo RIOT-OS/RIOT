@@ -58,7 +58,8 @@
  *
  * Which access scheme is used depends on the STM32 model.
  */
-#if defined(CPU_LINE_STM32F303xD) || defined(CPU_LINE_STM32F303xE) || \
+#if defined(CPU_LINE_STM32F072xB) || \
+    defined(CPU_LINE_STM32F303xD) || defined(CPU_LINE_STM32F303xE) || \
     defined(CPU_LINE_STM32WB35xx) || defined(CPU_LINE_STM32WB55xx)
 
 #define _ENDPOINT_NUMOF         (8)     /* Number of endpoints */
