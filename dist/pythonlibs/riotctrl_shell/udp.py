@@ -146,7 +146,7 @@ class UDPServer(ShellInteraction):
             exp = self.riotctrl.term.expect(
                 [
                     pexpect.TIMEOUT,
-                    # Remove, when tests/gnrc_udp uses `shell_cmd_udp_server`
+                    # TODO: Remove, when tests/gnrc_udp uses `shell_cmd_udp_server`
                     r"Packets received:\s+\d",
                     r"Received UDP data from \[[0-9a-f:]+%.+\]:\d+",
                 ],
