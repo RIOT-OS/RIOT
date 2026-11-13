@@ -1,0 +1,8 @@
+FEATURES_REQUIRED += periph_gpio_irq
+FEATURES_REQUIRED += periph_spi
+
+USEMODULE += checksum
+USEMODULE += iolist
+USEMODULE += luid
+USEMODULE += netdev_eth
+USEMODULE += ztimer_usec
