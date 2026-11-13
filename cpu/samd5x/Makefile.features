@@ -3,6 +3,7 @@ CPU_CORE = cortex-m4f
 FEATURES_PROVIDED += periph_hwrng
 FEATURES_PROVIDED += backup_ram
 FEATURES_PROVIDED += cortexm_mpu
+FEATURES_PROVIDED += periph_gpio_read_output
 FEATURES_PROVIDED += periph_gpio_tamper_wake
 FEATURES_PROVIDED += periph_rtc_mem
 FEATURES_PROVIDED += periph_spi_on_qspi
