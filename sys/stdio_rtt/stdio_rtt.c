@@ -344,7 +344,15 @@ static ssize_t _write(const void* in, size_t len) {
         }
     }
 
-    return (ssize_t)written;
+    /*
+     * Non-blocking mode drops what doesn't fit (no host draining the up buffer).
+     * Report the whole request as consumed: callers that loop until everything is
+     * written (e.g. pkg/mpaland-printf write_all()) would otherwise spin forever on
+     * a 0 return — a busy loop that starves every thread of equal or lower priority
+     * until a debugger starts reading RTT. Seen 2026-10-21 (6LoBAC mstp_6lbr): a
+     * printf from a MAIN-1 thread with no RTT host stopped the MS/TP FSM thread.
+     */
+    return blocking_stdout ? (ssize_t)written : (ssize_t)len;
 }
 
 STDIO_PROVIDER(STDIO_RTT, _init, _detach, _write)
