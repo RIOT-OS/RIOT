@@ -50,3 +50,9 @@ RCFLAGS_WRITE_SARIF = -fdiagnostics-add-output=sarif:file='$$@.sarif'
 ifneq (,$(filter $(GCC_VERSION),12 13))
   CFLAGS += --param=min-pagesize=0
 endif
+
+# Provide a minimal standalone compiler + linker invocation for testing flags
+LINKTEST = LC_ALL=C $(LINK) $(RIOTTOOLS)/testprogs/minimal_linkable.c -o /dev/null -lc
+ifneq (,$(filter picolibc,$(FEATURES_USED)))
+  LINKTEST += -specs=picolibc.specs
+endif
