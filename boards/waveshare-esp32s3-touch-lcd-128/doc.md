@@ -100,4 +100,4 @@ Flashing RIOT is quite easy. The board has a USB-C connector with
 reset/boot/flash logic. Just connect the board to your host computer
 and run:
 For detailed information about ESP32-S3 as well as configuring and compiling
-RIOT for ESP32-S3 boards, see \ref esp32_riot.
+RIOT for ESP32-S3 boards, see \ref cpu_esp32.

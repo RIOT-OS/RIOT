@@ -24,9 +24,7 @@ This document describes the RIOT implementation for supported variants
 
 @author     Gunar Schorcht <gunar@schorcht.net>
 
-\section esp32_riot  RIOT-OS on ESP32 SoC Series Boards
-
-## Table of Contents {#esp32_toc}
+# Table of Contents {#esp32_toc}
 
 1. [Overview](#esp32_overview)
 2. [Short Configuration Reference](#esp32_short_configuration_reference)

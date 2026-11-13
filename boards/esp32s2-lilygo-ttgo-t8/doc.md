@@ -118,7 +118,7 @@ BOARD=esp32s2-lilygo-ttgo-t8 make flash ...
 ```
 
 For detailed information about ESP32-S2 as well as configuring and compiling
-RIOT for ESP32-S2 boards, see \ref esp32_riot.
+RIOT for ESP32-S2 boards, see \ref cpu_esp32.
 
 ### USB-C connector is connected to the USB signals of the ESP32-S2 SoC
 

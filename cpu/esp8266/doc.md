@@ -7,9 +7,7 @@ SPDX-License-Identifier: LGPL-2.1-only
 @ingroup         cpu
 @brief           RIOT-OS port for Espressif's ESP8266 / ESP8285 MCUs
 
-\section esp8266_riot  RIOT-OS on ESP8266 and ESP8285 boards
-
-## Table of Contents {#esp8266_toc}
+# Table of Contents {#esp8266_toc}
 
 1. [Overview](#esp8266_overview)
 2. [Short Configuration Reference](#esp8266_short_configuration_reference)

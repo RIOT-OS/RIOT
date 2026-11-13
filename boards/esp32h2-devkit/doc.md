@@ -121,4 +121,4 @@ BOARD=esp32h2-devkit make flash ...
 ```
 
 For detailed information about ESP32-H2 as well as configuring and compiling
-RIOT for ESP32-H2 boards, see \ref esp32_riot.
+RIOT for ESP32-H2 boards, see \ref cpu_esp32.

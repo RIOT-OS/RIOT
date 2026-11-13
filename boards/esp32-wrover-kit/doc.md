@@ -177,7 +177,7 @@ on used hardware.
   to be removed and soldered. Module `esp_rtc_timer_32k` is enabled by default.
 
 For detailed information about the configuration of ESP32 boards, see
-section Peripherals in \ref esp32_riot.
+section Peripherals in \ref cpu_esp32.
 
 ### Optional Hardware Configurations
 
@@ -254,7 +254,7 @@ BOARD=esp32-wrover-kit PORT=/dev/ttyUSB1 make flash ...
 ```
 
 For detailed information about ESP32 as well as configuring and compiling RIOT
-for ESP32 boards, see \ref esp32_riot.
+for ESP32 boards, see \ref cpu_esp32.
 
 ## On-Chip Debugging with the Device {#esp32_wrover_kit_debugging}
 

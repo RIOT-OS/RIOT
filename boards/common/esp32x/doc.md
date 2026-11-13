@@ -9,4 +9,4 @@ SPDX-License-Identifier: LGPL-2.1-only
              all ESP32x boards.
 
 For detailed information about ESP32x SoCs, configuring and compiling RIOT
-for ESP32x boards, please refer \ref esp32_riot.
+for ESP32x boards, please refer \ref cpu_esp32.
