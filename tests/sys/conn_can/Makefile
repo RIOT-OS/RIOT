@@ -50,7 +50,7 @@ ifneq (,$(filter fdcan,$(USEMODULE)))
 		# Check your CAN transceiver datasheet to apply the good loop delay in nanoseconds.
 		# This configuration is mandatory if you are using CAN FD with bitrate switching.
 		# Can be configured here or through Kconfig
-		#CFLAGS += -DCONFIG_FDCAN_DEVICE_TRANSCEIVER_LOOP_DELAY=0
+		CFLAGS += -DCONFIG_FDCAN_DEVICE_TRANSCEIVER_LOOP_DELAY=0
 
 	# Allow only a default value for CI
 	else
