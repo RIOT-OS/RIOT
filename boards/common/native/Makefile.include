@@ -35,9 +35,11 @@ else
 endif
 endif
 
-# set the tap interface for term/valgrind
-PORT ?= tap0
-TERMFLAGS += $(PROCARGS) $(PORT)
+# set the tap interface for term/valgrind (skip when using ZEP)
+ifneq (1,$(USE_ZEP))
+  PORT ?= tap0
+  TERMFLAGS += $(PROCARGS) $(PORT)
+endif
 
 # Configure default eeprom file
 EEPROM_FILE ?= $(BINDIR)/native.eeprom

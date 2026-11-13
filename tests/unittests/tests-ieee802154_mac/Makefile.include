@@ -1,0 +1,4 @@
+USEMODULE += ieee802154
+USEMODULE += ieee802154_mac
+INCLUDES += -I$(RIOTBASE)/sys/net/link_layer/ieee802154/
+

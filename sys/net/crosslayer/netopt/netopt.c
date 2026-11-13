@@ -41,6 +41,7 @@ static const char *_netopt_strmap[] = {
     [NETOPT_PDU_SIZE]              = "NETOPT_PDU_SIZE",
     [NETOPT_MAX_PDU_SIZE]          = "NETOPT_MAX_PDU_SIZE",
     [NETOPT_PRELOADING]            = "NETOPT_PRELOADING",
+    [NETOPT_TX_INDIRECT]           = "NETOPT_TX_INDIRECT",
     [NETOPT_PROMISCUOUSMODE]       = "NETOPT_PROMISCUOUSMODE",
     [NETOPT_AUTOACK]               = "NETOPT_AUTOACK",
     [NETOPT_ACK_PENDING]           = "NETOPT_ACK_PENDING",

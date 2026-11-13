@@ -1914,6 +1914,11 @@ static void _event_handler_tx_done(event_t *evp)
     bool push_back = netif->flags & GNRC_NETIF_FLAGS_TX_FROM_PKTQUEUE;
     netif->flags &= ~GNRC_NETIF_FLAGS_TX_FROM_PKTQUEUE;
     _tx_done(netif, pkt, NULL, res, push_back);
+#if IS_USED(MODULE_GNRC_NETIF_PKTQ)
+    if (!gnrc_netif_pktq_empty(netif)) {
+        _send_queued_pkt(netif);
+    }
+#endif
 }
 #endif
 

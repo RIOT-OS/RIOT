@@ -41,7 +41,9 @@ ifneq (,$(filter socket_zep,$(USEMODULE)))
   USEMODULE += checksum
   USEMODULE += random
   USEMODULE += ieee802154
-  ifneq (,$(filter netdev,$(USEMODULE)))
+  ifneq (,$(filter gnrc_netif,$(USEMODULE)))
+    USEMODULE += gnrc_netif_ieee802154_mac
+  else ifneq (,$(filter netdev,$(USEMODULE)))
     USEMODULE += netdev_ieee802154_submac
   endif
   ifneq (,$(filter ieee802154_submac,$(USEMODULE)))

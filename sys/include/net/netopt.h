@@ -202,6 +202,10 @@ typedef enum {
      */
     NETOPT_PRELOADING,
     /**
+     * @brief   (@ref netopt_enable_t) send frames as indirect (if supported)
+     */
+    NETOPT_TX_INDIRECT,
+    /**
      * @brief   (@ref netopt_enable_t) promiscuous mode
      */
     NETOPT_PROMISCUOUSMODE,
@@ -868,6 +872,37 @@ typedef enum {
      * with CSMA/CA.
      */
     NETOPT_GTS_TX,
+
+    /**
+     * @brief (netopt_enable_t) Keep the tranceiver enabled when idle
+     *
+     */
+    NETOPT_RX_ON_WHEN_IDLE,
+
+    /**
+     * @brief (uint32_t) Sets the poll interval of indirect transmission IEEE802.15.4 MAC when associated
+     */
+    NETOPT_POLL,
+
+    /**
+     * @brief (uint32_t) Sets the poll interval of indirect transmission IEEE802.15.4 MAC when associated
+     */
+    NETOPT_POLL_INTERVAL,
+
+    /**
+     *  @brief (byte array) The payload which gets sent in beacons.
+     */
+    NETOPT_BEACON_PAYLOAD,
+
+    /**
+     * @brief (ieee802154_assoc_status_t)
+     */
+    NETOPT_ASSOC_STATUS,
+
+    /**
+     * @brief ()
+     */
+    NETOPT_START,
 
     /**
      * @brief   maximum number of options defined here.

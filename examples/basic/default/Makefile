@@ -41,6 +41,13 @@ FEATURES_OPTIONAL += netif
 
 FEATURES_OPTIONAL += periph_rtc
 
+# Use a simulated IEEE 802.15.4 radio on native.
+USE_ZEP ?= 0
+ifeq (1,$(USE_ZEP))
+  USEMODULE += socket_zep
+  USEMODULE += socket_zep_hello
+endif
+
 ifneq (,$(filter msba2,$(BOARD)))
   USEMODULE += mci
   USEMODULE += random
