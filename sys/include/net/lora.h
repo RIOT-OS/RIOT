@@ -17,6 +17,7 @@
  * @author      Alexandre Abadie <alexandre.abadie@inria.fr>
  */
 
+#include <stdbool.h>
 #include <stdint.h>
 #include <stdlib.h>
 
@@ -323,6 +324,64 @@ static inline uint32_t lora_bw_to_hz(uint8_t bw)
     default:
         return 0;
     }
+}
+
+/**
+ * @brief   Tells whether a LoRa modulation needs the low data rate
+ *          optimization, which is required from 16 ms per symbol
+ *
+ * @param[in] sf    spreading factor, LORA_SF*
+ * @param[in] bw    bandwidth, LORA_BW_*
+ *
+ * @return  true if the symbols last 16 ms or more
+ */
+static inline bool lora_ldro_required(uint8_t sf, uint8_t bw)
+{
+    /* the symbol lasts 2^SF / BW */
+    return ((uint64_t)(1UL << sf) * 1000) >= ((uint64_t)lora_bw_to_hz(bw) * 16);
+}
+
+/**
+ * @brief   Computes the time on air of a LoRa packet
+ *
+ * The formula is the one of the datasheets of the Semtech SX127x and SX126x
+ * transceivers, with the spreading factors 7 to 12. The SX126x adds a few
+ * symbols with the spreading factors 5 and 6, which aren't counted.
+ *
+ * @param[in] len               length of the payload, in bytes
+ * @param[in] sf                spreading factor, LORA_SF*
+ * @param[in] bw                bandwidth, LORA_BW_*
+ * @param[in] cr                coding rate, LORA_CR_4_5 to LORA_CR_4_8
+ * @param[in] preamble_len      length of the preamble, in symbols
+ * @param[in] implicit_header   true without the LoRa header
+ * @param[in] crc               true with the CRC of the payload
+ * @param[in] ldro              true with the low data rate optimization,
+ *                              see @ref lora_ldro_required
+ *
+ * @return  the time on air, in microseconds
+ * @return  0 if @p bw is unknown
+ */
+static inline uint32_t lora_time_on_air_us(size_t len, uint8_t sf, uint8_t bw, uint8_t cr,
+                                           uint16_t preamble_len, bool implicit_header,
+                                           bool crc, bool ldro)
+{
+    uint32_t bw_hz = lora_bw_to_hz(bw);
+    if (bw_hz == 0) {
+        return 0;
+    }
+
+    int32_t num = (8 * (int32_t)len) - (4 * sf) + 28 + (crc ? 16 : 0) -
+                  (implicit_header ? 20 : 0);
+    int32_t den = 4 * (sf - (ldro ? 2 : 0));
+    uint32_t payload_symbols = 8;
+    if (num > 0) {
+        payload_symbols += ((num + den - 1) / den) * (cr + 4);
+    }
+
+    /* in quarters of symbol: the preamble lasts (preamble_len + 4.25) symbols */
+    uint64_t quarters = ((uint64_t)preamble_len * 4) + 17 + ((uint64_t)payload_symbols * 4);
+
+    return (quarters * (1UL << sf) * 1000000) / (4 * (uint64_t)bw_hz);
 }
 
 #ifdef __cplusplus
