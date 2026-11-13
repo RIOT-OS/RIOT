@@ -1,0 +1,4 @@
+# enable reset into the ROM bootloader via USB, requires CDC ACM to be used
+ifneq (,$(filter usbus_cdc_acm,$(USEMODULE)))
+  USEMODULE += usb_board_reset
+endif

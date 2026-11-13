@@ -57,6 +57,20 @@ typedef uint32_t gpio_t;
 extern "C" {
 #endif
 
+/**
+ * @name    Power management configuration
+ *
+ * In SLEEP mode the processor enters deep sleep. If all processors are in
+ * deep sleep, only the clocks enabled in `CLOCKS->SLEEP_EN0` and
+ * `CLOCKS->SLEEP_EN1` keep running. All of them are enabled after reset, so
+ * that every peripheral keeps working and can wake up the processor.
+ * @{
+ */
+#define RP2350_PM_SLEEP     (0U)    /**< processor in deep sleep */
+#define RP2350_PM_IDLE      (1U)    /**< processor in sleep (wfi) */
+#define PM_NUM_MODES        (2U)    /**< number of usable low power modes */
+/** @} */
+
 /** GPIO Pin ID for oscillator debugging */
 #define OSC_DEBUG_PIN_ID 15u
 
@@ -122,6 +136,11 @@ static inline uint32_t* calculate_gpio_io_ctrl_register_addr(gpio_t pin) {
      * starting at the base address of IO_BANK0 */
     return (uint32_t*) (calculate_gpio_io_status_register_addr(pin) + 4);
 }
+
+/**
+ * @brief   Number of USB device endpoints per direction, including EP0
+ */
+#define USBDEV_NUM_ENDPOINTS    16
 
 #ifdef __cplusplus
 }

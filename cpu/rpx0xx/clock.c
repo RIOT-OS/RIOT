@@ -128,6 +128,14 @@ void clock_periph_configure(uint32_t aux)
     io_reg_atomic_set(&CLOCKS->CLK_PERI_CTRL, (1u << CLOCKS_CLK_PERI_CTRL_ENABLE_LSB));
 }
 
+void clock_usb_configure(uint32_t aux)
+{
+    io_reg_atomic_clear(&CLOCKS->CLK_USB_CTRL, (1u << CLOCKS_CLK_USB_CTRL_ENABLE_LSB));
+    io_reg_write_dont_corrupt(&CLOCKS->CLK_USB_CTRL, aux << CLOCKS_CLK_USB_CTRL_AUXSRC_LSB,
+                              CLOCKS_CLK_USB_CTRL_AUXSRC_BITS);
+    io_reg_atomic_set(&CLOCKS->CLK_USB_CTRL, (1u << CLOCKS_CLK_USB_CTRL_ENABLE_LSB));
+}
+
 void clock_gpout0_configure(uint32_t f_in, uint32_t f_out, uint32_t aux)
 {
     assert(f_out <= f_in);
