@@ -18,7 +18,7 @@ class TestBase(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         cls.ctrl = RIOTCtrl()
-        cls.ctrl.reset()
+        cls.reset_board()
         cls.ctrl.start_term()
         if cls.DEBUG:
             cls.ctrl.term.logfile = sys.stdout
@@ -34,6 +34,10 @@ class TestBase(unittest.TestCase):
 
     def setUp(self):
         flush_child(self.ctrl.term)
+
+    @classmethod
+    def reset_board(cls):
+        cls.ctrl.reset()
 
     @classmethod
     def init_shell_interaction(cls):
