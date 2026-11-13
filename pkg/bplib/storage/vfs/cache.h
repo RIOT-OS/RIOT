@@ -30,6 +30,13 @@
 extern "C" {
 #endif
 
+/** @brief The bundle was added to the cache, no other cache entry was replaced */
+#define BPLIB_CACHE_ADD_ADDED       0
+/** @brief The bundle was NOT added to the cache, since it contains more urgent bundles */
+#define BPLIB_CACHE_ADD_IGNORED     1
+/** @brief The bundle was added to the cache, but another cache entry was dropped */
+#define BPLIB_CACHE_ADD_REPLACED    2
+
 /**
  * @brief Bundle Cache element, containing information to uniquely identify a bundle on vfs.
  *
@@ -42,17 +49,14 @@ extern "C" {
 typedef struct {
     /** @brief clist base */
     clist_node_t list;
-    /** @brief destination node ID of the bundle */
+    /** @brief Destination node ID of the bundle */
     uint64_t node;
-    /** @brief destination service ID of the bundle */
+    /** @brief Destination service ID of the bundle */
     uint64_t service;
-    /** @brief expiry time of the bundle */
+    /** @brief Expiry time of the bundle */
     uint64_t expiry;
-    /** @brief Index in the storage.
-     * In case the above do not uniquely identify a bundle.
-     * It is only an uint8 because we assume that there won't be more than 256 bundles with
-     * the same expiry time to the same node at any given time. */
-    uint8_t index;
+    /** @brief Unique ID of the bundle */
+    uint32_t id;
 } cache_list_node_t;
 
 /**
@@ -80,14 +84,15 @@ typedef struct {
  * @param node Destinatione node ID of the bundle
  * @param service Destinatione service ID of the bundle
  * @param expiry Expiry DTN time of the bundle
- * @param index Index in the storage, in case the above do not uniquely identify a bundle.
+ * @param id Unique ID of the bundle
  *
- * @retval 1 if the new entry was NOT stored, since the cache is full with more urgent bundles
- * @retval 2 if the new entry was stored and replaced another entry
- * @retval 0 if the new entry was stored but without replacement
+ * @retval BPLIB_CACHE_ADD_IGNORED if the new entry was NOT stored, since the
+ *         cache is full with more urgent bundles
+ * @retval BPLIB_CACHE_ADD_REPLACED if the new entry was stored and replaced another entry
+ * @retval BPLIB_CACHE_ADD_ADDED if the new entry was stored but without replacement
  */
 int bplib_cache_add(cache_list_t* cache,
-    uint64_t node, uint64_t service, uint64_t expiry, uint8_t index);
+    uint64_t node, uint64_t service, uint64_t expiry, uint32_t id);
 
 /**
  * @brief Peek the given cache queue.
