@@ -188,6 +188,15 @@ static inline bool _does_handle_csma(ieee802154_dev_t *dev)
            ieee802154_radio_has_auto_csma(dev);
 }
 
+static inline bool _does_handle_frame_retrans(ieee802154_dev_t *dev)
+{
+    if (!IS_USED(MODULE_IEEE802154_SUBMAC_SOFT_FRAME_RETRANS)) {
+        return true;
+    }
+
+    return ieee802154_radio_has_frame_retrans(dev);
+}
+
 /**
  * @brief   Enable/disable CCA before the next transmission.
  */
@@ -217,6 +226,26 @@ static inline uint8_t _get_retrans(ieee802154_submac_t *submac)
 #else
     (void)submac;
     return 0;
+#endif
+}
+
+static inline uint8_t _get_retrans_nb(ieee802154_submac_t *submac)
+{
+#if IS_USED(MODULE_IEEE802154_SUBMAC_SOFT_FRAME_RETRANS)
+    return submac->retrans_nb;
+#else
+    (void)submac;
+    return 0;
+#endif
+}
+
+static inline void _set_retrans_nb(ieee802154_submac_t *submac, uint8_t retrans_nb)
+{
+#if IS_USED(MODULE_IEEE802154_SUBMAC_SOFT_FRAME_RETRANS)
+    submac->retrans_nb = retrans_nb;
+#else
+    (void)submac;
+    (void)retrans_nb;
 #endif
 }
 
@@ -270,7 +299,7 @@ static inline uint8_t _get_csma_retries_nb(ieee802154_submac_t *submac)
 #endif
 }
 
-static inline uint8_t _get_csma_retries(ieee802154_submac_t *submac)
+static inline int8_t _get_csma_retries(ieee802154_submac_t *submac)
 {
 #if IS_USED(MODULE_IEEE802154_SUBMAC_SOFT_CSMA_CA)
     return submac->csma_retries;
@@ -300,22 +329,23 @@ static inline void _set_csma_backoff_mask(ieee802154_submac_t *submac, uint8_t b
 #endif
 }
 
-static inline void _init_csma(ieee802154_submac_t *submac)
+static inline void _set_csma_retries(ieee802154_submac_t *submac, int8_t retries)
 {
 #if IS_USED(MODULE_IEEE802154_SUBMAC_SOFT_CSMA_CA)
-    submac->be.min = CONFIG_IEEE802154_DEFAULT_CSMA_CA_MIN_BE;
-    submac->be.max = CONFIG_IEEE802154_DEFAULT_CSMA_CA_MAX_BE;
-    submac->csma_retries = CONFIG_IEEE802154_DEFAULT_CSMA_CA_RETRIES;
-
-    if (ieee802154_radio_has_auto_csma(&submac->dev)) {
-        ieee802154_radio_set_csma_params(&submac->dev, &submac->be, submac->csma_retries);
-    }
+    submac->csma_retries = retries;
 #else
-    const ieee802154_csma_be_t be = {
-        .min = CONFIG_IEEE802154_DEFAULT_CSMA_CA_MIN_BE,
-        .max = CONFIG_IEEE802154_DEFAULT_CSMA_CA_MAX_BE,
-    };
-    ieee802154_radio_set_csma_params(&submac->dev, &be, CONFIG_IEEE802154_DEFAULT_CSMA_CA_RETRIES);
+    (void)submac;
+    (void)retries;
+#endif
+}
+
+static inline void _set_csma_be(ieee802154_submac_t *submac, const ieee802154_csma_be_t *be)
+{
+#if IS_USED(MODULE_IEEE802154_SUBMAC_SOFT_CSMA_CA)
+    submac->be = *be;
+#else
+    (void)submac;
+    (void)be;
 #endif
 }
 
@@ -336,7 +366,24 @@ static bool _has_retrans_left(ieee802154_submac_t *submac)
         return false;
     }
 
-    return _get_retrans(submac) < CONFIG_IEEE802154_DEFAULT_MAX_FRAME_RETRANS;
+    return _get_retrans_nb(submac) < _get_retrans(submac);
+}
+
+static inline void _handle_csma_ca(ieee802154_submac_t *submac)
+{
+#if IS_USED(MODULE_IEEE802154_SUBMAC_SOFT_CSMA_CA)
+    /* delay for an adequate random backoff period */
+    uint32_t bp = (random_uint32() & submac->backoff_mask) * submac->csma_backoff_us;
+
+    ztimer_sleep(ZTIMER_USEC, bp);
+    /* Prepare for next iteration */
+    uint8_t curr_be = (submac->backoff_mask + 1) >> 1;
+    if (curr_be < submac->be.max) {
+        submac->backoff_mask = (submac->backoff_mask << 1) | 1;
+    }
+#else
+    (void) submac;
+#endif
 }
 
 static ieee802154_submac_fsm_return_t _tx_end(ieee802154_submac_t *submac, int status,
@@ -379,7 +426,7 @@ static ieee802154_submac_fsm_return_t _handle_tx_no_ack(ieee802154_submac_t *sub
     /* In case of ACK Timeout, either trigger retransmissions or end
      * the TX procedure */
     if (_has_retrans_left(submac)) {
-        _set_retrans(submac, _get_retrans(submac) + 1);
+        _set_retrans_nb(submac, _get_retrans_nb(submac) + 1);
         res = ieee802154_radio_set_idle(&submac->dev, true);
         assert(res >= 0);
         return _state_transition(&submac->fsm, _fsm_state_prepare);
@@ -417,7 +464,7 @@ static ieee802154_submac_fsm_return_t _handle_fsm_ev_tx_ack(ieee802154_submac_t 
         .iol_next = NULL
     };
     _set_wait_for_ack(submac, false);
-    _set_retrans(submac, 0);
+    _set_retrans_nb(submac, 0);
     _set_csma_retries_nb(submac, 0);
     _set_csma_backoff_mask(submac, (1 << _get_csma_be_min(submac)) - 1);
     submac->tx_ftype = IEEE802154_FCF_TYPE_ACK;
@@ -565,19 +612,10 @@ static ieee802154_submac_fsm_return_t _fsm_state_prepare(ieee802154_submac_t *su
     case IEEE802154_FSM_EV_ENTRY: {
         ieee802154_fsm_state_cb_t tx_state = _fsm_state_tx;
 
-        if (submac->tx_ftype != IEEE802154_FCF_TYPE_ACK && !_does_handle_csma(dev)) {
-#if IS_USED(MODULE_IEEE802154_SUBMAC_SOFT_CSMA_CA)
-            /* delay for an adequate random backoff period */
-            uint32_t bp = (random_uint32() & submac->backoff_mask) *
-                          submac->csma_backoff_us;
-
-            ztimer_sleep(ZTIMER_USEC, bp);
-            /* Prepare for next iteration */
-            uint8_t curr_be = (submac->backoff_mask + 1) >> 1;
-            if (curr_be < submac->be.max) {
-                submac->backoff_mask = (submac->backoff_mask << 1) | 1;
-            }
-#endif
+        if (submac->tx_ftype != IEEE802154_FCF_TYPE_ACK &&
+            !_does_handle_csma(dev) &&
+            (_get_csma_retries(submac) > 0)) {
+            _handle_csma_ca(submac);
         }
         else if (submac->tx_ftype == IEEE802154_FCF_TYPE_ACK && !_does_send_ack(dev)) {
             /* no backoff for ACK frames but wait for SIFSPeriod */
@@ -714,7 +752,7 @@ static ieee802154_submac_fsm_return_t _fsm_state_wait_for_ack(ieee802154_submac_
             (ack[0] & IEEE802154_FCF_TYPE_MASK) == IEEE802154_FCF_TYPE_ACK) {
             ieee802154_submac_ack_timer_cancel(submac);
             ieee802154_tx_info_t tx_info;
-            tx_info.retrans = _get_retrans(submac);
+            tx_info.retrans = _get_retrans_nb(submac);
             bool fp = (ack[0] & IEEE802154_FCF_FRAME_PEND);
             ieee802154_radio_set_frame_filter_mode(&submac->dev, IEEE802154_FILTER_ACCEPT);
             return _tx_end(submac, fp ? TX_STATUS_FRAME_PENDING : TX_STATUS_SUCCESS,
@@ -830,7 +868,7 @@ int ieee802154_send(ieee802154_submac_t *submac, const iolist_t *iolist)
     bool cnf = buf[0] & IEEE802154_FCF_ACK_REQ;
 
     _set_wait_for_ack(submac, cnf);
-    _set_retrans(submac, 0);
+    _set_retrans_nb(submac, 0);
     submac->psdu = iolist;
     _set_csma_retries_nb(submac, 0);
     _set_csma_backoff_mask(submac, (1 << _get_csma_be_min(submac)) - 1);
@@ -1153,12 +1191,13 @@ int ieee802154_submac_init(ieee802154_submac_t *submac, const network_uint16_t *
     ieee802154_radio_set_cca_threshold(dev,
                                        CONFIG_IEEE802154_CCA_THRESH_DEFAULT);
 
-    if (ieee802154_radio_has_frame_retrans(&submac->dev)) {
-        ieee802154_radio_set_frame_retrans(&submac->dev,
-                CONFIG_IEEE802154_DEFAULT_MAX_FRAME_RETRANS);
-    }
+    ieee802154_submac_set_frame_retrans(submac, CONFIG_IEEE802154_DEFAULT_MAX_FRAME_RETRANS);
 
-    _init_csma(submac);
+    const ieee802154_csma_be_t be = {
+        .min = CONFIG_IEEE802154_DEFAULT_CSMA_CA_MIN_BE,
+        .max = CONFIG_IEEE802154_DEFAULT_CSMA_CA_MAX_BE,
+    };
+    ieee802154_submac_set_csma_params(submac, &be, CONFIG_IEEE802154_DEFAULT_CSMA_CA_RETRIES);
 
     assert(res >= 0);
 
@@ -1214,6 +1253,45 @@ bool ieee802154_submac_state_is_idle(ieee802154_submac_t *submac)
 bool ieee802154_submac_state_is_rx(ieee802154_submac_t *submac)
 {
     return submac->fsm.fsm_state_cb == _fsm_state_rx;
+}
+
+int ieee802154_submac_set_csma_params(ieee802154_submac_t *submac, const ieee802154_csma_be_t *bd,
+                                      int8_t retries)
+{
+    ieee802154_dev_t *dev = &submac->dev;
+
+    if (_does_handle_csma(dev)) {
+        return ieee802154_radio_set_csma_params(dev, bd, retries);
+    }
+
+    if (bd) {
+        _set_csma_be(submac, bd);
+    }
+
+    if (retries < 0) {
+        /* deactivate CSMA-CA also on the radio */
+        ieee802154_radio_set_csma_params(dev, NULL, retries);
+        _set_csma_retries(submac, retries);
+        return 0;
+    }
+
+    /* activate CCA on the radio, as we don't perform CCA on our own. */
+    ieee802154_radio_set_csma_params(dev, NULL, 0);
+    _set_csma_retries(submac, retries);
+
+    return 0;
+}
+
+int ieee802154_submac_set_frame_retrans(ieee802154_submac_t *submac, uint8_t retrans)
+{
+    ieee802154_dev_t *dev = &submac->dev;
+
+    if (_does_handle_frame_retrans(dev)) {
+        return ieee802154_radio_set_frame_retrans(dev, retrans);
+    }
+
+    _set_retrans(submac, retrans);
+    return 0;
 }
 
 /** @} */
