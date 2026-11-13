@@ -20,7 +20,6 @@
 #include <stdio.h>
 #include <inttypes.h>
 
-#include <shell.h>
 #include <thread.h>
 #include <ztimer.h>
 
@@ -67,7 +66,4 @@ int main(void)
 
     msg_t msg;
     msg_send(&msg, pids[0]);
-
-    char line_buf[SHELL_DEFAULT_BUFSIZE];
-    shell_run(NULL, line_buf, SHELL_DEFAULT_BUFSIZE);
 }

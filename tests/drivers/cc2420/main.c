@@ -19,7 +19,6 @@
 
 #include "cc2420.h"
 #include "init_dev.h"
-#include "shell.h"
 #include "test_utils/netdev_ieee802154_minimal.h"
 
 static cc2420_t cc2420[CC2420_NUM];
@@ -56,11 +55,7 @@ int main(void)
         return 1;
     }
 
-    /* start the shell */
     puts("Initialization successful - starting the shell now");
-
-    char line_buf[SHELL_DEFAULT_BUFSIZE];
-    shell_run(NULL, line_buf, SHELL_DEFAULT_BUFSIZE);
-
+    /* shell starts implicitly after returning */
     return 0;
 }
