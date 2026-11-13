@@ -1,0 +1,4 @@
+PSEUDOMODULES += driver_vl53l1x_st_api
+
+INCLUDES += -I$(PKGDIRBASE)/driver_vl53l1x_st_api/core
+INCLUDES += -I$(PKGDIRBASE)/driver_vl53l1x_st_api/platform
