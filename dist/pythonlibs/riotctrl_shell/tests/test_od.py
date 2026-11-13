@@ -55,3 +55,21 @@ def test_output_w_garbage():
         "00000008 >  10  11  12  \r\n"
         "0000000b"
     ) == bytes(range(0x8, 0x13))
+
+
+def test_multiple():
+    parser = riotctrl_shell.od.OdParser()
+    assert parser.parse(
+        "00000000  98  27  8E  57  DF  F7  FD  88  DC  14  3A  08  1B  87  2F  CB\n"
+        "00000010  D5  3F  CC  2A  90  E9  A0  97  7F  07  A1  EF  0D  F1  8C  26\n"
+        "00000000  EC  22  9E  75",
+        multiple=True,
+    ) == [
+        bytes.fromhex(
+            "          98  27  8E  57  DF  F7  FD  88  DC  14  3A  08  1B  87  2F  CB"
+            "          D5  3F  CC  2A  90  E9  A0  97  7F  07  A1  EF  0D  F1  8C  26"
+        ),
+        bytes.fromhex(
+            "          EC  22  9E  75"
+        )
+    ]
