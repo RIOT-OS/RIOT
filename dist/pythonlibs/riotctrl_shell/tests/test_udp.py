@@ -49,6 +49,9 @@ def test_udp_server_start():
     res = shell.udp_server_start(1337)
     assert res.startswith("Success:")
     assert ctrl.term.last_command == "udp server start 1337"
+    res = shell.udp_server_start(4232, summarize=True)
+    assert res.startswith("Success:")
+    assert ctrl.term.last_command == "udp server start 4232 -s"
 
 
 def test_udp_server_start_error():
