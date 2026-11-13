@@ -43,11 +43,16 @@ env:
 # split up native and IoT-LAB tasks to parallelize somewhat and prevent
 # to hit Github Limit of 6h per job.
 jobs:
-  check-secret:
+  check-inputs:
     runs-on: ubuntu-latest
     outputs:
       secret-configured: ${{ steps.secret-exists-check.outputs.defined }}
     steps:
+      - name: Print workflow_dispatch inputs
+        uses: shayki5/print-workflow-dispatch-inputs@v1
+        with:
+          print_env_vars: 'false'
+          add_to_summary: 'true'
       - name: Check if Secret is configured
         id: secret-exists-check
         # check if the secrets are configured before running the tasks
@@ -62,8 +67,8 @@ jobs:
 
   tasks:
     runs-on: ubuntu-26.04
-    needs: [check-secret]
-    if: needs.check-secret.outputs.secret-configured == 'true'
+    needs: [check-inputs]
+    if: needs.check-inputs.outputs.secret-configured == 'true'
     timeout-minutes: 360
     strategy:
       fail-fast: false
