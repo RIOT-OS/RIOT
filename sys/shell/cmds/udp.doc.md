@@ -35,6 +35,20 @@ Note that the shell buffer size may limit the input length (`SHELL_DEFAULT_BUFSI
 defaults to 128 bytes).
 
 
+## Generate UDP Payload
+
+Add `USEMODULE += shell_cmd_udp_send_generated` to your application Makefile.
+
+With that, the `udp send` command can be provided with the optional parameter `-d`.
+
+```
+> udp send [-b] <addr>:<port> {-d <data-len>|<data>} [<num> [<delay>]]
+```
+
+If the optional parameter `-d` is given, a generated number of `<data-len>` bytes is sent and
+`<data>` is not needed.
+`-d` and `-b` are mutually exclusive.
+
 # UDP Server
 
 Module. Add `USEMODULE += shell_cmd_udp_server` to your application Makefile.

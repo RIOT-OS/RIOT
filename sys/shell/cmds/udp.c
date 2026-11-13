@@ -38,8 +38,18 @@
 #  define SOCK_IP_EP_ANY  SOCK_IPV4_EP_ANY
 #endif
 
+#ifndef CONFIG_SHELL_CMD_UDP_BUFSIZE
+#  ifdef MODULE_SHELL_CMD_UDP_SEND_GENERATED
+#    define CONFIG_SHELL_CMD_UDP_BUFSIZE    1024U
+#  else
+#    define CONFIG_SHELL_CMD_UDP_BUFSIZE    (SHELL_DEFAULT_BUFSIZE / 2U)
+#  endif
+#endif
+
 #define SERVER_PRIO             (THREAD_PRIORITY_MAIN - 1)
 #define SERVER_STACKSIZE        (THREAD_STACKSIZE_DEFAULT)
+
+static uint8_t data_bytes[CONFIG_SHELL_CMD_UDP_BUFSIZE];
 
 #if IS_USED(MODULE_SHELL_CMD_UDP_SERVER)
 
@@ -178,10 +188,11 @@ static void _stop_server(void)
 
 #endif /* MODULE_SHELL_CMD_UDP_SERVER*/
 
-static void _send(const char *addr_str, const char *_data, size_t num,
-                  uint32_t delay, bool data_is_hex)
+static void _send(const char *addr_str, void *data, size_t data_len, size_t num, uint32_t delay,
+                  bool generate_data)
 {
     int res = -1;
+    uint8_t send_count = 0;
 
     /* parse destination address */
     sock_udp_ep_t dst;
@@ -194,19 +205,6 @@ static void _send(const char *addr_str, const char *_data, size_t num,
         return;
     }
 
-    const void *data = _data;
-    size_t data_len = strlen(data);
-    uint8_t data_bytes[SHELL_DEFAULT_BUFSIZE / 2];
-    if (data_is_hex) {
-        ssize_t ret = scn_buf_hex(data_bytes, sizeof(data_bytes), data, data_len);
-        if (ret < 0) {
-            puts("Error: unable to parse hexadecimal data");
-            return;
-        }
-        data = data_bytes;
-        data_len = ret;
-    }
-
     sock_udp_t sock;
     if ((res = sock_udp_create(&sock, NULL, &dst, 0)) < 0) {
         puts("Error creating socket");
@@ -214,6 +212,9 @@ static void _send(const char *addr_str, const char *_data, size_t num,
     }
 
     while (num--) {
+        if (generate_data && (data_len > 0)) {
+            memset(data, send_count++, data_len);
+        }
         if ((res = sock_udp_send(&sock, data, data_len, NULL)) < 0) {
             puts("Error sending data");
             sock_udp_close(&sock);
@@ -233,6 +234,17 @@ static void _send(const char *addr_str, const char *_data, size_t num,
     sock_udp_close(&sock);
 }
 
+static void _usage(const char *cmd)
+{
+    if (IS_USED(MODULE_SHELL_CMD_UDP_SEND_GENERATED)) {
+        printf("usage: %s send [-b] <addr>:<port> {-d <data_len>|<data>} [<num> [<delay in us>]]\n",
+               cmd);
+    }
+    else {
+        printf("usage: %s send [-b] <addr>:<port> <data> [<num> [<delay in us>]]\n", cmd);
+    }
+}
+
 static int _udp_cmd(int argc, char **argv)
 {
     if (argc < 2) {
@@ -243,17 +255,71 @@ static int _udp_cmd(int argc, char **argv)
     if (strcmp(argv[1], "send") == 0) {
         uint32_t num = 1;
         uint32_t delay = 1 * US_PER_SEC;
-        if (argc < 3) {
-            printf("usage: %s send [-b] <addr>:<port> "
-                   "<data> [<num> [<delay in us>]]\n", argv[0]);
+        if (argc < 4) {
+            _usage(argv[0]);
             return 1;
         }
-        bool binary = strcmp(argv[2], "-b") == 0;
-        if (binary) {
+
+        bool data_is_hex = strcmp(argv[2], "-b") == 0;
+        if (data_is_hex) {
             /* shift arguments by 1 to account for encountered -b option */
             argv++;
             argc--;
         }
+
+        const char *addr_str = argv[2];
+
+        if (argc < 4) {
+            _usage(argv[0]);
+            return 1;
+        }
+
+        bool generate_data =
+            IS_USED(MODULE_SHELL_CMD_UDP_SEND_GENERATED) && (strcmp(argv[3], "-d") == 0);
+        if (generate_data && data_is_hex) {
+            puts("Error: -b and -d are mutually exclusive");
+            return 1;
+        }
+
+        void *data = argv[3];
+        size_t data_len = strlen(argv[3]);
+
+        if (generate_data) {
+            char *conversion_end;
+
+            if (argc < 5) {
+                _usage(argv[0]);
+                return 1;
+            }
+            data_len = strtoul(argv[4], &conversion_end, 0);
+            if (*conversion_end != '\0') {
+                puts("Error: unable to parse -d parameter (must be integer)");
+                return 1;
+            }
+            if (data_len > sizeof(data_bytes)) {
+                puts("Error: send buffer too small, increase CONFIG_SHELL_CMD_UDP_BUFSIZE");
+                return 1;
+            }
+        }
+
+        if (data_is_hex) {
+            ssize_t ret = scn_buf_hex(data_bytes, sizeof(data_bytes), data, data_len);
+
+            if (ret < 0) {
+                puts("Error: unable to parse hexadecimal data");
+                return 1;
+            }
+            data = data_bytes;
+            data_len = ret;
+        }
+        else if (generate_data) {
+            data = data_bytes;
+            /* Shift arguments by 1 to account for encountered -d option so that
+             * test for argc > 4 works even with that option */
+            argv++;
+            argc--;
+        }
+
         if (argc > 4) {
             if (!IS_USED(MODULE_ZTIMER)) {
                 puts("Error: retransmission requires ztimer. "
@@ -265,7 +331,7 @@ static int _udp_cmd(int argc, char **argv)
                 delay = atoi(argv[5]);
             }
         }
-        _send(argv[2], argv[3], num, delay, binary);
+        _send(addr_str, data, data_len, num, delay, generate_data);
     }
     else if (strcmp(argv[1], "server") == 0) {
         if (!IS_USED(MODULE_SHELL_CMD_UDP_SERVER)) {
