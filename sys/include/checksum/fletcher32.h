@@ -20,6 +20,8 @@
 #include <stdlib.h>
 #include <stdint.h>
 
+#include "compiler_hints.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -41,12 +43,13 @@ typedef struct {
  * @note the returned sum is never 0
  * @note pay attention to the @p words parameter buffer containing 16 bit words, not bytes.
  *
- * @param[in]       buf     Input buffer to hash
+ * @param[in]       data    Input buffer to hash
  * @param[in]       words   Length of buffer, in 16 bit words
  *
  * @return 32 bit sized hash in the interval [1..2^32-1]
  */
-uint32_t fletcher32(const uint16_t *buf, size_t words);
+ACCESS(read_only, 1, 2)
+uint32_t fletcher32(const uint16_t *data, size_t words);
 
 /**
  * @brief Initialize a fletcher32 context
@@ -58,8 +61,8 @@ uint32_t fletcher32(const uint16_t *buf, size_t words);
 void fletcher32_init(fletcher32_ctx_t *ctx);
 
 /**
- * @brief Incrementally update the fletcher32 context with new data. Can be an arbitrary amount of
- * times with new data to checksum.
+ * @brief Incrementally update the fletcher32 context with new data. Can be an
+ *        arbitrary amount of times with new data to checksum.
  *
  * @note @p words is the number of 16 bit words in the buffer
  * @note @p data should contain an integer number of 16 bit words
