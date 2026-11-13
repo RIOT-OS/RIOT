@@ -233,7 +233,7 @@ class TestUDPServer(riotctrl_shell_tests.testcase_base.TestBase):
         assert "Error: invalid port specified" in str(ctx.exception)
 
         with self.assertRaises(RuntimeError) as ctx:
-            self.shell.udp_server_start("foobar")
+            self.shell.udp_server_start(0)
         assert "Error: invalid port specified" in str(ctx.exception)
 
     def _test_udp_server_start(self):
