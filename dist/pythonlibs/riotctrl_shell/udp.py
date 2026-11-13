@@ -31,7 +31,7 @@ class UDPClientSendParser(ShellInteractionParser):
             r"Success:\s+sen[td]\s+"
             r"(?P<payload_len>\d+)\s+"
             r"byte(\(s\))?\s+(over\s+UDP\s+)?to\s+"
-            r"\[(?P<dst>[0-9a-f:]+(%\S+)?)\]:"
+            r"\[(?P<dst>[0-9a-f:]+(%\S+)?)\]:"  # TODO: Add IPv4 support
             r"(?P<dport>\d+)$"
         )
 
@@ -148,6 +148,7 @@ class UDPServer(ShellInteraction):
                     pexpect.TIMEOUT,
                     # TODO: Remove, when tests/gnrc_udp uses `shell_cmd_udp_server`
                     r"Packets received:\s+\d",
+                    # TODO: Add IPv4 support
                     r"Received UDP data from \[[0-9a-f:]+%.+\]:\d+",
                 ],
                 timeout=timeout,
