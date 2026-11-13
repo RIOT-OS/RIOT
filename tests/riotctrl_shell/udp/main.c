@@ -222,6 +222,7 @@ static int _trigger_receive(int argc, char **argv)
         _trigger_count = atoi(argv[1]);
         if (_trigger_count == 0) {
             printf("usage: %s [count [delay_us]]\n", argv[0]);
+            return 1;
         }
     }
     if (argc < 3) {
@@ -231,6 +232,7 @@ static int _trigger_receive(int argc, char **argv)
         _trigger_delay = atoi(argv[2]);
         if (_trigger_delay == 0) {
             printf("usage: %s [count [delay_us]]\n", argv[0]);
+            return 1;
         }
     }
 

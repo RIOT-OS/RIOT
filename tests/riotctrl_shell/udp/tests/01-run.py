@@ -184,7 +184,7 @@ class TestUDP(riotctrl_shell_tests.testcase_base.TestBase):
         byts = self.od_parser.parse(res, multiple=True)
         assert len(byts) == count
         assert len(stats) == count
-        for i in range(3):
+        for i in range(count):
             assert byts[i] == b"abcd"
             assert stats[i]["payload_len"] == len(b"abcd")
             assert stats[i]["dst"] == "2001:db8::1"
@@ -201,7 +201,7 @@ class TestUDP(riotctrl_shell_tests.testcase_base.TestBase):
         byts = self.od_parser.parse(res, multiple=True)
         assert len(byts) == count
         assert len(stats) == count
-        for i in range(3):
+        for i in range(count):
             assert byts[i] == b"abcd"
             assert stats[i]["payload_len"] == len(b"abcd")
             assert stats[i]["dst"] == "2001:db8::1"
