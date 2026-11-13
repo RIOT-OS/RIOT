@@ -1,0 +1,4 @@
+FEATURES_PROVIDED += cpu_psoc6
+FEATURES_PROVIDED += periph_gpio periph_uart periph_timer periph_spi periph_i2c ble_nimble
+
+include $(RIOTCPU)/cortexm_common/Makefile.features

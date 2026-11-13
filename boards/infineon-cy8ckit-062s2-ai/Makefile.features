@@ -1,0 +1,9 @@
+CPU = psoc6
+CPU_CORE ?= cortex-m0plus
+CPU_MODEL = CY8C624ABZI
+
+FEATURES_PROVIDED += periph_uart
+FEATURES_PROVIDED += periph_gpio
+FEATURES_PROVIDED += periph_timer
+FEATURES_PROVIDED += periph_spi
+FEATURES_PROVIDED += periph_i2c
