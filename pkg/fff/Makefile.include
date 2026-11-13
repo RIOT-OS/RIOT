@@ -7,13 +7,8 @@ PSEUDOMODULES += fff
 # Tests don't need pedantic. Pedantic throws errors in variadic macros when compiling for C++
 CXXEXFLAGS += -Wno-pedantic
 
-ifeq (1,$(RIOT_CI_BUILD))
-  # TODO: remove this when the build containers clang is updated to version 16
-  TOOLCHAINS_BLACKLIST += llvm
-else
-  ifeq (llvm,$(TOOLCHAIN))
-    ifneq (1,$(call version_is_greater_or_equal,$(LLVM_VERSION),16))
-      $(error package fff requires clang 16.0.0 or newer. Use GCC or update clang.)
-    endif
+ifeq (llvm,$(TOOLCHAIN))
+  ifneq (1,$(call version_is_greater_or_equal,$(LLVM_VERSION),16))
+    $(error package fff requires clang 16.0.0 or newer. Use GCC or update clang.)
   endif
 endif
