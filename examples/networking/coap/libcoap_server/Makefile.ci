@@ -40,6 +40,7 @@ BOARD_INSUFFICIENT_MEMORY := \
     e104-bt5011a-tb \
     e180-zg120b-tb \
     ek-lm4f120xl \
+    esp32s2-wemos-mini \
     esp8266-esp-12x \
     esp8266-olimex-mod \
     esp8266-sparkfun-thing \
