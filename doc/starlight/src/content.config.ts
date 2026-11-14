@@ -6,26 +6,69 @@
  */
 
 import { defineCollection } from "astro:content";
-import { type Loader } from "astro/loaders";
+import { type Loader, type LoaderContext } from "astro/loaders";
 import { docsSchema } from "@astrojs/starlight/schema";
 import { promises as fs } from "node:fs";
 import { glob } from "astro/loaders";
 import { z } from "astro/zod";
 import path from "node:path";
+import { fileURLToPath, pathToFileURL } from "node:url";
 import {
-  extractDoxygenGroupFromDoxygen,
-  extractDoxygenGroupTitleFromDoxygen,
-  transformDoxygenMarkdown,
-} from "./lib/doxygen_filter";
+  type ApiDocLocation,
+  convertDoxygenDoc,
+  type DoxygenDocSource,
+  type DoxygenSite,
+  loadDoxygenSite,
+} from "./lib/doxygen_docs";
+import { REPOSITORY_URL, SOURCE_TREE_URL } from "../config";
+
+/* -------------------------------------------------------------------------- */
+/* Sources of the board and CPU documentation                                 */
+/* -------------------------------------------------------------------------- */
+
+const BOARDS: DoxygenDocSource = {
+  dir: "../../boards",
+  groupPrefix: "boards",
+  routePrefix: "boards",
+};
+const CPUS: DoxygenDocSource = {
+  dir: "../../cpu",
+  groupPrefix: "cpu",
+  routePrefix: "cpus",
+};
+
+/**
+ * The API documentation that the board and CPU documentation links to.
+ *
+ * Environment variables:
+ * - `RIOT_API_BASE_URL`: base URL of the API documentation
+ * - `RIOT_DOXYGEN_TAGFILE`: path or URL of its Doxygen tag file. An empty
+ *   value disables the tag file. If the variable is not set, the tag file of
+ *   a local build of the API documentation is used if there is one, and
+ *   else the tag file of the published API documentation.
+ */
+const API_DOC: ApiDocLocation = {
+  baseUrl: (process.env.RIOT_API_BASE_URL ?? "https://api.riot-os.org").replace(/\/+$/, ""),
+  tagFile: process.env.RIOT_DOXYGEN_TAGFILE,
+  localTagFile: "../doxygen/html/riot.tag",
+};
+
+/* -------------------------------------------------------------------------- */
+/* Collections                                                                */
+/* -------------------------------------------------------------------------- */
 
 const DoxygenDocSchema = z.object({
   title: z.string(),
   description: z.string().nullish(),
-  doxygenGroup: z.string(),
+  /** URL of the page of the group in the API documentation */
+  apiUrl: z.string(),
   githubFolder: z.string(),
   editUrl: z.string(),
   includeInOverview: z.boolean(),
-  parentId: z.string().nullable(),
+  /** Pages that are shown as related pages */
+  parentIds: z.array(z.string()),
+  /** Value of `BOARD` for the pages of boards, `null` for all other pages */
+  board: z.string().nullable(),
 });
 
 export const collections = {
@@ -34,11 +77,11 @@ export const collections = {
     schema: docsSchema(),
   }),
   boards: defineCollection({
-    loader: doxygenDocLoader("../../boards", "boards"),
+    loader: doxygenDocLoader(BOARDS),
     schema: DoxygenDocSchema
   }),
   cpus: defineCollection({
-    loader: doxygenDocLoader("../../cpu", "cpu"),
+    loader: doxygenDocLoader(CPUS),
     schema: DoxygenDocSchema
   }),
   changelog: defineCollection({
@@ -54,98 +97,95 @@ export const collections = {
   }),
 };
 
+/* -------------------------------------------------------------------------- */
+/* Loaders                                                                    */
+/* -------------------------------------------------------------------------- */
+
 /**
- * Load documentation from doc*.md files in the specified directory.
- * Each subdirectory may contain one or more files matching the pattern
- * `doc*.md` (e.g. `doc.md`, `doc-extra.md`). Extracts titles from
- * `@defgroup` directives like riot-index does.
+ * The board and the CPU documentation refer to each other, so both
+ * collection loaders work on the same data, see `loadDoxygenSite()`.
  *
- * @param dir The folder from which to load the doc*.md files.
- * @param doxygenGroupPrefix The prefix with which the doxygen group of these docs starts
+ * The files are read once per build and shared between both loaders. A
+ * loader that runs again (e.g. in `astro dev`) gets freshly read files
+ * instead of the data of its previous run.
  */
-function doxygenDocLoader(dir: string, doxygenGroupPrefix: string): Loader {
+let doxygenSite: { promise: Promise<DoxygenSite>; consumers: Set<DoxygenDocSource> } | undefined;
+
+/**
+ * @param consumer The source tree of the loader that asks for the data
+ * @param context  Context of this loader
+ */
+function getDoxygenSite(consumer: DoxygenDocSource, context: LoaderContext): Promise<DoxygenSite> {
+  if (!doxygenSite || doxygenSite.consumers.has(consumer)) {
+    // The copy of a downloaded tag file is kept with the other generated
+    // files of Astro. The cache directory of Astro is in `node_modules`,
+    // which `make build` and `make dev` install from scratch.
+    const tagFileCache = fileURLToPath(new URL(".astro/riot.tag", context.config.root));
+    const renderHeadingIds = async (markdown: string): Promise<string[]> => {
+      const { metadata } = await context.renderMarkdown(markdown);
+      return metadata?.headings?.map((heading) => heading.slug) ?? [];
+    };
+    doxygenSite = {
+      promise: loadDoxygenSite([BOARDS, CPUS], { ...API_DOC, tagFileCache }, renderHeadingIds),
+      consumers: new Set(),
+    };
+  }
+  doxygenSite.consumers.add(consumer);
+  return doxygenSite.promise;
+}
+
+/**
+ * Load documentation from doc*.md files of a source tree.
+ * Each subdirectory may contain one or more files matching the pattern
+ * `doc*.md` (e.g. `doc.md`, `doc_esp32.doc.md`).
+ *
+ * The files are found and converted by `lib/doxygen_docs.ts`. This loader
+ * puts the pages into the collection.
+ */
+function doxygenDocLoader(source: DoxygenDocSource): Loader {
   return {
-    name: `${doxygenGroupPrefix}-loader`,
+    name: `${source.groupPrefix}-loader`,
     load: async (context): Promise<void> => {
       try {
-        // Read all directories in the `dir` folder
-        const entries = await fs.readdir(dir, { withFileTypes: true });
-        const docDirs = entries.filter((entry) => entry.isDirectory());
+        const site = await getDoxygenSite(source, context);
 
-        for (const docDir of docDirs) {
-          const docName = docDir.name;
-          const docDirPath = path.join(dir, docName);
-
-          // Find all doc*.md files in this directory
-          let docFiles: string[];
-          try {
-            const dirEntries = await fs.readdir(docDirPath, {
-              withFileTypes: true,
-            });
-            docFiles = dirEntries
-              .filter(
-                (entry) => entry.isFile() && entry.name.endsWith("doc.md"),
-              )
-              .map((entry) => entry.name)
-              // Sort so iteration order is deterministic across platforms
-              .sort();
-          } catch (error) {
-            console.debug(
-              `Failed to read directory for ${doxygenGroupPrefix} "${docName}", skipping...`,
+        // the pages of files that are gone must not stay in the collection
+        context.store.clear();
+        for (const doc of site.docs.get(source) ?? []) {
+          const page = convertDoxygenDoc(doc, site);
+          if (page.unresolved.length) {
+            context.logger.warn(
+              `${doc.docPath}: unresolved references: ${page.unresolved.join(", ")}`,
             );
-            continue;
           }
 
-          if (docFiles.length === 0) {
-            console.debug(
-              `Tried to load documentation for ${doxygenGroupPrefix} "${docName}" but it doesn't contain any doc*.md files, skipping...`,
-            );
-            continue;
-          }
-
-          for (const docFile of docFiles) {
-            const docPath = path.join(docDirPath, docFile);
-            const baseName = path.basename(docFile, ".md");
-            const isParent = baseName === "doc";
-            const id = isParent ? docName : `${docName}/${baseName}`;
-
-            const docContent = await fs.readFile(docPath, "utf-8");
-
-            // Parse frontmatter out of the markdown content if it exists
-            const markdown = docContent;
-            const fallbackTitle = docName.replace(/-/g, " ");
-            const title = extractDoxygenGroupTitleFromDoxygen(
-              docContent,
-              doxygenGroupPrefix,
-              fallbackTitle,
-            );
-            const filteredMarkdown = transformDoxygenMarkdown(markdown);
-
-            // Parse @brief directives for description (take the first one as description)
-            const descriptionMatch = docContent.match(/@brief\s+(.+)/);
-            const description = descriptionMatch?.[1].trim();
-
-            // Add entry to content collection
-            context.store.set({
-              id: id,
-              filePath: docPath.replaceAll("../", ""),
-              data: {
-                title: title,
-                description: description,
-                doxygenGroup: extractDoxygenGroupFromDoxygen(docContent, doxygenGroupPrefix),
-                githubFolder: docDirPath.replaceAll("../", ""),
-                // Only the parent appears in the overview; children are hidden
-                // and reached via their parent's childrenIds.
-                includeInOverview: isParent,
-                parentId: isParent ? null : docName,
-              },
-              body: filteredMarkdown,
-              rendered: await context.renderMarkdown(filteredMarkdown),
-            });
-          }
+          context.store.set({
+            id: doc.id,
+            filePath: doc.sourcePath,
+            data: {
+              title: page.title,
+              description: page.description,
+              apiUrl: page.apiUrl,
+              githubFolder: doc.sourceDir,
+              editUrl: `${SOURCE_TREE_URL}/${doc.sourcePath}`,
+              // Only boards and CPUs appear in the overview. Further pages
+              // (`doc_*.doc.md`, `common/...`) are hidden and reached via the
+              // related pages and references.
+              includeInOverview: doc.isModulePage,
+              parentIds: doc.parentIds,
+              board: source === BOARDS && doc.isModulePage ? doc.docName : null,
+            },
+            body: page.markdown,
+            // The file URL is required, otherwise Starlight doesn't apply its
+            // Markdown plugins and `:::note` etc. are not rendered as asides.
+            rendered: await context.renderMarkdown(page.markdown, {
+              fileURL: pathToFileURL(path.resolve(doc.docPath)),
+            }),
+          });
         }
       } catch (error) {
-        console.error(`Error loading ${doxygenGroupPrefix}:`, error);
+        console.error(`Error loading ${source.groupPrefix}:`, error);
+        throw error;
       }
     },
   };
@@ -233,7 +273,7 @@ export function changelogLoader(): Loader {
             // Github treats both PRs and Issues the same way regarding links
             const contentWithGithubLinks = currentReleaseContent.replace(
               /#(\d+)/g,
-              "[#$1](https://github.com/RIOT-OS/RIOT/issues/$1)",
+              `[#$1](${REPOSITORY_URL}/issues/$1)`,
             );
 
             // Add entry to content collection

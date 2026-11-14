@@ -2,12 +2,23 @@
     "name": "guide",
     "type": "module",
     "version": "0.0.1",
+    "engines": {
+        "node": ">=22.22.0"
+    },
+    "devEngines": {
+        "runtime": {
+            "name": "node",
+            "version": ">=22.22.0",
+            "onFail": "error"
+        }
+    },
     "scripts": {
         "dev": "astro dev",
         "start": "astro dev",
         "build": "astro build",
         "preview": "astro preview",
-        "astro": "astro"
+        "astro": "astro",
+        "test": "node --test src/lib/*.test.ts"
     },
     "dependencies": {
         "@astrojs/markdown-satteri": "^0.4.4",

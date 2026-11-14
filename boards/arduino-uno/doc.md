@@ -91,7 +91,7 @@ and it will be difficult to restore the auto-reset feature of the clones.
 
 #### Software
 
-You need to have [AVaRICE](e539724b20) installed. Some
+You need to have [AVaRICE](https://github.com/avrdudes/avarice) installed. Some
 distros have this packaged already.
 
 #### Fuses

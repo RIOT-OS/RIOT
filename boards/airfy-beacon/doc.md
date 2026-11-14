@@ -174,8 +174,7 @@ previously opened GDB server and will also load your corresponding .elf file.
 
 Alternatively you can configure your IDE (e.g. eclipse or similar) to connect
 directly to the GDB server. [See here for more information on how to configure
-Eclipse](<https://github.com/RIOT-OS/RIOT/wiki/Using-the-Eclipse-IDE-for-C-and->
-CPP-Developers,-Howto)
+Eclipse](https://github.com/RIOT-OS/RIOT/wiki/Using-the-Eclipse-IDE-for-C-and-CPP-Developers,-Howto)
 
 ### Program the device manually
 

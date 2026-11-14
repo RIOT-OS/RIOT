@@ -7,6 +7,8 @@ on:
     paths:
       - 'doc/guides/**'
       - 'doc/starlight/**'
+      - 'boards/**/doc*.md'
+      - 'cpu/**/doc*.md'
       - 'CODE_OF_CONDUCT.md'
       - 'GOVERNANCE.md'
       - 'CONTRIBUTING.md'

@@ -251,8 +251,8 @@ in RIOT if the module `esp_hw_counter` is enabled.
 
 ESP32 integrates three UART interfaces. The following default pin
 configuration of UART interfaces as used by a most boards can be overridden
-by the application, see section [Application-Specific Configurations]
-(#esp32_application_specific_configurations).
+by the application, see section
+[Application-Specific Configurations](#esp32_application_specific_configurations).
 
 <center>
 

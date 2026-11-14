@@ -13,8 +13,7 @@ You can find general information about the Nucleo64 boards on the
 
 ## Hardware
 
-![Nucleo144 U575ZI-Q](https://www.st.com/bin/ecommerce/api/image.PF271812.en.fea
-ture-description-include-personalized-no-cpn-medium.jpg)
+![Nucleo144 U575ZI-Q](https://www.st.com/bin/ecommerce/api/image.PF271812.en.feature-description-include-personalized-no-cpn-medium.jpg)
 
 ### MCU
 

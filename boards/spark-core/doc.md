@@ -32,8 +32,8 @@ Link to [product website](http://docs.spark.io/hardware/).
 | I2Cs       | 2                 |
 | Vcc        | 2.0V - 3.6V           |
 | Datasheet  | [Datasheet](https://github.com/spark/core/blob/master/Datasheets/ST_STM32F103CB.pdf) |
-| Reference Manual | [Reference Manual](xxx) |
-| Programming Manual | [Programming Manual](xxx) |
+| Reference Manual | [Reference Manual](https://www.st.com/resource/en/reference_manual/rm0008-stm32f101xx-stm32f102xx-stm32f103xx-stm32f105xx-and-stm32f107xx-advanced-armbased-32bit-mcus-stmicroelectronics.pdf) |
+| Programming Manual | [Programming Manual](https://www.st.com/resource/en/programming_manual/pm0056-stm32f10xxx20xxx21xxxl1xxxx-cortexm3-programming-manual-stmicroelectronics.pdf) |
 | Board Manual   | [Board Manual](http://docs.spark.io/hardware/)|
 
 ## Hardware connection

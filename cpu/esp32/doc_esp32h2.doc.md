@@ -132,8 +132,8 @@ be used.
 
 ESP32-H2 integrates two UART interfaces. The following default pin
 configuration of UART interfaces as used by a most boards can be overridden
-by the application, see section [Application-Specific Configurations]
-(#esp32_application_specific_configurations).
+by the application, see section
+[Application-Specific Configurations](#esp32_application_specific_configurations).
 
 <center>
 

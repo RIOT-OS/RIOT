@@ -54,10 +54,8 @@ See [ARM Family](https://github.com/RIOT-OS/RIOT/wiki/Family:-ARM)
 
 Working:
 
-* [gcc-arm-embedded](<https://github.com/RIOT-OS/RIOT/wiki/Family:-ARM#gcc->
-arm-embedded-toolchain)
-* [gcc-linaro](<https://github.com/RIOT-OS/RIOT/wiki/Family:-ARM#linaro->
-toolchain)
+* [gcc-arm-embedded](https://github.com/RIOT-OS/RIOT/wiki/Family:-ARM#gcc-arm-embedded-toolchain)
+* [gcc-linaro](https://github.com/RIOT-OS/RIOT/wiki/Family:-ARM#linaro-toolchain)
 
 ### Programming and Debugging
 
@@ -97,8 +95,7 @@ Open node connector. The powering of the board is then assumed by a battery or
 by the USB connector  The choice of the power input is done electronically
 (power management).
 
-![IoT-LAB M3 architecture](<https://www.iot-lab.info/wp->
-content/uploads/2013/10/archiopenm3.png)
+![IoT-LAB M3 architecture](https://www.iot-lab.info/wp-content/uploads/2013/10/archiopenm3.png)
 
 ## Debugging
 

@@ -9,6 +9,7 @@
 import StarlightPage from "@astrojs/starlight/components/StarlightPage.astro";
 import { LinkCard } from "@astrojs/starlight/components";
 import { getCollection, render } from "astro:content";
+import { REPOSITORY_URL } from "../../../config";
 
 export async function getStaticPaths() {
   const changelog = await getCollection("changelog");
@@ -37,7 +38,7 @@ const { Content, headings } = await render(entry);
 >
   <LinkCard
     title="View on GitHub"
-    href={`https://github.com/RIOT-OS/RIOT/releases/tag/${entry.data.slug.replaceAll("-", ".")}`}
+    href={`${REPOSITORY_URL}/releases/tag/${entry.data.slug.replaceAll("-", ".")}`}
     description="The changelog can also be found on GitHub."
   />
   <Content />

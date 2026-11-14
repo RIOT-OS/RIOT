@@ -9,42 +9,25 @@ import { defineConfig } from "astro/config";
 import starlight from "@astrojs/starlight";
 import starlightImageZoom from "starlight-image-zoom";
 import starlightSidebarTopics from "starlight-sidebar-topics";
-import { satteri, type SatteriProcessorOptions } from '@astrojs/markdown-satteri';
-import * as emoji from 'node-emoji'
-
-type SatteriMdastPlugin = Extract<
-  NonNullable<SatteriProcessorOptions["mdastPlugins"]>[number],
-  { name: string }
->;
-
-function satteriEmoji(): SatteriMdastPlugin {
-  return {
-    name: 'satteri-emoji',
-    text(node, ctx) {
-      if (node.value && node.value.includes(':')) {
-        const emojified = emoji.emojify(node.value)
-        if (emojified !== node.value) {
-          ctx.setProperty(node, 'value', emojified)
-        }
-      }
-    }
-  }
-}
+import { markdownProcessor } from "./src/lib/markdown_processor.ts";
+import { SOURCE_TREE_URL } from "./config.ts";
 
 // https://astro.build/config
 export default defineConfig({
   site: "https://guide.riot-os.org",
   markdown: {
-    processor: satteri({
-      mdastPlugins: [satteriEmoji],
-    })
+    processor: markdownProcessor,
   },
   integrations: [
     starlight({
       title: "RIOT Documentation",
       markdown: {
-        processedDirs: ["../guides"],
+        // Board and CPU documentation is loaded from the doc*.md files in
+        // the source tree. Starlight's Markdown plugins (asides, heading
+        // links) are only applied to files in these directories.
+        processedDirs: ["../guides", "../../boards", "../../cpu"],
       },
+      tableOfContents: { minHeadingLevel: 2, maxHeadingLevel: 3 },
       routeMiddleware: "./src/routeData.ts",
       head: [
         {
@@ -306,7 +289,7 @@ export default defineConfig({
       }),
       ],
       editLink: {
-        baseUrl: "https://github.com/RIOT-OS/RIOT/tree/master/doc/guides",
+        baseUrl: `${SOURCE_TREE_URL}/doc/guides`,
       },
     }),
   ],

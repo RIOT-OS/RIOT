@@ -22,6 +22,10 @@ dev: install
 	@echo "Starting starlight live server..."
 	@npm run dev --prefix $(CURDIR)
 
+.PHONY: test
+test: install
+	@npm test --prefix $(CURDIR)
+
 .PHONY: clean
 clean:
 	-@rm -rf node_modules .astro dist

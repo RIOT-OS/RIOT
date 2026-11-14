@@ -72,3 +72,17 @@ main {
     font-size: calc(var(--font-scale) * var(--sl-text-h6)) !important;
   }
 }
+
+/*
+ * Starlight limits the content column to 45rem, which makes the wide
+ * configuration tables of board and CPU documentation hard to read.
+ * On these generated pages (marked with `.doxygen-doc`) the available width
+ * is used on large screens. Hand-written guides keep the default layout.
+ * Tables that are still too wide scroll horizontally, which Starlight does
+ * for all tables.
+ */
+@media (min-width: 72rem) {
+  :root:has(.doxygen-doc) {
+    --sl-content-width: 64rem;
+  }
+}
