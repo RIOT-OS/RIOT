@@ -58,7 +58,7 @@ extern "C" {
  * controller, which does not respond on I2C while in reset.
  * @{
  */
-#define LCD_RST_PIN         GPIO_PIN(PORT_J, 15)    /**< Panel and touch reset (low active) */
+#define LCD_RST_PIN         GPIO_PIN(PORT_J, 15)    /**< Panel and touch reset (active low) */
 /** @} */
 
 /**

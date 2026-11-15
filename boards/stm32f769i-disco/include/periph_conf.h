@@ -359,10 +359,11 @@ static const fmc_conf_t fmc_config = {
 /**
  * @brief   FMC Bank configuration
  *
- * The board has a SDRAM MT48LC4M32B2B5-6A with 128 MBit on-board.
- * It is organized in 4 banks of 1M x 32 bits each and connected to bank 5
- * at address 0xc0000000. The CAS latency and timings are the ones used by
- * ST's board support package (BSP) for this board.
+ * The board has a 128-Mbit SDRAM: MT48LC4M32B2B5-6A, or IS42S32400F-6BL
+ * from MB1225 revision B03 on. It is organized in 4 banks of 1M x 32 bits
+ * each and connected to bank 5 at address 0xc0000000. The CAS latency and
+ * timings are the ones used by ST's board support package (BSP) for this
+ * board.
  */
 static const fmc_bank_conf_t fmc_bank_config[] = {
     /* bank 5 is used for SDRAM */
@@ -373,7 +374,7 @@ static const fmc_bank_conf_t fmc_bank_config[] = {
         .address = 0xc0000000,               /* Bank 5 is mapped to 0xc0000000 */
         .size = MiB(16),                     /* Size in MiB, 4M x 32 Bit */
         .sdram = {
-            .clk_period = 2,                 /* SDCLK = 2 x HCLK */
+            .clk_period = 2,                 /* SDCLK period = 2 x HCLK periods */
             .row_bits = 12,                  /* A11..A0 used for row address */
             .col_bits = 8,                   /* A7..A0 used for column address */
             .cas_latency = 3,                /* CAS latency is 3 clock cycles */
@@ -382,7 +383,7 @@ static const fmc_bank_conf_t fmc_bank_config[] = {
             .write_protect = false,          /* No write protection */
             .burst_read = true,              /* Burst read mode enabled */
             .burst_write = false,            /* Burst write mode disabled */
-            .burst_interleaved = false,      /* Burst mode interleaved */
+            .burst_interleaved = false,      /* Sequential burst mode */
             .burst_len = FMC_BURST_LENGTH_1, /* Burst length is 1 */
             .timing = {                      /* SDRAM Timing parameters */
                 .row_to_col_delay = 2,       /* Row to column delay (2 clock cycles) */
@@ -486,7 +487,7 @@ static const pwm_conf_t pwm_config[] = {
  * @name    SDIO/SDMMC configuration
  *
  * The on-board microSD card slot (CN5) is connected to SDMMC2, with the card
- * detect signal on PI15 (low is active)
+ * detect signal on PI15 (active low)
  * @{
  */
 

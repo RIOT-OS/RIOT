@@ -59,8 +59,8 @@ The Arduino pins D0-D15 and A0-A5 are mapped in `arduino_iomap.h`.
 - B2 (black): reset button
 - LD1 (red, PJ13) and LD2 (green, PJ5): user LEDs, `LED0` and `LED1`
 - LD3 (green, PA12): Arduino D13 LED, `LED2`, shared with SPI2 SCK
-- LD4 (red): USB OTG HS overcurrent, driven by PD4, which must not be used as
-  an output
+- LD4 (red): lit on a USB OTG HS overcurrent; PD4 reads the same signal and
+  must not be used as an output
 - 4-inch 800x480 capacitive touch display, with an FT6x06 touch controller on
   I2C4
 - WM8994 audio codec on I2C4 and four digital MEMS microphones on DFSDM1
@@ -91,8 +91,7 @@ The Arduino pins D0-D15 and A0-A5 are mapped in `arduino_iomap.h`.
 | Digital microphones     | -       |                                                       |
 | External Quad-SPI flash | -       |                                                       |
 
-The USB OTG HS port works with TinyUSB; USBUS stack does not work on
-it yet.
+The USB OTG HS port works with TinyUSB; the USBUS stack does not work on it yet.
 
 ## Flashing the Board
 
