@@ -32,9 +32,8 @@
  * @brief   Default button GPIO pin definition
  *
  * The Adafruit Metro ESP32-S3 board has a BOOT button connected to GPIO0,
- * which can be used as button during normal operation. Since the GPIO0 pin
- * is pulled up, the button signal is inverted, i.e., pressing the button
- * will give a low signal.
+ * which can be used as button during normal operation. The GPIO0 pin
+ * has a pull-up resistor and the button is low-active.
  */
 #define BTN0_PIN        GPIO0
 

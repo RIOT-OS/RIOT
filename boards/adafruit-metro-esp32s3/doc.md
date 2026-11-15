@@ -25,7 +25,7 @@ The main features of the board are:
 - microSD card slot (SPI)
 - Red LED and RGB LED (NeoPixel)
 - STEMMA QT / Qwiic I2C connector
-- MAX17048 LiPo battery monitor
+- MAX17048 LiPo battery monitor (currently not supported)
 - LiPo battery charger with JST PH connector
 - Native USB-C with USB Serial/JTAG
 - DC barrel jack (6 V ... 12 V)
@@ -144,7 +144,7 @@ BOARD=adafruit-metro-esp32s3 make flash ...
 ```
 
 @note The board is shipped with the TinyUF2 bootloader and a factory
-application that use the native USB interface. Flashing RIOT overwrites the
+application that uses the native USB interface. Flashing RIOT overwrites the
 UF2 bootloader. If the USB Serial/JTAG interface is not available, the
 programmer cannot connect to the board and flashing is aborted with a
 timeout. In this case, restart the board manually in download mode by

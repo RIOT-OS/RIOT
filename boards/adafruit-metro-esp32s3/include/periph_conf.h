@@ -63,7 +63,7 @@ extern "C" {
  * the STEMMA QT connector. The on-board MAX17048 battery monitor is
  * connected to this bus with address 0x36.
  *
- * The GPIOs listed in the configuration are only initialized as I2C signals
+ * @note The GPIOs listed in the configuration are only initialized as I2C signals
  * when module `periph_i2c` is used. Otherwise they are not allocated and
  * can be used for other purposes.
  *
@@ -160,10 +160,10 @@ extern "C" {
 /**
  * @name   UART configuration
  *
- * ESP32-S3 provides 3 UART interfaces at maximum:
+ * ESP32-S3 provides 3 UART interfaces at maximum, two are defined by RIOT:
  *
  * UART_DEV(0) uses fixed standard configuration (Debug header).<br>
- * UART_DEV(1) is connected to the Arduino pins D0 (RX) and D1 (TX).<br>
+ * UART_DEV(1) is connected to the Arduino pins D0 (RX) and D1 (TX).
  *
  * @{
  */
