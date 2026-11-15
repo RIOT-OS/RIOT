@@ -43,7 +43,7 @@
  * @brief   Default interrupt flank definition for the button GPIO
  */
 #ifndef BTN0_INT_FLANK
-#define BTN0_INT_FLANK  GPIO_FALLING
+#  define BTN0_INT_FLANK  GPIO_FALLING
 #endif
 
 /**
@@ -67,10 +67,10 @@
 #define LED0_ACTIVE     1       /**< LED is high active */
 
 #ifndef WS281X_PARAM_PIN
-#define WS281X_PARAM_PIN    (GPIO45)  /**< GPIO pin connected to the data pin */
+#  define WS281X_PARAM_PIN    (GPIO45)   /**< GPIO pin connected to the data pin */
 #endif
 #ifndef WS281X_PARAM_NUMOF
-#define WS281X_PARAM_NUMOF  (1U)      /**< Number of LEDs chained */
+#  define WS281X_PARAM_NUMOF  (1U)       /**< Number of LEDs chained */
 #endif
 /** @} */
 

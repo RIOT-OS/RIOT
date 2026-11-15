@@ -40,7 +40,7 @@ extern "C" {
  * purposes.
  */
 #ifndef ADC_GPIOS
-#define ADC_GPIOS   { GPIO17, GPIO18, GPIO1, GPIO2, GPIO3, GPIO4 }
+#  define ADC_GPIOS   { GPIO17, GPIO18, GPIO1, GPIO2, GPIO3, GPIO4 }
 #endif
 
 /**
@@ -53,7 +53,7 @@ extern "C" {
  * purposes.
  */
 #ifndef DAC_GPIOS
-#define DAC_GPIOS   { GPIO17, GPIO18 }
+#  define DAC_GPIOS   { GPIO17, GPIO18 }
 #endif
 /** @} */
 
@@ -70,13 +70,13 @@ extern "C" {
  * @{
  */
 #ifndef I2C0_SPEED
-#define I2C0_SPEED  I2C_SPEED_FAST  /**< I2C bus speed of I2C_DEV(0) */
+#  define I2C0_SPEED  I2C_SPEED_FAST   /**< I2C bus speed of I2C_DEV(0) */
 #endif
 #ifndef I2C0_SCL
-#define I2C0_SCL    GPIO34          /**< SCL signal of I2C_DEV(0) */
+#  define I2C0_SCL    GPIO34           /**< SCL signal of I2C_DEV(0) */
 #endif
 #ifndef I2C0_SDA
-#define I2C0_SDA    GPIO33          /**< SDA signal of I2C_DEV(0) */
+#  define I2C0_SDA    GPIO33           /**< SDA signal of I2C_DEV(0) */
 #endif
 /** @} */
 
@@ -98,7 +98,7 @@ extern "C" {
  *        at maximum PWM_CHANNEL_NUM_DEV_MAX.
  */
 #ifndef PWM0_GPIOS
-#define PWM0_GPIOS  { GPIO8, GPIO10, GPIO11, GPIO14 }
+#  define PWM0_GPIOS  { GPIO8, GPIO10, GPIO11, GPIO14 }
 #endif
 
 /**
@@ -106,7 +106,7 @@ extern "C" {
  *        at maximum PWM_CHANNEL_NUM_DEV_MAX.
  */
 #ifndef PWM1_GPIOS
-#define PWM1_GPIOS  { GPIO15, GPIO16 }
+#  define PWM1_GPIOS  { GPIO15, GPIO16 }
 #endif
 /** @} */
 
@@ -129,35 +129,35 @@ extern "C" {
  * @{
  */
 #ifndef SPI0_CTRL
-#define SPI0_CTRL   FSPI    /**< FSPI is used as SPI_DEV(0) */
+#  define SPI0_CTRL   FSPI     /**< FSPI is used as SPI_DEV(0) */
 #endif
 #ifndef SPI0_SCK
-#define SPI0_SCK    GPIO36  /**< FSPI SCK (pin FSPICLK) */
+#  define SPI0_SCK    GPIO36   /**< FSPI SCK (pin FSPICLK) */
 #endif
 #ifndef SPI0_MISO
-#define SPI0_MISO   GPIO37  /**< FSPI MISO (pin FSPIQ) */
+#  define SPI0_MISO   GPIO37   /**< FSPI MISO (pin FSPIQ) */
 #endif
 #ifndef SPI0_MOSI
-#define SPI0_MOSI   GPIO35  /**< FSPI MOSI (pin FSPID) */
+#  define SPI0_MOSI   GPIO35   /**< FSPI MOSI (pin FSPID) */
 #endif
 #ifndef SPI0_CS0
-#define SPI0_CS0    GPIO15  /**< FSPI CS0 (Arduino pin D10) */
+#  define SPI0_CS0    GPIO15   /**< FSPI CS0 (Arduino pin D10) */
 #endif
 
 #ifndef SPI1_CTRL
-#define SPI1_CTRL   HSPI    /**< HSPI (SPI Controller 3) is used as SPI_DEV(1) */
+#  define SPI1_CTRL   HSPI     /**< HSPI (SPI Controller 3) is used as SPI_DEV(1) */
 #endif
 #ifndef SPI1_SCK
-#define SPI1_SCK    GPIO42  /**< HSPI SCK (Arduino pin D13) */
+#  define SPI1_SCK    GPIO42   /**< HSPI SCK (Arduino pin D13) */
 #endif
 #ifndef SPI1_MISO
-#define SPI1_MISO   GPIO21  /**< HSPI MISO (Arduino pin D12) */
+#  define SPI1_MISO   GPIO21   /**< HSPI MISO (Arduino pin D12) */
 #endif
 #ifndef SPI1_MOSI
-#define SPI1_MOSI   GPIO16  /**< HSPI MOSI (Arduino pin D11) */
+#  define SPI1_MOSI   GPIO16   /**< HSPI MOSI (Arduino pin D11) */
 #endif
 #ifndef SPI1_CS0
-#define SPI1_CS0    GPIO15  /**< HSPI CS0 (Arduino pin D10) */
+#  define SPI1_CS0    GPIO15   /**< HSPI CS0 (Arduino pin D10) */
 #endif
 /** @} */
 
@@ -176,10 +176,10 @@ extern "C" {
  * @{
  */
 #ifndef UART1_TXD
-#define UART1_TXD   GPIO6   /**< direct I/O pin for UART_DEV(1) TxD */
+#  define UART1_TXD   GPIO6    /**< direct I/O pin for UART_DEV(1) TxD */
 #endif
 #ifndef UART1_RXD
-#define UART1_RXD   GPIO5   /**< direct I/O pin for UART_DEV(1) RxD */
+#  define UART1_RXD   GPIO5    /**< direct I/O pin for UART_DEV(1) RxD */
 #endif
 /** @} */
 
