@@ -252,12 +252,32 @@ void pwm_set(pwm_t pwm, uint8_t channel, uint16_t value)
     critical_exit();
 }
 
+/* check whether the LEDC module is used by any other PWM device */
+static bool _ledc_module_used_by_others(pwm_t pwm)
+{
+    for (unsigned i = 0; i < PWM_NUMOF; i++) {
+        if ((i != pwm) && _pwm_dev[i].enabled) {
+            return true;
+        }
+    }
+    return false;
+}
+
 void pwm_poweron(pwm_t pwm)
 {
     DEBUG("%s pwm=%u\n", __func__, pwm);
 
-    /* enable and init the module and select the right clock source */
-    periph_module_enable(_CFG.module);
+    /* enable and reset the LEDC module if it is not yet used by another
+     * PWM device, the LEDC module is shared by all PWM devices */
+    if (!_ledc_module_used_by_others(pwm)) {
+        PERIPH_RCC_ATOMIC() {
+            ledc_ll_enable_bus_clock(true);
+            ledc_ll_enable_reset_reg(true);
+            ledc_ll_enable_reset_reg(false);
+        }
+    }
+
+    /* init the module and select the right clock source */
     ledc_hal_init(&_DEV.hw, _CFG.group);
     ledc_ll_enable_clock(_DEV.hw.dev, true);
     ledc_hal_set_slow_clk_sel(&_DEV.hw, (ledc_slow_clk_sel_t)LEDC_SCLK);
@@ -312,16 +332,11 @@ void pwm_poweroff(pwm_t pwm)
     _DEV.enabled = false;
     critical_exit();
 
-    /* check whether all devices of the same hardware module are disabled */
-    for (i = 0; i < PWM_NUMOF; i++) {
-        if ((_CFG.module == pwm_config[i].module) && _pwm_dev[i].enabled) {
-            break;
+    /* if all devices that share the LEDC module are disabled, it is powered off */
+    if (!_ledc_module_used_by_others(pwm)) {
+        PERIPH_RCC_ATOMIC() {
+            ledc_ll_enable_bus_clock(false);
         }
-    }
-
-    /* if all devices of the same hardware module are disable, it is powered off */
-    if (i == PWM_NUMOF) {
-        periph_module_disable(_CFG.module);
     }
 }
 

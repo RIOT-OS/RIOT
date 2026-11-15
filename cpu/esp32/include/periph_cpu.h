@@ -472,7 +472,6 @@ typedef enum {
  * @brief   I2C configuration structure type
  */
 typedef struct {
-    uint8_t module;         /**< I2C module identifier */
     i2c_speed_t speed;      /**< I2C bus speed */
     gpio_t scl;             /**< GPIO used as SCL pin */
     gpio_t sda;             /**< GPIO used as SDA pin */
@@ -581,7 +580,6 @@ typedef struct {
  * device corresponds to the number of GPIOs assigned to this PWM device.
  */
 typedef struct {
-    uint8_t module;         /**< LEDC module identifier */
     ledc_mode_t group;      /**< LEDC channel group used (low/high speed) */
     ledc_timer_t timer;     /**< LEDC timer used by this device */
     uint8_t ch_numof;       /**< Number of channels used by this device */
