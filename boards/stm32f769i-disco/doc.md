@@ -6,10 +6,10 @@
 
 The ST [STM32F769I-DISCO](https://www.st.com/en/evaluation-tools/32f769idiscovery.html)
 is a development board from ST's Discovery family built around the ARM
-Cortex-M7 STM32F769NI MCU, with a 4 inches 800x472 touch display, Ethernet,
+Cortex-M7 STM32F769NI MCU, with a 4-inch 800x480 touch display, Ethernet,
 USB OTG HS, audio, microSD and 16 MiB of SDRAM.
 
-The kit includes the MB1225 main board and the MB1166 display daughterboard
+The kit includes the MB1225 main board and the MB1166 display daughterboard.
 
 ## Hardware
 
@@ -33,7 +33,7 @@ The kit includes the MB1225 main board and the MB1166 display daughterboard
 | USBs              | 1 Full Speed, 1 High Speed (ULPI) |
 | Ethernet MAC      | Yes                               |
 | RNG               | Yes                               |
-| SDRAM             | Yes (16 MByte)                    |
+| SDRAM             | Yes (16 MiB)                      |
 | Vcc               | 1.7V - 3.6V                       |
 | Datasheet         | [MCU Datasheet](https://www.st.com/resource/en/datasheet/stm32f769ni.pdf) (pdf) |
 | Reference Manual  | [RM0410](https://www.st.com/resource/en/reference_manual/rm0410-stm32f76xxx-and-stm32f77xxx-advanced-armbased-32bit-mcus-stmicroelectronics.pdf) (pdf) |
@@ -61,7 +61,7 @@ The Arduino pins D0-D15 and A0-A5 are mapped in `arduino_iomap.h`.
 - LD3 (green, PA12): Arduino D13 LED, `LED2`, shared with SPI2 SCK
 - LD4 (red): USB OTG HS overcurrent, driven by PD4, which must not be used as
   an output
-- 4 inches 800x472 capacitive touch display, with an FT6x06 touch controller on
+- 4-inch 800x480 capacitive touch display, with an FT6x06 touch controller on
   I2C4
 - WM8994 audio codec on I2C4 and four digital MEMS microphones on DFSDM1
 
