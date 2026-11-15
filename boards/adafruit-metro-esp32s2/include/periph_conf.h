@@ -168,7 +168,7 @@ extern "C" {
  *
  * UART_DEV(0) uses the DEBUG TX/RX pins GPIO43 and GPIO44 (default
  *             configuration from `periph_conf_common_esp32s2.h`).<br>
- * UART_DEV(1) uses the Arduino pins D0 (RX, GPIO5) and D1 (TX, GPIO6).<br>
+ * UART_DEV(1) uses the Arduino pins D0 (RX, GPIO5) and D1 (TX, GPIO6).
  *
  * @note The stdio is provided via the USB interface of the ESP32-S2 by
  * default (module `stdio_cdc_acm`).
