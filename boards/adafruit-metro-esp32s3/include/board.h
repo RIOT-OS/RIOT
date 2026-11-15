@@ -47,7 +47,7 @@
  * @brief   Default interrupt flank definition for the button GPIO
  */
 #ifndef BTN0_INT_FLANK
-#define BTN0_INT_FLANK  GPIO_FALLING
+#  define BTN0_INT_FLANK  GPIO_FALLING
 #endif
 
 /**
@@ -69,10 +69,10 @@
 #define LED0_ACTIVE         (1)     /**< Red LED is high active */
 
 #ifndef WS281X_PARAM_PIN
-#define WS281X_PARAM_PIN    (GPIO46)  /**< GPIO pin connected to the NeoPixel */
+#  define WS281X_PARAM_PIN    (GPIO46)    /**< GPIO pin connected to the NeoPixel */
 #endif
 #ifndef WS281X_PARAM_NUMOF
-#define WS281X_PARAM_NUMOF  (1U)      /**< Number of LEDs chained */
+#  define WS281X_PARAM_NUMOF  (1U)        /**< Number of LEDs chained */
 #endif
 /** @} */
 
@@ -84,12 +84,12 @@
  * @{
  */
 #if MODULE_SDCARD_SPI || DOXYGEN
-#define SDCARD_SPI_PARAM_SPI        SPI_DEV(0)  /**< SPI device */
-#define SDCARD_SPI_PARAM_CS         SPI0_CS0    /**< SD_CS (GPIO45) */
-#define SDCARD_SPI_PARAM_CLK        SPI0_SCK    /**< SCK (GPIO39) */
-#define SDCARD_SPI_PARAM_MOSI       SPI0_MOSI   /**< MOSI (GPIO42) */
-#define SDCARD_SPI_PARAM_MISO       SPI0_MISO   /**< MISO (GPIO21) */
-#define SDCARD_SPI_PARAM_POWER      GPIO_UNDEF  /**< not used */
+#  define SDCARD_SPI_PARAM_SPI      SPI_DEV(0)  /**< SPI device */
+#  define SDCARD_SPI_PARAM_CS       SPI0_CS0    /**< SD_CS (GPIO45) */
+#  define SDCARD_SPI_PARAM_CLK      SPI0_SCK    /**< SCK (GPIO39) */
+#  define SDCARD_SPI_PARAM_MOSI     SPI0_MOSI   /**< MOSI (GPIO42) */
+#  define SDCARD_SPI_PARAM_MISO     SPI0_MISO   /**< MISO (GPIO21) */
+#  define SDCARD_SPI_PARAM_POWER    GPIO_UNDEF  /**< not used */
 #endif
 /** @} */
 

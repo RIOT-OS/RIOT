@@ -50,9 +50,9 @@ extern "C" {
  * purposes.
  */
 #ifndef ADC_GPIOS
-#define ADC_GPIOS   { GPIO14, GPIO15, GPIO16, GPIO17, GPIO18, GPIO1, \
-                      GPIO2, GPIO3, GPIO4, GPIO5, GPIO6, GPIO7, \
-                      GPIO8, GPIO9, GPIO10, GPIO11, GPIO12, GPIO13 }
+#  define ADC_GPIOS   { GPIO14, GPIO15, GPIO16, GPIO17, GPIO18, GPIO1, \
+                        GPIO2, GPIO3, GPIO4, GPIO5, GPIO6, GPIO7, \
+                        GPIO8, GPIO9, GPIO10, GPIO11, GPIO12, GPIO13 }
 #endif
 /** @} */
 
@@ -70,13 +70,13 @@ extern "C" {
  * @{
  */
 #ifndef I2C0_SPEED
-#define I2C0_SPEED  I2C_SPEED_FAST  /**< I2C bus speed of I2C_DEV(0) */
+#  define I2C0_SPEED  I2C_SPEED_FAST    /**< I2C bus speed of I2C_DEV(0) */
 #endif
 #ifndef I2C0_SCL
-#define I2C0_SCL    GPIO48          /**< SCL signal of I2C_DEV(0) */
+#  define I2C0_SCL    GPIO48            /**< SCL signal of I2C_DEV(0) */
 #endif
 #ifndef I2C0_SDA
-#define I2C0_SDA    GPIO47          /**< SDA signal of I2C_DEV(0) */
+#  define I2C0_SDA    GPIO47            /**< SDA signal of I2C_DEV(0) */
 #endif
 /** @} */
 
@@ -98,7 +98,7 @@ extern "C" {
  *        at maximum PWM_CHANNEL_NUM_DEV_MAX.
  */
 #ifndef PWM0_GPIOS
-#define PWM0_GPIOS  { GPIO3, GPIO5, GPIO6, GPIO9 }
+#  define PWM0_GPIOS  { GPIO3, GPIO5, GPIO6, GPIO9 }
 #endif
 
 /**
@@ -106,7 +106,7 @@ extern "C" {
  *        at maximum PWM_CHANNEL_NUM_DEV_MAX.
  */
 #ifndef PWM1_GPIOS
-#define PWM1_GPIOS  { GPIO10, GPIO11 }
+#  define PWM1_GPIOS  { GPIO10, GPIO11 }
 #endif
 
 /** @} */
@@ -125,35 +125,35 @@ extern "C" {
  * @{
  */
 #ifndef SPI0_CTRL
-#define SPI0_CTRL   FSPI    /**< FSPI (SPI Controller 2) is used as SPI_DEV(0) */
+#  define SPI0_CTRL   FSPI      /**< FSPI (SPI Controller 2) is used as SPI_DEV(0) */
 #endif
 #ifndef SPI0_SCK
-#define SPI0_SCK    GPIO39  /**< SCK (ICSP header, microSD card) */
+#  define SPI0_SCK    GPIO39    /**< SCK (ICSP header, microSD card) */
 #endif
 #ifndef SPI0_MISO
-#define SPI0_MISO   GPIO21  /**< MISO (ICSP header, microSD card) */
+#  define SPI0_MISO   GPIO21    /**< MISO (ICSP header, microSD card) */
 #endif
 #ifndef SPI0_MOSI
-#define SPI0_MOSI   GPIO42  /**< MOSI (ICSP header, microSD card) */
+#  define SPI0_MOSI   GPIO42    /**< MOSI (ICSP header, microSD card) */
 #endif
 #ifndef SPI0_CS0
-#define SPI0_CS0    GPIO45  /**< SD_CS of the microSD card */
+#  define SPI0_CS0    GPIO45    /**< SD_CS of the microSD card */
 #endif
 
 #ifndef SPI1_CTRL
-#define SPI1_CTRL   SPI3_HOST   /**< SPI3 is used as SPI_DEV(1) */
+#  define SPI1_CTRL   SPI3_HOST     /**< SPI3 is used as SPI_DEV(1) */
 #endif
 #ifndef SPI1_SCK
-#define SPI1_SCK    GPIO13  /**< SCK  (Arduino pin D13) */
+#  define SPI1_SCK    GPIO13    /**< SCK  (Arduino pin D13) */
 #endif
 #ifndef SPI1_MISO
-#define SPI1_MISO   GPIO12  /**< MISO (Arduino pin D12) */
+#  define SPI1_MISO   GPIO12    /**< MISO (Arduino pin D12) */
 #endif
 #ifndef SPI1_MOSI
-#define SPI1_MOSI   GPIO11  /**< MOSI (Arduino pin D11) */
+#  define SPI1_MOSI   GPIO11    /**< MOSI (Arduino pin D11) */
 #endif
 #ifndef SPI1_CS0
-#define SPI1_CS0    GPIO10  /**< CS0  (Arduino pin D10) */
+#  define SPI1_CS0    GPIO10    /**< CS0  (Arduino pin D10) */
 #endif
 /** @} */
 
@@ -171,10 +171,10 @@ extern "C" {
 #define UART0_RXD   GPIO44  /**< direct I/O pin for UART_DEV(0) RxD, can't be changed */
 
 #ifndef UART1_TXD
-#define UART1_TXD   GPIO40  /**< UART_DEV(1) TxD (Arduino pin D1) */
+#  define UART1_TXD   GPIO40    /**< UART_DEV(1) TxD (Arduino pin D1) */
 #endif
 #ifndef UART1_RXD
-#define UART1_RXD   GPIO41  /**< UART_DEV(1) RxD (Arduino pin D0) */
+#  define UART1_RXD   GPIO41    /**< UART_DEV(1) RxD (Arduino pin D0) */
 #endif
 /** @} */
 
