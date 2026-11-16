@@ -58,3 +58,5 @@ ifneq (,$(filter wakaama_client_dtls, $(USEMODULE)))
   USEMODULE += sock_dtls
   USEMODULE += credman_load
 endif
+
+FEATURES_REQUIRED += periph_pm
