@@ -1261,6 +1261,7 @@ int ieee802154_submac_set_csma_params(ieee802154_submac_t *submac, const ieee802
     ieee802154_dev_t *dev = &submac->dev;
 
     if (_does_handle_csma(dev)) {
+        /* The radio performs CSMA-CA in HW; return here */
         return ieee802154_radio_set_csma_params(dev, bd, retries);
     }
 
@@ -1269,13 +1270,13 @@ int ieee802154_submac_set_csma_params(ieee802154_submac_t *submac, const ieee802
     }
 
     if (retries < 0) {
-        /* deactivate CSMA-CA also on the radio */
+        /* Deactivate CCA before TX on the radio */
         ieee802154_radio_set_csma_params(dev, NULL, retries);
         _set_csma_retries(submac, retries);
         return 0;
     }
 
-    /* activate CCA on the radio, as we don't perform CCA on our own. */
+    /* Activate CCA before TX on the radio, as we don't perform CCA before TX on our own. */
     ieee802154_radio_set_csma_params(dev, NULL, 0);
     _set_csma_retries(submac, retries);
 
