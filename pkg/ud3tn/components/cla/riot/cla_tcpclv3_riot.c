@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: BSD-3-Clause OR Apache-2.0
+/* SPDX-License-Identifier: BSD-3-Clause OR Apache-2.0 */
 #include "cla/cla.h"
 #include "cla/cla_contact_tx_task.h"
 #include "cla/posix/cla_tcpclv3.h"
@@ -116,15 +116,12 @@ static ssize_t tcpclv3_send_all(struct tcpclv3_socket *sock,
 
     const uint8_t *data = (const uint8_t *)buffer;
     size_t total_sent = 0;
-    // printf("Sending data: %zu bytes\n", length);
     while (total_sent < length) {
-        // printf("Writing data: %zu bytes\n", length - total_sent);
         ssize_t sent = sock_tcp_write(sock->sock,
                                       data + total_sent,
                                       length - total_sent);
-        // printf("Sent value: %zd\n", sent);
         if (sent < 0) {
-            // printf("Error sending data: %zd\n", sent);
+
             return sent;
         }
         if (sent == 0) {
@@ -132,7 +129,6 @@ static ssize_t tcpclv3_send_all(struct tcpclv3_socket *sock,
         }
         total_sent += sent;
     }
-    // printf("Sending Success:Total bytes sent: %zu\n", total_sent);
     return total_sent;
 }
 
@@ -604,7 +600,10 @@ static void tcpclv3_listener_task(void *p)
 
     for (;;) {
         sock_tcp_t *sock = NULL;
-        /* Finite timeout: gnrc_tcp_accept() can miss an ESTABLISHED notification; each call rescans the queue. */
+        /*
+         * Finite timeout: gnrc_tcp_accept() can miss an ESTABLISHED
+         * notification; each call rescans the queue.
+         */
         const int accept_ret = sock_tcp_accept(
             &tcpclv3_config->listen_queue, &sock, TCPCLV3_ACCEPT_POLL_MS);
 
@@ -895,6 +894,7 @@ static size_t tcpclv3_forward_to_specific_parser(struct cla_link *link,
  * blocking any concurrent sock_tcp_write in the TX task. To avoid this
  * deadlock, we use a finite timeout and retry on -ETIMEDOUT, releasing the
  * lock periodically so the TX task gets windows to write.
+ *
  * NOTE: gnrc_sock_tcp passes the value directly to gnrc_tcp_recv which treats
  * it as milliseconds.
  */
@@ -957,18 +957,23 @@ static void tcpclv3_begin_packet(struct cla_link *link, size_t length, char *cla
         );
 
     int sdnv_len = sdnv_write_u32(&header_buffer[1], length);
-    // LOGF_INFO(
-    //  "TCPCLv3: Sending segment header for %lu byte bundle to %s",
-    //  (unsigned long)length,
-    //  param->cla_addr ? param->cla_addr : "<unknown>"
-    // );
-    // LOGF_INFO("TCPCLv3: Segment header: type=0x%02X, length=%d", header_buffer[0], sdnv_len);
+    /*
+     * LOGF_INFO(
+     *     "TCPCLv3: Sending segment header for %lu byte bundle to %s",
+     *     (unsigned long)length,
+     *     param->cla_addr ? param->cla_addr : "<unknown>"
+     * );
+     */
+    /*
+     * LOGF_INFO("TCPCLv3: Segment header: type=0x%02X, length=%d",
+     *            header_buffer[0], sdnv_len);
+     */
     if (tcpclv3_send_all(&param->socket, header_buffer, sdnv_len + 1) < 0) {
         LOGF_ERROR("%s", "TCPCLv3: send(segment_header) failed");
         link->config->vtable->cla_disconnect_handler(link);
     }
     else {
-        // LOGF_INFO("%s", "TCPCLv3: Segment header sent successfully");
+        /* LOGF_INFO("%s", "TCPCLv3: Segment header sent successfully"); */
     }
 }
 
@@ -989,17 +994,19 @@ static void tcpclv3_send_packet_data(
 
     ASSERT(param->state == TCPCLV3_ESTABLISHED);
 
-    // LOGF_INFO(
-    //  "TCPCLv3: Sending %lu payload bytes to %s",
-    //  (unsigned long)length,
-    //  param->cla_addr ? param->cla_addr : "<unknown>"
-    // );
+    /*
+     * LOGF_INFO(
+     *     "TCPCLv3: Sending %lu payload bytes to %s",
+     *     (unsigned long)length,
+     *     param->cla_addr ? param->cla_addr : "<unknown>"
+     * );
+     */
     if (tcpclv3_send_all(&param->socket, data, length) < 0) {
         LOGF_ERROR("%s", "TCPCLv3: send() failed");
         link->config->vtable->cla_disconnect_handler(link);
     }
     else {
-        // LOGF_INFO("%s", "TCPCLv3: Payload sent successfully");
+        /* LOGF_INFO("%s", "TCPCLv3: Payload sent successfully"); */
     }
 }
 

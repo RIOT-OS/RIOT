@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: BSD-3-Clause OR Apache-2.0
+/* SPDX-License-Identifier: BSD-3-Clause OR Apache-2.0 */
 #ifndef SOCKET_UTIL_H_INCLUDED
 #define SOCKET_UTIL_H_INCLUDED
 
@@ -19,4 +19,4 @@ int create_unix_domain_socket(const char *path);
  */
 int poll_recv_timeout(const int socket_fd, const int timeout);
 
-#endif // SOCKET_UTIL_H_INCLUDED
+#endif /* SOCKET_UTIL_H_INCLUDED */

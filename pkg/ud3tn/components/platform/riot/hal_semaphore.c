@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: BSD-3-Clause OR Apache-2.0
+/* SPDX-License-Identifier: BSD-3-Clause OR Apache-2.0 */
 /*
  * hal_semaphore.c
  *
@@ -36,7 +36,7 @@ bool hal_semaphore_is_blocked(Semaphore_t sem)
 {
     /* Try to wait without blocking */
     if (sema_try_wait(&sem->sem) == 0) {
-        sema_post(&sem->sem); // Restore if it succeeded
+        sema_post(&sem->sem); /* Restore if it succeeded */
         return false;
     }
     return true;

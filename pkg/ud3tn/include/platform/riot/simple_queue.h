@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: BSD-3-Clause OR Apache-2.0
+/* SPDX-License-Identifier: BSD-3-Clause OR Apache-2.0 */
 /*
  * simple_queue.h
  *
@@ -23,25 +23,29 @@
  * @brief The Queue_t struct Data structure holding all queue-related info
  */
 typedef struct {
-    // absolute length of the queue (in items)
+    /* absolute length of the queue (in items) */
     int item_length;
-    // size of one single item (in bytes)
+    /* size of one single item (in bytes) */
     int item_size;
 
-    // provides mutual exclusion for the given queue
+    /* provides mutual exclusion for the given queue */
     struct Semaphore *semaphore;
 
-    // these semaphores circumvent busy waiting
+    /* these semaphores circumvent busy waiting */
     struct Semaphore *sem_pop;
     struct Semaphore *sem_push;
 
-    // abs_start and abs_end are pointers to the first and last
-    // byte of the reserved memory
+    /*
+     * abs_start and abs_end are pointers to the first and last
+     * byte of the reserved memory
+     */
     char *abs_start;
     char *abs_end;
 
-    // current_start and current_end point to the first and last currently
-    // used elements in the queue
+    /*
+     * current_start and current_end point to the first and last currently
+     * used elements in the queue
+     */
     char *current_start;
     char *current_end;
 

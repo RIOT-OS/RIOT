@@ -1,6 +1,6 @@
 PKG_NAME = ud3tn
 PKG_URL = https://gitlab.com/d3tn/ud3tn.git
-// PKG_Version = v0.13.0
+# PKG_Version = v0.13.0
 PKG_VERSION = 7b0fd79924d844ded7b75ab4611d9f24933540e6
 PKG_LICENSE = Apache-2.0
 

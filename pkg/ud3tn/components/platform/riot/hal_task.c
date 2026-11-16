@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: BSD-3-Clause OR Apache-2.0
+/* SPDX-License-Identifier: BSD-3-Clause OR Apache-2.0 */
 /*
  * hal_task.c
  *
@@ -76,7 +76,10 @@ enum ud3tn_result hal_task_create(
 
     /* Set the task_id to pid */
     if (task_id) {
-        /* non-detached handling not fully mapped in RIOT out of the box, return PID regardless */
+        /*
+         * non-detached handling not fully mapped in RIOT out of the box,
+         * return PID regardless
+         */
         *task_id = (TaskIdentifier_t)(uintptr_t)pid;
     }
 

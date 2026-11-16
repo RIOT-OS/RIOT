@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: BSD-3-Clause OR Apache-2.0
+/* SPDX-License-Identifier: BSD-3-Clause OR Apache-2.0 */
 #ifndef HAL_TYPES_H_INCLUDED
 #define HAL_TYPES_H_INCLUDED
 
@@ -19,4 +19,4 @@ typedef struct Semaphore {
 #define HAL_SEMAPHORE_MAX_DELAY_MS 9223372036854ULL
 #define HAL_QUEUE_MAX_DELAY_MS HAL_SEMAPHORE_MAX_DELAY_MS
 
-#endif // HAL_TYPES_H_INCLUDED
+#endif /* HAL_TYPES_H_INCLUDED */

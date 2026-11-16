@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: BSD-3-Clause OR Apache-2.0
+/* SPDX-License-Identifier: BSD-3-Clause OR Apache-2.0 */
 /*
  * hal_time.c
  *
@@ -63,7 +63,7 @@ void hal_time_print_log_time_string(void)
     hal_semaphore_take_blocking(time_string_semph);
     time(&t);
     timestr = ctime(&t);
-    timestr[strlen(timestr) - 1] = '\0'; // remove '\n'
+    timestr[strlen(timestr) - 1] = '\0'; /* remove '\n' */
     fprintf(stderr, "[%s] ", timestr);
     hal_semaphore_release(time_string_semph);
 }

@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: BSD-3-Clause OR Apache-2.0
+/* SPDX-License-Identifier: BSD-3-Clause OR Apache-2.0 */
 /*
  * simple_queue.c
  *
@@ -50,15 +50,17 @@ static char *decrement(
 Queue_t *queueCreate(unsigned int queue_length, unsigned int item_size)
 {
     if (queue_length == 0 || item_size == 0) {
-        // if one of the values is zero, creating a queue
-        // makes no sense
+        /*
+         * if one of the values is zero, creating a queue
+         * makes no sense
+         */
         abort();
     }
 
-    // allocate memory to store management data
+    /* allocate memory to store management data */
     Queue_t *queue = malloc(sizeof(Queue_t));
 
-    // initialise the queue's semaphore
+    /* initialise the queue's semaphore */
     queue->semaphore = hal_semaphore_init_value(1);
     queue->sem_pop = hal_semaphore_init_value(0);
     queue->sem_push = hal_semaphore_init_value(queue_length);
@@ -66,7 +68,7 @@ Queue_t *queueCreate(unsigned int queue_length, unsigned int item_size)
     queue->item_length = queue_length;
     queue->item_size = item_size;
 
-    // allocate enough memory to store the actual items
+    /* allocate enough memory to store the actual items */
     queue->abs_start = malloc(queue->item_length * queue->item_size);
     queue->abs_end = queue->abs_start + (
         queue->item_length * queue->item_size);
@@ -79,19 +81,19 @@ Queue_t *queueCreate(unsigned int queue_length, unsigned int item_size)
 
 void queueDelete(Queue_t *queue)
 {
-    // get the semaphore
+    /* get the semaphore */
     hal_semaphore_take_blocking(queue->semaphore);
 
-    // free the data memory
+    /* free the data memory */
     free(queue->abs_start);
 
     hal_semaphore_delete(queue->sem_pop);
     hal_semaphore_delete(queue->sem_push);
 
-    // destroy the semaphore
+    /* destroy the semaphore */
     hal_semaphore_delete(queue->semaphore);
 
-    // free the memory resources for the management data
+    /* free the memory resources for the management data */
     free(queue);
 }
 
@@ -99,8 +101,10 @@ void queueReset(Queue_t *queue)
 {
     hal_semaphore_take_blocking(queue->semaphore);
 
-    // reset both current-pointers to the absolute start pointer
-    // old values will be simply overwritten when new items are stored
+    /*
+     * reset both current-pointers to the absolute start pointer
+     * old values will be simply overwritten when new items are stored
+     */
     queue->current_start = queue->abs_start;
     queue->current_end = queue->abs_start;
 
@@ -140,7 +144,7 @@ uint8_t queuePop(Queue_t *queue, void *targetBuffer, int64_t timeout)
 
 uint8_t queuePush(Queue_t *queue, const void *item, int64_t timeout, bool force)
 {
-    // forcefully replace the last element of the queue
+    /* forcefully replace the last element of the queue */
     if (force) {
         hal_semaphore_take_blocking(queue->semaphore);
 

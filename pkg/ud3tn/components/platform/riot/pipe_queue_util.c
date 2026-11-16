@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: BSD-3-Clause OR Apache-2.0
+/* SPDX-License-Identifier: BSD-3-Clause OR Apache-2.0 */
 #include "platform/posix/pipe_queue_util.h"
 
 #include <unistd.h>
@@ -26,7 +26,7 @@ ssize_t pipeq_read_all(int fd, void *buf, size_t count)
             }
             return -1;
         }
-        // unlikely case
+        /* unlikely case */
         read_bytes += tmp_result;
         tmp_buf += tmp_result;
         count -= tmp_result;
@@ -51,7 +51,7 @@ ssize_t pipeq_write_all(int fd, const void *buf, size_t count)
             }
             return -1;
         }
-        // unlikely case
+        /* unlikely case */
         written_bytes += tmp_result;
         tmp_buf += tmp_result;
         count -= tmp_result;

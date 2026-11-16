@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: BSD-3-Clause OR Apache-2.0
+/* SPDX-License-Identifier: BSD-3-Clause OR Apache-2.0 */
 #ifndef HAL_TASK_H_INCLUDED
 #define HAL_TASK_H_INCLUDED
 

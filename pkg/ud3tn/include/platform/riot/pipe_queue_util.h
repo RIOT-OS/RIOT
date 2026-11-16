@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: BSD-3-Clause OR Apache-2.0
+/* SPDX-License-Identifier: BSD-3-Clause OR Apache-2.0 */
 #ifndef PIPE_QUEUE_UTIL_H_INCLUDED
 #define PIPE_QUEUE_UTIL_H_INCLUDED
 
@@ -30,4 +30,4 @@ ssize_t pipeq_read_all(int fd, void *buf, size_t count);
  */
 ssize_t pipeq_write_all(int fd, const void *buf, size_t count);
 
-#endif // PIPE_QUEUE_UTIL_H_INCLUDED
+#endif /* PIPE_QUEUE_UTIL_H_INCLUDED */

@@ -1,8 +1,10 @@
-// SPDX-License-Identifier: BSD-3-Clause OR Apache-2.0
+/* SPDX-License-Identifier: BSD-3-Clause OR Apache-2.0 */
 
-// Next version of the Application Agent Protocol, supporting forwarding modules
-// and FIB control in extension to regular bundle reception/delivery.
-// NOTE: This is still experimental - use with caution!
+/*
+ * Next version of the Application Agent Protocol, supporting forwarding modules
+ * and FIB control in extension to regular bundle reception/delivery.
+ * NOTE: This is still experimental - use with caution!
+ */
 #include "aap2/aap2_agent.h"
 #include "aap2/aap2.pb.h"
 
@@ -31,7 +33,7 @@
 #include <string.h>
 #include <errno.h>
 
-// RIOT networking
+/* RIOT networking */
 #include "net/sock/tcp.h"
 #include "net/ipv6/addr.h"
 #include "net/af.h"
@@ -50,10 +52,10 @@ struct aap2_agent_comm_config {
     struct aap2_agent_config *parent;
     sock_tcp_t *client_sock;
     pb_istream_t pb_istream;
-    // Staged byte for non-destructive peek (replaces POSIX poll/select)
+    /* Staged byte for non-destructive peek (replaces POSIX poll/select) */
     uint8_t staged_byte;
     bool has_staged_byte;
-    // here use simple queue instead for communication with bundle processor
+    /* here use simple queue instead for communication with bundle processor */
     Queue_t *bundle_queue;
 
     bool is_subscriber;
@@ -61,19 +63,21 @@ struct aap2_agent_comm_config {
     char *secret;
     int keepalive_timeout_ms;
 
-    // TODO: Move to common multiplexer/demux state in BP. For now, allow
-    // only one sender per ID.
+    /*
+     * TODO: Move to common multiplexer/demux state in BP. For now, allow
+     * only one sender per ID.
+     */
     uint64_t last_bundle_timestamp_ms;
     uint64_t last_bundle_sequence_number;
 };
 
-// RIOT write param (replaces POSIX tcp_write_to_socket_param)
+/* RIOT write param (replaces POSIX tcp_write_to_socket_param) */
 struct aap2_write_param {
     sock_tcp_t *sock;
     int errno_;
 };
 
-// Returns: 1 = data available, 0 = timeout, -1 = error/disconnect
+/* Returns: 1 = data available, 0 = timeout, -1 = error/disconnect */
 static int aap2_peek_with_timeout(struct aap2_agent_comm_config *config,
                                   int timeout_ms)
 {
@@ -94,7 +98,7 @@ static int aap2_peek_with_timeout(struct aap2_agent_comm_config *config,
     return -1;
 }
 
-// forward declaration
+/* Forward declaration */
 static void aap2_agent_comm_task(void *const param);
 
 static bool pb_recv_callback(pb_istream_t *stream, uint8_t *buf, size_t count)
@@ -108,7 +112,7 @@ static bool pb_recv_callback(pb_istream_t *stream, uint8_t *buf, size_t count)
         );
     size_t idx = 0;
 
-    // Consume staged byte first (from peek operation)
+    /* Consume staged byte first (from peek operation) */
     if (config->has_staged_byte) {
         buf[0] = config->staged_byte;
         config->has_staged_byte = false;
@@ -167,7 +171,7 @@ static void aap2_agent_listener_task(void *const param)
         child_config->is_subscriber = false;
         child_config->registered_eid = NULL;
         child_config->secret = NULL;
-        child_config->keepalive_timeout_ms = -1; // infinite
+        child_config->keepalive_timeout_ms = -1; /* infinite */
 
         child_config->pb_istream = (pb_istream_t){
             &pb_recv_callback,
@@ -175,7 +179,7 @@ static void aap2_agent_listener_task(void *const param)
             SIZE_MAX,
             NULL,
         };
-        // here create the queue
+        /* here create the queue */
         child_config->bundle_queue = queueCreate(10, sizeof(struct bundle_adu));
 
         const enum ud3tn_result task_creation_result = hal_task_create(
@@ -258,16 +262,18 @@ static void agent_msg_recv(struct bundle_adu data, void *param,
         config->registered_eid,
         data.source
         );
-    // here add to queue
+    /* here add to queue */
     if (queuePush(config->bundle_queue, &data, -1, 0) != EXIT_SUCCESS) {
         LOG_ERRNO("AAP2Agent", "write()", errno);
         bundle_adu_free_members(data);
     }
-    /*if (pipeq_write_all(config->bundle_pipe_fd[1],
-                &data, sizeof(struct bundle_adu)) <= 0) {
-        LOG_ERRNO("AAP2Agent", "write()", errno);
-        bundle_adu_free_members(data);
-       }*/
+    /*
+     * if (pipeq_write_all(config->bundle_pipe_fd[1],
+     *             &data, sizeof(struct bundle_adu)) <= 0) {
+     *     LOG_ERRNO("AAP2Agent", "write()", errno);
+     *     bundle_adu_free_members(data);
+     * }
+     */
 }
 
 static int register_sink(const char *sink_identifier, bool is_subscriber,
@@ -282,8 +288,8 @@ static int register_sink(const char *sink_identifier, bool is_subscriber,
             : BP_SIGNAL_AGENT_REGISTER_RPC
         ),
         (struct agent) {
-        // NOTE that both sink_identifier and secret have to be
-        // valid for the full duration of the registration!
+        /* NOTE that both sink_identifier and secret have to be
+         * valid for the full duration of the registration! */
         .sink_identifier = sink_identifier,
         .secret = secret,
         .callback = is_subscriber ? agent_msg_recv : NULL,
@@ -329,8 +335,10 @@ static uint64_t allocate_sequence_number(
     struct aap2_agent_comm_config *const config,
     const uint64_t time_ms)
 {
-    // If a previous bundle was sent less than one millisecond ago, we need
-    // to increment the sequence number.
+    /*
+     * If a previous bundle was sent less than one millisecond ago, we need
+     * to increment the sequence number.
+     */
     if (config->last_bundle_timestamp_ms == time_ms) {
         return ++config->last_bundle_sequence_number;
     }
@@ -351,7 +359,7 @@ static aap2_ResponseStatus process_configure_msg(
         msg->endpoint_id
         );
 
-    // Clean up a previous registration in case there is one.
+    /* Clean up a previous registration in case there is one. */
     deregister_sink(config);
 
     if (validate_eid(msg->endpoint_id) != UD3TN_OK) {
@@ -380,11 +388,11 @@ static aap2_ResponseStatus process_configure_msg(
     }
 
     config->registered_eid = msg->endpoint_id;
-    msg->endpoint_id = NULL;            // take over freeing
+    msg->endpoint_id = NULL;            /* take over freeing */
     config->secret = msg->secret;
-    msg->secret = NULL;                 // take over freeing
+    msg->secret = NULL;                 /* take over freeing */
 
-    config->keepalive_timeout_ms = -1;  // infinite by default
+    config->keepalive_timeout_ms = -1;  /* infinite by default */
     if (msg->keepalive_seconds != 0) {
         if (msg->keepalive_seconds >= (INT32_MAX / 1000 / 2)) {
             LOGF_WARN(
@@ -396,8 +404,10 @@ static aap2_ResponseStatus process_configure_msg(
             config->keepalive_timeout_ms = (
                 msg->keepalive_seconds * 1000
                 );
-            // For active clients we wait for twice the specified
-            // timeout until we terminate the connection.
+            /*
+             * For active clients we wait for twice the specified
+             * timeout until we terminate the connection.
+             */
             if (!msg->is_subscriber) {
                 config->keepalive_timeout_ms *= 2;
             }
@@ -466,8 +476,8 @@ static aap2_ResponseStatus process_adu_msg(
             payload_data,
             payload_length
             );
-        ar_bytes[0] = 0x82;     // CBOR array of length 2
-        ar_bytes[1] = typecode; // Integer (record type)
+        ar_bytes[0] = 0x82;     /* CBOR array of length 2 */
+        ar_bytes[1] = typecode; /* Integer (record type) */
 
         free(payload_data);
         payload_data = ar_bytes;
@@ -542,7 +552,7 @@ static int process_aap_message(
     aap2_AAPResponse response = aap2_AAPResponse_init_default;
     int result = -1;
 
-    // Default response
+    /* Default response */
     response.response_status = (
         aap2_ResponseStatus_RESPONSE_STATUS_INVALID_REQUEST
         );
@@ -587,7 +597,7 @@ static int process_aap_message(
         &response
         );
 
-    // Free message contents
+    /* Free message contents */
     pb_release(aap2_AAPResponse_fields, &response);
     return result;
 }
@@ -622,16 +632,18 @@ static int send_bundle_from_pipe(struct aap2_agent_comm_config *const config)
 {
     struct bundle_adu data;
 
-    // here take from queue
+    /* here take from queue */
     if (queuePop(config->bundle_queue, &data, -1) != EXIT_SUCCESS) {
         LOG_ERRNO("AAP2Agent", "read()", errno);
         return -1;
     }
-    /*if (pipeq_read_all(config->bundle_pipe_fd[0],
-               &data, sizeof(struct bundle_adu)) <= 0) {
-        LOG_ERRNO("AAP2Agent", "read()", errno);
-        return -1;
-       }*/
+    /*
+     * if (pipeq_read_all(config->bundle_pipe_fd[0],
+     *            &data, sizeof(struct bundle_adu)) <= 0) {
+     *     LOG_ERRNO("AAP2Agent", "read()", errno);
+     *     return -1;
+     * }
+     */
 
     aap2_AAPMessage msg = aap2_AAPMessage_init_default;
 
@@ -641,7 +653,7 @@ static int send_bundle_from_pipe(struct aap2_agent_comm_config *const config)
     msg.msg.adu.payload_length = data.length;
     msg.msg.adu.creation_timestamp_ms = data.bundle_creation_timestamp_ms;
     msg.msg.adu.sequence_number = data.bundle_sequence_number;
-    // BIBE
+    /* BIBE */
     if (data.proc_flags == BUNDLE_FLAG_ADMINISTRATIVE_RECORD) {
         msg.msg.adu.adu_flags = aap2_BundleADUFlags_BUNDLE_ADU_BPDU;
     }
@@ -653,7 +665,7 @@ static int send_bundle_from_pipe(struct aap2_agent_comm_config *const config)
         &msg
         );
 
-    // NOTE: We do not "release" msg as there is nothing to deallocate here.
+    /* NOTE: We do not "release" msg as there is nothing to deallocate here. */
 
     if (send_result < 0) {
         bundle_adu_free_members(data);
@@ -691,7 +703,7 @@ static int send_bundle_from_pipe(struct aap2_agent_comm_config *const config)
         return send_result;
     }
 
-    // Receive status from client.
+    /* Receive status from client. */
     aap2_AAPResponse response = aap2_AAPResponse_init_default;
 
     if (aap2_peek_with_timeout(config, AAP2_AGENT_TIMEOUT_MS) <= 0) {
@@ -718,9 +730,9 @@ static int send_bundle_from_pipe(struct aap2_agent_comm_config *const config)
 
     if (response.response_status !=
         aap2_ResponseStatus_RESPONSE_STATUS_SUCCESS) {
-        // TODO: Implement configurable policy to re-route/keep somehow.
+        /* TODO: Implement configurable policy to re-route/keep somehow. */
         UD3TN_LOG_WARN("AAP2Agent: Client reported error for bundle, dropping.");
-        // NOTE: Do not return -1 here as this would close the socket.
+        /* NOTE: Do not return -1 here as this would close the socket. */
     }
 
 done:
@@ -729,27 +741,27 @@ done:
     return send_result;
 }
 /*
-   static void shutdown_bundle_pipe(int bundle_pipe_fd[2])
-   {
-    struct bundle_adu data;
-
-    while (poll_recv_timeout(bundle_pipe_fd[0], 0) > 0) {
-        if (pipeq_read_all(bundle_pipe_fd[0],
-                   &data, sizeof(struct bundle_adu)) <= 0) {
-            LOG_ERRNO("AAP2Agent", "read()", errno);
-            break;
-        }
-
-        LOGF_WARN(
-            "AAP2Agent: Dropping unsent bundle from '%s'.",
-            data.source
-        );
-        bundle_adu_free_members(data);
-    }
-
-    close(bundle_pipe_fd[0]);
-    close(bundle_pipe_fd[1]);
-   }
+ * static void shutdown_bundle_pipe(int bundle_pipe_fd[2])
+ * {
+ *     struct bundle_adu data;
+ *
+ *     while (poll_recv_timeout(bundle_pipe_fd[0], 0) > 0) {
+ *         if (pipeq_read_all(bundle_pipe_fd[0],
+ *                    &data, sizeof(struct bundle_adu)) <= 0) {
+ *             LOG_ERRNO("AAP2Agent", "read()", errno);
+ *             break;
+ *         }
+ *
+ *         LOGF_WARN(
+ *             "AAP2Agent: Dropping unsent bundle from '%s'.",
+ *             data.source
+ *         );
+ *         bundle_adu_free_members(data);
+ *     }
+ *
+ *     close(bundle_pipe_fd[0]);
+ *     close(bundle_pipe_fd[1]);
+ * }
  */
 static int send_keepalive(struct aap2_agent_comm_config *const config)
 {
@@ -765,13 +777,13 @@ static int send_keepalive(struct aap2_agent_comm_config *const config)
         &msg
         );
 
-    // NOTE: We do not "release" msg as there is nothing to deallocate here.
+    /* NOTE: We do not "release" msg as there is nothing to deallocate here. */
 
     if (send_result < 0) {
         return send_result;
     }
 
-    // Receive status from client.
+    /* Receive status from client. */
     aap2_AAPResponse response = aap2_AAPResponse_init_default;
 
     if (aap2_peek_with_timeout(config, AAP2_AGENT_TIMEOUT_MS) <= 0) {
@@ -814,7 +826,7 @@ static void aap2_agent_comm_task(void *const param)
         (struct aap2_agent_comm_config *)param
         );
 
-    // Send indicator for invalid version.
+    /* Send indicator for invalid version. */
     const uint8_t aap2_version_indicator = 0x2F;
 
     if (sock_tcp_write(config->client_sock, &aap2_version_indicator, 1) != 1) {
@@ -831,10 +843,10 @@ static void aap2_agent_comm_task(void *const param)
     if (send_message(config->client_sock, aap2_AAPMessage_fields, &msg)) {
         goto done;
     }
-    // NOTE: We do not "release" msg as there is nothing to deallocate here.
+    /* NOTE: We do not "release" msg as there is nothing to deallocate here. */
 
     aap2_AAPMessage request;
-    // Here use select instead
+    /* Here use select instead */
     for (;;) {
         if (config->is_subscriber) {
             if (send_bundle_from_pipe(config) < 0) {
@@ -852,7 +864,7 @@ static void aap2_agent_comm_task(void *const param)
                 break;
             }
             else if (select_result < 0) {
-                // An error message was already logged here.
+                /* An error message was already logged here. */
                 break;
             }
 
@@ -873,9 +885,11 @@ static void aap2_agent_comm_task(void *const param)
 
             uint8_t *payload = NULL;
 
-            // Read payload for ADU messages. Note that even if this
-            // fails we process the message with payload == NULL, to
-            // send a proper response.
+            /*
+             * Read payload for ADU messages. Note that even if this
+             * fails we process the message with payload == NULL, to
+             * send a proper response.
+             */
             if (request.which_msg == aap2_AAPMessage_adu_tag) {
                 payload = receive_payload(
                     &config->pb_istream,
@@ -898,7 +912,7 @@ static void aap2_agent_comm_task(void *const param)
 
 done:
     deregister_sink(config);
-    //shutdown_bundle_pipe(config->bundle_pipe_fd);
+    /*shutdown_bundle_pipe(config->bundle_pipe_fd); */
     queueDelete(config->bundle_queue);
     sock_tcp_disconnect(config->client_sock);
     free(config);
@@ -934,7 +948,9 @@ struct aap2_agent_config *aap2_agent_setup(
         return NULL;
     }
 
-    // Bind to specific IPv6 address if provided; "::" or "*" = all interfaces
+    /*
+     * Bind to specific IPv6 address if provided; "::" or "*" = all interfaces
+     */
     if (node && strcmp(node, "::") != 0 && strcmp(node, "*") != 0) {
         if (ipv6_addr_from_str((ipv6_addr_t *)&local.addr.ipv6, node) == NULL) {
             LOGF_ERROR("AAP2Agent: Invalid IPv6 address: \"%s\"", node);
