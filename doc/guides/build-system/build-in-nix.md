@@ -18,6 +18,27 @@ are under `dist/nix/`. Nix support is still highly experimental.
 - A Linux host: `x86_64-linux` has the full toolchain set, `aarch64-linux`
   supports the host, Arm, AVR, and ESP32 toolchains
 
+### Enabling Flakes
+
+Nix still ships flakes and the `nix` command line as experimental features.
+If `nix develop` fails with:
+
+```text
+experimental Nix feature 'flakes' is disabled
+```
+
+enable both features in `~/.config/nix/nix.conf` (or `/etc/nix/nix.conf`):
+
+```ini
+experimental-features = nix-command flakes
+```
+
+On NixOS, set the same option declaratively:
+
+```nix
+nix.settings.experimental-features = [ "nix-command" "flakes" ];
+```
+
 The Docker image remains the recommended option for exact reproduction of the
 official CI environment.
 
