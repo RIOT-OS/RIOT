@@ -23,24 +23,7 @@
 #define ENABLE_DEBUG    0
 #include "debug.h"
 
-/**
- * @brief MAC timer period
- *
- * The period is set to the CSMA-CA Backoff Period Unit (20 symbols, 320 us).
- * The system clock runs at 32 MHz. Thus, the timeout period is
- * 320us * 32MHz = ~10738 (0x29F2)
- */
-#define TIMER_PERIOD_LSB           (0xF2)
-#define TIMER_PERIOD_MSB           (0x29)
-
-/**
- * @brief MAC timer period
- *
- * The period is set to the CSMA-CA Backoff Period Unit (20 symbols, 320 us).
- * The system clock runs at 32 MHz. Thus, the timeout period is
- * 320us * 32MHz = ~10738 (0x29F2)
- */
-#define CCTEST_OBSSELX_EN           (BIT(7))
+#define CCTEST_OBSSELX_EN (BIT(7))  /**< Enable observation output on PCx */
 
 static void _cc2538_setup_mac_timer(void)
 {
@@ -49,8 +32,8 @@ static void _cc2538_setup_mac_timer(void)
     RFCORE_SFR_MTMSEL |= CC2538_SFR_MTMSEL_TIMER_P;
 
     /* Fix timer to Backoff period */
-    RFCORE_SFR_MTM0 |= TIMER_PERIOD_LSB;
-    RFCORE_SFR_MTM1 |= TIMER_PERIOD_MSB;
+    RFCORE_SFR_MTM0 = CC2538_RF_MT_PERIOD & 0xFF;
+    RFCORE_SFR_MTM1 = CC2538_RF_MT_PERIOD >> 8;
 
     RFCORE_SFR_MTMSEL &= ~CC2538_SFR_MTMSEL_MASK;
     RFCORE_SFR_MTCTRL |= CC2538_MCTRL_SYNC_MASK | CC2538_MCTRL_RUN_MASK;

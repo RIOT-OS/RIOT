@@ -89,6 +89,27 @@ extern "C" {
 #define CC2538_MCTRL_SYNC_MASK      (0x2)           /**< Sync MAC Timer to external clock */
 #define CC2538_MCTRL_RUN_MASK       (0x1)           /**< Run MAC Timer */
 
+/**
+ * @brief Frequency of the MAC timer in Hz
+ *
+ * The MAC timer runs on the system clock, one tick is 31.25 ns at 32 MHz.
+ */
+#define CC2538_RF_MT_FREQ (CLOCK_CORECLOCK)
+
+/**
+ * @brief MAC timer ticks per microsecond
+ */
+#define CC2538_RF_MT_TICKS_PER_US  (CC2538_RF_MT_FREQ / US_PER_SEC)
+
+/**
+ * @brief MAC timer period in ticks
+ *
+ * The CSP counts its CSMA-CA backoffs in MAC timer periods, so the period is
+ * the CSMA-CA backoff period unit (320us).
+ * usually it is 320us * 32MHz = 10240 (0x2800)
+ */
+#define CC2538_RF_MT_PERIOD  (320U * CC2538_RF_MT_TICKS_PER_US)
+
 #define CC2538_CSP_MCU_CTRL_MASK    (0x1)           /**< MCU Ctrl mask */
 
 #define CC2538_CSP_INCMAXY_MAX_MASK (0x7)           /**< CSP INCMAXY instruction (increment Register CSPX
