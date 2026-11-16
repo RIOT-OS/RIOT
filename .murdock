@@ -554,8 +554,13 @@ update_changed_modules() {
         # Although we can't skip builds, we might have gotten some insight about
         # which boards have to be built. Therefore we pass BOARDS_CHANGED
         # so it can be added to the boards list on quickbuilds.
-        if [ -n "$BOARDS_CHANGED" ]; then
+        # On non-quickbuilds (e.g. merge queue builds), BOARDS_CHANGED must be
+        # dropped, otherwise get_supported_boards() would restrict the full
+        # build to only the changed boards.
+        if [ ${QUICK_BUILD} -eq 1 ] && [ -n "$BOARDS_CHANGED" ]; then
             export BOARDS_CHANGED="$(basename_list $BOARDS_CHANGED)"
+        else
+            unset BOARDS_CHANGED
         fi
         return 0
     fi
