@@ -272,34 +272,40 @@ static int _len(ieee802154_dev_t *dev)
 }
 
 /**
+ * Read the MAC timer registers selected by MTMSEL as ticks within the range of the overflow counter.
+ *
+ * The overflow counter counts the elapsed timer periods of @ref CC2538_RF_MT_PERIOD.
+ */
+static uint64_t _mt_read(void)
+{
+    uint32_t ticks = RFCORE_SFR_MTM0 & 0xFF;
+    ticks |= (RFCORE_SFR_MTM1 & 0xFF) << 8;
+
+    uint32_t period_cnt = RFCORE_SFR_MTMOVF0 & 0xFF;
+    period_cnt |= (RFCORE_SFR_MTMOVF1 & 0xFF) << 8;
+    period_cnt |= (RFCORE_SFR_MTMOVF2 & 0xFF) << 16;
+
+    return ((uint64_t)period_cnt * CC2538_RF_MT_PERIOD) + ticks;
+}
+
+/**
  * Read the SFD capture of the MAC timer
  *
  * The MAC timer captures on the rising edge of the radio SFD status
- *
  */
 static uint64_t _sfd_capture_ticks(void)
 {
     unsigned irq_state = irq_disable();
-    uint8_t mtmsel = RFCORE_SFR_MTMSEL;
+    uint8_t sel = RFCORE_SFR_MTMSEL;
 
-    /* select the capture registers */
+    /* select both capture registers in one write */
     RFCORE_SFR_MTMSEL = CC2538_SFR_MTMSEL_TIMER_CAP | CC2538_SFR_MTMOVFSEL_CAP;
+    uint64_t capture = _mt_read();
 
-    uint64_t current_period_ticks = RFCORE_SFR_MTM0 | ((uint64_t)RFCORE_SFR_MTM1 << 8);
-
-    /* the overflow counter counts elapsed timer periods for a given period length */
-    uint64_t period_cnt = RFCORE_SFR_MTMOVF0;
-    period_cnt |= (uint64_t)RFCORE_SFR_MTMOVF1 << 8;
-    period_cnt |= (uint64_t)RFCORE_SFR_MTMOVF2 << 16;
-
-    /* the overflow counter counts elapsed timer periods not 2^16 ticks */
-    RFCORE_SFR_MTMSEL = CC2538_SFR_MTMSEL_TIMER_P;
-    uint32_t period_len = RFCORE_SFR_MTM0 | (RFCORE_SFR_MTM1 << 8);
-
-    RFCORE_SFR_MTMSEL = mtmsel;
+    RFCORE_SFR_MTMSEL = sel;
     irq_restore(irq_state);
 
-    return (period_cnt * period_len) + current_period_ticks;
+    return capture;
 }
 
 static int _read(ieee802154_dev_t *dev, void *buf, size_t size, ieee802154_rx_info_t *info)
@@ -359,7 +365,7 @@ static int _read(ieee802154_dev_t *dev, void *buf, size_t size, ieee802154_rx_in
                           (CC2538_CORR_VAL_MAX - CC2538_CORR_VAL_MIN);
 
 #if IS_USED(MODULE_IEEE802154_RX_TIMESTAMP)
-        info->timestamp = (_rx_timestamp_ticks * NS_PER_US) / (CLOCK_CORECLOCK / US_PER_SEC);
+        info->timestamp = (_rx_timestamp_ticks * NS_PER_US) / CC2538_RF_MT_TICKS_PER_US;
 #endif
     }
 
