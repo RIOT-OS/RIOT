@@ -9,6 +9,7 @@
 import StarlightPage from "@astrojs/starlight/components/StarlightPage.astro";
 import { getCollection } from "astro:content";
 import { CardGrid, LinkCard } from "@astrojs/starlight/components";
+import { normalizeSearchText } from "../../lib/module_search";
 
 export async function getStaticPaths() {
   const moduleTypes = ["boards", "cpus"] as const;
@@ -115,7 +116,9 @@ const {
         return (
           <div
             data-riot-module-item
-            data-riot-module-name={`${module.data.title} ${module.id} ${module.data.description}`.toLowerCase()}
+            data-riot-module-search={normalizeSearchText(
+              `${module.data.title} ${module.id} ${module.data.description ?? ""}`,
+            )}
           >
             <LinkCard
               title={module.data.title}
@@ -129,6 +132,8 @@ const {
   </CardGrid>
 
   <script>
+    import { matchesQuery } from "../../lib/module_search";
+
     const searchInput = document.getElementById(
       "riot-module-search",
     ) as HTMLInputElement | null;
@@ -139,19 +144,13 @@ const {
       document.querySelectorAll<HTMLElement>("[data-riot-module-item]"),
     );
 
-    /**
-     * Filters the module entries based on the search input. It checks if the
-     * search query is a substring of the modules title, ID,
-     * or description (all converted to lowercase for case-insensitive matching).
-     * If no entries match the filter, it shows a "no results" message.
-     */
+    // Show the modules that match the filter.
     function updateFilter() {
-      const query = searchInput?.value.toLowerCase().trim() ?? "";
+      const query = searchInput?.value.trim() ?? "";
       let visible = 0;
 
       for (const item of items) {
-        const haystack = item.getAttribute("data-riot-module-name") || "";
-        const matches = query.length === 0 || haystack.indexOf(query) !== -1;
+        const matches = matchesQuery(item.dataset.riotModuleSearch ?? "", query);
         item.hidden = !matches;
         if (matches) {
           visible += 1;
@@ -161,9 +160,24 @@ const {
       if (noResults) {
         noResults.hidden = visible !== 0;
       }
+
+      // Keep the filter in the URL, e.g. `?q=nrf52`, so that a filtered list can be shared
+      const url = new URL(window.location.href);
+      if (query === "") {
+        url.searchParams.delete("q");
+      } else {
+        url.searchParams.set("q", query);
+      }
+      history.replaceState(history.state, "", url);
     }
 
     if (searchInput) {
+      // Take the filter from a shared URL
+      const query = new URLSearchParams(window.location.search).get("q");
+      if (query !== null) {
+        searchInput.value = query;
+      }
+
       // Update filter on input change
       searchInput.addEventListener("input", updateFilter);
 
