@@ -59,8 +59,7 @@
                              RADIO_SHORTS_TXREADY_START_Msk)
 
 /**
- * @brief   PPI channel connecting RADIO->EVENTS_ADDRESS to the MAC timer
- *
+ * @brief PPI channel connecting RADIO->EVENTS_FRAMESTART to the MAC timer
  */
 #ifndef CONFIG_NRF802154_TIMESTAMP_PPI_CH
 #  define CONFIG_NRF802154_TIMESTAMP_PPI_CH   18U
@@ -69,13 +68,23 @@
 #define MAC_TIMER_DEV       (timer_config[NRF802154_TIMER].dev) /**< Hardware Timer */
 #define MAC_TIMER_CHAN_TS   1U /**< timer channel for capturing RX timestamp */
 
-/* Frequency of the MAC timer in Hz */
+/**
+ * @brief Frequency of the MAC timer in Hz
+ */
 #ifndef CONFIG_NRF802154_TIMER_FREQ
 #  define CONFIG_NRF802154_TIMER_FREQ   IEEE802154_SYMBOL_RATE_HZ
 #endif
 
 #define NRF802154_TICKS_TO_NS(ticks) \
     (((uint64_t)(ticks) * NS_PER_SEC) / CONFIG_NRF802154_TIMER_FREQ)
+
+/**
+ * @brief Duration of the PHR (2 symbols) in MAC timer ticks
+ *
+ * EVENTS_FRAMESTART fires after the PHR (measured 32 us after the SFD).
+ * It is subtracted to get the end of the SFD.
+ */
+#define NRF802154_PHR_TICKS  ((2U * CONFIG_NRF802154_TIMER_FREQ) / IEEE802154_SYMBOL_RATE_HZ)
 
 /**
  * @brief   Timestamp of the last received frame in timer ticks
@@ -463,7 +472,7 @@ void isr_radio(void)
         }
         else if (_state == STATE_RX) {
             if (IS_USED(MODULE_IEEE802154_RX_TIMESTAMP)) {
-                _rx_timestamp_ticks = MAC_TIMER_DEV->CC[MAC_TIMER_CHAN_TS];
+                _rx_timestamp_ticks = MAC_TIMER_DEV->CC[MAC_TIMER_CHAN_TS] - NRF802154_PHR_TICKS;
             }
             dev->cb(dev, IEEE802154_RADIO_INDICATION_RX_START);
         }
@@ -581,7 +590,7 @@ static int _request_on(ieee802154_dev_t *dev)
     NRF_RADIO->SHORTS = DEFAULT_SHORTS;
 
     if (IS_USED(MODULE_IEEE802154_RX_TIMESTAMP)) {
-        /* EVENTS_FRAMESTART marks the end of the SFD.
+        /* EVENTS_FRAMESTART marks the end of the SFD after the PHR!
          * https://docs.nordicsemi.com/r/bundle/ps_nrf52840/page/radio.html?
          * section=register.EVENTS_FRAMESTART */
         NRF_PPI->CH[CONFIG_NRF802154_TIMESTAMP_PPI_CH].EEP = (uint32_t)&NRF_RADIO->EVENTS_FRAMESTART;
@@ -801,7 +810,7 @@ static const ieee802154_radio_ops_t nrf802154_ops = {
           | IEEE802154_CAP_IRQ_CCA_DONE
           | IEEE802154_CAP_PHY_OQPSK
           | IEEE802154_CAP_FRAME_RETENTION
-          | IEEE802154_CAP_RX_TIMESTAMP,
+          | (IS_USED(MODULE_IEEE802154_RX_TIMESTAMP) ? IEEE802154_CAP_RX_TIMESTAMP : 0),
 
     .write = _write,
     .read = _read,
