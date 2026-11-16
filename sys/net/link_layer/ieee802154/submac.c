@@ -382,7 +382,7 @@ static inline void _handle_csma_ca(ieee802154_submac_t *submac)
         submac->backoff_mask = (submac->backoff_mask << 1) | 1;
     }
 #else
-    (void) submac;
+    (void)submac;
 #endif
 }
 
