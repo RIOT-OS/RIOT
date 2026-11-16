@@ -9,7 +9,7 @@
 import StarlightPage from "@astrojs/starlight/components/StarlightPage.astro";
 import { LinkCard, Code, Aside, CardGrid } from "@astrojs/starlight/components";
 import { getCollection, render } from "astro:content";
-import { REPOSITORY_URL, SOURCE_TREE_URL } from "../../../config";
+import { SOURCE_TREE_URL } from "../../../config";
 
 export async function getStaticPaths() {
   const moduleTypes = ["boards", "cpus"] as const;
@@ -90,12 +90,6 @@ const tocHeadings = isLeadingOverview(listed[0]) ? listed.slice(1) : listed;
        board and CPU documentation. */
   }
   <span class="doxygen-doc" hidden></span>
-
-  <Aside type="caution">
-    This page is automatically generated from RIOT doxygen documentation. If you
-    find any issues or have suggestions for improvement, please report them
-    on <a href={`${REPOSITORY_URL}/issues/22203`}>GitHub</a>.
-  </Aside>
 
   <CardGrid>
     <LinkCard
