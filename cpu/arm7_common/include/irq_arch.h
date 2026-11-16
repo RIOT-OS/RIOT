@@ -38,9 +38,7 @@ static inline void __set_cpsr(unsigned val)
 
 static inline bool irq_is_in(void)
 {
-    int retval;
-    __asm__ volatile(" mrs  %0, cpsr" : "=r"(retval) : /* no inputs */ : "memory");
-    return (retval & INTMode) == 18;
+    return (__get_cpsr() & INTMode) == 18;
 }
 
 static inline __attribute__((always_inline)) unsigned irq_disable(void)

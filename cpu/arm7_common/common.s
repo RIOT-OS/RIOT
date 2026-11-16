@@ -10,7 +10,6 @@
 
   .text
   .arm
-  .code 32
   .align 4  /* 0 */
 
   /* Constants */
