@@ -1,5 +1,5 @@
 /*
- * SPDX-FileCopyrightText: 2026 Hochschule für Angewandte Wissenschaften Hamburg
+ * SPDX-FileCopyrightText: 2026 HAW Hamburg
  * SPDX-License-Identifier: LGPL-2.1-only
  */
 #include <stdint.h>
