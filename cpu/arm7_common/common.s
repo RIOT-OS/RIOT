@@ -9,6 +9,7 @@
   /* GCC ARM assembler */
 
   .text
+  .arm
   .code 32
   .align 4  /* 0 */
 
