@@ -29,7 +29,7 @@ Uno Shield. The board configuration provides:
 
 - 6 x ADC channels
 - 2 x DAC channels
-- 2 x PWM devices with a total of 7 channels
+- 2 x PWM devices with a total of 6 channels
 - 1 x SPI device
 - 1 x I2C device
 - 2 x UART devices
@@ -55,7 +55,6 @@ PWM_DEV(0):0    | GPIO25 | D3          | \ref esp32_pwm_channels "PWM Channels"
 PWM_DEV(0):1    | GPIO16 | D5          | \ref esp32_pwm_channels "PWM Channels"
 PWM_DEV(0):2    | GPIO27 | D6          | \ref esp32_pwm_channels "PWM Channels"
 PWM_DEV(0):3    | GPIO13 | D9          | \ref esp32_pwm_channels "PWM Channels"
-PWM_DEV(0):4    | GPIO2  | A0          | \ref esp32_pwm_channels "PWM Channels"
 PWM_DEV(1):0    | GPIO5  | D10         | \ref esp32_pwm_channels "PWM Channels"
 PWM_DEV(1):1    | GPIO23 | D11         | \ref esp32_pwm_channels "PWM Channels"
 SPI_DEV(0):CLK  | GPIO18 | D13         | \ref esp32_spi_interfaces "SPI Interfaces"
@@ -86,6 +85,13 @@ be found
          that is connected to GPIO35 and analog Arduino pin A4 with white label
          `IO38` is actually ADC1 Channel0 that is connected to GPIO36. That is
          the colored labels are correct in the pinout.
+
+@note Analog Arduino pin A0 (GPIO2) is also connected to the on-board LED
+      circuit and is pulled down by a 1 kOhm resistor. A0 can therefore only
+      be used as analog input for low-impedance signal sources. Signal sources
+      with a higher output impedance, for example voltage dividers or the R-2R
+      resistor ladder of the Peripheral Selftesting Shield, are loaded
+      considerably and their voltage is reduced accordingly.
 
 ## Flashing the Device
 

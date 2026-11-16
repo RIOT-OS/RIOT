@@ -143,7 +143,7 @@ uint32_t pwm_init(pwm_t pwm, pwm_mode_t mode, uint32_t freq, uint16_t res)
     }
 
     /* number of hardware ticks required, at maximum it can be APB clock */
-    uint32_t hw_ticks = MIN(freq * hw_res, clk_freq);
+    uint32_t hw_ticks = MIN((uint64_t)freq * hw_res, clk_freq);
 
     /*
      * if the number of required ticks is less than the minimum supported by
@@ -231,7 +231,10 @@ void pwm_set(pwm_t pwm, uint8_t channel, uint16_t value)
             _DEV.ch[channel].hpoint = 0;
             break;
         case PWM_RIGHT:
-            _DEV.ch[channel].hpoint = _DEV.hw_res - 1 - _DEV.ch[channel].duty;
+            /* avoid underflow for a duty cycle of 100 % */
+            _DEV.ch[channel].hpoint = (_DEV.ch[channel].duty < _DEV.hw_res)
+                                    ? _DEV.hw_res - 1 - _DEV.ch[channel].duty
+                                    : 0;
             break;
         case PWM_CENTER:
             _DEV.ch[channel].hpoint = (_DEV.hw_res - _DEV.ch[channel].duty) >> 1;
@@ -247,8 +250,10 @@ void pwm_set(pwm_t pwm, uint8_t channel, uint16_t value)
     ledc_hal_set_duty_int_part(&_DEV.hw, ch, _DEV.ch[channel].duty);
     ledc_hal_set_hpoint(&_DEV.hw, ch, _DEV.ch[channel].hpoint);
     ledc_hal_set_sig_out_en(&_DEV.hw, ch, true);
-    ledc_hal_ls_channel_update(&_DEV.hw, ch);
+    /* duty_start has to be set before the update of the channel parameters,
+     * otherwise the new duty is not applied before the next update */
     ledc_hal_set_duty_start(&_DEV.hw, ch, true);
+    ledc_hal_ls_channel_update(&_DEV.hw, ch);
     critical_exit();
 }
 
@@ -283,9 +288,13 @@ void pwm_poweron(pwm_t pwm)
         /* restore used parameters */
         ledc_hal_set_duty_int_part(&_DEV.hw, _DEV.ch[i].ch, _DEV.ch[i].duty);
         ledc_hal_set_hpoint(&_DEV.hw, _DEV.ch[i].ch, _DEV.ch[i].hpoint);
+        /* unused channels output the idle level, which has to be LOW */
+        ledc_hal_set_idle_level(&_DEV.hw, _DEV.ch[i].ch, 0);
         ledc_hal_set_sig_out_en(&_DEV.hw, _DEV.ch[i].ch, _DEV.ch[i].used);
+        /* apply the restored duty also for unused channels so that no stale
+         * duty of a previous initialization remains active */
+        ledc_hal_set_duty_start(&_DEV.hw, _DEV.ch[i].ch, true);
         ledc_hal_ls_channel_update(&_DEV.hw, _DEV.ch[i].ch);
-        ledc_hal_set_duty_start(&_DEV.hw, _DEV.ch[i].ch, _DEV.ch[i].used);
     }
     _DEV.enabled = true;
     critical_exit();

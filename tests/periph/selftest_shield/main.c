@@ -39,6 +39,37 @@
 #include "stdio_uart.h" /* for STDIO_UART_DEV */
 #include "tiny_strerror.h"
 
+#ifdef CPU_ESP32
+#  include "adc_arch.h" /* for adc_raw_to_voltage */
+
+/**
+ * @brief   VCC of the shield in mV as selected with the VCC selector
+ *
+ * Used to scale the calibrated voltages of the ESP32x ADCs to 10 bit
+ * samples relative to VCC.
+ */
+#  ifndef SHIELD_VCC_MV
+#    define SHIELD_VCC_MV       3300
+#  endif
+
+/**
+ * @brief   Maximum input voltage in mV that can be measured by the ADC
+ *
+ * With the default attenuation of 12 dB, the ESP32x ADCs are only specified
+ * up to 2450 mV, above which the samples are increasingly compressed until
+ * the ADC saturates at about 3.1 V.
+ */
+#  ifndef SHIELD_ADC_VMAX_MV
+#    define SHIELD_ADC_VMAX_MV  2450
+#  endif
+
+/**
+ * @brief   Maximum 10 bit sample value the ADC can reach, used as upper
+ *          limit for the lower bound of expected samples
+ */
+#  define ADC_10BIT_MAX   ((uint32_t)SHIELD_ADC_VMAX_MV * 1024 / SHIELD_VCC_MV)
+#endif /* CPU_ESP32 */
+
 /* BEGIN: controls of the behavior of the testing app: */
 #ifndef STOP_ON_FAILURE
 #define STOP_ON_FAILURE         0
@@ -95,11 +126,17 @@
  * - Arduino I/O mapping for ADC (so that we know which line to test)
  * - The PCF857x driver (so that we can control the R-2R resistor ladder
  *   connected to the GPIO expander).
+ *
+ * The test can be disabled explicitly by defining ENABLE_ADC_TEST as 0, e.g.
+ * for boards where the R-2R resistor ladder output at A0 is loaded by on-board
+ * components.
  */
-#if defined(MODULE_PERIPH_ADC) && defined(ARDUINO_A0) && defined(MODULE_PCF857X)
-#  define ENABLE_ADC_TEST       1
-#else
-#  define ENABLE_ADC_TEST       0
+#ifndef ENABLE_ADC_TEST
+#  if defined(MODULE_PERIPH_ADC) && defined(ARDUINO_A0) && defined(MODULE_PCF857X)
+#    define ENABLE_ADC_TEST     1
+#  else
+#    define ENABLE_ADC_TEST     0
+#  endif
 #endif
 
 /* We want the code to be compile-tested even when tests are disabled. We
@@ -995,6 +1032,30 @@ static bool periph_spi_test(void)
     return failed;
 }
 
+/**
+ * @brief   Sample the given ADC line with 10 bit resolution relative to VCC
+ *
+ * The ADCs of ESP32x SoCs have significant offset and gain errors that also
+ * differ between the ADC units. The raw samples are therefore not proportional
+ * to VCC. Instead, the calibration data burned into the eFuses are used to
+ * convert the raw samples to voltages, which are then scaled to 10 bit
+ * relative to the VCC of the shield.
+ */
+static uint16_t adc_sample_10bit(adc_t line)
+{
+    int32_t sample = adc_sample(line, ADC_RES_10BIT);
+
+#ifdef CPU_ESP32
+    if (sample >= 0) {
+        int mv = 0;
+        adc_raw_to_voltage(line, sample, &mv);
+        sample = MIN(1023, (int32_t)mv * 1024 / SHIELD_VCC_MV);
+    }
+#endif
+
+    return sample;
+}
+
 static bool periph_pwm_test_chan(pwm_t pwm_dev, uint8_t pwm_chan, pwm_mode_t pwm_mode,
                                  adc_t adc_line)
 {
@@ -1013,12 +1074,15 @@ static bool periph_pwm_test_chan(pwm_t pwm_dev, uint8_t pwm_chan, pwm_mode_t pwm
         pwm_set(pwm_dev, pwm_chan, i);
         /* give voltage at ADC some time to settle */
         brief_delay();
-        uint16_t sample = adc_sample(adc_line, ADC_RES_10BIT);
+        uint16_t sample = adc_sample_10bit(adc_line);
         uint16_t expected = i << 2;
 
         /* let's allow for quite some error here */
         const uint16_t delta = 64;
         uint16_t lower = expected <= delta ? 0 : expected - delta;
+#ifdef CPU_ESP32
+        lower = MIN(lower, ADC_10BIT_MAX);
+#endif
         uint16_t upper = MIN(1023, expected + delta);
         bool test_failed = TEST((lower <= sample) && (upper >= sample));
         if (test_failed) {
@@ -1070,18 +1134,21 @@ static bool periph_adc_test(void)
     bool failed = false;
     print_start("ADC", "sample R2R DAC output");
 
-    adc_init(ARDUINO_A0);
+    ASSERT_NO_ERROR(adc_init(ARDUINO_A0));
     r_2r_dac_init();
 
     for (uint8_t i = 0; i < 16; i++) {
         r_2r_dac_write(i);
-        uint16_t sample = adc_sample(ARDUINO_A0, ADC_RES_10BIT);
+        uint16_t sample = adc_sample_10bit(ARDUINO_A0);
         uint16_t expected = i << 6;
 
         /* The resistors on board v0.3 are not that accurate, so allow for 10%
          * error margin */
         const uint16_t delta = 1024 / 10;
         uint16_t lower = expected <= delta ? 0 : expected - delta;
+#ifdef CPU_ESP32
+        lower = MIN(lower, ADC_10BIT_MAX);
+#endif
         uint16_t upper = MIN(1023, expected + delta);
         bool test_failed = TEST((lower <= sample) && (upper >= sample));
         if (test_failed) {

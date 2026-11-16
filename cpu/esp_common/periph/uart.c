@@ -100,6 +100,7 @@ struct uart_hw_t {
     uint8_t  signal_txd;    /* TxD signal from the controller */
     uint8_t  signal_rxd;    /* RxD signal to the controller */
     uint8_t  int_src;       /* peripheral interrupt source used by the UART device */
+    bool     powered;       /* indicates whether the UART is powered on */
 #endif
 };
 
@@ -232,6 +233,12 @@ void uart_write(uart_t uart, const uint8_t *data, size_t len)
     for (size_t i = 0; i < len; i++) {
         _uart_tx_one_char(uart, data[i]);
     }
+
+#ifndef CPU_ESP8266
+    /* uart_write is blocking, wait until all bytes are transmitted, but only
+     * if the UART is powered on, the transmission never completes otherwise */
+    while (_uarts[uart].powered && !uart_ll_is_tx_idle(_uarts[uart].regs)) {}
+#endif
 }
 
 void uart_poweron(uart_t uart)
@@ -240,6 +247,7 @@ void uart_poweron(uart_t uart)
 
 #ifndef CPU_ESP8266
     periph_module_enable(_uarts[uart].mod);
+    _uarts[uart].powered = true;
 #endif
     _uart_config(uart);
 }
@@ -249,6 +257,7 @@ void uart_poweroff(uart_t uart)
     assert(uart < UART_NUMOF);
 
 #ifndef CPU_ESP8266
+    _uarts[uart].powered = false;
     periph_module_disable(_uarts[uart].mod);
 #endif
 }

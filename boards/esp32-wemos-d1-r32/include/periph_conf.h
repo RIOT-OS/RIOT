@@ -61,8 +61,12 @@ extern "C" {
 
 /**
  * @brief Declaration of PWM_DEV(0) channels, at maximum six channels.
+ *
+ * GPIO2 (Arduino pin A0) is not used as PWM channel, since all channels of a
+ * PWM device are allocated by `pwm_init`, so that GPIO2 could no longer be
+ * used as ADC input once PWM_DEV(0) is used.
  */
-#define PWM0_GPIOS  { GPIO25, GPIO16, GPIO27, GPIO13, GPIO2 }
+#define PWM0_GPIOS  { GPIO25, GPIO16, GPIO27, GPIO13 }
 
 /**
  * @brief Declaration of PWM_DEV(1) channels, at maximum six channels.

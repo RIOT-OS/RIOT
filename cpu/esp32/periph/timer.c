@@ -107,6 +107,9 @@
 #define HW_TIMER_NUMOF      ARRAY_SIZE(_timers_desc)
 #define HW_TIMER_CHANNELS   1
 
+#define HW_TIMER_CLK_DIV_MIN    2       /* minimum clock divider */
+#define HW_TIMER_CLK_DIV_MAX    65536   /* maximum clock divider */
+
 struct _hw_timer_t {
     bool initialized;           /* indicates whether timer is already initialized */
     timer_isr_ctx_t isr_ctx;    /* registered ISR */
@@ -193,8 +196,10 @@ void IRAM_ATTR _timer_int_handler(void* arg)
             timer_ll_enable_intr(_timers[dev].group, _timers[dev].int_mask, false);
             timer_ll_clear_intr_status(_timers[dev].group, _timers[dev].int_mask);
 
-            /* execute the callback function */
-            _timers[dev].isr_ctx.cb(_timers[dev].isr_ctx.arg, 0);
+            /* execute the callback function if defined */
+            if (_timers[dev].isr_ctx.cb) {
+                _timers[dev].isr_ctx.cb(_timers[dev].isr_ctx.arg, 0);
+            }
         }
     }
 
@@ -213,8 +218,7 @@ int timer_init(tim_t dev, uint32_t freq, timer_cb_t cb, void *arg)
     uint32_t clk_div = TIMER_CLOCK_FREQ / freq;
 
     assert(dev <  HW_TIMER_NUMOF);
-    assert(clk_div >= 2 && clk_div <= 65536);
-    assert(cb != NULL);
+    assert(clk_div >= HW_TIMER_CLK_DIV_MIN && clk_div <= HW_TIMER_CLK_DIV_MAX);
 
     /* initialize timer data structure */
     _timers[dev].isr_ctx.cb  = cb;
@@ -351,6 +355,24 @@ void IRAM_ATTR timer_stop(tim_t dev)
     timer_ll_enable_counter(_timers[dev].group, _timers[dev].index, false);
 }
 
+uword_t timer_query_freqs_numof(tim_t dev)
+{
+    (void)dev;
+    /* clock divider values from HW_TIMER_CLK_DIV_MIN to HW_TIMER_CLK_DIV_MAX */
+    return HW_TIMER_CLK_DIV_MAX - HW_TIMER_CLK_DIV_MIN + 1;
+}
+
+uint32_t timer_query_freqs(tim_t dev, uword_t index)
+{
+    (void)dev;
+
+    if (index > (HW_TIMER_CLK_DIV_MAX - HW_TIMER_CLK_DIV_MIN)) {
+        return 0;
+    }
+
+    return TIMER_CLOCK_FREQ / (index + HW_TIMER_CLK_DIV_MIN);
+}
+
 #else /* MODULE_ESP_HW_COUNTER */
 
 #include "xtensa/config/core-isa.h"
@@ -460,7 +482,9 @@ void IRAM hw_timer_handler(void* arg)
         channel->used = false;
         xt_ints_off(BIT(timers_int[dev]));
         xthal_set_ccompare (dev, 0);
-        timer->isr_ctx.cb(timer->isr_ctx.arg, chn);
+        if (timer->isr_ctx.cb) {
+            timer->isr_ctx.cb(timer->isr_ctx.arg, chn);
+        }
     }
 
     irq_isr_exit();
@@ -472,7 +496,6 @@ int timer_init (tim_t dev, uint32_t freq, timer_cb_t cb, void *arg)
 
     assert(dev  <  HW_TIMER_NUMOF);
     assert(freq == HW_TIMER_FREQUENCY);
-    assert(cb   != NULL);
 
     if (_timers[dev].initialized) {
         DEBUG("%s timer dev=%u is already initialized (used)\n", __func__, dev);
@@ -644,5 +667,18 @@ static void IRAM __timer_channel_stop (struct _hw_timer_t* timer, struct hw_chan
         /* otherwise deactivate the channel */
         channel->used = false;
     }
+}
+
+uword_t timer_query_freqs_numof(tim_t dev)
+{
+    (void)dev;
+    /* only HW_TIMER_FREQUENCY is supported */
+    return 1;
+}
+
+uint32_t timer_query_freqs(tim_t dev, uword_t index)
+{
+    (void)dev;
+    return (index == 0) ? HW_TIMER_FREQUENCY : 0;
 }
 #endif /* MODULE_ESP_HW_COUNTER */

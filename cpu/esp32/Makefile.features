@@ -37,6 +37,7 @@ FEATURES_PROVIDED += periph_gpio_ll_irq_level_triggered_low
 FEATURES_PROVIDED += periph_gpio_ll_open_drain
 FEATURES_PROVIDED += periph_gpio_ll_open_drain_pull_up
 FEATURES_PROVIDED += periph_spi_reconfigure
+FEATURES_PROVIDED += periph_timer_query_freqs
 FEATURES_PROVIDED += puf_sram
 
 ifeq (xtensa,$(CPU_ARCH))

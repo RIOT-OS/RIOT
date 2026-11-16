@@ -28,13 +28,28 @@ DETAILED_OUTPUT ?= 0
 
 include $(RIOTBASE)/Makefile.include
 
+# We only need 1 thread (+ the Idle thread on some platforms) and we really
+# want this app working on as many boards as possible. ESP32x SoCs use an
+# extra thread for esp_timer and USB stacks (stdio via USB) use an extra thread.
 ifneq ($(CPU),esp32)
-  # We only need 1 thread (+ the Idle thread on some platforms) and we really
-  # want this app working on as many boards as possible
-  CFLAGS += -DMAXTHREADS=2
+  ifeq (,$(filter usbus tinyusb_device,$(USEMODULE)))
+    CFLAGS += -DMAXTHREADS=2
+  else
+    CFLAGS += -DMAXTHREADS=3
+  endif
 else
-  # ESP32x SoCs uses an extra thread for esp_timer
-  CFLAGS += -DMAXTHREADS=3
+  ifeq (,$(filter usbus tinyusb_device,$(USEMODULE)))
+    CFLAGS += -DMAXTHREADS=3
+  else
+    CFLAGS += -DMAXTHREADS=4
+  endif
+endif
+
+ifeq (esp32-wemos-d1-r32,$(BOARD))
+  # A0 (GPIO2) is pulled down by an on-board 1 kOhm resistor of the LED
+  # circuit, which reduces the output voltage of the R-2R resistor ladder
+  # (10 kOhm output impedance) to about 1/11, so the ADC test can't be used.
+  CFLAGS += -DENABLE_ADC_TEST=0
 endif
 
 CFLAGS += \
