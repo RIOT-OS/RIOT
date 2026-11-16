@@ -143,6 +143,80 @@ config IEEE802154_DEFAULT_ACK_REQ
     bool "Request ACKs by default"
     default y
 
+menuconfig KCONFIG_MODULE_IEEE802154_MAC
+    bool "Configure IEEE802.15.4 MAC using Kconfig"
+    depends on USEMODULE_IEEE802154_MAC
+    help
+        Configure IEEE802.15.4 MAC compile-time parameters using Kconfig.
+        When disabled, the defaults from the public MAC header remain active
+        and can still be overridden by the legacy macro names.
+
+if KCONFIG_MODULE_IEEE802154_MAC
+
+config IEEE802154_MAC_TXQ_LEN
+    int "IEEE802.15.4 MAC TX queue length"
+    default 4
+    range 1 255
+    help
+        Number of frames that can be queued in one MAC TX queue.
+        For indirect transmission this is the queue depth per destination
+        slot.
+
+config IEEE802154_MAC_TICK_INTERVAL_MS
+    int "IEEE802.15.4 MAC tick interval in ms"
+    default 1
+    range 1 65535
+    help
+        Period of the MAC maintenance tick. The tick drives indirect frame
+        expiration, association response waiting, and sleepy polling windows.
+
+config IEEE802154_MAC_FRAME_TIMEOUT
+    int "IEEE802.15.4 MAC indirect frame timeout in symbols"
+    default 125000
+    range 1 2147483647
+    help
+        Lifetime of queued indirect frames in symbols. For 2.4 GHz O-QPSK
+        with a 16 us symbol time, the default is about 2 seconds.
+
+config IEEE802154_MAC_TX_INDIRECTQ_SIZE
+    int "IEEE802.15.4 MAC indirect destination slots"
+    default 4
+    range 1 31
+    help
+        Number of destination slots in the indirect transmission queue.
+        Each slot contains IEEE802154_MAC_TXQ_LEN frames. The upper bound is
+        limited by the 32-bit free-mask used by the queue implementation.
+
+config IEEE802154_MAC_ASSOC_TABLE_SIZE
+    int "IEEE802.15.4 MAC association alias table size"
+    default IEEE802154_MAC_TX_INDIRECTQ_SIZE
+    range 1 31
+    help
+        Number of associated-device address alias entries remembered by the
+        MAC. This is used to match a device's extended and short addresses.
+
+config IEEE802154_MAC_BASE_SLOT_DURATION
+    int "IEEE802.15.4 MAC base slot duration in symbols"
+    default 60
+    range 1 65535
+
+config IEEE802154_MAC_MAX_LOST_BEACONS
+    int "IEEE802.15.4 MAC maximum lost beacons"
+    default 4
+    range 1 255
+
+config IEEE802154_MAC_MIN_CAP_LENGTH
+    int "IEEE802.15.4 MAC minimum CAP length in symbols"
+    default 440
+    range 1 65535
+
+config IEEE802154_MAC_NUM_SUPERFRAME_SLOTS
+    int "IEEE802.15.4 MAC superframe slots"
+    default 16
+    range 1 255
+
+endif # KCONFIG_MODULE_IEEE802154_MAC
+
 menu "IEEE802.15.4 Security"
     depends on USEMODULE_IEEE802154_SECURITY
 

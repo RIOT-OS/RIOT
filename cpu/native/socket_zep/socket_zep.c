@@ -130,7 +130,8 @@ static inline bool _dst_not_me(socket_zep_t *dev, const void *buf)
     uint8_t dst_addr[IEEE802154_LONG_ADDRESS_LEN] = { 0 };
     int dst_len;
     le_uint16_t dst_pan = { .u16 = 0 };
-    bool is_ack = *(uint8_t *)buf & IEEE802154_FCF_TYPE_ACK;
+    uint8_t frame_type = *(const uint8_t *)buf & IEEE802154_FCF_TYPE_MASK;
+    bool is_ack = frame_type == IEEE802154_FCF_TYPE_ACK;
 
     /* no need to check address if we are in promiscuous mode */
     if (dev->filter_mode == IEEE802154_FILTER_PROMISC ||
@@ -151,6 +152,23 @@ static inline bool _dst_not_me(socket_zep_t *dev, const void *buf)
     }
 
     dst_len = ieee802154_get_dst(buf, dst_addr, &dst_pan);
+
+    if (dst_len < 0) {
+        /* Beacons have no destination; data and commands may address the
+         * coordinator implicitly through the source PAN ID. */
+        if (frame_type == IEEE802154_FCF_TYPE_BEACON) {
+            return false;
+        }
+        if (!dev->pan_coord ||
+            (frame_type != IEEE802154_FCF_TYPE_DATA &&
+             frame_type != IEEE802154_FCF_TYPE_MACCMD)) {
+            return true;
+        }
+        if (ieee802154_get_src(buf, dst_addr, &dst_pan) < 0) {
+            return true;
+        }
+        return dst_pan.u16 != dev->pan_id;
+    }
 
     if (dst_pan.u16 != dev->pan_id && dst_pan.u16 != 0xffff) {
         DEBUG("socket_zep::dst_not_me: PAN ID %x != %x\n", dst_pan.u16, dev->pan_id);
@@ -338,6 +356,7 @@ void socket_zep_setup(socket_zep_t *dev, const socket_zep_params_t *params)
     assert((params->remote_addr != NULL) && (params->remote_port != NULL));
 
     dev->params = params;
+    dev->pan_coord = false;
 
     native_async_read_setup();
 }
@@ -443,7 +462,8 @@ static int _config_addr_filter(ieee802154_dev_t *dev, ieee802154_af_cmd_t cmd, c
         memcpy(&zepdev->pan_id, value, sizeof(zepdev->pan_id));
         break;
     case IEEE802154_AF_PAN_COORD:
-        return -ENOTSUP;
+        zepdev->pan_coord = *(const bool *)value;
+        break;
     }
 
     return 0;

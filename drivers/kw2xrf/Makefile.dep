@@ -5,7 +5,7 @@ USEMODULE += iolist
 USEMODULE += bhp
 
 ifneq (,$(filter netdev,$(USEMODULE)))
-  USEMODULE += netdev_ieee802154_submac
+  USEMODULE += gnrc_netif_ieee802154_mac
 endif
 
 ifneq (,$(filter ieee802154_submac,$(USEMODULE)))

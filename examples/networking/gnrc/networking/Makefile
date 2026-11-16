@@ -49,6 +49,7 @@ USE_ZEP ?= 0
 ZEP_PORT_BASE ?= 17754
 ifeq (1,$(USE_ZEP))
   USEMODULE += socket_zep
+  USEMODULE += socket_zep_hello
 endif
 
 # Uncomment the following 2 lines to specify static link lokal IPv6 address

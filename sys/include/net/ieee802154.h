@@ -80,6 +80,18 @@ extern "C" {
 #define IEEE802154_FCF_SRC_ADDR_RESV        (0x40)  /**< reserved address mode */
 #define IEEE802154_FCF_SRC_ADDR_SHORT       (0x80)  /**< source address length is 2 */
 #define IEEE802154_FCF_SRC_ADDR_LONG        (0xc0)  /**< source address length is 8 */
+
+/** @} */
+
+/**
+ * @brief IEEE 802.15.4 MAC commands definitions
+ * @{
+ */
+#define IEEE802154_CMD_ASSOCIATION_REQ      (0x01)
+#define IEEE802154_CMD_ASSOCIATION_RES      (0x02)
+#define IEEE802154_CMD_DISASSOCIATION       (0x03)
+#define IEEE802154_CMD_DATA_REQ             (0x04)
+#define IEEE802154_CMD_BEACON_REQ           (0x07)
 /** @} */
 
 /**

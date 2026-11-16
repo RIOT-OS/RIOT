@@ -323,6 +323,7 @@ PSEUDOMODULES += gnrc_txtsnd
 PSEUDOMODULES += ieee802154_rx_timestamp
 PSEUDOMODULES += ieee802154_security
 PSEUDOMODULES += ieee802154_submac
+PSEUDOMODULES += ieee802154_mac
 PSEUDOMODULES += ieee802154_submac_soft_ack
 PSEUDOMODULES += ieee802154_submac_soft_csma_ca
 PSEUDOMODULES += ieee802154_submac_soft_frame_retrans
@@ -535,7 +536,7 @@ PSEUDOMODULES += shell_cmd_gnrc_udp
 PSEUDOMODULES += shell_cmd_heap
 PSEUDOMODULES += shell_cmd_i2c_scan
 PSEUDOMODULES += shell_cmd_iw
-PSEUDOMODULES += shell_cmd_lwip_netif
+:x
 PSEUDOMODULES += shell_cmd_mci
 PSEUDOMODULES += shell_cmd_md5sum
 PSEUDOMODULES += shell_cmd_mtd

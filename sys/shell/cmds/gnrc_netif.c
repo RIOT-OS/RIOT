@@ -27,10 +27,16 @@
 #include "net/gnrc/netif/hdr.h"
 #include "net/ipv6/addr.h"
 #include "net/l2util.h"
+#include "net/l2scan_list.h"
 #include "net/lora.h"
 #include "net/loramac.h"
 #include "net/netif.h"
 #include "shell.h"
+
+#if IS_USED(MODULE_GNRC_NETIF_IEEE802154_MAC)
+#include "net/ieee802154.h"
+#include "net/gnrc/netif/ieee802154_mac.h"
+#endif
 
 #ifdef MODULE_NETSTATS
 #include "net/netstats.h"
@@ -251,6 +257,10 @@ static void _set_usage(char *cmd_name)
          "       * \"fec\" - FSK forward error correction\n"
          "       * \"channel_spacing\" - channel spacing\n"
 #endif
+#ifdef MODULE_GNRC_NETIF_IEEE802154_MAC
+         "       * \"poll_interval\" - Poll interval for indirect transmissions\n"
+         "       * \"beacon_payload\" - set beacon payload\n"
+#endif
          "       * \"power\" - TX power in dBm\n"
          "       * \"retrans\" - max. number of retransmissions\n"
          "       * \"src_len\" - sets the source address length in byte\n"
@@ -280,6 +290,30 @@ static void _del_usage(char *cmd_name)
     printf("usage: %s <if_id> del <ipv6_addr>\n",
            cmd_name);
 }
+
+static void _ifconfig_scan_usage(void)
+{
+    puts("Usage: ifconfig <if_id> scan [all|<channel>]");
+}
+
+#if IS_USED(MODULE_GNRC_NETIF_IEEE802154_MAC)
+static void _ifconfig_connect_usage(void)
+{
+    puts("Usage: ifconfig <if_id> connect <channel> <panid> <coord_addr> [capability]");
+    puts("  coord_addr: short (00:01) or long (aa:bb:cc:dd:ee:ff:00:11)");
+}
+
+static void _ifconfig_start_usage(void)
+{
+    puts("Usage: ifconfig <if_id> start <channel>");
+}
+
+static void _ifconfig_poll_usage(void)
+{
+    puts("Usage: ifconfig <if_id> poll <panid> <coord_addr>");
+    puts("  coord_addr: short (00:01) or long (aa:bb:cc:dd:ee:ff:00:11)");
+}
+#endif
 
 #ifdef MODULE_NETSTATS
 static void _stats_usage(char *cmd_name)
@@ -1357,6 +1391,34 @@ static int _netif_set_state(netif_t *iface, char *state_str)
     return 0;
 }
 
+#if IS_USED(MODULE_GNRC_NETIF_IEEE802154_MAC)
+static int _ifconfig_parse_ieee802154_coord_addr(const char *addr_str,
+                                                 ieee802154_addr_t *addr)
+{
+    if (!addr_str || !addr) {
+        return -EINVAL;
+    }
+
+    uint8_t buf[IEEE802154_LONG_ADDRESS_LEN];
+    size_t len = l2util_addr_from_str(addr_str, buf);
+
+    if (len == IEEE802154_SHORT_ADDRESS_LEN) {
+        addr->type = IEEE802154_ADDR_MODE_SHORT;
+        addr->v.short_addr.u8[0] = buf[0];
+        addr->v.short_addr.u8[1] = buf[1];
+        return 0;
+    }
+
+    if (len == IEEE802154_LONG_ADDRESS_LEN) {
+        addr->type = IEEE802154_ADDR_MODE_EXTENDED;
+        memcpy(addr->v.ext_addr.uint8, buf, len);
+        return 0;
+    }
+
+    return -EINVAL;
+}
+#endif
+
 static int _netif_set_encrypt_key(netif_t *iface, netopt_t opt, char *key_str)
 {
     size_t str_len = strlen(key_str);
@@ -1449,6 +1511,12 @@ static void _usage(char *cmd)
     _flag_usage(cmd);
     _add_usage(cmd);
     _del_usage(cmd);
+    _ifconfig_scan_usage();
+#ifdef MODULE_GNRC_NETIF_IEEE802154_MAC
+    _ifconfig_connect_usage();
+    _ifconfig_start_usage();
+    _ifconfig_poll_usage();
+#endif
 #ifdef MODULE_L2FILTER
     _l2filter_usage(cmd);
 #endif
@@ -1601,6 +1669,25 @@ static int _netif_set(char *cmd_name, netif_t *iface, char *key, char *value)
     else if (strcmp("state", key) == 0) {
         return _netif_set_state(iface, value);
     }
+#ifdef MODULE_GNRC_NETIF_IEEE802154_MAC
+    else if (strcmp("poll_interval", key) == 0) {
+        return _netif_set_u32(iface, NETOPT_POLL_INTERVAL, 0, value);
+    }
+    else if (strcmp("beacon_payload", key) == 0) {
+        size_t len = strlen(value);
+
+        if (netif_set_opt(iface, NETOPT_BEACON_PAYLOAD, 0,
+                          value, len) < 0) {
+            printf("error: unable to set beacon payload\n");
+            return 1;
+        }
+
+        printf("success: set beacon payload on interface ");
+        _print_iface_name(iface);
+        printf(" to %s\n", value);
+        return 0;
+    }
+#endif
 
     _set_usage(cmd_name);
     return 1;
@@ -1759,6 +1846,306 @@ static int _netif_del(netif_t *iface, char *addr_str)
 #endif
 }
 
+#if IS_USED(MODULE_GNRC_NETIF_IEEE802154_MAC)
+static void _ifconfig_scan_cb_ieee802154(void *netif_ptr, const l2scan_list_t *list)
+{
+    (void)netif_ptr;
+
+    puts("SCAN done");
+    puts(" IDX | CH | PANID  | ADDR                    | LQI | RSSI | PAYLOAD");
+    puts("-----+----+--------+-------------------------+-----+------+----------------");
+
+    size_t idx = 0;
+
+    for (list_node_t *node = list->head.next; node; node = node->next, idx++) {
+        gnrc_netif_ieee802154_mac_scan_list_node_t *entry =
+            container_of(node, gnrc_netif_ieee802154_mac_scan_list_node_t, node);
+
+        const gnrc_netif_ieee802154_mac_scan_result_t *res = &entry->result;
+
+        char addr_str[3 * IEEE802154_LONG_ADDRESS_LEN];
+        if (res->coord_addr.type == IEEE802154_ADDR_MODE_EXTENDED) {
+            l2util_addr_to_str(res->coord_addr.v.ext_addr.uint8,
+                               IEEE802154_LONG_ADDRESS_LEN,
+                               addr_str);
+        }
+        else if (res->coord_addr.type == IEEE802154_ADDR_MODE_SHORT) {
+            snprintf(addr_str, sizeof(addr_str), "0x%04x",
+                     byteorder_ntohs(res->coord_addr.v.short_addr));
+        }
+        else {
+            strcpy(addr_str, "none");
+        }
+
+        char payload_str[17];
+        size_t payload_len = res->beacon_payload_len;
+        if (payload_len > (sizeof(payload_str) - 1)) {
+            payload_len = sizeof(payload_str) - 1;
+        }
+
+        for (size_t i = 0; i < payload_len; i++) {
+            unsigned char c = res->beacon_payload[i];
+            payload_str[i] = isprint(c) ? (char)c : '.';
+        }
+        payload_str[payload_len] = '\0';
+
+        printf(" %3u | %2u | 0x%04x | %-20s | %3u | %4d | %-16s\n",
+               (unsigned)idx,
+               res->base.channel,
+               res->pan_id,
+               addr_str,
+               res->lqi,
+               res->base.strength,
+               payload_str);
+    }
+}
+
+static void _ifconfig_connect_cb_ieee802154(void *netif_ptr,
+                                            const netopt_connect_result_t *res)
+{
+    (void)netif_ptr;
+
+    if (!res) {
+        puts("CONNECT done");
+        return;
+    }
+
+    printf("CONNECT done: channel=%u\n", (unsigned)res->channel);
+}
+#endif
+
+static void _ifconfig_scan_cb_generic(void *netif_ptr, const l2scan_list_t *list)
+{
+    (void)netif_ptr;
+
+    puts("SCAN done");
+    puts(" IDX | CH | STR");
+    puts("-----+----+-----");
+
+    size_t idx = 0;
+
+    typedef struct {
+        list_node_t node;
+        netopt_scan_result_t result;
+    } _generic_scan_node_t;
+
+    for (list_node_t *node = list->head.next; node; node = node->next, idx++) {
+        _generic_scan_node_t *entry = container_of(node, _generic_scan_node_t, node);
+
+        printf(" %3u | %2u | %3d\n",
+               (unsigned)idx,
+               entry->result.channel,
+               entry->result.strength);
+    }
+}
+
+static int _ifconfig_scan(netif_t *netif, int argc, char **argv)
+{
+    uint16_t dev_type = 0;
+    uint16_t channel = NETOPT_SCAN_REQ_ALL_CH;
+    int res;
+
+    if (argc > 1) {
+        _ifconfig_scan_usage();
+        return 1;
+    }
+
+    if (argc == 1) {
+        if (strcmp(argv[0], "all") != 0) {
+            channel = (uint16_t)strtoul(argv[0], NULL, 0);
+        }
+    }
+
+    res = netif_get_opt(netif, NETOPT_DEVICE_TYPE, 0, &dev_type, sizeof(dev_type));
+    if (res < 0) {
+        puts("scan: unable to get device type");
+        return 1;
+    }
+
+    switch (dev_type) {
+#if IS_USED(MODULE_GNRC_NETIF_IEEE802154_MAC)
+        case NETDEV_TYPE_IEEE802154: {
+            static ieee802154_scan_result_t scan_results[
+                GNRC_NETIF_IEEE802154_MAC_SCAN_MAX_CH
+            ];
+            static size_t scan_results_used;
+
+            gnrc_netif_ieee802154_mac_scan_request_t req = {
+                .base = NETOPT_SCAN_REQUEST_INITIALIZER(channel,
+                                                        _ifconfig_scan_cb_ieee802154),
+                .type = IEEE802154_SCAN_ACTIVE,
+                .duration_us = 30000U,
+                .channels = NULL,
+                .channel_count = 0,
+                .results = scan_results,
+                .results_len = sizeof(scan_results) / sizeof(scan_results[0]),
+                .results_used = &scan_results_used,
+            };
+
+            res = netif_set_opt(netif, NETOPT_SCAN, 0, &req, sizeof(req));
+            if (res < 0) {
+                printf("scan start failed: %d\n", res);
+                return 1;
+            }
+            return 0;
+        }
+#endif
+        default: {
+            netopt_scan_request_t req =
+                NETOPT_SCAN_REQUEST_INITIALIZER(channel, _ifconfig_scan_cb_generic);
+
+            res = netif_set_opt(netif, NETOPT_SCAN, 0, &req, sizeof(req));
+            if (res < 0) {
+                printf("scan start failed: %d\n", res);
+                return 1;
+            }
+            return 0;
+        }
+    }
+}
+
+#if IS_USED(MODULE_GNRC_NETIF_IEEE802154_MAC)
+static int _ifconfig_connect_ieee802154(netif_t *netif, int argc, char **argv)
+{
+    uint16_t dev_type;
+    int res;
+
+    if (argc < 3 || argc > 4) {
+        _ifconfig_connect_usage();
+        return 1;
+    }
+
+    res = netif_get_opt(netif, NETOPT_DEVICE_TYPE, 0, &dev_type, sizeof(dev_type));
+    if (res < 0) {
+        puts("connect: unable to get device type");
+        return 1;
+    }
+
+    if (dev_type != NETDEV_TYPE_IEEE802154) {
+        puts("connect: interface is not IEEE 802.15.4");
+        return 1;
+    }
+
+    uint16_t channel = (uint16_t)strtoul(argv[0], NULL, 0);
+    uint16_t panid = (uint16_t)strtoul(argv[1], NULL, 0);
+
+    ieee802154_addr_t coord_addr = { 0 };
+    if (_ifconfig_parse_ieee802154_coord_addr(argv[2], &coord_addr) < 0) {
+        puts("connect: invalid coordinator address");
+        return 1;
+    }
+
+    ieee802154_assoc_capability_t cap = { .u8 = 0 };
+    cap.bits.rx_on_when_idle = 1;
+    cap.bits.allocate_address = 1;
+
+    if (argc == 4) {
+        cap.u8 = (uint8_t)strtoul(argv[3], NULL, 0);
+    }
+
+    gnrc_netif_ieee802154_mac_connect_request_t req = {
+        .base = {
+            .conn_cb = _ifconfig_connect_cb_ieee802154,
+        },
+        .channel = channel,
+        .panid = panid,
+        .coord_addr = coord_addr,
+        .capability = cap,
+    };
+
+    res = netif_set_opt(netif, NETOPT_CONNECT, 0, &req, sizeof(req));
+    if (res < 0) {
+        printf("connect start failed: %d\n", res);
+        return 1;
+    }
+
+    printf("CONNECT started: ch=%u pan=0x%04x\n", channel, panid);
+    return 0;
+}
+
+static int _ifconfig_start_ieee802154(netif_t *netif, int argc, char **argv)
+{
+    uint16_t dev_type = 0;
+    int res;
+
+    if (argc != 1) {
+        _ifconfig_start_usage();
+        return 1;
+    }
+
+    res = netif_get_opt(netif, NETOPT_DEVICE_TYPE, 0, &dev_type, sizeof(dev_type));
+    if (res < 0) {
+        puts("start: unable to get device type");
+        return 1;
+    }
+
+    if (dev_type != NETDEV_TYPE_IEEE802154) {
+        puts("start: interface is not IEEE 802.15.4");
+        return 1;
+    }
+
+    uint16_t channel = (uint16_t)strtoul(argv[0], NULL, 0);
+
+    gnrc_netif_ieee802154_mac_start_request_t req = {
+        .channel = channel,
+    };
+
+    res = netif_set_opt(netif, NETOPT_START, 0, &req, sizeof(req));
+    if (res < 0) {
+        printf("start failed: %d\n", res);
+        return 1;
+    }
+
+    printf("START started: ch=%u\n", channel);
+    return 0;
+}
+
+static int _ifconfig_poll_ieee802154(netif_t *netif, int argc, char **argv)
+{
+    uint16_t dev_type = 0;
+    int res;
+
+    if (argc < 2 || argc > 3) {
+        _ifconfig_poll_usage();
+        return 1;
+    }
+
+    res = netif_get_opt(netif, NETOPT_DEVICE_TYPE, 0, &dev_type, sizeof(dev_type));
+    if (res < 0) {
+        puts("poll: unable to get device type");
+        return 1;
+    }
+
+    if (dev_type != NETDEV_TYPE_IEEE802154) {
+        puts("poll: interface is not IEEE 802.15.4");
+        return 1;
+    }
+
+    uint16_t panid = (uint16_t)strtoul(argv[0], NULL, 0);
+
+    ieee802154_addr_t coord_addr = { 0 };
+    if (_ifconfig_parse_ieee802154_coord_addr(argv[1], &coord_addr) < 0) {
+        puts("poll: invalid coordinator address");
+        return 1;
+    }
+
+
+    gnrc_netif_ieee802154_mac_poll_request_t req = {
+        .panid = panid,
+        .coord_addr = coord_addr,
+    };
+
+    res = netif_set_opt(netif, NETOPT_POLL, 0, &req, sizeof(req));
+    if (res < 0) {
+        printf("poll failed: %d\n", res);
+        return 1;
+    }
+
+    printf("POLL triggered: pan=0x%04x\n", panid);
+    return 0;
+}
+#endif
+
 /* shell commands */
 
 /* TODO: updated tests/net/gnrc_dhcpv6_client to no longer abuse this shell command
@@ -1832,6 +2219,20 @@ int _gnrc_netif_config(int argc, char **argv)
 
             return _netif_del(iface, argv[3]);
         }
+        else if (strcmp(argv[2], "scan") == 0) {
+            return _ifconfig_scan(iface, argc - 3, argv + 3);
+        }
+#if IS_USED(MODULE_GNRC_NETIF_IEEE802154_MAC)
+        else if (strcmp(argv[2], "connect") == 0) {
+            return _ifconfig_connect_ieee802154(iface, argc - 3, argv + 3);
+        }
+        else if (strcmp(argv[2], "start") == 0) {
+            return _ifconfig_start_ieee802154(iface, argc - 3, argv + 3);
+        }
+        else if (strcmp(argv[2], "poll") == 0) {
+            return _ifconfig_poll_ieee802154(iface, argc - 3, argv + 3);
+        }
+#endif
 #ifdef MODULE_L2FILTER
         else if (strcmp(argv[2], "l2filter") == 0) {
             if (argc < 5) {

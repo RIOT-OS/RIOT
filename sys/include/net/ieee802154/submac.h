@@ -174,6 +174,15 @@ typedef struct {
 } ieee802154_submac_cb_t;
 
 /**
+ * @brief IEEE 802.15.4 SubMAC transmission options.
+ */
+typedef enum {
+    IEEE802154_SUBMAC_TX_OPT_NONE        = 0,
+    IEEE802154_SUBMAC_TX_OPT_NO_CSMA_CA  = BIT0,
+    IEEE802154_SUBMAC_TX_OPT_NO_RETRANS  = BIT1,
+} ieee802154_submac_tx_opts_t;
+
+/**
  * @brief Internal SubMAC FSM state machine events
  */
 typedef enum {
@@ -202,7 +211,7 @@ typedef enum {
  * @brief Internal SubMAC FSM state
  */
 typedef ieee802154_submac_fsm_return_t (*ieee802154_fsm_state_cb_t)(ieee802154_submac_t *submac,
-                                                                      ieee802154_fsm_ev_t ev);
+                                                                    ieee802154_fsm_ev_t ev);
 
 /**
  * @brief Internal SubMAC FSM
@@ -227,10 +236,14 @@ struct ieee802154_submac {
     uint8_t backoff_mask;               /**< internal value used for random backoff calculation */
     uint8_t csma_retries_nb;            /**< current number of CSMA-CA retries */
 #endif
+#if IS_USED(MODULE_IEEE802154_SUBMAC_SOFT_ACK)
+    bool frame_pending;                 /**< whether frame is pending */
+#endif
 #if IS_USED(MODULE_IEEE802154_SUBMAC_SOFT_FRAME_RETRANS)
     uint8_t retrans;                    /**< current number of retransmissions */
     bool wait_for_ack;                  /**< SubMAC is waiting for an ACK frame */
 #endif
+    uint8_t tx_opts;
     uint16_t ack_timeout_us;            /**< ACK timeout in µs */
     uint16_t panid;                     /**< IEEE 802.15.4 PAN ID */
     uint16_t channel_num;               /**< IEEE 802.15.4 channel number */
@@ -258,6 +271,28 @@ struct ieee802154_submac {
  *         @ref ieee802154_submac_cb_t::tx_done
  */
 int ieee802154_send(ieee802154_submac_t *submac, const iolist_t *iolist);
+
+/**
+ * @brief Transmit an IEEE 802.15.4 PSDU
+ *
+ * This function performs an IEEE 802.15.4 transmission like
+ * @ref ieee802154_send, with per-transmission options.
+ *
+ * Options apply to this send operation only. The SubMAC restores affected radio
+ * settings and clears the options before calling @ref ieee802154_submac_cb_t::tx_done.
+ *
+ * @param[in] submac pointer to the SubMAC descriptor
+ * @param[in] iolist pointer to the PSDU frame (without FCS)
+ * @param[in] tx_opts  Transmission options (bitwise OR combination).
+ *
+ * @return 0 on success
+ * @return -EBUSY if the SubMAC is not in RX or IDLE state or if called inside
+ *         @ref ieee802154_submac_cb_t::rx_done or
+ *         @ref ieee802154_submac_cb_t::tx_done
+ */
+int ieee802154_send_opts(ieee802154_submac_t *submac,
+                       const iolist_t *iolist,
+                       ieee802154_submac_tx_opts_t tx_opts);
 
 /**
  * @brief Set the IEEE 802.15.4 short address
@@ -411,9 +446,6 @@ static inline int ieee802154_set_tx_power(ieee802154_submac_t *submac,
 
 /**
  * @brief Get the received frame length
- *
- * @pre this function MUST be called either inside @ref ieee802154_submac_cb_t::rx_done
- *      or in SLEEP state.
  *
  * @param[in] submac pointer to the SubMAC
  *
@@ -593,6 +625,24 @@ static inline int ieee802154_set_rx(ieee802154_submac_t *submac)
 {
     return ieee802154_submac_process_ev(submac, IEEE802154_FSM_EV_REQUEST_SET_RX_ON);
 }
+
+/**
+ * @brief Set the src address matching.
+ *
+ * Try the radio HAL first. Software ACKs support a global frame-pending
+ * fallback for @ref IEEE802154_SRC_MATCH_EN only.
+ *
+ * @param[in] submac pointer to the SubMAC descriptor
+ * @param[in] cmd command for the source address match configuration
+ * @param[in] value value associated to cmd.
+ *
+ * @retval 0 on success
+ * @retval -ENOTSUP if neither hardware nor software supports the command
+ * @retval -EINVAL if the software fallback receives a NULL value
+ * @return Other errors returned by the radio HAL
+ */
+int ieee802154_submac_config_src_address_match(ieee802154_submac_t *submac,
+                                               ieee802154_src_match_t cmd, const void *value);
 
 #ifdef __cplusplus
 }

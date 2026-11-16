@@ -407,6 +407,7 @@ typedef struct {
 typedef struct {
     ieee802154_tx_status_t status;      /**< status of the last transmission */
     int8_t retrans;                     /**< number of frame retransmissions of the last TX */
+    bool frame_pending;                 /**< wether a frame for indirect TX is pending */
 } ieee802154_tx_info_t;
 
 /**

@@ -203,9 +203,6 @@ ifneq (,$(filter shell_cmd_gnrc_netif_lorawan,$(USEMODULE)))
   USEMODULE += shell_cmd_gnrc_netif_lora
   USEMODULE += shell_cmd_gnrc_netif
 endif
-ifneq (,$(filter shell_cmd_gnrc_pktbuf,$(USEMODULE)))
-    USEMODULE += gnrc_pktbuf
-endif
 ifneq (,$(filter shell_cmd_gnrc_rpl,$(USEMODULE)))
     USEMODULE += gnrc_rpl
 endif

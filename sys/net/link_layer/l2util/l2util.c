@@ -88,7 +88,8 @@ int l2util_eui64_from_addr(int dev_type, const uint8_t *addr, size_t addr_len,
             }
 #endif  /* defined(MODULE_NETDEV_ETH) || defined(MODULE_ESP_NOW) \
            defined(MODULE_NIMBLE_NETIF) */
-#if defined(MODULE_NETDEV_IEEE802154) || defined(MODULE_XBEE)
+#if defined(MODULE_NETDEV_IEEE802154) || defined(MODULE_GNRC_NETIF_IEEE802154_MAC) || \
+    defined(MODULE_XBEE)
         case NETDEV_TYPE_IEEE802154:
             switch (addr_len) {
                 /* EUI-64 can *not* be generated from the short address */
@@ -98,7 +99,8 @@ int l2util_eui64_from_addr(int dev_type, const uint8_t *addr, size_t addr_len,
                 default:
                     return -EINVAL;
             }
-#endif  /* defined(MODULE_NETDEV_IEEE802154) || defined(MODULE_XBEE) */
+#endif  /* defined(MODULE_NETDEV_IEEE802154) || defined(MODULE_GNRC_NETIF_IEEE802154_MAC) || \
+         * defined(MODULE_XBEE) */
 #if defined(MODULE_CC110X) || defined(MODULE_NRFMIN)
         case NETDEV_TYPE_CC110X:
         case NETDEV_TYPE_NRFMIN:
@@ -144,7 +146,8 @@ int l2util_ipv6_iid_from_addr(int dev_type,
                               eui64_t *iid)
 {
     switch (dev_type) {
-#if defined(MODULE_NETDEV_IEEE802154) || defined(MODULE_XBEE)
+#if defined(MODULE_NETDEV_IEEE802154) || defined(MODULE_GNRC_NETIF_IEEE802154_MAC) || \
+    defined(MODULE_XBEE)
         case NETDEV_TYPE_IEEE802154:
             if (ieee802154_get_iid(iid, addr, addr_len) != NULL) {
                 return sizeof(eui64_t);
@@ -152,7 +155,8 @@ int l2util_ipv6_iid_from_addr(int dev_type,
             else {
                 return -EINVAL;
             }
-#endif  /* defined(MODULE_NETDEV_IEEE802154) || defined(MODULE_XBEE) */
+#endif  /* defined(MODULE_NETDEV_IEEE802154) || defined(MODULE_GNRC_NETIF_IEEE802154_MAC) || \
+         * defined(MODULE_XBEE) */
 #if defined(MODULE_CC110X) || defined(MODULE_NRFMIN)
         case NETDEV_TYPE_CC110X:
         case NETDEV_TYPE_NRFMIN:
@@ -203,14 +207,16 @@ int l2util_ipv6_iid_to_addr(int dev_type, const eui64_t *iid, uint8_t *addr)
             addr[5] = iid->uint8[7];
             return sizeof(eui48_t);
 #endif  /* defined(MODULE_NIMBLE_NETIF) */
-#if defined(MODULE_NETDEV_IEEE802154) || defined(MODULE_XBEE)
+#if defined(MODULE_NETDEV_IEEE802154) || defined(MODULE_GNRC_NETIF_IEEE802154_MAC) || \
+    defined(MODULE_XBEE)
         case NETDEV_TYPE_IEEE802154:
             /* assume address was based on EUI-64
              * (see https://tools.ietf.org/html/rfc6775#section-5.2) */
             memcpy(addr, iid, sizeof(eui64_t));
             addr[0] ^= 0x02;
             return sizeof(eui64_t);
-#endif  /* defined(MODULE_NETDEV_IEEE802154) || defined(MODULE_XBEE) */
+#endif  /* defined(MODULE_NETDEV_IEEE802154) || defined(MODULE_GNRC_NETIF_IEEE802154_MAC) || \
+         * defined(MODULE_XBEE) */
 #ifdef MODULE_NRFMIN
         case NETDEV_TYPE_NRFMIN:
             addr[0] = iid->uint8[6];
@@ -278,7 +284,8 @@ int l2util_ndp_addr_len_from_l2ao(int dev_type,
             (void)opt;
             return sizeof(uint16_t);
 #endif  /* MODULE_NRFMIN */
-#if defined(MODULE_NETDEV_IEEE802154) || defined(MODULE_XBEE)
+#if defined(MODULE_NETDEV_IEEE802154) || defined(MODULE_GNRC_NETIF_IEEE802154_MAC) || \
+    defined(MODULE_XBEE)
         case NETDEV_TYPE_IEEE802154:
             /* see https://tools.ietf.org/html/rfc4944#section-8 */
             switch (opt->len) {
@@ -289,7 +296,8 @@ int l2util_ndp_addr_len_from_l2ao(int dev_type,
                 default:
                     return -EINVAL;
             }
-#endif  /* defined(MODULE_NETDEV_IEEE802154) || defined(MODULE_XBEE) */
+#endif  /* defined(MODULE_NETDEV_IEEE802154) || defined(MODULE_GNRC_NETIF_IEEE802154_MAC) || \
+         * defined(MODULE_XBEE) */
 #if defined(MODULE_NRF24L01P_NG)
         case NETDEV_TYPE_NRF24L01P_NG:
             (void)opt;

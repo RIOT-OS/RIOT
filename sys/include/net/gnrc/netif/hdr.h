@@ -86,6 +86,15 @@ extern "C" {
 #define GNRC_NETIF_HDR_FLAGS_MULTICAST  (0x40)
 
 /**
+ * @brief   Request indirect transmission for this packet
+ *
+ * @details This flag requests that the link layer queue the packet for
+ *          indirect transmission when supported, instead of attempting to send
+ *          it immediately.
+ */
+#define GNRC_NETIF_HDR_FLAGS_TX_INDIRECT (0x20)
+
+/**
  * @brief   More data will follow
  *
  * @details This flag signals that this packet is part of a burst of packets.
