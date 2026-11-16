@@ -62,7 +62,7 @@
  * @brief PPI channel connecting RADIO->EVENTS_FRAMESTART to the MAC timer
  *
  * @note This channel is not reserved for the 802.15.4 Radio and could
- *       potentially used by other subsystems.
+ *       potentially be used by other subsystems.
  */
 #ifndef CONFIG_NRF802154_TIMESTAMP_PPI_CH
 #  define CONFIG_NRF802154_TIMESTAMP_PPI_CH   18U
