@@ -95,3 +95,7 @@ keys/
 # Environments
 .venv
 venv/
+
+# Nix
+/result
+/result-*
