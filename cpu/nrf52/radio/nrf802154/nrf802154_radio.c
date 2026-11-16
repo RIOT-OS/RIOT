@@ -60,13 +60,16 @@
 
 /**
  * @brief PPI channel connecting RADIO->EVENTS_FRAMESTART to the MAC timer
+ *
+ * @note This channel is not reserved for the 802.15.4 Radio and could
+ *       potentially used by other subsystems.
  */
 #ifndef CONFIG_NRF802154_TIMESTAMP_PPI_CH
 #  define CONFIG_NRF802154_TIMESTAMP_PPI_CH   18U
 #endif
 
-#define MAC_TIMER_DEV       (timer_config[NRF802154_TIMER].dev) /**< Hardware Timer */
-#define MAC_TIMER_CHAN_TS   1U /**< timer channel for capturing RX timestamp */
+#define NRF802154_MAC_TIMER_DEV       (timer_config[NRF802154_TIMER].dev) /**< Hardware Timer */
+#define NRF802154_MAC_TIMER_CHAN_TS   1U /**< timer channel for capturing RX timestamp */
 
 /**
  * @brief Frequency of the MAC timer in Hz
@@ -472,7 +475,8 @@ void isr_radio(void)
         }
         else if (_state == STATE_RX) {
             if (IS_USED(MODULE_IEEE802154_RX_TIMESTAMP)) {
-                _rx_timestamp_ticks = MAC_TIMER_DEV->CC[MAC_TIMER_CHAN_TS] - NRF802154_PHR_TICKS;
+                _rx_timestamp_ticks = NRF802154_MAC_TIMER_DEV->CC[NRF802154_MAC_TIMER_CHAN_TS]
+                                    - NRF802154_PHR_TICKS;
             }
             dev->cb(dev, IEEE802154_RADIO_INDICATION_RX_START);
         }
@@ -595,7 +599,7 @@ static int _request_on(ieee802154_dev_t *dev)
          * section=register.EVENTS_FRAMESTART */
         NRF_PPI->CH[CONFIG_NRF802154_TIMESTAMP_PPI_CH].EEP = (uint32_t)&NRF_RADIO->EVENTS_FRAMESTART;
         NRF_PPI->CH[CONFIG_NRF802154_TIMESTAMP_PPI_CH].TEP =
-            (uint32_t)&MAC_TIMER_DEV->TASKS_CAPTURE[MAC_TIMER_CHAN_TS];
+            (uint32_t)&NRF802154_MAC_TIMER_DEV->TASKS_CAPTURE[NRF802154_MAC_TIMER_CHAN_TS];
         NRF_PPI->CHENSET = (1UL << CONFIG_NRF802154_TIMESTAMP_PPI_CH);
     }
 
