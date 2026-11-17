@@ -64,6 +64,10 @@ else
   USEMODULE := $(sort $(USEMODULE))
   DEFAULT_MODULE := $(sort $(DEFAULT_MODULE))
 
+  # default modules can include packages too, extend the paths if necessary
+  PKG_PATHS := $(sort $(foreach dir,$(PKGDIRS),\
+      $(foreach pkg,$(USEPKG),$(dir $(wildcard $(dir)/$(pkg)/Makefile)))))
+
   # Warn about used deprecated modules
   include $(RIOTMAKE)/deprecated_modules.inc.mk
   DEPRECATED_MODULES_USED := $(sort $(filter $(DEPRECATED_MODULES),$(USEMODULE)))
