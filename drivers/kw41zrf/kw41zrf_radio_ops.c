@@ -57,15 +57,14 @@
 #define KW41ZRF_IRQS    (0x00ff017fUL)
 
 /**
- * @brief   Duration of one event timer tick in us
+ * @brief Duration of one event timer tick in us
  *
- * The event timer runs with the IEEE 802.15.4 symbol rate (62.5 kHz),
- * see IEEE802154_ACK_TIMEOUT_SYMS used with T3CMP.
+ * The event timer runs with the IEEE 802.15.4 symbol rate (62.5 kHz).
  */
-#define US_PER_TIMER_TICK           (16U)
+#define US_PER_TIMER_TICK IEEE802154_SYMBOL_TIME_US
 
 /**
- * @brief   Minimum lead time in us for a timed transmission
+ * @brief Minimum lead time in us for a timed transmission
  *
  * A timed transmission closer than this to the current radio time starts
  * immediately, as the timer compare might be missed otherwise.
@@ -75,8 +74,7 @@
 #endif
 
 /**
- * @brief   Time in us from the start of a TX sequence to the start of the
- *          transmission
+ * @brief Time in us from the start of a TX sequence to the start of the transmission
  *
  * TX warm-up of the transceiver sequence manager (TSM).
  */
@@ -84,20 +82,9 @@
 #  define KW41ZRF_TX_RAMPUP_US          (END_OF_TX_WU)
 #endif
 
-/**
- * @brief   Time in us from the start of a TX sequence with CCA to the start
- *          of the transmission
- *
- * RX warm-up + CCA (8 symbols x 16us per symbol) + TX warm-up of the TSM.
- */
-#ifndef KW41ZRF_CCA_TX_RAMPUP_US
-#  define KW41ZRF_CCA_TX_RAMPUP_US      (END_OF_RX_WU + 128U + END_OF_TX_WU)
-#endif
-
 static kw41zrf_t intern_dev;
 /* number of event timer (24 bit) overflows, extends the radio time to 32 bit */
 static uint32_t _timer_ovf;
-static uint32_t _ramp_up_us;
 static const ieee802154_radio_ops_t kw41zrf_ops;
 static ieee802154_dev_t *_kw41zrf_hal_dev;
 
@@ -257,7 +244,7 @@ static int _request_op(ieee802154_dev_t *hal, ieee802154_hal_op_t op, void *ctx)
         }
 
         if (ctx) {
-            uint32_t start_us = *(const uint32_t *)ctx - _ramp_up_us;
+            uint32_t start_us = *(const uint32_t *)ctx - KW41ZRF_TX_RAMPUP_US;
             unsigned irq_state = irq_disable();
 
             if ((int32_t)(start_us - _get_time(hal)) >= (int32_t)KW41ZRF_TIMED_TX_MIN_LEAD_US) {
@@ -416,12 +403,10 @@ int _set_csma_params(ieee802154_dev_t *dev, const ieee802154_csma_be_t *bd, int8
 
     if (retries < 0) {
         bit_clear32(&ZLL->PHY_CTRL, ZLL_PHY_CTRL_CCABFRTX_SHIFT);
-        _ramp_up_us = KW41ZRF_TX_RAMPUP_US;
         return 0;
     }
     else if (retries == 0) {
         bit_set32(&ZLL->PHY_CTRL, ZLL_PHY_CTRL_CCABFRTX_SHIFT);
-        _ramp_up_us = KW41ZRF_CCA_TX_RAMPUP_US;
         return 0;
     }
 
