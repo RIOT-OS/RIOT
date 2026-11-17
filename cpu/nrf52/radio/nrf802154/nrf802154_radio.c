@@ -271,6 +271,10 @@ static int _request_op(ieee802154_dev_t *dev, ieee802154_hal_op_t op, void *ctx)
     switch (op) {
     case IEEE802154_HAL_OP_TRANSMIT:
         {
+            if (state != STATE_IDLE) {
+                return -EBUSY;
+            }
+
             volatile uint32_t *start_task;
 
             if (cfg.cca_send) {
