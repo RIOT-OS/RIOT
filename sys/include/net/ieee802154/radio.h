@@ -515,6 +515,15 @@ typedef struct {
 typedef enum {
     /**
      * @brief Transmission of a preloaded frame.
+     *
+     * If @p ctx is NULL on a transmit-request the frame is transmitted immediately.
+     *
+     * If the radio supports @ref IEEE802154_CAP_TIMED_TX, @p ctx may point to
+     * a `uint32_t` holding the absolute time of a start of a transmission in us
+     * in the same time base as @ref ieee802154_radio_get_time.
+     *
+     * On a transmit-confirmation @ref ieee802154_radio_confirm_transmit
+     * @p ctx may point to @ref ieee802154_tx_info_t struct.
      */
     IEEE802154_HAL_OP_TRANSMIT,
     /**
