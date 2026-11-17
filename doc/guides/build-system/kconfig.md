@@ -68,14 +68,12 @@ the variable `KCONFIG_ADD_CONFIG`, which will be applied _after_ default CPU and
 board configurations, `app.config` and `user.config`. This means that they will
 have priority.
 
-Let's say that the `SOCK_UTIL_SCHEME_MAXLEN` symbol in `sock_util` module needs
+Let's say that the `SOCK_SCHEME_MAXLEN` symbol in `sock_util` module needs
 to be configured. The `user.config` file could look like:
 
 ```makefile
-# activate configuration of sock_util using Kconfig
-CONFIG_KCONFIG_MODULE_SOCK_UTIL=y
 # change scheme part length
-CONFIG_SOCK_UTIL_SCHEME_MAXLEN=24
+CONFIG_SOCK_SCHEME_MAXLEN=24
 ```
 
 In this case, there is no need for using menuconfig. It's enough just to call
@@ -96,8 +94,7 @@ into existing applications, one can also use environment variables prefixed by
 [Configure using '.config' files](#configure-using-config-files), e.g., you could also use
 
 ```sh
-RIOT_CONFIG_KCONFIG_MODULE_SOCK_UTIL=1 \
-RIOT_CONFIG_SOCK_UTIL_SCHEME_MAXLEN=24 \
+RIOT_CONFIG_SOCK_SCHEME_MAXLEN=24 \
     make
 ```
 
@@ -476,7 +473,7 @@ configure compile-time configurations with `USEMODULE` dependencies:
 menu "Configure Sock Utilities"
     depends on USEMODULE_SOCK_UTIL
 
-config SOCK_UTIL_SCHEME_MAXLEN
+config SOCK_SCHEME_MAXLEN
     int "Maximum length of the scheme part for sock_urlsplit"
     default 16
 
