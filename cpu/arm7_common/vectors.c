@@ -21,27 +21,27 @@
 
 #include "log.h"
 
-void isr_fio(void)   __attribute__((interrupt("FIQ")));
+__attribute__((target("arm"))) void isr_fio(void)   __attribute__((interrupt("FIQ")));
 //void isr_swi (void)   __attribute__((interrupt("SWI")));
-void isr_undef(void) __attribute__((interrupt("UNDEF")));
+__attribute__((target("arm"))) void isr_undef(void) __attribute__((interrupt("UNDEF")));
 
 volatile int arm_abortflag = 0;
 
-void isr_fio(void)
+__attribute__((target("arm"))) void isr_fio(void)
 {
     LOG_ERROR("Kernel Panic,\nEarly FIQ call\n");
 
     while (1) {}
 }
 
-void isr_swi(void)
+__attribute__((target("arm"))) void isr_swi(void)
 {
     LOG_ERROR("Kernel Panic,\nEarly SWI call\n");
 
     while (1) {}
 }
 
-void abtorigin(const char *vector, unsigned long *lnk_ptr1)
+__attribute__((target("arm"))) void abtorigin(const char *vector, unsigned long *lnk_ptr1)
 {
     register unsigned long *lnk_ptr2;
     register unsigned long *sp;
@@ -61,7 +61,7 @@ void abtorigin(const char *vector, unsigned long *lnk_ptr1)
     while (1) {}
 }
 
-void isr_undef(void)
+__attribute__((target("arm"))) void isr_undef(void)
 {
     /* cppcheck-suppress variableScope
      * (reason: used within __asm__ which cppcheck doesn't pick up) */
@@ -77,7 +77,7 @@ void isr_undef(void)
     while (1) {}
 }
 
-void isr_pabt(void)
+__attribute__((target("arm"))) void isr_pabt(void)
 {
     /* cppcheck-suppress variableScope
      * (reason: used within __asm__ which cppcheck doesn't pick up) */
@@ -93,7 +93,7 @@ void isr_pabt(void)
     while (1) {}
 }
 
-void isr_dabt(void)
+__attribute__((target("arm"))) void isr_dabt(void)
 {
     /* cppcheck-suppress variableScope
      * (reason: used within __asm__ which cppcheck doesn't pick up) */
