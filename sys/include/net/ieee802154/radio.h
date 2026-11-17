@@ -1039,6 +1039,11 @@ static inline int ieee802154_radio_request_transmit(ieee802154_dev_t *dev)
  */
 static inline int ieee802154_radio_request_transmit_at(ieee802154_dev_t *dev, uint32_t time_us)
 {
+    int32_t diff = (int32_t)(time_us - dev->driver->get_time(dev));
+    if (diff < 0) {
+        /* target time already passed (or >= 2^31 us in the future) */
+        return ieee802154_radio_request_transmit(dev);
+    }
     return dev->driver->request_op(dev, IEEE802154_HAL_OP_TRANSMIT, &time_us);
 }
 
