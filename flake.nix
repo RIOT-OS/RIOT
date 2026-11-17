@@ -215,6 +215,7 @@
           picocom
           minicom
           esptool
+          libusb1
           socat
           iproute2
           inetutils
