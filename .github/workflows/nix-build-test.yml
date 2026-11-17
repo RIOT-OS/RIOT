@@ -1,0 +1,43 @@
+---
+name: Nix Build Test
+
+on:
+  pull_request:
+    paths:
+      - 'flake.nix'
+      - 'flake.lock'
+      - 'dist/nix/**'
+      - '.github/workflows/nix-examples.yml'
+  push:
+    branches:
+      - master
+    paths:
+      - 'flake.nix'
+      - 'flake.lock'
+      - 'dist/nix/**'
+      - '.github/workflows/nix-examples.yml'
+  workflow_dispatch:
+
+jobs:
+  hello-world:
+    name: Build hello-world (${{ matrix.board }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        board:
+          - native64
+          - rpi-pico-2-riscv
+          - rpi-pico-2-arm
+    steps:
+      - name: Checkout
+        uses: actions/checkout@main
+
+      - name: Install Nix
+        uses: cachix/install-nix-action@v31
+        with:
+          extra_nix_config: |
+            experimental-features = nix-command flakes
+
+      - name: Build Test Boards
+        run: nix develop --command make -C examples/basic/hello-world BOARD=${{ matrix.board }} -j"$(nproc)" all
