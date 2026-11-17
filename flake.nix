@@ -209,22 +209,25 @@
           avrdude
           dfu-util
           pyocd
-          bossa
-          stlink
           mspdebug
           picocom
           minicom
           esptool
           libusb1
           socat
-          iproute2
           inetutils
           qemu
-          can-utils
           dtc
           gperf
           protobuf
           flatbuffers
+        ]
+        ++ lib.optionals (system == "x86_64-linux") [
+          # These packages currently fail to build on aarch64-linux.
+          bossa
+          stlink
+          iproute2
+          can-utils
         ];
 
       llvmPackagesFor =
@@ -282,9 +285,7 @@
 
             shellHook = commonShellHook + ''
               if [ -t 1 ]; then
-                echo "RIOT Nix development shell"
-                echo "  Build:  make -C examples/basic/hello-world BOARD=native64"
-                echo "  Static: ./dist/tools/ci/static_tests.sh"
+                echo "Enabled RIOT Nix development shell ❄️"
               fi
             '';
           };
