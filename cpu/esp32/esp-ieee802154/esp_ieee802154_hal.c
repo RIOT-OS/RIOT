@@ -143,7 +143,6 @@ static int _confirm_on(ieee802154_dev_t *dev)
 static int _request_op(ieee802154_dev_t *dev, ieee802154_hal_op_t op, void *ctx)
 {
     (void)dev;
-    (void)ctx;
 
     switch (op) {
     case IEEE802154_HAL_OP_TRANSMIT:
