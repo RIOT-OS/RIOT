@@ -706,6 +706,14 @@ static int _config_cca_cmd(int argc, char **argv)
     return res;
 }
 
+static int _set_defaults(int argc, char **argv)
+{
+    (void) argc;
+    (void) argv;
+
+    return _set_default_values();
+}
+
 static int _caps_cmd(int argc, char **argv)
 {
     (void) argc;
@@ -816,6 +824,7 @@ static const shell_command_t shell_commands[] = {
     { "test_states", "Test state changes", _test_states },
     { "test_off_on", "Test set the radio off then on [cycles]. Radio is in RX afterwards",
         _test_off_on },
+    { "set_defaults", "Set default values for the radio", _set_defaults },
     { "cca", "Perform CCA", _cca },
     { "config_cca", "Config CCA parameters", _config_cca_cmd },
     { "promisc", "Set promiscuos mode", promisc },
