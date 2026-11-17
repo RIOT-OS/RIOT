@@ -38,8 +38,8 @@ extern struct bundle_agent_interface bundle_agent_interface;
 #  define LOCAL_EID "dtn://node-a.dtn/"
 #  define PEER_EID "dtn://node-b.dtn/"
 #  define PEER_EID_C "dtn://node-c.dtn/"
-#  define LOCAL_IP "fd12:dead:beef:1:8c82:41ff:fe6c:4b32"
-#  define PEER_IP "fd12:dead:beef:1:fc8b:caff:fee1:111e"
+#  define LOCAL_IP "fd12:dead:beef:1:9802:e0ff:fe7d:d553"
+#  define PEER_IP "fd12:dead:beef:1:b073:85ff:fe41:8889"
 #  define PEER_PORT "4557"
 #  define PEER_IP_C "fd12:dead:beef:1:48bd:97ff:fee0:e4ec"
 #  define PEER_PORT_C "4558"
@@ -48,18 +48,18 @@ extern struct bundle_agent_interface bundle_agent_interface;
 #  define LOCAL_EID "dtn://node-b.dtn/"
 #  define PEER_EID "dtn://node-a.dtn/"
 #  define PEER_EID_C "dtn://node-c.dtn/"
-#  define LOCAL_IP "fd12:dead:beef:1:fc8b:caff:fee1:111e"
+#  define LOCAL_IP "fd12:dead:beef:1:b073:85ff:fe41:8889"
 #  define LOCAL_PORT "4557"
-#  define PEER_IP "fd12:dead:beef:1:8c82:41ff:fe6c:4b32"
+#  define PEER_IP "fd12:dead:beef:1:9802:e0ff:fe7d:d553"
 #  define PEER_PORT "4556"
-#  define PEER_IP_C "fd12:dead:beef:1:48bd:97ff:fee0:e4ec"
+#  define PEER_IP_C "fd12:dead:beef:1:f82f:3ff:fe34:de94"
 #  define PEER_PORT_C "4558"
 #endif
 #ifdef NODE_C
 #  define LOCAL_EID "dtn://node-c.dtn/"
 #  define PEER_EID "dtn://node-b.dtn/"
-#  define LOCAL_IP "fd12:dead:beef:1:48bd:97ff:fee0:e4ec"
-#  define PEER_IP "fd12:dead:beef:1:88f5:d9ff:fe8d:21f"
+#  define LOCAL_IP "fd12:dead:beef:1:f82f:3ff:fe34:de94"
+#  define PEER_IP "fd12:dead:beef:1:b073:85ff:fe41:8889"
 #  define PEER_PORT "4557"
 #endif
 #ifdef NODE_A_ESP32
@@ -127,11 +127,11 @@ static void dtn_chat_thread(void *arg)
                                           BP_SIGNAL_AGENT_REGISTER, // Register agent
                                           chat_agent, false);
 #if defined(NODE_A) || defined(NODE_A_ESP32)
-    add_route(CHAT_SINK_ID, PEER_IP, PEER_PORT, PEER_EID);
+    //add_route(CHAT_SINK_ID, PEER_IP, PEER_PORT, PEER_EID);
 #endif
 #if defined(NODE_B) || defined(NODE_B_ESP32)
     add_route(CHAT_SINK_ID, PEER_IP_C, PEER_PORT_C, PEER_EID_C);
-    add_route(CONFIG_AGENT_ID, PEER_IP, PEER_PORT, PEER_EID);
+    //add_route(CONFIG_AGENT_ID, PEER_IP, PEER_PORT, PEER_EID);
     add_route(CHAT_SINK_ID, PEER_IP, PEER_PORT, PEER_EID);
     advertise_route(PEER_IP, PEER_PORT, CONFIG_AGENT_ID, PEER_EID, LOCAL_IP, LOCAL_PORT,
                     CHAT_SINK_ID, PEER_EID_C);
@@ -142,20 +142,20 @@ static void dtn_chat_thread(void *arg)
     int counter = 0;
     char payload[128];
     while (1) {
-#if defined(NODE_A) || defined(NODE_A_ESP32)
-        if (counter % 2 == 0) {
-            snprintf(payload, sizeof(payload), "Hello World | Counter: %d", ++counter);
-            send_chat_message(payload, PEER_EID);
-        }
-        else {
-            snprintf(payload, sizeof(payload), "Hello World | Counter: %d", ++counter);
-            send_chat_message(payload, PEER_EID_C);
-        }
-#endif
-#if defined(NODE_B) || defined(NODE_B_ESP32)
-        snprintf(payload, sizeof(payload), "Hello World | Counter: %d", ++counter);
-        send_chat_message(payload, PEER_EID);
-#endif
+// #if defined(NODE_A) || defined(NODE_A_ESP32)
+//         if (counter % 2 == 0) {
+//             snprintf(payload, sizeof(payload), "Hello World | Counter: %d", ++counter);
+//             send_chat_message(payload, PEER_EID);
+//         }
+//         else {
+//             snprintf(payload, sizeof(payload), "Hello World | Counter: %d", ++counter);
+//             send_chat_message(payload, PEER_EID_C);
+//         }
+// #endif
+// #if defined(NODE_B) || defined(NODE_B_ESP32)
+//         snprintf(payload, sizeof(payload), "Hello World | Counter: %d", ++counter);
+//         send_chat_message(payload, PEER_EID);
+// #endif
         ztimer_sleep(ZTIMER_MSEC, 5000); // send every 5 seconds
     }
 }
@@ -259,6 +259,55 @@ void add_route(const char *sink_id, const char *peer_ip, const char *peer_port,
     }
 }
 
+static int _add_route(int argc, char **argv)
+{
+    if (argc < 5) {
+        printf("Usage: %s <sink_id> <peer_ip> <peer_port> <peer_eid>\n"
+               "Example: %s chat fd12:dead:beef:1:8c82:41ff:fe6c:4b32 "
+               "4556 dtn://node-a.dtn/\n", argv[0], argv[0]);
+        return 1;
+    }
+
+    const char *sink_id = argv[1];
+    const char *peer_ip = argv[2];
+    const char *peer_port = argv[3];
+    const char *peer_eid = argv[4];
+
+    add_route(sink_id, peer_ip, peer_port, peer_eid);
+    return 0;
+}
+
+// static int _advertise_route(int argc, char **argv)
+// {
+//     if (argc < 4) {
+//         printf("Usage: %s <advertise_dest_eid> <peer_eid> <advertise_cla>\n"
+//                "Example: %s dtn://node-b.dtn/ dtn://node-a.dtn/ tcpclv3-riot:[fd12:dead:beef:1:9802:e0ff:fe7d:d553]:4556\n", argv[0], argv[0]);
+//         return 1;
+//     }
+
+//     const char *advertise_dest_eid = argv[1];
+//     const char *peer_eid = argv[2];
+//     const char *advertise_cla = argv[3];
+
+//     advertise_route(advertise_dest_eid, peer_eid, advertise_cla);
+//     return 0;
+// }
+
+static int _send_msg(int argc, char **argv)
+{
+    if (argc < 3) {
+        printf("Usage: %s <message> <peer_eid>\n"
+               "Example: %s \"Hello, World!\" dtn://node-a.dtn/\n", argv[0], argv[0]);
+        return 1;
+    }
+
+    const char *message = argv[1];
+    const char *peer_eid = argv[2];
+
+    send_chat_message(message, peer_eid);
+    return 0;
+}
+
 void auto_init_ula(void)
 {
     gnrc_netif_t *netif = NULL;
@@ -290,11 +339,15 @@ void auto_init_ula(void)
     }
 }
 
+
+SHELL_COMMAND(add_route, "Adds a route", _add_route);
+// SHELL_COMMAND(advertise_route, "Advertises a route", _advertise_route);
+SHELL_COMMAND(send_msg, "Sends a message", _send_msg);
+
 int main(void)
 {
-    printf("Starte DTN Node: %s\n", LOCAL_EID);
+    printf("Start DTN Node: %s\n", LOCAL_EID);
     auto_init_ula();
-    int tlsf_add_global_pool(void *mem, size_t bytes);
     ztimer_sleep(ZTIMER_MSEC, 1000);
 
     int argc = 6;

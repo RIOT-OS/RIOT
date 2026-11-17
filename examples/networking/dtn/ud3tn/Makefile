@@ -12,7 +12,7 @@ USEMODULE += shell_cmds_default
 USEMODULE += ps
 
 # Select NODE_A, NODE_B, or NODE_C and adapt the peer addresses in main.c.
-CFLAGS += -DNODE_A
+#CFLAGS += -DNODE_A
 CFLAGS += -DISR_STACKSIZE=2048
 CFLAGS += -DCONFIG_GNRC_TCP_RCV_BUFFERS=8
 CFLAGS += -DCONFIG_GNRC_TCP_MSL_MS=2000
