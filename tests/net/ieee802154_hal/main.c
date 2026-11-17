@@ -714,6 +714,44 @@ static int _set_defaults(int argc, char **argv)
     return _set_default_values();
 }
 
+static int _off(int argc, char **argv)
+{
+    (void) argc;
+    (void) argv;
+
+    int res;
+    if((res = ieee802154_radio_off(&_radio)) < 0) {
+        printf("Radio turning off failed res=%d \n", res);
+        return 1;
+    }
+    puts("Radio off\n");
+    return 0;
+}
+
+static int _on(int argc, char **argv)
+{
+    (void) argc;
+    (void) argv;
+
+    int res;
+
+    if((res = ieee802154_radio_request_on(&_radio)) < 0) {
+        printf("Radio turning on failed res=%d \n", res);
+        return 1;
+    }
+    puts("Radio requested on\n");
+
+    uint32_t wake_us;
+    if((res = _wait_confirm_on(&wake_us)) < 0) {
+        printf("Radio turning on failed res=%d \n", res);
+        return 1;
+    }
+    _restore_after_on();
+
+    printf("Radio on after %" PRIu32 " us\n", wake_us);
+    return 0;
+}
+
 static int _caps_cmd(int argc, char **argv)
 {
     (void) argc;
@@ -825,6 +863,8 @@ static const shell_command_t shell_commands[] = {
     { "test_off_on", "Test set the radio off then on [cycles]. Radio is in RX afterwards",
         _test_off_on },
     { "set_defaults", "Set default values for the radio", _set_defaults },
+    { "off", "turn the radio off", _off },
+    { "on", "turn the radio on and go to RX", _on },
     { "cca", "Perform CCA", _cca },
     { "config_cca", "Config CCA parameters", _config_cca_cmd },
     { "promisc", "Set promiscuos mode", promisc },
