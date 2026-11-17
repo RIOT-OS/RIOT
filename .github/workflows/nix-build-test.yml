@@ -7,7 +7,7 @@ on:
       - 'flake.nix'
       - 'flake.lock'
       - 'dist/nix/**'
-      - '.github/workflows/nix-examples.yml'
+      - '.github/workflows/nix-build-test.yml'
   push:
     branches:
       - master
@@ -15,20 +15,13 @@ on:
       - 'flake.nix'
       - 'flake.lock'
       - 'dist/nix/**'
-      - '.github/workflows/nix-examples.yml'
+      - '.github/workflows/nix-build-test.yml'
   workflow_dispatch:
 
 jobs:
   hello-world:
-    name: Build hello-world (${{ matrix.board }})
+    name: Build hello-world
     runs-on: ubuntu-latest
-    strategy:
-      fail-fast: false
-      matrix:
-        board:
-          - native64
-          - rpi-pico-2-riscv
-          - rpi-pico-2-arm
     steps:
       - name: Checkout
         uses: actions/checkout@main
@@ -39,5 +32,11 @@ jobs:
           extra_nix_config: |
             experimental-features = nix-command flakes
 
-      - name: Build Test Boards
-        run: nix develop --command make -C examples/basic/hello-world BOARD=${{ matrix.board }} -j"$(nproc)" all
+      - name: Build hello-world for native64
+        run: nix develop --command make -C examples/basic/hello-world BOARD=native64 -j"$(nproc)" all
+
+      - name: Build hello-world for rpi-pico-2-riscv
+        run: nix develop --command make -C examples/basic/hello-world BOARD=rpi-pico-2-riscv -j"$(nproc)" all
+
+      - name: Build hello-world for rpi-pico-2-arm
+        run: nix develop --command make -C examples/basic/hello-world BOARD=rpi-pico-2-arm -j"$(nproc)" all
