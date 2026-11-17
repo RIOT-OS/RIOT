@@ -33,9 +33,6 @@
 #define ED_RSSISCALE        (4U)    /**< RSSI scale for internal HW value */
 #define ED_RSSIOFFS         (-92)   /**< RSSI offset for internal HW value */
 
-/* The MAC timer provides the radio time in us */
-#define TIMER_FREQ          (1000000UL)
-
 #define TX_POWER_MIN        (-40)                               /* in dBm */
 #define TX_POWER_MAX        ((int)RADIO_TXPOWER_TXPOWER_Max)    /* in dBm */
 
@@ -61,14 +58,24 @@
                              RADIO_SHORTS_CCABUSY_DISABLE_Msk | \
                              RADIO_SHORTS_TXREADY_START_Msk)
 
-#define MAC_TIMER_CHAN_TX   (0U)    /**< MAC timer channel for timed transmission */
+#define NRF802154_MAC_TIMER_CHAN_TX   (0U)    /**< MAC timer channel for timed transmission */
 
 /**
  * @brief PPI channel connecting the MAC timer compare event of
- *        @ref MAC_TIMER_CHAN_TX to the TX task of the radio.
+ *        @ref NRF802154_MAC_TIMER_CHAN_TX to the TX task of the radio.
+ *
+ * @note This channel is not reserved for the 802.15.4 Radio and could
+ *       potentially be used by other subsystems.
  */
 #ifndef NRF802154_PPI_CH_TX
 #  define NRF802154_PPI_CH_TX (19U)
+#endif
+
+/**
+ * @brief Frequency of the MAC timer in Hz
+ */
+#ifndef CONFIG_NRF802154_TIMER_FREQ
+#  define CONFIG_NRF802154_TIMER_FREQ   (1000000UL)
 #endif
 
 /**
@@ -77,8 +84,9 @@
  * A timed transmission closer than this to the current radio time starts
  * immediately, as the timer compare event might be missed otherwise.
  */
-#ifndef NRF802154_TIMED_TX_MIN_LEAD_US
-#  define NRF802154_TIMED_TX_MIN_LEAD_US (2U)
+#ifndef NRF802154_TIMED_TX_MIN_LEAD_TICKS
+#  define NRF802154_TIMED_TX_MIN_LEAD_TICKS ((2U * CONFIG_NRF802154_TIMER_FREQ) / \
+                                                   IEEE802154_SYMBOL_RATE_HZ)
 #endif
 
 /**
@@ -88,15 +96,6 @@
  */
 #ifndef NRF802154_FAST_RAMPUP_US
 #  define NRF802154_FAST_RAMPUP_US (40U)
-#endif
-
-/**
- * @brief Time in us from RXEN to the start of the transmission with CCA
- *
- * Fast RX ramp-up + CCA (8 symbols x 16us per Symbol) + fast TX ramp-up.
- */
-#ifndef NRF802154_CCA_TX_RAMPUP_US
-#  define NRF802154_CCA_TX_RAMPUP_US ((2 * NRF802154_FAST_RAMPUP_US) + 128U)
 #endif
 
 static uint8_t rxbuf[IEEE802154_FRAME_LEN_MAX + 3]; /* len PHR + PSDU + LQI */
@@ -131,7 +130,7 @@ static ieee802154_dev_t *nrf802154_hal_dev;
 
 static void _cancel_timed_tx(void)
 {
-    timer_clear(NRF802154_TIMER, MAC_TIMER_CHAN_TX);
+    timer_clear(NRF802154_TIMER, NRF802154_MAC_TIMER_CHAN_TX);
     NRF_PPI->CHENCLR = (1UL << NRF802154_PPI_CH_TX);
 }
 
@@ -141,16 +140,17 @@ static void _start_tx_at(uint32_t time_us, volatile uint32_t *start_task)
      * the compare event can't be missed */
     unsigned irq_state = irq_disable();
 
-    if ((int32_t)(time_us - timer_read(NRF802154_TIMER)) < (int32_t)NRF802154_TIMED_TX_MIN_LEAD_US){
+    if ((int32_t)(time_us - timer_read(NRF802154_TIMER)) <
+        (int32_t)NRF802154_TIMED_TX_MIN_LEAD_TICKS) {
         /* already passed or too close, start immediately */
         *start_task = 1;
     }
     else {
         NRF_PPI->CH[NRF802154_PPI_CH_TX].EEP =
-            (uint32_t)&timer_config[NRF802154_TIMER].dev->EVENTS_COMPARE[MAC_TIMER_CHAN_TX];
+        (uint32_t)&timer_config[NRF802154_TIMER].dev->EVENTS_COMPARE[NRF802154_MAC_TIMER_CHAN_TX];
         NRF_PPI->CH[NRF802154_PPI_CH_TX].TEP = (uint32_t)start_task;
         NRF_PPI->CHENSET = (1UL << NRF802154_PPI_CH_TX);
-        timer_set_absolute(NRF802154_TIMER, MAC_TIMER_CHAN_TX, time_us);
+        timer_set_absolute(NRF802154_TIMER, NRF802154_MAC_TIMER_CHAN_TX, time_us);
     }
 
     irq_restore(irq_state);
@@ -284,9 +284,7 @@ static int _request_op(ieee802154_dev_t *dev, ieee802154_hal_op_t op, void *ctx)
 
             if (ctx) {
                 uint32_t starting_point_us = *(const uint32_t *)ctx;
-                uint32_t rampup_us = cfg.cca_send ?
-                    NRF802154_CCA_TX_RAMPUP_US : NRF802154_FAST_RAMPUP_US;
-                _start_tx_at(starting_point_us - rampup_us, start_task);
+                _start_tx_at(starting_point_us - NRF802154_FAST_RAMPUP_US, start_task);
             }
             else {
                 *start_task = 1;
