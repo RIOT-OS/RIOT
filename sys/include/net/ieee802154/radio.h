@@ -185,8 +185,8 @@ typedef enum {
      * @brief the device supports timed transmission
      *
      * A device that declares this capability provides a free running radio
-     * time (see @ref ieee802154_radio_ops::get_time) and is able to transmit frames at a absolute
-     * time (see @ref ieee802154_radio_request_transmit_at).
+     * time (see @ref ieee802154_radio_ops::get_time) and is able to transmit frames
+     * not earlier than an absolute time (see @ref ieee802154_radio_request_transmit_at).
      */
     IEEE802154_CAP_TIMED_TX             = BIT22,
 } ieee802154_rf_caps_t;
@@ -1007,25 +1007,27 @@ static inline int ieee802154_radio_request_transmit(ieee802154_dev_t *dev)
 }
 
 /**
- * @brief Transmit a preloaded frame at a given point in time
+ * @brief Start a transmission of a preloaded frame at a given point in time.
  *
  * This function calls ieee802154_radio_ops::request_op with @ref
  * IEEE802154_HAL_OP_TRANSMIT and a pointer to @p time_us as context.
  *
  * @p time_us refers to the radio time (see @ref ieee802154_radio_get_time)
  * at which the transmission of the frame (preamble) starts. The device starts
- * the transmission procedure earlier to compensate the ramp-up and, if
- * enabled, the CCA before the transmission. If that start already passed,
+ * the transmission procedure earlier to compensate the ramp-up time. If that start already passed,
  * the transmission procedure starts immediately and the frame is sent late.
  *
  * @pre The upper layer should have set the transceiver to IDLE (see
- * @ref ieee802154_radio_set_idle) and the frame is already in the framebuffer
- * (@ref ieee802154_radio_ops_t::write).
+ *      @ref ieee802154_radio_set_idle) and the frame is already in the framebuffer
+ *      (@ref ieee802154_radio_ops_t::write).
  * @pre The device is on.
  * @pre The device supports @ref IEEE802154_CAP_TIMED_TX.
  *
  * @note @ref ieee802154_radio_confirm_transmit MUST be used to
- * finish the transmission.
+ *       finish the transmission.
+ *
+ * @note During a pending transmission it is not permitted to perform further frame transmissions
+ *       or receptions.
  *
  * @param[in] dev IEEE802.15.4 device descriptor
  * @param[in] time_us radio time in microseconds to start the transmission
@@ -1041,7 +1043,8 @@ static inline int ieee802154_radio_request_transmit_at(ieee802154_dev_t *dev, ui
 }
 
 /**
- * @brief Confirmation function for @ref ieee802154_radio_request_transmit
+ * @brief Confirmation function for @ref ieee802154_radio_request_transmit or
+ * @ref ieee802154_radio_request_transmit_at
  * This function must be called to finish the transmission procedure and
  * get the transmission status. This function should be called on @ref
  * IEEE802154_RADIO_CONFIRM_TX_DONE. If no interrupt is available, this
@@ -1581,7 +1584,7 @@ static inline bool ieee802154_radio_has_irq_ack_timeout(ieee802154_dev_t *dev)
 }
 
 /**
- * @brief Check if the device supports delayed (timed) transmission
+ * @brief Check if the device supports timed transmission
  *
  * Internally this function reads ieee802154_radio_ops::caps and checks for
  * @ref IEEE802154_CAP_TIMED_TX.
