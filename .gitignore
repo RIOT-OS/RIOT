@@ -99,3 +99,4 @@ venv/
 # Nix
 /result
 /result-*
+/.direnv

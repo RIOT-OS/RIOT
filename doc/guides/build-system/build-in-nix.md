@@ -62,6 +62,9 @@ The `native` shell also contains the regular (wrapped) LLVM toolchain, so
 `TOOLCHAIN=llvm` can be used for native builds. The default shell contains
 LLVM for cross compilation.
 
+If you have a tool such as `direnv` installed, it should also automatically
+recognize and apply the nix development environment.
+
 ## Building
 
 Once inside the shell, use `make` as usual:
