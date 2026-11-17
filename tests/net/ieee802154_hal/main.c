@@ -339,6 +339,9 @@ static int _init(void)
     res = ieee802154_radio_set_cca_threshold(&_radio, CONFIG_IEEE802154_CCA_THRESH_DEFAULT);
     expect(res >= 0);
 
+    if (ieee802154_radio_has_frame_retrans(&_radio)) {
+        ieee802154_radio_set_frame_retrans(&_radio, CONFIG_IEEE802154_DEFAULT_MAX_FRAME_RETRANS);
+    }
     /* Set the transceiver state to RX_ON in order to receive packets */
     ieee802154_radio_set_rx(&_radio);
     return 0;
