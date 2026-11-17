@@ -39,9 +39,9 @@
 
 #define RTT_SECOND_MAX  (RTT_MAX_VALUE/RTT_FREQUENCY)
 
-#define TICKS(x)        (    (x) * RTT_SECOND)
-#define SECONDS(x)      (_RTT(x) / RTT_SECOND)
-#define SUBSECONDS(x)   (_RTT(x) % RTT_SECOND)
+#define RTT_RTC_TICKS(x) ((x) * RTT_SECOND)
+#define SECONDS(x)       (_RTT(x) / RTT_SECOND)
+#define SUBSECONDS(x)    (_RTT(x) % RTT_SECOND)
 
 /* Place counter in .noinit section if no backup RAM is available.
    This means the date is undefined at cold boot, but will likely still
@@ -77,7 +77,7 @@ static void _update_alarm(uint32_t now)
 {
     uint32_t next_alarm;
 
-    last_alarm = TICKS(SECONDS(now));
+    last_alarm = RTT_RTC_TICKS(SECONDS(now));
 
     /* no alarm or alarm beyond this period */
     if ((alarm_cb == NULL)     ||
@@ -95,7 +95,7 @@ static void _update_alarm(uint32_t now)
         alarm_cb(alarm_cb_arg);
     }
 
-    _set_alarm(now, TICKS(next_alarm));
+    _set_alarm(now, RTT_RTC_TICKS(next_alarm));
 }
 
 /* the RTT alarm callback */
@@ -116,7 +116,7 @@ void rtc_init(void)
         last_alarm = rtt_get_counter();
     }
 
-    _set_alarm(last_alarm, TICKS(RTT_SECOND_MAX));
+    _set_alarm(last_alarm, RTT_RTC_TICKS(RTT_SECOND_MAX));
 }
 
 int rtc_set_time(struct tm *time)
