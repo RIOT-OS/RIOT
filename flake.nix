@@ -222,7 +222,7 @@
           protobuf
           flatbuffers
         ]
-        ++ lib.optionals (system == "x86_64-linux" || system == "aarch64-linux")[
+        ++ lib.optionals (system == "x86_64-linux" || system == "aarch64-linux") [
           # These are currently not provided for aarch64-darwin
           bossa # Currently broken but should work again whenever they fix it
           stlink
