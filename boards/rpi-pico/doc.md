@@ -108,14 +108,24 @@ BOARD=rpi-pico PROGRAMMER=jlink make flash
 
 ## Accessing RIOT shell
 
-This board's default access to RIOT shell is via UART (UART0 TX - pin 1, UART0 RX - pin 2).
-
-The default baud rate is 115 200.
+This board's default access to RIOT shell is via USB (CDC ACM), so only a USB
+cable is required.
 
 The simplest way to connect to the shell is the execution of the command:
 
 ```shell
 BOARD=rpi-pico make term
+```
+
+While a RIOT application with the USB stdio is running, the board is reset into
+the bootloader automatically when it is flashed, so the BOOTSEL button does not
+have to be pressed.
+
+To access the shell via UART instead (UART0 TX - pin 1, UART0 RX - pin 2,
+115 200 baud), select `stdio_uart`:
+
+```shell
+USEMODULE=stdio_uart BOARD=rpi-pico make flash term
 ```
 
 @warning Raspberry Pi Pico board is not 5V tolerant. Use voltage divider or logic level shifter when connecting to 5V UART.
@@ -142,16 +152,3 @@ BOARD=rpi-pico make debug
 into RAM again after each cold boot. The initialization code of RIOT now seems to play well with the
 debugger, so it remains persistent on soft reboots. If you face issues with losing connection to
 the debugger on reboot, try `monitor reset init` in GDB to soft-reboot instead.
-
-## Known Issues / Problems
-
-### Early State Implementation
-
-Currently no support for the following peripherals is implemented:
-
-- USB
-- RTC
-- Watchdog
-- SMP support (multi CPU support is not implemented in RIOT)
-
-The I2C peripheral is implemented through the PIO.

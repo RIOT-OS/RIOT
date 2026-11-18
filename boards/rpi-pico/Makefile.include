@@ -1,5 +1,9 @@
 CPU_MODEL       := RP2040
-PORT_LINUX      ?= /dev/ttyUSB0
+ifneq (,$(filter stdio_cdc_acm,$(USEMODULE)))
+  PORT_LINUX    ?= /dev/ttyACM0
+else
+  PORT_LINUX    ?= /dev/ttyUSB0
+endif
 
 ifeq ($(PROGRAMMER),jlink)
   JLINK_DEVICE = RP2040_M0_0
