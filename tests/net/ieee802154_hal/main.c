@@ -63,7 +63,8 @@ static uint8_t seq;
 
 static ieee802154_dev_t _radio;
 
-static int _set_default_values(void) {
+static int _set_default_values(void)
+{
     int res;
     ieee802154_radio_set_frame_filter_mode(&_radio, IEEE802154_FILTER_ACCEPT);
 
@@ -452,27 +453,28 @@ static void _restore_after_on(void)
     }
 }
 
-static int _test_off_on(int argc, char **argv) {
+static int _test_off_on(int argc, char **argv)
+{
     unsigned cycles = (argc > 1) ? (unsigned)atoi(argv[1]) : 1;
     uint32_t wake_us;
     uint32_t max_us = 0;
     int res = 0;
 
     for (unsigned i = 0; i < cycles; i++) {
-        if((res = ieee802154_radio_off(&_radio)) != 0) {
+        if ((res = ieee802154_radio_off(&_radio)) != 0) {
             puts("Radio not off");
             expect(res == 0);
         }
 
         /* The radio shall be off so you can call this immediately */
-        if((res = ieee802154_radio_request_on(&_radio)) != 0) {
+        if ((res = ieee802154_radio_request_on(&_radio)) != 0) {
             puts("On Request should be valid");
             expect(res == 0);
         }
 
         res = _wait_confirm_on(&wake_us);
 
-        if(res) {
+        if (res) {
             puts("Radio should be on");
             expect(res == 0);
         }
@@ -482,8 +484,7 @@ static int _test_off_on(int argc, char **argv) {
             max_us = wake_us;
         }
     }
-    printf("Test succeeded: %u off/on cycles, max wake-up time %" PRIu32 " us\n",
-           cycles, max_us);
+    printf("Test succeeded: %u off/on cycles, max wake-up time %" PRIu32 " us\n", cycles, max_us);
     return 0;
 }
 
