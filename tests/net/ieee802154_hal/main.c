@@ -721,7 +721,7 @@ static int _off(int argc, char **argv)
     (void) argv;
 
     int res;
-    if((res = ieee802154_radio_off(&_radio)) < 0) {
+    if ((res = ieee802154_radio_off(&_radio)) < 0) {
         printf("Radio turning off failed res=%d \n", res);
         return 1;
     }
@@ -736,14 +736,14 @@ static int _on(int argc, char **argv)
 
     int res;
 
-    if((res = ieee802154_radio_request_on(&_radio)) < 0) {
+    if ((res = ieee802154_radio_request_on(&_radio)) < 0) {
         printf("Radio turning on failed res=%d \n", res);
         return 1;
     }
     puts("Radio requested on\n");
 
     uint32_t wake_us;
-    if((res = _wait_confirm_on(&wake_us)) < 0) {
+    if ((res = _wait_confirm_on(&wake_us)) < 0) {
         printf("Radio turning on failed res=%d \n", res);
         return 1;
     }
