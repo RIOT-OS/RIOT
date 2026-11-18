@@ -1,0 +1,25 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: crasbe <crasbe@gmail.com>
+Date: Wed, 18 Nov 2026 18:30:32 +0100
+Subject: [PATCH] examples/client: include sys/types.h for ssize_t
+
+object_server.c uses the POSIX type ssize_t, but relied on it being
+provided transitively by other headers (e.g. <time.h> pulling in
+<sys/types.h>). This is not the case for all C libraries, e.g. picolibc
+1.8 with -std=c11, so include <sys/types.h> explicitly.
+---
+ examples/client/object_server.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/examples/client/object_server.c b/examples/client/object_server.c
+index a19516d..ff1e142 100644
+--- a/examples/client/object_server.c
++++ b/examples/client/object_server.c
+@@ -52,6 +52,7 @@
+ #include <stdlib.h>
+ #include <string.h>
+ #include <inttypes.h>
++#include <sys/types.h>
+ 
+ typedef struct _server_instance_
+ {
