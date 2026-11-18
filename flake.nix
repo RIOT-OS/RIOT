@@ -72,6 +72,7 @@
             pexpect
             psutil
             pyserial
+            twisted
             scapy
             (ps.callPackage ./dist/nix/python/riotctrl.nix { })
             (ps.callPackage ./dist/nix/python/pyhsslms.nix { })
@@ -135,6 +136,7 @@
           texinfo
           ccache
           git
+          (pkgs.callPackage ./dist/nix/git-cache.nix { })
           curl
           wget
           rsync
@@ -392,6 +394,7 @@
                 ${./flake.nix} \
                 ${./dist/nix/toolchains.nix} \
                 ${./dist/nix/vera.nix} \
+                ${./dist/nix/git-cache.nix} \
                 ${./dist/nix/python/riotctrl.nix} \
                 ${./dist/nix/python/pyhsslms.nix}
               touch $out

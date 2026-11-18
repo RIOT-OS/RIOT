@@ -5,7 +5,8 @@ This directory contains the package definitions used by the RIOT Nix flake
 
 - `toolchains.nix` packages prebuilt vendor toolchains that are not available
   in nixpkgs (RIOT's MSP430 GCC, xPack RISC-V GCC, and the ESP8266 toolchain).
-- `vera.nix` builds `vera++`, which is not packaged in nixpkgs.
+- `vera.nix` builds `vera++`
+- `git-cache.nix` builds `git-cache-rs`
 - `python/` contains Python packages that are missing from nixpkgs.
 
 See the [Build in Nix guide](../../doc/guides/build-system/build-in-nix.md) for
