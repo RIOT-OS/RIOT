@@ -71,14 +71,11 @@ static int _set_default_values(void)
     uint16_t panid = CONFIG_IEEE802154_DEFAULT_PANID;
 
     /* Set all IEEE addresses */
-    res = ieee802154_radio_config_addr_filter(&_radio,
-                                        IEEE802154_AF_SHORT_ADDR, &short_addr);
+    res = ieee802154_radio_config_addr_filter(&_radio, IEEE802154_AF_SHORT_ADDR, &short_addr);
     expect(res >= 0);
-    res = ieee802154_radio_config_addr_filter(&_radio,
-                                        IEEE802154_AF_EXT_ADDR, &ext_addr);
+    res = ieee802154_radio_config_addr_filter(&_radio, IEEE802154_AF_EXT_ADDR, &ext_addr);
     expect(res >= 0);
-    res = ieee802154_radio_config_addr_filter(&_radio,
-                                        IEEE802154_AF_PANID, &panid);
+    res = ieee802154_radio_config_addr_filter(&_radio, IEEE802154_AF_PANID, &panid);
     expect(res >= 0);
 
     /* Set PHY configuration */
@@ -426,7 +423,6 @@ int _cca(int argc, char **argv)
 
     return 0;
 }
-
 
 /* wait for confirm_on give up after RADIO_ON_TIMEOUT_US */
 static int _wait_confirm_on(uint32_t *wake_us)
