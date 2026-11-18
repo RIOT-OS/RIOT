@@ -1010,7 +1010,6 @@ AVR8_ISR(TRX24_XAH_AMI_vect, txr24_xah_ami_handler)
  */
 static inline void txr24_tx_end_handler(void)
 {
-
     uint8_t status = *AT86RF2XX_REG__TRX_STATE & AT86RF2XX_TRX_STATUS_MASK__TRX_STATUS;
     DEBUG("TRX24_TX_END 0x%x\n", status);
 
@@ -1019,8 +1018,6 @@ static inline void txr24_tx_end_handler(void)
     if (status != AT86RF2XX_PHY_STATE_RX) {
         at86rf2xx_periph->cb(at86rf2xx_periph, IEEE802154_RADIO_CONFIRM_TX_DONE);
     }
-
-
 }
 AVR8_ISR(TRX24_TX_END_vect, txr24_tx_end_handler);
 
