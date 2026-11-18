@@ -1023,6 +1023,7 @@ static inline void txr24_tx_end_handler(void)
 
 }
 AVR8_ISR(TRX24_TX_END_vect, txr24_tx_end_handler);
+
 /**
  * @brief ISR for transceiver's wakeup finished interrupt
  *
