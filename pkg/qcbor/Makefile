@@ -13,10 +13,20 @@ include $(RIOTBASE)/pkg/pkg.mk
 CFLAGS += -Wno-maybe-uninitialized
 CFLAGS += -Wno-type-limits
 
-# The newlib implementation of some ESP variants does not implement the
-# `feclearexcept` and `fetestexcept` functions from `fenv.h` used by
-# QCBOR. Disabling the HW FPU support works around this issue.
+# - newlib for some ESP variants does not implement the `feclearexcept` and
+#   `fetestexcept` functions from `fenv.h`.
+# - picolibc in general and newlib for RISC-V only define the floating-point
+#   exception macros (`FE_INVALID`, ...) used in `fenv.h` if the target has an FPU.
+# - newlib for many other architectures *does* always define these functions or
+#   macros, but it's better not to rely on that.
+# -> Disable the HW FPU support to work around these issues.
 ifneq (,$(filter esp8266 esp32s2, $(CPU_FAM)))
+  CFLAGS += -DQCBOR_DISABLE_FLOAT_HW_USE
+else ifneq (,$(filter rv32 rv64,$(CPU_ARCH)))
+  # Currently there is no `riscv_fpu` module that would tell us whether or not
+  # a HW FPU is present, so it has to be disabled for all RISC-Vs.
+  CFLAGS += -DQCBOR_DISABLE_FLOAT_HW_USE
+else ifeq (,$(filter cortexm_fpu,$(USEMODULE)))
   CFLAGS += -DQCBOR_DISABLE_FLOAT_HW_USE
 endif
 
