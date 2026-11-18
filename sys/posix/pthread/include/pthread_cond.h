@@ -17,8 +17,7 @@
 #include "mutex.h"
 #include "priority_queue.h"
 
-#if defined(__WITH_AVRLIBC__)
-/* avr-libc 'time.h' does not include 'sys/types.h' but we need 'clockid_t' */
+#if defined(__WITH_AVRLIBC__) || defined(MODULE_PICOLIBC)
 #   include <sys/types.h>
 #endif
 
