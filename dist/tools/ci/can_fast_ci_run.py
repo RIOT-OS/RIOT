@@ -31,7 +31,7 @@ OTHER_CLASSIFIERS = [
     [re.compile(r"^(dist\/.*|\.clang-format|\.clang-tidy|\.vscode/.*)$"), "tools"],
 ]
 
-REGEX_MODULE = re.compile(r"^(boards\/common|core|cpu|drivers|sys)\/")
+REGEX_MODULE = re.compile(r"^((boards\/common|core|cpu|drivers|sys)\/|boards\/[^\/]+$)")
 REGEX_PKG = re.compile(r"^pkg\/")
 REGEX_BOARD = re.compile(r"^boards\/")
 REGEX_APP = re.compile(r"^(bootloaders|examples|fuzzing|tests)\/")
