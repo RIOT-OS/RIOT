@@ -1,5 +1,6 @@
 # configure the serial interface
 PORT_LINUX ?= /dev/ttyUSB1
+PORT_DARWIN ?= $(wordlist 2, 2, $(sort $(wildcard /dev/cu.usbserial*)))
 
 ifneq (,$(filter esp_jtag,$(USEMODULE)))
   OPENOCD_CONFIG ?= board/esp32-ethernet-kit-3.3v.cfg

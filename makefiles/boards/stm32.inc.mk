@@ -5,7 +5,7 @@ ifeq (bmp,$(PROGRAMMER))
   # On Blackmagic Probe, the first ACM is used to connect to the gdb server,
   # the second is the BMP's UART interface
   PORT_LINUX ?= /dev/ttyACM1
-  PORT_DARWIN ?= $(wordlist 2, 2, $(sort $(wildcard /dev/tty.usbmodem*)))
+  PORT_DARWIN ?= $(wordlist 2, 2, $(sort $(wildcard /dev/cu.usbmodem*)))
 endif
 
 # STM32 boards can become un-flashable after a hardfault,

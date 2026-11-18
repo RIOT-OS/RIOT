@@ -35,7 +35,7 @@ ifeq (1,$(MOST_RECENT_PORT))
 endif
 # Otherwise, use as default the most commonly used ports on Linux and OSX
 PORT_LINUX ?= /dev/ttyACM0
-PORT_DARWIN ?= $(firstword $(sort $(wildcard /dev/tty.usbmodem*)))
+PORT_DARWIN ?= $(firstword $(sort $(wildcard /dev/cu.usbmodem*)))
 
 # set default port depending on operating system
 ifeq ($(OS),Linux)

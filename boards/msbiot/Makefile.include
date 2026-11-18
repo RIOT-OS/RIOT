@@ -8,6 +8,7 @@ STLINK_VERSION ?= 2
 
 ifeq (openocd,$(PROGRAMMER))
   PORT_LINUX ?= /dev/ttyUSB0
+  PORT_DARWIN ?= $(firstword $(sort $(wildcard /dev/cu.usbserial*)))
 endif
 
 # Setup of programmer and serial is shared between STM32 based boards

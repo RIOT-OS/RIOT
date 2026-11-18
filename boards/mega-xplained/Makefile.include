@@ -4,11 +4,12 @@ ATMEGA_BOOTLOADER_SIZE ?= 4K
 
 # Avrdude programmer defaults to the external flasher Bus Pirate ISP.
 AVRDUDE_PROGRAMMER  ?= buspirate
+
 # set serial port for avrdude with buspirate
 ifeq ($(OS),Linux)
   PROG_DEV ?= /dev/ttyUSB0
 else ifeq ($(OS),Darwin)
-  PROG_DEV ?= $(firstword $(sort $(wildcard /dev/tty.usbserial*)))
+  PROG_DEV ?= $(firstword $(sort $(wildcard /dev/cu.usbserial*)))
 endif
 
 # configure the terminal program
