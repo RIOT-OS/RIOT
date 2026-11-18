@@ -833,6 +833,9 @@ void _irq_handler(void *ctx)
      * This avoids unnecessary overhead of offloading the IRQ */
     if (bhp->dev.sleep) {
         bhp->dev.sleep = false;
+        if (bhp->hal->cb) {
+            bhp->hal->cb(bhp->hal, IEEE802154_RADIO_CONFIRM_ON);
+        }
         return;
     }
 
@@ -854,6 +857,7 @@ static const ieee802154_radio_ops_t at86rf2xx_ops = {
             | IEEE802154_CAP_IRQ_CRC_ERROR
             | IEEE802154_CAP_IRQ_RX_START
             | IEEE802154_CAP_IRQ_TX_DONE
+            | IEEE802154_CAP_IRQ_WAKE_UP_DONE
 #if ! IS_ACTIVE(AT86RF2XX_BASIC_MODE)
             | IEEE802154_CAP_FRAME_RETRANS
             | IEEE802154_CAP_AUTO_CSMA
