@@ -9,6 +9,11 @@ BUILDDEPS += warn_release_tests
 TERMDEPS += warn_release_tests
 PYTHONPATH += $(MAKEFILE_PATH)
 
+# Use a terminal that passes the output through unchanged: pyterm holds back a
+# prompt that does not start a line (e.g. after the output of "od" on an empty
+# buffer) until the next newline, so the tests time out waiting for it.
+RIOT_TERMINAL ?= socat
+
 include $(RIOTBASE)/Makefile.include
 
 warn_release_tests:
