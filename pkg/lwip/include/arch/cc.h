@@ -81,7 +81,7 @@ extern "C" {
 #    define LWIP_PLATFORM_ASSERT(x)     \
         do { \
             LOG_ERROR("Assertion \"%s\" failed at %s:%d\n", x, __FILE__, __LINE__); \
-            fflush(NULL); \
+            fflush(stdout); \
             abort(); \
         } while (0)
 #  endif
@@ -93,7 +93,7 @@ extern "C" {
 #    define LWIP_PLATFORM_ASSERT(x)     \
         do { \
             printf("Assertion \"%s\" failed at %s:%d\n", x, __FILE__, __LINE__); \
-            fflush(NULL); \
+            fflush(stdout); \
             abort(); \
         } while (0)
 #  endif
