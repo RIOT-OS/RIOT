@@ -33,6 +33,8 @@
           # RIOT's Python requirements include ecdsa, which nixpkgs currently
           # marks as insecure (it is only used by the MCUboot tooling).
           config.permittedInsecurePackages = [ "python3.14-ecdsa-0.19.2" ];
+          # adafruit-nrfutil bundles Nordic's proprietary DFU libraries.
+          config.allowUnfreePackages = [ "adafruit-nrfutil" ];
         };
 
       espPackagesFor = system: nixpkgs-esp-dev.packages.${system};
@@ -209,6 +211,7 @@
           avrdude
           dfu-util
           pyocd
+          adafruit-nrfutil
           mspdebug
           picocom
           minicom
