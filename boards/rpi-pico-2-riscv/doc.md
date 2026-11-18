@@ -8,9 +8,6 @@ See @ref boards_rpi_pico_2 for further information.
 @ingroup     boards
 @brief       Support for the RP2350 based Raspberry Pi Pico board
 
-@warning The support for the Raspberry Pi Pico 2 is still in a very early stage!
-See [Known Issues](#rpi_pico_2_known_issues).
-
 ## Overview
 
 The Raspberry Pi Pico 2 is a microcontroller board based on the RP2350 chip,
@@ -130,16 +127,26 @@ However, it does not allow for debugging using GDB.
 RIOT will download and install the Picotool locally in the RIOT folder.
 This process will take some minutes to complete.
 
-## Known Issues {#rpi_pico_2_known_issues}
+## Accessing RIOT shell
 
-Currently RP2350 support is rather minimal,
-as such peripheral support is extremely limited.
-The following peripherals are supported:
+The default access to RIOT shell is via USB (CDC ACM), so only a USB cable is
+required.
 
-- XH3IRQ RISC-V Interrupt Controller (CortexM Interrupts also work)
-- GPIO
-- UART
-    - The UART Baudrate is set to 115200.
-    - UART does not work via USB, you need to connect it directly to the GPIO pins.
+The simplest way to connect to the shell is the execution of the command:
 
-More peripherals will be added in the future.
+```bash
+BOARD=rpi-pico-2-riscv make term
+```
+
+or, if you want to use the CortexM:
+
+```bash
+BOARD=rpi-pico-2-arm make term
+```
+
+While a RIOT application with the USB stdio is running, the board is reset into
+the bootloader automatically when it is flashed, so the BOOTSEL button does not
+have to be pressed.
+
+To access the shell via UART instead (UART0 TX - GPIO 0, UART0 RX - GPIO 1,
+115200 baud), select `stdio_uart`.

@@ -11,6 +11,8 @@ INCLUDES += -I$(RIOTCPU)/common/rp2350/include
 INCLUDES += -isystem$(PKGDIRBASE)/picosdk/src/rp2_common/cmsis/stub/CMSIS/Core/Include
 INCLUDES += -isystem$(PKGDIRBASE)/picosdk/src/rp2_common/cmsis/stub/CMSIS/Device/RP2350/Include
 INCLUDES += -isystem$(PKGDIRBASE)/picosdk/src/rp2350/hardware_regs/include/hardware
+# allow code shared with the RP2040 to include "hardware/regs/*.h"
+INCLUDES += -isystem$(PKGDIRBASE)/picosdk/src/rp2350/hardware_regs/include
 
 # Supported programmers and debuggers
 PROGRAMMERS_SUPPORTED := picotool openocd jlink

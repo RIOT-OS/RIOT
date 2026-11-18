@@ -120,14 +120,24 @@ BOARD=rpi-pico-w PROGRAMMER=jlink make flash
 
 ## Accessing RIOT shell
 
-This board's default access to RIOT shell is via UART (UART0 TX - pin 1, UART0 RX - pin 2).
-
-The default baud rate is 115 200.
+This board's default access to RIOT shell is via USB (CDC ACM), so only a USB
+cable is required.
 
 The simplest way to connect to the shell is the execution of the command:
 
 ```shell
 BOARD=rpi-pico-w make term
+```
+
+While a RIOT application with the USB stdio is running, the board is reset into
+the bootloader automatically when it is flashed, so the BOOTSEL button does not
+have to be pressed.
+
+To access the shell via UART instead (UART0 TX - pin 1, UART0 RX - pin 2,
+115 200 baud), select `stdio_uart`:
+
+```shell
+USEMODULE=stdio_uart BOARD=rpi-pico-w make flash term
 ```
 
 @warning Raspberry Pi Pico board is not 5V tolerant. Use voltage divider or logic level shifter when connecting to 5V UART.

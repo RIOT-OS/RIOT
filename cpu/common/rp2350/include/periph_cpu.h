@@ -141,6 +141,17 @@ static inline uint32_t* calculate_gpio_io_ctrl_register_addr(gpio_t pin) {
     return (uint32_t*) (calculate_gpio_io_status_register_addr(pin) + 4);
 }
 
+/**
+ * @brief   Number of USB device endpoints per direction, including EP0
+ */
+#define USBDEV_NUM_ENDPOINTS    16
+
+/**
+ * @brief   USBDEV buffers have no alignment requirements, the driver copies
+ *          the data between the DPRAM and the buffers
+ */
+#define USBDEV_CPU_DMA_ALIGNMENT    (1)
+
 #ifdef __cplusplus
 }
 #endif

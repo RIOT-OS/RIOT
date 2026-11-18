@@ -2,3 +2,4 @@ FEATURES_PROVIDED += periph_gpio
 FEATURES_PROVIDED += periph_timer
 FEATURES_PROVIDED += periph_timer_periodic
 FEATURES_PROVIDED += periph_uart
+FEATURES_PROVIDED += periph_usbdev
