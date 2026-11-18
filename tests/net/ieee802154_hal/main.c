@@ -195,6 +195,7 @@ static void _hal_radio_cb(ieee802154_dev_t *dev, ieee802154_trx_ev_t status)
     switch (status) {
         case IEEE802154_RADIO_CONFIRM_TX_DONE:
         case IEEE802154_RADIO_CONFIRM_CCA:
+        case IEEE802154_RADIO_CONFIRM_ON:
             mutex_unlock(&lock);
             break;
         case IEEE802154_RADIO_INDICATION_RX_DONE:
@@ -346,6 +347,10 @@ static int _init(void)
     res = ieee802154_radio_request_on(&_radio);
 
     expect(res >= 0);
+    if (ieee802154_radio_has_irq_wake_up(&_radio)) {
+        /* consume IEEE802154_RADIO_CONFIRM_ON */
+        mutex_lock(&lock);
+    }
     while (ieee802154_radio_confirm_on(&_radio) == -EAGAIN) {}
 
     _set_default_values();
@@ -430,11 +435,18 @@ static int _wait_confirm_on(uint32_t *wake_us)
     int res;
     uint32_t start = ztimer_now(ZTIMER_USEC);
 
-    while ((res = ieee802154_radio_confirm_on(&_radio)) == -EAGAIN) {
-        if (ztimer_now(ZTIMER_USEC) - start > RADIO_ON_TIMEOUT_US) {
-            return -ETIMEDOUT;
+    if (ieee802154_radio_has_irq_wake_up(&_radio)) {
+        mutex_lock(&lock);
+        res = ieee802154_radio_confirm_on(&_radio);
+    }
+    else {
+        while ((res = ieee802154_radio_confirm_on(&_radio)) == -EAGAIN) {
+            if (ztimer_now(ZTIMER_USEC) - start > RADIO_ON_TIMEOUT_US) {
+                return -ETIMEDOUT;
+            }
         }
     }
+
     *wake_us = ztimer_now(ZTIMER_USEC) - start;
     return res;
 }
