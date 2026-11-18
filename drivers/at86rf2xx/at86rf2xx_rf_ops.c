@@ -32,7 +32,7 @@
 #  include "at86rf2xx_aes.h"
 #endif
 
-#define ENABLE_DEBUG (0)
+#define ENABLE_DEBUG 0
 #include "debug.h"
 
 /**
@@ -830,7 +830,7 @@ void _irq_handler(void *ctx)
     at86rf2xx_bhp_ev_t *bhp = ctx;
 
     /* While the device is sleeping we assume only AWAKE_END.
-     * This avoids uneccessary overhead of offloading the IRQ */
+     * This avoids unnecessary overhead of offloading the IRQ */
     if (bhp->dev.sleep) {
         bhp->dev.sleep = false;
         return;
