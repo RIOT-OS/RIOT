@@ -35,9 +35,10 @@ __extension__
 #include <string.h>
 /* prevent cyclic dependency with newlib/picolibc's `sys/types.h` */
 #if (defined(MODULE_NEWLIB) || defined(MODULE_PICOLIBC)) && !defined(CPU_ESP8266)
-#include <sys/_timeval.h>
+#  include <sys/_types.h>
+#  include <sys/_timeval.h>
 #else
-#include <sys/time.h>
+#  include <sys/time.h>
 #endif
 
 #include "bitfield.h"
