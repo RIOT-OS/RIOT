@@ -650,7 +650,8 @@ static int _ls_handler(int argc, char **argv)
             printf("/");
         } else if (stat.st_mode & S_IFREG) {
             if (stat.st_size) {
-                printf("\t%lu B", stat.st_size);
+                /* this will print incorrect values for files >2GiB */
+                printf("\t%"PRIu32" B", (uint32_t)stat.st_size);
             }
             ++nfiles;
         }
