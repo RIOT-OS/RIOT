@@ -181,6 +181,11 @@ typedef enum {
      * e.g. for software handling of the ACK reply.
      */
     IEEE802154_CAP_FRAME_RETENTION      = BIT21,
+    /**
+     * @brief the device reports the end of his Wake-Up procedure.
+     */
+    IEEE802154_CAP_IRQ_WAKE_UP_DONE          = BIT22,
+
 } ieee802154_rf_caps_t;
 
 /**
@@ -295,6 +300,12 @@ typedef enum {
      * This event is present if radio has @ref IEEE802154_CAP_IRQ_CCA_DONE.
      */
     IEEE802154_RADIO_CONFIRM_CCA,
+    /**
+     * @brief the Wake-Up procedure finished
+     *
+     * This event is present if radio has @ref IEEE802154_CAP_IRQ_WAKE_UP_DONE.
+     */
+    IEEE802154_RADIO_CONFIRM_ON,
 } ieee802154_trx_ev_t;
 
 /**
@@ -1506,6 +1517,10 @@ static inline bool ieee802154_radio_has_irq_ack_timeout(ieee802154_dev_t *dev)
     return (dev->driver->caps & IEEE802154_CAP_IRQ_ACK_TIMEOUT);
 }
 
+static inline bool ieee802154_radio_has_irq_wake_up(ieee802154_dev_t *dev)
+{
+    return (dev->driver->caps & IEEE802154_CAP_IRQ_WAKE_UP_DONE);
+}
 /**
  * @brief Check if the device supports frame retransmissions (with CSMA-CA).
  *
