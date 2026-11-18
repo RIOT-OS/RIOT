@@ -127,7 +127,7 @@ static void dtn_chat_thread(void *arg)
                                           BP_SIGNAL_AGENT_REGISTER, // Register agent
                                           chat_agent, false);
 #if defined(NODE_A) || defined(NODE_A_ESP32)
-    //add_route(CHAT_SINK_ID, PEER_IP, PEER_PORT, PEER_EID);
+    add_route(CHAT_SINK_ID, PEER_IP, PEER_PORT, PEER_EID);
 #endif
 #if defined(NODE_B) || defined(NODE_B_ESP32)
     add_route(CHAT_SINK_ID, PEER_IP_C, PEER_PORT_C, PEER_EID_C);
@@ -135,6 +135,8 @@ static void dtn_chat_thread(void *arg)
     add_route(CHAT_SINK_ID, PEER_IP, PEER_PORT, PEER_EID);
     advertise_route(PEER_IP, PEER_PORT, CONFIG_AGENT_ID, PEER_EID, LOCAL_IP, LOCAL_PORT,
                     CHAT_SINK_ID, PEER_EID_C);
+    // advertise_route(PEER_IP_C, PEER_PORT_C, CONFIG_AGENT_ID, PEER_EID_C, LOCAL_IP, LOCAL_PORT,
+    //                 CHAT_SINK_ID, PEER_EID);
 #endif
 
     printf("DTN Chat Thread gestartet.\n");
@@ -277,21 +279,28 @@ static int _add_route(int argc, char **argv)
     return 0;
 }
 
-// static int _advertise_route(int argc, char **argv)
-// {
-//     if (argc < 4) {
-//         printf("Usage: %s <advertise_dest_eid> <peer_eid> <advertise_cla>\n"
-//                "Example: %s dtn://node-b.dtn/ dtn://node-a.dtn/ tcpclv3-riot:[fd12:dead:beef:1:9802:e0ff:fe7d:d553]:4556\n", argv[0], argv[0]);
-//         return 1;
-//     }
+static int _advertise_route(int argc, char **argv)
+{
+    if (argc < 7) {
+        printf("Usage: %s <peer_ip> <peer_port> <peer_eid> <local_ip> <local_port> <chat_sink_id> <advertise_eid>\n", argv[0]);
+        return 1;
+    }
+    printf("advertising route...\n");
+    const char *peer_ip = argv[1];
+    const char *peer_port = argv[2];
+    const char *peer_eid = argv[3];
+    const char *local_ip = argv[4];
+    const char *local_port = argv[5];
+    const char *chat_sink_id = argv[6];
+    const char *advertise_eid= argv[7];
+    advertise_route(peer_ip, peer_port, peer_eid, local_ip, local_port,
+                    chat_sink_id, advertise_eid);
+                   
+    printf("Route advertised\n");
+    return 0;
+}
 
-//     const char *advertise_dest_eid = argv[1];
-//     const char *peer_eid = argv[2];
-//     const char *advertise_cla = argv[3];
 
-//     advertise_route(advertise_dest_eid, peer_eid, advertise_cla);
-//     return 0;
-// }
 
 static int _send_msg(int argc, char **argv)
 {
@@ -341,7 +350,7 @@ void auto_init_ula(void)
 
 
 SHELL_COMMAND(add_route, "Adds a route", _add_route);
-// SHELL_COMMAND(advertise_route, "Advertises a route", _advertise_route);
+SHELL_COMMAND(advertise_route, "Advertises a route", _advertise_route);
 SHELL_COMMAND(send_msg, "Sends a message", _send_msg);
 
 int main(void)
@@ -376,9 +385,9 @@ int main(void)
     start_tasks(parse_cmdline(argc, argv));
     hal_task_create(dtn_chat_thread, NULL, true, NULL);
 
-    char line_buf[SHELL_DEFAULT_BUFSIZE];
+    char line_buf[256]; /*_add_route command woulde overflow with SHELL_DEFAULT_BUFSIZE*/
     msg_init_queue(_main_msg_queue, MAIN_MSG_QUEUE_SIZE);
-    shell_run(NULL, line_buf, SHELL_DEFAULT_BUFSIZE);
+    shell_run(NULL, line_buf, sizeof(line_buf));
 
     return start_os();
 }
