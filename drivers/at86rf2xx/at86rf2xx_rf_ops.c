@@ -289,15 +289,23 @@ static int _request_on(ieee802154_dev_t *hal)
 
 static int _confirm_on(ieee802154_dev_t *hal)
 {
-    DEBUG("at86rf2xx_rf_ops: confirm_on\n");
     at86rf2xx_t *dev = hal->priv;
 
-    /* AWAKE_END not received yet */
+    /* AWAKE_END not received yet, the ISR clears the flag */
     if (dev->sleep) {
         return -EAGAIN;
     }
 
     mutex_lock(&dev->lock);
+    /* rearm first so an AWAKE_END arriving during the read is not lost */
+    dev->sleep = true;
+    /* Verify the IRQ was AWAKE_END. Reading IRQ_STATUS also releases the IRQ line */
+    if (!(at86rf2xx_reg_read(dev, AT86RF2XX_REG__IRQ_STATUS) & AT86RF2XX_IRQ_MASK_SLEEP)) {
+        /* spurious IRQ keep waiting for AWAKE_END */
+        mutex_unlock(&dev->lock);
+        return -EAGAIN;
+    }
+    dev->sleep = false;
     at86rf2xx_reg_write(dev, AT86RF2XX_REG__IRQ_MASK, AT86RF2XX_IRQ_MASK_DEFAULT);
     mutex_unlock(&dev->lock);
     return 0;
@@ -780,12 +788,7 @@ void at86rf2xx_irq_handler(ieee802154_dev_t *hal)
      */
     state = at86rf2xx_get_status(dev);
     if (state == AT86RF2XX_STATE_SLEEP) {
-        mutex_lock(&dev->lock);
-        /* While sleeping only AWAKE_END should be enabled */
-        if (at86rf2xx_reg_read(dev, AT86RF2XX_REG__IRQ_STATUS) & AT86RF2XX_IRQ_MASK_SLEEP) {
-            dev->sleep = false;
-        }
-        mutex_unlock(&dev->lock);
+        dev->sleep = false;
         return;
     }
     mutex_lock(&dev->lock);
@@ -825,6 +828,13 @@ static void _event_handler(event_t *event)
 void _irq_handler(void *ctx)
 {
     at86rf2xx_bhp_ev_t *bhp = ctx;
+
+    /* While the device is sleeping we assume only AWAKE_END.
+     * This avoids uneccessary overhead of offloading the IRQ */
+    if (bhp->dev.sleep) {
+        bhp->dev.sleep = false;
+        return;
+    }
 
     event_post(bhp->evq, &bhp->ev);
 }
