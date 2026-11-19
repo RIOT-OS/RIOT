@@ -37,6 +37,7 @@
 #define SYMBOL_TIME (16U) /**< 16 us */
 #define ACK_TIMEOUT_TIME (40 * SYMBOL_TIME)
 #define TX_RX_TURNAROUND (12 * SYMBOL_TIME)
+#define TIMED_TX_MAX_DELAY_MS ((uint32_t)((UINT32_MAX >> 1) / US_PER_MS))
 
 /* the CC2538 takes 193 us to put the transceiver in RX_ON, which officially
  * violates the official TX<->RX turnaround time (192 us for O-QPSK).
@@ -483,9 +484,6 @@ int txtsnd(int argc, char **argv)
 
 static int _txtsnd_timed(int argc, char **argv, bool relative)
 {
-    const char *usage = relative ?
-        "Usage: txtsnd_after <long_addr> <len> <delay_ms> [ackreq]" :
-        "Usage: txtsnd_at <long_addr> <len> <time_us> [ackreq]";
     uint8_t addr[IEEE802154_LONG_ADDRESS_LEN];
     size_t len;
     size_t res;
@@ -493,12 +491,13 @@ static int _txtsnd_timed(int argc, char **argv, bool relative)
     bool ack_req = false;
 
     if (argc != 4 && !(argc == 5 && strcmp(argv[4], "ackreq") == 0)) {
-        puts(usage);
         if (relative) {
-            puts("       <delay_ms> is the delay from the current radio time");
+            puts("Usage: txtsnd_after <long_addr> <len> <delay_ms> [ackreq]\n"
+                 "       <delay_ms> is the delay from the current radio time");
         }
         else {
-            puts("       <time_us> is the radio time (see radio_time)");
+            puts("Usage: txtsnd_at <long_addr> <len> <time_us> [ackreq]\n"
+                 "       <time_us> is the radio time (see radio_time)");
         }
         return 1;
     }
@@ -510,14 +509,20 @@ static int _txtsnd_timed(int argc, char **argv, bool relative)
 
     res = l2util_addr_from_str(argv[1], addr);
     if (res == 0) {
-        puts(usage);
+        printf("Error: invalid address %s\n", argv[1]);
         return 1;
     }
     len = atoi(argv[2]);
+
     time_us = strtoul(argv[3], NULL, 10);
 
     if (relative) {
-        time_us = ieee802154_radio_get_time(&_radio) + time_us * US_PER_MS;
+        if (time_us > TIMED_TX_MAX_DELAY_MS) {
+            printf("Error: delay must not exceed %" PRIu32 " ms\n", TIMED_TX_MAX_DELAY_MS);
+            return 1;
+        }
+        /* wraparound of the radio time is intended here */
+        time_us = ieee802154_radio_get_time(&_radio) + (time_us * US_PER_MS);
         printf("Sending at radio time %" PRIu32 "\n", time_us);
     }
 
