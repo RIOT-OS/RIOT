@@ -360,7 +360,7 @@ static bool _has_retrans_left(ieee802154_submac_t *submac)
 }
 
 /*
- * @brief Check wether the incoming frame is a data request or not.
+ * @brief Check whether the incoming frame is a data request or not.
  */
 static bool _is_data_request(ieee802154_submac_t *submac, const uint8_t *mhr, size_t frame_len)
 {
@@ -451,7 +451,7 @@ static ieee802154_submac_fsm_return_t _handle_fsm_ev_request_tx(ieee802154_subma
 static ieee802154_submac_fsm_return_t _handle_fsm_ev_tx_ack(ieee802154_submac_t *submac,
                                                             uint8_t seq_num, uint8_t pending_bit)
 {
-    uint8_t ack[] = { IEEE802154_FCF_TYPE_ACK | pending_bit, 0x00,  seq_num };
+    uint8_t ack[] = { IEEE802154_FCF_TYPE_ACK | pending_bit, 0x00, seq_num };
     iolist_t iolist = {
         .iol_base = ack,
         .iol_len = sizeof(ack),

@@ -241,7 +241,8 @@ struct ieee802154_submac {
     const iolist_t *psdu;               /**< stores the current PSDU */
     uint8_t tx_ftype;                   /**< frame type of the current TX frame */
 #if IS_USED(MODULE_IEEE802154_SUBMAC_SOFT_ACK)
-    bool frame_pending : 1;             /**< Whether the Frame Pending bit should be set on the next ACK transmission */
+    bool frame_pending : 1;             /**< Whether the Frame Pending bit should be set on
+                                             the next data request */
 #endif
 };
 
@@ -605,7 +606,7 @@ static inline int ieee802154_set_rx(ieee802154_submac_t *submac)
  * @param[in] value  value associated to @p cmd
  *
  * @retval 0 on success
- * @retval negative errno on error
+ * @retval -ERRNO on error
  */
 int ieee802154_submac_config_src_address_match(ieee802154_submac_t *submac,
                                                ieee802154_src_match_t cmd,
