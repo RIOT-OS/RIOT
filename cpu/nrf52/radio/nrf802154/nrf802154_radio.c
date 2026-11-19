@@ -93,7 +93,7 @@
  * @brief Time in us from TXEN to the start of the transmission
  *
  * The radio uses the fast ramp-up mode according to the Nordic PS.
- * https://docs.nordicsemi.com/r/bundle/ps_nrf52840/page/radio.html?section=concept_rnf_nml_4r__fig
+ * https://docs.nordicsemi.com/r/bundle/ps_nrf52840/page/radio.html#ariaid-title121
  */
 #ifndef NRF802154_FAST_RAMPUP_US
 #  define NRF802154_FAST_RAMPUP_US (40U)
