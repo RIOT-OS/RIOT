@@ -721,7 +721,7 @@ static int _off(int argc, char **argv)
         printf("Radio turning off failed res=%d \n", res);
         return 1;
     }
-    puts("Radio off\n");
+    puts("Radio off");
     return 0;
 }
 
@@ -733,10 +733,15 @@ static int _on(int argc, char **argv)
     int res;
 
     if ((res = ieee802154_radio_request_on(&_radio)) < 0) {
-        printf("Radio turning on failed res=%d \n", res);
+        if (res == -EALREADY) {
+            puts("Radio request_on failed; Radio already on");
+        }
+        else {
+            printf("Radio request_on failed res=%d \n", res);
+        }
         return 1;
     }
-    puts("Radio requested on\n");
+    puts("Radio requested on");
 
     uint32_t wake_us;
     if ((res = _wait_confirm_on(&wake_us)) < 0) {
