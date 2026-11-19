@@ -129,8 +129,10 @@ void _rx_done_handler(event_t *event)
     ieee802154_rx_info_t info;
     ieee802154_dev_t* dev = &_radio;
 
-    /* Force transition to IDLE before calling the read function */
-    ieee802154_radio_set_idle(dev, true);
+
+    /* Don't force transition to IDLE before calling the read function
+     * as the radio can be busy transmitting ack */
+    while (ieee802154_radio_set_idle(dev, false) < 0) {}
 
     /* Read packet from internal framebuffer
      *
