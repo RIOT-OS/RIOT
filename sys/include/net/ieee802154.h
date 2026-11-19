@@ -83,6 +83,13 @@ extern "C" {
 /** @} */
 
 /**
+ * @brief IEEE 802.15.4 MAC commands definitions (2024 Section 7.5)
+ * @{
+ */
+#define IEEE802154_MACCMD_DATA_REQ          (0x04) /**< Data Request Command */
+/** @} */
+
+/**
  * @brief   Channel ranges
  * @{
  */
