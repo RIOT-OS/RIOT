@@ -10,7 +10,7 @@
  * @ingroup     drivers_periph
  * @brief       Low-level RTT (Real Time Timer) peripheral driver
  *
- * # (Low-) Power Implications
+ * ## (Low-) Power Implications
  *
  * After the RTT has been initialized (i.e. after calling rtt_init()), the RTT
  * should be powered on and running. The RTT can then be powered off manually
@@ -20,6 +20,11 @@
  *
  * On many CPUs, certain power states might need to be blocked in rtt_init(), so
  * that it is ensured that the RTT will function properly while it is enabled.
+ *
+ * Some implementations, e.g. the LPTIM based STM32 one, trigger an additional
+ * interrupt after setting an alarm, to avoid busy waiting for the compare
+ * register update. This can cause an additional wakeup shortly after entering
+ * sleep.
  *
  * @warning     This module will be automatically be used as a backend for
  *              ZTIMER_SEC and ZTIMER_MSEC. If direct access to RTT is needed
