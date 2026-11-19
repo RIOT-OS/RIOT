@@ -32,7 +32,7 @@ extern "C" {
 #define LV_CONF_H   1
 
 /*====================
-   MEMORY SETTINGS
+ * MEMORY SETTINGS
  *====================*/
 
 /** Use the LVGL built-in memory allocator (TLSF) */
@@ -67,14 +67,14 @@ extern "C" {
 #endif
 
 /*====================
-   OPERATING SYSTEM
+ * OPERATING SYSTEM
  *====================*/
 
 /** LVGL is only used from a single RIOT thread, no OS abstraction is needed */
 #define LV_USE_OS               LV_OS_NONE
 
 /*========================
-   RENDERING SETTINGS
+ * RENDERING SETTINGS
  *========================*/
 
 /** Default color format of the displays.
@@ -90,72 +90,72 @@ extern "C" {
  */
 #ifndef LV_DRAW_SW_SUPPORT_RGB565_SWAPPED
 /** Support of the RGB565 swapped pixel format */
-#define LV_DRAW_SW_SUPPORT_RGB565_SWAPPED           0
+#  define LV_DRAW_SW_SUPPORT_RGB565_SWAPPED         0
 #endif
 #ifndef LV_DRAW_SW_SUPPORT_RGB888
 /** Support of the RGB888 pixel format */
-#define LV_DRAW_SW_SUPPORT_RGB888                   0
+#  define LV_DRAW_SW_SUPPORT_RGB888                 0
 #endif
 #ifndef LV_DRAW_SW_SUPPORT_XRGB8888
 /** Support of the XRGB8888 pixel format */
-#define LV_DRAW_SW_SUPPORT_XRGB8888                 IS_USED(MODULE_LVGL_SDL)
+#  define LV_DRAW_SW_SUPPORT_XRGB8888               IS_USED(MODULE_LVGL_SDL)
 #endif
 #ifndef LV_DRAW_SW_SUPPORT_ARGB8888
 /** Support of the ARGB8888 pixel format */
-#define LV_DRAW_SW_SUPPORT_ARGB8888                 IS_USED(MODULE_LVGL_SDL)
+#  define LV_DRAW_SW_SUPPORT_ARGB8888               IS_USED(MODULE_LVGL_SDL)
 #endif
 #ifndef LV_DRAW_SW_SUPPORT_ARGB8888_PREMULTIPLIED
 /** Support of the ARGB8888 premultiplied pixel format */
-#define LV_DRAW_SW_SUPPORT_ARGB8888_PREMULTIPLIED   0
+#  define LV_DRAW_SW_SUPPORT_ARGB8888_PREMULTIPLIED 0
 #endif
 #ifndef LV_DRAW_SW_SUPPORT_L8
 /** Support of the L8 pixel format */
-#define LV_DRAW_SW_SUPPORT_L8                       0
+#  define LV_DRAW_SW_SUPPORT_L8                     0
 #endif
 #ifndef LV_DRAW_SW_SUPPORT_AL88
 /** Support of the AL88 pixel format */
-#define LV_DRAW_SW_SUPPORT_AL88                     0
+#  define LV_DRAW_SW_SUPPORT_AL88                   0
 #endif
 #ifndef LV_DRAW_SW_SUPPORT_A8
 /** Support of the A8 pixel format */
-#define LV_DRAW_SW_SUPPORT_A8                       0
+#  define LV_DRAW_SW_SUPPORT_A8                     0
 #endif
 #ifndef LV_DRAW_SW_SUPPORT_I1
 /** Support of the I1 (monochrome) pixel format */
-#define LV_DRAW_SW_SUPPORT_I1                       (IS_USED(MODULE_U8G2_DISP_DEV) || \
-                                                     IS_USED(MODULE_EPD_BW_SPI))
+#  define LV_DRAW_SW_SUPPORT_I1                     (IS_USED(MODULE_U8G2_DISP_DEV) || \
+                                                   IS_USED(MODULE_EPD_BW_SPI))
 #endif
 
 /*====================
-   CORE SETTINGS
+ * CORE SETTINGS
  *====================*/
 
 /** Widget subject observers are not used by RIOT */
 #ifndef LV_USE_OBSERVER
 /** Not supported */
-#define LV_USE_OBSERVER         0
+#  define LV_USE_OBSERVER       0
 #endif
 
 /*====================
-   FONT USAGE
+ * FONT USAGE
  *====================*/
 
 /** Montserrat font size 12 */
 #ifndef LV_FONT_MONTSERRAT_12
-#define LV_FONT_MONTSERRAT_12   1
+#  define LV_FONT_MONTSERRAT_12 1
 #endif
 /** Montserrat font size 14 */
 #ifndef LV_FONT_MONTSERRAT_14
-#define LV_FONT_MONTSERRAT_14   0
+#  define LV_FONT_MONTSERRAT_14 0
 #endif
 
 /** Always set a default font */
 #ifndef LV_FONT_DEFAULT
-#define LV_FONT_DEFAULT         LV_FONT_DEFAULT_MONTSERRAT_12
+#  define LV_FONT_DEFAULT       LV_FONT_DEFAULT_MONTSERRAT_12
 #endif
 
 /*====================
-   WIDGET USAGE
+ * WIDGET USAGE
  *====================*/
 
 /** Not supported */
@@ -276,7 +276,7 @@ extern "C" {
 /** Logging is disabled by default */
 #ifndef LV_USE_LOG
 /** Not supported */
-#define LV_USE_LOG                  0
+#  define LV_USE_LOG                0
 #endif
 
 /*==================

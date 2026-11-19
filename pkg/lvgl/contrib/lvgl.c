@@ -35,7 +35,7 @@
 #ifndef LVGL_COLOR_BUF_SIZE
 #  if IS_USED(MODULE_U8G2_DISP_DEV) || IS_USED(MODULE_EPD_BW_SPI)
 /* Monochrome displays are refreshed in full: the buffer must contain the whole
-   screen, with one bit per pixel */
+ * screen, with one bit per pixel */
 #    define LVGL_COLOR_BUF_SIZE     (LVGL_I1_PALETTE_SIZE + \
                                      ((LV_HOR_RES_MAX + 7) / 8) * LV_VER_RES_MAX)
 #  else
@@ -63,7 +63,7 @@ static LV_ATTRIBUTE_MEM_ALIGN uint8_t _draw_buf[LVGL_COLOR_BUF_SIZE];
 static screen_dev_t *_screen_dev = NULL;
 
 /* LVGL renders 1-bit pixels with the most significant bit first while the
-   RIOT monochrome display drivers expect the least significant bit first */
+ * RIOT monochrome display drivers expect the least significant bit first */
 static void _monochrome_1bit_convert(uint8_t *buf, size_t size)
 {
     for (size_t i = 0; i < size; i++) {
