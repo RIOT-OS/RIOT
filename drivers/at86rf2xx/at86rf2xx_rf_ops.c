@@ -268,7 +268,7 @@ static int _request_on(ieee802154_dev_t *hal)
 
     if (!dev->sleep) {
         mutex_unlock(&dev->lock);
-        return 0;
+        return -EALREADY;
     }
 
 #if !AT86RF2XX_IS_PERIPH
@@ -325,6 +325,10 @@ static int _off(ieee802154_dev_t *hal)
 {
     DEBUG("at86rf2xx_rf_ops: off\n");
     at86rf2xx_t *dev = hal->priv;
+
+    if (dev->sleep) {
+        return 0;
+    }
 
     mutex_lock(&dev->lock);
     at86rf2xx_reg_write(dev, AT86RF2XX_REG__TRX_STATE, AT86RF2XX_STATE_FORCE_TRX_OFF);
