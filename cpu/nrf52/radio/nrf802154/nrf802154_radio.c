@@ -271,33 +271,31 @@ static int _request_op(ieee802154_dev_t *dev, ieee802154_hal_op_t op, void *ctx)
 
     switch (op) {
     case IEEE802154_HAL_OP_TRANSMIT:
-        {
-            if (state != STATE_IDLE) {
-                return -EBUSY;
-            }
-
-            volatile uint32_t *start_task;
-
-            if (cfg.cca_send) {
-                NRF_RADIO->SHORTS = CCA_SHORTS;
-                start_task = &NRF_RADIO->TASKS_RXEN;
-            }
-            else {
-                NRF_RADIO->SHORTS = DEFAULT_SHORTS;
-                start_task = &NRF_RADIO->TASKS_TXEN;
-            }
-
-            if (ctx) {
-                uint32_t starting_point_us = *(const uint32_t *)ctx;
-                _start_tx_at(starting_point_us - NRF802154_FAST_RAMPUP_US, start_task);
-            }
-            else {
-                *start_task = 1;
-            }
-
-            state = STATE_TX;
-            break;
+        if (state != STATE_IDLE) {
+            return -EBUSY;
         }
+
+        volatile uint32_t *start_task;
+
+        if (cfg.cca_send) {
+            NRF_RADIO->SHORTS = CCA_SHORTS;
+            start_task = &NRF_RADIO->TASKS_RXEN;
+        }
+        else {
+            NRF_RADIO->SHORTS = DEFAULT_SHORTS;
+            start_task = &NRF_RADIO->TASKS_TXEN;
+        }
+
+        if (ctx) {
+            uint32_t starting_point_us = *(const uint32_t *)ctx;
+            _start_tx_at(starting_point_us - NRF802154_FAST_RAMPUP_US, start_task);
+        }
+        else {
+            *start_task = 1;
+        }
+
+        state = STATE_TX;
+        break;
     case IEEE802154_HAL_OP_SET_RX:
         if (_state != STATE_IDLE && _state != STATE_RX) {
             goto end;
