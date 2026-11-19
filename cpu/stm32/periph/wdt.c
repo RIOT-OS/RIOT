@@ -14,12 +14,13 @@
  * @author      Francisco Molina <francois-xavier.molina@inria.fr>
  */
 
-#include <stdlib.h>
 #include <assert.h>
 #include <inttypes.h>
 #include <stdbool.h>
+#include <stdlib.h>
 
 #include "cpu.h"
+#include "irq.h"
 #include "mutex.h"
 #include "timex.h"
 
@@ -50,10 +51,6 @@ static uint8_t _prescaler = 0;
 static uint16_t _reload = IWDG_RLR_RL;
 static bool _started;
 
-/* When the PR, RR or WINR registers are unlocked, nobody else should
- * try to unlock or lock them. */
-mutex_t _iwdg_unlocked;
-
 static inline uint32_t _wdt_time(uint8_t pre, uint16_t rel)
 {
     /* wdt_time (us) = LSI(us) x 4 x 2^PRE x RELOAD */
@@ -70,12 +67,13 @@ static void _set_config(void)
      * before starting it. */
     while (IWDG->SR & (IWDG_SR_PVU | IWDG_SR_RVU)) {}
 
-    mutex_lock(&_iwdg_unlocked);
+    /* don't allow any other accesses in the unlocked state */
+    unsigned state = irq_disable();
     IWDG->KR = IWDG_UNLOCK;
     IWDG->PR = _prescaler;
     IWDG->RLR = _reload;
     IWDG->KR = IWDG_LOCK;
-    mutex_unlock(&_iwdg_unlocked);
+    irq_restore(state);
 
     /* Wait for the update before reloading the counter with the new value */
     while (IWDG->SR & (IWDG_SR_PVU | IWDG_SR_RVU)) {}
