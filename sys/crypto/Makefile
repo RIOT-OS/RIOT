@@ -1,5 +1,5 @@
 ifeq (, $(RIOT_CHACHA_PRNG_DEFAULT))
-    RIOT_CHACHA_PRNG_DEFAULT := $(shell head -c 64 /dev/urandom | hexdump -e '"0x%4xull,"')
+    RIOT_CHACHA_PRNG_DEFAULT := $(shell hexdump -v -n 64 -e '"0x%08xull,"' /dev/urandom)
 endif
 
 CFLAGS += -DRIOT_CHACHA_PRNG_DEFAULT="$(RIOT_CHACHA_PRNG_DEFAULT)"
