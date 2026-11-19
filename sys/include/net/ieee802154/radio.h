@@ -1605,8 +1605,8 @@ static inline bool ieee802154_radio_has_irq_ack_timeout(ieee802154_dev_t *dev)
  *
  * @param[in] dev IEEE802.15.4 device descriptor
  *
- * @return true if the device has support
- * @return false otherwise
+ * @retval true if the device has support
+ * @retval false otherwise
  */
 static inline bool ieee802154_radio_has_timed_tx(ieee802154_dev_t *dev)
 {
