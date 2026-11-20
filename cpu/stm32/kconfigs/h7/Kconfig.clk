@@ -12,7 +12,7 @@ menu "Clock Source Configuration"
 
 choice
     prompt "Select main clock source"
-    default USE_HSI_DIRECT
+    default USE_HSI_PLL
     help
       Only one main clock source can be active:
       - HSI direct (no PLL)
