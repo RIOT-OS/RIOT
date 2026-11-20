@@ -942,6 +942,22 @@ static inline uint8_t ieee802154_dbm_to_rssi(int16_t dbm)
     return val - IEEE802154_RADIO_RSSI_OFFSET;
 }
 
+/**
+ * @brief Checks if a frame passes the IEEE 802.15.4 frame filtering
+ *        according to the 2024 Std. version section 6.6.2 Reception and rejection.
+ *
+ * @param[in] mhr        MAC header of the received frame.
+ * @param[in] panid      PAN ID of the receiving device.
+ * @param[in] short_addr Short address of the receiving device.
+ * @param[in] ext_addr   Extended address of the receiving device.
+ * @param[in] pan_coord  Whether the receiving device is the PAN coordinator.
+ *
+ * @retval true   frame passes the filter
+ * @retval false  frame shall be discarded
+ */
+bool ieee802154_frame_filter(const uint8_t *mhr, uint16_t panid, network_uint16_t short_addr,
+                             const eui64_t *ext_addr, bool pan_coord);
+
 #ifdef __cplusplus
 }
 #endif
