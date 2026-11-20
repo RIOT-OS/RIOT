@@ -1,0 +1,40 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: RIOT uD3TN port <buildsystem@riot>
+Date: Tue, 10 Nov 2026 14:12:00 +0100
+Subject: [PATCH] Register RIOT TCPCLv3 CLA
+
+---
+ components/cla/cla.c | 12 ++----------
+ 1 file changed, 2 insertions(+), 10 deletions(-)
+
+diff --git a/components/cla/cla.c b/components/cla/cla.c
+--- a/components/cla/cla.c
++++ b/components/cla/cla.c
+@@ -2,11 +2,7 @@
+ #include "cla/cla.h"
+ #include "cla/cla_contact_tx_task.h"
+ 
+-#include "cla/posix/cla_mtcp.h"
+-#include "cla/posix/cla_smtcp.h"
+-#include "cla/posix/cla_tcpclv3.h"
+-#include "cla/posix/cla_tcpspp.h"
+-#include "cla/posix/cla_bibe.h"
++#include "cla/riot/cla_tcpclv3_riot.h"
+ 
+ #include "platform/hal_io.h"
+ #include "platform/hal_task.h"
+@@ -37,11 +33,7 @@ struct available_cla_list_entry {
+ };
+ 
+ const struct available_cla_list_entry AVAILABLE_CLAS[] = {
+-	{ "mtcp", &mtcp_create },
+-	{ "smtcp", &smtcp_create },
+-	{ "tcpclv3", &tcpclv3_create },
+-	{ "tcpspp", &tcpspp_create },
+-	{ "bibe", &bibe_create },
++	{ "tcpclv3-riot", &tcpclv3_riot_create },
+ };
+ 
+ 
+-- 
+2.39.0

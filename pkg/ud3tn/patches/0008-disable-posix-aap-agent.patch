@@ -1,0 +1,50 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: RIOT uD3TN port <buildsystem@riot>
+Date: Tue, 10 Nov 2026 14:16:00 +0100
+Subject: [PATCH] Disable the POSIX AAP agent on RIOT
+
+---
+ components/ud3tn/init.c | 16 ----------------
+ 1 file changed, 16 deletions(-)
+
+diff --git a/components/ud3tn/init.c b/components/ud3tn/init.c
+--- a/components/ud3tn/init.c
++++ b/components/ud3tn/init.c
+@@ -8,7 +8,6 @@
+ 
+ #include "aap2/aap2_agent.h"
+ 
+-#include "agents/application_agent.h"
+ #include "agents/echo_agent.h"
+ 
+ #include "cla/cla.h"
+@@ -26,6 +25,5 @@ uint8_t LOG_LEVEL = DEFAULT_LOG_LEVEL;
+ 
+ // References kept for program runtime
+-static struct application_agent_config *aa_cfg;
+ static struct aap2_agent_config *aa2_cfg;
+ 
+ void init(int argc, char *argv[])
+@@ -116,20 +114,6 @@ void start_tasks(const struct ud3tn_cmdline_options *const opt)
+ 	if (opt->allow_remote_configuration)
+ 		LOG_WARN("!! WARNING !! Remote configuration capability ENABLED!");
+ 
+-	aa_cfg = application_agent_setup(
+-		&bundle_agent_interface,
+-		opt->aap_socket,
+-		opt->aap_node,
+-		opt->aap_service,
+-		opt->bundle_version,
+-		opt->lifetime_s * 1000
+-	);
+-
+-	if (!aa_cfg) {
+-		LOG_ERROR("INIT: Application agent could not be initialized!");
+-		abort();
+-	}
+-
+ 	aa2_cfg = aap2_agent_setup(
+ 		&bundle_agent_interface,
+ 		opt->aap2_socket,
+-- 
+2.39.0
