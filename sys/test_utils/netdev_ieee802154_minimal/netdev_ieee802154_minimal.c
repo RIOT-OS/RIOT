@@ -111,7 +111,7 @@ void _recv(netdev_t *dev)
     printf("Src. addr.: %s\n", _addr_str);
 
     /* check frame type */
-    switch (_buffer[0] & IEEE802154_FCF_TYPE_MASK) {
+    switch (ieee802154_get_frame_type(_buffer)) {
         case IEEE802154_FCF_TYPE_BEACON:
             puts("BEACON");
             break;
@@ -136,10 +136,10 @@ void _recv(netdev_t *dev)
 
     printf("ACK req.: %s", _buffer[0] & IEEE802154_FCF_ACK_REQ ? "1, " : "0, ");
 
-    printf("PAN comp.:%s", _buffer[0] & IEEE802154_FCF_PAN_COMP ? "1, " : "0, ");
+    printf("PAN comp.:%s", ieee802154_has_pan_compression(_buffer) ? "1, " : "0, ");
 
     printf("Version: ");
-    printf("%u, ", (unsigned)((_buffer[1] & IEEE802154_FCF_VERS_MASK) >> 4));
+    printf("%u, ", (unsigned)(ieee802154_get_frame_version(_buffer) >> 4));
 
     printf("Seq.: %u\n", (unsigned)ieee802154_get_seq(_buffer));
 
