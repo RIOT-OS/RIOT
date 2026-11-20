@@ -13,9 +13,7 @@
 
 #include <string.h>
 
-#include "compiler_hints.h"
 #include "net/unicoap/server.h"
-#include "thread.h"
 
 #define ENABLE_DEBUG CONFIG_UNICOAP_DEBUG_LOGGING
 #include "debug.h"
@@ -110,6 +108,35 @@ int unicoap_resource_handle_well_known_core(unicoap_message_t* message, const un
     unicoap_response_init_with_options(message, UNICOAP_STATUS_CONTENT, (uint8_t*)links, size,
                                        &options);
     return unicoap_send_response(message, ctx);
+}
+
+int unicoap_server_preprocess_request(unicoap_packet_t* packet,
+                                      unicoap_messaging_flags_t* flags,
+                                      unicoap_exchange_arg_t* arg,
+                                      bool truncated)
+{
+    int res;
+    if (truncated) {
+        _SERVER_DEBUG("truncated, not processing, sending Size1\n");
+        UNICOAP_OPTIONS_ALLOC(response_options, 5);
+        unicoap_options_set_size1(&response_options, CONFIG_UNICOAP_BLOCK_SIZE);
+        unicoap_response_init_with_options(packet->message, UNICOAP_STATUS_REQUEST_ENTITY_TOO_LARGE,
+                                            NULL, 0, &response_options);
+        unicoap_messaging_send(packet, UNICOAP_MESSAGING_FLAGS_DEFAULT, NULL);
+        return UNICOAP_PREPROCESSING_ERROR_REQUEST;
+    }
+
+    const unicoap_resource_t* resource = NULL;
+    const unicoap_listener_t* listener = NULL;
+    if ((res = unicoap_resource_find(packet, &resource, &listener)) != 0) {
+        unicoap_response_init_empty(packet->message, res < 0 ? UNICOAP_STATUS_INTERNAL_SERVER_ERROR :
+                                                        (unicoap_status_t)res);
+        unicoap_messaging_send(packet, UNICOAP_MESSAGING_FLAGS_DEFAULT, NULL);
+        return UNICOAP_PREPROCESSING_ERROR_REQUEST;
+    }
+    arg->resource = resource;
+    *flags = _messaging_flags_resource(resource->flags);
+    return UNICOAP_PREPROCESSING_SUCCESS_REQUEST;
 }
 
 int unicoap_server_process_request(unicoap_packet_t* packet, const unicoap_resource_t* resource)

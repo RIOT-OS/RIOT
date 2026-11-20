@@ -6,6 +6,7 @@
 
 #pragma once
 
+#include "mutex.h"
 #include "net/unicoap/constants.h" /* IWYU pragma: export */
 #include "net/unicoap/config.h" /* IWYU pragma: export */
 #include "net/unicoap/message.h" /* IWYU pragma: export */
@@ -94,7 +95,51 @@ typedef struct {
 #define UNICOAP_JOB(func) { \
     .super = { \
         .handler = _UNICOAP_TRY_TYPECHECK_JOB_FUNC(func) \
-    } \
+    }, \
+    .roadblock = MUTEX_INIT_LOCKED \
+}
+
+typedef struct {} unicoap_blocking_job_res_t;
+
+/** @brief A job that can be enqueued and executed by the `unicoap` message processing loop. */
+typedef struct {
+    /**
+     * @brief Event that is posted on internal queue
+     * @warning Do not read or write.
+     * @internal
+     */
+    unicoap_job_t super;
+
+    /**
+     * @brief Mutex to synchronously wait for job completion on the calling thread
+     * @warning Do not read or write.
+     * @internal
+     */
+    mutex_t roadblock;
+
+    int res;
+} unicoap_blocking_job_t;
+
+/**
+ * @brief Initializes a @ref unicoap_blocking_job_t.
+ *
+ * @param func A function that must be of type `unicoap_blocking_job_t (unicoap_blocking_job_t *job)`.
+ * @returns Designated initializer for @ref unicoap_blocking_job_t
+ */
+#define UNICOAP_BLOCKING_JOB(func) (unicoap_blocking_job_t){ \
+    .super.super = { \
+        .handler = _UNICOAP_TRY_TYPECHECK_BLOCKING_JOB_FUNC(func) \
+    }, \
+    .roadblock = MUTEX_INIT_LOCKED, \
+    .res = 0, \
+}
+
+// TODO: docs
+static inline unicoap_blocking_job_res_t unicoap_blocking_job_finish(unicoap_blocking_job_t *job, int res)
+{
+    job->res = res;
+    mutex_unlock(&job->roadblock);
+    return (unicoap_blocking_job_res_t){};
 }
 
 /**
@@ -118,6 +163,9 @@ typedef struct {
  * ```
  */
 int unicoap_loop_enqueue(unicoap_job_t* job);
+
+// TODO: docs
+int unicoap_loop_enqueue_and_block(unicoap_blocking_job_t* job);
 /** @} */
 
 /** @} */
