@@ -150,6 +150,7 @@ impl<E: fmt::Debug> Termination for Result<(), E> {
     }
 }
 
+#[cfg(not(rustc_has_never))]
 impl Termination for crate::never::Never {
     fn report(self) -> i32 {
         self
