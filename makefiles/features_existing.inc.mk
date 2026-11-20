@@ -84,6 +84,7 @@ FEATURES_EXISTING := \
     cpu_nrf51 \
     cpu_nrf52 \
     cpu_nrf53 \
+    cpu_nrf54l \
     cpu_nrf9160 \
     cpu_qn908x \
     cpu_rp2350_arm \

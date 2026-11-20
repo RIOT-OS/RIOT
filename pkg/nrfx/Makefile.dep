@@ -3,4 +3,4 @@
 # file will only be evaluated when an application or package explicitly
 # specifies USEPKG+=nrfx.
 
-FEATURES_REQUIRED_ANY += cpu_nrf51|cpu_nrf52|cpu_nrf53|cpu_nrf9160
+FEATURES_REQUIRED_ANY += cpu_nrf51|cpu_nrf52|cpu_nrf53|cpu_nrf54l|cpu_nrf9160
