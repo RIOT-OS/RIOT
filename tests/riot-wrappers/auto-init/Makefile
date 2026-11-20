@@ -1,3 +1,5 @@
+include ../Makefile.riot-wrappers_common
+
 # name of your application
 APPLICATION = riot-wrappers-test-auto-init
 BOARD ?= native

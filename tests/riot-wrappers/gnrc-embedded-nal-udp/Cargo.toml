@@ -8,6 +8,6 @@ edition = "2024"
 crate-type = ["staticlib"]
 
 [dependencies]
-riot-wrappers = { path = "../..", features = [ "set_panic_handler", "panic_handler_format", "with_embedded_nal" ] }
+riot-wrappers = { version = "*", features = [ "set_panic_handler", "panic_handler_format", "with_embedded_nal" ] }
 riot-sys = "*"
 embedded-nal = "0.6.0"
