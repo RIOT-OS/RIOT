@@ -1,1 +1,4 @@
+# use picolibc to reduce RAM usage
+FEATURES_REQUIRED += picolibc
+
 include $(RIOTBOARD)/common/nucleo32/Makefile.dep
