@@ -133,6 +133,7 @@ def detect_built_in_includes(compiler, args, flags):
         includes, version = detect_includes_and_version_gcc(compiler, flags)
         if args.clangd:
             internal = detect_gcc_internal_includes(compiler, flags)
+            # sort out gcc internals that confuse clang
             includes = [i for i in includes if i not in internal]
         if compiler.endswith('-g++') and args.add_libstdcxx_includes:
             detect_libstdcxx_includes(compiler, includes, version)
