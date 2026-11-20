@@ -70,3 +70,34 @@ BPLib_Status_t BPLib_STOR_StorageTblValidateFunc(void *TblData)
     (void) TblData;
     return BPLIB_SUCCESS;
 }
+
+void BPLib_STOR_AddToCustodialUpdateBatch(BPLib_Instance_t *Inst,
+                                          uint32_t BundleId,
+                                          BPLib_CT_StorOp_t Op)
+{
+    (void) Inst;
+    (void) BundleId;
+    (void) Op;
+    return;
+}
+
+void BPLib_STOR_UpdateCustodialBundles(BPLib_Instance_t* Inst)
+{
+    (void) Inst;
+    return;
+}
+
+BPLib_Status_t BPLib_STOR_SetNewRetransmitTrigger(BPLib_Instance_t *Inst,
+                                                  uint32_t ContactId)
+{
+    (void) Inst;
+    (void) ContactId;
+    return BPLIB_SUCCESS;
+}
+
+BPLib_Status_t BPLib_STOR_Egress(BPLib_Instance_t *instance, size_t max_bundles)
+{
+    (void) instance;
+    (void) max_bundles;
+    return BPLIB_SUCCESS;
+}

@@ -1,0 +1,19 @@
+From 4fee36765db4167c95c2cc5ce7932c247f870aa6 Mon Sep 17 00:00:00 2001
+From: Simon Grund <mail@simongrund.de>
+Date: Wed, 26 Aug 2026 13:35:27 +0200
+Subject: [PATCH 4/9] Exclude default config header
+
+This way a header with better defaults can be provided by RIOT without
+patching
+---
+ inc/{bplib_cfg.h => bplib_cfg_EXCLUDED.h} | 0
+ 1 file changed, 0 insertions(+), 0 deletions(-)
+ rename inc/{bplib_cfg.h => bplib_cfg_EXCLUDED.h} (100%)
+
+diff --git a/inc/bplib_cfg.h b/inc/bplib_cfg_EXCLUDED.h
+similarity index 100%
+rename from inc/bplib_cfg.h
+rename to inc/bplib_cfg_EXCLUDED.h
+-- 
+2.43.0
+
