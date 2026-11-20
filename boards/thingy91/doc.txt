@@ -1,0 +1,30 @@
+/**
+@defgroup    boards_thingy91 Thingy:91
+@ingroup     boards
+@brief       Support for the Thingy:91 board.
+ 
+## General information
+The Nordic Thingy:91 is a battery-operated prototyping platform for cellular IoT using LTE-M,
+NB-IoT and GNSS. It is ideal for creating Proof-of-Concept (PoC),
+demos and initial prototypes in your cellular IoT development phase.
+- https://www.nordicsemi.com/Products/Development-hardware/Nordic-Thingy-91
+## Components
+
+## Features
+- 700-960 MHz + 1710-2200 MHz LTE band support 
+- LTE-M/NB-IoT/GPS, Bluetooth LE and NFC passive tag antennas
+- 
+A detailed description of the board pinout (if available)
+  
+### Flash the board
+Used extra software: https://eclipse-embed-cdt.github.io/debug/jlink/install/ 
+
+Some notes about how to flash the board
+- BOARD=thingy9160 make flash term
+
+
+compilation to run
+
+
+
+
