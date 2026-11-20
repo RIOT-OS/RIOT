@@ -8,6 +8,7 @@ DISABLE_MODULE += auto_init_xtimer
 # Boards that can't run only on xtimer or that always select ztimer
 BOARDS_UNSUPPORTED += \
                    adafruit-feather-nrf52840-express \
+                   adafruit-metro-esp32s2 \
                    bitcraze-crazyflie21-main \
                    esp32s2-wemos-mini \
                    hamilton \
