@@ -470,7 +470,6 @@ dependencies = [
 [[package]]
 name = "riot-sys"
 version = "0.8.0"
-source = "git+https://github.com/RIOT-OS/rust-riot-sys#5739e23904dbcb1b2406b6a6aa0f1c654311640e"
 dependencies = [
  "bindgen",
  "c2rust-asm-casts",
@@ -484,7 +483,6 @@ dependencies = [
 [[package]]
 name = "riot-wrappers"
 version = "0.9.2"
-source = "git+https://github.com/RIOT-OS/rust-riot-wrappers#0884b164a049a7e5ce8b774554ee9822069d9eee"
 dependencies = [
  "bare-metal",
  "coap-handler",
