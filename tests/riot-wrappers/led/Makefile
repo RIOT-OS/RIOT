@@ -1,3 +1,5 @@
+include ../Makefile.riot-wrappers_common
+
 # name of your application
 APPLICATION = riot-wrappers-test-leds
 BOARD ?= native

@@ -9,4 +9,4 @@ publish = false
 crate-type = ["staticlib"]
 
 [dependencies]
-riot-wrappers = { path = "../..", features = [ "set_panic_handler", "panic_handler_format" ] }
+riot-wrappers = { version = "*", features = [ "set_panic_handler", "panic_handler_format" ] }

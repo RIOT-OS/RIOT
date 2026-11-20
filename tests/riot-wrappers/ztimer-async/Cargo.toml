@@ -9,7 +9,7 @@ publish = false
 crate-type = ["staticlib"]
 
 [dependencies]
-riot-wrappers = { path = "../..", features = [ "set_panic_handler", "panic_handler_format", "embedded-hal-async", "provide_critical_section_1_0" ] }
+riot-wrappers = { version = "*", features = [ "set_panic_handler", "panic_handler_format", "embedded-hal-async", "provide_critical_section_1_0" ] }
 embassy-executor-riot = { git = "https://gitlab.com/etonomy/riot-module-examples" }
 embassy-executor = "0.5.0" # Not enabling any of its executors: there's the -riot for that
 static_cell = "2"
