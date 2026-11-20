@@ -30,13 +30,16 @@ BOARD_INSUFFICIENT_MEMORY := \
     nucleo-f302r8 \
     nucleo-f303k8 \
     nucleo-f334r8 \
+    nucleo-f410rb \
     nucleo-g031k8 \
     nucleo-g070rb \
     nucleo-g071rb \
+    nucleo-g431rb \
     nucleo-l011k4 \
     nucleo-l031k6 \
     nucleo-l053r8 \
     nucleo-l073rz \
+    nucleo-l412kb \
     olimexino-stm32 \
     opencm904 \
     samd10-xmini \

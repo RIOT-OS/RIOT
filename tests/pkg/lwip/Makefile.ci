@@ -3,7 +3,10 @@ BOARD_INSUFFICIENT_MEMORY := \
     blackpill-stm32f103c8 \
     bluepill-stm32f030c8 \
     bluepill-stm32f103c8 \
+    calliope-mini \
     i-nucleo-lrwan1 \
+    microbit \
+    nrf51dongle \
     nucleo-c031c6 \
     nucleo-f030r8 \
     nucleo-f031k6 \
