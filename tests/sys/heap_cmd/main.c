@@ -53,12 +53,6 @@ int main(void)
 {
     puts("Shell-based test application for heap functions.\n"
          "Use the 'help' command to get more information on how to use it.");
-
-    /* define buffer to be used by the shell */
-    char line_buf[SHELL_DEFAULT_BUFSIZE];
-
-    /* define own shell commands */
-    shell_run(NULL, line_buf, SHELL_DEFAULT_BUFSIZE);
-
+    /* shell starts implicitly after returning */
     return 0;
 }

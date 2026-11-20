@@ -137,8 +137,6 @@ void *server_thread(void *arg)
 
 int main(void)
 {
-    char line_buf[SHELL_DEFAULT_BUFSIZE];
-
     sys_lock_tcpip_core();
 
     /* According to the RFC 3493 interfaces are indexed from 1 */
@@ -171,8 +169,6 @@ int main(void)
     printf("%s\"]}\n", buffer);
 
     thread_create(server_stack, sizeof(server_stack), THREAD_PRIORITY_MAIN - 1, 0, server_thread, NULL, "server");
-
-    shell_run(NULL, line_buf, SHELL_DEFAULT_BUFSIZE);
 
     return 0;
 }

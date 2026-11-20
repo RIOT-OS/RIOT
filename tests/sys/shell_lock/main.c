@@ -37,12 +37,6 @@ int main(void)
     test_utils_interactive_sync();
 
     puts("test_shell_lock");
-
-    /* define buffer to be used by the shell */
-    char line_buf[SHELL_DEFAULT_BUFSIZE];
-
-    /* start shell */
-    shell_run(NULL, line_buf, SHELL_DEFAULT_BUFSIZE);
-
+    /* shell starts implicitly after returning */
     return 0;
 }

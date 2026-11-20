@@ -19,7 +19,6 @@
 
 #include <stdio.h>
 
-#include "shell.h"
 #include "msg.h"
 
 #define MAIN_QUEUE_SIZE     (8U)
@@ -35,11 +34,7 @@ int main(void)
          "provided shell commands (i.e. ifconfig, ping) to interact with\n"
          "the tinyUSB based network interface.\n");
 
-    /* start shell */
     puts("Starting the shell now...");
-    char line_buf[SHELL_DEFAULT_BUFSIZE];
-    shell_run(NULL, line_buf, SHELL_DEFAULT_BUFSIZE);
-
-    /* should be never reached */
+    /* shell starts implicitly after returning */
     return 0;
 }
