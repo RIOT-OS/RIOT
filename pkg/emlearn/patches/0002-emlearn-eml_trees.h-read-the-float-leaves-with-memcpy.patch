@@ -1,0 +1,38 @@
+From 1e6b870e1de18d8fceb836b47b4337315bb97dc3 Mon Sep 17 00:00:00 2001
+From: Alexandre Abadie <alexandre.abadie@inria.fr>
+Date: Thu, 12 Nov 2026 21:04:37 +0100
+Subject: [PATCH] emlearn/eml_trees.h: read the float leaves with memcpy
+
+The leaves are stored as bytes: casting them to a float pointer increases
+the required alignment, which fails with -Wcast-align, and the access is
+unaligned on the platforms that require aligned floats.
+---
+ emlearn/eml_trees.h | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
+
+diff --git a/emlearn/eml_trees.h b/emlearn/eml_trees.h
+index 2692718..9260ef6 100644
+--- a/emlearn/eml_trees.h
++++ b/emlearn/eml_trees.h
+@@ -12,6 +12,7 @@
+ 
+ #include <stdint.h>
+ #include <math.h>
++#include <string.h>
+ #include <eml_common.h>
+ 
+ #ifdef __cplusplus
+@@ -274,8 +275,8 @@ eml_trees_regress(const EmlTrees *forest,
+     for (int32_t i=0; i<forest->n_trees; i++) {
+         const int32_t leaf_number = eml_trees_predict_tree(forest, forest->tree_roots[i], features, features_length);        
+         const int32_t leaf_offset = leaf_number * leaf_size;
+-        const float *leaf_data = (float *)(forest->leaves + leaf_offset);
+-        const float val = *leaf_data;
++        float val;
++        memcpy(&val, forest->leaves + leaf_offset, sizeof(val));
+         sum += val;
+     }
+ 
+-- 
+2.53.0
+
