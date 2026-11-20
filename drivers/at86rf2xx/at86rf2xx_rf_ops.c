@@ -32,8 +32,25 @@
 #  include "at86rf2xx_aes.h"
 #endif
 
-#define ENABLE_DEBUG (0)
+#define ENABLE_DEBUG 0
 #include "debug.h"
+
+/**
+ * @brief default IRQs
+ */
+#define AT86RF2XX_IRQ_MASK_DEFAULT  (AT86RF2XX_IRQ_STATUS_MASK__TRX_END \
+                                     | AT86RF2XX_IRQ_STATUS_MASK__RX_START)
+
+/**
+ * @brief IRQ enabled while the transceiver sleeps: only AWAKE_END
+ *
+ * On the SPI transceivers AWAKE_END shares IRQ_4 with CCA_ED_DONE.
+ */
+#if AT86RF2XX_IS_PERIPH
+#  define AT86RF2XX_IRQ_MASK_SLEEP  (AT86RF2XX_IRQ_STATUS_MASK__AWAKE)
+#else
+#  define AT86RF2XX_IRQ_MASK_SLEEP  (AT86RF2XX_IRQ_STATUS_MASK__CCA_ED_DONE)
+#endif
 
 static const ieee802154_radio_ops_t at86rf2xx_ops;
 static ieee802154_dev_t *at86rf2xx_periph;
@@ -248,13 +265,16 @@ static int _request_on(ieee802154_dev_t *hal)
     DEBUG("at86rf2xx_rf_ops: request_on\n");
     at86rf2xx_t *dev = hal->priv;
     mutex_lock(&dev->lock);
+
+    if (!dev->sleep) {
+        mutex_unlock(&dev->lock);
+        return 0;
+    }
+
 #if !AT86RF2XX_IS_PERIPH
+    /* needed to receive AWAKE_END */
     gpio_irq_enable(dev->params.int_pin);
 #endif
-    /* enable interrupts */
-    at86rf2xx_reg_write(dev, AT86RF2XX_REG__IRQ_MASK,
-                        AT86RF2XX_IRQ_STATUS_MASK__TRX_END | AT86RF2XX_IRQ_STATUS_MASK__RX_START);
-
 #if AT86RF2XX_IS_PERIPH
     /* Setting SLPTR bit in TRXPR to 0 returns the radio transceiver
      * to the TRX_OFF state */
@@ -269,17 +289,24 @@ static int _request_on(ieee802154_dev_t *hal)
 
 static int _confirm_on(ieee802154_dev_t *hal)
 {
-    DEBUG("at86rf2xx_rf_ops: confirm_on\n");
     at86rf2xx_t *dev = hal->priv;
-    mutex_lock(&dev->lock);
-    int status = at86rf2xx_reg_read(dev, AT86RF2XX_REG__TRX_STATUS)
-                 & AT86RF2XX_TRX_STATUS_MASK__TRX_STATUS;
 
-    if (status != AT86RF2XX_TRX_STATUS__TRX_OFF) {
+    /* AWAKE_END not received yet, the ISR clears the flag */
+    if (dev->sleep) {
+        return -EAGAIN;
+    }
+
+    mutex_lock(&dev->lock);
+    /* rearm first so an AWAKE_END arriving during the read is not lost */
+    dev->sleep = true;
+    /* Verify the IRQ was AWAKE_END. Reading IRQ_STATUS also releases the IRQ line */
+    if (!(at86rf2xx_reg_read(dev, AT86RF2XX_REG__IRQ_STATUS) & AT86RF2XX_IRQ_MASK_SLEEP)) {
+        /* spurious IRQ keep waiting for AWAKE_END */
         mutex_unlock(&dev->lock);
         return -EAGAIN;
     }
-    at86rf2xx_reg_read(dev, AT86RF2XX_REG__IRQ_STATUS);
+    dev->sleep = false;
+    at86rf2xx_reg_write(dev, AT86RF2XX_REG__IRQ_MASK, AT86RF2XX_IRQ_MASK_DEFAULT);
     mutex_unlock(&dev->lock);
     return 0;
 }
@@ -301,12 +328,16 @@ static int _off(ieee802154_dev_t *hal)
 
     mutex_lock(&dev->lock);
     at86rf2xx_reg_write(dev, AT86RF2XX_REG__TRX_STATE, AT86RF2XX_STATE_FORCE_TRX_OFF);
-
+    /* Ensure we are in the right state */
+    while ((at86rf2xx_reg_read(dev, AT86RF2XX_REG__TRX_STATUS)
+            & AT86RF2XX_TRX_STATUS_MASK__TRX_STATUS) != AT86RF2XX_TRX_STATUS__TRX_OFF) {}
     /* Discard all IRQ flags, framebuffer is lost anyway */
     at86rf2xx_reg_read(dev, AT86RF2XX_REG__IRQ_STATUS);
+    /* Only AWAKE_END should be enabled while sleeping */
+    at86rf2xx_reg_write(dev, AT86RF2XX_REG__IRQ_MASK, AT86RF2XX_IRQ_MASK_SLEEP);
+    dev->sleep = true;
     /* Go to SLEEP mode from TRX_OFF */
 #if AT86RF2XX_IS_PERIPH
-    /* reset interrupts states in device */
     /* Setting SLPTR bit brings radio transceiver to sleep in in TRX_OFF*/
     *AT86RF2XX_REG__TRXPR |= (AT86RF2XX_TRXPR_SLPTR);
 #else
@@ -444,8 +475,7 @@ static int _confirm_cca(at86rf2xx_t *dev, void *ctx)
     }
 
     /* Restore to default IRQs */
-    at86rf2xx_reg_write(dev, AT86RF2XX_REG__IRQ_MASK,
-                        AT86RF2XX_IRQ_STATUS_MASK__TRX_END | AT86RF2XX_IRQ_STATUS_MASK__RX_START);
+    at86rf2xx_reg_write(dev, AT86RF2XX_REG__IRQ_MASK, AT86RF2XX_IRQ_MASK_DEFAULT);
     at86rf2xx_set_state(dev, AT86RF2XX_PHY_STATE_RX);
     *((bool *)ctx) = (reg & AT86RF2XX_TRX_STATUS_MASK__CCA_STATUS) != 0;
     return 0;
@@ -640,6 +670,7 @@ int at86rf2xx_init(at86rf2xx_t *dev, const at86rf2xx_params_t *params, ieee80215
 
     mutex_init(&dev->lock);
     mutex_lock(&dev->lock);
+    dev->sleep = false;
 #if AT86RF2XX_IS_PERIPH
     (void)params;
     /* set all interrupts off */
@@ -688,11 +719,6 @@ int at86rf2xx_init(at86rf2xx_t *dev, const at86rf2xx_params_t *params, ieee80215
     /* disable clock output to save power */
     at86rf2xx_disable_clock_output(dev);
 
-    /* enable interrupts */
-    at86rf2xx_reg_write(dev, AT86RF2XX_REG__IRQ_MASK,
-                        AT86RF2XX_IRQ_STATUS_MASK__TRX_END
-                        | AT86RF2XX_IRQ_STATUS_MASK__RX_START);
-
     /* enable TX start interrupt for retry counter */
 #if AT86RF2XX_HAVE_TX_START_IRQ
     at86rf2xx_reg_write(dev, AT86RF2XX_REG__IRQ_MASK1,
@@ -702,15 +728,10 @@ int at86rf2xx_init(at86rf2xx_t *dev, const at86rf2xx_params_t *params, ieee80215
     /* clear interrupt flags */
     at86rf2xx_reg_read(dev, AT86RF2XX_REG__IRQ_STATUS);
 
-    /* Go to SLEEP mode from TRX_OFF */
-#if AT86RF2XX_IS_PERIPH
-    /* Setting SLPTR bit brings radio transceiver to sleep in in TRX_OFF*/
-    *AT86RF2XX_REG__TRXPR |= (AT86RF2XX_TRXPR_SLPTR);
-#else
-    gpio_set(dev->params.sleep_pin);
-#endif
-
     mutex_unlock(&dev->lock);
+
+    /* Go to SLEEP mode after mutex_unlock to avoid self-lock */
+    _off(hal);
     DEBUG("[at86rf2xx] reset complete.\n");
 
     return 0;
@@ -766,9 +787,8 @@ void at86rf2xx_irq_handler(ieee802154_dev_t *hal)
      * an assertion in the submac.
      */
     state = at86rf2xx_get_status(dev);
-    /* If transceiver is sleeping register access is impossible and frames are
-     * lost anyway, so return immediately.*/
     if (state == AT86RF2XX_STATE_SLEEP) {
+        dev->sleep = false;
         return;
     }
     mutex_lock(&dev->lock);
@@ -809,6 +829,16 @@ void _irq_handler(void *ctx)
 {
     at86rf2xx_bhp_ev_t *bhp = ctx;
 
+    /* While the device is sleeping we assume only AWAKE_END.
+     * This avoids unnecessary overhead of offloading the IRQ */
+    if (bhp->dev.sleep) {
+        bhp->dev.sleep = false;
+        if (bhp->hal->cb) {
+            bhp->hal->cb(bhp->hal, IEEE802154_RADIO_CONFIRM_ON);
+        }
+        return;
+    }
+
     event_post(bhp->evq, &bhp->ev);
 }
 
@@ -827,6 +857,7 @@ static const ieee802154_radio_ops_t at86rf2xx_ops = {
             | IEEE802154_CAP_IRQ_CRC_ERROR
             | IEEE802154_CAP_IRQ_RX_START
             | IEEE802154_CAP_IRQ_TX_DONE
+            | IEEE802154_CAP_IRQ_WAKE_UP_DONE
 #if ! IS_ACTIVE(AT86RF2XX_BASIC_MODE)
             | IEEE802154_CAP_FRAME_RETRANS
             | IEEE802154_CAP_AUTO_CSMA
@@ -983,7 +1014,6 @@ AVR8_ISR(TRX24_XAH_AMI_vect, txr24_xah_ami_handler)
  */
 static inline void txr24_tx_end_handler(void)
 {
-
     uint8_t status = *AT86RF2XX_REG__TRX_STATE & AT86RF2XX_TRX_STATUS_MASK__TRX_STATUS;
     DEBUG("TRX24_TX_END 0x%x\n", status);
 
@@ -992,10 +1022,9 @@ static inline void txr24_tx_end_handler(void)
     if (status != AT86RF2XX_PHY_STATE_RX) {
         at86rf2xx_periph->cb(at86rf2xx_periph, IEEE802154_RADIO_CONFIRM_TX_DONE);
     }
-
-
 }
 AVR8_ISR(TRX24_TX_END_vect, txr24_tx_end_handler);
+
 /**
  * @brief ISR for transceiver's wakeup finished interrupt
  *
@@ -1008,7 +1037,10 @@ static inline void txr24_awake_handler(void)
 {
     /* __enter_isr(); is not necessary as there is nothing which causes a
      * thread_yield and the interrupt can not be interrupted by an other ISR */
+    at86rf2xx_t *dev = at86rf2xx_periph->priv;
+
     DEBUG("TRX24_AWAKE\n");
+    dev->sleep = false;
 }
 AVR8_ISR(TRX24_AWAKE_vect, txr24_awake_handler);
 
