@@ -56,10 +56,14 @@ Module. Add `USEMODULE += shell_cmd_udp_server` to your application Makefile.
 ## Start UDP Server
 
 ```
-> udp server start <port>
+> udp server start <port> [-s]
 ```
 
 Start a UDP server listening on `<port>` on any interface in a separate thread.
+Without the optional `-s` flag, the server will print the sender and a hexdump of the
+UDP payload when it receives a UDP packet. With `-s`, it only prints
+"Packets received: `<count>`", with `<count>` being the number of packets that the server received
+up to that point since it was started.
 
 # Stop UDP server
 

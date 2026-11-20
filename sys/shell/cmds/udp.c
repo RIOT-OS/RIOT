@@ -58,10 +58,12 @@ static char server_stack[SERVER_STACKSIZE];
 /* accessed from both main and server thread */
 static event_queue_t queue;
 static kernel_pid_t server_pid = KERNEL_PID_UNDEF;
+static bool _server_summarize = false;
 
 static void _server_handler(sock_udp_t *sock, sock_async_flags_t type, void *arg)
 {
-    (void)arg;
+    unsigned int *received_packets = arg;
+
     if (type & SOCK_ASYNC_MSG_RECV) {
         sock_udp_ep_t src;
         ssize_t res;
@@ -72,17 +74,22 @@ static void _server_handler(sock_udp_t *sock, sock_async_flags_t type, void *arg
 
         res = sock_udp_recv_buf(sock, &buf, &buf_ctx, 0, &src);
         if (res > 0) {
-            printf("Received UDP data from ");
-            if (sock_udp_ep_fmt(&src, _addr_str, &_port) >= 0) {
-                printf("[%s]:%u\n", _addr_str, _port);
+            if (_server_summarize) {
+                printf("Packets received: %u\n", ++(*received_packets));
             }
             else {
-                printf("unspecified source\n");
-            }
+                printf("Received UDP data from ");
+                if (sock_udp_ep_fmt(&src, _addr_str, &_port) >= 0) {
+                    printf("[%s]:%u\n", _addr_str, _port);
+                }
+                else {
+                    printf("unspecified source\n");
+                }
 
-            while (res > 0) {
-                od_hex_dump(buf, res, OD_WIDTH_DEFAULT);
-                res = sock_udp_recv_buf(sock, &buf, &buf_ctx, 0, &src);
+                while (res > 0) {
+                    od_hex_dump(buf, res, OD_WIDTH_DEFAULT);
+                    res = sock_udp_recv_buf(sock, &buf, &buf_ctx, 0, &src);
+                }
             }
         }
         else {
@@ -104,6 +111,7 @@ static event_t _server_stop_event = { .handler = _server_stop_cb };
 static void *_server_thread(void *arg)
 {
     uint16_t port = (uint16_t)(uintptr_t)arg;
+    unsigned int received_packets = 0U;
 
     sock_udp_ep_t local = SOCK_IP_EP_ANY;
     local.port = port;
@@ -118,7 +126,7 @@ static void *_server_thread(void *arg)
     printf("Success: started UDP server on port %" PRIu16 "\n", port);
 
     event_queue_claim(&queue);
-    sock_udp_event_init(&sock, &queue, _server_handler, NULL);
+    sock_udp_event_init(&sock, &queue, _server_handler, &received_packets);
     _server_should_stop = false;
 
     while (!_server_should_stop) {
@@ -136,7 +144,7 @@ static void *_server_thread(void *arg)
 /* thread-local to main thread */
 static uint16_t server_port = 0;
 
-static void _start_server(const char *port_str)
+static void _start_server(const char *port_str, bool summarize)
 {
     /* check if server is already running */
     if (server_pid != KERNEL_PID_UNDEF) {
@@ -149,6 +157,7 @@ static void _start_server(const char *port_str)
         printf("Error: invalid port specified\n");
         return;
     }
+    _server_summarize = summarize;
     /* init event queue to be used by server thread */
     event_queue_init_detached(&queue);
     /* start server */
@@ -173,9 +182,10 @@ static void _stop_server(void)
 
 #else
 
-static void _start_server(const char *port_str)
+static void _start_server(const char *port_str, bool summarize)
 {
     (void)port_str;
+    (void)summarize;
     /* not reachable since all calls are module-guarded */
     assert(0);
 }
@@ -334,10 +344,10 @@ static int _udp_cmd(int argc, char **argv)
         }
         if (strcmp(argv[2], "start") == 0) {
             if (argc < 4) {
-                printf("usage %s server start <port>\n", argv[0]);
+                printf("usage %s server start <port> [-s]\n", argv[0]);
                 return 1;
             }
-            _start_server(argv[3]);
+            _start_server(argv[3], (argc >= 5) && (strcmp("-s", argv[4]) == 0));
         }
         else if (strcmp(argv[2], "stop") == 0) {
             _stop_server();
