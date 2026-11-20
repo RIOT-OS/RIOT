@@ -484,7 +484,7 @@ dependencies = [
 [[package]]
 name = "riot-wrappers"
 version = "0.9.2"
-source = "git+https://github.com/RIOT-OS/rust-riot-wrappers#61c794b0a7a65c1ef5743cc1b7a912e72caf25ca"
+source = "git+https://github.com/RIOT-OS/rust-riot-wrappers#0884b164a049a7e5ce8b774554ee9822069d9eee"
 dependencies = [
  "bare-metal",
  "coap-handler",
@@ -503,6 +503,7 @@ dependencies = [
  "pin-utils",
  "rand_core",
  "riot-sys",
+ "rustc_version",
  "switch-hal",
 ]
 
@@ -529,10 +530,25 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "6b1e7f9a428571be2dc5bc0505c13fb6bf936822b894ec87abf8a08a4e51742d"
 
 [[package]]
+name = "rustc_version"
+version = "0.4.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "cfcb3a22ef46e85b45de6ee7e79d063319ebb6594faafcf1c225ea92ab6e9b92"
+dependencies = [
+ "semver",
+]
+
+[[package]]
 name = "ryu"
 version = "1.0.18"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "f3cb5ba0dc43242ce17de99c180e96db90b235b8a9fdc9543c96d2209116bd9f"
+
+[[package]]
+name = "semver"
+version = "1.0.28"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "8a7852d02fc848982e0c167ef163aaff9cd91dc640ba85e263cb1ce46fae51cd"
 
 [[package]]
 name = "serde"
