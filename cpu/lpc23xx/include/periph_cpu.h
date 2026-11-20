@@ -37,6 +37,29 @@ extern "C" {
 /** @} */
 
 /**
+ * @name    USB device configuration
+ * @{
+ */
+
+/**
+ * @brief Number of USB device peripherals
+ */
+#define USBDEV_NUMOF                         (1U)
+
+/**
+ * @brief Whether the CPU sets the USB address after the status stage
+ *
+ * The Serial Interface Engine applies the address after the status stage.
+ */
+#define USBDEV_CPU_SET_ADDR_AFTER_STATUS     (0)
+
+/**
+ * @brief Slave mode needs no DMA alignment; word alignment keeps buffers efficient.
+ */
+#define USBDEV_CPU_DMA_ALIGNMENT             (4)
+/** @} */
+
+/**
  * @brief Fast GPIO register definition struct
  */
 typedef struct {
