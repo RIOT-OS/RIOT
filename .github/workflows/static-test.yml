@@ -44,8 +44,8 @@ jobs:
         # Note: CI_BASE_BRANCH is empty when not in a PR
         if [ -n "${CI_BASE_BRANCH}" ]; then
           git fetch origin ${CI_BASE_BRANCH}:${CI_BASE_BRANCH} --no-tags
-          echo "Rebasing PR branch onto origin/${CI_BASE_BRANCH}..."
-          git rebase origin/${CI_BASE_BRANCH}
+          echo "Merging base branch origin/${CI_BASE_BRANCH} into PR branch..."
+          git merge origin/${CI_BASE_BRANCH}
         else
           git config diff.renameLimit 16384
         fi
