@@ -17,6 +17,8 @@
 #include "net/ieee802154.h"
 #include "string_utils.h"
 
+/* AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA */
+
 const uint8_t ieee802154_addr_bcast[IEEE802154_ADDR_BCAST_LEN] = IEEE802154_ADDR_BCAST;
 
 size_t ieee802154_set_frame_hdr(uint8_t *buf, const uint8_t *src, size_t src_len,
