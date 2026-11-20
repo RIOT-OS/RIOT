@@ -1,6 +1,15 @@
 use std::env;
 
 fn main() {
+    let rustc_version = rustc_version::version().unwrap();
+    assert_eq!(rustc_version.major, 1);
+    // This probably has a minor gap in correctness for some half-release-cycles of nightlies, but
+    // that's OK because we'll remove that ASAP anyway (after bumping MSRV).
+    if rustc_version.minor >= 100 {
+        println!("cargo:rustc-cfg=rustc_has_never");
+    }
+    println!("cargo::rustc-check-cfg=cfg(rustc_has_never)");
+
     println!("cargo:rerun-if-env-changed=RIOTBUILD_CONFIG_HEADER_C");
     let riotbuildh = env::var("RIOTBUILD_CONFIG_HEADER_C")
         .expect("riotbuild.h is expected to be indicated in the RIOTBUILD_CONFIG_HEADER_C environment variable, or another source of enabled modules provided.");
