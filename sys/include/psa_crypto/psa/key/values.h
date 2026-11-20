@@ -43,6 +43,16 @@ extern "C" {
 #endif
 
 /**
+ * @brief   Number of required allocated sealed key slots.
+ *
+ * @details These should be defined by the developer to
+ *          fit their requirements. The default number is 0.
+ */
+#ifndef CONFIG_PSA_SEALED_KEY_COUNT
+#define CONFIG_PSA_SEALED_KEY_COUNT  0
+#endif
+
+/**
  * @brief   Number of required allocated protected key slots.
  *
  * @details These should be defined by the developer to

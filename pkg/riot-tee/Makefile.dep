@@ -1,0 +1,10 @@
+# riot-tee is a secure firmware for Armv8-M devices with TrustZone-M, and the
+# application runs as its non-secure image.
+FEATURES_REQUIRED += trustzone_m
+USEMODULE += trustzone_m_nonsecure
+
+USEMODULE += cortexm_svc
+
+# riot-tee compiles the cc3xx driver from the tf-m sources. Packages are
+# downloaded before any package is built, so the sources are there in time.
+USEPKG += tf-m
