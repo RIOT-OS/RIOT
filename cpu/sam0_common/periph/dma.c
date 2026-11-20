@@ -176,7 +176,7 @@ void dma_setup(dma_t dma, unsigned trigger, uint8_t prio, dma_cb_t cb, void *ctx
 }
 
 void dma_prepare(dma_t dma, uint8_t width, const void *src, void *dst,
-                 size_t num, dma_incr_t incr)
+                 size_t num, dma_incr_t incr, dma_blockact_t blockact)
 {
     DEBUG("[DMA]: Prepare %u, num: %u\n", dma, (unsigned)num);
     DmacDescriptor *descr = &descriptors[dma];
@@ -186,6 +186,7 @@ void dma_prepare(dma_t dma, uint8_t width, const void *src, void *dst,
     descr->DESCADDR.reg = (uint32_t)NULL;
     descr->BTCTRL.reg = width << DMAC_BTCTRL_BEATSIZE_Pos |
                         incr << DMAC_BTCTRL_SRCINC_Pos |
+                        blockact << DMAC_BTCTRL_BLOCKACT_Pos |
                         DMAC_BTCTRL_VALID;
 }
 
@@ -313,6 +314,70 @@ void dma_cancel(dma_t dma)
     while (DMAC->Channel[dma].CHCTRLA.reg & DMAC_CHCTRLA_ENABLE) {}
 #endif
 }
+
+void dma_resume(dma_t dma)
+{
+    DEBUG("[dma]: resuming: %u\n", dma);
+
+#ifdef REG_DMAC_CHID
+    unsigned state = irq_disable();
+    DMAC->CHID.reg = DMAC_CHID_ID(dma);
+    DMAC->CHCTRLB.reg |= DMAC_CHCTRLB_CMD_RESUME;
+    irq_restore(state);
+#else
+    DMAC->Channel[dma].CHCTRLB.reg |= DMAC_CHCTRLB_CMD_RESUME;
+#endif
+}
+
+#if MODULE_PERIPH_DMA_EVENT
+void dma_event_use(dma_t dma, event_channel_t ch)
+{
+    periph_event_attach(ch, EVENT_USER_DMAC_CH_0 + dma);
+}
+
+void dma_event_disuse(dma_t dma, event_channel_t ch)
+{
+    periph_event_detach(ch, EVENT_USER_DMAC_CH_0 + dma);
+}
+
+void dma_event_setup(dma_t dma, dma_evact_t evact)
+{
+#ifdef DMAC_CHCTRLB_EVACT
+    unsigned state = irq_disable();
+    DMAC->CHID.reg = DMAC_CHID_ID(dma);
+    DMAC->CHCTRLB.reg
+        = (DMAC->CHCTRLB.reg & ~DMAC_CHCTRLB_EVACT_Msk) | (evact << DMAC_CHCTRLB_EVACT_Pos);
+    irq_restore(state);
+#else
+    DMAC->Channel[dma].CHEVCTRL.reg
+        = (DMAC->Channel[dma].CHEVCTRL.reg & ~DMAC_CHEVCTRL_EVACT_Msk) | (evact << DMAC_CHEVCTRL_EVACT_Pos);
+#endif
+}
+
+void dma_event_input_enable(dma_t dma)
+{
+#ifdef DMAC_CHCTRLB_EVIE
+    unsigned state = irq_disable();
+    DMAC->CHID.reg = DMAC_CHID_ID(dma);
+    DMAC->CHCTRLB.reg |= DMAC_CHCTRLB_EVIE;
+    irq_restore(state);
+#else
+    DMAC->Channel[dma].CHEVCTRL.reg |= DMAC_CHEVCTRL_EVIE;
+#endif
+}
+
+void dma_event_input_disable(dma_t dma)
+{
+#ifdef DMAC_CHCTRLB_EVIE
+    unsigned state = irq_disable();
+    DMAC->CHID.reg = DMAC_CHID_ID(dma);
+    DMAC->CHCTRLB.reg &= ~DMAC_CHCTRLB_EVIE;
+    irq_restore(state);
+#else
+    DMAC->Channel[dma].CHEVCTRL.reg &= ~DMAC_CHEVCTRL_EVIE;
+#endif
+}
+#endif /* MODULE_PERIPH_DMA_EVENT */
 
 void isr_dmac(void)
 {
