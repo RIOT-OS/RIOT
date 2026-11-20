@@ -17,6 +17,7 @@
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  */
 
+#include <stdbool.h>
 #include <stdint.h>
 #include <stdlib.h>
 
@@ -59,6 +60,7 @@ extern "C" {
 #define IEEE802154_FCF_TYPE_DATA            (0x01)
 #define IEEE802154_FCF_TYPE_ACK             (0x02)
 #define IEEE802154_FCF_TYPE_MACCMD          (0x03)
+#define IEEE802154_FCF_TYPE_RESERVED        (0x04)
 
 #define IEEE802154_FCF_SECURITY_EN          (0x08)  /**< enable security */
 #define IEEE802154_FCF_FRAME_PEND           (0x10)  /**< follow-up frame is pending */
@@ -74,6 +76,7 @@ extern "C" {
 #define IEEE802154_FCF_VERS_MASK            (0x30)
 #define IEEE802154_FCF_VERS_V0              (0x00)
 #define IEEE802154_FCF_VERS_V1              (0x10)
+#define IEEE802154_FCF_VERS_V2              (0x20)
 
 #define IEEE802154_FCF_SRC_ADDR_MASK        (0xc0)
 #define IEEE802154_FCF_SRC_ADDR_VOID        (0x00)  /**< no source address */
@@ -734,6 +737,107 @@ int ieee802154_dst_filter(const uint8_t *mhr, uint16_t pan,
 static inline uint8_t ieee802154_get_seq(const uint8_t *mhr)
 {
     return mhr[2];
+}
+
+/**
+ * @brief Gets the Frame Type field of the Frame Control Field.
+ *
+ * @pre length of allocated space at @p mhr > 0
+ *
+ * @param[in] mhr  MAC Header.
+ *
+ * @return Type of the frame.
+ */
+static inline uint8_t ieee802154_get_frame_type(const uint8_t *mhr)
+{
+    return (mhr[0] & IEEE802154_FCF_TYPE_MASK);
+}
+
+/**
+ * @brief Gets the frame version field.
+ *
+ * @pre length of allocated space at @p mhr > 1
+ *
+ * @param[in] mhr MAC Header.
+ *
+ * @return The masked but not shifted frame version field (one of IEEE802154_FCF_VERS_{V0, V1, V2}).
+ */
+static inline uint8_t ieee802154_get_frame_version(const uint8_t *mhr)
+{
+    return (mhr[1] & IEEE802154_FCF_VERS_MASK);
+}
+
+/**
+ * @brief Get Source Addressing Mode.
+ *
+ * @pre length of allocated space at @p mhr > 1
+ *
+ * @param[in] mhr MAC Header.
+ *
+ * @return Source Addressing Mode
+ */
+static inline uint8_t ieee802154_get_src_mode(const uint8_t *mhr)
+{
+    return (mhr[1] & IEEE802154_FCF_SRC_ADDR_MASK);
+}
+
+/**
+ * @brief Get Destination Addressing Mode.
+ *
+ * @pre length of allocated space at @p mhr > 1
+ *
+ * @param[in] mhr MAC Header.
+ *
+ * @return Destination Addressing Mode
+ */
+static inline uint8_t ieee802154_get_dst_mode(const uint8_t *mhr)
+{
+    return (mhr[1] & IEEE802154_FCF_DST_ADDR_MASK);
+}
+
+/**
+ * @brief Checks whether the frame contains a Source Address Field.
+ *
+ * @pre length of allocated space at @p mhr > 1
+ *
+ * @param[in] mhr MAC Header.
+ *
+ * @retval true  if present
+ * @retval false if not present
+ */
+static inline bool ieee802154_has_src(const uint8_t *mhr)
+{
+    return ieee802154_get_src_mode(mhr) != IEEE802154_FCF_SRC_ADDR_VOID;
+}
+
+/**
+ * @brief Checks whether the frame contains a Destination Address Field.
+ *
+ * @pre length of allocated space at @p mhr > 1
+ *
+ * @param[in] mhr MAC Header.
+ *
+ * @retval true  if present
+ * @retval false if not present
+ */
+static inline bool ieee802154_has_dst(const uint8_t *mhr)
+{
+    return ieee802154_get_dst_mode(mhr) != IEEE802154_FCF_DST_ADDR_VOID;
+}
+
+/**
+ * @brief Checks whether the frame has pan compression bit set.
+ *
+ * @pre length of allocated space at @p mhr > 0
+ *
+ * @param[in] mhr MAC Header.
+ *
+ * @retval true  if set
+ * @retval false if not set
+ */
+static inline bool ieee802154_has_pan_compression(const uint8_t *mhr)
+{
+    return (mhr[0] & IEEE802154_FCF_PAN_COMP) != 0;
 }
 
 /**
