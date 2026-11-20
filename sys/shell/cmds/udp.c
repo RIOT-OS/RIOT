@@ -322,7 +322,8 @@ static int _udp_cmd(int argc, char **argv)
         if (argc > 4) {
             if (!IS_USED(MODULE_ZTIMER)) {
                 puts(
-                    "Error: retransmission requires ztimer. Add ztimer_msec or ztimer_usec to USEMODULE.");
+                    "Error: retransmission requires ztimer. "
+                    "Add ztimer_msec or ztimer_usec to USEMODULE.");
                 return 1;
             }
             num = atoi(argv[4]);
@@ -335,7 +336,8 @@ static int _udp_cmd(int argc, char **argv)
     else if (strcmp(argv[1], "server") == 0) {
         if (!IS_USED(MODULE_SHELL_CMD_UDP_SERVER)) {
             puts(
-                "Error: server command not supported in this build. Add shell_cmd_udp_server to USEMODULE.");
+                "Error: server command not supported in this build. "
+                "Add shell_cmd_udp_server to USEMODULE.");
             return 1;
         }
         if (argc < 3) {
