@@ -36,6 +36,7 @@
 #include "net/ethernet.h"
 #include "net/netdev/eth.h"
 #include "plic.h"
+#include "ztimer.h"
 
 #define ENABLE_DEBUG 0
 #include "debug.h"
@@ -76,6 +77,7 @@ static alignas(GRETH_CACHE_LINE_SIZE) uint8_t _rx_buf[CONFIG_GRETH_RX_DESC_NUM][
 #define GRETH_MDIO_START_TIMEOUT (10000u)   /**< MDIO BUSY assert after command */
 #define GRETH_RESET_TIMEOUT      (100000u)  /**< MAC software reset */
 #define GRETH_TX_TIMEOUT         (1000000u) /**< TX DMA completion */
+#define GRETH_ANEG_POLL_MS       (10u)      /**< auto-negotiation poll interval */
 /** @} */
 
 static inline void _cbo_flush(void *addr)
@@ -219,6 +221,11 @@ static void _phy_reset_and_aneg(greth_t *dev)
 {
     greth_regs_t *regs = GRETH_REGS(dev);
 
+    /* No link before the reset usually means no cable, so don't wait long. */
+    int status = _mdio_read(regs, dev->phy_addr, GRETH_MII_STATUS);
+    bool had_link = (status > 0) && (status & GRETH_MII_STATUS_LINK);
+    uint32_t budget_ms = had_link ? CONFIG_GRETH_ANEG_TIMEOUT_MS : CONFIG_GRETH_LINK_PROBE_MS;
+
     _mdio_write_reg(regs, dev->phy_addr, GRETH_MII_CTRL, GRETH_MII_CTRL_RST);
 
     for (unsigned i = 0; i < GRETH_ANEG_TIMEOUT; i++) {
@@ -233,13 +240,21 @@ static void _phy_reset_and_aneg(greth_t *dev)
         return;
     }
 
-    for (unsigned i = 0; i < GRETH_ANEG_TIMEOUT; i++) {
-        int status = _mdio_read(regs, dev->phy_addr, GRETH_MII_STATUS);
+    if (!had_link) {
+        LOG_INFO("[greth] no link, waiting up to %" PRIu32 " ms for one\n", budget_ms);
+    }
+
+    for (uint32_t waited = 0; waited < budget_ms; waited += GRETH_ANEG_POLL_MS) {
+        status = _mdio_read(regs, dev->phy_addr, GRETH_MII_STATUS);
         if (status >= 0 && (status & GRETH_MII_STATUS_ANEG_DONE)) {
+            if (!had_link || waited >= 1000) {
+                LOG_INFO("[greth] link up after %" PRIu32 " ms\n", waited);
+            }
             return;
         }
+        ztimer_sleep(ZTIMER_MSEC, GRETH_ANEG_POLL_MS);
     }
-    DEBUG("[greth] auto-negotiation timeout — continuing anyway\n");
+    LOG_WARNING("[greth] no link after %" PRIu32 " ms, continuing\n", budget_ms);
 }
 
 static void _phy_configure_mac(greth_t *dev)
@@ -278,8 +293,12 @@ static void _phy_configure_mac(greth_t *dev)
         bool link_up = (phy_stat & GRETH_MII_STATUS_LINK) != 0;
         if (!link_up || common == 0) {
             /* Link not up at init means LPA is invalid. Default to 100FD. */
-            speed_100 = true;
-            full_duplex = true;
+            speed_100 = (adv & (GRETH_MII_LPA_100_FD | GRETH_MII_LPA_100_HD)) != 0;
+            full_duplex = (adv & (speed_100 ? GRETH_MII_LPA_100_FD : GRETH_MII_LPA_10_FD)) != 0;
+            if (adv == 0) {
+                speed_100 = true;
+                full_duplex = true;
+            }
         }
         else if (common & GRETH_MII_LPA_100_FD) {
             speed_100 = true;
@@ -419,6 +438,10 @@ static int _init(netdev_t *netdev)
         }
     }
     DEBUG("[greth] SW reset done: ctrl=0x%08" PRIx32 "\n", _mmio_read(&regs->ctrl));
+
+    /* With EDCL the core polls the PHY itself until auto-negotiation is done.
+     * Without a link that never happens and MDIO stays busy, so stop it first. */
+    _mmio_write(&regs->ctrl, GRETH_CTRL_EDCLDIS);
 
     int phy = _phy_detect(regs);
     if (phy < 0) {
