@@ -183,7 +183,7 @@ int suit_handle_manifest_structure(suit_manifest_t *manifest,
  * @param   handlers_len    Length of the SUIT manifest handlers
  *
  * @returns     SUIT_OK if all handlers executed successfully
- * @returns     negative on error, see @ref suit_v3_error_t
+ * @returns     negative on error, see @ref suit_error_t
  */
 int suit_handle_manifest_structure_bstr(suit_manifest_t *manifest,
                                         nanocbor_value_t *bseq,
