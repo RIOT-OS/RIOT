@@ -28,6 +28,30 @@ FEATURES_PROVIDED += cpu_$(CPU)
 FEATURES_CONFLICT += picolibc:newlib
 FEATURES_CONFLICT_MSG += "Only one standard C library can be used."
 
+# The libstdc++/libsupc++ shipped with the GCC toolchains and used by LLVM
+# is built against newlib and these include newlib C headers that conflict
+# with picolibc.
+# Special care is needed for picolibc and libstdc++ to work: In addition to
+# the default libstdc++ compiled against newlib, a second one compiled against
+# picolibc needs to be installed and the `picolibc.specs` file needs to adjust
+# the builtin search paths for libs and headers so that the correct libstdc++ is
+# found.
+#
+# Notably, Debian and Ubuntu users can install e.g. libstdc++-arm-none-eabi-picolibc
+# in addition to the `arm-none-eabi` toolchain and should be good. They can safely
+# override the check with `export PICOLIBC_CPP_OVERRIDE=1`. Other toolchains
+# may not include a compatible libstdc++, causing cryptic compilation errors.
+#
+# Strictly speaking, C++ code not making use of libstdc++ should still be possible.
+# In practice, including basic C++ headers will cause compilation issue due to
+# libstdc++ headers depending on internal implementation details of newlib / picolibc.
+# Hence, even basic C++ is marked as incompatible with picolibc by default.
+ifneq (1,$(PICOLIBC_CPP_OVERRIDE))
+  FEATURES_CONFLICT += cpp:picolibc
+  FEATURES_CONFLICT += libstdcpp:picolibc
+  FEATURES_CONFLICT_MSG += "picolibc can not be used with C++, you can override this by setting PICOLIBC_CPP_OVERRIDE=1."
+endif
+
 FEATURES_CONFLICT += periph_gpio_irq:periph_gpio_ll_irq
 FEATURES_CONFLICT_MSG += "Only one GPIO IRQ implementation can be used."
 
