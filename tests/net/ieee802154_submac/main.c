@@ -75,11 +75,13 @@ static const uint8_t payload[] =
     "lacinia mi elementum interdum ligula.";
 
 static int print_addr(int argc, char **argv);
+static int toggle_ack_pending_bit(int argc, char **argv);
 static int txtsnd(int argc, char **argv);
 static int txtsnd_multiple_times(int argc, char **argv);
 
 static const shell_command_t shell_commands[] = {
     { "print_addr", "Print IEEE802.15.4 addresses", print_addr },
+    { "toggle_ack_pending", "Toggles the ACK pending bit in submac", toggle_ack_pending_bit },
     { "txtsnd", "Send IEEE 802.15.4 packet", txtsnd },
     { "txtsnd_n", "Send multiple IEEE 802.15.4 packets", txtsnd_multiple_times },
     { NULL, NULL, NULL }
@@ -223,6 +225,22 @@ static int print_addr(int argc, char **argv)
     char addr_str[IEEE802154_LONG_ADDRESS_LEN_STR_MAX];
     printf("%s\n", l2util_addr_to_str(
                long_addr.uint8, IEEE802154_LONG_ADDRESS_LEN, addr_str));
+    return 0;
+}
+
+static int toggle_ack_pending_bit(int argc, char **argv)
+{
+    (void)argc;
+    (void)argv;
+    static bool ack_pending;
+    ack_pending = !ack_pending;
+    int res = ieee802154_submac_config_src_address_match(&submac, IEEE802154_SRC_MATCH_EN,
+                                                         &ack_pending);
+    if (res < 0) {
+        printf("toggle_ack_pending failed: %d\n", res);
+        return 0;
+    }
+    printf("ACK Frame Pending bit: %s\n", ack_pending ? "set" : "cleared");
     return 0;
 }
 

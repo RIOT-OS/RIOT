@@ -894,7 +894,11 @@ struct ieee802154_radio_ops {
      * the Frame Pending bit in ACK frames accordingly.
      * In case the radio doesn't support @ref IEEE802154_CAP_SRC_ADDR_MATCH,
      * this functions is used to activate the Frame Pending bit for all ACK
-     * frames (in order to be compliant with the IEEE 802.15.4 standard).
+     * frames if the radio supports @ref IEEE802154_CAP_AUTO_ACK
+     * (in order to be compliant with the IEEE 802.15.4 standard).
+     *
+     * If the radio doesn't support @ref IEEE802154_CAP_SRC_ADDR_MATCH
+     * and @ref IEEE802154_CAP_AUTO_ACK this function can be NULL.
      *
      * @pre The device is on
      *
@@ -942,6 +946,20 @@ static inline bool ieee802154_radio_has_capability(ieee802154_dev_t *dev, uint32
 static inline bool ieee802154_radio_has_peek(ieee802154_dev_t *dev)
 {
     return dev->driver->peek != NULL;
+}
+
+/**
+ * @brief Check if the device implements the config_src_address_match function.
+ *
+ * Internally this function reads @ref ieee802154_radio_ops::config_src_addr_match and
+ * checks whether it's not NULL.
+ *
+ * @retval true if the device has @ref ieee802154_radio_ops::config_src_addr_match
+ * @retval false if it doesn't
+ */
+static inline bool ieee802154_radio_has_config_src_address_match(ieee802154_dev_t *dev)
+{
+    return dev->driver->config_src_addr_match != NULL;
 }
 
 /**
