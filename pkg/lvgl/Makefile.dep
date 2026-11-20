@@ -1,32 +1,63 @@
 USEMODULE += lvgl
 USEMODULE += lvgl_core
-USEMODULE += lvgl_draw
-USEMODULE += lvgl_draw_sw
-USEMODULE += lvgl_extra
-USEMODULE += lvgl_font
-USEMODULE += lvgl_hal
-USEMODULE += lvgl_misc
-USEMODULE += lvgl_widgets
 
-ifneq (,$(filter lvgl_extra_widget_spinner,$(USEMODULE)))
+ifneq (,$(filter lvgl_widget_animimage lvgl_widget_canvas,$(USEMODULE)))
+  USEMODULE += lvgl_widget_image
+endif
+
+ifneq (,$(filter lvgl_widget_spinner,$(USEMODULE)))
   USEMODULE += lvgl_widget_arc
-endif
-
-ifneq (,$(filter lvgl_extra_widget_win lvgl_extra_widget_menu,$(USEMODULE)))
-  USEMODULE += lvgl_widget_btn
-  USEMODULE += lvgl_widget_img
-endif
-
-ifneq (,$(filter lvgl_extra_widget_tabview,$(USEMODULE)))
-  USEMODULE += lvgl_widget_btnmatrix
-endif
-
-ifneq (,$(filter lvgl_widget_textarea lvgl_widget_roller lvgl_widget_img lvgl_widget_dropdown lvgl_extra_widget_win,$(USEMODULE)))
-  USEMODULE += lvgl_widget_label
 endif
 
 ifneq (,$(filter lvgl_widget_slider,$(USEMODULE)))
   USEMODULE += lvgl_widget_bar
+endif
+
+ifneq (,$(filter lvgl_widget_scale,$(USEMODULE)))
+  USEMODULE += lvgl_widget_image
+  USEMODULE += lvgl_widget_line
+endif
+
+ifneq (,$(filter lvgl_widget_calendar lvgl_widget_list lvgl_widget_menu lvgl_widget_msgbox \
+                 lvgl_widget_tabview lvgl_widget_win,$(USEMODULE)))
+  USEMODULE += lvgl_layout_flex
+endif
+
+ifneq (,$(filter lvgl_widget_spinbox,$(USEMODULE)))
+  USEMODULE += lvgl_widget_textarea
+endif
+
+ifneq (,$(filter lvgl_widget_keyboard,$(USEMODULE)))
+  USEMODULE += lvgl_widget_buttonmatrix
+  USEMODULE += lvgl_widget_textarea
+endif
+
+ifneq (,$(filter lvgl_widget_calendar,$(USEMODULE)))
+  USEMODULE += lvgl_widget_button
+  USEMODULE += lvgl_widget_buttonmatrix
+  USEMODULE += lvgl_widget_dropdown
+endif
+
+ifneq (,$(filter lvgl_widget_list lvgl_widget_menu lvgl_widget_msgbox lvgl_widget_win,$(USEMODULE)))
+  USEMODULE += lvgl_widget_image
+endif
+
+ifneq (,$(filter lvgl_widget_menu lvgl_widget_tabview lvgl_widget_win,$(USEMODULE)))
+  USEMODULE += lvgl_widget_button
+endif
+
+ifneq (,$(filter lvgl_widget_dropdown lvgl_widget_list lvgl_widget_menu lvgl_widget_msgbox \
+                 lvgl_widget_roller lvgl_widget_table lvgl_widget_tabview lvgl_widget_textarea \
+                 lvgl_widget_win,$(USEMODULE)))
+  USEMODULE += lvgl_widget_label
+endif
+
+ifneq (,$(filter lvgl_theme_default_dark lvgl_theme_default_grow,$(USEMODULE)))
+  USEMODULE += lvgl_theme_default
+endif
+
+ifneq (,$(filter lvgl_sdl,$(USEMODULE)))
+  FEATURES_REQUIRED += arch_native
 endif
 
 ifneq (,$(filter lvgl_contrib,$(USEMODULE)))

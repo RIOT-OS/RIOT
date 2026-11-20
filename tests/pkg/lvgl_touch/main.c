@@ -24,8 +24,8 @@
 #include "random.h"
 
 static lv_obj_t *btn;
-static const lv_coord_t x_size = 100;
-static const lv_coord_t y_size = 50;
+static const int32_t x_size = 100;
+static const int32_t y_size = 50;
 
 static void btn_event_cb(lv_event_t *event)
 {
@@ -33,8 +33,8 @@ static void btn_event_cb(lv_event_t *event)
     if (code == LV_EVENT_CLICKED) {
         puts("Button clicked!");
 
-        lv_coord_t x_pos = random_uint32_range(0, lv_obj_get_width(lv_scr_act()) - x_size);
-        lv_coord_t y_pos = random_uint32_range(0, lv_obj_get_height(lv_scr_act()) - y_size);
+        int32_t x_pos = random_uint32_range(0, lv_obj_get_width(lv_screen_active()) - x_size);
+        int32_t y_pos = random_uint32_range(0, lv_obj_get_height(lv_screen_active()) - y_size);
 
         lv_obj_set_pos(btn, x_pos, y_pos);
     }
@@ -46,11 +46,11 @@ int main(void)
     disp_dev_backlight_on();
 
     /* Add a button to the current screen */
-    btn = lv_btn_create(lv_scr_act());
+    btn = lv_button_create(lv_screen_active());
 
     /* Set the button position and size */
-    lv_coord_t x_pos = (lv_obj_get_width(lv_scr_act()) - x_size) / 2;
-    lv_coord_t y_pos = (lv_obj_get_height(lv_scr_act()) - y_size) / 2;
+    int32_t x_pos = (lv_obj_get_width(lv_screen_active()) - x_size) / 2;
+    int32_t y_pos = (lv_obj_get_height(lv_screen_active()) - y_size) / 2;
     lv_obj_set_pos(btn, x_pos, y_pos);
     lv_obj_set_size(btn, 100, 50);
 

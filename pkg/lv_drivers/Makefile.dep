@@ -1,5 +1,0 @@
-USEPKG += lvgl
-
-ifneq (,$(filter lv_drivers_sdl,$(USEMODULE)))
-  FEATURES_REQUIRED += arch_native
-endif

@@ -15,6 +15,13 @@ endif
 # Configure the lvgl_riot_conf.h header for lvgl kconfig management
 CFLAGS += -DLV_CONF_KCONFIG_EXTERNAL_INCLUDE=\""lvgl_riot_conf.h"\"
 
+ifneq (,$(filter lvgl_sdl,$(USEMODULE)))
+  SDL_LINKFLAGS = $(call memoized,SDL_LINKFLAGS,$(shell sdl2-config --libs))
+  LINKFLAGS += $(SDL_LINKFLAGS)
+  SDL_CFLAGS = $(call memoized,SDL_CFLAGS,$(shell sdl2-config --cflags))
+  CFLAGS += $(SDL_CFLAGS)
+endif
+
 # lvgl module is not a concrete module, so declare it as a pseudomodule
 PSEUDOMODULES += lvgl
 
@@ -22,22 +29,5 @@ PSEUDOMODULES += lvgl
 PSEUDOMODULES += lvgl_contrib_touch
 
 # extra modes for the default theme
-PSEUDOMODULES += lvgl_extra_theme_default_dark
-PSEUDOMODULES += lvgl_extra_theme_default_grow
-
-# extra lvgl widgets defined as pseudomodules
-PSEUDOMODULES += lvgl_widget_arc
-PSEUDOMODULES += lvgl_widget_bar
-PSEUDOMODULES += lvgl_widget_btn
-PSEUDOMODULES += lvgl_widget_btnmatrix
-PSEUDOMODULES += lvgl_widget_canvas
-PSEUDOMODULES += lvgl_widget_checkbox
-PSEUDOMODULES += lvgl_widget_dropdown
-PSEUDOMODULES += lvgl_widget_img
-PSEUDOMODULES += lvgl_widget_label
-PSEUDOMODULES += lvgl_widget_line
-PSEUDOMODULES += lvgl_widget_roller
-PSEUDOMODULES += lvgl_widget_slider
-PSEUDOMODULES += lvgl_widget_switch
-PSEUDOMODULES += lvgl_widget_textarea
-PSEUDOMODULES += lvgl_widget_table
+PSEUDOMODULES += lvgl_theme_default_dark
+PSEUDOMODULES += lvgl_theme_default_grow

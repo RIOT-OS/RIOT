@@ -5,9 +5,26 @@
 
 @see      https://github.com/LVGL/lvgl
 
+## Modules
+
+The LVGL core is always built. The optional parts of LVGL are selected with
+the following modules:
+
+- widgets: `lvgl_widget_<name>`, where `<name>` is the name of the widget in
+  LVGL (e.g. `lvgl_widget_button`, `lvgl_widget_label`, `lvgl_widget_chart`).
+  The widgets required by another widget are automatically selected.
+- themes: `lvgl_theme_default`, `lvgl_theme_mono` and `lvgl_theme_simple`. The
+  default theme can be configured with the `lvgl_theme_default_dark` and
+  `lvgl_theme_default_grow` modules.
+- layouts: `lvgl_layout_flex` and `lvgl_layout_grid`.
+
+The `lvgl_contrib` module provides the integration with the RIOT display
+(@ref drivers_disp_dev) and touch (@ref drivers_touch_dev) devices, the
+latter being enabled with `lvgl_contrib_touch`.
+
 ## Configuration options
 
-The package can be configured with using several variables. These variables can
+The package can be configured using several variables. These variables can
 either be configured using CFLAGS or using Kconfig (via `make menuconfig`).
 LVGL_TASK_THREAD_PRIO cannot be configured via Kconfig.
 
@@ -15,19 +32,41 @@ LVGL_TASK_THREAD_PRIO cannot be configured via Kconfig.
 
 - `CONFIG_LVGL_INACTIVITY_PERIOD_MS`: maximum inactivity period before going to sleep in ms.
   (default: 5s)
-- `CONFIG_LVGL_TASK_HANDLER_DELAY_MS`: delay between lvgl task handle call in us.
+- `CONFIG_LVGL_TASK_HANDLER_DELAY_MS`: delay between lvgl task handle call in ms.
   (default: 5ms)
 - `LVGL_TASK_THREAD_PRIO`: lvgl task handler thread priority.
   (default: THREAD_PRIORITY_MAIN - 1)
+- `LVGL_COLOR_BUF_SIZE`: size in bytes of the buffer LVGL renders into.
+  (default: 10 lines of the display for color displays, the full screen for
+  monochrome displays)
+- `LV_MEM_SIZE`: size in bytes of the LVGL heap.
 
 Example of command line for changing the max activity period to 5s:
 
 ```
-CFLAGS=-DCONFIG_LVGL_ACTIVITY_PERIOD=5000 make -C tests/pkg/lvgl
+CFLAGS=-DCONFIG_LVGL_INACTIVITY_PERIOD_MS=5000 make -C tests/pkg/lvgl
 ```
 
 ### SDL Usage
 
-See @ref pkg_lv_drivers.
+On native, LVGL uses its built-in SDL2 driver to simulate the display in a
+window on the host. The mouse is used as touch input device.
+
+To run lvgl inside a simulator (native), SDL2 is required. On debian/ubuntu
+this could be as simple as installing the `libsdl2-dev` package, or
+`libsdl2-dev:i386` for the 32bit native board.
+
+The size of the window is set with `LV_HOR_RES_MAX` and `LV_VER_RES_MAX`
+(default: 320x240).
+
+Using SDL2 requires more stack so in case you are using it add
+
+```
+CFLAGS += '-DTHREAD_STACKSIZE_MAIN=128*1024'
+```
+
+to your makefile. 64kB overflows on native64, the tests use 128kB. Other uses
+may need more or may need this to be applied to other threads using
+`THREAD_STACKSIZE_DEFAULT`.
 
  */

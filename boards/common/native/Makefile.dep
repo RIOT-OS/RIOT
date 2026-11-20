@@ -21,8 +21,7 @@ ifneq (,$(filter vfs_default,$(USEMODULE)))
 endif
 
 ifneq (,$(filter lvgl,$(USEPKG)))
-  USEPKG += lv_drivers
-  USEMODULE += lv_drivers_sdl
+  USEMODULE += lvgl_sdl
 endif
 
 USEMODULE += native_drivers
