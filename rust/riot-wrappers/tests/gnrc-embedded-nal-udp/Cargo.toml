@@ -1,0 +1,13 @@
+[package]
+name = "riot-wrappers-test-gnrc-embedded-nal-udp"
+version = "0.0.0"
+authors = ["Christian Amsüss <chrysn@fsfe.org>"]
+edition = "2024"
+
+[lib]
+crate-type = ["staticlib"]
+
+[dependencies]
+riot-wrappers = { path = "../..", features = [ "set_panic_handler", "panic_handler_format", "with_embedded_nal" ] }
+riot-sys = "*"
+embedded-nal = "0.6.0"
