@@ -728,7 +728,7 @@ dependencies = [
 [[package]]
 name = "riot-wrappers"
 version = "0.9.2"
-source = "git+https://github.com/RIOT-OS/rust-riot-wrappers#61c794b0a7a65c1ef5743cc1b7a912e72caf25ca"
+source = "git+https://github.com/RIOT-OS/rust-riot-wrappers#0884b164a049a7e5ce8b774554ee9822069d9eee"
 dependencies = [
  "bare-metal",
  "coap-handler",
@@ -751,6 +751,7 @@ dependencies = [
  "pin-utils",
  "rand_core",
  "riot-sys",
+ "rustc_version",
  "switch-hal",
 ]
 
