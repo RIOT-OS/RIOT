@@ -5,17 +5,6 @@
 
 #pragma once
 
-/**
- * @ingroup     cpu_esp_common
- * @{
- *
- * @file
- * @brief       Common log macros for ESP SoCs
- *
- * @author      Gunar Schorcht <gunar@schorcht.net>
- *
- */
-
 #ifndef DOXYGEN
 
 #ifdef __cplusplus
@@ -27,86 +16,78 @@ extern "C" {
 #include <inttypes.h>
 
 #include "log.h"
+#include "ansi_style.h"
 
-extern uint32_t system_get_time_ms (void);
-extern int ets_printf(const char *fmt, ...);
-
-#if MODULE_ESP_LOG_COLORED
-
-#define LOG_RESET_COLOR   "\033[0m"
-#define LOG_COLOR_E       "\033[1;31m"
-#define LOG_COLOR_W       "\033[1;33m"
-#define LOG_COLOR_I       "\033[1m"
-#define LOG_COLOR_D       "\033[0;32m"
-#define LOG_COLOR_V
-
-#else /* MODULE_ESP_LOG_COLORED */
-
-#define LOG_RESET_COLOR
-#define LOG_COLOR_E
-#define LOG_COLOR_W
-#define LOG_COLOR_I
-#define LOG_COLOR_D
-#define LOG_COLOR_V
-
-#endif /* MODULE_ESP_LOG_COLORED */
-
-#if MODULE_ESP_LOG_TAGGED
-
-#define LOG_FORMAT(letter, format)  LOG_COLOR_ ## letter #letter " (%" PRIu32 ") [%s] " format LOG_RESET_COLOR
-
-#define LOG_TAG(level, letter, tag, format, ...) \
-                 do { \
-                    if ((unsigned)level <= (unsigned)LOG_LEVEL) { \
-                        printf(LOG_FORMAT(letter, format), system_get_time_ms(), tag, ##__VA_ARGS__); \
-                        fflush(stdout); \
-                    } \
-                } while (0)
-
-#define LOG_TAG_EARLY(level, letter, tag, format, ...) \
-                do { \
-                    if (LOG_LEVEL >= level) { \
-                        ets_printf(LOG_FORMAT(letter, format), system_get_time_ms(), tag, ##__VA_ARGS__); \
-                    } \
-                } while (0)
-
-#else /* MODULE_ESP_LOG_TAGGED */
-
-#define LOG_FORMAT(letter, format)  LOG_COLOR_ ## letter format LOG_RESET_COLOR
-
-#define LOG_TAG(level, letter, tag, format, ...) \
-                do { \
-                    (void)tag; \
-                    if ((unsigned)level <= (unsigned)LOG_LEVEL) { \
-                        printf(LOG_FORMAT(letter, format), ##__VA_ARGS__); \
-                        fflush(stdout); \
-                    } \
-                } while (0U)
-
-#define LOG_TAG_EARLY(level, letter, tag, format, ...) \
-                do { \
-                    (void)tag; \
-                    if ((unsigned)level <= (unsigned)LOG_LEVEL) { \
-                        ets_printf(LOG_FORMAT(letter, format), ##__VA_ARGS__); \
-                    } \
-                } while (0U)
-
-#endif /* MODULE_ESP_LOG_TAGGED */
+#include "rom/ets_sys.h"
 
 /**
- * Override LOG_* definitions with a tagged version. By default the function
- * name is used as tag.
+ * @addtogroup  cpu_esp_common
+ * @{
+ *
+ * @file
+ * @brief       Common log macros for ESP SoCs
+ * @author      Gunar Schorcht <gunar@schorcht.net>
  */
-#ifndef MODULE_LOG_PRINTFNOFORMAT
-#undef LOG_ERROR
-#undef LOG_INFO
-#undef LOG_WARNING
-#undef LOG_DEBUG
-#define LOG_ERROR(format, ...)   LOG_TAG(LOG_ERROR, E, __func__, format, ##__VA_ARGS__)
-#define LOG_WARNING(format, ...) LOG_TAG(LOG_WARNING, W, __func__, format, ##__VA_ARGS__)
-#define LOG_INFO(format, ...)    LOG_TAG(LOG_INFO, I, __func__, format, ##__VA_ARGS__)
-#define LOG_DEBUG(format, ...)   LOG_TAG(LOG_DEBUG, D, __func__, format, ##__VA_ARGS__)
+
+#if defined(MODULE_ESP_LOG_COLORED)
+#  define ESP_LOG_RESET_COLOR   ANSI_STYLE_RESET
+#  define ESP_LOG_COLOR_LOG_ERROR   ANSI_STYLE(FG(RED), BOLD)
+#  define ESP_LOG_COLOR_LOG_WARNING       ANSI_STYLE(FG(YELLOW), BOLD)
+#  define ESP_LOG_COLOR_LOG_INFO       ANSI_STYLE(BOLD)
+#  define ESP_LOG_COLOR_LOG_DEBUG       ANSI_STYLE(GREEN)
+#  define ESP_LOG_COLOR_LOG_ALL         
+#else /* MODULE_ESP_LOG_COLORED */
+#  define ESP_LOG_RESET_COLOR
+#  define ESP_LOG_COLOR_LOG_ERROR
+#  define ESP_LOG_COLOR_LOG_WARNING
+#  define ESP_LOG_COLOR_LOG_INFO
+#  define ESP_LOG_COLOR_LOG_DEBUG
+#  define ESP_LOG_COLOR_LOG_ALL
+#endif /* MODULE_ESP_LOG_COLORED */
+
+#ifndef LOG_RESET_COLOR
+#  define LOG_RESET_COLOR ESP_LOG_RESET_COLOR
+#  define LOG_COLOR_E ESP_LOG_COLOR_LOG_ERROR
+#  define LOG_COLOR_W ESP_LOG_COLOR_LOG_WARNING
+#  define LOG_COLOR_I ESP_LOG_COLOR_LOG_INFO
+#  define LOG_COLOR_D ESP_LOG_COLOR_LOG_DEBUG
+#  define LOG_COLOR_V ESP_LOG_COLOR_LOG_ALL
 #endif
+
+#define ESP_LOG_LETTER_LOG_ERROR "E"
+#define ESP_LOG_LETTER_LOG_WARNING "W"
+#define ESP_LOG_LETTER_LOG_INFO "I"
+#define ESP_LOG_LETTER_LOG_DEBUG "D"
+#define ESP_LOG_LETTER_LOG_VERBOSE "V"
+
+#if defined(MODULE_ESP_LOG_TAGGED)
+#    define ESP_LOG_FORMAT_DEFAULT(level, unit, format, ...) \
+        ESP_LOG_COLOR_ ## level \
+        ESP_LOG_LETTER_ ## level \
+        " (%" PRIu32 ") [%s] " format ESP_LOG_RESET_COLOR, \
+        system_get_time_ms(), unit, ##__VA_ARGS__
+#else
+#    define ESP_LOG_FORMAT_DEFAULT(level, unit, format, ...) \
+        ESP_LOG_COLOR_ ## level \
+        format ESP_LOG_RESET_COLOR, \
+        ##__VA_ARGS__
+#endif
+
+#if defined(LOG_FORMAT)
+#  define ESP_LOG_FORMAT LOG_FORMAT
+#else 
+#  define ESP_LOG_FORMAT ESP_LOG_FORMAT_DEFAULT
+#endif
+
+#define esp_log_write_early(level, unit, ...) \
+    ets_printf(ESP_LOG_FORMAT(level, unit, __VA_ARGS__))
+
+#define LOG_TAG_EARLY(level, _letter, unit, ...) \
+    LOG_IMPL(esp_log_write_early, level, unit, __VA_ARGS__)
+
+#define LOG_TAG(level, _letter, tag, format, ...) \
+    LOG_WITH_UNIT(level, tag, format, ##__VA_ARGS__)
+
 
 /** Tagged LOG_* definitions */
 #define LOG_TAG_ERROR(tag, format, ...)   LOG_TAG(LOG_ERROR, E, tag, format, ##__VA_ARGS__)
@@ -123,11 +104,11 @@ extern int ets_printf(const char *fmt, ...);
 #define ESP_EARLY_LOGV(tag, format, ...) LOG_TAG_EARLY(LOG_ALL, V, tag, format "\n", ##__VA_ARGS__)
 
 #ifdef CPU_ESP8266
-#define ESP_LOGE(tag, format, ...) LOG_TAG(LOG_ERROR, E, tag, format "\n", ##__VA_ARGS__)
-#define ESP_LOGW(tag, format, ...) LOG_TAG(LOG_WARNING, W, tag, format "\n", ##__VA_ARGS__)
-#define ESP_LOGI(tag, format, ...) LOG_TAG(LOG_INFO, I, tag, format "\n", ##__VA_ARGS__)
-#define ESP_LOGD(tag, format, ...) LOG_TAG(LOG_DEBUG, D, tag, format "\n", ##__VA_ARGS__)
-#define ESP_LOGV(tag, format, ...) LOG_TAG(LOG_ALL, V, tag, format "\n", ##__VA_ARGS__)
+#  define ESP_LOGE(tag, format, ...) LOG_TAG(LOG_ERROR, E, tag, format "\n", ##__VA_ARGS__)
+#  define ESP_LOGW(tag, format, ...) LOG_TAG(LOG_WARNING, W, tag, format "\n", ##__VA_ARGS__)
+#  define ESP_LOGI(tag, format, ...) LOG_TAG(LOG_INFO, I, tag, format "\n", ##__VA_ARGS__)
+#  define ESP_LOGD(tag, format, ...) LOG_TAG(LOG_DEBUG, D, tag, format "\n", ##__VA_ARGS__)
+#  define ESP_LOGV(tag, format, ...) LOG_TAG(LOG_ALL, V, tag, format "\n", ##__VA_ARGS__)
 #endif
 
 #ifdef __cplusplus
