@@ -1,0 +1,42 @@
+---
+name: Nix Build Test
+
+on:
+  pull_request:
+    paths:
+      - 'flake.nix'
+      - 'flake.lock'
+      - 'dist/nix/**'
+      - '.github/workflows/nix-build-test.yml'
+  push:
+    branches:
+      - master
+    paths:
+      - 'flake.nix'
+      - 'flake.lock'
+      - 'dist/nix/**'
+      - '.github/workflows/nix-build-test.yml'
+  workflow_dispatch:
+
+jobs:
+  hello-world:
+    name: Build hello-world
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@main
+
+      - name: Install Nix
+        uses: cachix/install-nix-action@v31
+        with:
+          extra_nix_config: |
+            experimental-features = nix-command flakes
+
+      - name: Build hello-world for native64
+        run: nix develop --command make -C examples/basic/hello-world BOARD=native64 -j"$(nproc)" all
+
+      - name: Build hello-world for rpi-pico-2-riscv
+        run: nix develop --command make -C examples/basic/hello-world BOARD=rpi-pico-2-riscv -j"$(nproc)" all
+
+      - name: Build hello-world for rpi-pico-2-arm
+        run: nix develop --command make -C examples/basic/hello-world BOARD=rpi-pico-2-arm -j"$(nproc)" all
