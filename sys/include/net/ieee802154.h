@@ -55,12 +55,12 @@ extern "C" {
 #define IEEE802154_FCF_LEN                  (2U)
 #define IEEE802154_FCS_LEN                  (2U)
 
-#define IEEE802154_FCF_TYPE_MASK            (0x07)
-#define IEEE802154_FCF_TYPE_BEACON          (0x00)
-#define IEEE802154_FCF_TYPE_DATA            (0x01)
-#define IEEE802154_FCF_TYPE_ACK             (0x02)
-#define IEEE802154_FCF_TYPE_MACCMD          (0x03)
-#define IEEE802154_FCF_TYPE_RESERVED        (0x04)
+#define IEEE802154_FCF_TYPE_MASK            (0x07)  /**< Frame Type Mask */
+#define IEEE802154_FCF_TYPE_BEACON          (0x00)  /**< Frame Type Beacon */
+#define IEEE802154_FCF_TYPE_DATA            (0x01)  /**< Frame Type Data */
+#define IEEE802154_FCF_TYPE_ACK             (0x02)  /**< Frame Type ACK */
+#define IEEE802154_FCF_TYPE_MACCMD          (0x03)  /**< Frame Type MAC Command */
+#define IEEE802154_FCF_TYPE_RESERVED        (0x04)  /**< Frame Type Reserved */
 
 #define IEEE802154_FCF_SECURITY_EN          (0x08)  /**< enable security */
 #define IEEE802154_FCF_FRAME_PEND           (0x10)  /**< follow-up frame is pending */
@@ -73,10 +73,10 @@ extern "C" {
 #define IEEE802154_FCF_DST_ADDR_SHORT       (0x08)  /**< destination address length is 2 */
 #define IEEE802154_FCF_DST_ADDR_LONG        (0x0c)  /**< destination address length is 8 */
 
-#define IEEE802154_FCF_VERS_MASK            (0x30)
-#define IEEE802154_FCF_VERS_V0              (0x00)
-#define IEEE802154_FCF_VERS_V1              (0x10)
-#define IEEE802154_FCF_VERS_V2              (0x20)
+#define IEEE802154_FCF_VERS_MASK            (0x30)  /**< Frame Version Mask (Reserved (0b11)) */
+#define IEEE802154_FCF_VERS_V0              (0x00)  /**< Frame Version 0 (0b00) */
+#define IEEE802154_FCF_VERS_V1              (0x10)  /**< Frame Version 1 (0b01) */
+#define IEEE802154_FCF_VERS_V2              (0x20)  /**< Frame Version 2 (0b10) */
 
 #define IEEE802154_FCF_SRC_ADDR_MASK        (0xc0)
 #define IEEE802154_FCF_SRC_ADDR_VOID        (0x00)  /**< no source address */
