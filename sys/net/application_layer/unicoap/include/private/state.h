@@ -7,6 +7,7 @@
 #pragma once
 
 #include <stdlib.h>
+#include "modules.h"
 #include "ztimer.h"
 #include "random.h"
 #include "event.h"
@@ -134,22 +135,58 @@ static inline unicoap_scheduled_event_t* unicoap_scheduled_event_of_event(event_
 typedef void (*unicoap_event_callback_t)(unicoap_scheduled_event_t* event);
 
 /**
- * @brief Schedules an event on the internal unicoap queue
+ * @brief Initializes an event on the internal unicoap queue but doesn't arm it yet
  *
  * If you instead want to execute as soon as possible, use @ref unicoap_loop_enqueue instead.
  *
- * @param[in,out] event The event to schedule. Provide a pointer to a pre-allocated event
- * @param[in] callback Function pointer to be called on the internal queue after @p duration ms have elapses
+ * @param[in,out] event The event to init. Provide a pointer to a pre-allocated event
+ * @param[in] callback Function pointer to be called on the internal queue after
+ *                     @p duration ms have elapsed
  * @param duration Number of milliseconds to wait
  * @param[in] name A null-terminated string identifier to distinguish the event in debug logs
  *
  * @p name has no effect when `DEVELHELP` is disabled.
  */
-void unicoap_event_schedule(unicoap_scheduled_event_t* event, unicoap_event_callback_t callback,
-                            uint32_t duration, const char* name);
+void unicoap_event_init(unicoap_scheduled_event_t* event,
+                        unicoap_event_callback_t callback,
+                        uint32_t duration, const char* name);
+
+/**
+ * @brief Checks if event has been initialized
+ *
+ * @param[in,out] event The event to check
+ *
+ * @returns A boolean value indicating whether the event has been initialized
+ */
+static inline bool unicoap_event_is_initialized(unicoap_scheduled_event_t* event)
+{
+    return event->ztimer.arg == event && event->ztimer.base.offset > 0;
+}
+
+/**
+ * @brief Checks if event has been armed
+ *
+ * @param[in,out] event The event to check
+ *
+ * @returns A boolean value indicating whether the event has been armed
+ */
+static inline bool unicoap_event_is_scheduled(unicoap_scheduled_event_t* event)
+{
+    return unicoap_event_is_initialized(event) && 
+           ztimer_is_set(UNICOAP_CLOCK, &event->ztimer);
+}
+
+/**
+ * @brief Arms timer of a scheduled event
+ *
+ * @param[in,out] event The event to arm. Provide a pointer to a pre-allocated event
+ */
+void unicoap_event_schedule(unicoap_scheduled_event_t* event);
 
 /**
  * @brief Discards the currently set timeout, and reschedules the event to be posted in @p duration ms
+ *
+ * Changes duration and arms timer again.
  *
  * Use this method to rerun the timer with the same callbacks but a new timeout value.
  * E.g., the RFC 7252 driver utilizes this method for setting the next acknowledgement timeout.
@@ -157,7 +194,33 @@ void unicoap_event_schedule(unicoap_scheduled_event_t* event, unicoap_event_call
  * @param[in] event Scheduled event you want to reschedule
  * @param[in] duration Number of milliseconds the event should be posted on the queue
  */
-void unicoap_event_reschedule(unicoap_scheduled_event_t* event, uint32_t duration);
+static inline void unicoap_event_reschedule(unicoap_scheduled_event_t* event, uint32_t duration)
+{
+    event->ztimer.base.offset = duration;
+    unicoap_event_schedule(event);
+}
+
+/**
+ * @brief Initializes and arms an event to be fired on internal unicoap queue
+ *
+ * If you instead want to execute as soon as possible, use @ref unicoap_loop_enqueue instead.
+ *
+ * @param[in,out] event The event to schedule. Provide a pointer to a pre-allocated event
+ * @param[in] callback Function pointer to be called on the internal queue after
+ *                     @p duration ms have elapsed
+ * @param duration Number of milliseconds to wait
+ * @param[in] name A null-terminated string identifier to distinguish the event in debug logs
+ *
+ * @p name has no effect when `DEVELHELP` is disabled.
+ */
+static inline void unicoap_event_init_and_schedule(unicoap_scheduled_event_t* event,
+                                                   unicoap_event_callback_t callback,
+                                                   uint32_t duration, const char* name)
+{
+    unicoap_event_init(event, callback, duration, name);
+    unicoap_event_schedule(event);
+}
+
 /**
  * @brief Cancels the event
  *
@@ -188,6 +251,13 @@ void unicoap_event_cancel(unicoap_scheduled_event_t* event);
   */
 #define UNICOAP_HAVE_CLIENT_STATE \
     IS_USED(MODULE_UNICOAP_CLIENT) && CONFIG_UNICOAP_CLIENT_MEMOS_CAPACITY > 0
+
+/** 
+  * @brief A feature check macro that determines whether server state objects are supported
+  */
+#define UNICOAP_HAVE_SERVER_STATE \
+    IS_USED(MODULE_UNICOAP_SERVER) && CONFIG_UNICOAP_SERVER_MEMOS_CAPACITY > 0 && \
+    (IS_USED(MODULE_UNICOAP_SERVER_OBSERVATION) /* || block-wise || ... */)
 
 /**
  * @brief A type used to retain state spanning across a single or multiple message exchanges
@@ -382,6 +452,20 @@ void unicoap_exchange_notify(void* state, unicoap_layer_notification_t type, voi
 void unicoap_exchange_notify_all(const unicoap_endpoint_t* endpoint, unicoap_layer_notification_t type, void* arg);
 /** @} */
 
+/** @cond */
+static inline void _unicoap_memo_realloc(unicoap_memo_t* memo)
+{
+#if UNICOAP_HAVE_MESSAGING_STATE
+    /* Make sure messaging layer releases associated state before exchange layer reuses memo. */
+    unicoap_messaging_notify(memo->messaging.state, UNICOAP_LAYER_NOTIFICATION_STATE_RELEASE,
+                             NULL, memo->endpoint.proto);
+    memo->messaging.state = NULL;
+#else
+    (void)memo;
+#endif
+}
+/** @endcond */
+
 /* MARK: - Client state */
 /**
  * @name Client state
@@ -409,6 +493,9 @@ static inline bool unicoap_callback_is_present(const unicoap_callback_t callback
     return callback._any != NULL;
 }
 
+#define UNICOAP_CLIENT_MEMO_STORE_OPTIONS \
+    IS_USED(MODULE_UNICOAP_CLIENT_CANCELLATION) && IS_USED(MODULE_UNICOAP_CLIENT_OBSERVATION)
+
 /**
  * @brief Client exchange
  */
@@ -429,11 +516,34 @@ typedef struct {
     uint16_t reference_id;
 #endif
 
+#if UNICOAP_CLIENT_MEMO_STORE_OPTIONS
+    uint8_t options_storage[CONFIG_UNICOAP_OPTIONS_BUFFER_CLIENT_MEMO_CAPACITY];
+    unicoap_options_t options;
+#endif
+
     /**
      * @brief Request flags from application, from the original call to `unicoap_send_request_*`
      */
     unicoap_request_flags_t flags;
 } unicoap_client_memo_t;
+
+static inline unicoap_options_t* unicoap_client_memo_options(unicoap_client_memo_t* memo) {
+    (void)memo;
+#if UNICOAP_CLIENT_MEMO_STORE_OPTIONS
+    return &memo->options;
+#else
+    return NULL;
+#endif
+}
+
+static inline uint8_t* unicoap_client_memo_options_storage(unicoap_client_memo_t* memo) {
+    (void)memo;
+#if UNICOAP_CLIENT_MEMO_STORE_OPTIONS
+    return memo->options_storage;
+#else
+    return NULL;
+#endif
+}
 
 /**
  * @brief Returns client memo of common memo state object
@@ -546,6 +656,155 @@ int unicoap_client_memo_assign_refno(unicoap_client_memo_t* memo);
  * will indicate a hard failure and make the messaging layer release state including connections.
  */
 void unicoap_client_memo_free(unicoap_client_memo_t* memo, int error);
+
+/**
+ * @brief Reallocates memo for fresh, repeated use, dropping messaging-layer state
+ *
+ * @param[in,out] memo Memo state bucket to reuse
+ */
+static inline void unicoap_client_memo_realloc(unicoap_client_memo_t* memo)
+{
+    _unicoap_memo_realloc(&memo->super);
+}
+/** @} */
+
+/* MARK: - Server state */
+/**
+ * @name Server state
+ * @{
+ */
+
+/**
+ * @brief Server exchange
+ */
+typedef struct {
+    unicoap_memo_t super;
+
+    /** @brief Resource */
+    const unicoap_resource_t* resource;
+
+    /** @brief Request token generated by unicoap */
+    uint8_t token[CONFIG_UNICOAP_EXTERNAL_TOKEN_CAPACITY];
+
+    size_t token_length : UNICOAP_TOKEN_LENGTH_FIXED_WIDTH;
+
+    /* TODO: Differentiate block-wise/observation via flags etc. 
+     * For now, memos are only used for resource observation. */
+} unicoap_server_memo_t;
+
+/**
+ * @brief Returns server memo of common memo state object
+ * @param[in] memo Superclass memo
+ * @returns Server memo state object
+ */
+static inline unicoap_server_memo_t* unicoap_server_memo_of_super(unicoap_memo_t* memo) {
+    return container_of(memo, unicoap_server_memo_t, super);
+}
+
+/**
+ * @brief Returns server memo of event
+ * @param[in] event Superclass event
+ * @returns Server memo state object
+ */
+static inline unicoap_server_memo_t* unicoap_server_memo_of_event(event_t* event) {
+    return unicoap_server_memo_of_super(unicoap_memo_of_event(event));
+}
+
+/**
+ * @brief Returns server memo of scheduled event
+ * @param[in] timeout Superclass event
+ * @returns Server memo state object
+ */
+static inline unicoap_server_memo_t* unicoap_server_memo_of_timeout(unicoap_scheduled_event_t* timeout) {
+    return unicoap_server_memo_of_super(unicoap_memo_of_timeout(timeout));
+}
+
+/**
+ * @brief Allocates and sets up a new memo
+ *
+ * @note This function is thread-safe.
+ *
+ * @param[in] endpoint Remote endpoint
+ * @param[in] resource Resource
+ *
+ * @returns New memo
+ */
+unicoap_server_memo_t* unicoap_server_memo_create(const unicoap_endpoint_t* endpoint,
+                                                  const unicoap_resource_t* resource);
+
+/**
+ * @brief Tries to find or allocate a server exchange memo with the given endpoint, token, resource
+ *
+ * @param[in] endpoint Remote endpoint of exchange
+ * @param[in] resource Resource
+ * @param[in] token Token
+ * @param token_length Token length
+ * @param allocate A boolean value indicating whether to allocate if no matching memo is found
+ *
+ * @returns Memo, if found
+ */
+unicoap_server_memo_t* unicoap_server_memo_with_token(const unicoap_endpoint_t* endpoint,
+                                                      const unicoap_resource_t* resource,
+                                                      const uint8_t* token, size_t token_length,
+                                                      bool allocate);
+
+/**
+ * @brief Tries to find the next server memo tied to the given resource
+ *
+ * @param[in] resource Resource
+ * @param[in,out] memo Memo pointer
+ *
+ * When you call the iterator, @p memo should point to an existing memo or `NULL` if it's the first
+ * call. Once @p memo is `NULL` after a call to this function, stop calling the iterator function,
+ * this means the iterator has finished. If you call it again, it will start iterating again from
+ * the start.
+ */
+void unicoap_server_memo_advance_with_resource(const unicoap_resource_t* resource, unicoap_server_memo_t** memo);
+
+/**
+ * @brief Tries to find the next server memo tied to the given resource
+ *
+ * @param[in] resource Resource
+ * @param[in,out] memo Current memo, may be `NULL` initially
+ *
+ * When you call the iterator, @p memo should be an existing memo or `NULL` if it's the first
+ * call. Once this function returns `NULL`, stop calling the iterator function,
+ * this means the iterator has finished.
+ *
+ * @returns @p memo pointee after one iteration, i.e., after calling
+ *          @ref unicoap_server_memo_advance_with_resource
+ */
+static inline unicoap_server_memo_t* unicoap_server_memo_next_with_resource(
+    const unicoap_resource_t* resource, unicoap_server_memo_t* memo)
+{
+    unicoap_server_memo_advance_with_resource(resource, &memo);
+    return memo;
+}
+
+/**
+ * @brief Frees memo and associated buffers
+ *
+ * @param[in,out] memo Memo state bucket to discard and free
+ * @param error Error number indicating a failure on the exchange layer to propagate to the
+ *              messaging layer, instructing it to release state. May be zero.
+ *
+ * You do not need to forward every error on the exchange layer to the messaging layer
+ * when calling this function. For example, when cancelling a pending request,
+ * you can treat this as an `-ECANCELED` error on the exchange layer and call the client callback
+ * with said error, but you may as well pass 0 for @p error as propagating the error down
+ * will indicate a hard failure and make the messaging layer release state including connections.
+ */
+void unicoap_server_memo_free(unicoap_server_memo_t* memo, int error);
+
+/**
+ * @brief Reallocates memo for fresh, repeated use, dropping messaging-layer state
+ *
+ * @param[in,out] memo Memo state bucket to reuse
+ */
+static inline void unicoap_server_memo_realloc(unicoap_server_memo_t* memo)
+{
+    _unicoap_memo_realloc(&memo->super);
+}
 /** @} */
 
 #ifdef __cplusplus

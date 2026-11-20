@@ -754,6 +754,9 @@ void unicoap_print_resource_flags(unicoap_resource_flags_t flags)
     if (flags & UNICOAP_RESOURCE_FLAG_MATCH_SUBTREE) {
         printf("MATCH_SUBTREE ");
     }
+    if (flags & UNICOAP_RESOURCE_FLAG_OBSERVABLE) {
+        printf("OBSERVABLE ");
+    }
     printf("]");
 }
 
@@ -774,6 +777,18 @@ void unicoap_print_request_flags(unicoap_request_flags_t flags)
 {
     printf("[ ");
     if (flags & UNICOAP_REQUEST_FLAG_RELIABLE) {
+        printf("RELIABLE ");
+    }
+    if (flags & UNICOAP_REQUEST_FLAG_OBSERVE) {
+        printf("OBSERVE ");
+    }
+    printf("]");
+}
+
+void unicoap_print_response_flags(unicoap_response_flags_t flags)
+{
+    printf("[ ");
+    if (flags & UNICOAP_RESPONSE_FLAG_RELIABLE) {
         printf("RELIABLE ");
     }
     printf("]");

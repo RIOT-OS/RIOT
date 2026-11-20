@@ -6,6 +6,7 @@
 
 #pragma once
 
+#include <errno.h>
 #include <stdbool.h>
 #include <stdint.h>
 
@@ -206,6 +207,37 @@ typedef struct unicoap_resource unicoap_resource_t;
  * @name Reacting to CoAP requests
  * @{
  */
+
+/**
+ * @brief Response flags
+ */
+typedef enum {
+    /**
+     * @brief Ensures reliable transmission of the response
+     *
+     * Use this flag to ensure the response is sent reliably. This may be useful when the resource
+     * hasn't already been defined as unconditionally reliable using
+     * @ref UNICOAP_RESOURCE_FLAG_RELIABLE. In the latter case, this flag can be used, but has no
+     * effect.
+     *
+     * This flag is ignored with reliable transports. For unreliable transports, a message
+     * sent with this flag will require an acknowledgement to be sent from the CoAP
+     * peer.
+     *
+     * **Default**: Reliable if the resource has @ref UNICOAP_RESOURCE_FLAG_RELIABLE set.
+     */
+    UNICOAP_RESPONSE_FLAG_RELIABLE = 0x0001,
+} unicoap_response_flags_t;
+
+/**
+ * @brief Prints response flags
+ *
+ * @memberof unicoap_response_flags_t
+ *
+ * @param flags Response flags
+ */
+void unicoap_print_response_flags(unicoap_response_flags_t flags);
+
 /**
  * @brief Request context used to send a response to a given request
  */
@@ -222,7 +254,35 @@ typedef struct {
      * @private
      */
     void* _packet;
+
+    /**
+     * @brief Internal
+     *
+     * @warning This is an internal property. Do not access from your application!
+     * @private
+     */
+    unicoap_response_flags_t _flags : 1;
+
+    /**
+     * @brief Internal
+     *
+     * @warning This is an internal property. Do not access from your application!
+     * @private
+     */
+    bool _subscribed : 1;
 } unicoap_request_context_t;
+
+/**
+ * @brief Sets response flags in the current request handler context
+ *
+ * @param[in,out] ctx The request handler context
+ * @param flags Flags to apply to the response
+ */
+static inline void unicoap_response_set_flags(unicoap_request_context_t* ctx, 
+                                              unicoap_response_flags_t flags)
+{
+    ctx->_flags = flags;
+}
 
 /**
  * @brief Resource request handler
@@ -245,6 +305,28 @@ typedef struct {
  */
 typedef int (*unicoap_request_handler_t)(unicoap_message_t* request, const unicoap_aux_t* aux,
                                          unicoap_request_context_t* ctx, void* arg);
+
+/**
+ * @brief Checks if the request asks for the client to be registered as an observer of this resource
+ *
+ * @ingroup net_unicoap_server
+ * @ingroup net_unicoap_observation
+ *
+ * @param[in,out] ctx Request context
+ *
+ * @returns A boolean value indicating whether the request has the `Observe` option set
+ *          and has been registerd.
+ */
+static inline bool unicoap_observation_requester_observes_resource(unicoap_request_context_t* ctx)
+{
+#if IS_USED(MODULE_UNICOAP_SERVER_OBSERVATION)
+    return ctx->_subscribed;
+#else
+    (void)ctx;
+    return false;
+#endif
+}
+
 
 /**
  * @brief Determines if the client is interested in a response
@@ -309,13 +391,16 @@ unicoap_status_t unicoap_response_status_from_errno(int _errno);
  */
 typedef enum {
     /**
-     * @brief Sets the type of the message to confirmable (`CON`),
-     * if an unreliable transport is used.
+     * @brief Enforces reliable transmission of responses and notifications
      *
-     * This flag is ignored with reliable transports. For unreliable transports, a message
+     * Use this flag to generally mark the resource as reliable, i.e., all response and
+     * notifications sent from this resource will always be sent reliably, to avoid
+     * setting @ref UNICOAP_RESPONSE_FLAG_RELIABLE every time before you call
+     * @ref unicoap_send_response and @ref unicoap_send_notification.
+     *
+     * This flag is ignored with reliable transports. For unreliable transports, a response
      * sent with this flag will require an acknowledgement to be sent from the CoAP
      * peer.
-     *
      */
     UNICOAP_RESOURCE_FLAG_RELIABLE = 0x0001,
 
@@ -328,11 +413,18 @@ typedef enum {
      */
     UNICOAP_RESOURCE_FLAG_MATCH_SUBTREE = 0x4000,
 
+    /**
+     * @brief Allows clients to register for notifications from the given resource
+     */
+    UNICOAP_RESOURCE_FLAG_OBSERVABLE = 0x0200,
+
     /* TODO: Advanced features */
 } unicoap_resource_flags_t;
 
 /**
  * @brief Prints resource flags
+ *
+ * @memberof unicoap_resource_flags_t
  *
  * @param flags Resource flags
  */
@@ -513,6 +605,125 @@ ssize_t unicoap_resource_encode_link(const unicoap_resource_t* resource, char* b
                                      size_t capacity, unicoap_link_encoder_ctx_t* context);
 /** @} */
 
+/** @addtogroup net_unicoap_observation */
+/* MARK: - Checking observation state */
+/**
+ * @name Checking observation state
+ * @{
+ */
+/**
+ * @brief Checks if any observers are currently subscribed to the resource
+ *
+ * @param[in] resource CoAP resource
+ *
+ * @returns A boolean value indicating if the resource has a nonzero susbcriber count
+ */
+#if IS_USED(MODULE_UNICOAP_SERVER_OBSERVATION) || defined(DOXYGEN)
+bool unicoap_observation_resource_has_observers(const unicoap_resource_t* resource);
+#else
+static inline
+bool unicoap_observation_resource_has_observers(const unicoap_resource_t* resource) {
+    (void)resource;
+    return false;
+}
+#endif
+
+/**
+ * @brief Removes all observers from the list of observers of the given resource
+ *
+ * @param[in] resource CoAP resource
+ */
+#if IS_USED(MODULE_UNICOAP_SERVER_OBSERVATION) || defined(DOXYGEN)
+void unicoap_observation_resource_drop_observers(const unicoap_resource_t* resource);
+#else
+static inline
+void unicoap_observation_resource_drop_observers(const unicoap_resource_t* resource)
+{
+}
+#endif
+/** @} */
+
+/* MARK: - Sending notifications */
+/**
+ * @name Sending notifications
+ * @{
+ */
+
+/**
+ * @brief Notification context used to send notifications to a resource's observers
+ */
+typedef struct {
+    /**
+     * @brief Resource this request was directed to
+     */
+    const unicoap_resource_t* resource;
+
+    /**
+     * @brief Internal
+     *
+     * @warning This is an internal property. Do not access from your application!
+     * @private
+     */
+    unicoap_response_flags_t _flags;
+} unicoap_notification_context_t;
+
+/**
+ * @brief Sets the origin resource in the given notification context
+ *
+ * @param[in,out] ctx The request handler context
+ * @param resource The resource from which to send the notification to registered observers 
+ */
+static inline void unicoap_notification_set_resource(unicoap_notification_context_t* ctx, 
+                                                     const unicoap_resource_t* resource)
+{
+    ctx->resource = resource;
+}
+
+/**
+ * @brief Sets notification flags in the given notification context
+ *
+ * @param[in,out] ctx The notification context
+ * @param flags Flags to apply to the notification
+ */
+static inline void unicoap_notification_set_flags(unicoap_notification_context_t* ctx, 
+                                                  unicoap_response_flags_t flags)
+{
+    ctx->_flags = flags;
+}
+
+/**
+ * @brief Sends a notification to registered observers
+ *
+ * Sends the message to clients that have registered for resource observation notifications from this
+ * resource.
+ * @pre The given resource must have @ref UNICOAP_RESOURCE_FLAG_OBSERVABLE.
+ *
+ * Consumes @p response .
+ *
+ * @param[in,out] response Response message to send
+ * @param[in] ctx The notification context in which to send the notification to registered observers
+ *
+ * @returns Zero on success or negative integer on error
+ * @retval UNICOAP_OBSERVATION_NO_SUBSCRIBERS if no subscribers are registerd for @p resource
+ */
+#if IS_USED(MODULE_UNICOAP_SERVER_OBSERVATION) || defined(DOXYGEN)
+int unicoap_send_notification(unicoap_message_t* response, unicoap_notification_context_t* ctx);
+#else
+static inline
+int unicoap_send_notification(unicoap_message_t* response, unicoap_notification_context_t* ctx)
+{
+    (void)response;
+    (void)ctx;
+    return -ENOTSUP;
+}
+#endif
+
+/**
+ * @brief Error number indicating no subscribers are available to send notification to
+ */
+#define UNICOAP_OBSERVATION_NO_SUBSCRIBERS (-10000)
+/** @} */
+
 /* MARK: - Matching requests and resources */
 /**
  * @name Matching requests and resources
@@ -524,7 +735,7 @@ ssize_t unicoap_resource_encode_link(const unicoap_resource_t* resource, char* b
 typedef struct unicoap_listener unicoap_listener_t;
 
 /**
- * @brief   Handler function for the request matcher strategy
+ * @brief Handler function for the request matcher strategy
  *
  * @param[in]  listener     Listener
  * @param[out] resource     Matching resource
@@ -538,6 +749,7 @@ typedef int (*unicoap_request_matcher_t)(const unicoap_listener_t* listener,
                                          const unicoap_resource_t** resource,
                                          const unicoap_message_t* request,
                                          const unicoap_endpoint_t* endpoint);
+
 /**
  * @brief A modular collection of resources for a server
  */
@@ -778,6 +990,30 @@ static inline bool unicoap_match_proto(unicoap_proto_set_t protocols, unicoap_pr
                     "The unicoap_server_resource_declarations module is missing, resource cannot be registered"); \
       unicoap_resource_t CONCAT(unicoap_resource_, name) =
 #endif
+
+/**
+ * @brief A reference to a static CoAP resource
+ *
+ * @param name The internal name of the resource entry as passed to @ref UNICOAP_RESOURCE
+ *
+ * @returns @ref unicoap_resource_t
+ */
+#define UNICOAP_RESOURCE_NAMED(name) \
+    ({ extern unicoap_resource_t CONCAT(unicoap_resource_, name); \
+       &CONCAT(unicoap_resource_, name); })
+/** @} */
+
+/* MARK: - Accessing the listener */
+/**
+ * @name Accessing the listener
+ * @{
+ */
+/**
+ * @brief Retrieves the listener containing all resources declared at compile time
+ *
+ * @returns @ref unicoap_listener_t
+ */
+unicoap_listener_t* unicoap_listener_for_resource_declarations(void);
 /** @} */
 /** @} */
 
