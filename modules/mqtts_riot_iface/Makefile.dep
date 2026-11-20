@@ -1,0 +1,5 @@
+
+ifneq (,$(filter mqtts_riot_iface,$(USEMODULE))) # if module in USEMODULE
+  USEMODULE +=  gnrc_wolfssl_tls  
+  USEPKG += paho-mqtt                     # add dependencies to USEMODULE
+endif

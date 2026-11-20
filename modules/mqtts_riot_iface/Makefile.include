@@ -1,0 +1,2 @@
+INCLUDES += -I$(RIOTBASE)/modules/mqtts_riot_iface
+DIRS += $(RIOTBASE)/modules/mqtts_riot_iface
