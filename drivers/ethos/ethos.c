@@ -160,12 +160,14 @@ static void ethos_isr(void *arg, uint8_t c)
             }
             break;
         case IN_FRAME:
-            _handle_char(dev, c);
             if (c == ETHOS_ESC_CHAR) {
                 dev->state = IN_ESCAPE;
             }
-            else if (c == ETHOS_FRAME_DELIMITER) {
-                _end_of_frame(dev);
+            else {
+                _handle_char(dev, c);
+                if (c == ETHOS_FRAME_DELIMITER) {
+                    _end_of_frame(dev);
+                }
             }
             break;
         case IN_ESCAPE:
@@ -176,9 +178,6 @@ static void ethos_isr(void *arg, uint8_t c)
                     break;
                 case (ETHOS_FRAME_TYPE_TEXT ^ 0x20):
                     dev->frametype = ETHOS_FRAME_TYPE_TEXT;
-                    /* reset tsrb (used for networking) */
-                    dev->inbuf.reads = 0;
-                    dev->inbuf.writes = 0;
                     dev->state = IN_FRAME;
                     return;
                 case (ETHOS_FRAME_TYPE_HELLO ^ 0x20):
@@ -186,6 +185,7 @@ static void ethos_isr(void *arg, uint8_t c)
                     dev->frametype = ETHOS_FRAME_TYPE_DATA;
                     break;
                 case ETHOS_FRAME_DELIMITER:
+                    _handle_char(dev, ETHOS_ESC_CHAR);
                     _handle_char(dev, c);
                     _reset_state(dev);
                     return;
@@ -195,7 +195,8 @@ static void ethos_isr(void *arg, uint8_t c)
                     return;
             }
             dev->state = IN_FRAME;
-            /* write marker to tsrb for thread layer to handle */
+            /* preserve escaped sequence for the thread layer to unstuff */
+            _handle_char(dev, ETHOS_ESC_CHAR);
             _handle_char(dev, c);
             break;
         default:
