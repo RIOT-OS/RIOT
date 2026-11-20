@@ -1,0 +1,13 @@
+[package]
+name = "riot-wrappers-test-gpio"
+version = "0.1.0"
+authors = ["Christian Amsüss <chrysn@fsfe.org>"]
+edition = "2021"
+publish = false
+
+[lib]
+crate-type = ["staticlib"]
+
+[dependencies]
+riot-wrappers = { path = "../..", features = [ "set_panic_handler", "panic_handler_format" ] }
+embedded-hal = "1"
