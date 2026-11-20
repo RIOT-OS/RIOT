@@ -80,6 +80,26 @@ typedef enum {
 #define VBAT_ADC_MAX        4095
 /** @} */
 
+/**
+ * @name   RCC clock gating for USB full-speed (USB DRD FS) on STM32U3
+ * @{
+ * USB is on the APB2 bus (RM0487); enable bit @c RCC_APB2ENR_USB1EN.
+ */
+#if !defined(RCC_U3_USBDEV_FS_RMASK)
+#  define RCC_U3_USBDEV_FS_RMASK  RCC_APB2ENR_USB1EN
+#endif
+/** @} */
+
+/**
+ * @name   USB DRD FS peripheral handle
+ * @{
+ * Alias @c USB_DRD_FS to @c USB for @c periph_conf.h.
+ */
+#if !defined(USB)
+#  define USB  USB_DRD_FS
+#endif
+/** @} */
+
 #endif /* DOXYGEN */
 
 #ifdef __cplusplus
