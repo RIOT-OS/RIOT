@@ -1,7 +1,7 @@
 PKG_NAME    = bplib
 PKG_URL     = https://github.com/nasa/bplib
-# Original bplibs 7.0.2 release
-PKG_VERSION = 5eda6abc1f2c4d7e1aea0a5681992e9e717b60bf
+# Original bplibs 7.0.5 release
+PKG_VERSION = c5fb8358dd99149aa7ba463ed416d76049521a3a
 PKG_LICENSE = Apache-2.0
 
 include $(RIOTBASE)/pkg/pkg.mk
