@@ -3,7 +3,7 @@ name = "riot-sys"
 version = "0.8.0"
 authors = ["Christian Amsüss <chrysn@fsfe.org>"]
 edition = "2021"
-rust-version = "1.64"
+rust-version = "1.79"
 
 description = "Rust FFI wrappers for the RIOT operating system"
 documentation = "https://rustdoc.etonomy.org/riot_sys/"
