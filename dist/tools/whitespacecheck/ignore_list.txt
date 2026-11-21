@@ -2,3 +2,4 @@
 dist/tools/fixdep/fixdep.c
 *.svg
 *.patch
+rust/*
