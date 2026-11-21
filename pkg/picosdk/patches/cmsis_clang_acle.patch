@@ -8,12 +8,12 @@ Subject: [PATCH] cmsis_clang: Declare missing ACLE hint and barrier functions
  1 file changed, 31 insertions(+)
 
 diff --git a/src/rp2_common/cmsis/stub/CMSIS/Core/Include/cmsis_clang.h b/src/rp2_common/cmsis/stub/CMSIS/Core/Include/cmsis_clang.h
-index 364d18e1..a612a8fd 100644
+index 364d18e1..26175e85 100644
 --- a/src/rp2_common/cmsis/stub/CMSIS/Core/Include/cmsis_clang.h
 +++ b/src/rp2_common/cmsis/stub/CMSIS/Core/Include/cmsis_clang.h
-@@ -33,6 +33,37 @@
- #error Compiler must support ACLE V2.0
- #endif /* (__ARM_ACLE >= 200) */
+@@ -38,6 +38,37 @@
+ #define __has_builtin(x) (0)
+ #endif
  
 +/* Clang 20's <arm_acle.h> only declares these functions when
 + * __has_builtin() reports the intrinsic as unavailable. When that header is
@@ -46,9 +46,9 @@ index 364d18e1..a612a8fd 100644
 +#  endif
 +#endif
 +
- /* Fallback for __has_builtin */
- #ifndef __has_builtin
- #define __has_builtin(x) (0)
+ /* CMSIS compiler specific defines */
+ #ifndef   __ASM
+ #define __ASM                                  __asm
 -- 
 2.56.0
 
