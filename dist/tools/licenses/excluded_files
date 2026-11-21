@@ -4,3 +4,7 @@ cpu/arm7tdmi_gba/cartridge_header.s
 pkg/esp8266_sdk/bootloader/sdkconfig_default.h
 tests/pkg/utensor/external_modules/models/deep_mlp.cpp
 tests/pkg/emlearn/model.h
+# Temporary exclusion while merging trees
+rust/riot-sys/riot-bindgen.h
+rust/riot-sys/riot-c2rust.h
+rust/riot-sys/riot-headers.h
