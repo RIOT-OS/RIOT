@@ -26,7 +26,7 @@ module is in use.
 
 All the relevant information -- including the location of the actually used
 RIOT header files and flags influencing the ABI -- is conveyed to `riot-sys` by passing on the
-compiler and the CFLAGS. This can either be done by passing in the path to a "compile commads"
+compiler and the CFLAGS. This can either be done by passing in the path to a "compile commands"
 file through the `RIOT_COMPILE_COMMANDS` environment variable (accompanied by a
 `RIOT_USEMODULES`, as that part of `CFLAGS` is missing from the compile commands), or
 alternatively by passing in the C compiler as `RIOT_CC` and the CFLAGS (both their
@@ -73,7 +73,7 @@ and `DEP_RIOT_SYS_CFLAGS` which includes the enabled modules.
 
 Some decisions of downstream crates need to depend on whether some feature is around in
 RIOT. For many things that's best checked on module level, but some minor items have no
-module to mark the feature, and checking for versions by numers is not fine-grained enough,
+module to mark the feature, and checking for versions by numbers is not fine-grained enough,
 so it's easiest to check for concrete strings in the bindgen output.
 
 The `build.rs` of this crate contains a list of marker conditions. These lead to `MARKER_foo=1`
