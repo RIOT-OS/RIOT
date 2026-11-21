@@ -122,15 +122,17 @@ class TestSelf(riotctrl_shell_tests.testcase_base.TestBase):
         assert "usage:" in str(ctx.exception)
 
 
-class TestUDP(riotctrl_shell_tests.testcase_base.TestBase):
-    @classmethod
-    def init_shell_interaction(cls):
-        cls.shell = riotctrl_shell.udp.UDPClient(cls.ctrl)
-
+class WithUDPParsers(riotctrl_shell_tests.testcase_base.TestBase):
     def setUp(self):
         super().setUp()
         self.od_parser = riotctrl_shell.od.OdParser()
         self.udp_parser = riotctrl_shell.udp.UDPClientSendParser()
+
+
+class TestUDP(WithUDPParsers):
+    @classmethod
+    def init_shell_interaction(cls):
+        cls.shell = riotctrl_shell.udp.UDPClient(cls.ctrl)
 
     def test_udp_client_errors(self):
         with self.assertRaises(RuntimeError) as ctx:
@@ -175,6 +177,17 @@ class TestUDP(riotctrl_shell_tests.testcase_base.TestBase):
         assert stats[0]["dst"] == "2001:db8::3"
         assert stats[0]["dport"] == 1234
 
+    def test_udp_client_send_int(self):
+        payload_len = 10
+        res = self.shell.udp_client_send("2001:db8::1", 5683, payload_len)
+        stats = self.udp_parser.parse(res)
+        byts = self.od_parser.parse(res)
+        assert byts == f"{payload_len}".encode()
+        assert len(stats) == 1
+        assert stats[0]["payload_len"] == len(f"{payload_len}".encode())
+        assert stats[0]["dst"] == "2001:db8::1"
+        assert stats[0]["dport"] == 5683
+
     def test_udp_client_only_count(self):
         count = 3
         start = time.time()
@@ -208,6 +221,87 @@ class TestUDP(riotctrl_shell_tests.testcase_base.TestBase):
             assert stats[i]["dport"] == 5683
         assert (stop - start) >= (count - 1) * timeout / 1_000_000
 
+    def test_udp_client_send_multiple_int(self):
+        payload_len = 16
+        count = 20
+        timeout = 500
+        # repeat twice so that we check that the payload generating counter resets
+        for _ in range(2):
+            start = time.time()
+            res = self.shell.udp_client_send(
+                "2001:db8::1", 5683, payload_len, count, timeout
+            )
+            stop = time.time()
+            stats = self.udp_parser.parse(res)
+            byts = self.od_parser.parse_multiple(res)
+            assert len(byts) == count
+            assert len(stats) == count
+            for i in range(count):
+                assert byts[i] == f"{payload_len}".encode()
+                assert stats[i]["payload_len"] == len(f"{payload_len}".encode())
+                assert stats[i]["dst"] == "2001:db8::1"
+                assert stats[i]["dport"] == 5683
+            assert (stop - start) >= (count - 1) * timeout / 1_000_000
+
+
+class TestUDPSendLen(WithUDPParsers):
+    @classmethod
+    def init_shell_interaction(cls):
+        cls.shell = riotctrl_shell.udp.UDPClientSendLen(cls.ctrl)
+
+    def test_udp_client_send_text(self):
+        res = self.shell.udp_client_send("2001:db8::1", 5573, "Hello World!")
+        stats = self.udp_parser.parse(res)
+        byts = self.od_parser.parse(res)
+        assert byts == b"Hello World!"
+        assert len(stats) == 1
+        assert stats[0]["payload_len"] == len("Hello World!")
+        assert stats[0]["dst"] == "2001:db8::1"
+        assert stats[0]["dport"] == 5573
+
+    def test_udp_client_send_bytes(self):
+        res = self.shell.udp_client_send("2001:db8::3", 1234, b"\x00\x11\x22\x33\x44")
+        stats = self.udp_parser.parse(res)
+        byts = self.od_parser.parse(res)
+        assert byts == b"\x00\x11\x22\x33\x44"
+        assert len(stats) == 1
+        assert stats[0]["payload_len"] == len(b"\x00\x11\x22\x33\x44")
+        assert stats[0]["dst"] == "2001:db8::3"
+        assert stats[0]["dport"] == 1234
+
+    def test_udp_client_send_generated(self):
+        payload_len = 10
+        res = self.shell.udp_client_send("2001:db8::1", 5683, payload_len)
+        stats = self.udp_parser.parse(res)
+        byts = self.od_parser.parse(res)
+        assert byts == b"\x00" * payload_len
+        assert len(stats) == 1
+        assert stats[0]["payload_len"] == payload_len
+        assert stats[0]["dst"] == "2001:db8::1"
+        assert stats[0]["dport"] == 5683
+
+    def test_udp_client_send_multiple_generated(self):
+        payload_len = 16
+        count = 20
+        timeout = 500
+        # repeat twice so that we check that the payload generating counter resets
+        for _ in range(2):
+            start = time.time()
+            res = self.shell.udp_client_send(
+                "2001:db8::1", 5683, payload_len, count, timeout
+            )
+            stop = time.time()
+            stats = self.udp_parser.parse(res)
+            byts = self.od_parser.parse_multiple(res)
+            assert len(byts) == count
+            assert len(stats) == count
+            for i in range(count):
+                assert byts[i] == (i.to_bytes(1) * payload_len)
+                assert stats[i]["payload_len"] == payload_len
+                assert stats[i]["dst"] == "2001:db8::1"
+                assert stats[i]["dport"] == 5683
+            assert (stop - start) >= (count - 1) * timeout / 1_000_000
+
 
 class UDPServerTestShell(
     riotctrl_shell.sys.Reboot,
@@ -236,8 +330,8 @@ class TestUDPServer(riotctrl_shell_tests.testcase_base.TestBase):
             self.shell.udp_server_start(0)
         assert "Error: invalid port specified" in str(ctx.exception)
 
-    def _test_udp_server_start(self):
-        res = self.shell.udp_server_start(5683)
+    def _test_udp_server_start(self, summarize=False):
+        res = self.shell.udp_server_start(5683, summarize=summarize)
         assert "Success: started UDP server on port 5683" in res
 
     def test_udp_server_start(self):
@@ -259,9 +353,7 @@ class TestUDPServer(riotctrl_shell_tests.testcase_base.TestBase):
         res = self.shell.udp_server_stop()
         assert "Success: stopped UDP server" in res
 
-    def test_udp_server_check_output(self):
-        self._test_udp_server_start()
-
+    def _test_udp_server_check_output(self):
         self.shell.preload_payload(b"abcdef")
         self.shell.payload_remote("[2001:db8::1]:12345")
 
@@ -300,6 +392,17 @@ class TestUDPServer(riotctrl_shell_tests.testcase_base.TestBase):
         self.shell.trigger_receive(count=7, delay_us=100000)
         lost_perc = self.shell.udp_server_check_output(10, 100000)
         assert lost_perc == (10 - 7) * 10
+
+    def test_udp_server_check_output_full(self):
+        self._test_udp_server_start()
+        self._test_udp_server_check_output()
+
+    def test_udp_server_check_output_summarized(self):
+        self._test_udp_server_start(summarize=True)
+        # check output only counts the received packets so we
+        # can use the same method without modification for
+        # summarize=True
+        self._test_udp_server_check_output()
 
 
 if __name__ == "__main__":

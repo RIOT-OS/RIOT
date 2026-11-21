@@ -18,8 +18,8 @@
  * @}
  */
 
-#include <stdio.h>
 #include <inttypes.h>
+#include <stdio.h>
 
 #include "fmt.h"
 #include "net/sock/udp.h"
@@ -38,8 +38,18 @@
 #  define SOCK_IP_EP_ANY  SOCK_IPV4_EP_ANY
 #endif
 
+#ifndef CONFIG_SHELL_CMD_UDP_BUFSIZE
+#  ifdef MODULE_SHELL_CMD_UDP_SEND_LEN
+#    define CONFIG_SHELL_CMD_UDP_BUFSIZE    1024U
+#  else
+#    define CONFIG_SHELL_CMD_UDP_BUFSIZE    (SHELL_DEFAULT_BUFSIZE / 2U)
+#  endif
+#endif
+
 #define SERVER_PRIO             (THREAD_PRIORITY_MAIN - 1)
 #define SERVER_STACKSIZE        (THREAD_STACKSIZE_DEFAULT)
+
+static uint8_t data_bytes[CONFIG_SHELL_CMD_UDP_BUFSIZE];
 
 #if IS_USED(MODULE_SHELL_CMD_UDP_SERVER)
 
@@ -48,10 +58,12 @@ static char server_stack[SERVER_STACKSIZE];
 /* accessed from both main and server thread */
 static event_queue_t queue;
 static kernel_pid_t server_pid = KERNEL_PID_UNDEF;
+static bool _server_summarize = false;
 
 static void _server_handler(sock_udp_t *sock, sock_async_flags_t type, void *arg)
 {
-    (void)arg;
+    unsigned int *received_packets = arg;
+
     if (type & SOCK_ASYNC_MSG_RECV) {
         sock_udp_ep_t src;
         ssize_t res;
@@ -62,17 +74,22 @@ static void _server_handler(sock_udp_t *sock, sock_async_flags_t type, void *arg
 
         res = sock_udp_recv_buf(sock, &buf, &buf_ctx, 0, &src);
         if (res > 0) {
-            printf("Received UDP data from ");
-            if (sock_udp_ep_fmt(&src, _addr_str, &_port) >= 0) {
-                printf("[%s]:%u\n", _addr_str, _port);
+            if (_server_summarize) {
+                printf("Packets received: %u\n", ++(*received_packets));
             }
             else {
-                printf("unspecified source\n");
-            }
+                printf("Received UDP data from ");
+                if (sock_udp_ep_fmt(&src, _addr_str, &_port) >= 0) {
+                    printf("[%s]:%u\n", _addr_str, _port);
+                }
+                else {
+                    printf("unspecified source\n");
+                }
 
-            while (res > 0) {
-                od_hex_dump(buf, res, OD_WIDTH_DEFAULT);
-                res = sock_udp_recv_buf(sock, &buf, &buf_ctx, 0, &src);
+                while (res > 0) {
+                    od_hex_dump(buf, res, OD_WIDTH_DEFAULT);
+                    res = sock_udp_recv_buf(sock, &buf, &buf_ctx, 0, &src);
+                }
             }
         }
         else {
@@ -94,6 +111,7 @@ static event_t _server_stop_event = { .handler = _server_stop_cb };
 static void *_server_thread(void *arg)
 {
     uint16_t port = (uint16_t)(uintptr_t)arg;
+    unsigned int received_packets = 0U;
 
     sock_udp_ep_t local = SOCK_IP_EP_ANY;
     local.port = port;
@@ -108,7 +126,7 @@ static void *_server_thread(void *arg)
     printf("Success: started UDP server on port %" PRIu16 "\n", port);
 
     event_queue_claim(&queue);
-    sock_udp_event_init(&sock, &queue, _server_handler, NULL);
+    sock_udp_event_init(&sock, &queue, _server_handler, &received_packets);
     _server_should_stop = false;
 
     while (!_server_should_stop) {
@@ -126,7 +144,7 @@ static void *_server_thread(void *arg)
 /* thread-local to main thread */
 static uint16_t server_port = 0;
 
-static void _start_server(const char *port_str)
+static void _start_server(const char *port_str, bool summarize)
 {
     /* check if server is already running */
     if (server_pid != KERNEL_PID_UNDEF) {
@@ -139,11 +157,12 @@ static void _start_server(const char *port_str)
         printf("Error: invalid port specified\n");
         return;
     }
+    _server_summarize = summarize;
     /* init event queue to be used by server thread */
     event_queue_init_detached(&queue);
     /* start server */
-    server_pid = thread_create(server_stack, sizeof(server_stack), SERVER_PRIO,
-                                0, _server_thread, (void *)(uintptr_t)server_port, "UDP server");
+    server_pid = thread_create(server_stack, sizeof(server_stack), SERVER_PRIO, 0, _server_thread,
+                               (void *)(uintptr_t)server_port, "UDP server");
     if (server_pid <= KERNEL_PID_UNDEF) {
         puts("Error: can not start server thread");
         return;
@@ -163,9 +182,10 @@ static void _stop_server(void)
 
 #else
 
-static void _start_server(const char *port_str)
+static void _start_server(const char *port_str, bool summarize)
 {
     (void)port_str;
+    (void)summarize;
     /* not reachable since all calls are module-guarded */
     assert(0);
 }
@@ -178,10 +198,11 @@ static void _stop_server(void)
 
 #endif /* MODULE_SHELL_CMD_UDP_SERVER*/
 
-static void _send(const char *addr_str, const char *_data, size_t num,
-                  uint32_t delay, bool data_is_hex)
+static void _send(const char *addr_str, void *data, size_t data_len, size_t num, uint32_t delay,
+                  bool generate_data)
 {
     int res = -1;
+    uint8_t send_count = 0;
 
     /* parse destination address */
     sock_udp_ep_t dst;
@@ -194,19 +215,6 @@ static void _send(const char *addr_str, const char *_data, size_t num,
         return;
     }
 
-    const void *data = _data;
-    size_t data_len = strlen(data);
-    uint8_t data_bytes[SHELL_DEFAULT_BUFSIZE / 2];
-    if (data_is_hex) {
-        ssize_t ret = scn_buf_hex(data_bytes, sizeof(data_bytes), data, data_len);
-        if (ret < 0) {
-            puts("Error: unable to parse hexadecimal data");
-            return;
-        }
-        data = data_bytes;
-        data_len = ret;
-    }
-
     sock_udp_t sock;
     if ((res = sock_udp_create(&sock, NULL, &dst, 0)) < 0) {
         puts("Error creating socket");
@@ -214,6 +222,9 @@ static void _send(const char *addr_str, const char *_data, size_t num,
     }
 
     while (num--) {
+        if (generate_data && (data_len > 0)) {
+            memset(data, send_count++, data_len);
+        }
         if ((res = sock_udp_send(&sock, data, data_len, NULL)) < 0) {
             puts("Error sending data");
             sock_udp_close(&sock);
@@ -243,21 +254,78 @@ static int _udp_cmd(int argc, char **argv)
     if (strcmp(argv[1], "send") == 0) {
         uint32_t num = 1;
         uint32_t delay = 1 * US_PER_SEC;
-        if (argc < 3) {
-            printf("usage: %s send [-b] <addr>:<port> "
-                   "<data> [<num> [<delay in us>]]\n", argv[0]);
+        if (argc < 4) {
+            if (IS_USED(MODULE_SHELL_CMD_UDP_SEND_LEN)) {
+                printf(
+                    "usage: %s send [-b] <addr>:<port> {-d <data_len>|<data>} "
+                    "[<num> [<delay in us>]]\n",
+                    argv[0]);
+            }
+            else {
+                printf("usage: %s send [-b] <addr>:<port> <data> [<num> [<delay in us>]]\n",
+                       argv[0]);
+            }
             return 1;
         }
-        bool binary = strcmp(argv[2], "-b") == 0;
-        if (binary) {
+
+        bool data_is_hex = strcmp(argv[2], "-b") == 0;
+        if (data_is_hex) {
             /* shift arguments by 1 to account for encountered -b option */
             argv++;
             argc--;
         }
+
+        const char *addr_str = argv[2];
+
+        bool generate_data =
+            IS_USED(MODULE_SHELL_CMD_UDP_SEND_LEN) && (strcmp(argv[3], "-d") == 0);
+        if (generate_data && data_is_hex) {
+            puts("Error: -b and -d are mutually exclusive");
+            return 1;
+        }
+
+        void *data = argv[3];
+        size_t data_len = strlen(argv[3]);
+
+        if (generate_data) {
+            char *conversion_end;
+            /* even with the theoretical shift for `data_is_hex`, argv[4] should still
+             * be fine, as for `data_is_hex` and `generate_data` we error out earlier.
+             * => the earlier argc < 4 still holds */
+            data_len = strtoul(argv[4], &conversion_end, 0);
+            if (*conversion_end != '\0') {
+                puts("Error: unable to parse -d parameter (must be integer)");
+                return 1;
+            }
+            if (data_len > sizeof(data_bytes)) {
+                puts("Error: send buffer too small, increase CONFIG_SHELL_CMD_UDP_BUFSIZE");
+                return 1;
+            }
+        }
+
+        if (data_is_hex) {
+            ssize_t ret = scn_buf_hex(data_bytes, sizeof(data_bytes), data, data_len);
+
+            if (ret < 0) {
+                puts("Error: unable to parse hexadecimal data");
+                return 1;
+            }
+            data = data_bytes;
+            data_len = ret;
+        }
+        else if (generate_data) {
+            data = data_bytes;
+            /* Shift arguments by 1 to account for encountered -d option so that
+             * test for argc > 4 works even with that option */
+            argv++;
+            argc--;
+        }
+
         if (argc > 4) {
             if (!IS_USED(MODULE_ZTIMER)) {
-                puts("Error: retransmission requires ztimer. "
-                     "Add ztimer_msec or ztimer_usec to USEMODULE.");
+                puts(
+                    "Error: retransmission requires ztimer. "
+                    "Add ztimer_msec or ztimer_usec to USEMODULE.");
                 return 1;
             }
             num = atoi(argv[4]);
@@ -265,12 +333,13 @@ static int _udp_cmd(int argc, char **argv)
                 delay = atoi(argv[5]);
             }
         }
-        _send(argv[2], argv[3], num, delay, binary);
+        _send(addr_str, data, data_len, num, delay, generate_data);
     }
     else if (strcmp(argv[1], "server") == 0) {
         if (!IS_USED(MODULE_SHELL_CMD_UDP_SERVER)) {
-            puts("Error: server command not supported in this build. "
-                 "Add shell_cmd_udp_server to USEMODULE.");
+            puts(
+                "Error: server command not supported in this build. "
+                "Add shell_cmd_udp_server to USEMODULE.");
             return 1;
         }
         if (argc < 3) {
@@ -279,10 +348,10 @@ static int _udp_cmd(int argc, char **argv)
         }
         if (strcmp(argv[2], "start") == 0) {
             if (argc < 4) {
-                printf("usage %s server start <port>\n", argv[0]);
+                printf("usage %s server start <port> [-s]\n", argv[0]);
                 return 1;
             }
-            _start_server(argv[3]);
+            _start_server(argv[3], (argc >= 5) && (strcmp("-s", argv[4]) == 0));
         }
         else if (strcmp(argv[2], "stop") == 0) {
             _stop_server();
