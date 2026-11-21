@@ -27,13 +27,6 @@ impl From<riot_sys::sock_udp_ep_t> for UdpEp {
     }
 }
 
-impl From<riot_sys::inline::sock_udp_ep_t> for UdpEp {
-    fn from(ep: riot_sys::inline::sock_udp_ep_t) -> Self {
-        // INLINE TRANSMUTE
-        unsafe { Self(core::mem::transmute(ep)) }
-    }
-}
-
 impl AsRef<riot_sys::sock_udp_ep_t> for UdpEp {
     fn as_ref(&self) -> &riot_sys::sock_udp_ep_t {
         &self.0
@@ -43,18 +36,6 @@ impl AsRef<riot_sys::sock_udp_ep_t> for UdpEp {
 impl AsMut<riot_sys::sock_udp_ep_t> for UdpEp {
     fn as_mut(&mut self) -> &mut riot_sys::sock_udp_ep_t {
         &mut self.0
-    }
-}
-
-impl AsRef<riot_sys::inline::sock_udp_ep_t> for UdpEp {
-    fn as_ref(&self) -> &riot_sys::inline::sock_udp_ep_t {
-        unsafe { crate::inline_cast_ref(&self.0) }
-    }
-}
-
-impl AsMut<riot_sys::inline::sock_udp_ep_t> for UdpEp {
-    fn as_mut(&mut self) -> &mut riot_sys::inline::sock_udp_ep_t {
-        unsafe { crate::inline_cast_ref_mut(&mut self.0) }
     }
 }
 
