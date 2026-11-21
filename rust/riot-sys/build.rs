@@ -7,6 +7,15 @@ use std::fmt::Write;
 use std::path::PathBuf;
 
 fn main() {
+    // Cargo has no native deprecation for features
+    if env::var_os("CARGO_FEATURE_KEEP_EXTERN_TYPES").is_some() {
+        println!(
+            "cargo::warning=The riot-sys feature `keep-extern-types` is deprecated and without \
+             effect (it only applied to C2Rust, which is not used any more). Please stop \
+             enabling it; it will be removed in a future version."
+        );
+    }
+
     let cc;
     let mut cflags;
 

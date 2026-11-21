@@ -31,8 +31,9 @@ serde_json = "1"
 serde = { version = "1", features = [ "derive" ] }
 
 [features]
-# Without effect since C2Rust is not used any more; kept for compatibility.
+# Deprecated: Without effect since C2Rust is not used any more; kept for
+# compatibility, and produces a warning when enabled.
 keep-extern-types = []
 
 # this needs to be set to build together with RIOT-rs.
-riot-rs = [ "riot-build", "riot-rs-core", "keep-extern-types" ]
+riot-rs = [ "riot-build", "riot-rs-core" ]
