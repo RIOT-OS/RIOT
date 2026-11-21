@@ -1,0 +1,54 @@
+# Ideally this should be replaced with a call out to Murdock; until that is
+# practical, building representative examples.
+
+name: build-test
+
+on:
+  pull_request:
+    branches:
+      - '*'
+
+jobs:
+  build-test:
+    runs-on: ubuntu-latest
+    container: riot/riotbuild
+    steps:
+    - uses: actions/checkout@v3
+    - uses: actions/checkout@v3
+      with:
+        repository: RIOT-OS/RIOT
+        path: RIOT
+    - name: Patch .cargo/config.toml to use current checkout
+      run: |
+        cd RIOT
+        rm -f .cargo/config.toml
+        mkdir -p .cargo # should not be needed any more after https://github.com/RIOT-OS/RIOT/pull/18151
+        echo '[patch.crates-io]' >> .cargo/config.toml
+        echo 'riot-sys = { path = "../", version = "*" }' >> .cargo/config.toml
+        echo 'riot-wrappers = { git = "https://github.com/RIOT-OS/rust-riot-wrappers" }' >> .cargo/config.toml
+    - name: Build on selected platforms
+      # not going with a 
+      #
+      # strategy:
+      #   matrix:
+      #     example: [examples/lang_support/official/rust-hello-world examples/lang_support/official/rust-gcoap tests/rust_minimal]
+      #
+      # setup here because really most of the stuff is the same, and the `cargo
+      # update` is much faster the second time (so a parallel execution may
+      # still be faster but uses 3x the resources)
+      run: |
+        BOARDS='native sltb001a samr21-xpro'
+        DIRS='examples/lang_support/official/rust-hello-world examples/lang_support/official/rust-gcoap tests/rust_minimal'
+        # It appears that there has to be output before :: commands really catch on
+        echo "Building ${DIRS} on ${BOARDS}"
+        echo "::echo ::on"
+        cd RIOT
+        for D in ${DIRS}; do
+          cd ${D}
+          echo "::group::Preparing ${D}"
+          cargo update -p riot-sys -p riot-wrappers --aggressive
+          cargo tree
+          cd -
+          echo "::endgroup::"
+        done
+        ./dist/tools/compile_test/compile_like_murdock.py --boards $BOARDS --apps $DIRS -j16

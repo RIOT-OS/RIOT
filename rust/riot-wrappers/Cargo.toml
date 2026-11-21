@@ -1,0 +1,115 @@
+[package]
+name = "riot-wrappers"
+version = "0.9.2"
+authors = ["Christian Amsüss <chrysn@fsfe.org>"]
+edition = "2021"
+rust-version = "1.79.0"
+
+description = "Rust API wrappers for the RIOT operating system"
+documentation = "https://doc.riot-os.org/rustdoc/latest/riot_wrappers/"
+repository = "https://github.com/RIOT-OS/rust-riot-wrappers"
+keywords = ["riot", "riot-os", "iot", "bindings", "embedded-hal-impl"]
+categories = ["api-bindings", "no-std"]
+# This is chosen to ease code migration between this and other implementations
+# of embedded-hal. Beware that for any practical use, the LGPL terms of RIOT-OS
+# still apply to resulting binary; this is visible to any Cargo based license
+# checkers by the matching license set on the riot-sys crate.
+license = "MIT OR Apache-2.0"
+
+
+[dependencies]
+embedded-hal-0-2 = { package = "embedded-hal", version = "0.2.4", features = ["unproven"] }
+embedded-hal = "1"
+switch-hal = "0.4.0"
+nb = "0.1.1"
+# The promise of the 0.8.0 series is to not break riot-wrappers
+riot-sys = ">= 0.7.14, < 0.9.0"
+num-traits = { version = "0.2", default-features = false }
+mutex-trait = "0.2"
+
+bare-metal = "1"
+
+# Only used for shell, where a macro is described to take a string literal and
+# in the macro implementation turns it into a CStr.
+cstr = "^0.2.11"
+
+heapless = "^0.8"
+rand_core_06 = { package = "rand_core", version = "^0.6" }
+
+# For nimble UUID parsing and some debug implementations
+hex = { version = "^0.4.3", default-features = false }
+
+coap-numbers = "^0.2.0"
+
+embedded-graphics = "0.6"
+
+coap-message-0-3 = { package = "coap-message", version = "^0.3.3" }
+coap-handler-0-2 = { package = "coap-handler", version = "^0.2.0" }
+embedded-nal = { version = "0.6.0", optional = true }
+embedded-nal-tcpextensions = { version = "0.1", optional = true }
+embedded-nal-async-0-7 = { package = "embedded-nal-async", version = "0.7.1", optional = true }
+embedded-io-async = { version = "0.6", optional = true }
+pin-utils = "0.1"
+pin-project = "1.0.11"
+
+# as used in embedded-nal 0.6
+no-std-net-0-5 = { package = "no-std-net", version = "0.5", optional = true }
+# as used in embedded-nal-async
+no-std-net-0-6 = { package = "no-std-net", version = "0.6", optional = true }
+
+embedded-hal-async = { version = "1", optional = true }
+
+critical-section = { version = "1.0", optional = true }
+
+[build-dependencies]
+rustc_version = "0.4.1"
+
+[features]
+default = []
+
+# Set a panic handler.
+#
+# Unless a panic handler is provided by another mechanism, exactly one crate in
+# an application should set this feature.
+set_panic_handler = []
+
+# If present, the panic handler uses string formatting to produce an error
+# message. Otherwise, it just writes a static panic message to stdout.
+panic_handler_format = []
+
+# If present, the panic handler calls to `core_panic` and thus halts the full
+# system. Otherwise, the panic in thread mode outside of a critical section
+# only affects that single thread.
+panic_handler_crash = []
+
+# Provide an implementation of critical-section 1.0 using irq_disable()/_restore().
+provide_critical_section_1_0 = ["critical-section/restore-state-u32"]
+
+with_coap_message = []
+with_coap_handler = []
+
+with_embedded_nal = ["embedded-nal", "embedded-nal-tcpextensions", "no-std-net-0-5"]
+with_embedded_nal_async = [ "embedded-io-async", "embedded-nal-async-0-7", "no-std-net-0-6" ]
+
+with_embedded_hal_async = [ "embedded-hal-async" ]
+
+# See msg::v2 documentation. Enabling this exposes components not under semver
+# guarantees.
+with_msg_v2 = []
+
+# Use actual `!` rather than the stable Never workaround. As far as the
+# workaround is understood, this causes no actual change in any types, just in
+# the private names that are assigned to them.
+#
+# This is primarily for documentation building; enabling it may also help users
+# of nightly when they see a mess of types.
+#
+# This will effectively be turned always-on (and thus ignored and deprecated)
+# once MSRV is increased to 1.100.
+actual_never_type = []
+
+# Enable documentation enhancements that depend on nightly
+#
+# This has some effects of its own (making ValueInThread fundamental), and also
+# enables actual_never_type.
+nightly_docs = [ "actual_never_type" ]

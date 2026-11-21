@@ -21,7 +21,9 @@ github_annotate_setup
 ROOT=$(git rev-parse --show-toplevel)
 EXIT_CODE=0
 
-FILES=$(FILEREGEX='\.h$' changed_files)
+# Header files in Rust crates are consumed by the crate and not made available
+# to the rest of the system.
+FILES=$(FILEREGEX='\.h$' EXCLUDE='^rust/' changed_files)
 
 # check files
 for FILE in ${FILES}; do

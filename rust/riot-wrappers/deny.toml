@@ -1,0 +1,19 @@
+[licenses]
+version = 2
+# We'll generally add license here as long as they're OSI approved, but let's keep an eye on them…
+allow = ["Apache-2.0", "BSD-3-Clause", "ISC", "MIT"]
+# … and for those, I'd rather doublecheck (all are either FSF or OSI approved):
+exceptions = [
+  { allow = ["LGPL-2.1"], crate = "riot-sys" },
+  { allow = ["Unicode-DFS-2016", "Unicode-3.0"], crate = "unicode-ident" },
+]
+private = { ignore = true }
+confidence-threshold = 1.0
+
+[advisories]
+ignore = [
+  # We just export bare-metal's critical sections, nothing bad happens unless someone uses them (and we'd need to bump versions to not export it)
+  "RUSTSEC-2026-0110",
+  # portable-atomic is only used in tests (transitively, but we need to configure it directly).
+  "RUSTSEC-2023-0089",
+]
