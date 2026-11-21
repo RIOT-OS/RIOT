@@ -257,7 +257,8 @@ static int _udp_cmd(int argc, char **argv)
         if (argc < 4) {
             if (IS_USED(MODULE_SHELL_CMD_UDP_SEND_LEN)) {
                 printf(
-                    "usage: %s send [-b] <addr>:<port> {-d <data_len>|<data>} [<num> [<delay in us>]]\n",
+                    "usage: %s send [-b] <addr>:<port> {-d <data_len>|<data>} "
+                    "[<num> [<delay in us>]]\n",
                     argv[0]);
             }
             else {
@@ -276,7 +277,8 @@ static int _udp_cmd(int argc, char **argv)
 
         const char *addr_str = argv[2];
 
-        bool generate_data = IS_USED(MODULE_SHELL_CMD_UDP_SEND_LEN) && (strcmp(argv[3], "-d") == 0);
+        bool generate_data =
+            IS_USED(MODULE_SHELL_CMD_UDP_SEND_LEN) && (strcmp(argv[3], "-d") == 0);
         if (generate_data && data_is_hex) {
             puts("Error: -b and -d are mutually exclusive");
             return 1;
