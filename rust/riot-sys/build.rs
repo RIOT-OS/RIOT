@@ -299,7 +299,8 @@ fn main() {
         ("UART_DEV", "uart_t", Some("unsigned num"), false, None),
         ("PWM_DEV", "pwm_t", Some("unsigned num"), false, None),
         ("ADC_LINE", "adc_t", Some("unsigned num"), false, None),
-        ("TIMER_DEV", "timer_t", Some("unsigned num"), false, None),
+        // RIOT's timer type is tim_t; timer_t would be POSIX' (which is a pointer on native).
+        ("TIMER_DEV", "tim_t", Some("unsigned num"), false, None),
         ("QDEC_DEV", "qdec_t", Some("unsigned num"), false, None),
         ("DAC_LINE", "dac_t", Some("unsigned num"), false, None),
     ];
