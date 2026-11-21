@@ -1,0 +1,15 @@
+on: pull_request
+
+name: Git checks
+
+jobs:
+  message-check:
+    name: Block Autosquash Commits
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out riot-wrappers
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+      - name: Block Autosquash Commits
+        run: "! git log --oneline origin/main.. |grep 'fixup!\\|squash!\\|MERGE\\|DNM'"
