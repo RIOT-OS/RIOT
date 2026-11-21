@@ -6,8 +6,6 @@ use std::env;
 use std::fmt::Write;
 use std::path::PathBuf;
 
-use serde_json::json;
-
 fn main() {
     let cc;
     let mut cflags;
@@ -165,8 +163,6 @@ fn main() {
     println!("cargo:CC={}", &cc);
     println!("cargo:CFLAGS={}", &cflags);
 
-    println!("cargo:rerun-if-changed=riot-bindgen.h");
-
     let cflags = shlex::split(&cflags).expect("Odd shell escaping in RIOT_CFLAGS");
     let cflags: Vec<String> = cflags
         .into_iter()
@@ -185,9 +181,225 @@ fn main() {
         })
         .collect();
 
-    let bindings = builder()
-        .header("riot-bindgen.h")
+    let out_path = PathBuf::from(env::var("OUT_DIR").unwrap());
+    let manifest_dir = PathBuf::from(env::var("CARGO_MANIFEST_DIR").unwrap());
+
+    println!("cargo:rerun-if-changed=riot-bindgen.h");
+    println!("cargo:rerun-if-changed=riot-headers.h");
+
+    // Function-like and initializer macros that are made available as functions.
+    //
+    // They are emitted as `static inline` functions into the generated header; from there, they
+    // are picked up by bindgen's static function wrapping like any other `static inline` function
+    // of RIOT.
+    //
+    // Entries marked "is const" need to be scalar: Rather than a function, a typed `static const`
+    // is emitted, which bindgen evaluates; it is exposed as a `const fn macro_NAME()`.
+    //
+    // (`MUTEX_INIT` is not in here, but implemented manually in `src/manual.rs`, as it is needed
+    // in const context, but is a struct).
+    //
+    // Fields: macro name, return type, arguments, is const, fallback value
+    let macro_functions = [
+        ("SOCK_IPV4_EP_ANY", "sock_udp_ep_t", None, false, None),
+        ("SOCK_IPV6_EP_ANY", "sock_udp_ep_t", None, false, None),
+        // neither C2Rust nor bindgen understand the cast without help
+        ("STATUS_NOT_FOUND", "thread_status_t", None, true, None),
+        // If any board is ever added that works completely differently, this'll have to go behind
+        // a feature-gate
+        (
+            "GPIO_PIN",
+            "gpio_t",
+            Some("unsigned port, unsigned pin"),
+            // would be nice to have them const, but on boards like samd21-xpro that'd require
+            // several nightly features (const_ptr_offset, const_mut_refs).
+            false,
+            None,
+        ),
+        // These are bound to the signature already in periph_init.
+        ("I2C_DEV", "i2c_t", Some("unsigned num"), false, None),
+        ("SPI_DEV", "spi_t", Some("unsigned num"), false, None),
+        // No good source on why this sould have a fixed signature, but at this point it's a
+        // pattern.
+        ("UART_DEV", "uart_t", Some("unsigned num"), false, None),
+        ("PWM_DEV", "pwm_t", Some("unsigned num"), false, None),
+        ("ADC_LINE", "adc_t", Some("unsigned num"), false, None),
+        // RIOT's timer type is tim_t; timer_t would be POSIX' (which is a pointer on native).
+        ("TIMER_DEV", "tim_t", Some("unsigned num"), false, None),
+        ("QDEC_DEV", "qdec_t", Some("unsigned num"), false, None),
+        ("DAC_LINE", "dac_t", Some("unsigned num"), false, None),
+    ];
+    let mut macro_functions: Vec<_> = macro_functions
+        .iter()
+        .map(
+            |(macro_name, return_type, args, is_const, fallback_value)| {
+                (
+                    macro_name.to_string(),
+                    *return_type,
+                    *args,
+                    *is_const,
+                    *fallback_value,
+                )
+            },
+        )
+        .collect();
+    for i in 0..8 {
+        macro_functions.push((format!("LED{}_ON", i), "void", None, false, None));
+        macro_functions.push((format!("LED{}_OFF", i), "void", None, false, None));
+        macro_functions.push((format!("LED{}_TOGGLE", i), "void", None, false, None));
+        macro_functions.push((
+            format!("LED{}_IS_PRESENT", i),
+            "int",
+            Some("defined"),
+            true,
+            Some("-1"),
+        ));
+    }
+
+    // Constants that bindgen can not express from the macro alone (because they contain casts,
+    // or because they are enum members that bindgen prefixes with the enum name). They are made
+    // available under their C name with their C type. On the C side, they go through a `static
+    // const long long` (because bindgen only evaluates initializers of plain integer types, not
+    // of enums), and are cast to their type in Rust.
+    //
+    // Fields: name, C type, preprocessor condition (default: `defined(name)`)
+    let typed_constants: &[(&str, &str, Option<&str>)] = &[
+        ("GPIO_UNDEF", "gpio_t", None),
+        ("STATUS_NOT_FOUND", "thread_status_t", None),
+        // Enum members of RIOT's af.h, which also provides `#define AF_INET AF_INET` etc.
+        ("AF_UNSPEC", "unix_af_t", None),
+        ("AF_UNIX", "unix_af_t", None),
+        ("AF_PACKET", "unix_af_t", None),
+        ("AF_INET", "unix_af_t", None),
+        ("AF_INET6", "unix_af_t", None),
+        (
+            "SOCK_ASYNC_MSG_RECV",
+            "sock_async_flags_t",
+            Some("defined(MODULE_SOCK_ASYNC)"),
+        ),
+    ];
+    const CONST_PREFIX: &str = "riot_sys_const_";
+
+    let mut header = String::new();
+    writeln!(
+        header,
+        "/* Generated by riot-sys' build.rs -- do not edit */\n\
+         #include \"{}\"\n",
+        manifest_dir.join("riot-bindgen.h").display()
+    )
+    .unwrap();
+
+    const MACROCONST_PREFIX: &str = "riot_sys_macroconst_";
+    for (macro_name, return_type, mut args, is_const, fallback_value) in macro_functions.iter() {
+        let expression = match args {
+            None => macro_name.to_string(),
+            Some("void") => format!("{macro_name}()"),
+            // Special handling for macros that are not used as values, but are more of an ifdef
+            // guard.
+            Some("defined") => {
+                args = None;
+                // No need to check further: the function is already inside an ifdef
+                "1".to_string()
+            }
+            Some(args) => format!(
+                "{macro_name}({})",
+                args.split(", ")
+                    .map(|s| &s[s.find(" ").expect("Non-void args need to have names")..])
+                    .collect::<Vec<&str>>()
+                    .join(", ")
+            ),
+        };
+        let args = args.unwrap_or("void");
+
+        // The ifdef guards make errors easier to spot: A "cannot find function
+        // `macro_SOCK_IPV6_EP_ANY` in crate `riot_sys`" can lead one to check whether
+        // SOCK_IPV6_EP_ANY is really defined.
+        writeln!(header, "#ifdef {macro_name}").unwrap();
+        if *is_const {
+            assert!(args == "void", "Const macros can not take arguments");
+            writeln!(
+                header,
+                "static const long long {MACROCONST_PREFIX}{macro_name} = (long long)({expression});"
+            )
+        } else if *return_type == "void" {
+            // in C, assigning and returning void is special
+            writeln!(
+                header,
+                "static inline void macro_{macro_name}({args}) {{\n    {expression};\n}}"
+            )
+        } else {
+            writeln!(
+                header,
+                "static inline {return_type} macro_{macro_name}({args}) {{\n    \
+                 {return_type} result = {expression};\n    return result;\n}}"
+            )
+        }
+        .unwrap();
+        if let Some(fallback_value) = fallback_value {
+            if *is_const {
+                writeln!(
+                    header,
+                    "#else\nstatic const long long {MACROCONST_PREFIX}{macro_name} = {fallback_value};"
+                )
+            } else {
+                writeln!(
+                header,
+                "#else\nstatic inline {return_type} macro_{macro_name}({args}) {{\n    \
+                 return {fallback_value};\n}}"
+                )
+            }
+            .unwrap();
+        }
+        writeln!(header, "#endif\n").unwrap();
+    }
+
+    for (name, _ctype, condition) in typed_constants {
+        let condition = condition
+            .map(|c| c.to_string())
+            .unwrap_or_else(|| format!("defined({name})"));
+        writeln!(
+            header,
+            "#if {condition}\nstatic const long long {CONST_PREFIX}{name} = (long long)({name});\n#endif\n"
+        )
+        .unwrap();
+    }
+
+    let header_path = out_path.join("riot-sys.h");
+    std::fs::write(&header_path, header).expect("Failed to write riot-sys.h");
+
+    // Wrappers for static (inline) functions
+    //
+    // bindgen produces a C file that contains non-static wrappers around all static functions;
+    // the Rust declarations link to these wrappers. That C file needs to be built with the same
+    // compiler and flags as the rest of RIOT and linked into the application; RIOT's build system
+    // does that, and tells us where to put the file through RIOT_SYS_STATIC_FNS_C.
+    //
+    // Without that variable (eg. when just running `cargo check` or `cargo doc`), the file is
+    // placed in OUT_DIR, and linking will fail unless something else picks it up from there.
+    println!("cargo:rerun-if-env-changed=RIOT_SYS_STATIC_FNS_C");
+    let static_fns_c = env::var("RIOT_SYS_STATIC_FNS_C")
+        .map(PathBuf::from)
+        .unwrap_or_else(|_| out_path.join("static_fns.c"));
+    assert!(
+        static_fns_c.extension().is_some_and(|e| e == "c"),
+        "RIOT_SYS_STATIC_FNS_C needs to end in .c"
+    );
+    // bindgen does not write the file if there is nothing to wrap; don't let stale versions linger.
+    let _ = std::fs::remove_file(&static_fns_c);
+
+    let mut builder = builder()
+        .header(header_path.to_str().expect("OUT_DIR is UTF-8"))
         .clang_args(&cflags)
+        // Enables workarounds in riot-bindgen.h that are only needed (and only correct) when
+        // parsing the headers with libclang, as opposed to when compiling the static fn wrappers.
+        .clang_arg("-DRIOT_SYS_BINDGEN")
+        .wrap_static_fns(true)
+        .wrap_static_fns_path(static_fns_c.with_extension(""));
+    for (name, _, _) in typed_constants {
+        // If bindgen understands the macro on its own, it'd produce a clashing definition.
+        builder = builder.blocklist_item(name);
+    }
+    let bindings = builder
         .use_core()
         .ctypes_prefix("core::ffi")
         // This is the defensive choice in presence of odd targets, as it forces us to be explicit
@@ -245,480 +457,69 @@ fn main() {
         .generate()
         .expect("Unable to generate bindings");
 
-    let out_path = PathBuf::from(env::var("OUT_DIR").unwrap());
-    let bindgen_outfilename = out_path.join("bindings.rs");
-    bindings
-        .write_to_file(&bindgen_outfilename)
-        .expect("Couldn't write bindings!");
-    // Store for inspection for markers; see there
+    if !static_fns_c.exists() {
+        // Keep the C side simple: there is always a file to build.
+        std::fs::write(
+            &static_fns_c,
+            "/* No static functions were found by riot-sys */\n\
+             typedef int riot_sys_no_static_fns;\n",
+        )
+        .expect("Failed to write static fns stub");
+    }
+    // Backdate the file: If it is removed, the build script is rerun (and recreates it), but its
+    // own creation should not cause reruns. (RIOT rebuilds it unconditionally anyway).
+    std::fs::File::options()
+        .write(true)
+        .open(&static_fns_c)
+        .and_then(|f| f.set_modified(std::time::UNIX_EPOCH + std::time::Duration::from_secs(1)))
+        .expect("Failed to backdate static fns file");
+    println!("cargo:rerun-if-changed={}", static_fns_c.display());
+
     let mut bindgen_output = Vec::<u8>::new();
     bindings
         .write(Box::new(&mut bindgen_output))
         .expect("String writing never fails");
+    let bindgen_outfilename = out_path.join("bindings.rs");
+    std::fs::write(&bindgen_outfilename, &bindgen_output).expect("Couldn't write bindings!");
+    // Kept for inspection for markers; see there
     let bindgen_output = std::str::from_utf8(&bindgen_output).expect("Rust source code is UTF-8");
 
-    // Build a compile_commands.json, and run C2Rust
-    //
-    // The output is cleared beforehand (for c2rust no-ops when an output file is present), and the
-    // input is copied to OUT_DIR as that's the easiest way to get c2rust to put the output file in
-    // a different place -- and because some additions are generated anyway.
-
-    let c2rust_infile = "riot-c2rust.h";
-    // Follows from c2rust_infile and C2Rust's file name translation scheme
-    let c2rust_output = out_path.join("riot_c2rust.rs");
-    let headercopy = out_path.join(c2rust_infile);
-    println!("cargo:rerun-if-changed=riot-c2rust.h");
-
-    std::fs::copy("riot-headers.h", out_path.join("riot-headers.h"))
-        .expect("Failed to copy over header file");
-
-    // These constant initializers are unusable without knowledge of which type they're for; adding
-    // the information here to build explicit consts
-    let macro_functions = [
-        ("SOCK_IPV4_EP_ANY", "sock_udp_ep_t", None, true, None),
-        ("SOCK_IPV6_EP_ANY", "sock_udp_ep_t", None, true, None),
-        ("MUTEX_INIT", "mutex_t", None, true, None),
-        // neither C2Rust nor bindgen understand the cast without help
-        ("STATUS_NOT_FOUND", "thread_status_t", None, true, None),
-        // If any board is ever added that works completely differently, this'll have to go behind
-        // a feature-gate
-        (
-            "GPIO_PIN",
-            "gpio_t",
-            Some("unsigned port, unsigned pin"),
-            // would be nice to have them const, but on boards like samd21-xpro that'd require
-            // several nightly features (const_ptr_offset, const_mut_refs).
-            false,
-            None,
-        ),
-        // These are bound to the signature already in periph_init.
-        ("I2C_DEV", "i2c_t", Some("unsigned num"), false, None),
-        ("SPI_DEV", "spi_t", Some("unsigned num"), false, None),
-        // No good source on why this sould have a fixed signature, but at this point it's a
-        // pattern.
-        ("UART_DEV", "uart_t", Some("unsigned num"), false, None),
-        ("PWM_DEV", "pwm_t", Some("unsigned num"), false, None),
-        ("ADC_LINE", "adc_t", Some("unsigned num"), false, None),
-        // RIOT's timer type is tim_t; timer_t would be POSIX' (which is a pointer on native).
-        ("TIMER_DEV", "tim_t", Some("unsigned num"), false, None),
-        ("QDEC_DEV", "qdec_t", Some("unsigned num"), false, None),
-        ("DAC_LINE", "dac_t", Some("unsigned num"), false, None),
-    ];
-    let mut macro_functions: Vec<_> = macro_functions
-        .iter()
-        .map(
-            |(macro_name, return_type, args, is_const, fallback_value)| {
-                (
-                    macro_name.to_string(),
-                    *return_type,
-                    *args,
-                    *is_const,
-                    *fallback_value,
-                )
-            },
-        )
-        .collect();
-    for i in 0..8 {
-        macro_functions.push((format!("LED{}_ON", i), "void", None, false, None));
-        macro_functions.push((format!("LED{}_OFF", i), "void", None, false, None));
-        macro_functions.push((format!("LED{}_TOGGLE", i), "void", None, false, None));
-        macro_functions.push((
-            format!("LED{}_IS_PRESENT", i),
-            "int",
-            Some("defined"),
-            true,
-            Some("-1"),
-        ));
-    }
-
-    let mut c_code = String::new();
-    std::fs::File::open("riot-c2rust.h")
-        .expect("Failed to open riot-c2rust.h")
-        .read_to_string(&mut c_code)
-        .expect("Failed to read riot-c2rust.h");
-
-    for (macro_name, return_type, mut args, _is_const, fallback_value) in macro_functions.iter() {
-        let expression = match args {
-            None => macro_name.to_string(),
-            Some("void") => format!("{macro_name}()"),
-            // This could be an extra field of another enum variant too -- its point is to
-            // introduce special handling for macros that are not just used with no arguments, but
-            // are really more of an ifdef guard.
-            //
-            // Those would also *work* with `None`, but it creates code such as `#define
-            // LED0_IS_PRESENT` / `int result =
-            // LED0_IS_PRESENT;`, which is kind of accepted by C2Rust to mean 1 (which is the case
-            // when passed through `-D` but maybe not by the one-argument `#define`), but also
-            // shows an error in the C2Rust output, which can be misleading when there is a
-            // different C2Rust error but those errors are also visible (as was the case in
-            // <https://github.com/RIOT-OS/RIOT/issues/21079>).
-            Some("defined") => {
-                args = None;
-                // No need to check further: the function is already inside an ifdef
-                "1".to_string()
-            }
-            Some(args) => format!(
-                "{macro_name}({})",
-                args.split(", ")
-                    .map(|s| &s[s.find(" ").expect("Non-void args need to have names")..])
-                    // Not really essential concepturally, but .join is only available on
-                    // slices, not on Iterator
-                    .collect::<Vec<&str>>()
-                    .join(", ")
-            ),
-        };
-
-        // The ifdef guards make errors easier to spot: A "cannot find function
-        // `macro_SOCK_IPV6_EP_ANY` in crate `riot_sys`" can lead one to check whether
-        // SOCK_IPV6_EP_ANY is really defined, whereas if the macro is missing, C2Rust would
-        // produce a run-time panic, and the compiler would reject that in a const function.
-        //
-        // This is more reliable than the previous approach of trying to defined a `-DSOME_MODULE`
-        // condition, also because there may not even be a module that gives a precise condition.
-        if *return_type == "void" {
-            // in C, assigning and returning void is special
-            write!(
-                c_code,
-                r"
-
-#ifdef {macro_name}
-{return_type} macro_{macro_name}({args}) {{
-    {expression};
-}}
-                ",
-                return_type = return_type,
-                expression = expression,
-                args = args.unwrap_or("void"),
-            )
-        } else {
-            write!(
-                c_code,
-                r"
-
-#ifdef {macro_name}
-{return_type} macro_{macro_name}({args}) {{
-    {return_type} result = {expression};
-    return result;
-}}
-                ",
-                return_type = return_type,
-                expression = expression,
-                args = args.unwrap_or("void"),
-            )
+    // Const accessors for the scalar macros, and typed constants
+    let mut macro_consts = String::new();
+    let rust_type = |ctype: &str| match ctype {
+        "int" => "core::ffi::c_int".to_string(),
+        other => other.to_string(),
+    };
+    let evaluated = |name: &str| {
+        let found = bindgen_output.contains(&format!("pub const {name}: "));
+        if !found && bindgen_output.contains(&format!("pub static {name}: ")) {
+            panic!("bindgen could not evaluate {name}");
         }
-        .unwrap();
-
-        if let Some(fallback_value) = fallback_value {
+        found
+    };
+    for (macro_name, return_type, _, is_const, _) in macro_functions.iter() {
+        if *is_const && evaluated(&format!("{MACROCONST_PREFIX}{macro_name}")) {
+            let rust_type = rust_type(return_type);
             writeln!(
-                c_code,
-                r"
-#else
-{return_type} macro_{macro_name}({args}) {{
-    return {fallback_value};
-}}
-                     ",
-                args = args.unwrap_or("void"),
+                macro_consts,
+                "pub const unsafe fn macro_{macro_name}() -> {rust_type} \
+                 {{ {MACROCONST_PREFIX}{macro_name} as {rust_type} }}"
             )
             .unwrap();
         }
-        writeln!(c_code, r" #endif").unwrap();
     }
-
-    let mut outfile =
-        std::fs::File::create(&headercopy).expect("Failed to open temporary riot-c2rust.h");
-    outfile
-        .write_all(c_code.as_bytes())
-        .expect("Failed to write to riot-c2rust.h");
-    outfile
-        .sync_all()
-        .expect("failed to write to riot-c2rust.h");
-
-    if cc.find("clang") == None {
-        panic!("riot-sys only accepts clang style CFLAGS. RIOT can produce them using the compile_commands tool even when using a non-clang compiler, such as GCC.");
-    };
-
-    let arguments: Vec<_> = core::iter::once("any-cc".to_string())
-        .chain(cflags.into_iter())
-        .chain(core::iter::once(c2rust_infile.to_string()))
-        .collect();
-    let compile_commands = json!([{
-        "arguments": arguments,
-        "directory": out_path,
-        "file": c2rust_infile,
-    }]);
-    let compile_commands_name = out_path.join("compile_commands.json");
-
-    let mut compile_commands_file = std::fs::File::create(compile_commands_name.clone())
-        .expect("Failed to create compile_commands.json");
-    serde_json::to_writer_pretty(&mut compile_commands_file, &compile_commands)
-        .expect("Failed to write to compile_commands.json");
-    compile_commands_file
-        .sync_all()
-        .expect("Failed to write to compile_commands.json");
-
-    let compile_commands_name = compile_commands_name
-        .to_str()
-        .expect("Inexpressible path name");
-
-    println!("cargo:rerun-if-env-changed=C2RUST");
-    println!("cargo:rerun-if-env-changed=PATH");
-    let c2rust = std::env::var("C2RUST").unwrap_or_else(|_| "c2rust".to_string());
-    let c2rust_version = std::process::Command::new(&c2rust)
-        .args(&["--version"])
-        .output()
-        .expect("C2Rust version check did not complete")
-        .stdout;
-    let c2rust_version = String::from_utf8_lossy(&c2rust_version);
-    print!("C2Rust binary {}, version: {}", c2rust, c2rust_version);
-    // Version won't tell us whether --translate-const-macros needs a TRANSLATE_CONST_MACROS
-    // argument or not, because people can also install from git
-    let c2rust_help = std::process::Command::new(&c2rust)
-        .args(&["transpile", "--help"])
-        .output()
-        .expect("C2Rust --help did not work")
-        .stdout;
-    let c2rust_help =
-        core::str::from_utf8(&c2rust_help).expect("C2Rust help had non-UTF8 characters");
-    let translate_const_macros_arg = if c2rust_help.contains("TRANSLATE_CONST_MACROS") {
-        "--translate-const-macros=conservative"
-    } else {
-        // versions up to 0.20
-        "--translate-const-macros"
-    };
-    // FIXME: This does not rat on the used files. Most are probably included from riot-bindgen.h
-    // anyway, tough.
-    println!("Running C2Rust on {}", compile_commands_name);
-    let status = std::process::Command::new(&c2rust)
-        .args(&[
-            "transpile",
-            compile_commands_name,
-            "--emit-modules",
-            "--emit-no-std",
-            translate_const_macros_arg,
-            "--overwrite-existing",
-            "--fail-on-error",
-        ])
-        .status()
-        .expect("C2Rust failed");
-    if !status.success() {
-        println!(
-            "cargo:warning=C2Rust failed with error code {}, exiting",
-            status
-        );
-        std::process::exit(status.code().unwrap_or(1));
-    }
-
-    // Some fix-ups to the C2Rust output
-    // (could just as well call sed...)
-
-    use std::io::{Read, Write};
-
-    let mut rustcode = String::new();
-    std::fs::File::open(c2rust_output)
-        .expect("Failed to open riot_c2rust.rs")
-        .read_to_string(&mut rustcode)
-        .expect("Failed to read from riot_c2rust.rs");
-
-    rustcode = rustcode.replace("use ::libc;\n", "");
-
-    if !c2rust_version.contains("+git-for-riot") && c2rust_version.contains("C2Rust 0.15") {
-        // Old C2Rust still generate old-style ASM -- workaround for https://github.com/immunant/c2rust/issues/306
-        rustcode = rustcode.replace(" asm!(", " llvm_asm!(");
-    }
-
-    // Workaround for https://github.com/immunant/c2rust/issues/372
-    rustcode = rustcode.replace("::core::intrinsics::", "crate::intrinsics_replacements::");
-
-    println!("cargo:rerun-if-env-changed=CARGO_FEATURE_KEEP_EXTERN_TYPES");
-    if env::var("CARGO_FEATURE_KEEP_EXTERN_TYPES").is_err() {
-        // For documentation on why we do this, see include in src/inline.rs.
-
-        let pubtypepattern = regex::Regex::new("pub type (?P<type>[a-zA-Z0-9_]+);").unwrap();
-        let pubtypes = pubtypepattern
-            .captures_iter(&rustcode)
-            .map(|m| m.name("type").unwrap().as_str());
-
-        let pubtype_replacements = out_path.join("pubtype_replacements.rs");
-        let mut pubtype_replacements_file = std::fs::File::create(pubtype_replacements)
-            .expect("Failed to create pubtype_replacements.rs");
-
-        for pt in pubtypes {
+    for (name, ctype, _) in typed_constants {
+        if evaluated(&format!("{CONST_PREFIX}{name}")) {
+            let rust_type = rust_type(ctype);
             writeln!(
-                pubtype_replacements_file,
-                "pub type {} = [u8; isize::MAX as _];",
-                pt
+                macro_consts,
+                "pub const {name}: {rust_type} = {CONST_PREFIX}{name} as {rust_type};"
             )
-            .expect("Failed to write to pubtype_replacements.rs");
+            .unwrap();
         }
-
-        rustcode = pubtypepattern
-            .replace_all(&rustcode, "/* $0 */")
-            .to_string();
     }
-
-    // On 64-bit native, what gets emitted as vprintf(_, _, _: __builtin_va_list) gets emitted as
-    // vprintf(_, _, _: core::ffi::VaList), which is unsupported in stable -- but we don't use that
-    // function, it's just an unfortunate side effect of --preserve-unused-functions. This quick
-    // workaround enables building and ensures that the function is never called.
-    rustcode = rustcode.replace("::core::ffi::VaList", "::core::convert::Infallible");
-    rustcode = rustcode.replace("__arg.as_va_list()", "__arg");
-
-    // Replace the function declarations with ... usually something pub, but special considerations
-    // may apply
-    let mut rustcode_functionsreplaced = String::new();
-    let function_original_prefix = r#"unsafe extern "C" fn "#;
-    let mut functionchunks = rustcode.split(function_original_prefix);
-    rustcode_functionsreplaced.push_str(
-        functionchunks
-            .next()
-            .expect("Split produces at least a hit"),
-    );
-
-    for chunk in functionchunks {
-        let funcname = &chunk[..chunk.find('(').expect("Function has parentheses somewhere")];
-        let macro_details = if funcname.len() > 5 && &funcname[..6] == "macro_" {
-            macro_functions
-                .iter()
-                .filter(|(macro_name, _, _, _, _)| &funcname[6..] == *macro_name)
-                .next()
-        } else {
-            None
-        };
-        let new_prefix = match (funcname, macro_details) {
-            // used as a callback, therefore does need the extern "C" -- FIXME probably worth a RIOT issue
-            ("_evtimer_msg_handler" | "_evtimer_mbox_handler", _) => function_original_prefix,
-
-            // Assigned by CMSIS to the const that is being overridden and thus needs its original
-            // "C" type; see also riot-c2rust.h. (Actually using it would cause a linker error
-            // anyway).
-            ("__masked_builtin_arm_get_fpscr" | "__masked_builtin_arm_set_fpscr", _) => {
-                function_original_prefix
-            }
-
-            // same problem but from C2Rust's --translate-const-macros
-            ("__NVIC_SetPriority", _) => function_original_prefix,
-
-            // As below (no need for extern), and they are const as declared ni the macro_functions
-            // list.
-            (_, Some((_, _, _, is_const, _))) => {
-                // No "pub" because that's already a "pub" in front of it, they were never static
-                match is_const {
-                    // FIXME: These should be unsafe -- just because most of them are const doesn't
-                    // necessrily mean they're safe (just the first few happened to be, but that's
-                    // not this crate's place to assert)
-                    true => "const unsafe fn ",
-                    false => "unsafe fn ",
-                }
-            }
-
-            // C2Rust transpiles these into Rust with conflicting lifetimes, see
-            // https://github.com/immunant/c2rust/issues/309
-            //
-            // Simply disabling them here because they aren't used by any other inline code (and
-            // will, when the manual llvm_asm to asm changes are added to riot-sys, not have manual
-            // asm conversions on top of that).
-            ("__SMLALD" | "__SMLALDX" | "__SMLSLD" | "__SMLSLDX", _) => {
-                "#[cfg(c2rust_fixed_309)]\npub unsafe fn "
-            }
-
-            // The rest we don't need to call through the extern convention, but let's please make
-            // them pub to be usable
-            _ => "pub unsafe fn ",
-        };
-        rustcode_functionsreplaced.push_str(new_prefix);
-        rustcode_functionsreplaced.push_str(chunk);
-    }
-
-    rustcode = rustcode_functionsreplaced;
-
-    // We don't even need that function any more, we just have that in there so that c2rust gives
-    // us its callees as functions. (In bindgen, we'd just list the functions we'd like to have).
-    rustcode = rustcode.replace(
-        "pub pub unsafe fn use_everything()",
-        "#[cfg(false)] unsafe fn use_everything()",
-    );
-    // The macro_ wrappers are already `pub` because they are regular functions we create here that
-    // just go around the macro code; removing the double pub.
-    rustcode = rustcode.replace("pub pub unsafe fn ", "pub unsafe fn ");
-
-    let output_replaced = out_path.join("riot_c2rust_replaced.rs");
-    std::fs::File::create(output_replaced)
-        .expect("Failed to create riot_c2rust_replaced.rs")
-        .write(rustcode.as_bytes())
-        .expect("Failed to write to riot_c2rust_replaced.rs");
-
-    // Pub uses of inline right into the main lib.rs
-    //
-    // This is primarily for things that can really come from either backend (eg. irq functions
-    // that are regular on native but static inline on others), and for convenience stuff like
-    // macro_.
-    //
-    // Some functions are also in because they're innocuous enough.
-    //
-    // If (eg. on some platform but not on others) any function here is not an inline function,
-    // that does not hurt; the entry doesn't do anything on these then. (But it is especially
-    // valuable, as it ensures that on the *other* platforms it's still available with the same
-    // Rust name).
-    let mut toplevel_from_inline: Vec<String> = [
-        "bluetil_ad_add_flags",
-        "coap_get_code_raw",
-        "coap_get_total_hdr_len",
-        "gnrc_netapi_dispatch_send",
-        "gnrc_netif_ipv6_addrs_get",
-        "gnrc_netreg_entry_init_pid",
-        "gpio_is_valid",
-        "irq_disable",
-        "irq_is_enabled",
-        "irq_is_in",
-        "irq_restore",
-        "mutex_trylock",
-        "mutex_lock",
-        "pid_is_valid",
-        "shell_run_forever",
-        "sock_udp_recv",
-        "sock_udp_send",
-        "thread_get",
-        "thread_getpid",
-        "thread_get_unchecked",
-        "ztimer_spin",
-        "ws281x_prepare_transmission",
-        "ws281x_end_transmission",
-        // because when defined through RIOT's af.h these are enums and thus unix_af_t prefixed.
-        "AF_UNSPEC",
-        "AF_UNIX",
-        "AF_PACKET",
-        "AF_INET",
-        "AF_INET6",
-    ]
-    .iter()
-    .map(|name| name.to_string())
-    .collect();
-    for (macro_name, _, _, _, _) in macro_functions.iter() {
-        toplevel_from_inline.push(format!("macro_{}", macro_name));
-    }
-    let toplevel_from_inline: Vec<String> = toplevel_from_inline
-        .drain(..)
-        .filter(|s: &String| {
-            // Not just matching on `pub fn`: `irq_disable` on native is visible as `extern "C" {
-            // fn irq_disable(); }`, and that should not trigger going through C2Rust.
-            rustcode.contains(&format!("pub fn {}(", s))
-                || rustcode.contains(&format!("unsafe fn {}(", s))
-                || rustcode.contains(&format!(" {}: ", s))
-        })
-        .collect();
-    let toplevel_from_inline_filename = out_path.join("toplevel_from_inline.rs");
-    std::fs::File::create(toplevel_from_inline_filename)
-        .expect("Failed to create toplevel_from_inline.rs")
-        .write(
-            format!(
-                "
-               pub use inline::{{ {} }};
-           ",
-                toplevel_from_inline.join(",\n")
-            )
-            .as_bytes(),
-        )
-        .expect("Failed to write to toplevel_from_inline.rs");
+    std::fs::write(out_path.join("macro_consts.rs"), macro_consts)
+        .expect("Failed to write macro_consts.rs");
 
     enum MarkerCondition {
         /// This has been around for long enough that no actual check is performed any more, the

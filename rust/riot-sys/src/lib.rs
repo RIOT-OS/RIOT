@@ -109,29 +109,27 @@
 //!
 //! ---
 //!
-//! The types and constants of RIOT are translated in two forms:
-//! through bindgen (to be linked together), and through C2Rust (transpiled, to be inlined).
-//! This is necessary because neither can express the full set of useful RIOT APIs.
-//!
-//! All bindgen types are reexported in the main module and exclusively public through there. The
-//! C2Rust types largely reside in the [inline] module, with some pub used into the root module as
-//! necessary or convenient.
+//! The types, constants and functions of RIOT are translated through bindgen. Functions that are
+//! `static inline` in C (and a few function-like macros, which are available as `macro_NAME`) are
+//! reached through small non-inline wrapper functions that bindgen generates as a C file; RIOT's
+//! build system compiles and links that file (see `RIOT_SYS_STATIC_FNS_C`).
 #![no_std]
 #![allow(non_upper_case_globals)]
 #![allow(non_camel_case_types)]
 #![allow(non_snake_case)]
-#![cfg_attr(feature = "keep-extern-types", feature(extern_types))]
 
 #[deprecated(note = "Use core::ffi types directly")]
 pub mod libc;
 
-mod intrinsics_replacements;
-
 mod bindgen;
+/// Compatibility alias for the crate root (formerly: C2Rust transpiled functions).
 pub mod inline;
-
-include!(concat!(env!("OUT_DIR"), "/toplevel_from_inline.rs"));
 pub use bindgen::*;
+
+mod manual;
+pub use manual::*;
+
+include!(concat!(env!("OUT_DIR"), "/macro_consts.rs"));
 
 // re-export RIOT-rs core (used by riot-wrappers)
 #[cfg(feature = "riot-rs")]

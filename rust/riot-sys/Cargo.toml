@@ -15,10 +15,6 @@ license = "LGPL-2.1"
 links = "riot-sys"
 
 [dependencies]
-c2rust-asm-casts = "0.2"
-# Relevant for some boards like the wemos-zero
-c2rust-bitfields = { version = "0.3", features = ["no_std"] }
-
 # optionally use RIOT-rs's riot-build
 riot-build = { version = "< 0.2.0", optional = true }
 riot-rs-core = { version = "< 0.2.0", optional = true }
@@ -33,12 +29,9 @@ bindgen = { git = "https://github.com/chrysn-pull-requests/rust-bindgen", branch
 shlex = "^1.3"
 serde_json = "1"
 serde = { version = "1", features = [ "derive" ] }
-regex = "1"
 
 [features]
-# When this is active, the workarounds that keep C2Rust from generating extern
-# types are disabled, and the library uses the nightly compiler feature
-# `extern_types`.
+# Without effect since C2Rust is not used any more; kept for compatibility.
 keep-extern-types = []
 
 # this needs to be set to build together with RIOT-rs.
