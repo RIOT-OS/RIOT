@@ -142,7 +142,7 @@ fn main() {
     //
     // This is sometimes necessary when some C API compatible change (eg. renaming a field with a
     // deprecated union while introducing a proper accessor, as done in
-    // https://github.com/RIOT-OS/RIOT/pull/20900) leads to changes in bindgen and c2rust outputs.
+    // https://github.com/RIOT-OS/RIOT/pull/20900) leads to changes in the bindgen output.
     //
     // This is similar to the markers that were previously used in riot-sys. We access files
     // directly to avoid going through `links=` (see also
@@ -167,8 +167,8 @@ fn main() {
     // alternatives.
     let bindgen_output_file = std::env::var("DEP_RIOT_SYS_BINDGEN_OUTPUT_FILE").unwrap();
     let emulate_accessible = [
-        // It's a static inline function and riot-sys currently only gives the file for the bindgen
-        // output, not the c2rust output. Using coap_build_udp_hdr presence as a stand-in.
+        // Checked in the header, as that was the only way to find static inline functions while
+        // they were translated by C2Rust.
         //
         // Remove this after a release including coap_pkt_set_code
         // <https://github.com/RIOT-OS/riot/issues/20900> has been published.

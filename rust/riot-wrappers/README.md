@@ -81,15 +81,6 @@ Code conventions
 
 There is a [contributing guide](CONTRIBUTING.md) for this repository.
 
-In older pieces of code (predating the use of C2Rust), static inline RIOT functions
-or expanded macros are used. To keep track of them, comments in the shape of
-``EXPANDED ${FILE}:${LINE}`` are set (referring to line numbers in RIOT commit 6b96f69b).
-
-As these are being replaced by using C2Rust idioms, conflicts between C2Rust's
-and bindgen's versions of structs arise instead, typically around pointers. When these
-are cast away, they're fed through `inline_cast` & co to perform some checks,
-or commented with ``INLINE TRANSMUTE`` for the very hard cases.
-
 License
 -------
 
@@ -97,7 +88,7 @@ This crate is dual-licensed under the same terms of the MIT license or the
 Apache 2.0 license, as is commonplace in the embedded Rust ecosystem.
 
 Note that it crate depends on `riot-sys`, which is licensed under RIOT's LGPL
-2.1 to reflect that it uses code transpiled from RIOT.
+2.1 to reflect that it uses code translated from RIOT.
 
 The crate is maintained by Christian Amsüss <chrysn@fsfe.org> as part of the etonomy
 project, see <https://etonomy.org/>, and the RIOT team.

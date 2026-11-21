@@ -212,7 +212,7 @@ fn main() {
     let macro_functions = [
         ("SOCK_IPV4_EP_ANY", "sock_udp_ep_t", None, false, None),
         ("SOCK_IPV6_EP_ANY", "sock_udp_ep_t", None, false, None),
-        // neither C2Rust nor bindgen understand the cast without help
+        // bindgen does not understand the cast without help
         ("STATUS_NOT_FOUND", "thread_status_t", None, true, None),
         // If any board is ever added that works completely differently, this'll have to go behind
         // a feature-gate
