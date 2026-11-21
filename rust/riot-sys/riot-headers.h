@@ -171,29 +171,21 @@
 #include "uuid.h"
 #endif
 #ifdef MODULE_XTIMER
-// Uses C11 generics since https://github.com/RIOT-OS/RIOT/pull/20494
-#ifndef IS_C2RUST
 #include <xtimer.h>
-#endif
 #endif
 #ifdef MODULE_ZTIMER
 #include <ztimer.h>
 #endif
 #ifdef MODULE_ZTIMER64
-#ifndef IS_C2RUST
 #include <ztimer64.h>
-#endif
 #endif
 #ifdef MODULE_ZTIMER_PERIODIC
 #include <ztimer/periodic.h>
 #endif
 #ifdef MODULE_VFS
-// Touches atomics, but we don't need macro expansions or static inlines from this one
-#ifndef IS_C2RUST
 // Actually using VFS needs constants like O_RDONLY
 #include <fcntl.h>
 #include <vfs.h>
-#endif
 #endif
 #ifdef MODULE_AUTO_INIT
 #include "auto_init_utils.h"
@@ -201,17 +193,12 @@
 
 /* packages */
 #ifdef MODULE_NIMBLE_AUTOADV
-#  ifndef IS_C2RUST
-/* These contain variadic functions ... and besides, let's only use C2Rust where we need it */
-#    include "nimble_autoadv.h"
-#    include "nimble_autoadv_params.h"
-#  endif
+#  include "nimble_autoadv.h"
+#  include "nimble_autoadv_params.h"
 #endif
 #ifdef MODULE_NIMBLE_HOST
 #  include "host/ble_gatt.h"
-#  ifndef IS_C2RUST
-#    include "host/ble_gap.h"
-#  endif
+#  include "host/ble_gap.h"
 #  include "host/ble_hs_adv.h"
 #endif
 #ifdef MODULE_NIMBLE_SVC_GAP
@@ -228,7 +215,7 @@
 #endif
 
 /* wolfSSL */
-#if defined(MODULE_WOLFSSL) && !defined(IS_C2RUST)
+#ifdef MODULE_WOLFSSL
 #include <wolfssl/wolfcrypt/settings.h>
 #include <wolfssl/wolfcrypt/sha256.h>
 #include <wolfssl/ssl.h>
