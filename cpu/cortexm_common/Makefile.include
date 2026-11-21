@@ -1,6 +1,21 @@
 # include module specific includes
 INCLUDES += -I$(RIOTCPU)/cortexm_common/include
 
+ifeq (to-be-set-later, $(RUST_TARGET))
+  # RUST_TARGET is set in `cpu/cortexm_common/Makefile.features` for most cores,
+  # manually set it here for `to-be-set-later`. See there for a full
+  # explanation.
+  ifeq (cortex-m33, $(CPU_CORE))
+    ifneq (,$(filter cortexm_fpu, $(USEMODULE)))
+      RUST_TARGET = thumbv8m.main-none-eabihf
+    else
+      RUST_TARGET = thumbv8m.main-none-eabi
+    endif
+  else
+    $(error RUST_TARGET set to 'to-be-set-later' but never actually set!)
+  endif
+endif
+
 # All variables must be defined in the CPU configuration when using the common
 # `ldscripts/cortexm.ld`
 ifneq (,$(ROM_START_ADDR)$(RAM_START_ADDR)$(ROM_LEN)$(RAM_LEN))
