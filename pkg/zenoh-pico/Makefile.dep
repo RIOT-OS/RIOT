@@ -1,0 +1,10 @@
+USEMODULE += zenoh-pico_riot
+
+USEMODULE += random
+USEMODULE += sock_tcp
+USEMODULE += ztimer64_msec
+USEMODULE += ztimer_msec
+
+# zenoh-pico relies on int being at least 32 bit wide
+FEATURES_BLACKLIST += arch_8bit
+FEATURES_BLACKLIST += arch_16bit

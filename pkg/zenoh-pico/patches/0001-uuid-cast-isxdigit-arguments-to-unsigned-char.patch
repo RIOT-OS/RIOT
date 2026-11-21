@@ -1,0 +1,25 @@
+From 45c1507122231ed59ac6d0a81f0454b1b07284f8 Mon Sep 17 00:00:00 2001
+From: Alexandre Abadie <alexandre.abadie@inria.fr>
+Date: Sun, 8 Nov 2026 17:17:10 +0100
+Subject: [PATCH] uuid: cast isxdigit() arguments to unsigned char
+
+Passing a negative char to the ctype functions is undefined behavior, and
+clang warns about it with the newlib implementation. isupper() is
+already called this way.
+---
+ src/utils/uuid.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/utils/uuid.c b/src/utils/uuid.c
+index c0d1dd83..e853c44f 100644
+--- a/src/utils/uuid.c
++++ b/src/utils/uuid.c
+@@ -59,7 +59,7 @@ _z_id_t _z_id_from_string(const _z_string_t *str) {
+         char high = s[offset];
+         char low = s[offset + 1];
+ 
+-        if (!isxdigit(high) || !isxdigit(low) || isupper((unsigned char)high) || isupper((unsigned char)low)) {
++        if (!isxdigit((unsigned char)high) || !isxdigit((unsigned char)low) || isupper((unsigned char)high) || isupper((unsigned char)low)) {
+             return _z_id_empty();
+         }
+ 
