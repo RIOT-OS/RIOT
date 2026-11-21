@@ -13,7 +13,7 @@
 //! Not provided by riot-wrappers are methods of implementing interrupts that are directly called
 //! by the CPU's interrupt mechanism. These are `extern "C"` functions (often with a `() -> ()`
 //! signature) exported under a particular name using `#[no_mangle]`. Any platform specifics (such
-//! as the [`riot_sys::inline::cortexm_isr_end()`] function) need to be managed by the
+//! as the [`riot_sys::cortexm_isr_end()`] function) need to be managed by the
 //! implementer, just as when implementing a C interrupt.
 //!
 //! Rust code intended for use within interrupts does not generally need special precautions -- but

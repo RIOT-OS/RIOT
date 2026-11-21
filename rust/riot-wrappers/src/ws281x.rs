@@ -48,7 +48,7 @@ impl<C: ChannelType + Default + Copy, const N: usize> BufferedWs281x<C, N> {
 impl<C: ChannelType, const N: usize> BufferedWs281x<C, N> {
     pub fn write(&mut self) {
         unsafe {
-            riot_sys::ws281x_prepare_transmission(crate::inline_cast_mut(&mut self.dev as *mut _));
+            riot_sys::ws281x_prepare_transmission(&mut self.dev as *mut _);
             riot_sys::ws281x_write_buffer(
                 &mut self.dev,
                 &self.buffer as *const _ as *const core::ffi::c_void,
@@ -56,7 +56,7 @@ impl<C: ChannelType, const N: usize> BufferedWs281x<C, N> {
                     .try_into()
                     .expect("Buffer exceeds experssible range"),
             );
-            riot_sys::ws281x_end_transmission(crate::inline_cast_mut(&mut self.dev as *mut _));
+            riot_sys::ws281x_end_transmission(&mut self.dev as *mut _);
         }
     }
 }

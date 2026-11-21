@@ -118,9 +118,7 @@ impl NcEntry {
         const {
             assert!(riot_sys::KERNEL_PID_UNDEF == 0, "Interface lookup mixes unspecified interface with PIDs and thus relies on the unspecified latter being 0.")
         };
-        let interface = unsafe {
-            riot_sys::inline::gnrc_ipv6_nib_nc_get_iface(crate::inline_cast_ref(&self.0))
-        };
+        let interface = unsafe { riot_sys::gnrc_ipv6_nib_nc_get_iface(&self.0) };
         // Let's not get into size discussions
         let interface = interface as usize;
         interface.try_into().ok()
@@ -128,7 +126,7 @@ impl NcEntry {
 
     #[doc(alias = "gnrc_ipv6_nib_nc_is_router")]
     pub fn is_router(&self) -> bool {
-        unsafe { riot_sys::inline::gnrc_ipv6_nib_nc_is_router(crate::inline_cast_ref(&self.0)) }
+        unsafe { riot_sys::gnrc_ipv6_nib_nc_is_router(&self.0) }
     }
 
     /// Access the entry's Neighbor Unreachability Detection (NUD) state
@@ -136,9 +134,7 @@ impl NcEntry {
     /// This is None if the interface's NUD state is invalid (including values introduced to RIOT
     /// OS but not known to riot-wrappers).
     pub fn nud_state(&self) -> Option<NudState> {
-        let result = NudState::from_c(unsafe {
-            riot_sys::inline::gnrc_ipv6_nib_nc_get_nud_state(crate::inline_cast_ref(&self.0))
-        });
+        let result = NudState::from_c(unsafe { riot_sys::gnrc_ipv6_nib_nc_get_nud_state(&self.0) });
         result
     }
 
@@ -147,9 +143,7 @@ impl NcEntry {
     /// This is None if the interface's neighbor  state is invalid (including values
     /// introduced to RIOT OS but not known to riot-wrappers).
     pub fn ar_state(&self) -> Option<ArState> {
-        let result = ArState::from_c(unsafe {
-            riot_sys::inline::gnrc_ipv6_nib_nc_get_ar_state(crate::inline_cast_ref(&self.0))
-        });
+        let result = ArState::from_c(unsafe { riot_sys::gnrc_ipv6_nib_nc_get_ar_state(&self.0) });
         result
     }
 }

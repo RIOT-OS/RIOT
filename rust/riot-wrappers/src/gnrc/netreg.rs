@@ -46,7 +46,7 @@ pub fn register_for_messages<F: FnOnce() -> crate::never::Never>(
     let mut entry = MaybeUninit::uninit();
     unsafe {
         riot_sys::gnrc_netreg_entry_init_pid(
-            crate::inline_cast_mut(entry.as_mut_ptr()),
+            entry.as_mut_ptr(),
             demux_ctx,
             grant.destination().into(),
         )

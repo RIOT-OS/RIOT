@@ -50,7 +50,7 @@ where
     let tcb = if tcb >= &stack[0] as *const u8 as *mut _
         && tcb <= &stack[stack.len() - 1] as *const u8 as *mut _
     {
-        Some(crate::inline_cast_mut(tcb))
+        Some(tcb)
     } else {
         None
     };
@@ -243,7 +243,7 @@ impl TrackedThread {
         let status = self.pid.status();
         let tcb = self.pid.thread();
         if let (Ok(status), Ok(tcb), Some(startup_tcb)) = (status, tcb, self.tcb) {
-            if crate::inline_cast(tcb) == startup_tcb {
+            if tcb == startup_tcb {
                 status
             } else {
                 Status::Stopped

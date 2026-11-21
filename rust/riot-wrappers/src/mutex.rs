@@ -23,7 +23,7 @@ use core::cell::UnsafeCell;
 ///
 /// [std::sync::mutex]: https://doc.rust-lang.org/std/sync/struct.Mutex.html
 pub struct Mutex<T> {
-    mutex: UnsafeCell<riot_sys::inline::mutex_t>,
+    mutex: UnsafeCell<riot_sys::mutex_t>,
     data: UnsafeCell<T>,
 }
 
@@ -106,7 +106,7 @@ impl<'a, T> crate::thread::ValueInThread<&'a Mutex<T>> {
     pub fn lock(self) -> MutexGuard<'a, T> {
         // unsafe: All preconditions of the C function are met (not-NULL through taking a &self,
         // being initialized through RAII guarantees, thread context is in the InThread).
-        unsafe { riot_sys::mutex_lock(crate::inline_cast_mut(self.mutex.get())) };
+        unsafe { riot_sys::mutex_lock(self.mutex.get()) };
         MutexGuard { mutex: &self }
     }
 }
@@ -132,7 +132,7 @@ pub struct MutexGuard<'a, T> {
 
 impl<'a, T> Drop for MutexGuard<'a, T> {
     fn drop(&mut self) {
-        unsafe { riot_sys::mutex_unlock(crate::inline_cast_mut(self.mutex.mutex.get())) }
+        unsafe { riot_sys::mutex_unlock(self.mutex.mutex.get()) }
     }
 }
 
@@ -143,7 +143,7 @@ impl<'a, T> MutexGuard<'a, T> {
     pub fn unlock_and_sleep(self) {
         let m = &self.mutex.mutex;
         ::core::mem::forget(self);
-        unsafe { riot_sys::mutex_unlock_and_sleep(crate::inline_cast_mut(m.get())) };
+        unsafe { riot_sys::mutex_unlock_and_sleep(m.get()) };
     }
 }
 

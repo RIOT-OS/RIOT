@@ -80,7 +80,7 @@ impl<const HZ: u32> ValueInThread<Clock<HZ>> {
     /// it's best done using a [ValueInThread].
     #[doc(alias = "ztimer_spin")]
     pub fn spin(&self, duration: Ticks<HZ>) {
-        unsafe { riot_sys::ztimer_spin(crate::inline_cast_mut(self.0), duration.0) };
+        unsafe { riot_sys::ztimer_spin(self.0, duration.0) };
     }
 
     /// Pause the current thread for the given duration, possibly exceeding values expressible in
@@ -161,7 +161,7 @@ impl<const HZ: u32> Clock<HZ> {
     /// result makes sense, which can come for example from an acquisition.
     fn now(&self) -> Timestamp<HZ> {
         // The `as u32` strips down the 64bit value of the deprecated ZTIMER_NOW64
-        Timestamp(unsafe { riot_sys::inline::ztimer_now(crate::inline_cast_mut(self.0)) } as u32)
+        Timestamp(unsafe { riot_sys::ztimer_now(self.0) } as u32)
     }
 
     /// A version of [`ValueInThread<Clock>::set_during`] that relies on this module's knowledge of
@@ -244,7 +244,7 @@ impl<const HZ: u32> Clock<HZ> {
     pub fn acquire(&self) -> LockedClock<HZ> {
         // ztimer_acquire is inline or non-inline depending on ZTIMER_ONDEMAND
         #[allow(unused_imports)] // reason: which of these is used depends on ZTIMER_ONDEMAND
-        use riot_sys::inline::*;
+        use riot_sys::*;
         #[allow(unused_imports)] // reason: which of these is used depends on ZTIMER_ONDEMAND
         use riot_sys::*;
 
@@ -252,7 +252,7 @@ impl<const HZ: u32> Clock<HZ> {
         let clock = self.0 as *mut riot_sys::ztimer_clock_t;
 
         // unsafe: C function can be called at any time
-        unsafe { ztimer_acquire(crate::inline_cast_mut(clock)) };
+        unsafe { ztimer_acquire(clock) };
 
         LockedClock(self.clone())
     }
@@ -315,7 +315,7 @@ impl<const HZ: u32> Drop for LockedClock<HZ> {
     fn drop(&mut self) {
         // ztimer_release is inline or non-inline depending on ZTIMER_ONDEMAND
         #[allow(unused_imports)] // reason: which of these is used depends on ZTIMER_ONDEMAND
-        use riot_sys::inline::*;
+        use riot_sys::*;
         #[allow(unused_imports)] // reason: which of these is used depends on ZTIMER_ONDEMAND
         use riot_sys::*;
 
@@ -323,7 +323,7 @@ impl<const HZ: u32> Drop for LockedClock<HZ> {
         let clock = self.0 .0 as *mut riot_sys::ztimer_clock_t;
 
         // unsafe: C function can be called at any time
-        unsafe { ztimer_acquire(crate::inline_cast_mut(clock)) };
+        unsafe { ztimer_acquire(clock) };
     }
 }
 

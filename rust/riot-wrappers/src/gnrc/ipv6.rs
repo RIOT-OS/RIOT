@@ -18,7 +18,7 @@ impl super::Netif {
         };
         let result = unsafe {
             riot_sys::gnrc_netif_ipv6_addrs_get(
-                crate::inline_cast(self.0),
+                self.0,
                 addrs.addresses.as_mut() as *mut _ as _, /* justified by array guarantees and repr(Transparent) */
                 core::mem::size_of_val(&addrs.addresses) as _,
             )
@@ -120,22 +120,22 @@ impl Address {
 
     #[doc(alias = "ipv6_addr_is_unspecified")]
     pub fn is_unspecified(&self) -> bool {
-        unsafe { riot_sys::inline::ipv6_addr_is_unspecified(crate::inline_cast_ref(self)) }
+        unsafe { riot_sys::ipv6_addr_is_unspecified(&self.inner) }
     }
 
     #[doc(alias = "ipv6_addr_is_loopback")]
     pub fn is_loopback(&self) -> bool {
-        unsafe { riot_sys::inline::ipv6_addr_is_loopback(crate::inline_cast_ref(self)) }
+        unsafe { riot_sys::ipv6_addr_is_loopback(&self.inner) }
     }
 
     #[doc(alias = "ipv6_addr_is_multicast")]
     pub fn is_multicast(&self) -> bool {
-        unsafe { riot_sys::inline::ipv6_addr_is_multicast(crate::inline_cast_ref(self)) }
+        unsafe { riot_sys::ipv6_addr_is_multicast(&self.inner) }
     }
 
     #[doc(alias = "ipv6_addr_is_link_local")]
     pub fn is_link_local(&self) -> bool {
-        unsafe { riot_sys::inline::ipv6_addr_is_link_local(crate::inline_cast_ref(self)) }
+        unsafe { riot_sys::ipv6_addr_is_link_local(&self.inner) }
     }
 }
 

@@ -81,10 +81,10 @@ pub fn register_static<C: Callback>(
     });
 
     unsafe {
-        riot_sys::inline::gnrc_netreg_entry_init_cb(
-            crate::inline_cast_mut(slot.0.as_mut_ptr()),
+        riot_sys::gnrc_netreg_entry_init_cb(
+            slot.0.as_mut_ptr(),
             context.demux_ctx,
-            crate::inline_cast_mut(slot.1.as_mut_ptr()),
+            slot.1.as_mut_ptr(),
         );
 
         riot_sys::gnrc_netreg_register(context.nettype, slot.0.as_mut_ptr())

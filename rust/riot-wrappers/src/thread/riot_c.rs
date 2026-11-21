@@ -152,7 +152,7 @@ impl KernelPID {
         if t == 0 as *mut _ {
             Err(NoSuchThread)
         } else {
-            Ok(crate::inline_cast(t))
+            Ok(t)
         }
     }
 
@@ -183,9 +183,9 @@ impl KernelPID {
                 }
             }
             // After https://github.com/RIOT-OS/RIOT/pull/18942 (presumably 2024.07 and later)
-            impl Into<*const riot_sys::inline::thread_t> for ThreadOrItsStart {
-                fn into(self) -> *const riot_sys::inline::thread_t {
-                    crate::inline_cast(self.0)
+            impl Into<*const riot_sys::thread_t> for ThreadOrItsStart {
+                fn into(self) -> *const riot_sys::thread_t {
+                    self.0
                 }
             }
 
@@ -198,7 +198,7 @@ impl KernelPID {
                 size: unsafe { (*thread).stack_size as _ },
                 #[allow(unused_imports)]
                 free: unsafe {
-                    use riot_sys::inline::*;
+                    use riot_sys::*;
                     use riot_sys::*;
                     thread_measure_stack_free(ThreadOrItsStart(thread).into())
                 } as usize,

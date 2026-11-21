@@ -176,7 +176,7 @@ impl<'a, const UDPCOUNT: usize> embedded_nal::UdpClientStack for StackAccessor<'
 
         (unsafe {
             riot_sys::sock_udp_send(
-                crate::inline_cast_mut(&mut *socket as *mut _),
+                &mut *socket as *mut _,
                 buffer.as_ptr() as _,
                 buffer.len().try_into().unwrap(),
                 0 as *const _,
@@ -198,11 +198,11 @@ impl<'a, const UDPCOUNT: usize> embedded_nal::UdpClientStack for StackAccessor<'
 
         let read = (unsafe {
             riot_sys::sock_udp_recv(
-                crate::inline_cast_mut(&mut *socket as *mut _),
+                &mut *socket as *mut _,
                 buffer.as_mut_ptr() as _,
                 buffer.len().try_into().unwrap(),
                 0,
-                crate::inline_cast_mut(remote.as_mut_ptr() as *mut _),
+                remote.as_mut_ptr() as *mut _,
             )
         })
         .negative_to_error()
@@ -240,7 +240,7 @@ impl<'a, const UDPCOUNT: usize> embedded_nal::UdpFullStack for StackAccessor<'a,
 
         (unsafe {
             riot_sys::sock_udp_send(
-                crate::inline_cast_mut(&mut *socket as *mut _),
+                &mut *socket as *mut _,
                 buffer.as_ptr() as _,
                 buffer.len().try_into().unwrap(),
                 remote.as_ref(),

@@ -134,7 +134,7 @@ macro_rules! implementation_module {
         async fn send(&mut self, data: &[u8]) -> Result<(), Self::Error> {
             unsafe {
                 riot_sys::sock_udp_send(
-                    crate::inline_cast_ref_mut(self.socket),
+                    self.socket,
                     data.as_ptr() as _,
                     data.len() as _,
                     core::ptr::null(),
@@ -173,12 +173,12 @@ macro_rules! implementation_module {
                 ..Default::default()
             };
             unsafe {
-                riot_sys::inline::sock_udp_send_aux(
-                    crate::inline_cast_ref_mut(self.socket),
+                riot_sys::sock_udp_send_aux(
+                    self.socket,
                     data.as_ptr() as _,
                     data.len() as _,
                     remote.as_ref() as *const _,
-                    crate::inline_cast_ref_mut(&mut aux),
+                    &mut aux,
                 )
                 .negative_to_error()?
             };
@@ -320,7 +320,7 @@ macro_rules! implementation_module {
             flags: riot_sys::sock_async_flags_t,
             arg: *mut crate::libc::c_void,
         ) {
-            if flags & riot_sys::inline::SOCK_ASYNC_MSG_RECV == 0 {
+            if flags & riot_sys::SOCK_ASYNC_MSG_RECV == 0 {
                 // We can get stray _MSG_SENT in here (although I'm not sure those even get
                 // generated currently). Waking once would do no harm, as the polling function
                 // would just find that the socket is surprisingly not ready and register the

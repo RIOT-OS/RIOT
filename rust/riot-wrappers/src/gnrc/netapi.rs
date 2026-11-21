@@ -15,11 +15,9 @@ pub fn dispatch_send(
     pkt: impl Into<Pktsnip<Shared>>,
 ) -> i32 {
     let pkt = unsafe { pkt.into().to_ptr() };
-    let subscribers = unsafe {
-        riot_sys::gnrc_netapi_dispatch_send(nettype, demux_ctx, crate::inline_cast_mut(pkt))
-    };
+    let subscribers = unsafe { riot_sys::gnrc_netapi_dispatch_send(nettype, demux_ctx, pkt) };
     if subscribers == 0 {
-        unsafe { riot_sys::inline::gnrc_pktbuf_release(crate::inline_cast_mut(pkt)) };
+        unsafe { riot_sys::gnrc_pktbuf_release(pkt) };
     }
     subscribers
 }

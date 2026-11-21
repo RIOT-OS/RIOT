@@ -168,7 +168,7 @@ impl embedded_hal::spi::SpiBus for SpiBus {
     fn read(&mut self, words: &mut [u8]) -> Result<(), Infallible> {
         transaction(
             &self,
-            riot_sys::inline::GPIO_UNDEF.try_into().unwrap(),
+            riot_sys::GPIO_UNDEF.try_into().unwrap(),
             &mut [Operation::Read(words)],
         );
         Ok(())
@@ -176,7 +176,7 @@ impl embedded_hal::spi::SpiBus for SpiBus {
     fn write(&mut self, words: &[u8]) -> Result<(), <Self as embedded_hal::spi::ErrorType>::Error> {
         transaction(
             &self,
-            riot_sys::inline::GPIO_UNDEF.try_into().unwrap(),
+            riot_sys::GPIO_UNDEF.try_into().unwrap(),
             &mut [Operation::Write(words)],
         );
         Ok(())
@@ -184,7 +184,7 @@ impl embedded_hal::spi::SpiBus for SpiBus {
     fn transfer(&mut self, read: &mut [u8], write: &[u8]) -> Result<(), Infallible> {
         transaction(
             &self,
-            riot_sys::inline::GPIO_UNDEF.try_into().unwrap(),
+            riot_sys::GPIO_UNDEF.try_into().unwrap(),
             &mut [Operation::Transfer(read, write)],
         );
         Ok(())
@@ -192,7 +192,7 @@ impl embedded_hal::spi::SpiBus for SpiBus {
     fn transfer_in_place(&mut self, words: &mut [u8]) -> Result<(), Infallible> {
         transaction(
             &self,
-            riot_sys::inline::GPIO_UNDEF.try_into().unwrap(),
+            riot_sys::GPIO_UNDEF.try_into().unwrap(),
             &mut [Operation::TransferInPlace(words)],
         );
         Ok(())

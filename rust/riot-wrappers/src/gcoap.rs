@@ -357,7 +357,7 @@ pub struct PacketBuffer<'b> {
 impl<'b> PacketBuffer<'b> {
     /// Wrapper for coap_get_code_raw
     pub fn get_code_raw(&self) -> u8 {
-        (unsafe { riot_sys::coap_get_code_raw(crate::inline_cast_ref(self.pkt)) }) as u8
+        (unsafe { riot_sys::coap_get_code_raw(self.pkt) }) as u8
         // odd return type in C
     }
 
@@ -382,9 +382,7 @@ impl<'b> PacketBuffer<'b> {
     pub fn set_code_raw(&mut self, code: u8) {
         #[cfg(accessible_riot_sys_inline_coap_pkt_set_code)]
         {
-            unsafe {
-                riot_sys::inline::coap_pkt_set_code(crate::inline_cast_ref_mut(self.pkt), code)
-            };
+            unsafe { riot_sys::coap_pkt_set_code(self.pkt, code) };
         }
         #[cfg(not(accessible_riot_sys_inline_coap_pkt_set_code))]
         {

@@ -104,9 +104,7 @@ impl<M: Mode> Pktsnip<M> {
             unsafe { (netif_snip.data.as_ptr() as *const gnrc_netif_hdr_t).as_ref() }.unwrap();
         // unsafe: Using C API as documented
         debug_assert!(
-            netif_snip.data.len()
-                == unsafe { riot_sys::inline::gnrc_netif_hdr_sizeof(crate::inline_cast(header)) }
-                    as _
+            netif_snip.data.len() == unsafe { riot_sys::gnrc_netif_hdr_sizeof(header) } as _
         );
         Some(Header(header))
     }

@@ -97,12 +97,12 @@ impl<M: Mode> Drop for Pktsnip<M> {
 impl<M: Mode> Pktsnip<M> {
     #[doc(alias = "gnrc_pkt_len")]
     pub fn len(&self) -> usize {
-        (unsafe { riot_sys::inline::gnrc_pkt_len(crate::inline_cast(self.ptr)) }) as _
+        (unsafe { riot_sys::gnrc_pkt_len(self.ptr) }) as _
     }
 
     #[doc(alias = "gnrc_pkt_count")]
     pub fn count(&self) -> usize {
-        (unsafe { riot_sys::inline::gnrc_pkt_count(crate::inline_cast(self.ptr)) }) as _
+        (unsafe { riot_sys::gnrc_pkt_count(self.ptr) }) as _
     }
 
     pub fn iter_snips(&self) -> SnipIter<'_> {
