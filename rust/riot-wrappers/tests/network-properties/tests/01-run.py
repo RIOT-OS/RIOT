@@ -5,7 +5,7 @@ import sys
 from testrunner import run
 
 def test(child):
-    # Cant' make any predictions about network addresses, but showing them
+    # Can't make any predictions about network addresses, but showing them
     # should not crash.
     for _ in range(3):
         child.expect("Netif at ")
