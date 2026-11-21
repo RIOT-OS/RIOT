@@ -13,8 +13,8 @@ On supported CPUs, Rust can be used to develop RIOT applications.
 Support is indicated in the `has_rust_target` feature.
 
 In addition to the regular RIOT build toolchain
-and a recent nightly Rust toolchain for the given target,
-using this also requires C2Rust with some patches applied to be installed,
+and a recent Rust toolchain for the given target,
+using this also requires libclang (used by bindgen),
 see <a href="#toolchain">toolchain</a> for installation instructions.
 All these are readily available in the [official RIOT docker image],
 which gets used by default if `BUILD_IN_DOCKER=1` is set.
@@ -66,9 +66,10 @@ configures the Rust target depending on the board's CPU,
 and unpacks the static library into object files to facilitate interaction with XFA.
 
 The [**riot-sys**] crate translates a selected subset of RIOT's header files for use in Rust,
-this happens both using the [bindgen] crate (working from API information in header files)
-and [C2Rust] \(translating static inline functions, and with some help from riot-sys,
-constant preprocessor initializers).
+this happens using the [bindgen] crate (working from API information in header files).
+Static inline functions (and, with some help from riot-sys, function-like preprocessor macros)
+are made available through small wrapper functions that bindgen generates as C code;
+the RIOT build system compiles them with the regular C compiler and links them into the application.
 Functions exported by riot-sys are inherently unsafe to use (in Rust's sense of unsafe),
 and may be somewhat volatile in their API due to mismatches between RIOT's / C's
 and Rust's API stability concepts.
@@ -89,7 +90,6 @@ The wrappers are [documented together with riot-sys and some of the examples].
 [**riot-sys**]: https://crates.io/crates/riot-sys
 [**riot-wrappers**]: https://crates.io/crates/riot-wrappers
 [bindgen]: https://crates.io/crates/bindgen
-[C2Rust]: https://c2rust.com/
 [riot_wrappers::mutex::Mutex]: https://rustdoc.etonomy.org/riot_wrappers/mutex/struct.Mutex.html
 [documented together with riot-sys and some of the examples]: https://rustdoc.etonomy.org/
 [I2CDevice]: https://rustdoc.etonomy.org/riot_wrappers/i2c/struct.I2CDevice.html
@@ -146,26 +146,10 @@ consider installing this list of packages on Debian
 (or an equivalent list on the distribution of your choice):
 
 ```shell
-apt install libclang-dev llvm llvm-dev cmake libssl-dev pkg-config
+apt install libclang-dev
 ```
 
-This encompasses both components needed for riot-sys and for the later installation of C2Rust.
-
-In addition to the Rust compiler you'll need to install the C2Rust transpiler,
-as this is using some recent fixes, it is best installed as:
-
-<!-- The locked works around <https://github.com/dtolnay/proc-macro2/issues/475> as closed in <https://github.com/immunant/c2rust/pull/1197>, there is no newer release that could be tested. -->
-
-```shell
-cargo install c2rust --git https://github.com/immunant/c2rust --tag v0.19.0 --locked
-```
-
-If multiple versions of LLVM are installed locally,
-it may be necessary to prefix it with the selected LLVM version:
-
-```shell
-LLVM_CONFIG_PATH=/usr/bin/llvm-config-16 cargo install …
-```
+These are the components needed by riot-sys (through bindgen).
 
 [cargo]: https://doc.rust-lang.org/cargo/
 [**rustup**, installed as described on its project website]: https://rustup.rs/
@@ -248,24 +232,9 @@ There are a few variations that can occur:
     (Keeping riot-sys and riot-wrappers compatible with the latest release
     is also important to retain the ability to backport fixes).
 
-- When functions are moved from being static and not being static,
-    their names go from `riot_sys::inline::name` to `riot_sys::name` (or vice versa).
-
-    riot-sys [has a list] of items that are always publicly exported directly as `riot_sys::name`,
-    just add the function there.
-
-    If non-generic types are referenced in them,
-    they go from `riot_sys::inline::my_type_t` to `riot_sys::my_type_t`.
-    The [inline_cast] function family helps making that cast a bit safer.
-
-- Things fail around atomics.
-
-    Until [C2Rust's support for atomics has improved],
-    riot-sys requires all exported headers to use the better supported `atomic_utils.h`.
-
-    If it is unavoidable that atomics are part of header files
-    (and not actually used in any static inline functions),
-    riot-sys's [atomics workarounds] can be extended as a last resort.
+- When a function-like macro or a constant that bindgen can not express (e.g. because it contains a cast)
+    needs to be available in Rust,
+    it can be added to the lists of macro functions and typed constants in riot-sys's `build.rs`.
 
 [riot-wrappers]: https://github.com/RIOT-OS/rust-riot-wrappers/
 [riot-sys]: https://github.com/RIOT-OS/rust-riot-sys/
@@ -276,7 +245,3 @@ There are a few variations that can occur:
 [#18181]: https://github.com/RIOT-OS/RIOT/pull/18181
 [See the phydat callback type change]: https://github.com/RIOT-OS/rust-riot-wrappers/pull/6/files#diff-ccb7946e3b4122ea3ce23fa9bc54eba63d75f7a6142fd4afdd9908b1bead50e0
 [See the coap_request_ctx_t change]: https://github.com/RIOT-OS/rust-riot-wrappers/pull/4/files
-[has a list]: https://github.com/RIOT-OS/rust-riot-sys/blob/525b2384a3541d4879a5f3845ee6241243c29a78/build.rs#L533
-[inline_cast]: https://github.com/RIOT-OS/rust-riot-wrappers/blob/db9d163e3eddcb7154edcf25db7207e4123964ee/src/lib.rs#L68
-[C2Rust's support for atomics has improved]: https://github.com/immunant/c2rust/issues/436
-[atomics workarounds]: https://github.com/RIOT-OS/rust-riot-sys/blob/525b2384a3541d4879a5f3845ee6241243c29a78/riot-c2rust.h#L79
