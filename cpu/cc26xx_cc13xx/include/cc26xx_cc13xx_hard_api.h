@@ -43,9 +43,9 @@ typedef struct {
     uint32_t (* mean_val)(uint32_t *databuffer, uint32_t datacount);
     /** Standard deviation value */
     uint32_t (* stdd_val)(uint32_t *databuffer, uint32_t datacount);
-    void (* hf_source_safe_switch)(void); /**< HF source safe-switch */
     void (* __reserved3)(uint32_t); /**< Reserved */
     void (* __reserved4)(uint32_t); /**< Reserved */
+    void (* hf_source_safe_switch)(void); /**< HF source safe-switch */
     void (* compa_in)(uint8_t signal); /**< Select CompA input */
     void (* compa_ref)(uint8_t signal); /**< Select CompA reference */
     void (* adc_compb_in)(uint8_t signal); /**< Select ADC CompB input */
