@@ -28,7 +28,7 @@ ifneq (,$(filter cc13x0%,$(CPU_MODEL)))
   DEFAULT_OPENOCD_CONFIG := $(RIOTBASE)/boards/common/cc26xx_cc13xx/dist/openocd_cc13x0.cfg
   DEFAULT_JLINK_DEVICE := CC13xx
 endif
-ifneq (,$(filter cc13x2%,$(CPU_MODEL)))
+ifneq (,$(filter cc13x2% cc1312% cc1352%,$(CPU_MODEL)))
   DEFAULT_OPENOCD_CONFIG := $(RIOTBASE)/boards/common/cc26xx_cc13xx/dist/openocd_cc13x2.cfg
   DEFAULT_JLINK_DEVICE := CC13xx
 endif
