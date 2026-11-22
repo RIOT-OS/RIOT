@@ -505,22 +505,22 @@ int config_phy(int argc, char **argv)
     }
 
     ieee802154_phy_mode_t phy_mode;
-    if (strcasecmp(argv[1], "BPSK")) {
+    if (strcasecmp(argv[1], "BPSK") == 0) {
         phy_mode = IEEE802154_PHY_BPSK;
     }
-    else if (strcasecmp(argv[1], "ASK")) {
+    else if (strcasecmp(argv[1], "ASK") == 0) {
         phy_mode = IEEE802154_PHY_ASK;
     }
-    else if (strcasecmp(argv[1], "O-QPSK")) {
+    else if (strcasecmp(argv[1], "O-QPSK") == 0) {
         phy_mode = IEEE802154_PHY_OQPSK;
     }
-    else if (strcasecmp(argv[1], "MR-O-QPSK")) {
+    else if (strcasecmp(argv[1], "MR-O-QPSK") == 0) {
         phy_mode = IEEE802154_PHY_MR_OQPSK;
     }
-    else if (strcasecmp(argv[1], "MR-OFDM")) {
+    else if (strcasecmp(argv[1], "MR-OFDM") == 0) {
         phy_mode = IEEE802154_PHY_MR_OFDM;
     }
-    else if (strcasecmp(argv[1], "MR-FSK")) {
+    else if (strcasecmp(argv[1], "MR-FSK") == 0) {
         phy_mode = IEEE802154_PHY_MR_FSK;
     }
     else {
