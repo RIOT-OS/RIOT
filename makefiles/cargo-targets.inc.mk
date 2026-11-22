@@ -65,6 +65,7 @@ $(CARGO_LIB): cargo-preflight $(RIOTBUILD_CONFIG_HEADER_C) $(BUILDDEPS) $(CARGO_
 		CARGO_BUILD_TARGET="$(RUST_TARGET)" \
 		cargo \
 			build \
+			$(if $(filter 1,$(QUIETER)),--quiet) \
 			--profile $(CARGO_PROFILE) \
 			$(CARGO_OPTIONS)
 

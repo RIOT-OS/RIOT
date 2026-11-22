@@ -26,6 +26,16 @@
 #![allow(unused_mut)]
 // Probably __attribute__((used)) doesn't get translated
 #![allow(unused)]
+// The generated code is not ours to tidy up; these lints fire on every build (e.g. on bitfield
+// accessors and on the C library declarations RIOT's headers pull in) and only add noise.
+// `unknown_lints` keeps older compilers that lack some of these lints quiet.
+#![allow(unknown_lints)]
+// 'expect' allows us to see when the necessity goes way -- but some lints don't trigger in all
+// situations. If any of those show up as "this lint expectation is unfulfilled", first try
+// removing it at all and run a few more examples. If it triggers for some and not for others, move
+// it to "allow"; if removing it causes no further warnings: concratulations, our code got better
+// (or the linter now produces fewer false negatives).
+#![expect(clashing_extern_declarations)]
 
 extern "C" {
     /// Symbol indicating untranslated `llvm_asm!` code.
