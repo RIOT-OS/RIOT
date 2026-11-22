@@ -1,0 +1,16 @@
+# SPDX-FileCopyrightText: 2026 Harshita
+# SPDX-License-Identifier: LGPL-2.1-only
+
+menu "Energy-aware Huffman coding"
+    depends on USEMODULE_HUFFMAN_EE
+
+config HUFFMAN_EE_MAX_SYMBOLS
+    int "Maximum number of symbols in one table"
+    default 256
+    range 1 32767
+    help
+        Largest alphabet a huffman_ee table can hold. The build functions
+        need about 16 bytes of stack per symbol, and the exact builders
+        about 60 bytes per symbol.
+
+endmenu # Energy-aware Huffman coding
