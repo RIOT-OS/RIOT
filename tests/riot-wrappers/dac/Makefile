@@ -9,7 +9,7 @@ FEATURES_REQUIRED += periph_dac
 # just a pin on the extension header. (It's probably true for most boards, but
 # so far nobody guarantees that. Just add your board here if your DAC0 pin is
 # good to use).
-BOARDS_SUPPORTED =
+BOARDS_SUPPORTED = \
     stk3700 \
     #
 
