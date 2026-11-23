@@ -26,6 +26,7 @@
 #include "irq_arch.h"
 #include "macros/xtstr.h"
 #include "panic.h"
+#include "pfic.h"
 #include "plic.h"
 #include "sched.h"
 #include "vendor/riscv_csr.h"
@@ -57,8 +58,11 @@ void riscv_irq_init(void)
         write_csr(mtvec, (uintptr_t)&trap_entry);
     }
 
-    /* Clear all interrupt enables */
-    write_csr(mie, 0);
+    /* Clear all interrupt enables. QingKe cores (PFIC) have no mie CSR,
+     * accessing it raises an illegal instruction exception. */
+    if (!IS_ACTIVE(MODULE_PERIPH_PFIC)) {
+        write_csr(mie, 0);
+    }
 
     /* Initial PLIC external interrupt controller */
     if (IS_ACTIVE(MODULE_PERIPH_PLIC)) {
@@ -67,9 +71,14 @@ void riscv_irq_init(void)
     if (IS_ACTIVE(MODULE_PERIPH_CLIC)) {
         clic_init();
     }
+    if (IS_ACTIVE(MODULE_PERIPH_PFIC)) {
+        pfic_init();
+    }
 
     /* Enable external interrupts */
-    set_csr(mie, MIP_MEIP);
+    if (!IS_ACTIVE(MODULE_PERIPH_PFIC)) {
+        set_csr(mie, MIP_MEIP);
+    }
 
     /*  Set default state of mstatus */
     set_csr(mstatus, MSTATUS_DEFAULT);
@@ -151,6 +160,9 @@ __attribute((used)) static void handle_trap(uword_t mcause)
         default:
             if (IS_ACTIVE(MODULE_PERIPH_CLIC)) {
                 clic_isr_handler(trap);
+            }
+            else if (IS_ACTIVE(MODULE_PERIPH_PFIC)) {
+                pfic_isr_handler(trap);
             }
             else {
                 /* Unknown interrupt */
