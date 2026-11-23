@@ -21,6 +21,9 @@
 #include "pfic.h"
 #include "vendor/riscv_csr.h"
 
+#define PFIC_IRQ_REG_INDEX(irq)  (((uint32_t)(irq)) >> 5)
+#define PFIC_IRQ_BIT_MASK(irq)   (1UL << (((uint32_t)(irq)) & 0x1F))
+
 /* PFIC ISR function list */
 static pfic_isr_cb_t _ext_isrs[PFIC_NUM_INTERRUPTS];
 
@@ -44,13 +47,13 @@ void pfic_enable_interrupt(unsigned irq, unsigned priority)
 {
     assert(irq < PFIC_NUM_INTERRUPTS);
     pfic_set_priority(irq, priority);
-    PFIC->IENR[irq / 32] = 1UL << (irq % 32);
+    PFIC->IENR[PFIC_IRQ_REG_INDEX(irq)] = PFIC_IRQ_BIT_MASK(irq);
 }
 
 void pfic_disable_interrupt(unsigned irq)
 {
     assert(irq < PFIC_NUM_INTERRUPTS);
-    PFIC->IRER[irq / 32] = 1UL << (irq % 32);
+    PFIC->IRER[PFIC_IRQ_REG_INDEX(irq)] = PFIC_IRQ_BIT_MASK(irq);
 }
 
 void pfic_set_priority(unsigned irq, unsigned priority)
@@ -62,13 +65,13 @@ void pfic_set_priority(unsigned irq, unsigned priority)
 void pfic_set_pending(unsigned irq)
 {
     assert(irq < PFIC_NUM_INTERRUPTS);
-    PFIC->IPSR[irq / 32] = 1UL << (irq % 32);
+    PFIC->IPSR[PFIC_IRQ_REG_INDEX(irq)] = PFIC_IRQ_BIT_MASK(irq);
 }
 
 void pfic_clear_pending(unsigned irq)
 {
     assert(irq < PFIC_NUM_INTERRUPTS);
-    PFIC->IPRR[irq / 32] = 1UL << (irq % 32);
+    PFIC->IPRR[PFIC_IRQ_REG_INDEX(irq)] = PFIC_IRQ_BIT_MASK(irq);
 }
 
 void pfic_set_handler(unsigned irq, pfic_isr_cb_t cb)
