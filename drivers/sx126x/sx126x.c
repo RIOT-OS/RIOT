@@ -267,26 +267,29 @@ void sx126x_setup(sx126x_t *dev, const sx126x_params_t *params, uint8_t index)
     netdev_register(&dev->netdev, NETDEV_SX126X, index);
 }
 
-/* Codes of the LoRa bandwidths supported by the SX126x */
-static const struct {
-    bool supported;
-    sx126x_lora_bw_t code;
-} _bandwidths[] = {
-    [LORA_BW_125_KHZ]   = { true, SX126X_LORA_BW_125 },
-    [LORA_BW_250_KHZ]   = { true, SX126X_LORA_BW_250 },
-    [LORA_BW_500_KHZ]   = { true, SX126X_LORA_BW_500 },
-    [LORA_BW_7_8_KHZ]   = { true, SX126X_LORA_BW_007 },
-    [LORA_BW_10_4_KHZ]  = { true, SX126X_LORA_BW_010 },
-    [LORA_BW_15_6_KHZ]  = { true, SX126X_LORA_BW_015 },
-    [LORA_BW_20_8_KHZ]  = { true, SX126X_LORA_BW_020 },
-    [LORA_BW_31_25_KHZ] = { true, SX126X_LORA_BW_031 },
-    [LORA_BW_41_7_KHZ]  = { true, SX126X_LORA_BW_041 },
-    [LORA_BW_62_5_KHZ]  = { true, SX126X_LORA_BW_062 },
+/* Codes of the LoRa bandwidths, indexed by LORA_BW_*: the 2.4 GHz bandwidths,
+ * from LORA_BW_200_KHZ to LORA_BW_1600_KHZ, are not supported by the SX126x */
+static const sx126x_lora_bw_t _bandwidths[] = {
+    [LORA_BW_125_KHZ]   = SX126X_LORA_BW_125,
+    [LORA_BW_250_KHZ]   = SX126X_LORA_BW_250,
+    [LORA_BW_500_KHZ]   = SX126X_LORA_BW_500,
+    [LORA_BW_7_8_KHZ]   = SX126X_LORA_BW_007,
+    [LORA_BW_10_4_KHZ]  = SX126X_LORA_BW_010,
+    [LORA_BW_15_6_KHZ]  = SX126X_LORA_BW_015,
+    [LORA_BW_20_8_KHZ]  = SX126X_LORA_BW_020,
+    [LORA_BW_31_25_KHZ] = SX126X_LORA_BW_031,
+    [LORA_BW_41_7_KHZ]  = SX126X_LORA_BW_041,
+    [LORA_BW_62_5_KHZ]  = SX126X_LORA_BW_062,
 };
+
+static bool _is_2g4_bandwidth(uint8_t bandwidth)
+{
+    return (bandwidth >= LORA_BW_200_KHZ) && (bandwidth <= LORA_BW_1600_KHZ);
+}
 
 bool sx126x_bandwidth_is_supported(const sx126x_t *dev, uint8_t bandwidth)
 {
-    if ((bandwidth >= ARRAY_SIZE(_bandwidths)) || !_bandwidths[bandwidth].supported) {
+    if ((bandwidth >= ARRAY_SIZE(_bandwidths)) || _is_2g4_bandwidth(bandwidth)) {
         return false;
     }
     /* The LLCC68 only supports the bandwidths of 125, 250 and 500 kHz */
@@ -332,7 +335,7 @@ static void sx126x_init_default_config(sx126x_t *dev)
 #endif
 
     assert(sx126x_bandwidth_is_supported(dev, CONFIG_LORA_BW_DEFAULT));
-    dev->mod_params.bw = _bandwidths[CONFIG_LORA_BW_DEFAULT].code;
+    dev->mod_params.bw = _bandwidths[CONFIG_LORA_BW_DEFAULT];
     dev->mod_params.sf = (sx126x_lora_sf_t)CONFIG_LORA_SF_DEFAULT;
     dev->mod_params.cr = (sx126x_lora_cr_t)CONFIG_LORA_CR_DEFAULT;
     dev->mod_params.ldro = _compute_ldro(dev);
@@ -582,7 +585,7 @@ uint8_t sx126x_get_bandwidth(const sx126x_t *dev)
 {
     DEBUG("[sx126x]: sx126x_get_bandwidth \n");
     for (uint8_t bw = 0; bw < ARRAY_SIZE(_bandwidths); bw++) {
-        if (_bandwidths[bw].supported && (_bandwidths[bw].code == dev->mod_params.bw)) {
+        if (!_is_2g4_bandwidth(bw) && (_bandwidths[bw] == dev->mod_params.bw)) {
             return bw;
         }
     }
@@ -593,7 +596,7 @@ void sx126x_set_bandwidth(sx126x_t *dev, uint8_t bandwidth)
 {
     DEBUG("[sx126x]: sx126x_set_bandwidth %02x\n", bandwidth);
     assert(sx126x_bandwidth_is_supported(dev, bandwidth));
-    dev->mod_params.bw = _bandwidths[bandwidth].code;
+    dev->mod_params.bw = _bandwidths[bandwidth];
     dev->mod_params.ldro = _compute_ldro(dev);
     sx126x_set_lora_mod_params(dev, &dev->mod_params);
 }
