@@ -1,17 +1,17 @@
-From 321ef67c4675f566dcbe885558ece59e3a4f3845 Mon Sep 17 00:00:00 2001
+From b2afa1198ec755c356acc3244b7d5ae57809a7c1 Mon Sep 17 00:00:00 2001
 From: Gunar Schorcht <gunar@schorcht.net>
 Date: Sat, 1 Mar 2025 17:56:30 +0100
-Subject: [PATCH 09/28] bt/controller: fix printf format string
+Subject: [PATCH 09/51] bt/controller: fix printf format string
 
 ---
  components/bt/controller/esp32/bt.c | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/components/bt/controller/esp32/bt.c b/components/bt/controller/esp32/bt.c
-index d94c9c0507..6a20c2b1b7 100644
+index 1e06d46246..71fa42342b 100644
 --- a/components/bt/controller/esp32/bt.c
 +++ b/components/bt/controller/esp32/bt.c
-@@ -1273,7 +1273,7 @@ static void btdm_controller_mem_init(void)
+@@ -1311,7 +1311,7 @@ static void btdm_controller_mem_init(void)
  {
      /* initialise .data section */
      memcpy(&_data_start_btdm, (void *)_data_start_btdm_rom, &_data_end_btdm - &_data_start_btdm);
@@ -21,5 +21,5 @@ index d94c9c0507..6a20c2b1b7 100644
      //initial em, .bss section
      for (int i = 1; i < sizeof(btdm_dram_available_region)/sizeof(btdm_dram_available_region_t); i++) {
 -- 
-2.34.1
+2.43.0
 

@@ -1,14 +1,14 @@
-From b215127198549f5b1362479c72856fd9c4a75cdb Mon Sep 17 00:00:00 2001
+From 85a92c1dd70e02615ef5ba90a057a39d7cde7677 Mon Sep 17 00:00:00 2001
 From: Gunar Schorcht <gunar@schorcht.net>
 Date: Sun, 2 Mar 2025 10:21:03 +0100
-Subject: [PATCH 20/28] nvs_flash: extern declaration of strlcpy
+Subject: [PATCH 20/51] nvs_flash: extern declaration of strlcpy
 
 ---
  components/nvs_flash/src/nvs_storage.cpp | 2 ++
  1 file changed, 2 insertions(+)
 
 diff --git a/components/nvs_flash/src/nvs_storage.cpp b/components/nvs_flash/src/nvs_storage.cpp
-index e5db0caefe..4db36cec91 100644
+index f1080d20b1..afe622c621 100644
 --- a/components/nvs_flash/src/nvs_storage.cpp
 +++ b/components/nvs_flash/src/nvs_storage.cpp
 @@ -7,6 +7,8 @@
@@ -21,5 +21,5 @@ index e5db0caefe..4db36cec91 100644
  
  #ifndef ESP_PLATFORM
 -- 
-2.34.1
+2.43.0
 

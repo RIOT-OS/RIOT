@@ -42,6 +42,7 @@ and the Xtensa core configuration need not have a timer.
 
 #ifdef __ASSEMBLER__
 #include    <xtensa/coreasm.h>
+#include    "xtensa_specreg_compat.h"
 #endif
 
 #include    <xtensa/corebits.h>

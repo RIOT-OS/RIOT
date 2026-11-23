@@ -1,17 +1,17 @@
-From 415abab5769271f7d68b6c0daae68c54fe411734 Mon Sep 17 00:00:00 2001
+From 9b1c0f01415bf5cedbd0c829df9e74064cfbbcfc Mon Sep 17 00:00:00 2001
 From: Gunar Schorcht <gunar@schorcht.net>
 Date: Thu, 10 Apr 2025 00:29:40 +0200
-Subject: [PATCH 30/30] newlib: remove semaphore.h to avoid conflicts
+Subject: [PATCH 30/51] newlib: remove semaphore.h to avoid conflicts
 
 ---
- .../newlib/platform_include/semaphore.h       | 73 -------------------
+ .../esp_libc/platform_include/semaphore.h     | 73 -------------------
  1 file changed, 73 deletions(-)
- delete mode 100644 components/newlib/platform_include/semaphore.h
+ delete mode 100644 components/esp_libc/platform_include/semaphore.h
 
-diff --git a/components/newlib/platform_include/semaphore.h b/components/newlib/platform_include/semaphore.h
+diff --git a/components/esp_libc/platform_include/semaphore.h b/components/esp_libc/platform_include/semaphore.h
 deleted file mode 100644
 index 31d47d2072..0000000000
---- a/components/newlib/platform_include/semaphore.h
+--- a/components/esp_libc/platform_include/semaphore.h
 +++ /dev/null
 @@ -1,73 +0,0 @@
 -/*
@@ -88,5 +88,5 @@ index 31d47d2072..0000000000
 -}
 -#endif
 -- 
-2.34.1
+2.43.0
 

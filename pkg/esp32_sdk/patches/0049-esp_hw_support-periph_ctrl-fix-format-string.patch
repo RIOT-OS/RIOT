@@ -1,0 +1,33 @@
+From 4aa8697aada34b23e77df71651e9dc680d76f7b1 Mon Sep 17 00:00:00 2001
+From: Gunar Schorcht <gunar@schorcht.net>
+Date: Thu, 8 Oct 2026 18:10:45 +0200
+Subject: [PATCH 45/51] esp_hw_support/periph_ctrl: fix format string
+
+---
+ components/esp_hw_support/periph_ctrl.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/components/esp_hw_support/periph_ctrl.c b/components/esp_hw_support/periph_ctrl.c
+index 661cb9874c..1eec659f4c 100644
+--- a/components/esp_hw_support/periph_ctrl.c
++++ b/components/esp_hw_support/periph_ctrl.c
+@@ -3,6 +3,7 @@
+  *
+  * SPDX-License-Identifier: Apache-2.0
+  */
++#include <inttypes.h>
+ #include "freertos/FreeRTOS.h"
+ #include "esp_attr.h"
+ #include "esp_private/periph_ctrl.h"
+@@ -238,7 +239,7 @@ IRAM_ATTR bool phy_module_has_clock_bits(uint32_t mask)
+ #endif
+ #endif
+     if ((val & mask) != mask) {
+-        ESP_LOGW("periph_ctrl", "phy module clock bits 0x%x, required 0x%x", val, mask);
++        ESP_LOGW("periph_ctrl", "phy module clock bits 0x%" PRIx32 ", required 0x%" PRIx32, val, mask);
+         return false;
+     }
+     return true;
+-- 
+2.43.0
+

@@ -1,14 +1,14 @@
-From d203d26a1c478fb1cec92ed569fec73a89299bd8 Mon Sep 17 00:00:00 2001
+From 4a6171281efd6f6850880fd88bf7f66eb723016c Mon Sep 17 00:00:00 2001
 From: Gunar Schorcht <gunar@schorcht.net>
 Date: Sun, 2 Mar 2025 10:42:40 +0100
-Subject: [PATCH 25/28] esp_app_format: set app_elf_sha256 in esp_app_desc
+Subject: [PATCH 25/51] esp_app_format: set app_elf_sha256 in esp_app_desc
 
 ---
  components/esp_app_format/esp_app_desc.c | 2 ++
  1 file changed, 2 insertions(+)
 
 diff --git a/components/esp_app_format/esp_app_desc.c b/components/esp_app_format/esp_app_desc.c
-index 302250b179..c44b32648b 100644
+index 4b53fdc702..6eac1621fc 100644
 --- a/components/esp_app_format/esp_app_desc.c
 +++ b/components/esp_app_format/esp_app_desc.c
 @@ -42,6 +42,8 @@ const __attribute__((weak)) __attribute__((section(".rodata_desc")))  esp_app_de
@@ -21,5 +21,5 @@ index 302250b179..c44b32648b 100644
  
  #ifdef CONFIG_BOOTLOADER_APP_SECURE_VERSION
 -- 
-2.34.1
+2.43.0
 

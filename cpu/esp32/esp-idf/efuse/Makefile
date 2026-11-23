@@ -6,6 +6,7 @@ ESP32_SDK_SRC = \
   components/efuse/$(CPU_FAM)/esp_efuse_table.c \
   components/efuse/$(CPU_FAM)/esp_efuse_utility.c \
   components/efuse/src/esp_efuse_api.c \
+  components/efuse/src/esp_efuse_fields.c \
   components/efuse/src/esp_efuse_utility.c \
   components/esp_hw_support/mac_addr.c \
   #

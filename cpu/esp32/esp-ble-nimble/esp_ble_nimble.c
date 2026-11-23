@@ -16,6 +16,8 @@
  * @}
  */
 
+#include <sys/param.h>
+
 #include "log.h"
 #include "esp_bt.h"
 #include "mutex.h"
@@ -286,3 +288,82 @@ void esp_ble_nimble_init(void)
     /* init HCI H4 processing */
     hci_h4_sm_init(&_esp_h4sm, &hci_h4_allocs_from_ll, _esp_hci_h4_frame_cb);
 }
+
+#if defined(CPU_FAM_ESP32C6) || defined(CPU_FAM_ESP32H2)
+/*
+ * The BLE controller library of ESP-IDF v6.x uses some functions of the
+ * ESP-IDF NimBLE porting layer that are not provided by the NimBLE package:
+ *
+ * - os_mempool_flags_set/os_mempool_flags_clear only modify the flags,
+ *   the RIOT NimBLE memory pool implementation ignores ESP-IDF specific flags.
+ * - os_ext_mempool_register_cb registers a put and a get callback for an
+ *   extended memory pool. The `struct os_mempool_ext` of the NimBLE package
+ *   has no members for the get callback. Therefore, the get callbacks are
+ *   stored in a separate table and `os_memblock_get` is wrapped by the linker
+ *   (`-Wl,--wrap=os_memblock_get`) to call them.
+ */
+#include "os/os_mempool.h"
+
+#ifndef ESP_BLE_EXT_MEMPOOL_GET_CB_NUMOF
+#  define ESP_BLE_EXT_MEMPOOL_GET_CB_NUMOF 8
+#endif
+
+typedef void *_os_mempool_get_fn(struct os_mempool_ext *ome, void *arg);
+
+static struct {
+    struct os_mempool_ext *mpe;
+    _os_mempool_get_fn *get_cb;
+    void *get_arg;
+} _ext_mempool_get_cbs[ESP_BLE_EXT_MEMPOOL_GET_CB_NUMOF];
+
+void os_mempool_flags_set(struct os_mempool *mp, uint8_t flags)
+{
+    mp->mp_flags |= flags;
+}
+
+void os_mempool_flags_clear(struct os_mempool *mp, uint8_t flags)
+{
+    mp->mp_flags &= ~flags;
+}
+
+void os_ext_mempool_register_cb(struct os_mempool_ext *mpe,
+                                void *put_cb, void *put_arg,
+                                void *get_cb, void *get_arg)
+{
+    mpe->mpe_put_cb = put_cb;
+    mpe->mpe_put_arg = put_arg;
+
+    unsigned free_slot = ESP_BLE_EXT_MEMPOOL_GET_CB_NUMOF;
+
+    for (unsigned i = 0; i < ESP_BLE_EXT_MEMPOOL_GET_CB_NUMOF; i++) {
+        if (_ext_mempool_get_cbs[i].mpe == mpe) {
+            free_slot = i;
+            break;
+        }
+        if ((_ext_mempool_get_cbs[i].mpe == NULL) &&
+            (free_slot == ESP_BLE_EXT_MEMPOOL_GET_CB_NUMOF)) {
+            free_slot = i;
+        }
+    }
+    assert(free_slot < ESP_BLE_EXT_MEMPOOL_GET_CB_NUMOF);
+
+    _ext_mempool_get_cbs[free_slot].mpe = get_cb ? mpe : NULL;
+    _ext_mempool_get_cbs[free_slot].get_cb = get_cb;
+    _ext_mempool_get_cbs[free_slot].get_arg = get_arg;
+}
+
+void *__real_os_memblock_get(struct os_mempool *mp);
+
+void *__wrap_os_memblock_get(struct os_mempool *mp)
+{
+    if (mp && (mp->mp_flags & OS_MEMPOOL_F_EXT)) {
+        for (unsigned i = 0; i < ESP_BLE_EXT_MEMPOOL_GET_CB_NUMOF; i++) {
+            if (_ext_mempool_get_cbs[i].mpe == (struct os_mempool_ext *)mp) {
+                return _ext_mempool_get_cbs[i].get_cb(_ext_mempool_get_cbs[i].mpe,
+                                                      _ext_mempool_get_cbs[i].get_arg);
+            }
+        }
+    }
+    return __real_os_memblock_get(mp);
+}
+#endif

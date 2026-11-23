@@ -1,14 +1,14 @@
-From 1357b5b40f12686aa0265df131c43c9a87bb8897 Mon Sep 17 00:00:00 2001
+From 0012a19fd223817b755575bef97af058f3d818f0 Mon Sep 17 00:00:00 2001
 From: Gunar Schorcht <gunar@schorcht.net>
 Date: Sun, 30 Mar 2025 13:07:34 +0200
-Subject: [PATCH 35/35] bt/controller: fix include path for esp32h2
+Subject: [PATCH 34/51] bt/controller: fix include path for esp32h2
 
 ---
  components/bt/include/esp32h2/include/esp_bt.h | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/components/bt/include/esp32h2/include/esp_bt.h b/components/bt/include/esp32h2/include/esp_bt.h
-index c21a1bc854..ff047aace5 100644
+index fbe98297db..6021f64a19 100644
 --- a/components/bt/include/esp32h2/include/esp_bt.h
 +++ b/components/bt/include/esp32h2/include/esp_bt.h
 @@ -14,7 +14,7 @@
@@ -21,5 +21,5 @@ index c21a1bc854..ff047aace5 100644
  
  #ifdef CONFIG_BT_LE_HCI_INTERFACE_USE_UART
 -- 
-2.34.1
+2.43.0
 

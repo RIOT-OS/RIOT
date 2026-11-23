@@ -20,6 +20,7 @@
  */
 
 #include "esp_private/periph_ctrl.h"
+#include "hal/usb_wrap_ll.h"
 #include "rom/usb/chip_usb_dw_wrapper.h"
 #include "rom/usb/usb_persist.h"
 #include "soc/rtc_cntl_reg.h"
@@ -36,8 +37,10 @@ static void _reconfigure_usb(void)
 {
 #ifdef CPU_FAM_ESP32S3
     /* disable USB OTG controller */
-    periph_module_reset(PERIPH_USB_MODULE);
-    periph_module_disable(PERIPH_USB_MODULE);
+    PERIPH_RCC_ATOMIC() {
+        usb_wrap_ll_reset_register();
+        usb_wrap_ll_enable_bus_clock(false);
+    }
 
     /* allow USB Serial/JTAG to use the internal USB transceiver */
     RTCCNTL.usb_conf.sw_usb_phy_sel = 0;

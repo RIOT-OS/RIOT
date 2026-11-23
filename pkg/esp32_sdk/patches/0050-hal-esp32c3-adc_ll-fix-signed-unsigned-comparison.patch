@@ -1,0 +1,25 @@
+From 031aba676b71158a444cacfb80ba14322b44f377 Mon Sep 17 00:00:00 2001
+From: Gunar Schorcht <gunar@schorcht.net>
+Date: Thu, 8 Oct 2026 18:31:04 +0200
+Subject: [PATCH 46/51] hal/esp32c3/adc_ll: fix signed/unsigned comparison
+
+---
+ components/esp_hal_ana_conv/esp32c3/include/hal/adc_ll.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/components/esp_hal_ana_conv/esp32c3/include/hal/adc_ll.h b/components/esp_hal_ana_conv/esp32c3/include/hal/adc_ll.h
+index 00c2d89d66..db7d7555d3 100644
+--- a/components/esp_hal_ana_conv/esp32c3/include/hal/adc_ll.h
++++ b/components/esp_hal_ana_conv/esp32c3/include/hal/adc_ll.h
+@@ -519,7 +519,7 @@ static inline void adc_ll_digi_dma_set_eof_num(uint32_t num)
+ static inline void adc_ll_digi_dma_clr_eof(void)
+ {
+     uint32_t eof_num = HAL_FORCE_READ_U32_REG_FIELD(APB_SARADC.dma_conf, apb_adc_eof_num);
+-    for (int i = 0; i <= eof_num; i++) {
++    for (uint32_t i = 0; i <= eof_num; i++) {
+         HAL_FORCE_MODIFY_U32_REG_FIELD(APB_SARADC.dma_conf, apb_adc_eof_num, i);
+     }
+ }
+-- 
+2.43.0
+
