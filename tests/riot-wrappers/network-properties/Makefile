@@ -9,6 +9,15 @@ APPLICATION_RUST_MODULE = riot_wrappers_test_networkproperties
 # break, and that will be the time to split it. So far, also IPv6 support can
 # just be assumed. (Really, anyone writing an IoT application without IPv6
 # support may want to look into Cobol).
+
+ifneq (,$(filter native native32 native64,$(BOARD)))
+  # Use ZEP instead of a TAP interface, which is not available in CI
+  USEMODULE += socket_zep
+  USEMODULE += netdev
+  USEMODULE += gnrc_netif_ieee802154
+  TERMFLAGS ?= -z "localhost:17754"
+endif
+
 USEMODULE += netdev_default
 USEMODULE += auto_init_gnrc_netif
 USEMODULE += gnrc_ipv6_default
