@@ -9,6 +9,8 @@
 #define _BSD_SOURCE 1
 #define _DEFAULT_SOURCE 1
 
+#include <stdbool.h>
+#include <stddef.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdarg.h>
@@ -77,6 +79,7 @@ struct dhcp_msg {
 #define DHCP_MSG_LEN (DHCP_BASE_LEN + DHCP_HOLE_LEN)
     u_int8_t options[312];
 };
+#define DHCP_HDR_LEN offsetof(struct dhcp_msg, options)
 
 struct dhcp_light_msg {
     u_int8_t op, htype, hlen, hops;
@@ -225,7 +228,7 @@ relay_dhcp_to_client(int slipfd)
 
     n = recv(dhsock, &inm, sizeof(inm), 0x0/*flags*/);
 
-    if (n < (int)(sizeof(inm) - sizeof(inm.options) + 4)) {
+    if (n < (int)DHCP_HDR_LEN + 4) {
         return;
     }
 
@@ -243,7 +246,7 @@ relay_dhcp_to_client(int slipfd)
      */
     memcpy(pkt.m.options, inm.options, 4); /* Magic cookie */
 
-    end = inm.options + (n - (sizeof(inm) - sizeof(inm.options)));
+    end = inm.options + (n - DHCP_HDR_LEN);
     p = inm.options + 4;		/* Magic cookie */
     t = pkt.m.options + 4;	/* Magic cookie */
     out_end = pkt.m.options + sizeof(pkt.m.options);
@@ -268,42 +271,49 @@ relay_dhcp_to_client(int slipfd)
             return;
         }
 
+        bool copy = false;
+
         switch (op) {
         case DHCP_OPTION_MSG_TYPE:
             if (p[1] != 1) {
                 return;
             }
             msg_type = p[2];
-            /* fall through */
+            copy = true;
+            break;
         case DHCP_OPTION_SUBNET_MASK:
-        case DHCP_OPTION_ROUTER:
         case DHCP_OPTION_LEASE_TIME:
-        case DHCP_OPTION_SERVER_ID:	/* Copy these options */
-            if ((op == DHCP_OPTION_SUBNET_MASK && p[1] != 4) ||
-                (op == DHCP_OPTION_ROUTER && (p[1] == 0 || p[1] % 4 != 0)) ||
-                ((op == DHCP_OPTION_LEASE_TIME ||
-                  op == DHCP_OPTION_SERVER_ID) && p[1] != 4)) {
+        case DHCP_OPTION_SERVER_ID:
+            if (p[1] != 4) {
                 return;
             }
+            copy = true;
+            break;
+        case DHCP_OPTION_ROUTER:
+            if (p[1] == 0 || p[1] % 4 != 0) {
+                return;
+            }
+            copy = true;
+            break;
+        case DHCP_OPTION_DNS_SERVER: /* Only copy first server */
+            if (p[1] < 4 || p[1] % 4 != 0 || (size_t)(out_end - t) < 6) {
+                return;
+            }
+            *t++ = DHCP_OPTION_DNS_SERVER;
+            *t++ = 4;
+            memcpy(t, p + 2, 4);
+            t += 4;
+            break;
+        default:			/* Ignore these options */
+            break;
+        }
+
+        if (copy) {
             if (option_size > (size_t)(out_end - t)) {
                 return;
             }
             memcpy(t, p, option_size);
             t += option_size;
-            break;
-
-        case DHCP_OPTION_DNS_SERVER: /* Only copy first server */
-            if (p[1] < 4 || p[1] % 4 != 0 || (size_t)(out_end - t) < 6) {
-                return;
-            }
-            *t++ = p[0];
-            *t++ = 4;
-            memcpy(t, p + 2, 4);
-            t += 4;
-            break;
-
-        default:			/* Ignore these options */
-            break;
         }
 
         p += option_size;
