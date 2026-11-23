@@ -74,6 +74,8 @@
 #endif
 
 #if IS_USED(MODULE_ESP_IDF_SPI_FLASH)
+#include "esp_flash.h"
+#include "esp_intr_alloc.h"
 #include "esp_private/spi_flash_os.h"
 #include "esp_flash_internal.h"
 #endif
@@ -92,6 +94,32 @@
 
 #define ENABLE_DEBUG 0
 #include "debug.h"
+
+#if IS_USED(MODULE_ESP_IDF_SPI_FLASH)
+/*
+ * As long as esp_flash_app_init is not called, the default chip uses the
+ * no-OS functions of ESP-IDF. Their start and end functions only disable and
+ * enable the cache, but not the interrupts. An interrupt whose handler or
+ * interrupt entry code is not completely located in IRAM would therefore
+ * crash during an esp_flash operation. The start and end functions are
+ * wrapped to disable the non-IRAM interrupts as the app functions do.
+ */
+static DRAM_ATTR const esp_flash_os_functions_t *_noos_funcs;
+static DRAM_ATTR esp_flash_os_functions_t _esp_flash_os_functions;
+
+static IRAM_ATTR esp_err_t _esp_flash_start(void *arg)
+{
+    esp_intr_noniram_disable();
+    return _noos_funcs->start(arg);
+}
+
+static IRAM_ATTR esp_err_t _esp_flash_end(void *arg)
+{
+    esp_err_t res = _noos_funcs->end(arg);
+    esp_intr_noniram_enable();
+    return res;
+}
+#endif /* MODULE_ESP_IDF_SPI_FLASH */
 
 #define STRINGIFY(s) STRINGIFY2(s)
 #define STRINGIFY2(s) #s
@@ -371,6 +399,13 @@ static NORETURN void IRAM system_init (void)
     esp_err_t flash_ret = esp_flash_init_default_chip();
     (void)flash_ret;
     assert(flash_ret == ESP_OK);
+
+    /* use the wrapped no-OS functions to disable non-IRAM interrupts */
+    _noos_funcs = esp_flash_default_chip->os_func;
+    _esp_flash_os_functions = *_noos_funcs;
+    _esp_flash_os_functions.start = _esp_flash_start;
+    _esp_flash_os_functions.end = _esp_flash_end;
+    esp_flash_default_chip->os_func = &_esp_flash_os_functions;
 #endif /* MODULE_ESP_IDF_SPI_FLASH */
 
     /* starting RIOT */
