@@ -44,12 +44,21 @@
 
 #define MSG_TYPE_ISR            (0x3456)
 
-/* Bandwidths that can be set with the shell, in kHz */
+/* Bandwidths that can be set with the shell, in kHz: only the SX1276
+ * supports 62.5 kHz */
+#ifdef MODULE_SX1276
+#  define SX127X_BANDWIDTHS     "62.5, 125, 250, 500"
+#else
+#  define SX127X_BANDWIDTHS     "125, 250, 500"
+#endif
+
 static const struct {
     const char *name;
     uint8_t bw;
 } _bandwidths[] = {
+#ifdef MODULE_SX1276
     { "62.5", LORA_BW_62_5_KHZ },
+#endif
     { "125", LORA_BW_125_KHZ },
     { "250", LORA_BW_250_KHZ },
     { "500", LORA_BW_500_KHZ },
@@ -66,7 +75,7 @@ int lora_setup_cmd(int argc, char **argv)
 
     if (argc < 4) {
         puts("usage: setup "
-             "<bandwidth (62.5, 125, 250, 500)> "
+             "<bandwidth (" SX127X_BANDWIDTHS ")> "
              "<spreading factor (7..12)> "
              "<code rate (5..8)>");
         return -1;
@@ -82,7 +91,7 @@ int lora_setup_cmd(int argc, char **argv)
     }
     if (idx == ARRAY_SIZE(_bandwidths)) {
         puts("[Error] setup: invalid bandwidth value given, "
-             "only 62.5, 125, 250 or 500 allowed.");
+             "only " SX127X_BANDWIDTHS " allowed.");
         return -1;
     }
     printf("setup: setting %sKHz bandwidth\n", _bandwidths[idx].name);
