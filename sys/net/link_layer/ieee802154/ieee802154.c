@@ -282,7 +282,7 @@ int ieee802154_get_dst(const uint8_t *mhr, uint8_t *dst, le_uint16_t *dst_pan)
 }
 
 /**
- * @brief Whether the Destination PAN ID field present in the frame
+ * @brief Whether the Destination PAN ID field is present in the frame
  *
  * Frame version 0/1: present if a destination address is present.
  * Frame version 2:   PAN ID Compression table (802.15.4 2024 Std.,
