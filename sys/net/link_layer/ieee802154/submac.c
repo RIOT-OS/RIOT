@@ -459,7 +459,7 @@ static ieee802154_submac_fsm_return_t _fsm_state_rx(ieee802154_submac_t *submac,
     case IEEE802154_FSM_EV_RX_DONE:
         while (ieee802154_radio_set_idle(dev, false) < 0) {}
         int rx_len = ieee802154_radio_len(dev);
-        assert(rx_len <= (int)IEEE802154_FRAME_LEN_MAX);
+        assert(rx_len <= (int)ieee802154_frame_len_max(ieee802154_get_phy_mode(submac)));
         /* Make sure it's not an ACK frame */
         if (rx_len <= (int)IEEE802154_MIN_FRAME_LEN) {
             /* Skip ACK frame */

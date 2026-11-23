@@ -259,6 +259,33 @@ static inline uint8_t ieee802154_mr_fsk_plen(ieee802154_mr_fsk_srate_t srate)
 }
 
 /**
+ * @brief   Get the maximum frame length of a PHY (phyMaxPacketSize)
+ *
+ * From IEEE Std 802.15.4-2024, Table 12-2: 2047 bytes for the SUN PHYs
+ * (MR-O-QPSK, MR-OFDM, MR-FSK), 127 for the others. The SUN PHYs only count
+ * when one of the ieee802154_phy_mr_* modules is used.
+ *
+ * @param[in] phy_mode  PHY mode
+ * @return    maximum PSDU length in bytes
+ */
+static inline unsigned ieee802154_frame_len_max(ieee802154_phy_mode_t phy_mode)
+{
+    switch (phy_mode) {
+    case IEEE802154_PHY_MR_OQPSK:
+    case IEEE802154_PHY_MR_OFDM:
+    case IEEE802154_PHY_MR_FSK:
+        if (IS_USED(MODULE_IEEE802154_PHY_MR_OQPSK) ||
+            IS_USED(MODULE_IEEE802154_PHY_MR_OFDM) ||
+            IS_USED(MODULE_IEEE802154_PHY_MR_FSK)) {
+            return IEEE802154G_FRAME_LEN_MAX;
+        }
+        /* fall-through */
+    default:
+        return IEEE802154_FRAME_LEN_MAX;
+    }
+}
+
+/**
  * @brief   Special address definitions
  * @{
  */
