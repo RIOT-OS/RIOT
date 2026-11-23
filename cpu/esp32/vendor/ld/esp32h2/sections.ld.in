@@ -326,6 +326,7 @@ SECTIONS
 
     *components/riscv/interrupt.*(.text .text._global_interrupt_handler .text.intr_get_item .text.intr_handler_get_arg)
     *components/riscv/vectors.*(.literal .literal.* .text .text.*)
+    *components/freertos/*/portable/riscv/portasm.*(.literal .literal.* .text .text.*)
 
     *librtc.a:(.literal .literal.* .text .text.*)
 
