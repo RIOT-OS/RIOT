@@ -74,8 +74,8 @@ static int _is_prefix(const huffman_ee_table_t *t, int i, int j)
 /* true if no codeword of the table is the start of another one */
 static int _is_prefix_free(const huffman_ee_table_t *t)
 {
-    for (int i = 0; i < t->num_symbols; i++) {
-        for (int j = 0; j < t->num_symbols; j++) {
+    for (uint16_t i = 0; i < t->num_symbols; i++) {
+        for (uint16_t j = 0; j < t->num_symbols; j++) {
             if ((i != j) && _is_prefix(t, i, j)) {
                 return 0;
             }
@@ -90,7 +90,7 @@ static int _is_complete(const huffman_ee_table_t *t)
 {
     uint64_t sum = 0;
 
-    for (int i = 0; i < t->num_symbols; i++) {
+    for (uint16_t i = 0; i < t->num_symbols; i++) {
         sum += UINT64_C(1) << (HUFFMAN_EE_MAX_CODE_LEN - t->code[i].length);
     }
     return sum == (UINT64_C(1) << HUFFMAN_EE_MAX_CODE_LEN);
@@ -108,7 +108,7 @@ static uint64_t _weighted_cost(const huffman_ee_table_t *t, const huffman_ee_par
 {
     uint64_t cost = 0;
 
-    for (int i = 0; i < t->num_symbols; i++) {
+    for (uint16_t i = 0; i < t->num_symbols; i++) {
         uint32_t bits = t->code[i].bits;
         uint32_t ones = 0;
         uint32_t transitions = 0;
@@ -138,7 +138,7 @@ static uint64_t _lambda_objective(const huffman_ee_table_t *t, const huffman_ee_
     uint64_t ending_zero = 0;
     uint64_t starting_one = 0;
 
-    for (int i = 0; i < t->num_symbols; i++) {
+    for (uint16_t i = 0; i < t->num_symbols; i++) {
         uint32_t bits = t->code[i].bits;
         uint8_t len = t->code[i].length;
         uint32_t ones = 0;
