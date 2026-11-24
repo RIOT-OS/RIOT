@@ -66,6 +66,36 @@ extern "C" {
 #define BTN0_MODE    GPIO_IN_PU
 /** @} */
 
+/**
+ * @name    Antenna configuration pin interface
+ * @{
+ */
+#define RFCTL1_PIN    GPIO_PIN(PORT_F, 2) /* DIG2 -> SWITCH_N */
+#define RFCTL2_PIN    GPIO_PIN(PORT_G, 1) /* DIG1 -> SWITCH_P */
+/** @} */
+
+/**
+ * @brief   Antenna configuration values
+ */
+enum {
+    RFCTL_ANTENNA_BOARD,
+    RFCTL_ANTENNA_EXT,
+};
+
+/**
+ * @name    Default antenna configuration
+ * @{
+ */
+#ifndef RFCTL_ANTENNA_DEFAULT
+#  define RFCTL_ANTENNA_DEFAULT   RFCTL_ANTENNA_BOARD
+#endif
+/** @} */
+
+/**
+ * @brief   Set antenna switch
+ */
+void board_antenna_config(uint8_t antenna);
+
 #ifdef __cplusplus
 }
 #endif
