@@ -71,7 +71,7 @@ extern "C" {
  * `CFLAGS += -DCONFIG_HUFFMAN_EE_MAX_SYMBOLS=64`. Must be at most 32767.
  */
 #ifndef CONFIG_HUFFMAN_EE_MAX_SYMBOLS
-#define CONFIG_HUFFMAN_EE_MAX_SYMBOLS   (256)
+#define CONFIG_HUFFMAN_EE_MAX_SYMBOLS (256)
 #endif
 
 /**

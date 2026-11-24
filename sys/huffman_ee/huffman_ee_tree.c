@@ -46,6 +46,10 @@ _Static_assert(CONFIG_HUFFMAN_EE_MAX_SYMBOLS <= 0x7FFF,
 /* Seed used when the caller passes 0 (the random generator cannot start at 0) */
 #define DEFAULT_SEED    (UINT32_C(0x9E3779B9))
 
+/* The merge tree of the exact build has num_symbols leaves and num_symbols - 1
+ * internal nodes */
+#define EX_NODES        (2 * CONFIG_HUFFMAN_EE_MAX_SYMBOLS)
+
 /* How the 0/1 labels are handed out when two subtrees are merged */
 typedef enum {
     LABEL_PLAIN,    /* the first subtree always gets 0 (normal Huffman) */
@@ -76,7 +80,15 @@ typedef struct {
 /* Min-heap: always gives back the subtree with the lowest frequency      */
 /* ---------------------------------------------------------------------- */
 
-/* true if subtree a must come out of the heap before subtree b */
+/**
+ * @brief   Compare two subtrees in the heap
+ *
+ * @param[in] ctx   Build context with the subtrees
+ * @param[in] a     Index of the first subtree
+ * @param[in] b     Index of the second subtree
+ *
+ * @return  true if @p a must be taken out of the heap before @p b
+ */
 static bool _heap_less(const build_ctx_t *ctx, uint16_t a, uint16_t b)
 {
     const subtree_t *sa = &ctx->sub[a];
@@ -90,6 +102,12 @@ static bool _heap_less(const build_ctx_t *ctx, uint16_t a, uint16_t b)
     return sa->order < sb->order;
 }
 
+/**
+ * @brief   Put a subtree into the heap
+ *
+ * @param[in] ctx   Build context with the heap
+ * @param[in] item  Index of the subtree to add
+ */
 static void _heap_push(build_ctx_t *ctx, uint16_t item)
 {
     uint16_t pos = ctx->heap_len++;
@@ -108,6 +126,13 @@ static void _heap_push(build_ctx_t *ctx, uint16_t item)
     }
 }
 
+/**
+ * @brief   Take the lightest subtree out of the heap
+ *
+ * @param[in] ctx   Build context with the heap
+ *
+ * @return  index of the lightest subtree
+ */
 static uint16_t _heap_pop(build_ctx_t *ctx)
 {
     uint16_t top = ctx->heap[0];
@@ -143,7 +168,15 @@ static uint16_t _heap_pop(build_ctx_t *ctx)
 /* Choosing the labels                                                    */
 /* ---------------------------------------------------------------------- */
 
-/* xorshift32: a tiny random number generator, good enough for coin tosses */
+/**
+ * @brief   Draw the next pseudo random number (xorshift32)
+ *
+ * A tiny generator, good enough for the coin tosses of the random baselines.
+ *
+ * @param[in,out] state     State of the generator
+ *
+ * @return  the next random number
+ */
 static uint32_t _rng_next(uint32_t *state)
 {
     uint32_t x = *state;
@@ -155,7 +188,9 @@ static uint32_t _rng_next(uint32_t *state)
     return x;
 }
 
-/*
+/**
+ * @brief   Cost of one subtree with a given leading bit
+ *
  * Cost of all codewords of one subtree if the bit @p bit is put in front of
  * them. Every codeword counts with its frequency:
  *
@@ -163,6 +198,14 @@ static uint32_t _rng_next(uint32_t *state)
  *
  * The caller must make sure that no codeword in the subtree is already
  * HUFFMAN_EE_MAX_CODE_LEN bits long.
+ *
+ * @param[in] table         Code table under construction
+ * @param[in] ctx           Build context with the leaves of the subtree
+ * @param[in] first_leaf    First symbol of the subtree
+ * @param[in] bit           Bit to put in front of every codeword
+ * @param[in] params        Weights of the energy model
+ *
+ * @return  the cost of the subtree
  */
 static uint64_t _subtree_cost(const huffman_ee_table_t *table,
                               const build_ctx_t *ctx, uint16_t first_leaf,
@@ -182,9 +225,19 @@ static uint64_t _subtree_cost(const huffman_ee_table_t *table,
     return cost;
 }
 
-/*
- * Decide which label the first subtree (a) gets. The second subtree (b)
- * always gets the opposite label. Returns 0 or 1.
+/**
+ * @brief   Decide which label the first subtree gets
+ *
+ * The second subtree always gets the opposite label.
+ *
+ * @param[in] table     Code table under construction
+ * @param[in] ctx       Build context (its random state is used for LABEL_RANDOM)
+ * @param[in] a         First subtree
+ * @param[in] b         Second subtree
+ * @param[in] mode      How the label is picked
+ * @param[in] params    Weights of the energy model
+ *
+ * @return  0 if the first subtree gets 0, 1 if it gets 1
  */
 static uint32_t _choose_label(const huffman_ee_table_t *table, build_ctx_t *ctx,
                               const subtree_t *a, const subtree_t *b,
@@ -209,7 +262,14 @@ static uint32_t _choose_label(const huffman_ee_table_t *table, build_ctx_t *ctx,
     }
 }
 
-/* Put @p bit in front of the codeword of every symbol in a subtree */
+/**
+ * @brief   Put a bit in front of the codeword of every symbol of a subtree
+ *
+ * @param[in,out] table     Code table under construction
+ * @param[in] ctx           Build context with the leaves of the subtree
+ * @param[in] first_leaf    First symbol of the subtree
+ * @param[in] bit           Bit to put in front of every codeword
+ */
 static void _prepend_bit(huffman_ee_table_t *table, const build_ctx_t *ctx,
                          uint16_t first_leaf, uint32_t bit)
 {
@@ -227,7 +287,16 @@ static void _prepend_bit(huffman_ee_table_t *table, const build_ctx_t *ctx,
 /* Building the code                                                      */
 /* ---------------------------------------------------------------------- */
 
-/* Merge the two lightest subtrees into one. Returns 0 or -E2BIG. */
+/**
+ * @brief   Merge the two lightest subtrees into one
+ *
+ * @param[in,out] table     Code table under construction
+ * @param[in,out] ctx       Build context with the heap
+ * @param[in] mode          How the labels are picked
+ * @param[in] params        Weights of the energy model
+ *
+ * @return  0 on success, -E2BIG if a codeword would become too long
+ */
 static int _merge_lightest(huffman_ee_table_t *table, build_ctx_t *ctx,
                            label_mode_t mode, const huffman_ee_params_t *params)
 {
@@ -258,7 +327,16 @@ static int _merge_lightest(huffman_ee_table_t *table, build_ctx_t *ctx,
     return 0;
 }
 
-/* Checks the arguments shared by all build functions */
+/**
+ * @brief   Check the arguments shared by all build functions
+ *
+ * @param[in] table         Code table to fill in
+ * @param[in] symbols       Symbols of the alphabet
+ * @param[in] freqs         How often each symbol occurs
+ * @param[in] num_symbols   Size of the alphabet
+ *
+ * @return  0 if the arguments are usable, a negative errno otherwise
+ */
 static int _check_input(const huffman_ee_table_t *table, const uint16_t *symbols,
                         const uint32_t *freqs, size_t num_symbols)
 {
@@ -290,6 +368,19 @@ static int _check_input(const huffman_ee_table_t *table, const uint16_t *symbols
     return 0;
 }
 
+/**
+ * @brief   Build a code with the given label rule
+ *
+ * @param[in,out] table     Code table to fill in
+ * @param[in] symbols       Symbols of the alphabet
+ * @param[in] freqs         How often each symbol occurs
+ * @param[in] num_symbols   Size of the alphabet
+ * @param[in] mode          How the labels are picked
+ * @param[in] params        Weights of the energy model (NULL for LABEL_PLAIN)
+ * @param[in] seed          Seed of the random generator (0 for the default)
+ *
+ * @return  0 on success, a negative errno otherwise
+ */
 static int _build(huffman_ee_table_t *table, const uint16_t *symbols,
                   const uint32_t *freqs, size_t num_symbols, label_mode_t mode,
                   const huffman_ee_params_t *params, uint32_t seed)
@@ -371,10 +462,15 @@ int huffman_ee_build_random(huffman_ee_table_t *table, const uint16_t *symbols,
 /* Exact optimal labelling (dynamic program over the fixed Huffman tree)  */
 /* ====================================================================== */
 
-/* The merge tree has num_symbols leaves and num_symbols - 1 internal nodes */
-#define EX_NODES        (2 * CONFIG_HUFFMAN_EE_MAX_SYMBOLS)
-
-/* true if subtree a comes before subtree b (lowest frequency, then oldest) */
+/**
+ * @brief   Compare two subtrees of the exact build
+ *
+ * @param[in] nfreq     Frequencies of the nodes of the fixed tree
+ * @param[in] a         Index of the first node
+ * @param[in] b         Index of the second node
+ *
+ * @return  true if @p a comes before @p b (lowest frequency, then oldest)
+ */
 static bool _ex_less(const uint32_t *nfreq, uint16_t a, uint16_t b)
 {
     if (nfreq[a] != nfreq[b]) {
@@ -383,6 +479,14 @@ static bool _ex_less(const uint32_t *nfreq, uint16_t a, uint16_t b)
     return a < b;
 }
 
+/**
+ * @brief   Put a node into the heap of the exact build
+ *
+ * @param[in] heap      Heap
+ * @param[in,out] len   Number of entries in the heap
+ * @param[in] nfreq     Frequencies of the nodes
+ * @param[in] item      Node to add
+ */
 static void _ex_push(uint16_t *heap, uint16_t *len, const uint32_t *nfreq, uint16_t item)
 {
     uint16_t pos = (*len)++;
@@ -400,6 +504,15 @@ static void _ex_push(uint16_t *heap, uint16_t *len, const uint32_t *nfreq, uint1
     }
 }
 
+/**
+ * @brief   Take the lightest node out of the heap of the exact build
+ *
+ * @param[in] heap      Heap
+ * @param[in,out] len   Number of entries in the heap
+ * @param[in] nfreq     Frequencies of the nodes
+ *
+ * @return  index of the lightest node
+ */
 static uint16_t _ex_pop(uint16_t *heap, uint16_t *len, const uint32_t *nfreq)
 {
     uint16_t top = heap[0];
@@ -430,15 +543,25 @@ static uint16_t _ex_pop(uint16_t *heap, uint16_t *len, const uint32_t *nfreq)
     return top;
 }
 
-/*
- * One pass of the dynamic program over the tree, for the "incoming label of
- * the root" being fixed implicitly (the caller handles the root). Fills g0/g1
- * (best cost of each subtree as a function of the label of the edge leading
- * into it) and, when choices is not NULL, the label chosen for the left child.
+/**
+ * @brief   One pass of the dynamic program over the fixed tree
  *
- * alpha_eff and beta_eff are the (possibly scaled) weights; extra0 is the
- * per-frequency penalty a leaf pays when its incoming label is 0 (used for
- * lambda; 0 otherwise).
+ * The incoming label of the root is fixed implicitly; the caller handles the
+ * root. Fills g0/g1 (best cost of each subtree as a function of the label of
+ * the edge leading into it) and, when the choices are not NULL, the label
+ * chosen for the left child of every internal node.
+ *
+ * @param[in] nodes         Number of nodes of the fixed tree
+ * @param[in] nlo           Left child of each node (NO_LEAF for a leaf)
+ * @param[in] nhi           Right child of each node (NO_LEAF for a leaf)
+ * @param[in] nfreq         Frequency of each node
+ * @param[in] alpha_eff     Weight of a 1 bit (possibly scaled)
+ * @param[in] beta_eff      Weight of a transition inside a codeword (possibly scaled)
+ * @param[in] extra0        Per-frequency penalty of a leaf with incoming label 0
+ * @param[out] g0           Best cost per subtree for an incoming 0
+ * @param[out] g1           Best cost per subtree for an incoming 1
+ * @param[out] c0           Label of the left child for an incoming 0 (may be NULL)
+ * @param[out] c1           Label of the left child for an incoming 1 (may be NULL)
  */
 static void _ex_dp(uint16_t nodes, const uint16_t *nlo, const uint16_t *nhi,
                    const uint32_t *nfreq, int64_t alpha_eff, int64_t beta_eff,
@@ -498,9 +621,24 @@ static void _ex_dp(uint16_t nodes, const uint16_t *nlo, const uint16_t *nhi,
     }
 }
 
-/* Cost of the whole tree once the root orientation (label of the left child)
- * and the per-subtree DP values are known. Only the alpha part applies at the
- * root: the root has no incoming edge, so no transition happens there. */
+/**
+ * @brief   Cost of the whole tree for one root orientation
+ *
+ * Only the alpha part applies at the root: the root has no incoming edge, so
+ * no transition happens there.
+ *
+ * @param[in] nlo           Left child of each node
+ * @param[in] nhi           Right child of each node
+ * @param[in] nfreq         Frequency of each node
+ * @param[in] alpha_eff     Weight of a 1 bit (possibly scaled)
+ * @param[in] g0            Best cost per subtree for an incoming 0
+ * @param[in] g1            Best cost per subtree for an incoming 1
+ * @param[in] root          Index of the root
+ * @param[in] l             Label of the left child of the root
+ * @param[out] label_out    Label of the left child that was used (may be NULL)
+ *
+ * @return  the cost of the whole tree
+ */
 static int64_t _ex_root_cost(const uint16_t *nlo, const uint16_t *nhi,
                              const uint32_t *nfreq, int64_t alpha_eff,
                              const int64_t *g0, const int64_t *g1, uint16_t root,
@@ -525,8 +663,22 @@ static int64_t _ex_root_cost(const uint16_t *nlo, const uint16_t *nhi,
     return cost;
 }
 
-/* Hand out the codewords by walking the tree from the root, using the choices
- * stored in c0/c1. */
+/**
+ * @brief   Hand out the codewords of the fixed tree
+ *
+ * Walks the tree from the root and uses the choices stored in c0/c1.
+ *
+ * @param[in,out] table     Code table to fill in
+ * @param[in] nodes         Number of nodes of the fixed tree (unused)
+ * @param[in] root          Index of the root
+ * @param[in] nlo           Left child of each node
+ * @param[in] nhi           Right child of each node
+ * @param[in] c0            Label of the left child for an incoming 0
+ * @param[in] c1            Label of the left child for an incoming 1
+ * @param[in] root_label    Label of the left child of the root
+ *
+ * @return  0 on success, -E2BIG if a codeword would become too long
+ */
 static int _ex_assign(huffman_ee_table_t *table, uint16_t nodes, uint16_t root,
                       const uint16_t *nlo, const uint16_t *nhi,
                       const uint8_t *c0, const uint8_t *c1, uint8_t root_label)
@@ -574,6 +726,18 @@ static int _ex_assign(huffman_ee_table_t *table, uint16_t nodes, uint16_t root,
     return 0;
 }
 
+/**
+ * @brief   Build the exact optimal labelling of the fixed Huffman tree
+ *
+ * @param[in,out] table     Code table to fill in
+ * @param[in] symbols       Symbols of the alphabet
+ * @param[in] freqs         How often each symbol occurs
+ * @param[in] num_symbols   Size of the alphabet
+ * @param[in] params        Weights of the energy model
+ * @param[in] use_lambda    Also put the boundary term into the decisions
+ *
+ * @return  0 on success, a negative errno otherwise
+ */
 static int _exact(huffman_ee_table_t *table, const uint16_t *symbols,
                   const uint32_t *freqs, size_t num_symbols,
                   const huffman_ee_params_t *params, bool use_lambda)
