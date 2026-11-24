@@ -31,7 +31,7 @@ class UDPClientSendParser(ShellInteractionParser):
             r"Success:\s+sen[td]\s+"
             r"(?P<payload_len>\d+)\s+"
             r"byte(\(s\))?\s+(over\s+UDP\s+)?to\s+"
-            r"\[(?P<dst>[0-9a-f:]+(%\S+)?)\]:"  # TODO: Add IPv4 support
+            r"(?P<dst>(\[(?P<ipv6>[0-9a-f:]+(%\S+)?)\])|[0-9.]+):"
             r"(?P<dport>\d+)$"
         )
 
@@ -58,6 +58,20 @@ class UDPClientSendParser(ShellInteractionParser):
         ...                    "what happens if we have an error?\\n")
         >>> res
         []
+        >>> res = parser.parse("Success: send 12 byte to 192.168.1.42:8080  \\n"
+        ...                    "Success: sent 5 byte(s) to 5.6.7.8:2333\\n")
+        >>> len(res)
+        2
+        >>> sorted(res[0])
+        ['dport', 'dst', 'payload_len']
+        >>> sorted(res[1])
+        ['dport', 'dst', 'payload_len']
+        >>> res[0]["payload_len"], res[1]["payload_len"]
+        (12, 5)
+        >>> res[0]["dst"], res[1]["dst"]
+        ('192.168.1.42', '5.6.7.8')
+        >>> res[0]["dport"], res[1]["dport"]
+        (8080, 2333)
         """
         res = []
         for line in cmd_output.splitlines():
@@ -66,6 +80,9 @@ class UDPClientSendParser(ShellInteractionParser):
                 msg = m.groupdict()
                 msg["payload_len"] = int(msg["payload_len"])
                 msg["dport"] = int(msg["dport"])
+                if msg.get("ipv6"):
+                    msg["dst"] = msg["ipv6"]
+                msg.pop("ipv6", None)
                 res.append(msg)
         return res
 
@@ -78,7 +95,10 @@ class UDPClient(ShellInteraction):
     Shell interaction for `shell_cmd_udp`
     """
 
-    ADDR_PORT_PAIR_FMT = "[{addr}]:{port}"
+    ADDR_PORT_PAIR_FMT = {
+        "ipv4": "{addr}:{port}",
+        "ipv6": "[{addr}]:{port}",
+    }
 
     def _fmt_payload(self, payload: Union[str, bytes]) -> tuple[str, str]:
         if isinstance(payload, bytes):
@@ -108,7 +128,15 @@ class UDPClient(ShellInteraction):
         else:
             # wait 1 sec for output
             timeout = 1
-        addr_port = self.ADDR_PORT_PAIR_FMT.format(addr=dest_addr, port=port)
+        if re.match(r"^\d+(\.\d+){3}$", str(dest_addr).strip()):
+            # dest_addr is IPv4 address
+            addr_type = "ipv4"
+        else:
+            addr_type = "ipv6"
+        addr_port = self.ADDR_PORT_PAIR_FMT[addr_type].format(
+            addr=dest_addr,
+            port=port,
+        )
         flags, payload = self._fmt_payload(payload)
         res = self.cmd(
             f"udp send {flags}{addr_port} {payload}{delay_str}",
@@ -187,8 +215,7 @@ class UDPServer(ShellInteraction):
                 [
                     pexpect.TIMEOUT,
                     r"Packets received:\s+\d",
-                    # TODO: Add IPv4 support
-                    r"Received UDP data from \[[0-9a-f:]+%.+\]:\d+",
+                    r"Received UDP data from \[([0-9a-f:]+%.+|[0-9.]+)\]:\d+",
                 ],
                 timeout=timeout,
             )

@@ -157,6 +157,16 @@ class TestUDP(WithUDPParsers):
         assert stats[0]["dst"] == "2001:db8::1"
         assert stats[0]["dport"] == 5573
 
+    def test_udp_client_send_ipv4(self):
+        res = self.shell.udp_client_send("192.168.42.1", 5573, "Hello World!")
+        stats = self.udp_parser.parse(res)
+        byts = self.od_parser.parse(res)
+        assert byts == b"Hello World!"
+        assert len(stats) == 1
+        assert stats[0]["payload_len"] == len("Hello World!")
+        assert stats[0]["dst"] == "192.168.42.1"
+        assert stats[0]["dport"] == 5573
+
     def test_udp_client_send_text_like_hex(self):
         res = self.shell.udp_client_send("2001:db8::2", 5683, "abcd001122")
         stats = self.udp_parser.parse(res)
@@ -359,6 +369,13 @@ class TestUDPServer(riotctrl_shell_tests.testcase_base.TestBase):
     def _test_udp_server_check_output(self, summarize=False):
         self.shell.preload_payload(b"abcdef")
         self.shell.payload_remote("[2001:db8::1]:12345")
+
+        self.shell.trigger_receive()
+        lost_perc = self.shell.udp_server_check_output()
+        assert lost_perc == 0
+
+        self.shell.preload_payload(b"abcdef")
+        self.shell.payload_remote("192.168.3.4:12345")
 
         self.shell.trigger_receive()
         lost_perc = self.shell.udp_server_check_output()

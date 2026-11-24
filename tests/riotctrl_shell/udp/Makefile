@@ -3,6 +3,7 @@ USEMODULE += shell_cmd_udp_send_generated
 USEMODULE += shell_cmd_udp_server
 
 USEMODULE += fmt
+USEMODULE += ipv4_addr
 USEMODULE += ipv6_addr
 USEMODULE += od
 USEMODULE += shell_cmd_sys
@@ -14,5 +15,6 @@ include $(CURDIR)/../Makefile.riotctrl_shell_common
 
 INCLUDES += -I$(CURDIR)
 CFLAGS += -DSOCK_HAS_ASYNC
+CFLAGS += -DSOCK_HAS_IPV4
 CFLAGS += -DSOCK_HAS_IPV6
 CFLAGS += -DTESTING_MOCK_SOCK_UDP
