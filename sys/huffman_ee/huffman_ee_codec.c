@@ -22,6 +22,12 @@
 #include "huffman_ee/huffman_ee.h"
 #include "huffman_ee_internal.h"
 
+/* Bits that are packed into one element of the input/output buffer */
+#define BITS_PER_BYTE       (8U)
+
+/* Mask of the first (most significant) bit of one buffer element */
+#define FIRST_BIT_MASK      (0x80U)
+
 int huffman_ee_encode(const huffman_ee_table_t *table, const uint16_t *input,
                       size_t input_len, void *out, size_t out_size,
                       size_t *out_bits)
@@ -32,8 +38,8 @@ int huffman_ee_encode(const huffman_ee_table_t *table, const uint16_t *input,
     }
 
     uint8_t *buf = out;
-    size_t pos = 0;                     /* number of bits written so far */
-    size_t capacity = out_size * 8;     /* number of bits that fit in buf */
+    size_t pos = 0;                             /* number of bits written so far */
+    size_t capacity = out_size * BITS_PER_BYTE; /* number of bits that fit in buf */
 
     /* only 1 bits are written below, so start with all zeros */
     memset(buf, 0, out_size);
@@ -52,7 +58,8 @@ int huffman_ee_encode(const huffman_ee_table_t *table, const uint16_t *input,
         /* write the codeword from its first bit to its last bit */
         for (int b = code->length - 1; b >= 0; b--) {
             if ((code->bits >> b) & 1) {
-                buf[pos >> 3] |= (uint8_t)(0x80U >> (pos & 7));
+                buf[pos / BITS_PER_BYTE] |=
+                    (uint8_t)(FIRST_BIT_MASK >> (pos % BITS_PER_BYTE));
             }
             pos++;
         }
@@ -61,7 +68,16 @@ int huffman_ee_encode(const huffman_ee_table_t *table, const uint16_t *input,
     return 0;
 }
 
-/* Index of the symbol whose codeword is the lowest @p length bits of @p bits */
+/**
+ * @brief   Index of the symbol whose codeword is the lowest @p length bits
+ *          of @p bits
+ *
+ * @param[in] table     Code table to search
+ * @param[in] bits      Bits that were read so far
+ * @param[in] length    Number of bits to compare
+ *
+ * @return  index of the symbol, -1 if there is none
+ */
 static int _table_match(const huffman_ee_table_t *table, uint32_t bits, uint8_t length)
 {
     for (uint16_t i = 0; i < table->num_symbols; i++) {
@@ -91,7 +107,9 @@ int huffman_ee_decode(const huffman_ee_table_t *table, const void *in,
         if (pending_len >= HUFFMAN_EE_MAX_CODE_LEN) {
             return -EINVAL;
         }
-        pending = (pending << 1) | ((buf[pos >> 3] >> (7 - (pos & 7))) & 1);
+        pending = (pending << 1) |
+                  ((buf[pos / BITS_PER_BYTE] >>
+                    (BITS_PER_BYTE - 1 - (pos % BITS_PER_BYTE))) & 1U);
         pending_len++;
 
         /* Huffman codes are prefix-free: the first match is the symbol */
