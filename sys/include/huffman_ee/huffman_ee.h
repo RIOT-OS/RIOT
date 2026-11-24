@@ -169,7 +169,9 @@ int huffman_ee_build(huffman_ee_table_t *table, const uint16_t *symbols,
  * Only the alpha and beta weights are used (as in huffman_ee_build()).
  *
  * @note    Needs more stack than the other builders, roughly 60 bytes per
- *          symbol of the alphabet.
+ *          symbol of the alphabet: with the default of 256 symbols that is
+ *          about 15 KiB, so boards (or threads) whose stack is smaller
+ *          need a lower CONFIG_HUFFMAN_EE_MAX_SYMBOLS.
  *
  * Parameters and return values as for huffman_ee_build().
  */
@@ -192,7 +194,9 @@ int huffman_ee_build_exact(huffman_ee_table_t *table, const uint16_t *symbols,
  * participates here (unlike in huffman_ee_build()).
  *
  * @note    Needs more stack than the other builders, roughly 60 bytes per
- *          symbol of the alphabet.
+ *          symbol of the alphabet: with the default of 256 symbols that is
+ *          about 15 KiB, so boards (or threads) whose stack is smaller
+ *          need a lower CONFIG_HUFFMAN_EE_MAX_SYMBOLS.
  *
  * Additional return value on top of those of huffman_ee_build(): -E2BIG if
  * the weights and the total frequency are so large that the scaled costs
