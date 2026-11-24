@@ -32,6 +32,10 @@ static msg_t _main_msg_queue[MAIN_MSG_QUEUE_SIZE];
 #define CONFIG_AGENT_ID "config"
 #define CHAT_SINK_ID "chat"
 
+#define CONTACT_START_S          0ULL
+#define CONTACT_END_S            4102444800ULL
+#define CONTACT_RATE_BYTES_PER_S 100000U
+
 extern struct bundle_agent_interface bundle_agent_interface;
 
 #ifdef NODE_A
@@ -40,27 +44,27 @@ extern struct bundle_agent_interface bundle_agent_interface;
 #  define PEER_EID_C "dtn://node-c.dtn/"
 #  define LOCAL_IP "fd12:dead:beef:1:9802:e0ff:fe7d:d553"
 #  define PEER_IP "fd12:dead:beef:1:b073:85ff:fe41:8889"
-#  define PEER_PORT "4557"
+#  define PEER_PORT "4556"
 #  define PEER_IP_C "fd12:dead:beef:1:48bd:97ff:fee0:e4ec"
-#  define PEER_PORT_C "4558"
+#  define PEER_PORT_C "4556"
 #endif
 #ifdef NODE_B
 #  define LOCAL_EID "dtn://node-b.dtn/"
 #  define PEER_EID "dtn://node-a.dtn/"
 #  define PEER_EID_C "dtn://node-c.dtn/"
 #  define LOCAL_IP "fd12:dead:beef:1:b073:85ff:fe41:8889"
-#  define LOCAL_PORT "4557"
+#  define LOCAL_PORT "4556"
 #  define PEER_IP "fd12:dead:beef:1:9802:e0ff:fe7d:d553"
 #  define PEER_PORT "4556"
 #  define PEER_IP_C "fd12:dead:beef:1:f82f:3ff:fe34:de94"
-#  define PEER_PORT_C "4558"
+#  define PEER_PORT_C "4556"
 #endif
 #ifdef NODE_C
 #  define LOCAL_EID "dtn://node-c.dtn/"
 #  define PEER_EID "dtn://node-b.dtn/"
 #  define LOCAL_IP "fd12:dead:beef:1:f82f:3ff:fe34:de94"
 #  define PEER_IP "fd12:dead:beef:1:b073:85ff:fe41:8889"
-#  define PEER_PORT "4557"
+#  define PEER_PORT "4556"
 #endif
 #ifdef NODE_A_ESP32
 #  define LOCAL_EID "dtn://node-a.dtn/"
@@ -68,26 +72,26 @@ extern struct bundle_agent_interface bundle_agent_interface;
 #  define PEER_EID_C "dtn://node-c.dtn/"
 #  define LOCAL_IP "fd12:dead:beef:1:7ae3:6dff:fe09:5e7c"
 #  define PEER_IP "fd12:dead:beef:1:cac9:a3ff:feca:7404"
-#  define PEER_PORT "4557"
+#  define PEER_PORT "4556"
 #endif
 #ifdef NODE_B_ESP32
 #  define LOCAL_EID "dtn://node-b.dtn/"
 #  define PEER_EID "dtn://node-a.dtn/"
 #  define PEER_EID_C "dtn://node-c.dtn/"
 #  define LOCAL_IP "fd12:dead:beef:1:cac9:a3ff:feca:7404"
-#  define LOCAL_PORT "4557"
+#  define LOCAL_PORT "4556"
 #  define PEER_IP "fd12:dead:beef:1:7ae3:6dff:fe09:5e7c"
 #  define PEER_PORT "4556"
 #  define PEER_IP_C "fd12:dead:beef:1:3685:18ff:fe22:4938"
-#  define PEER_PORT_C "4558"
+#  define PEER_PORT_C "4556"
 #endif
 #ifdef NODE_C_ESP32
 #  define LOCAL_EID "dtn://node-c.dtn/"
 #  define PEER_EID "dtn://node-b.dtn/"
 #  define LOCAL_IP "fd12:dead:beef:1:3685:18ff:fe22:4938"
-#  define LOCAL_PORT "4558"
+#  define LOCAL_PORT "4556"
 #  define PEER_IP "fd12:dead:beef:1:cac9:a3ff:feca:7404"
-#  define PEER_PORT "4557"
+#  define PEER_PORT "4556"
 #endif
 
 void send_chat_message(const char *message, const char *peer_eid);
@@ -203,8 +207,10 @@ void advertise_route(const char *peer_ip, const char *peer_port, const char *pee
     /* Example resulting command:
      * (dtn://node-c.dtn/):(tcpclv3-riot:[fd12:dead:beef:1:88f5:d9ff:fe8d:21f]:4557):[(dtn://node-c.dtn/chat)]:[{0,4102444800,100000}];
      */
-    snprintf(config_cmd, sizeof(config_cmd), "(%s):(%s):[(%s)]:[{0,4102444800,100000}];",
-             advertise_eid, advertise_cla, advertise_dest_eid);
+    snprintf(config_cmd, sizeof(config_cmd),
+         "(%s):(%s):[(%s)]:[{%llu,%llu,%u}];",
+         advertise_eid, advertise_cla, advertise_dest_eid,
+         CONTACT_START_S, CONTACT_END_S, CONTACT_RATE_BYTES_PER_S);
 
     const size_t cmd_len = strlen(config_cmd);
     const size_t payload_len = cmd_len + 1;
@@ -238,8 +244,10 @@ void add_route(const char *sink_id, const char *peer_ip, const char *peer_port,
         char config_cmd[320];
 
         snprintf(peer_cla, sizeof(peer_cla), "tcpclv3-riot:[%s]:%s", peer_ip, peer_port);
-        snprintf(config_cmd, sizeof(config_cmd), "(%s):(%s):[(%s)]:[{0,4102444800,100000}];",
-                 peer_eid, peer_cla, dest_eid);
+        snprintf(config_cmd, sizeof(config_cmd),
+         "(%s):(%s):[(%s)]:[{%llu,%llu,%u}];",
+         advertise_eid, advertise_cla, advertise_dest_eid,
+         CONTACT_START_S, CONTACT_END_S, CONTACT_RATE_BYTES_PER_S);
 
         printf(config_cmd);
 
@@ -293,7 +301,7 @@ static int _advertise_route(int argc, char **argv)
     const char *local_port = argv[5];
     const char *chat_sink_id = argv[6];
     const char *advertise_eid= argv[7];
-    advertise_route(peer_ip, peer_port, peer_eid, local_ip, local_port,
+    advertise_route(peer_ip, peer_port, CONFIG_AGENT_ID , peer_eid, local_ip, local_port,
                     chat_sink_id, advertise_eid);
                    
     printf("Route advertised\n");
@@ -370,11 +378,11 @@ int main(void)
     argv[4] = "tcpclv3-riot:*,4556";
 #endif
 #if defined(NODE_B) || defined(NODE_B_ESP32)
-    argv[4] = "tcpclv3-riot:*,4557";
+    argv[4] = "tcpclv3-riot:*,4556";
 #endif
 
 #if defined(NODE_C) || defined(NODE_C_ESP32)
-    argv[4] = "tcpclv3-riot:*,4558";
+    argv[4] = "tcpclv3-riot:*,4556";
 #endif
 #ifdef CLA_OPTS_OVERRIDE
     argv[4] = CLA_OPTS_OVERRIDE; /* only for tests */
