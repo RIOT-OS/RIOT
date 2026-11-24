@@ -11,7 +11,13 @@ UNIFLASH_PATH ?= "UNIFLASH_PATH unconfigured"
 # check which uniflash version is available, either 4.x or 3.x
 ifneq ("$(wildcard $(UNIFLASH_PATH)/dslite.sh)","")
   FLASHER ?= $(UNIFLASH_PATH)/dslite.sh
-  FFLAGS  = --config $(UNIFLASH_CONFIG_CCXML) $(FLASHFILE)
+  # Device commands that DSLite runs once the image is written, for example
+  # PinReset. `dslite.sh --mode flash --config <ccxml> --list-device-cmds`
+  # lists the ones of a device.
+  UNIFLASH_POST_FLASH_CMD ?=
+  FFLAGS  = --config $(UNIFLASH_CONFIG_CCXML) \
+            $(addprefix --post-flash-device-cmd ,$(UNIFLASH_POST_FLASH_CMD)) \
+            $(FLASHFILE)
   # configure uniflash for resetting target
   # xds110reset path changed in version UniFlash v4.4.0
   # Try to detect the newest one and fallback to only 'xds110reset'
