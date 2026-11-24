@@ -305,6 +305,7 @@ void spi_acquire(spi_t bus, spi_cs_t cs, spi_mode_t mode, spi_clk_t clk)
         case SPI_MODE_3: cfg2 |= SPI_CFG2_CPOL | SPI_CFG2_CPHA; break;
     }
     cfg2 |= SPI_CFG2_MASTER; /* Master Mode */
+    cfg2 |= SPI_CFG2_AFCNTR; /* Keep control of SPI pins when SPE is 0 (between transfers) */
     /* Write CFG1 and CFG2 */
     dev(bus)->CFG1 = cfg1;
     dev(bus)->CFG2 = cfg2;
