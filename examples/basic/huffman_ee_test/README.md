@@ -126,3 +126,18 @@ energy when the distribution is skewed. The compression packages are listed
 next to it only to show what they do on the same data: they remove bytes, which
 the module does not, and the module lowers the energy of the bits, which they
 do not.
+
+Resources
+---------
+
+The tables and the stack used by the exact builders scale with the maximum
+number of symbols, `CONFIG_HUFFMAN_EE_MAX_SYMBOLS` (256 by default). One table
+needs about 14 bytes per symbol, and `huffman_ee_build_exact()` and
+`huffman_ee_build_exact_lambda()` need around 60 bytes of stack per symbol,
+which is about 15 KiB with the default bound. Boards whose main thread stack is
+smaller than that have to lower the bound:
+
+    CFLAGS += -DCONFIG_HUFFMAN_EE_MAX_SYMBOLS=32
+
+This example only ever sends 14 different values, so 32 symbols are plenty and
+the example sets that bound itself. The other builders need far less stack.

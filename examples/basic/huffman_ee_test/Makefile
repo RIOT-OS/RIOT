@@ -7,6 +7,12 @@ USEMODULE += huffman_ee
 USEPKG += heatshrink
 USEPKG += lz4
 USEPKG += uzlib
+
+# The example sends at most 14 different values. A small symbol bound keeps
+# both the static tables and the stack needed by huffman_ee_build_exact()
+# small, so the example fits the boards that build it.
+CFLAGS += -DCONFIG_HUFFMAN_EE_MAX_SYMBOLS=32
+
 # If no BOARD is found in the environment, use this default:
 BOARD ?= native
 
