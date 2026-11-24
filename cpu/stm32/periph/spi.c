@@ -28,6 +28,7 @@
 
 #include "compiler_hints.h"
 #include "mutex.h"
+#include "busy_wait.h"
 #include "periph/gpio.h"
 #include "periph/spi.h"
 #include "pm_layered.h"
@@ -43,12 +44,18 @@
 
 #ifdef SPI_CR2_FRXTH
 /* configure SPI for 8-bit data width */
-#define SPI_CR2_SETTINGS    (SPI_CR2_FRXTH |\
-                             SPI_CR2_DS_0 |\
-                             SPI_CR2_DS_1 |\
-                             SPI_CR2_DS_2)
+#  define SPI_CR2_SETTINGS  (SPI_CR2_FRXTH | \
+                             SPI_CR2_DS_0 | SPI_CR2_DS_1 | SPI_CR2_DS_2)
 #else
-#define SPI_CR2_SETTINGS    0
+#  define SPI_CR2_SETTINGS  0
+#endif
+
+#if defined(CPU_FAM_STM32H7) || defined(CPU_FAM_STM32U3)
+#  define SPI_FLAG_TX_RDY   SPI_SR_TXP
+#  define SPI_FLAG_RX_RDY   SPI_SR_RXP
+#else
+#  define SPI_FLAG_TX_RDY   SPI_SR_TXE
+#  define SPI_FLAG_RX_RDY   SPI_SR_RXNE
 #endif
 
 /**
@@ -106,7 +113,7 @@ void spi_init(spi_t bus)
 {
     assume(bus < SPI_NUMOF);
 
-    /* initialize device lock (as locked, spi_init_pins() will unlock it */
+    /* initialize device lock (as locked, spi_init_pins() will unlock it) */
     locks[bus] = (mutex_t)MUTEX_INIT_LOCKED;
     /* trigger pin initialization */
     spi_init_pins(bus);
@@ -279,33 +286,25 @@ void spi_acquire(spi_t bus, spi_cs_t cs, spi_mode_t mode, spi_clk_t clk)
 #if CPU_FAM_STM32H7
 
     uint32_t cr1 = 0;
-    if (cs != SPI_HWCS_MASK) {
-        cr1 |= SPI_CR1_SSI;    /* internal SS high when SSM=1 */
-    }
-    dev(bus)->CR1 = cr1;   /* write SSI (do not set SPE yet) */
-
-    /* Build CFG1 */
     uint32_t cfg1 = 0;
+    uint32_t cfg2 = 0;
+
     cfg1 |= ((br << SPI_CFG1_MBR_Pos) & SPI_CFG1_MBR_Msk); /* Set master baud rate */
     cfg1 |= (SPI_CFG1_DSIZE_0 | SPI_CFG1_DSIZE_1 | SPI_CFG1_DSIZE_2); /* DSIZE = 8-bit */
 
-    /* Build CFG2 fully before any write */
-    uint32_t cfg2 = 0;
-    cfg2 |= SPI_CFG2_SSOM;
-    if (cs != SPI_HWCS_MASK) {
+    /* set to Master Mode and set SPI Mode */
+    cfg2 = SPI_CFG2_MASTER | mode;
+
+    if (cs == SPI_HWCS_MASK) {
+        /* hardware CS: set SSOE so peripheral drives NSS, enable NSS management in Master Mode */
+        cfg2 |= SPI_CFG2_SSOE | SPI_CFG2_SSOM;
+    }
+    else {
+        cr1 |= SPI_CR1_SSI;    /* internal SS high when SSM=1 */
         cfg2 |= SPI_CFG2_SSM; /* software NSS management (use GPIO as CS) */
-    } else {
-        /* hardware CS: set SSOE so peripheral drives NSS */
-        cfg2 |= SPI_CFG2_SSOE;
     }
-    switch (mode) {
-        case SPI_MODE_0: cfg2 &= ~(SPI_CFG2_CPHA | SPI_CFG2_CPOL); break;
-        case SPI_MODE_1: cfg2 = (cfg2 & ~SPI_CFG2_CPOL) | SPI_CFG2_CPHA; break;
-        case SPI_MODE_2: cfg2 = (cfg2 & ~SPI_CFG2_CPHA) | SPI_CFG2_CPOL; break;
-        case SPI_MODE_3: cfg2 |= SPI_CFG2_CPOL | SPI_CFG2_CPHA; break;
-    }
-    cfg2 |= SPI_CFG2_MASTER; /* Master Mode */
-    /* Write CFG1 and CFG2 */
+
+    dev(bus)->CR1 = cr1;   /* SPE is not yet enabled */
     dev(bus)->CFG1 = cfg1;
     dev(bus)->CFG2 = cfg2;
 
@@ -472,94 +471,68 @@ static void _transfer_no_dma(spi_t bus, const void *out, void *in, size_t len)
     const uint8_t *outbuf = out;
     uint8_t *inbuf = in;
 
-#if CPU_FAM_STM32H7
-
+    /* recast the data register(s) to uint_8 to force 8-bit access */
+    volatile uint8_t *TXDR, *RXDR;
+#if defined(CPU_FAM_STM32H7) || defined(CPU_FAM_STM32U3)
     dev(bus)->IFCR = 0xFFFFFFFF;
+    TXDR = (volatile uint8_t *)&(dev(bus)->TXDR);
+    RXDR = (volatile uint8_t *)&(dev(bus)->RXDR);
+#else
+    /* the previous generations just used one register for both directions */
+    TXDR = (volatile uint8_t *)&(dev(bus)->DR);
+    RXDR = TXDR;
+#endif
 
-    /* drain RX FIFO (read any stale bytes) */
-    while (dev(bus)->SR & SPI_SR_RXP) {
-        (void)*(volatile uint8_t*)&(dev(bus)->RXDR);
-    }
-
-    /* we need to recast the data register to uint_8 to force 8-bit access */
-    volatile uint8_t *TXDR = (volatile uint8_t*)&(dev(bus)->TXDR);
-    volatile uint8_t *RXDR = (volatile uint8_t*)&(dev(bus)->RXDR);
-
-    dev(bus)->CR2 = (len << SPI_CR2_TSIZE_Pos) & SPI_CR2_TSIZE_Msk;
-    dev(bus)->CR1 |= SPI_CR1_SPE;
-    dev(bus)->CR1 |= SPI_CR1_CSTART;  /* Start transfer */
-
-    /* transfer data, use shortpath if only sending data */
-    if (!inbuf) {
-        for (size_t i = 0; i < len; i++) {
-            while (!(dev(bus)->SR & SPI_SR_TXP)) {}
-            *TXDR = outbuf[i];
-        }
-    }
-    else if (!outbuf) {
-        for (size_t i = 0; i < len; i++) {
-            while (!(dev(bus)->SR & SPI_SR_TXP)) { /* busy wait */ }
-            *TXDR = 0;
-            while (!(dev(bus)->SR & SPI_SR_RXP)) { /* busy wait */ }
-            inbuf[i] = *RXDR;
-        }
-    }
-    else {
-        for (size_t i = 0; i < len; i++) {
-            while (!(dev(bus)->SR & SPI_SR_TXP)) { /* busy wait */ }
-            *TXDR = outbuf[i];
-            while (!(dev(bus)->SR & SPI_SR_RXP)) { /* busy wait */ }
-            inbuf[i] = *RXDR;
-        }
-    }
-
-    /* wait for transmitter to fully finish */
-    while (!(dev(bus)->SR & SPI_SR_TXC)) {}
-
-    /* drain remaining RX FIFO */
-    while (dev(bus)->SR & SPI_SR_RXP) {
+    /* drain stale RX bytes */
+    while (dev(bus)->SR & SPI_FLAG_RX_RDY) {
         (void)*RXDR;
     }
-    _wait_for_end(bus);
-#else
-    /* we need to recast the data register to uint_8 to force 8-bit access */
-    volatile uint8_t *DR = (volatile uint8_t*)&(dev(bus)->DR);
 
-    /* transfer data, use shortpath if only sending data */
-    if (!inbuf) {
-        for (size_t i = 0; i < len; i++) {
-            while (!(dev(bus)->SR & SPI_SR_TXE)) {}
-            *DR = outbuf[i];
-        }
-    }
-    else if (!outbuf) {
-        for (size_t i = 0; i < len; i++) {
-            while (!(dev(bus)->SR & SPI_SR_TXE)) { /* busy wait */ }
-            *DR = 0;
-            while (!(dev(bus)->SR & SPI_SR_RXNE)) { /* busy wait */ }
-            inbuf[i] = *DR;
-        }
-    }
-    else {
-        for (size_t i = 0; i < len; i++) {
-            while (!(dev(bus)->SR & SPI_SR_TXE)) { /* busy wait */ }
-            *DR = outbuf[i];
-            while (!(dev(bus)->SR & SPI_SR_RXNE)) { /* busy wait */ }
-            inbuf[i] = *DR;
-        }
-    }
-
-    /* wait until everything is finished and empty the receive buffer */
-    while (!(dev(bus)->SR & SPI_SR_TXE)) {}
-    while (dev(bus)->SR & SPI_SR_BSY) {}
-    while (dev(bus)->SR & SPI_SR_RXNE) {
-        /* make sure to "read" any data, so the RXNE is indeed clear.
-         * Otherwise we risk reading stale data in the next transfer */
-        (void)*DR;
-    }
-
-    _wait_for_end(bus);
+#if defined(CPU_FAM_STM32H7) || defined(CPU_FAM_STM32U3)
+    dev(bus)->CR2 = (len << SPI_CR2_TSIZE_Pos) & SPI_CR2_TSIZE_Msk;
 #endif
+    dev(bus)->CR1 |= SPI_CR1_SPE;
+#if defined(CPU_FAM_STM32H7) || defined(CPU_FAM_STM32U3)
+    dev(bus)->CR1 |= SPI_CR1_CSTART;
+#endif
+
+    for (size_t i = 0; i < len; i++) {
+        while (!(dev(bus)->SR & SPI_FLAG_TX_RDY)) {}
+        *TXDR = outbuf ? outbuf[i] : 0; /* write 0 if no outbuf was specified */
+
+        if (inbuf) {
+            while (!(dev(bus)->SR & SPI_FLAG_RX_RDY)) {}
+            inbuf[i] = *RXDR;
+        }
+    }
+
+    /* wait for the transmitter to fully finish */
+#if defined(CPU_FAM_STM32H7) || defined(CPU_FAM_STM32U3)
+    while (!(dev(bus)->SR & SPI_SR_TXC)) {}
+
+    /* The SPIv3 peripheral has an errata that the EOT event can fire before
+     * the transmission actually stopped. If the SPI peripheral is disabled
+     * too quickly, the last bit can be corrupted.
+     * See ES0626 "2.16.7 Truncation of SPI output signals after EOT event"
+     * for the STM32U375/385 errata. */
+    uint32_t sck_hz = periph_apb_clk(spi_config[bus].apbbus) >> (prescalers[bus] + 1);
+    /* Half SCK period in µs, rounded up, wait at least 1 half period */
+    uint32_t half_period_us = sck_hz ? (((1000000UL / 2) + sck_hz - 1) / sck_hz) : 1;
+    busy_wait_us(half_period_us);
+#else
+    while (!(dev(bus)->SR & SPI_FLAG_TX_RDY)) {}
+    while (dev(bus)->SR & SPI_SR_BSY) {}
+#endif
+
+    /* drain remaining RX FIFO */
+    while (dev(bus)->SR & SPI_FLAG_RX_RDY) {
+        (void)*RXDR;
+    }
+
+#if defined(CPU_FAM_STM32H7) || defined(CPU_FAM_STM32U3)
+    dev(bus)->CR1 &= ~SPI_CR1_SPE;
+#endif
+    _wait_for_end(bus);
 }
 
 void spi_transfer_bytes(spi_t bus, spi_cs_t cs, bool cont,
