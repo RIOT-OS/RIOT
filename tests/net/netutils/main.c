@@ -102,8 +102,8 @@ static void test_ipv6_addr_from_str__success4(void)
     ipv6_addr_t address;
     netif_t *netif;
 
-    TEST_ASSERT_EQUAL_INT(netutils_get_ipv6(&address, &netif, SOCK_DNS_MOCK_EXAMPLE_COM_HOSTNAME), 0);
-    TEST_ASSERT(ipv6_addr_equal(&sock_dns_mock_example_com_addr_ipv6, &address));
+    TEST_ASSERT_EQUAL_INT(netutils_get_ipv6(&address, &netif, SOCK_DNS_MOCK_HOSTNAME), 0);
+    TEST_ASSERT(ipv6_addr_equal(&sock_dns_mock_addr_ipv6, &address));
 }
 
 static void test_ipv6_addr_from_str__success5(void)
@@ -159,8 +159,8 @@ static void test_ipv4_addr_from_str__success2(void)
 {
     ipv4_addr_t address;
 
-    TEST_ASSERT_EQUAL_INT(netutils_get_ipv4(&address, SOCK_DNS_MOCK_EXAMPLE_COM_HOSTNAME), 0);
-    TEST_ASSERT(ipv4_addr_equal(&sock_dns_mock_example_com_addr_ipv4, &address));
+    TEST_ASSERT_EQUAL_INT(netutils_get_ipv4(&address, SOCK_DNS_MOCK_HOSTNAME), 0);
+    TEST_ASSERT(ipv4_addr_equal(&sock_dns_mock_addr_ipv4, &address));
 }
 
 Test *tests_netutils_ipv4_tests(void)
