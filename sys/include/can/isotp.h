@@ -91,6 +91,7 @@ struct tpcon {
     uint8_t state;        /**< the protocol state */
     uint8_t bs;           /**< block size */
     uint8_t sn;           /**< current sequence number */
+    uint8_t ll_dl;        /**< CAN_DL of the first frame of the current reception */
     int tx_handle;        /**< handle of the last sent frame */
     gnrc_pktsnip_t *snip; /**< allocated snip containing data buffer */
 };

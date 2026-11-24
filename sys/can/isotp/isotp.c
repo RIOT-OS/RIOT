@@ -332,6 +332,8 @@ static int _isotp_rcv_ff(struct isotp *isotp, can_frame_t *frame, size_t ae)
         DEBUG("\n");
     }
 
+    isotp->rx.ll_dl = frame->len;
+
     isotp->rx.sn = 1;
 
     if (isotp->opt.flags & CAN_ISOTP_LISTEN_MODE) {
@@ -350,6 +352,12 @@ static int _isotp_rcv_cf(struct isotp *isotp, can_frame_t *frame, size_t ae)
     DEBUG("_isotp_rcv_cf: state=%d\n", isotp->rx.state);
 
     if (isotp->rx.state != ISOTP_WAIT_CF) {
+        return 1;
+    }
+
+    /* Non-final CFs must match the FF's CAN_DL (ISO 15765-2:2016 9.6.4.1). */
+    if ((frame->len != isotp->rx.ll_dl) &&
+        (isotp->rx.idx + (frame->len - (ae + N_PCI_SZ)) < isotp->rx.snip->size)) {
         return 1;
     }
 
