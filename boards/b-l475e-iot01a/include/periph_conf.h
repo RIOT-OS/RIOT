@@ -20,6 +20,7 @@
 #define CONFIG_BOARD_HAS_LSE            1
 #endif
 
+#include "board.h"
 #include "periph_cpu.h"
 #include "clk_conf.h"
 #include "cfg_rtt_default.h"
@@ -41,6 +42,7 @@ static const dma_conf_t dma_config[] = {
     { .stream = 8 },    /* DMA2 Channel 1 - SPI3_RX */
     { .stream = 9 },    /* DMA2 Channel 2 - SPI3_TX */
     { .stream = 10 },   /* DMA2 Channel 3 - UART4_TX */
+    { .stream = 5 },    /* DMA1 Channel 6 - DFSDM1_FLT2 */
 };
 
 #define DMA_0_ISR  isr_dma1_channel2
@@ -50,6 +52,7 @@ static const dma_conf_t dma_config[] = {
 #define DMA_4_ISR  isr_dma2_channel1
 #define DMA_5_ISR  isr_dma2_channel2
 #define DMA_6_ISR  isr_dma2_channel3
+#define DMA_7_ISR  isr_dma1_channel6
 
 #define DMA_NUMOF           ARRAY_SIZE(dma_config)
 /** @} */
@@ -240,6 +243,25 @@ static const i2c_conf_t i2c_config[] = {
 #define I2C_1_ISR           isr_i2c2_er
 
 #define I2C_NUMOF           ARRAY_SIZE(i2c_config)
+/** @} */
+
+/**
+ * @name    PDM configuration
+ * @{
+ */
+/**
+ * @brief   PDM configuration
+ */
+static const pdm_conf_t pdm_config = {
+    .din_pin  = PDM_DIN_PIN,
+    .clk_pin  = PDM_CLK_PIN,
+    .din_af   = GPIO_AF6,
+    .clk_af   = GPIO_AF6,
+    .filter   = 2,                      /* DMA of FLT0/1 used by USART1/SPI2 */
+    .chan     = 2,
+    .dma      = 7,                      /* DMA1 Channel 6 */
+    .dma_chan = 0,                      /* CxS = 0 */
+};
 /** @} */
 
 #ifdef __cplusplus
