@@ -36,6 +36,9 @@ ifneq (,$(filter $(AVRDUDE_PROGRAMMER),arduino avr109 buspirate stk500v1 stk500v
   # make the flasher port configurable (e.g. with atmelice the port is usb)
   # defaults to terminal's serial port if not configured
   AVRDUDE_PROGRAMMER_FLAGS += -P $(PROG_DEV)
+else ifneq (,$(DEBUG_ADAPTER_ID))
+  # Several programmers connected, select the one with this serial number
+  AVRDUDE_PROGRAMMER_FLAGS += -P usb:$(DEBUG_ADAPTER_ID)
 endif
 AVRDUDE_PROGRAMMER_FLAGS += $(FFLAGS_EXTRA)
 
