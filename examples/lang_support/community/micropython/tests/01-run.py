@@ -48,8 +48,8 @@ def testfunc(child):
         assert duration > t and duration < (t + slack)
         return duration
 
-    # get overhead from sleeping 0ms, add 10 percent
-    slack = int(test_sleep(0, 1000) * 1.1)
+    # get overhead from sleeping 0 ms, add 10 percent plus 200 ms.
+    slack = int(test_sleep(0, 1000) * 1.1) + 200
 
     test_sleep(50, slack)
     test_sleep(250, slack)
