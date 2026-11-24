@@ -34,7 +34,10 @@
 #include <stdio.h>
 #include <string.h>
 
+#include "heatshrink_encoder.h"
 #include "huffman_ee/huffman_ee.h"
+#include "lz4.h"
+#include "uzlib.h"
 
 /* Number of symbols in the test streams */
 #define STREAM_LEN      (5000)
@@ -63,6 +66,13 @@ static huffman_ee_table_t table_energy;
 static huffman_ee_table_t table_exact;
 static uint16_t stream[STREAM_LEN];
 static uint8_t raw_bytes[STREAM_LEN * 2];
+
+/* The compression packages that ship with RIOT work on bytes, so they are
+ * given one byte per reading, which is what a node has before any coding. */
+static uint8_t comp_in[STREAM_LEN];
+static uint8_t comp_out[STREAM_LEN + (STREAM_LEN / 2)];
+static uzlib_hash_entry_t uzlib_hash[8 * 64];
+static heatshrink_encoder hs_enc;
 
 static uint32_t rng_state = 12345;
 
@@ -190,8 +200,79 @@ static void _row(const char *name, size_t bits, const huffman_ee_counts_t *c,
            sign, (long long)(bp / 100), (long long)(bp % 100));
 }
 
+/* Print one row for a stream that was not built by the module (a compression
+ * package, or the uncoded bytes). The stream is counted byte by byte, the
+ * unit the radio sends, with the same energy model as the other rows. */
+static void _packed_row(const char *name, const uint8_t *buf, size_t nbytes,
+                        const huffman_ee_params_t *p, uint64_t baseline)
+{
+    huffman_ee_counts_t c;
+
+    _count_fields(buf, nbytes * 8, 8, &c);
+    _row(name, nbytes * 8, &c, huffman_ee_energy(&c, p), baseline);
+}
+
+/* Run the compression packages that ship with RIOT on the same readings and
+ * print what each of them needs to send them. They are given one byte per
+ * reading, which is what a node has before any coding. */
+static void _compressor_rows(const huffman_ee_params_t *p, uint64_t baseline)
+{
+    for (size_t i = 0; i < STREAM_LEN; i++) {
+        comp_in[i] = (uint8_t)stream[i];
+    }
+    _packed_row("bytes, no coding", comp_in, STREAM_LEN, p, baseline);
+
+    /* uzlib (deflate: LZ77 plus Huffman) */
+    struct uzlib_comp comp = { 0 };
+
+    comp.dict_size = 32768;
+    comp.hash_bits = 6;
+    comp.hash_table = uzlib_hash;
+    zlib_start_block(&comp.out);
+    uzlib_compress(&comp, comp_in, STREAM_LEN);
+    zlib_finish_block(&comp.out);
+    size_t uz = comp.out.outlen;
+    if (uz > sizeof(comp_out)) {
+        uz = sizeof(comp_out);
+    }
+    memcpy(comp_out, comp.out.outbuf, uz);
+    _packed_row("uzlib (deflate)", comp_out, uz, p, baseline);
+
+    /* heatshrink (LZSS) */
+    heatshrink_encoder_reset(&hs_enc);
+    size_t in_pos = 0;
+    size_t hs = 0;
+
+    while (hs < sizeof(comp_out)) {
+        size_t sunk = 0;
+        size_t written = 0;
+
+        if (in_pos < STREAM_LEN) {
+            heatshrink_encoder_sink(&hs_enc, &comp_in[in_pos], STREAM_LEN - in_pos, &sunk);
+            in_pos += sunk;
+            heatshrink_encoder_poll(&hs_enc, &comp_out[hs], sizeof(comp_out) - hs, &written);
+            hs += written;
+        }
+        else if (heatshrink_encoder_finish(&hs_enc) == HSER_FINISH_MORE) {
+            heatshrink_encoder_poll(&hs_enc, &comp_out[hs], sizeof(comp_out) - hs, &written);
+            hs += written;
+        }
+        else {
+            break;
+        }
+    }
+    _packed_row("heatshrink (LZSS)", comp_out, hs, p, baseline);
+
+    /* lz4 (LZ77, byte oriented) */
+    int lz = LZ4_compress_default((const char *)comp_in, (char *)comp_out,
+                                  (int)STREAM_LEN, (int)sizeof(comp_out));
+    if (lz > 0) {
+        _packed_row("lz4", comp_out, (size_t)lz, p, baseline);
+    }
+}
+
 static void _run_case(const char *title, const uint16_t *sym, const uint32_t *freq,
-                      size_t num, const huffman_ee_params_t *p)
+                      size_t num, const huffman_ee_params_t *p, bool compressors)
 {
     huffman_ee_counts_t c;
     unsigned width = 1;
@@ -236,6 +317,15 @@ static void _run_case(const char *title, const uint16_t *sym, const uint32_t *fr
 
     puts("\n(without the module the value is sent raw; the Huffman rows all have"
          " the same size and differ only in energy)\n");
+
+    if (compressors) {
+        puts("(the compression packages below are given one byte per reading;"
+             " their stream is counted per transmitted byte)\n");
+        _compressor_rows(p, e_raw);
+        puts("(the compression packages and this module work on different"
+             " things: they remove bytes, the module lowers the energy of the"
+             " bits that are sent)\n");
+    }
 }
 
 int main(void)
@@ -246,10 +336,10 @@ int main(void)
     puts("huffman_ee demo: with and without the module\n");
 
     _run_case("skewed sensor data (IBRL temperatures)",
-              ibrl_sym, ibrl_freq, NELEMS(ibrl_sym), &p_paper);
+              ibrl_sym, ibrl_freq, NELEMS(ibrl_sym), &p_paper, true);
     _run_case("same data, alpha=1 (1 bits and transitions equal)",
-              ibrl_sym, ibrl_freq, NELEMS(ibrl_sym), &p_ones);
+              ibrl_sym, ibrl_freq, NELEMS(ibrl_sym), &p_ones, false);
     _run_case("flat data (worst case: all values equally likely)",
-              flat_sym, flat_freq, NELEMS(flat_sym), &p_paper);
+              flat_sym, flat_freq, NELEMS(flat_sym), &p_paper, false);
     return 0;
 }

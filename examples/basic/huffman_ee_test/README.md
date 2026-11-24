@@ -13,14 +13,34 @@ and only chooses the labels, which lowers the energy of the transmitted stream.
 The example sends the same stream of readings in several ways and prints the
 number of bits and the energy of each:
 
-* `raw (no compression)` — the value as a plain fixed-width field. This is what
-  a node does when it has no entropy coder: the compressors that ship with RIOT
-  (`heatshrink`, `lz4`, `uzlib`) reduce the size for repetitive data, but none
-  of them looks at the bit pattern, so they are not used in this comparison.
+* `raw (no compression)` — the value as a plain fixed-width field.
 * `Huffman, plain` — a normal Huffman code.
 * `Huffman, energy-aware` — the code built by this module.
 * `Huffman, exact optimal` — the same, but with the exact labelling instead of
   the greedy one.
+
+For comparison the example also runs the compression packages that ship with
+RIOT on the same readings, one byte per reading:
+
+* `bytes, no coding` — the readings as they come off the sensor, without any
+  coding. This is the baseline of the packages below.
+* `uzlib (deflate)` — LZ77 together with Huffman coding.
+* `heatshrink (LZSS)` — the compressor that RIOT uses for small devices.
+* `lz4` — a fast, byte oriented compressor.
+
+The packages are given one byte per reading and their output is counted per
+transmitted byte, so those rows are counted in a different unit than the
+Huffman rows above.
+
+The two approaches do different things. The compression packages remove bytes,
+and that is what saves energy on radios whose transmit power is constant, such
+as BLE, 802.15.4 and LoRa: there the energy follows the airtime, so only the
+number of bytes matters. This module keeps the number of bits as it is and
+lowers the energy of the bits that are sent, which helps on links whose energy
+depends on the bit pattern itself, for example on-off-keying transmitters,
+where a `1` draws current and every change between `0` and `1` costs extra. The
+example prints both, so it is visible where the module helps and where it does
+not.
 
 All rows use the same energy model
 
@@ -69,6 +89,16 @@ Expected output
     Huffman, energy-aware    17099   7542   5920   2520     159280  +46.53 %
     Huffman, exact optimal   17099   7542   5920   2520     159280  +46.53 %
 
+    (without the module the value is sent raw; the Huffman rows all have the same size and differ only in energy)
+
+    (the compression packages below are given one byte per reading; their stream is counted per transmitted byte)
+
+    bytes, no coding         40000  14119  17924   2411     302715  -1.61 %
+    uzlib (deflate)          39352  13808  18557   3259     297976  -0.02 %
+    heatshrink (LZSS)        29488  10658  12341   1768     227269  +23.71 %
+    lz4                      35776  11761  13744   2034     250998  +15.74 %
+    (the compression packages and this module work on different things: they remove bytes, the module lowers the energy of the bits that are sent)
+
     === same data, alpha=1 (1 bits and transitions equal) ===
     weights: alpha=1 beta=1 lambda=1
 
@@ -92,4 +122,7 @@ relations are what matter: the Huffman rows all have the same size, because the
 module only changes the labels, and the energy-aware one is the cheapest. On
 flat data there is nothing to save and every row is identical. Compared to
 sending the values uncompressed, the module uses both fewer bits and less
-energy when the distribution is skewed.
+energy when the distribution is skewed. The compression packages are listed
+next to it only to show what they do on the same data: they remove bytes, which
+the module does not, and the module lowers the energy of the bits, which they
+do not.

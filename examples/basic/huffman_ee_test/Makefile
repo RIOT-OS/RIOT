@@ -1,6 +1,12 @@
 # name of your application
 APPLICATION = huffman_ee_test
 USEMODULE += huffman_ee
+
+# compression packages that ship with RIOT, used for the comparison in the
+# example
+USEPKG += heatshrink
+USEPKG += lz4
+USEPKG += uzlib
 # If no BOARD is found in the environment, use this default:
 BOARD ?= native
 
