@@ -73,7 +73,7 @@ static void _server_handler(sock_udp_t *sock, sock_async_flags_t type, void *arg
         void *buf_ctx = NULL;
 
         res = sock_udp_recv_buf(sock, &buf, &buf_ctx, 0, &src);
-        if (res > 0) {
+        if (res >= 0) {
             if (_server_summarize) {
                 printf("Packets received: %u\n", ++(*received_packets));
             }
@@ -87,11 +87,18 @@ static void _server_handler(sock_udp_t *sock, sock_async_flags_t type, void *arg
                 }
             }
 
-            while (res > 0) {
-                if (!_server_summarize) {
+            while (res >= 0) {
+                if (!_server_summarize && (res > 0)) {
                     od_hex_dump(buf, res, OD_WIDTH_DEFAULT);
                 }
+                /* deallocate `buf_ctx`, even if payload was of length 0
+                 * (e.g. gnrc_pktsnip_t with data == NULL) */
                 res = sock_udp_recv_buf(sock, &buf, &buf_ctx, 0, &src);
+
+                if (res == 0) {
+                    /* 0 signals deallocation of `buf_ctx` here */
+                    break;
+                }
             }
         }
         else {
