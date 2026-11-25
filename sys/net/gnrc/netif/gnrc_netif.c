@@ -1868,8 +1868,12 @@ static void _tx_done(gnrc_netif_t *netif, gnrc_pktsnip_t *pkt,
         }
         else {
             put_res = gnrc_netif_pktq_put(netif, pkt);
-            gnrc_netif_pktq_sched_get(netif);
         }
+        /* (re)start the dequeue timer also on push back: for netdevs with
+         * confirm_send(), -EBUSY for a packet sent from the queue is reported
+         * on TX confirmation, typically after the timer started on dequeue
+         * expired */
+        gnrc_netif_pktq_sched_get(netif);
         if (put_res == 0) {
             DEBUG("gnrc_netif: (re-)queued pkt %p\n", (void *)pkt);
             return; /* early return to not release */
