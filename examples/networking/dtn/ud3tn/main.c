@@ -40,11 +40,13 @@ static msg_t _main_msg_queue[MAIN_MSG_QUEUE_SIZE];
 #define CONTACT_END_S            4102444800ULL
 #define CONTACT_RATE_BYTES_PER_S 100000U
 
-typedef struct {
+
+
+struct dtn_config_t{
     const char *eid;
     const char *cla_options;
     bool remote_config;
-} dtn_config_t;
+};
 
 static bool dtn_started;
 
@@ -107,7 +109,7 @@ extern struct bundle_agent_interface bundle_agent_interface;
 #endif
 
 #if UD3TN_AUTO_START
-static const dtn_config_t default_dtn_config = {
+static const struct dtn_config_t default_dtn_config = {
     .eid = LOCAL_EID,
     .cla_options = "tcpclv3-riot:*,4556",
     .remote_config = true,
@@ -121,7 +123,7 @@ void advertise_route(const char *peer_ip, const char *peer_port, const char *pee
 void add_route(const char *sink_id, const char *peer_ip, const char *peer_port,
                const char *peer_eid);
 void auto_init_ula(void);
-static int start_dtn(const dtn_config_t *config);
+static int start_dtn(const struct dtn_config_t *config);
 
 static void chat_callback(struct bundle_adu data, void *param, const void *bp_context)
 {
@@ -364,7 +366,7 @@ static int _start_dtn(int argc, char **argv)
         }
     }
 
-    dtn_config_t config = {
+    struct dtn_config_t config = {
         .eid = argv[1],
         .cla_options = argv[2],
         .remote_config = remote_config,
@@ -374,7 +376,7 @@ static int _start_dtn(int argc, char **argv)
 }
 
 
-static int start_dtn(const dtn_config_t *config)
+static int start_dtn(const struct dtn_config_t *config)
 {
     if (dtn_started) {
         puts("uD3TN is already running.");

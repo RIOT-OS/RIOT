@@ -38,6 +38,12 @@
 
 #define TCPCLV3_RX_TIMEOUT_MS  (100U)
 #define TCPCLV3_ACCEPT_POLL_MS (100U)
+#define LISTEN_QUEUE_SIZE 4
+/*
+* The length of the queue depends on the CFLAG “DCONFIG_GNRC_TCP_RCV_BUFFERS.” 
+* The longer the queue, the more RCV_BUFFERS are required, 
+* which leads to higher RAM usage.
+*/
 static const char *CLA_NAME = "tcpclv3-riot";
 
 
@@ -54,7 +60,7 @@ struct tcpclv3_config {
 
     /* Listening queue for accepting incoming connections */
     sock_tcp_queue_t listen_queue;
-    sock_tcp_t listen_queue_array[4];
+    sock_tcp_t listen_queue_array[LISTEN_QUEUE_SIZE];
     bool listening;
 
     /* Hash table for managing active connections by EID */
