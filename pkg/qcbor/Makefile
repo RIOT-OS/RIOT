@@ -13,6 +13,5 @@ include $(RIOTBASE)/pkg/pkg.mk
 CFLAGS += -Wno-maybe-uninitialized
 CFLAGS += -Wno-type-limits
 
-
 all:
 	$(QQ)"$(MAKE)" -C $(PKG_SOURCE_DIR)/src -f $(RIOTBASE)/Makefile.base MODULE=$(PKG_NAME)
