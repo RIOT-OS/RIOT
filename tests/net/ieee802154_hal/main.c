@@ -537,12 +537,13 @@ int config_phy(int argc, char **argv)
     uint8_t channel = atoi(argv[2]);
     int8_t tx_pow = atoi(argv[3]);
 
-    if (channel < 11 || channel > 26) {
+    ieee802154_dev_t *dev = &_radio;
+
+    if (ieee802154_radio_has_24_ghz(dev) && (channel < 11 || channel > 26)) {
         puts("Wrong channel configuration (11 <= channel <= 26).");
         return 1;
     }
 
-    ieee802154_dev_t *dev = &_radio;
     ieee802154_radio_set_idle(dev, true);
     ieee802154_phy_conf_t conf = {.phy_mode=phy_mode, .channel=channel, .pow=tx_pow};
     if (ieee802154_radio_config_phy(dev, &conf) < 0) {
