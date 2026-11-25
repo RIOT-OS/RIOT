@@ -1,5 +1,6 @@
 BOARD_INSUFFICIENT_MEMORY := \
     acd52832 \
+    adafruit-metro-esp32s2 \
     airfy-beacon \
     arduino-duemilanove \
     arduino-leonardo \
