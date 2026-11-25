@@ -35,6 +35,20 @@ Note that the shell buffer size may limit the input length (`SHELL_DEFAULT_BUFSI
 defaults to 128 bytes).
 
 
+## Generate UDP Payload
+
+Add `USEMODULE += shell_cmd_udp_send_generated` to your application Makefile.
+
+With that, the `udp send` command can be provided with the optional parameter `-d`.
+
+```
+> udp send [-b] <addr>:<port> {-d <data-len>|<data>} [<num> [<delay>]]
+```
+
+If the optional parameter `-d` is given, a generated number of `<data-len>` bytes is sent and
+`<data>` is not needed.
+`-d` and `-b` are mutually exclusive.
+
 # UDP Server
 
 Module. Add `USEMODULE += shell_cmd_udp_server` to your application Makefile.
@@ -42,10 +56,14 @@ Module. Add `USEMODULE += shell_cmd_udp_server` to your application Makefile.
 ## Start UDP Server
 
 ```
-> udp server start <port>
+> udp server start <port> [-s]
 ```
 
 Start a UDP server listening on `<port>` on any interface in a separate thread.
+Without the optional `-s` flag, the server will print the sender and a hexdump of the
+UDP payload when it receives a UDP packet. With `-s`, it only prints
+"Packets received: `<count>`", with `<count>` being the number of packets that the server received
+up to that point since it was started.
 
 # Stop UDP server
 
