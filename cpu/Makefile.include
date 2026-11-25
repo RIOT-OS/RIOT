@@ -1,4 +1,7 @@
 # SORT THIS ALPHABETICALLY BY COMMON CPU MODULE NAME!
+ifneq (,$(filter cpu_common_qingke,$(USEMODULE)))
+  include $(RIOTCPU)/common/qingke/Makefile.include
+endif
 ifneq (,$(filter cpu_common_rp2,$(USEMODULE)))
   include $(RIOTCPU)/common/rp2/Makefile.include
 endif
