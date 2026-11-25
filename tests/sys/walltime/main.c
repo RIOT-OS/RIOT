@@ -12,6 +12,9 @@
  */
 
 #include <errno.h>
+#include <stdint.h>
+
+#include "modules.h"
 #include "shell.h"
 #include "time_units.h"
 #include "fmt.h"
@@ -57,6 +60,55 @@ static void _add_and_remove_dummy_cb(void)
         goto fail;                                                  \
     }
 
+/* only the newlib and picolibc default syscalls implement gettimeofday()
+ * on top of walltime, native uses the host's libc */
+#if IS_USED(MODULE_NEWLIB_SYSCALLS_DEFAULT) || IS_USED(MODULE_PICOLIBC_SYSCALLS_DEFAULT)
+#  include <sys/time.h>
+#  include <time.h>
+
+/**
+ * @brief   Check that gettimeofday() and time() return the wall-clock time
+ *
+ * @note    For dates past 2038, this will fail on architectures that use
+ *          a 32 bit time_t.
+ *
+ * @param[in] expect    expected seconds since 01.01.1970
+ */
+static int _check_gettimeofday(int64_t expect)
+{
+    struct timeval tv;
+    if (gettimeofday(&tv, NULL) < 0) {
+        printf("gettimeofday() failed (errno %d)\n", errno);
+        return -1;
+    }
+
+    int64_t now = time(NULL);
+
+    /* walltime might have advanced by a second since it was set */
+    if (tv.tv_sec < expect || tv.tv_sec > expect + 1 || now < expect || now > expect + 1 ||
+        tv.tv_usec < 0 || tv.tv_usec >= (suseconds_t)US_PER_SEC) {
+        printf("expected ");
+        print_s64_dec(expect);
+        printf("s, got gettimeofday() = ");
+        print_s64_dec(tv.tv_sec);
+        printf("s ");
+        print_s64_dec(tv.tv_usec);
+        printf("us, time() = ");
+        print_s64_dec(now);
+        puts("s");
+        return -1;
+    }
+
+    return 0;
+}
+#else
+static int _check_gettimeofday(int64_t expect)
+{
+    (void)expect;
+    return 0;
+}
+#endif
+
 static void _unlock(void *ctx)
 {
     mutex_unlock(ctx);
@@ -78,6 +130,9 @@ static int _cmd_test(int argc, char **argv)
     TEST_RES(res, "walltime_get()");
     res = rtc_tm_compare(&now, &expect);
     TEST_RES(res, "rtc_tm_compare()");
+    /* 2020-01-01 12:34:56 UTC */
+    res = _check_gettimeofday(1577882096LL);
+    TEST_RES(res, "_check_gettimeofday()");
 
     res = scn_time_tm_iso8601(&expect, "2046-01-01 12:34:56", ' ');
     TEST_RES(res, "parse time");
@@ -87,6 +142,9 @@ static int _cmd_test(int argc, char **argv)
     TEST_RES(res, "walltime_get()");
     res = rtc_tm_compare(&now, &expect);
     TEST_RES(res, "rtc_tm_compare()");
+    /* 2046-01-01 12:34:56 UTC */
+    res = _check_gettimeofday(2398422896LL);
+    TEST_RES(res, "_check_gettimeofday()");
 
     mutex_t lock = MUTEX_INIT_LOCKED;
     uint32_t now_ms = ztimer_now(ZTIMER_MSEC);
