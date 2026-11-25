@@ -112,10 +112,17 @@ static void test_qcbor_decode(void)
     error = QCBORDecode_GetNext(&decode_context, &cbor_item);
     TEST_ASSERT_EQUAL_INT(QCBOR_SUCCESS, error);
     TEST_ASSERT_EQUAL_INT(QCBOR_TYPE_TRUE, cbor_item.uDataType);
-    uint64_t val;
+    uint64_t val = 0;
     /* trigger the use of `feclearexcept` and `fetestexcept` */
-    QCBORDecode_GetUInt64ConvertAll(&decode_context, QCBOR_TYPE_FLOAT, &val);
+    QCBORDecode_GetUInt64ConvertAll(&decode_context, QCBOR_CONVERT_TYPE_FLOAT,
+                                    &val);
+    error = QCBORDecode_GetAndResetError(&decode_context);
+#ifdef QCBOR_DISABLE_FLOAT_HW_USE
+    TEST_ASSERT_EQUAL_INT(QCBOR_ERR_HW_FLOAT_DISABLED, error);
+#else
+    TEST_ASSERT_EQUAL_INT(QCBOR_SUCCESS, error);
     TEST_ASSERT_EQUAL_INT(2, val);
+#endif
     error = QCBORDecode_Finish(&decode_context);
     TEST_ASSERT_EQUAL_INT(QCBOR_SUCCESS, error);
 }
