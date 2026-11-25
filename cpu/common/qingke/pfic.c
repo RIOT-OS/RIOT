@@ -4,7 +4,7 @@
  */
 
 /**
- * @ingroup         cpu_riscv_common
+ * @ingroup         cpu_qingke_common
  * @{
  *
  * @file
