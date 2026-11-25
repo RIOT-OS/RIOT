@@ -383,6 +383,11 @@ static void _uart_config(uart_t uart)
         return;
     }
 
+#ifndef CPU_ESP8266
+    /* don't wait after end of TX, set to 0 as the ESP-IDF does */
+    uart_ll_set_tx_idle_num(_uarts[uart].regs, 0);
+#endif
+
     /* reset the FIFOs */
     uart_ll_rxfifo_rst(_uarts[uart].regs);
     uart_ll_txfifo_rst(_uarts[uart].regs);
