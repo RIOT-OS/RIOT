@@ -73,9 +73,9 @@ void riscv_irq_init(void)
     if (IS_ACTIVE(MODULE_PERIPH_CLIC)) {
         clic_init();
     }
-    if (IS_ACTIVE(MODULE_PERIPH_PFIC)) {
-        pfic_init();
-    }
+#if IS_ACTIVE(MODULE_PERIPH_PFIC) 
+    pfic_init();
+#endif
 
     /* Enable external interrupts */
     if (!IS_ACTIVE(MODULE_PERIPH_PFIC)) {
@@ -160,11 +160,12 @@ __attribute((used)) static void handle_trap(uword_t mcause)
             break;
 
         default:
+#if IS_ACTIVE(MODULE_PERIPH_PFIC) 
+            pfic_isr_handler(trap);
+            break;
+#endif
             if (IS_ACTIVE(MODULE_PERIPH_CLIC)) {
                 clic_isr_handler(trap);
-            }
-            else if (IS_ACTIVE(MODULE_PERIPH_PFIC)) {
-                pfic_isr_handler(trap);
             }
             else {
                 /* Unknown interrupt */
