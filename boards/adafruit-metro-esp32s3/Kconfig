@@ -1,0 +1,13 @@
+# SPDX-FileCopyrightText: 2026 Gunar Schorcht
+# SPDX-License-Identifier: LGPL-2.1-only
+
+config BOARD
+    default "adafruit-metro-esp32s3" if BOARD_ADAFRUIT_METRO_ESP32S3
+
+config BOARD_ADAFRUIT_METRO_ESP32S3
+    bool
+    default y
+    select BOARD_COMMON_ESP32S3
+    select CPU_MODEL_ESP32S3_WROOM_1X_N16R8
+
+source "$(RIOTBOARD)/common/esp32s3/Kconfig"
