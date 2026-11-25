@@ -22,6 +22,10 @@
 #include "ud3tn/init.h"
 #include "ztimer.h"
 
+#ifndef UD3TN_AUTO_START
+#define UD3TN_AUTO_START 0
+#endif
+
 // Define your generated 64-bit ULA Prefix (fd00::/64)
 #define ULA_PREFIX      "fd12:dead:beef:1::"
 #define ULA_PREFIX_LEN  64
@@ -35,6 +39,14 @@ static msg_t _main_msg_queue[MAIN_MSG_QUEUE_SIZE];
 #define CONTACT_START_S          0ULL
 #define CONTACT_END_S            4102444800ULL
 #define CONTACT_RATE_BYTES_PER_S 100000U
+
+typedef struct {
+    const char *eid;
+    const char *cla_options;
+    bool remote_config;
+} dtn_config_t;
+
+static bool dtn_started;
 
 extern struct bundle_agent_interface bundle_agent_interface;
 
@@ -94,6 +106,14 @@ extern struct bundle_agent_interface bundle_agent_interface;
 #  define PEER_PORT "4556"
 #endif
 
+#if UD3TN_AUTO_START
+static const dtn_config_t default_dtn_config = {
+    .eid = LOCAL_EID,
+    .cla_options = "tcpclv3-riot:*,4556",
+    .remote_config = true,
+};
+#endif
+
 void send_chat_message(const char *message, const char *peer_eid);
 void advertise_route(const char *peer_ip, const char *peer_port, const char *peer_sink_id,
                      const char *peer_eid, const char *advertise_ip, const char *advertise_port,
@@ -101,6 +121,7 @@ void advertise_route(const char *peer_ip, const char *peer_port, const char *pee
 void add_route(const char *sink_id, const char *peer_ip, const char *peer_port,
                const char *peer_eid);
 void auto_init_ula(void);
+static int start_dtn(const dtn_config_t *config);
 
 static void chat_callback(struct bundle_adu data, void *param, const void *bp_context)
 {
@@ -246,7 +267,7 @@ void add_route(const char *sink_id, const char *peer_ip, const char *peer_port,
         snprintf(peer_cla, sizeof(peer_cla), "tcpclv3-riot:[%s]:%s", peer_ip, peer_port);
         snprintf(config_cmd, sizeof(config_cmd),
          "(%s):(%s):[(%s)]:[{%llu,%llu,%u}];",
-         advertise_eid, advertise_cla, advertise_dest_eid,
+         peer_eid, peer_cla, dest_eid,
          CONTACT_START_S, CONTACT_END_S, CONTACT_RATE_BYTES_PER_S);
 
         printf(config_cmd);
@@ -325,6 +346,79 @@ static int _send_msg(int argc, char **argv)
     return 0;
 }
 
+static int _start_dtn(int argc, char **argv)
+{
+    if (argc < 3 || argc > 4) {
+        printf("Usage: %s <eid> <cla_options> <remote_config>[on|off]\n", argv[0]);
+        return 1;
+    }
+
+    bool remote_config = false;
+    if (argc == 4) {
+        if (strcmp(argv[3], "on") == 0) {
+            remote_config = true;
+        }
+        else if (strcmp(argv[3], "off") != 0) {
+            puts("remote_config must be 'on' or 'off'.");
+            return 1;
+        }
+    }
+
+    dtn_config_t config = {
+        .eid = argv[1],
+        .cla_options = argv[2],
+        .remote_config = remote_config,
+    };
+
+    return start_dtn(&config);
+}
+
+
+static int start_dtn(const dtn_config_t *config)
+{
+    if (dtn_started) {
+        puts("uD3TN is already running.");
+        return 1;
+    }
+
+    if (!config || !config->eid || !config->cla_options) {
+        puts("Missing DTN configuration.");
+        return 1;
+    }
+
+    char *ud3tn_argv[7];
+    int ud3tn_argc = 0;
+
+    ud3tn_argv[ud3tn_argc++] = "ud3tn";
+    ud3tn_argv[ud3tn_argc++] = "-e";
+    ud3tn_argv[ud3tn_argc++] = config->eid;
+    ud3tn_argv[ud3tn_argc++] = "-c";
+    ud3tn_argv[ud3tn_argc++] = config->cla_options;
+
+    if (config->remote_config) {
+        ud3tn_argv[ud3tn_argc++] = "-R";
+    }
+    ud3tn_argv[ud3tn_argc] = NULL;
+
+    init(ud3tn_argc, ud3tn_argv);
+
+    const struct ud3tn_cmdline_options *options =
+        parse_cmdline(ud3tn_argc, ud3tn_argv);
+    if (!options) {
+        puts("Invalid uD3TN configuration.");
+        return 1;
+    }
+
+    start_tasks(options);
+    dtn_started = true;
+
+    if (hal_task_create(dtn_chat_thread, NULL, true, NULL) != UD3TN_OK) {
+        puts("Could not start the DTN chat task.");
+        return 1;
+    }
+
+    return 0;
+}
 void auto_init_ula(void)
 {
     gnrc_netif_t *netif = NULL;
@@ -360,38 +454,18 @@ void auto_init_ula(void)
 SHELL_COMMAND(add_route, "Adds a route", _add_route);
 SHELL_COMMAND(advertise_route, "Advertises a route", _advertise_route);
 SHELL_COMMAND(send_msg, "Sends a message", _send_msg);
-
+SHELL_COMMAND(start_dtn, "Starts uD3TN", _start_dtn);
 int main(void)
 {
     printf("Start DTN Node: %s\n", LOCAL_EID);
     auto_init_ula();
     ztimer_sleep(ZTIMER_MSEC, 1000);
 
-    int argc = 6;
-    char *argv[6];
-    argv[0] = "ud3tn";
-    argv[1] = "-e";
-    argv[2] = LOCAL_EID;
-    argv[3] = "-c";
-
-#if defined(NODE_A) || defined(NODE_A_ESP32)
-    argv[4] = "tcpclv3-riot:*,4556";
+#if UD3TN_AUTO_START
+    if (start_dtn(&default_dtn_config) != 0) {
+        puts("Automatic uD3TN start failed.");
+    }
 #endif
-#if defined(NODE_B) || defined(NODE_B_ESP32)
-    argv[4] = "tcpclv3-riot:*,4556";
-#endif
-
-#if defined(NODE_C) || defined(NODE_C_ESP32)
-    argv[4] = "tcpclv3-riot:*,4556";
-#endif
-#ifdef CLA_OPTS_OVERRIDE
-    argv[4] = CLA_OPTS_OVERRIDE; /* only for tests */
-#endif
-    argv[5] = "-R"; /* Enables remote configuration capability*/
-
-    init(argc, argv);
-    start_tasks(parse_cmdline(argc, argv));
-    hal_task_create(dtn_chat_thread, NULL, true, NULL);
 
     char line_buf[256]; /*_add_route command woulde overflow with SHELL_DEFAULT_BUFSIZE*/
     msg_init_queue(_main_msg_queue, MAIN_MSG_QUEUE_SIZE);
