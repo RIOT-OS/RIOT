@@ -3,6 +3,7 @@
 #ifndef _PRCI_DRIVER_H_
 #define _PRCI_DRIVER_H_
 
+#include <stdint.h>
 
 typedef enum prci_freq_target {
   

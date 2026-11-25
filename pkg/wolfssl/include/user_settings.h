@@ -16,6 +16,7 @@ extern "C" {
 #define WOLFSSL_RIOT_OS 1
 #endif
 #include <random.h>
+#include <sys/types.h>
 #define CUSTOM_RAND_GENERATE random_uint32
 #define CUSTOM_RAND_TYPE uint32_t
 #define NO_WRITEV
