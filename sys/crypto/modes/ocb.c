@@ -324,6 +324,10 @@ int32_t cipher_decrypt_ocb(const cipher_t *cipher,
                            const uint8_t *input, size_t input_len,
                            uint8_t *output)
 {
+    if (input_len < tag_len) {
+        return OCB_ERR_INVALID_DATA_LENGTH;
+    }
+
     if (input_len > (uint32_t)(INT32_MAX + tag_len)) {
         // We would not be able to return the proper output length for data this long
         return OCB_ERR_INVALID_DATA_LENGTH;
