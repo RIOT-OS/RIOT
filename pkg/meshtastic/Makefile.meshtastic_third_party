@@ -3,6 +3,6 @@ MODULE = meshtastic_third_party
 SRCXX = aes-ccm.cpp
 
 CXXEXFLAGS += -Wno-unused-parameter
-CXXEXFLAGS +=-Wno-ignored-qualifiers
+CXXEXFLAGS += -Wno-ignored-qualifiers
 
 include $(RIOTBASE)/Makefile.base
