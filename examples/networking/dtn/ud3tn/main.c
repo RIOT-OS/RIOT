@@ -56,8 +56,8 @@ extern struct bundle_agent_interface bundle_agent_interface;
 #  define LOCAL_EID "dtn://node-a.dtn/"
 #  define PEER_EID "dtn://node-b.dtn/"
 #  define PEER_EID_C "dtn://node-c.dtn/"
-#  define LOCAL_IP "fd12:dead:beef:1:9802:e0ff:fe7d:d553"
-#  define PEER_IP "fd12:dead:beef:1:b073:85ff:fe41:8889"
+#  define LOCAL_IP "fd12:dead:beef:1:18ea:83ff:fead:1e17"
+#  define PEER_IP "fd12:dead:beef:1:f831:6fff:fe99:94cc"
 #  define PEER_PORT "4556"
 #  define PEER_IP_C "fd12:dead:beef:1:48bd:97ff:fee0:e4ec"
 #  define PEER_PORT_C "4556"
@@ -66,9 +66,9 @@ extern struct bundle_agent_interface bundle_agent_interface;
 #  define LOCAL_EID "dtn://node-b.dtn/"
 #  define PEER_EID "dtn://node-a.dtn/"
 #  define PEER_EID_C "dtn://node-c.dtn/"
-#  define LOCAL_IP "fd12:dead:beef:1:b073:85ff:fe41:8889"
+#  define LOCAL_IP "fd12:dead:beef:1:f831:6fff:fe99:94cc"
 #  define LOCAL_PORT "4556"
-#  define PEER_IP "fd12:dead:beef:1:9802:e0ff:fe7d:d553"
+#  define PEER_IP "fd12:dead:beef:1:18ea:83ff:fead:1e17"
 #  define PEER_PORT "4556"
 #  define PEER_IP_C "fd12:dead:beef:1:f82f:3ff:fe34:de94"
 #  define PEER_PORT_C "4556"
@@ -168,8 +168,8 @@ static void dtn_chat_thread(void *arg)
 
     printf("DTN Chat Thread gestartet.\n");
 
-    int counter = 0;
-    char payload[128];
+    // int counter = 0;
+    // char payload[128];
     while (1) {
 // #if defined(NODE_A) || defined(NODE_A_ESP32)
 //         if (counter % 2 == 0) {
@@ -192,10 +192,10 @@ static void dtn_chat_thread(void *arg)
 void send_chat_message(const char *message, const char *peer_eid)
 {
     char dest_eid[128];
-    char payload[128];
+    char payload[256];
 
     snprintf(dest_eid, sizeof(dest_eid), "%schat", peer_eid);
-    snprintf(payload, sizeof(payload), "%s  SRC: %s, DST: %s", message, LOCAL_EID, dest_eid);
+    snprintf(payload, sizeof(payload), "%s  SRC: %s, DST: %s", message, LOCAL_EID, dest_eid); /*[-Wformat-truncation=]*/
     printf("[DTN SEND] %s\n", payload);
 
     char *p_copy = strdup(payload);
@@ -272,7 +272,7 @@ void add_route(const char *sink_id, const char *peer_ip, const char *peer_port,
          peer_eid, peer_cla, dest_eid,
          CONTACT_START_S, CONTACT_END_S, CONTACT_RATE_BYTES_PER_S);
 
-        printf(config_cmd);
+        // printf(config_cmd); -Wformat-security
 
         const size_t cmd_len = strlen(config_cmd);
         const size_t payload_len = cmd_len + 1;
@@ -282,7 +282,7 @@ void add_route(const char *sink_id, const char *peer_ip, const char *peer_port,
             payload[0] = 0x31;
             memcpy(&payload[1], config_cmd, cmd_len);
 
-            agent_create_forward_bundle(&bundle_agent_interface, 7, sink_id, config_eid,
+            agent_create_forward_bundle(&bundle_agent_interface, 7, sink_id, config_eid, /* [-Wdiscarded-qualifiers] with sink_id. agent_create_forward_bundle expects a non-const char * */
                                         hal_time_get_timestamp_ms(), 0, 60000, payload, payload_len,
                                         0);
 
@@ -351,7 +351,8 @@ static int _send_msg(int argc, char **argv)
 static int _start_dtn(int argc, char **argv)
 {
     if (argc < 3 || argc > 4) {
-        printf("Usage: %s <eid> <cla_options> <remote_config>[on|off]\n", argv[0]);
+        printf("Usage: %s <eid> <cla_options> <remote_config>[on|off]\n"
+               "Example: %s dtn://node-a.dtn/ tcpclv3-riot:*,4556 on\n", argv[0],argv[0]); /*[-Wformat=security]*/
         return 1;
     }
 
@@ -389,6 +390,7 @@ static int start_dtn(const struct dtn_config_t *config)
     }
 
     char *ud3tn_argv[7];
+    /*char *ud3tn_argv[9];*/
     int ud3tn_argc = 0;
 
     ud3tn_argv[ud3tn_argc++] = "ud3tn";
@@ -396,6 +398,8 @@ static int start_dtn(const struct dtn_config_t *config)
     ud3tn_argv[ud3tn_argc++] = config->eid;
     ud3tn_argv[ud3tn_argc++] = "-c";
     ud3tn_argv[ud3tn_argc++] = config->cla_options;
+    /*ud3tn_argv[ud3tn_argc++] = "-L";*/
+    /*ud3tn_argv[ud3tn_argc++] = "3";*/
 
     if (config->remote_config) {
         ud3tn_argv[ud3tn_argc++] = "-R";
@@ -457,6 +461,7 @@ SHELL_COMMAND(add_route, "Adds a route", _add_route);
 SHELL_COMMAND(advertise_route, "Advertises a route", _advertise_route);
 SHELL_COMMAND(send_msg, "Sends a message", _send_msg);
 SHELL_COMMAND(start_dtn, "Starts uD3TN", _start_dtn);
+
 int main(void)
 {
     printf("Start DTN Node: %s\n", LOCAL_EID);
