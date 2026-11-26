@@ -350,7 +350,7 @@ static void tests_clif_decode_encode_non_null_terminated(void)
     #define BUFF_SIZE 50
     char output_buf[BUFF_SIZE];
     clif_t out_link;
-    clif_attr_t attrs[128];
+    clif_attr_t attrs[4];
 
     ssize_t input_len = sizeof(input_buf);
 
