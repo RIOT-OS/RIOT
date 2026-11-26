@@ -1423,6 +1423,64 @@ static void test_ieee802154_frame_filter_pan_coord_data_no_addr_fail(void)
                                                          true));
 }
 
+static void test_ieee802154_frame_filter_beacon_pancomp_fail(void)
+{
+    const network_uint16_t exp_addr = byteorder_htons(TEST_UINT16);
+    const eui64_t long_addr = {.uint64.u64 = TEST_UINT64};
+    const le_uint16_t exp_pan = byteorder_htols(TEST_UINT16 + 1);
+    const network_uint16_t src = byteorder_htons(TEST_UINT16 + 2);
+    /* v0/v1 Beacon must not use PAN ID compression */
+    const uint8_t mhr[] = { IEEE802154_FCF_TYPE_BEACON | IEEE802154_FCF_PAN_COMP,
+                            IEEE802154_FCF_VERS_V1 | IEEE802154_FCF_SRC_ADDR_SHORT,
+                            TEST_UINT8,
+                            src.u8[1], src.u8[0] };
+    TEST_ASSERT_EQUAL_INT(false, ieee802154_frame_filter(mhr,
+                                                         exp_pan.u16,
+                                                         exp_addr,
+                                                         &long_addr,
+                                                         false));
+}
+
+static void test_ieee802154_frame_filter_beacon_src_resv_fail(void)
+{
+    const network_uint16_t exp_addr = byteorder_htons(TEST_UINT16);
+    const eui64_t long_addr = {.uint64.u64 = TEST_UINT64};
+    const le_uint16_t exp_pan = byteorder_htols(TEST_UINT16 + 1);
+    const network_uint16_t src = byteorder_htons(TEST_UINT16 + 2);
+    /* reserved Source Addressing Mode */
+    const uint8_t mhr[] = { IEEE802154_FCF_TYPE_BEACON,
+                            IEEE802154_FCF_VERS_V1 | IEEE802154_FCF_SRC_ADDR_RESV,
+                            TEST_UINT8,
+                            exp_pan.u8[0], exp_pan.u8[1],
+                            src.u8[1], src.u8[0] };
+    TEST_ASSERT_EQUAL_INT(false, ieee802154_frame_filter(mhr,
+                                                         exp_pan.u16,
+                                                         exp_addr,
+                                                         &long_addr,
+                                                         false));
+}
+
+static void test_ieee802154_frame_filter_data_dst_resv_fail(void)
+{
+    const network_uint16_t exp_addr = byteorder_htons(TEST_UINT16);
+    const eui64_t long_addr = {.uint64.u64 = TEST_UINT64};
+    const le_uint16_t exp_pan = byteorder_htols(TEST_UINT16 + 1);
+    const network_uint16_t src = byteorder_htons(TEST_UINT16 + 2);
+    /* reserved Destination Addressing Mode, must not be treated as
+     * "no destination" and accepted by the PAN coordinator */
+    const uint8_t mhr[] = { IEEE802154_FCF_TYPE_DATA,
+                            IEEE802154_FCF_VERS_V1 | IEEE802154_FCF_DST_ADDR_RESV |
+                                IEEE802154_FCF_SRC_ADDR_SHORT,
+                            TEST_UINT8,
+                            exp_pan.u8[0], exp_pan.u8[1],
+                            src.u8[1], src.u8[0] };
+    TEST_ASSERT_EQUAL_INT(false, ieee802154_frame_filter(mhr,
+                                                         exp_pan.u16,
+                                                         exp_addr,
+                                                         &long_addr,
+                                                         true));
+}
+
 static void test_ieee802154_get_seq(void)
 {
     const uint8_t mhr[] = { 0x00, 0x00, TEST_UINT8 };
@@ -1584,6 +1642,9 @@ Test *tests_ieee802154_tests(void)
         new_TestFixture(test_ieee802154_frame_filter_pan_coord_pan_fail),
         new_TestFixture(test_ieee802154_frame_filter_pan_coord_maccmd),
         new_TestFixture(test_ieee802154_frame_filter_pan_coord_data_no_addr_fail),
+        new_TestFixture(test_ieee802154_frame_filter_beacon_pancomp_fail),
+        new_TestFixture(test_ieee802154_frame_filter_beacon_src_resv_fail),
+        new_TestFixture(test_ieee802154_frame_filter_data_dst_resv_fail),
         new_TestFixture(test_ieee802154_get_seq),
         new_TestFixture(test_ieee802154_get_iid_addr_len_0),
         new_TestFixture(test_ieee802154_get_iid_addr_len_SIZE_MAX),
