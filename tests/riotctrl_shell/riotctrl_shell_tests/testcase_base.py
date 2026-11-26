@@ -22,7 +22,7 @@ class TestBase(unittest.TestCase):
         cls.ctrl.start_term()
         if cls.DEBUG:
             cls.ctrl.term.logfile = sys.stdout
-        flush_child(cls.ctrl.term)
+        cls.flush_term()
         cls.init_shell_interaction()
         cls.logger = logging.getLogger(cls.__name__)
         if cls.DEBUG:
@@ -33,8 +33,12 @@ class TestBase(unittest.TestCase):
         cls.ctrl.stop_term()
 
     def setUp(self):
-        flush_child(self.ctrl.term)
+        self.flush_term()
 
     @classmethod
     def init_shell_interaction(cls):
         pass
+
+    @classmethod
+    def flush_term(cls):
+        flush_child(cls.ctrl.term)

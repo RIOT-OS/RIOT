@@ -18,8 +18,6 @@ import pexpect
 
 import riotctrl_shell.loramac
 
-from testrunner.spawn import flush_child
-
 import riotctrl_shell_tests.testcase_base
 
 
@@ -184,7 +182,7 @@ class TestLoramac(TestBase):
         # Closing "> " of first parameter doc is swallowed by shell parser as prompt
         assert re.search(r"Usage: loramac set <(([^|>]+)\|?)+", help_text)
         # Go to actual prompt
-        flush_child(self.ctrl.term)
+        self.flush_term()
         keys = []
         for match in re.findall(r"([^<|>]+)\|?", help_text):
             if "loramac set" in match:
