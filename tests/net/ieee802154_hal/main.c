@@ -505,22 +505,22 @@ int config_phy(int argc, char **argv)
     }
 
     ieee802154_phy_mode_t phy_mode;
-    if (strcasecmp(argv[1], "BPSK")) {
+    if (strcasecmp(argv[1], "BPSK") == 0) {
         phy_mode = IEEE802154_PHY_BPSK;
     }
-    else if (strcasecmp(argv[1], "ASK")) {
+    else if (strcasecmp(argv[1], "ASK") == 0) {
         phy_mode = IEEE802154_PHY_ASK;
     }
-    else if (strcasecmp(argv[1], "O-QPSK")) {
+    else if (strcasecmp(argv[1], "O-QPSK") == 0) {
         phy_mode = IEEE802154_PHY_OQPSK;
     }
-    else if (strcasecmp(argv[1], "MR-O-QPSK")) {
+    else if (strcasecmp(argv[1], "MR-O-QPSK") == 0) {
         phy_mode = IEEE802154_PHY_MR_OQPSK;
     }
-    else if (strcasecmp(argv[1], "MR-OFDM")) {
+    else if (strcasecmp(argv[1], "MR-OFDM") == 0) {
         phy_mode = IEEE802154_PHY_MR_OFDM;
     }
-    else if (strcasecmp(argv[1], "MR-FSK")) {
+    else if (strcasecmp(argv[1], "MR-FSK") == 0) {
         phy_mode = IEEE802154_PHY_MR_FSK;
     }
     else {
@@ -537,12 +537,13 @@ int config_phy(int argc, char **argv)
     uint8_t channel = atoi(argv[2]);
     int8_t tx_pow = atoi(argv[3]);
 
-    if (channel < 11 || channel > 26) {
+    ieee802154_dev_t *dev = &_radio;
+
+    if (ieee802154_radio_has_24_ghz(dev) && (channel < 11 || channel > 26)) {
         puts("Wrong channel configuration (11 <= channel <= 26).");
         return 1;
     }
 
-    ieee802154_dev_t *dev = &_radio;
     ieee802154_radio_set_idle(dev, true);
     ieee802154_phy_conf_t conf = {.phy_mode=phy_mode, .channel=channel, .pow=tx_pow};
     if (ieee802154_radio_config_phy(dev, &conf) < 0) {
