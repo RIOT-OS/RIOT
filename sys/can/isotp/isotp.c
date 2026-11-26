@@ -134,12 +134,9 @@ static int _isotp_dispatch_rx(struct isotp *isotp)
     return ret;
 }
 
-static int _isotp_dispatch_tx(struct isotp *isotp, int err)
+static int _isotp_notify_tx(struct isotp *isotp, int err)
 {
     msg_t msg;
-
-    gnrc_pktbuf_release(isotp->tx.snip);
-    isotp->tx.snip = NULL;
 
     if (isotp->opt.flags & CAN_ISOTP_TX_DONT_WAIT) {
         return 0;
@@ -155,11 +152,19 @@ static int _isotp_dispatch_tx(struct isotp *isotp, int err)
     msg.content.ptr = isotp->arg;
 
     if (_send_msg(&msg, &isotp->entry) < 1) {
-        DEBUG("_isotp_dispatch_tx: msg lost\n");
+        DEBUG("_isotp_notify_tx: msg lost\n");
         return -EOVERFLOW;
     }
 
     return 0;
+}
+
+static int _isotp_dispatch_tx(struct isotp *isotp, int err)
+{
+    gnrc_pktbuf_release(isotp->tx.snip);
+    isotp->tx.snip = NULL;
+
+    return _isotp_notify_tx(isotp, err);
 }
 
 static void _rx_timeout(void *arg)
@@ -196,8 +201,14 @@ static int _isotp_rcv_fc(struct isotp *isotp, can_frame_t *frame, size_t ae)
 
     if (frame->len < ae + FC_CONTENT_SZ) {
         /* Invalid length */
+        gnrc_pktsnip_t *snip = isotp->tx.snip;
+
+        isotp->tx.snip = NULL;
+        gnrc_pktbuf_release(snip);
         isotp->tx.state = ISOTP_IDLE;
+        _isotp_notify_tx(isotp, EINVAL);
         return 1;
+    }
     }
 
     isotp->txfc.bs = frame->data[ae + 1];
