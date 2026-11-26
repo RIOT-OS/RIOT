@@ -364,6 +364,7 @@ bool ieee802154_frame_filter(const uint8_t *mhr, uint16_t panid, network_uint16_
         case IEEE802154_FCF_TYPE_ACK:
         case IEEE802154_FCF_TYPE_MACCMD:
             break;
+        /* 0b100: reserved, 0b101 to 0b111: not supported */
         default:
             return false;
     }
@@ -371,6 +372,12 @@ bool ieee802154_frame_filter(const uint8_t *mhr, uint16_t panid, network_uint16_
     /* b) The Frame Version field shall not contain a reserved value. (reserved is 0b11) */
     /* TODO Frame version 2 is not supported by the header parsers */
     if (version >= IEEE802154_FCF_VERS_V2) {
+        return false;
+    }
+
+    /* Addressing Mode fields shall not contain a reserved value */
+    if ((ieee802154_get_dst_mode(mhr) == IEEE802154_FCF_DST_ADDR_RESV) ||
+        (ieee802154_get_src_mode(mhr) == IEEE802154_FCF_SRC_ADDR_RESV)) {
         return false;
     }
 
@@ -396,7 +403,9 @@ bool ieee802154_frame_filter(const uint8_t *mhr, uint16_t panid, network_uint16_
         /* Beacon with frame version V0/V1: Source Address and Source PAN ID fields
          * shall be present, destination Address and destination PAN ID fields shall not */
         if ((version != IEEE802154_FCF_VERS_V2) &&
-            ((ieee802154_has_src(mhr) == 0) || has_dst)) {
+            ((ieee802154_has_src(mhr) == 0) || has_dst ||
+             /* PAN ID Compression would omit the Source PAN ID */
+             ieee802154_has_pan_compression(mhr))) {
             return false;
         }
 

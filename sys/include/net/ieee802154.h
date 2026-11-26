@@ -946,6 +946,8 @@ static inline uint8_t ieee802154_dbm_to_rssi(int16_t dbm)
  * @brief Checks if a frame passes the IEEE 802.15.4 frame filtering
  *        according to the 2024 Std. version section 6.6.2 Reception and rejection.
  *
+ * @note Frame Version 2 is currently not supported.
+ *
  * @param[in] mhr        MAC header of the received frame.
  * @param[in] panid      PAN ID of the receiving device.
  * @param[in] short_addr Short address of the receiving device.
