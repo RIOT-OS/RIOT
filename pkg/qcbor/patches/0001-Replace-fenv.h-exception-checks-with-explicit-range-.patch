@@ -22,6 +22,9 @@ platforms. While at it:
   0x7ff) rounds up to 2^64, so 2^64 itself passed the check and was
   converted to uint64_t, which is undefined behavior.
 
+This patch can be removed once
+https://github.com/laurencelundblade/QCBOR/pull/462 is merged.
+
 Assisted-By: Claude Code Opus 5.5
 ---
  src/qcbor_decode.c | 50 +++++++++++++++++++---------------------------
