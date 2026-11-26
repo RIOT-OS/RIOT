@@ -1,0 +1,16 @@
+MODULE = meshtastic
+
+SRCXX = MeshPayload.cpp
+SRCXX += MeshChannel.cpp
+SRCXX += libmeshtastic_leaf.cpp
+SRCXX += MeshPacket.cpp
+SRCXX += MeshCrypto.cpp
+SRCXX += MeshCryptoPKI.cpp
+
+# SRCXX += $(wildcard $(CURDIR)/*.cpp)
+
+# enable ARDUINO macro in the meantime to workaround millis() and micros()
+CXXEXFLAGS += -DARDUINO
+
+
+include $(RIOTBASE)/Makefile.base
