@@ -68,9 +68,11 @@ else ifeq (l4,$(CPU_FAM))
 else ifeq (mp1,$(CPU_FAM))
   CPU_CORE = cortex-m4f
 else ifeq (g4,$(CPU_FAM))
-  CPU_CORE = cortex-m4
+  CPU_CORE = cortex-m4f
   SVD_MODEL := STM32G$(STM32_MODEL)xx
-else ifneq (,$(filter $(CPU_FAM),wb wl))
+else ifneq (,$(filter $(CPU_FAM),wb))
+  CPU_CORE = cortex-m4f
+else ifneq (,$(filter $(CPU_FAM),wl))
   CPU_CORE = cortex-m4
 else ifneq (,$(filter $(CPU_FAM),f7 h7))
   CPU_CORE = cortex-m7
