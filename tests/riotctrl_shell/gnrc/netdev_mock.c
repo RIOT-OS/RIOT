@@ -14,6 +14,7 @@
  *              See https://github.com/RIOT-OS/Release-Specs/
  */
 
+#include <stdbool.h>
 #include <stdio.h>
 
 #include "net/ethernet.h"
@@ -23,6 +24,7 @@
 #include "net/loramac.h"
 #include "net/netdev_test.h"
 #include "od.h"
+#include "shell.h"
 #include "test_utils/expect.h"
 
 typedef struct {
@@ -56,16 +58,49 @@ static uint8_t _ieee802154_encrypt_key_len = 0;
 static uint8_t _ieee802154_retrans = 3;
 static uint8_t _lora_app_key_len = 0;
 static int8_t _ieee802154_cca_threshold = -2;
+static bool _dump_send = false;
+
+static void _set_dump_send_usage(const char *cmd)
+{
+    printf("usage: %s {on|off}\n", cmd);
+}
+
+static int _set_dump_send(int argc, char **argv)
+{
+    if (argc < 2) {
+        _set_dump_send_usage(argv[0]);
+        return 1;
+    }
+
+    if (strcmp(argv[1], "on") == 0) {
+        _dump_send = true;
+    }
+    else if (strcmp(argv[1], "off") == 0) {
+        _dump_send = false;
+    }
+    else {
+        _set_dump_send_usage(argv[0]);
+        return 1;
+    }
+
+    return 0;
+}
+
+SHELL_COMMAND(set_dump_send, "Set if interfaces should dump sent packets", _set_dump_send);
 
 static int _send_eth(netdev_t *netdev, const iolist_t *iolist)
 {
     int res = 0;
 
-    printf("Sending on interface %d\n", _eth_netif.pid);
+    if (_dump_send) {
+        printf("Sending on interface %d\n", _eth_netif.pid);
+    }
 
     (void)netdev;
     for (const iolist_t *ptr = iolist; ptr != NULL; ptr = ptr->iol_next) {
-        od_hex_dump_ext(ptr->iol_base, ptr->iol_len, OD_WIDTH_DEFAULT, res);
+        if (_dump_send) {
+            od_hex_dump_ext(ptr->iol_base, ptr->iol_len, OD_WIDTH_DEFAULT, res);
+        }
 
         res += ptr->iol_len;
     }
@@ -192,11 +227,15 @@ static int _send_ieee802154(netdev_t *netdev, const iolist_t *iolist)
 {
     int res = 0;
 
-    printf("Sending on interface %d\n", _ieee802154_netif.pid);
+    if (_dump_send) {
+        printf("Sending on interface %d\n", _ieee802154_netif.pid);
+    }
 
     (void)netdev;
     for (const iolist_t *ptr = iolist; ptr != NULL; ptr = ptr->iol_next) {
-        od_hex_dump_ext(ptr->iol_base, ptr->iol_len, OD_WIDTH_DEFAULT, res);
+        if (_dump_send) {
+            od_hex_dump_ext(ptr->iol_base, ptr->iol_len, OD_WIDTH_DEFAULT, res);
+        }
 
         res += ptr->iol_len;
     }
