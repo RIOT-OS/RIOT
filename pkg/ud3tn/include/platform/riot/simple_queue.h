@@ -12,6 +12,10 @@
  * license. See the LICENSE file in the project root for details.
  *
  */
+/**
+ * @file
+ * @brief Lightweight queue interface used by the RIOT platform port.
+ */
 
 #ifndef SIMPLE_QUEUE_H_INCLUDED
 #define SIMPLE_QUEUE_H_INCLUDED

@@ -1,4 +1,8 @@
 /* SPDX-License-Identifier: BSD-3-Clause OR Apache-2.0 */
+/**
+ * @file
+ * @brief Helpers for reading from and writing to queue pipes.
+ */
 #ifndef PIPE_QUEUE_UTIL_H_INCLUDED
 #define PIPE_QUEUE_UTIL_H_INCLUDED
 
@@ -7,7 +11,7 @@
 #include <sys/types.h>
 
 /**
- * A wrapper for read() that either reads all bytes, or returns -1 or 0.
+ * @brief Read all requested bytes from a file descriptor.
  *
  * @param fd The file descriptor to be read from.
  * @param buf The buffer used for storing read data.
@@ -19,7 +23,7 @@
 ssize_t pipeq_read_all(int fd, void *buf, size_t count);
 
 /**
- * A wrapper for write() that either reads all bytes, or returns -1 or 0.
+ * @brief Write all requested bytes to a file descriptor.
  *
  * @param fd The file descriptor to be written to.
  * @param buf The buffer containing the data to be written.
