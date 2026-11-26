@@ -293,8 +293,8 @@ int ieee802154_get_dst(const uint8_t *mhr, uint8_t *dst, le_uint16_t *dst_pan)
  */
 static bool _has_dst_pan(const uint8_t *mhr)
 {
-    uint8_t dst_mode = ieee802154_get_dst_mode(mhr);
-    uint8_t src_mode = ieee802154_get_src_mode(mhr);
+    ieee802154_dst_addr_mode_t dst_mode = ieee802154_get_dst_mode(mhr);
+    ieee802154_src_addr_mode_t src_mode = ieee802154_get_src_mode(mhr);
     bool has_pan_comp = ieee802154_has_pan_compression(mhr);
     bool has_dst = ieee802154_has_dst(mhr);
     bool has_src = ieee802154_has_src(mhr);

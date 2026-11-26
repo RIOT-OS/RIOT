@@ -68,10 +68,6 @@ extern "C" {
 #define IEEE802154_FCF_PAN_COMP             (0x40)  /**< compress source PAN ID */
 
 #define IEEE802154_FCF_DST_ADDR_MASK        (0x0c)
-#define IEEE802154_FCF_DST_ADDR_VOID        (0x00)  /**< no destination address */
-#define IEEE802154_FCF_DST_ADDR_RESV        (0x04)  /**< reserved address mode */
-#define IEEE802154_FCF_DST_ADDR_SHORT       (0x08)  /**< destination address length is 2 */
-#define IEEE802154_FCF_DST_ADDR_LONG        (0x0c)  /**< destination address length is 8 */
 
 #define IEEE802154_FCF_VERS_MASK            (0x30)  /**< Frame Version Mask (Reserved (0b11)) */
 #define IEEE802154_FCF_VERS_V0              (0x00)  /**< Frame Version 0 (0b00) */
@@ -79,10 +75,6 @@ extern "C" {
 #define IEEE802154_FCF_VERS_V2              (0x20)  /**< Frame Version 2 (0b10) */
 
 #define IEEE802154_FCF_SRC_ADDR_MASK        (0xc0)
-#define IEEE802154_FCF_SRC_ADDR_VOID        (0x00)  /**< no source address */
-#define IEEE802154_FCF_SRC_ADDR_RESV        (0x40)  /**< reserved address mode */
-#define IEEE802154_FCF_SRC_ADDR_SHORT       (0x80)  /**< source address length is 2 */
-#define IEEE802154_FCF_SRC_ADDR_LONG        (0xc0)  /**< source address length is 8 */
 /** @} */
 
 /**
@@ -188,6 +180,27 @@ extern "C" {
  * [1] all but MR-O-QPSK
  */
 #define IEEE802154_CCA_DURATION_IN_SYMBOLS      (8)
+
+/**
+ * @brief 802.15.4 Frame Control Field Destination Addressing Mode
+ */
+typedef enum {
+    IEEE802154_FCF_DST_ADDR_VOID  = 0x00,  /**< no destination address */
+    IEEE802154_FCF_DST_ADDR_RESV  = 0x04,  /**< reserved address mode */
+    IEEE802154_FCF_DST_ADDR_SHORT = 0x08,  /**< destination address length is 2 */
+    IEEE802154_FCF_DST_ADDR_LONG  = 0x0c,  /**< destination address length is 8 */
+} ieee802154_dst_addr_mode_t;
+
+/**
+ * @brief 802.15.4 Frame Control Field Source Addressing Mode
+ */
+typedef enum {
+    IEEE802154_FCF_SRC_ADDR_VOID  = 0x00,  /**< no source address */
+    IEEE802154_FCF_SRC_ADDR_RESV  = 0x40,  /**< reserved address mode */
+    IEEE802154_FCF_SRC_ADDR_SHORT = 0x80,  /**< source address length is 2 */
+    IEEE802154_FCF_SRC_ADDR_LONG  = 0xc0,  /**< source address length is 8 */
+} ieee802154_src_addr_mode_t;
+
 
 /**
  * @brief   802.15.4 PHY modes
@@ -776,7 +789,7 @@ static inline uint8_t ieee802154_get_frame_version(const uint8_t *mhr)
  *
  * @return Source Addressing Mode
  */
-static inline uint8_t ieee802154_get_src_mode(const uint8_t *mhr)
+static inline ieee802154_src_addr_mode_t ieee802154_get_src_mode(const uint8_t *mhr)
 {
     return (mhr[1] & IEEE802154_FCF_SRC_ADDR_MASK);
 }
@@ -790,7 +803,7 @@ static inline uint8_t ieee802154_get_src_mode(const uint8_t *mhr)
  *
  * @return Destination Addressing Mode
  */
-static inline uint8_t ieee802154_get_dst_mode(const uint8_t *mhr)
+static inline ieee802154_dst_addr_mode_t ieee802154_get_dst_mode(const uint8_t *mhr)
 {
     return (mhr[1] & IEEE802154_FCF_DST_ADDR_MASK);
 }
