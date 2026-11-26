@@ -24,23 +24,6 @@ void AESCommon::clear() {
 AESCommon::AESCommon() {
 }
 
-void AESCommon::subBytesAndShiftRows(uint8_t *output, const uint8_t *input) {
-}
-
-void AESCommon::inverseShiftRowsAndSubBytes(uint8_t *output, const uint8_t *input) {
-}
-
-void AESCommon::mixColumn(uint8_t *output, uint8_t *input) {
-}
-
-void AESCommon::inverseMixColumn(uint8_t *output, const uint8_t *input) {
-}
-
-void AESCommon::keyScheduleCore(uint8_t *output, const uint8_t *input, uint8_t iteration) {
-}
-
-void AESCommon::applySbox(uint8_t *output, const uint8_t *input) {
-}
 
 AES128::AES128() {
     
