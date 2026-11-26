@@ -92,7 +92,7 @@ CFLAGS += -DSYSTEM_STM32$(call uppercase,$(CPU_FAM))XX_H
 ifneq (,$(filter STM32MP157Cxx,$(CPU_LINE)))
   STM32CMSIS_INCLUDE_DIR = $(RIOTCPU)/stm32/include/vendor/cmsis/$(CPU_FAM)/Include
 else
-  STM32CMSIS_INCLUDE_DIR = $(BUILD_DIR)/pkg/stm32cmsis/$(CPU_FAM)/Include
+  STM32CMSIS_INCLUDE_DIR = $(PKGDIRBASE)/stm32cmsis/$(CPU_FAM)/Include
   STM32FAM_INCLUDE_FILE = $(STM32CMSIS_INCLUDE_DIR)/stm32$(CPU_FAM)xx.h
   INCLUDES += -isystem$(STM32CMSIS_INCLUDE_DIR)
 endif
