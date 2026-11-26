@@ -1,20 +1,21 @@
 
 #include "AES.h"
 
+#include "crypto/aes.h"
+
 AESCommon::~AESCommon() {
 }
 
 size_t AESCommon::blockSize() const {
-    size_t returnValue;
-    return 0;
+    return cipher_get_block_size(&_cipher);
 }
 
 void AESCommon::encryptBlock(uint8_t *output, const uint8_t *input) {
-    aes_encrypt(&_aes_context, input, output);
+    cipher_encrypt(&_cipher, input, output);
 }
 
 void AESCommon::decryptBlock(uint8_t *output, const uint8_t *input) {
-    aes_decrypt(&_aes_context, input, output);
+    cipher_decrypt(&_cipher, input, output);
 }
 
 void AESCommon::clear() {
@@ -57,8 +58,7 @@ bool AES128::setKey(const uint8_t *key, size_t len) {
         return false;
     }
     _key_size = len;
-    int result = aes_init(&_aes_context, key, (uint8_t) len);
-    return result == 1;
+    return cipher_init(&_cipher, CIPHER_AES, key, len) == CIPHER_INIT_SUCCESS;
 }
 
 AES256::AES256() {
@@ -76,8 +76,7 @@ bool AES256::setKey(const uint8_t *key, size_t len) {
         return false;
     }
     _key_size = len;
-    int result = aes_init(&_aes_context, key, (uint8_t) len);
-    return result == 1;
+    return cipher_init(&_cipher, CIPHER_AES, key, len) == CIPHER_INIT_SUCCESS;
 }
 
 AESTiny256::AESTiny256() {

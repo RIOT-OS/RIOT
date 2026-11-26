@@ -34,7 +34,7 @@ extern "C" {
 #include <stddef.h>
 #include <stdint.h>
 
-#include "crypto/aes.h"
+#include "crypto/ciphers.h"
 
 #ifdef __cplusplus
 }
@@ -77,7 +77,7 @@ protected:
     // friend class AESTiny256;
     // friend class AESSmall128;
     // friend class AESSmall256;
-    cipher_context_t _aes_context;
+    cipher_t _cipher;
     size_t _key_size = 0;
 };
 
