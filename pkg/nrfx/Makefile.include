@@ -25,6 +25,9 @@ ifneq (,$(filter nrfx_full,$(USEMODULE)))
   ifneq (,$(filter nrf52840xxaa,$(CPU_MODEL)))
     CFLAGS += -DNRF52840_XXAA
   endif
+  ifneq (,$(filter nrf54l15xxaa,$(CPU_MODEL)))
+    CFLAGS += -DNRF54L15_XXAA
+  endif
 
   INCLUDES += -I$(PKGDIRBASE)/nrfx
   INCLUDES += -I$(PKGDIRBASE)/nrfx/mdk

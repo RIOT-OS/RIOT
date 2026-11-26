@@ -1,0 +1,71 @@
+From 71b67b726193e4ae809111497e800f659d90176a Mon Sep 17 00:00:00 2001
+From: Alexandre Abadie <alexandre.abadie@inria.fr>
+Date: Wed, 18 Nov 2026 16:49:20 +0100
+Subject: [PATCH] RIOT specific changes
+
+---
+ mdk/nrf54l15_application.h | 4 ++--
+ mdk/nrf54l15_global.h      | 2 +-
+ mdk/nrf54l15_types.h       | 4 ++--
+ 3 files changed, 5 insertions(+), 5 deletions(-)
+
+diff --git a/mdk/nrf54l15_application.h b/mdk/nrf54l15_application.h
+index 8fad64b..3c7a341 100644
+--- a/mdk/nrf54l15_application.h
++++ b/mdk/nrf54l15_application.h
+@@ -201,7 +201,7 @@ typedef enum {
+ #define __NUM_SAUREGIONS               4             /*!< Number of regions                                                    */
+ 
+ #include "core_cm33.h"                               /*!< ARM Cortex-M33 processor and core peripherals                        */
+-#include "system_nrf.h"                              /*!< nrf54l15_application System Library                                  */
++/* #include "system_nrf.h" */                        /*!< nrf54l15_application System Library                                  */
+ 
+ #endif                                               /*!< NRF_APPLICATION                                                      */
+ 
+@@ -216,7 +216,7 @@ typedef enum {
+ 
+ /* ========================================= Start of section using anonymous unions ========================================= */
+ 
+-#include "compiler_abstraction.h"
++/* #include "compiler_abstraction.h" */
+ 
+ #if defined (__CC_ARM)
+   #pragma push
+diff --git a/mdk/nrf54l15_global.h b/mdk/nrf54l15_global.h
+index 77c703f..bfd2d2e 100644
+--- a/mdk/nrf54l15_global.h
++++ b/mdk/nrf54l15_global.h
+@@ -42,7 +42,7 @@ POSSIBILITY OF SUCH DAMAGE.
+ 
+ /* ========================================= Start of section using anonymous unions ========================================= */
+ 
+-#include "compiler_abstraction.h"
++/* #include "compiler_abstraction.h" */
+ 
+ #if defined (__CC_ARM)
+   #pragma push
+diff --git a/mdk/nrf54l15_types.h b/mdk/nrf54l15_types.h
+index a69de5f..91b339d 100644
+--- a/mdk/nrf54l15_types.h
++++ b/mdk/nrf54l15_types.h
+@@ -40,7 +40,7 @@ POSSIBILITY OF SUCH DAMAGE.
+ #endif
+ 
+ #include <stdint.h>
+-#include "compiler_abstraction.h"
++/* #include "compiler_abstraction.h" */
+ 
+ 
+ /* ============================================ Include required type specifiers ============================================= */
+@@ -100,7 +100,7 @@ typedef enum {
+ 
+ /* ========================================= Start of section using anonymous unions ========================================= */
+ 
+-#include "compiler_abstraction.h"
++/* #include "compiler_abstraction.h" */
+ 
+ #if defined (__CC_ARM)
+   #pragma push
+-- 
+2.53.0
+
