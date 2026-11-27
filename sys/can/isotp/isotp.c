@@ -261,6 +261,16 @@ static int _isotp_rcv_sf(struct isotp *isotp, can_frame_t *frame, size_t ae)
     }
 
     size_t len = (frame->data[ae] & 0x0F);
+
+    /* SF_DL = 0 is reserved by ISO 15765-2:2016 Table 10 (see 9.6.2.2) and
+     * must be ignored. Note that the receive timer and state have already
+     * been reset above, so an unexpected SF in the middle of a multi-frame
+     * reception also abandons that transfer - which is the only sane action
+     * once the peer's framing no longer matches the ongoing reception. */
+    if (len == 0) {
+        return 1;
+    }
+
     if (len > frame->len - (SF_PCI_SZ + ae)) {
         return 1;
     }
