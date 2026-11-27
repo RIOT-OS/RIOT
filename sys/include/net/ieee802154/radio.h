@@ -502,6 +502,41 @@ typedef struct {
 } ieee802154_mr_fsk_conf_t;
 
 /**
+ * @brief extension for IEEE 802.15.4 O-QPSK PHY
+ */
+typedef struct {
+    ieee802154_phy_conf_t super;        /**< common settings */
+} ieee802154_oqpsk_conf_t;
+
+/**
+ * @brief extension for IEEE 802.15.4 BPSK PHY
+ */
+typedef struct {
+    ieee802154_phy_conf_t super;        /**< common settings */
+} ieee802154_bpsk_conf_t;
+
+/**
+ * @brief Union of all supported PHY configurations
+ *
+ * All members start with @ref ieee802154_phy_conf_t so a pointer to this
+ * union can be cast to `ieee802154_phy_conf_t *` to access the common
+ * settings.
+ */
+typedef union {
+    ieee802154_oqpsk_conf_t oqpsk;          /**< valid if phy_mode == OQPSK */
+    ieee802154_bpsk_conf_t bpsk;            /**< valid if phy_mode == BPSK */
+#if IS_USED(MODULE_IEEE802154_PHY_MR_OQPSK)
+    ieee802154_mr_oqpsk_conf_t mr_oqpsk;    /**< valid if phy_mode == MR_OQPSK */
+#endif
+#if IS_USED(MODULE_IEEE802154_PHY_MR_OFDM)
+    ieee802154_mr_ofdm_conf_t mr_ofdm;      /**< valid if phy_mode == MR_OFDM */
+#endif
+#if IS_USED(MODULE_IEEE802154_PHY_MR_FSK)
+    ieee802154_mr_fsk_conf_t mr_fsk;        /**< valid if phy_mode == MR_FSK */
+#endif
+} ieee802154_phy_pib_t;
+
+/**
  * @brief IEEE 802.15.4 radio operations
  */
 typedef enum {
