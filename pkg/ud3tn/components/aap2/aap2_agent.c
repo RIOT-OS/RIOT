@@ -925,6 +925,7 @@ struct aap2_agent_config *aap2_agent_setup(
     const char *node, const char *service,
     const uint8_t bp_version, uint64_t lifetime_ms)
 {
+    (void)socket_path; /* Unix domain sockets are not used on RIOT. */
     struct aap2_agent_config *const config = malloc(
         sizeof(struct aap2_agent_config)
         );

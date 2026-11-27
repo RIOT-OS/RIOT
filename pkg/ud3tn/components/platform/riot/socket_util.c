@@ -9,6 +9,7 @@
 
 int create_unix_domain_socket(const char *path)
 {
+    (void)path; /* Unix domain sockets are not used on RIOT. */
     /*
      * Unix domain socket is not supported on stm32 board
      * int sock = socket(AF_UNIX, SOCK_STREAM, 0);
