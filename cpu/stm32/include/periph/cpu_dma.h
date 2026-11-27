@@ -86,6 +86,13 @@ typedef enum {
 } dma_fifo_thresh_t;
 
 /**
+ * @brief   Signature of event callback functions triggered from interrupts
+ *
+ * @param[in] arg       optional context for the callback
+ */
+typedef void (*dma_cb_t)(void *arg);
+
+/**
  * @brief   DMA channel/trigger configuration for DMA peripherals without
  *          channel/trigger filtering such as the stm32f1 and stm32f3.
  */
@@ -188,13 +195,6 @@ void dma_resume(dma_t dma, uint16_t remaining);
 void dma_stop(dma_t dma);
 
 /**
- * @brief   Wait for the end of a transfer
- *
- * @param[in] dma     logical DMA stream
- */
-void dma_wait(dma_t dma);
-
-/**
  * @brief   Configure a DMA stream for a new transfer
  *
  * @param[in]  dma     logical DMA stream
@@ -259,6 +259,57 @@ void dma_setup_ext(dma_t dma, dma_burst_t pburst, dma_burst_t mburst,
  * @param[in]   incr_mem    Increment the memory address (by the transfer width) after read/write
  */
 void dma_prepare(dma_t dma, void *mem, size_t len, bool incr_mem);
+
+/**
+ * @brief   Set DMA callback
+ *
+ * The callback is called from interrupt context when a transfer is complete.
+ * It must be set before @ref dma_start and stays set until it is changed or
+ * the stream is released with @ref dma_release.
+ *
+ * @note @ref dma_transfer sets its own callback and clears it afterwards.
+ *
+ * @param[in]   dma         Logical DMA stream
+ * @param[in]   cb          Callback function, NULL to disable
+ * @param[in]   ctx         Context passed to the callback (optional)
+ */
+void dma_set_cb(dma_t dma, dma_cb_t cb, void *ctx);
+
+/**
+ * @brief   Enable circular DMA mode
+ *
+ * In circular mode the transfer restarts automatically at the end of the buffer
+ * and the callback triggers twice per buffer cycle, once when the first half of
+ * the buffer is full and once when the whole buffer is full.
+ *
+ * @note The stream must be stopped before enabling circular mode and it cannot
+ *       be used with memory-to-memory transfers. Call this after @ref dma_setup
+ *       or @ref dma_configure, as both disable circular mode again.
+ *
+ * @param[in] dma     Logical DMA stream
+ */
+void dma_enable_loop(dma_t dma);
+
+/**
+ * @brief   Disable circular DMA mode
+ *
+ * @note The stream must be stopped before disabling circular mode.
+ *
+ * @param[in] dma     Logical DMA stream
+ */
+void dma_disable_loop(dma_t dma);
+
+/**
+ * @brief   Get the remaining number of data items to transfer
+ *
+ * @note In circular mode, a value greater than half the buffer length means
+ *       the second half is complete, otherwise the first half is complete.
+ *
+ * @param[in] dma     Logical DMA stream
+ *
+ * @return  remaining number of data items in the current buffer cycle
+ */
+uint16_t dma_get_remaining(dma_t dma);
 
 #endif /* MODULE_PERIPH_DMA */
 
