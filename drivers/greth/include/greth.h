@@ -75,9 +75,29 @@ extern "C" {
 #define GRETH_BUF_SIZE              (1536U)
 
 /**
- * @brief   PHY auto-negotiate timeout in poll iterations
+ * @brief   PHY reset completion timeout in poll iterations
  */
 #define GRETH_ANEG_TIMEOUT          (100000U)
+
+/**
+ * @brief   How long to wait for auto-negotiation to complete, in ms
+ *
+ * After the PHY reset the link comes back only once auto-negotiation is
+ * done, which takes about 1.5 s with a link partner.
+ */
+#ifndef CONFIG_GRETH_ANEG_TIMEOUT_MS
+#define CONFIG_GRETH_ANEG_TIMEOUT_MS    (3000U)
+#endif
+
+/**
+ * @brief   How long to wait for a link when there was none before the reset, in ms
+ *
+ * A PHY without a link at init most likely has no cable attached, so the
+ * boot only waits this long instead of the full auto-negotiation timeout.
+ */
+#ifndef CONFIG_GRETH_LINK_PROBE_MS
+#define CONFIG_GRETH_LINK_PROBE_MS      (500U)
+#endif
 /** @} */
 
 /**
