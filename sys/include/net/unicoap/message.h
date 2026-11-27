@@ -302,18 +302,16 @@ typedef struct {
     uint8_t token_length : UNICOAP_TOKEN_LENGTH_FIXED_WIDTH;
 
     /**
-     * @brief Determines if the corresponding message is considered an `Observe` registration
+     * @brief Indicates that the message is a nontraditional message
      *
-     * This property avoids the need to read the `Observe` option every time this value is needed
-     */
-    bool is_registration : 1;
-
-    /**
-     * @brief Determines if the corresponding message is considered an `Observe` notification
+     * @private
      *
-     * This property avoids the need to read the `Observe` option every time this value is needed
+     * A response sent without a matching request message that elicited
+     * this reponse is a nontraditional message.
+     * The RFC 7252 messaging layer can use this to force the separate
+     * response style for nontraditional responses.
      */
-    bool is_notification : 1;
+    bool _nontraditional : 1;
 
     /** @brief RFC 7252 only properties */
     struct {

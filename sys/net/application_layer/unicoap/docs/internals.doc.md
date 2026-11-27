@@ -120,9 +120,7 @@ On a high level, each driver interacts with the upper layers on these three occa
   [sending from the messaging layer](@ref unicoap_messaging_send). The exchange layer will call into
   this functionality, prompting the driver to perform any due work in the messaging layer like
   attempting to retransmit the message. Apart from the message, as well as the remote and local
-  endpoint, this function accepts flags that customize transmission behavior. The RFC 7252 message
-  type is abstracted into a _reliability_ flag the messaging layer in the CoAP over UDP and DTLS
-  drivers interpret as an instruction to send a confirmable message. When finished, the messaging
+  endpoint, this function accepts flags that customize transmission behavior. When finished, the messaging
   layer serializes the message and forwards it to the transport implementation.
 
 - **Receiving side / Inbound**: Upon receipt of a new message, each driver will need to invoke an
@@ -134,7 +132,7 @@ On a high level, each driver interacts with the upper layers on these three occa
   [single, generic ping function that multiplexes](/FIXME-upcoming-pr-unicoap_ping) between the
   driver implementations.
 
-### Communication Between Layers
+## Messaging
 
 The following figure illustrates communication between layers in a block-wise transfer,
 where a client request from the application may result in multiple
@@ -151,6 +149,41 @@ CoAP over DTLS drivers that share the RFC 7252 messaging implementation:
 
 Both the CoAP over UDP and CoAP over DTLS driver support sending vectored data, hence the `sendv`
 suffixes in the function names depicted in the figure above.
+
+`unicoap` distinguishes two concepts:
+
+A **transmission** happens in the messaging and transport layer and is the effort of trying to send
+a single packet data unit (PDU) over the wire. This may include retransmissions, timers,
+acknowledgements, and reset messages.
+
+An **exchange** takes place on the exchange layer and is the effort of exchanging the
+_representation_ of a message and may encompass multiple transmissions and/or request and response
+CoAP PDUs. The representation of a request or response/resource be divided into individual blocks
+in a block-wise transfer. A server employing resource observation may use send notifications
+as part of an exchange to inform the client about updates to the representation of the
+response/resource. The state associated with such an exchange is stored as a
+@ref unicoap_client_memo_t or @ref unicoap_server_memo_t.
+
+#### Reliability
+The RFC 7252 message type is abstracted into a concept called _reliability.
+@ref UNICOAP_MESSAGING_FLAG_RELIABLE instructs the messaging layer to switch to reliable
+transmission. Seeing this flag, the RFC 7252 messaging layer uses a confirmable messages instead
+of a non-confirmable. The flag has no effect if the messaging layer is itself reliable.
+
+#### Tracking
+`unicoap` also uses a concept called _tracking_ to determine whether to keep state
+for a transmission. `unicoap`'s exchange layer is able to instruct the messaging layer to
+forcefully keep track of a transmission even if it normally wouldn't. This is done by
+passing @ref UNICOAP_MESSAGING_FLAG_TRACK to @ref unicoap_messaging_send.
+This implies the messaging layer retains state objects either because it needs to or because it
+was forced too due to the flag.
+
+In the RFC 7252 messaging layer, `CON`s are naturally tracked, i.e., remembered until they
+are `ACK`ed or `RST`'d. `NON`s are not tracked, unless forced to be tracked by the presence of
+the flag. This happens when `unicoap` sends a request and an application callback is present, or
+when `unicoap` sends notifications.
+
+### State Management
 
 To manage state, the exchange and messaging layer(s) exchange notifications composed of a
 notification type and an opaque state object pointer that may point to the layer-internal
