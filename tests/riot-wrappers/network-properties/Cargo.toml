@@ -1,0 +1,12 @@
+[package]
+name = "riot-wrappers-test-networkproperties"
+version = "0.1.0"
+authors = ["Christian Amsüss <chrysn@fsfe.org>"]
+edition = "2021"
+publish = false
+
+[lib]
+crate-type = ["staticlib"]
+
+[dependencies]
+riot-wrappers = { version = "*", features = [ "set_panic_handler", "panic_handler_format" ] }

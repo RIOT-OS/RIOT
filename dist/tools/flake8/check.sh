@@ -23,7 +23,6 @@ cd $RIOTBASE
 . "${RIOTTOOLS}"/ci/changed_files.sh
 
 EXCLUDE="^(.+/vendor/\
-|rust\
 |dist/tools/cc2538-bsl\
 |dist/tools/mcuboot\
 |dist/tools/uhcpd\

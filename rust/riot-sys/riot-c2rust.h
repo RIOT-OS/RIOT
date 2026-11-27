@@ -1,3 +1,8 @@
+/*
+ * SPDX-FileCopyrightText: 2021 Christian Amsüss
+ * SPDX-License-Identifier: LGPL-2.1-only
+ */
+
 // Workaround for https://github.com/immunant/c2rust/issues/345
 //
 // As these are not really in the call tree of any public RIOT function, making
@@ -19,11 +24,11 @@ extern int missing_implementation_for_fpscr_in_c2rust_see_issue_345;
  * an error, as seen in https://github.com/RIOT-OS/RIOT/issues/21079 */
 __attribute__((unused))
 static inline int __masked_builtin_arm_get_fpscr(void) {
-	return missing_implementation_for_fpscr_in_c2rust_see_issue_345;
+    return missing_implementation_for_fpscr_in_c2rust_see_issue_345;
 }
 __attribute__((unused))
 static inline void __masked_builtin_arm_set_fpscr(int fpscr){
-	missing_implementation_for_fpscr_in_c2rust_see_issue_345 = fpscr;
+    missing_implementation_for_fpscr_in_c2rust_see_issue_345 = fpscr;
 }
 
 // This is currently the only relevant user of stdatomic.h. As it doesn't
@@ -150,59 +155,59 @@ static inline void __masked_builtin_arm_set_fpscr(int fpscr){
 #include "riot-headers.h"
 
 void use_everything(void) {
-	/* While most of them are from modules somewhere, we only need to make them
-	 * conditional if their corresponding includes in riot-headers.h are
-	 * conditional. */
+    /* While most of them are from modules somewhere, we only need to make them
+     * conditional if their corresponding includes in riot-headers.h are
+     * conditional. */
 
-	ztimer_acquire(0);
-	thread_get(0);
-	thread_getpid();
-	pid_is_valid(0);
-	gpio_is_valid(0);
-	irq_is_in();
-	irq_is_enabled();
-	irq_disable();
-	irq_restore(0);
-	mutex_lock(0);
-	mutex_trylock(0);
-	ztimer_now(0);
-	ztimer_spin(0, 0);
+    ztimer_acquire(0);
+    thread_get(0);
+    thread_getpid();
+    pid_is_valid(0);
+    gpio_is_valid(0);
+    irq_is_in();
+    irq_is_enabled();
+    irq_disable();
+    irq_restore(0);
+    mutex_lock(0);
+    mutex_trylock(0);
+    ztimer_now(0);
+    ztimer_spin(0, 0);
 
-	gnrc_netapi_dispatch_send(0, 0, 0);
-	gnrc_netif_hdr_sizeof(0);
-	gnrc_pktbuf_release(0);
-	gnrc_pkt_len(0);
-	gnrc_pkt_count(0);
+    gnrc_netapi_dispatch_send(0, 0, 0);
+    gnrc_netif_hdr_sizeof(0);
+    gnrc_pktbuf_release(0);
+    gnrc_pkt_len(0);
+    gnrc_pkt_count(0);
 
-	thread_measure_stack_free(0);
+    thread_measure_stack_free(0);
 
-	gnrc_ipv6_nib_nc_get_ar_state(0);
-	gnrc_netif_ipv6_addrs_get(0, 0, 0);
-	ipv6_addr_is_unspecified(0);
-	ipv6_addr_is_loopback(0);
-	ipv6_addr_is_multicast(0);
-	ipv6_addr_is_link_local(0);
-	gnrc_ipv6_nib_nc_get_iface(0);
-	gnrc_netif_ipv6_addrs_get(0, 0, 0);
-	gnrc_ipv6_nib_nc_get_nud_state(0);
-	gnrc_ipv6_nib_nc_is_router(0);
-	gnrc_netreg_entry_init_pid(0, 0, 0);
+    gnrc_ipv6_nib_nc_get_ar_state(0);
+    gnrc_netif_ipv6_addrs_get(0, 0, 0);
+    ipv6_addr_is_unspecified(0);
+    ipv6_addr_is_loopback(0);
+    ipv6_addr_is_multicast(0);
+    ipv6_addr_is_link_local(0);
+    gnrc_ipv6_nib_nc_get_iface(0);
+    gnrc_netif_ipv6_addrs_get(0, 0, 0);
+    gnrc_ipv6_nib_nc_get_nud_state(0);
+    gnrc_ipv6_nib_nc_is_router(0);
+    gnrc_netreg_entry_init_pid(0, 0, 0);
 
 #ifdef MODULE_NANOCOAP
-	coap_pkt_set_code(0, 0);
-	coap_get_code_raw(0);
+    coap_pkt_set_code(0, 0);
+    coap_get_code_raw(0);
 #endif
 
 #ifdef MODULE_SOCK_UDP
-	sock_udp_send(0, 0, 0, 0);
-	sock_udp_recv(0, 0, 0, 0, 0);
+    sock_udp_send(0, 0, 0, 0);
+    sock_udp_recv(0, 0, 0, 0, 0);
 #endif
 
 #ifdef MODULE_GNRC_NETAPI_CALLBACKS
-	gnrc_netreg_entry_init_cb(0, 0, 0);
+    gnrc_netreg_entry_init_cb(0, 0, 0);
 #endif
 
 #ifdef MODULE_SHELL
-	shell_run_forever(0, 0, 0);
+    shell_run_forever(0, 0, 0);
 #endif
 }

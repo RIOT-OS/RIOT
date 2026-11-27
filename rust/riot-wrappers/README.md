@@ -7,9 +7,8 @@ The [crate documentation](https://doc.riot-os.org/rustdoc/latest/riot_wrappers/)
 modules are available, and which other crates' traits they implement.
 
 For a newcomer's starting point, see [RIOT's documentation on using it with Rust].
-For basic code examples see [RIOT's examples](https://github.com/RIOT-OS/RIOT/tree/master/examples/lang_support/official)
-(those with "rust" in their name), and the
-[additional examples](https://gitlab.com/etonomy/riot-examples/)
+For basic code examples see [RIOT's examples](https://github.com/RIOT-OS/RIOT/tree/master/examples/lang_support/official), and the
+[additional examples](https://codeberg.org/RIOT/rust-examples)
 which showcase more of the wrapped APIs.
 
 [RIOT's documentation on using it with Rust]: https://doc.riot-os.org/using-rust.html
@@ -41,13 +40,9 @@ part of RIOT's example directory.
 Supported RIOT & Rust versions
 ------------------------------
 
-Currently, this crate targets the latest development version of RIOT.
-Support for the latest release is maintained on a best-effort basis.
+This crate is developed alongside RIOT OS, and only expected to work with the version of RIOT it is shipped with.
 
 This crate has no MSRV, it may start depending on the latest stable as soon as RIOT's build infrastructure has it.
-
-When a released version of RIOT is used with anything but the riot-sys / riot-wrappers / nightly-compiler combination it was released with,
-it is likely that all these must be upgraded together.
 
 In terms of public API,
 riot-wrappers aims to uphold SemVer guarantees
@@ -99,5 +94,4 @@ Apache 2.0 license, as is commonplace in the embedded Rust ecosystem.
 Note that it crate depends on `riot-sys`, which is licensed under RIOT's LGPL
 2.1 to reflect that it uses code transpiled from RIOT.
 
-The crate is maintained by Christian Amsüss <chrysn@fsfe.org> as part of the etonomy
-project, see <https://etonomy.org/>, and the RIOT team.
+The crate is maintained as part of RIOT OS.

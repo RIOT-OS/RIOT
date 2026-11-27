@@ -27,7 +27,7 @@
 * Support for all outdated traits was removed:
 
   * `embedded-hal` 0.2 (except for ADC and SPI)
-  
+
   * `coap-handler` 0.1 and `coap-message` 0.2
 
   * `embedded-nal-async` 0.6

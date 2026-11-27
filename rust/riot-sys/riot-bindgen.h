@@ -1,3 +1,8 @@
+/*
+ * SPDX-FileCopyrightText: 2022 Christian Amsüss
+ * SPDX-License-Identifier: LGPL-2.1-only
+ */
+
 // Workarounds for https://github.com/rust-lang/rust-bindgen/issues/1636
 // (only needed when building for cortex using toolchain=llvm)
 #undef UINT16_MAX

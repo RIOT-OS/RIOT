@@ -1,3 +1,8 @@
+/*
+ * SPDX-FileCopyrightText: 2020 Christian Amsüss
+ * SPDX-License-Identifier: LGPL-2.1-only
+ */
+
 /* core libraries */
 #include <irq.h>
 #ifdef MODULE_CORE_MSG
