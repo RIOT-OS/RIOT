@@ -18,6 +18,7 @@
 
 #include <limits.h>
 
+#include "macros/units.h"
 #include "periph_cpu_common.h"
 
 #ifdef __cplusplus
@@ -75,6 +76,26 @@ enum {
     SAM0_GCLK_DISABLED = 0xF,           /**< disabled GCLK          */
 };
 /** @} */
+
+/**
+ * @brief   Minimal allowed ADC clock frequency
+ */
+#define SAM0_ADC_CLOCK_FREQ_MIN KHZ(30)
+
+/**
+ * @brief   Maximal allowed ADC clock frequency
+ */
+#define SAM0_ADC_CLOCK_FREQ_MAX KHZ(2100)
+
+/**
+ * @brief   ADC Input channel source resistance in Ω
+ */
+#define SAM0_ADC_R_SAMPLE       3500
+
+/**
+ * @brief   ADC Sampling capacitance in F
+ */
+#define SAM0_ADC_C_SAMPLE       3.5E-12
 
 /**
  * @brief   Override SPI hardware chip select macro
