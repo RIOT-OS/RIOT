@@ -16,8 +16,10 @@
 #include <stdint.h>
 
 #include "container.h"
+#include "iolist.h"
+#include "modules.h"
 #include "random.h"
-#include "ztimer.h"
+#include "private/pdu/rfc7252.h"
 
 #define ENABLE_DEBUG CONFIG_UNICOAP_DEBUG_LOGGING
 #include "debug.h"
@@ -116,6 +118,8 @@ typedef struct {
 #if CONFIG_UNICOAP_RFC7252_TRANSMISSIONS_CAPACITY > 0
     _transmission_t transmissions[CONFIG_UNICOAP_RFC7252_TRANSMISSIONS_CAPACITY];
 #endif
+
+    unicoap_packet_t* _unacknowledged_packet;
 } _state_t;
 
 static inline void* _transmission_get_session(_transmission_t* transmission)
@@ -466,7 +470,11 @@ static ssize_t _build_and_send_pdu(
     _transmission_t** transmission)
 {
     assert(packet);
-    assert(packet->message);
+    /* Require allocated message struct unless it's an empty message. This saves memory at the call
+     * site when sending an (empty) ACK or RST. */
+    assert(packet->message ||
+           _get_type(packet) == UNICOAP_TYPE_ACK ||
+           _get_type(packet) == UNICOAP_TYPE_RST);
     assert(packet->remote);
     MESSAGING_7252_DEBUG("sending ");
     PACKET_7252_DEBUG(packet);
@@ -648,31 +656,43 @@ error:
 
 /* MARK: - Empty Messages */
 
-static int _send_empty_message(unicoap_packet_t* packet)
+static int _acknowledge_or_reset(unicoap_packet_t* packet, unicoap_rfc7252_message_type_t type)
 {
-    packet->message->code = UNICOAP_CODE_EMPTY;
-    packet->message->options = NULL;
-    packet->message->payload = NULL;
-    packet->message->payload_size = 0;
+    /* This is all faster than going through the PDU builder for an empty message. And it saves us
+     * stack allocations that we'd need to prepare for an arbitrary message (more iolist structs and
+     * bigger header buffer for additional token. */
+    unicoap_rfc7252_header_t empty_message = {
+        .version = UNICOAP_COAP_VERSION_1,
+        .code = UNICOAP_CODE_EMPTY,
+    };
 
-    packet->properties.token = NULL;
-    packet->properties.token_length = 0;
+    iolist_t vector = {
+        .iol_base = &empty_message,
+        .iol_len = sizeof(empty_message)
+    };
 
-    return (int)_build_and_send_pdu(packet, NULL);
+    unicoap_rfc7252_header_set_message_id(&empty_message, _get_id(packet));
+    unicoap_rfc7252_header_set_type(&empty_message, type);
+
+    /* We do not reconnect here for messaging-layer-only PDUs (empty ACKs and RSTs).
+     * Reason: If we send an ACK or RST that means we got a message before. This implies
+     * there was a DTLS session. RFC 7252 mandates ACKs and RSTs must be sent within the
+     * same epoch. A new DTLS session always leads to a new epoch. So sending an ACK or RST
+     * after reconnecting is pointless. Hence, we do not need to call _connect here and can
+     * just send, possibly getting an error from the DTLS transport layer if there's no session. */
+    return _sendv(&vector, packet->remote, packet->local, _packet_get_dtls_session(packet));
 }
 
 static inline int _acknowledge(unicoap_packet_t* packet)
 {
     MESSAGING_7252_DEBUG(UNICOAP_MESSAGE_ID_FORMAT "sending empty ACK\n", _get_id(packet));
-    _set_type(packet, UNICOAP_TYPE_ACK);
-    return _send_empty_message(packet);
+    return _acknowledge_or_reset(packet, UNICOAP_TYPE_ACK);
 }
 
 static inline int _reset(unicoap_packet_t* packet)
 {
     MESSAGING_7252_DEBUG(UNICOAP_MESSAGE_ID_FORMAT "sending RST\n", _get_id(packet));
-    _set_type(packet, UNICOAP_TYPE_RST);
-    return _send_empty_message(packet);
+    return _acknowledge_or_reset(packet, UNICOAP_TYPE_RST);
 }
 
 static int _resume(const unicoap_endpoint_t* endpoint, unicoap_sock_dtls_session_t* session)
@@ -822,6 +842,12 @@ int unicoap_messaging_process_rfc7252(const uint8_t* pdu, size_t size, unicoap_m
     switch ((res = unicoap_exchange_preprocess(packet, &flags, &arg,
                                                event & UNICOAP_MESSAGING_RFC7252_EVENT_TRUNCATED))) {
     case UNICOAP_PREPROCESSING_SUCCESS_REQUEST:
+        if (_get_type(packet) == UNICOAP_TYPE_CON) {
+            MESSAGING_7252_DEBUG(UNICOAP_MESSAGE_ID_FORMAT "have not ACKed yet\n", _get_id(packet));
+            assert(_state._unacknowledged_packet == NULL);
+            _state._unacknowledged_packet = packet;
+            /* TODO: Deferred responses (proxy) require space for more than one outstanding ACK. */
+        }
         break;
 
     /* This is a response the exchange layer expected.
@@ -834,11 +860,7 @@ int unicoap_messaging_process_rfc7252(const uint8_t* pdu, size_t size, unicoap_m
                                  _get_id(packet));
 
             /* We're going to need the response below, don't override it. */
-            unicoap_message_t* message = packet->message;
-            unicoap_message_t m = *packet->message;
-            packet->message = &m;
             _acknowledge(packet);
-            packet->message = message;
         }
         break;
     }
@@ -890,11 +912,15 @@ int unicoap_messaging_process_rfc7252(const uint8_t* pdu, size_t size, unicoap_m
     }
 
     /* processor is prewarmed, let's throw the message in the processor */
-    if ((res = unicoap_exchange_process(packet, arg)) < 0) {
-        return res;
-    }
+    res = unicoap_exchange_process(packet, arg);
 
-    return 0;
+    /* If the request was ignored, the ACK is still oustanding. */
+    if (_state._unacknowledged_packet) {
+        MESSAGING_7252_DEBUG("ACKing because nobody did\n");
+        _acknowledge(packet);
+        _state._unacknowledged_packet = NULL;
+    }
+    return res;
 
 reset:
     /* using gotos here to avoid overhead of multiple identical function calls */
@@ -904,12 +930,18 @@ reset:
 
 /* MARK: - Message Transmission */
 
-static void _format_separate(unicoap_packet_t* packet, unicoap_messaging_flags_t flags)
+static inline void _format_separate(unicoap_packet_t* packet, unicoap_messaging_flags_t flags)
 {
     /* requests and separate responses */
     _set_id(packet, _generate_message_id());
     _set_type(packet,
               flags & UNICOAP_MESSAGING_FLAG_RELIABLE ? UNICOAP_TYPE_CON : UNICOAP_TYPE_NON);
+}
+
+static inline void _format_piggybacked(unicoap_packet_t* packet, unicoap_messaging_flags_t flags)
+{
+    (void)flags;
+    _set_type(packet, UNICOAP_TYPE_ACK);
 }
 
 int unicoap_messaging_send_rfc7252(unicoap_packet_t* packet, unicoap_messaging_flags_t flags, void* exchange)
@@ -920,17 +952,23 @@ int unicoap_messaging_send_rfc7252(unicoap_packet_t* packet, unicoap_messaging_f
     uint8_t* carbon_copy = NULL;
     _transmission_t* transmission = NULL;
 
-    if (packet->properties.is_notification) {
-        /* notification, always use separate response style */
-        _format_separate(packet, flags);
-    }
-    else if (unicoap_message_code_is_response(packet->message->code) &&
-             /* Message properties in the packet are still those of the request (ID, token, type) */
-             _get_type(packet) == UNICOAP_TYPE_CON &&
-             /* Do not piggyback when instructed to respond reliably, send CON and require ACK */
-             !(flags & UNICOAP_MESSAGING_FLAG_RELIABLE)) {
-        /* piggybacked response, immediate response style */
-        _set_type(packet, UNICOAP_TYPE_ACK);
+    /* _unacknowledged_packet will only be set if we're still in some subordinate call frame
+     * originating from unicoap_messaging_process_rfc7252. So comparing that pointer is safe
+     * as the original packet memory address is still valid. The server reuses the packet
+     * struct from the request. This will change with deferred response support for async proxies.
+     */
+    if (unicoap_message_code_is_response(packet->message->code) && 
+        _state._unacknowledged_packet == packet 
+    ) {
+        if (flags & UNICOAP_MESSAGING_FLAG_RELIABLE) {
+            MESSAGING_7252_DEBUG("ACKing request first to send separate response\n");
+            _acknowledge(packet);
+            _format_separate(packet, flags);
+        } else {
+            MESSAGING_7252_DEBUG("ACKing request with piggybacked response\n");
+            _format_piggybacked(packet, flags);
+        }
+        _state._unacknowledged_packet = NULL;
     }
     else {
         _format_separate(packet, flags);

@@ -15,6 +15,7 @@
 #include <errno.h>
 #include <stdbool.h>
 
+#include "compiler_hints.h"
 #include "iolist.h"
 #include "net/unicoap/message.h"
 #include "net/unicoap/options.h"
@@ -356,9 +357,12 @@ int unicoap_pdu_buildv_options_and_payload(uint8_t* header, size_t header_size,
                                            iolist_t iolists[UNICOAP_PDU_IOLIST_COUNT])
 {
     assert(header);
-    assert(message);
     assert(iolists);
     iolist_init(iolists, header, header_size, NULL);
+
+    if (unlikely(!message)) {
+        return 0;
+    }
 
     iolist_t* element = iolists;
     if (message->options && unicoap_message_options_size(message) > 0) {

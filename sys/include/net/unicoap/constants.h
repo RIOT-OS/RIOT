@@ -62,7 +62,11 @@ typedef enum {
  *
  * Use this constant to define bitfields containing a token length member.
  */
-#define UNICOAP_TOKEN_LENGTH_FIXED_WIDTH 4
+#if CONFIG_UNICOAP_ALLOW_EXTENDED_TOKENS
+#  define UNICOAP_TOKEN_LENGTH_FIXED_WIDTH 17
+#else
+#  define UNICOAP_TOKEN_LENGTH_FIXED_WIDTH 4
+#endif
 /** @} */
 
 /* MARK: - RFC 7252 message types */
