@@ -12,20 +12,14 @@
  *
  * @author      Alexandre Abadie <alexandre.abadie@inria.fr>
  */
-#ifdef MODULE_ESP_COMMON
-/* ESP_COMMON provides its own log_module implementation see
- * - cpu/esp_common/include/log_module.h
- * - cpu/esp_common/include/esp_common_log.h */
 
-typedef int dont_be_pedantic; /* this c-file is not empty */
-
-#else /*MODULE_ESP_COMMON*/
 #include <assert.h>
 #include <stdio.h>
 #include <stdarg.h>
 
 #include "kernel_defines.h"
 #include "log.h"
+#include "ansi_style.h"
 
 /**
  * @brief   Default ANSI color escape code for error logs
@@ -33,7 +27,7 @@ typedef int dont_be_pedantic; /* this c-file is not empty */
  * Default is bold red
  */
 #ifndef LOG_ERROR_ANSI_COLOR_CODE
-#define LOG_ERROR_ANSI_COLOR_CODE       ("\033[1;31m")
+#define LOG_ERROR_ANSI_COLOR_CODE       ANSI_STYLE(BOLD, FOREGROUND(RED))
 #endif
 
 /**
@@ -42,7 +36,7 @@ typedef int dont_be_pedantic; /* this c-file is not empty */
  * Default is bold yellow
  */
 #ifndef LOG_WARNING_ANSI_COLOR_CODE
-#define LOG_WARNING_ANSI_COLOR_CODE     ("\033[1;33m")
+#define LOG_WARNING_ANSI_COLOR_CODE     ANSI_STYLE(BOLD, FOREGROUND(YELLOW))
 #endif
 
 /**
@@ -51,7 +45,7 @@ typedef int dont_be_pedantic; /* this c-file is not empty */
  * Default is bold white
  */
 #ifndef LOG_INFO_ANSI_COLOR_CODE
-#define LOG_INFO_ANSI_COLOR_CODE        ("\033[1m")
+#define LOG_INFO_ANSI_COLOR_CODE        ANSI_STYLE(BOLD)
 #endif
 
 /**
@@ -60,7 +54,7 @@ typedef int dont_be_pedantic; /* this c-file is not empty */
  * Default is green
  */
 #ifndef LOG_DEBUG_ANSI_COLOR_CODE
-#define LOG_DEBUG_ANSI_COLOR_CODE       ("\033[0;32m")
+#define LOG_DEBUG_ANSI_COLOR_CODE       ANSI_STYLE(FOREGROUND(GREEN))
 #endif
 
 /**
@@ -93,7 +87,7 @@ void log_write(unsigned level, const char *format, ...)
 #pragma clang diagnostic pop
 #endif /* clang */
     va_end(args);
-    printf(LOG_RESET_ANSI_COLOR_CODE);
+    printf(ANSI_STYLE_RESET);
 
 #if !defined(__MSP430__)
     /* no fflush on msp430 */
