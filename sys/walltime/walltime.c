@@ -14,7 +14,9 @@
  *
  * @}
  */
+
 #include <errno.h>
+#include <stdint.h>
 #include <string.h>
 
 #include "auto_init.h"
@@ -71,14 +73,18 @@ bool walltime_change_unsubscribe(walltime_change_sub_t *sub)
 uint32_t walltime_get_riot(uint16_t *ms)
 {
     struct tm now;
-    walltime_get(&now, ms);
+    if (walltime_get(&now, ms) < 0) {
+        return UINT32_MAX;
+    }
     return rtc_mktime(&now);
 }
 
 time_t walltime_get_unix(uint16_t *ms)
 {
     struct tm now;
-    walltime_get(&now, ms);
+    if (walltime_get(&now, ms) < 0) {
+        return (time_t)UINT64_MAX;
+    }
     return mktime(&now);
 }
 

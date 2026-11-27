@@ -2,6 +2,7 @@
  * SPDX-FileCopyrightText: 2025 ML!PA Consulting GmbH
  * SPDX-License-Identifier: LGPL-2.1-only
  */
+
 #pragma once
 
 /**
@@ -112,7 +113,7 @@ int walltime_get(struct tm *time, uint16_t *ms);
  *                  Always set to 0 if the backend does not support millisecond
  *                  resolution.
  *
- * @returns seconds since `RIOT_EPOCH`
+ * @returns seconds since `RIOT_EPOCH` or UINT32_MAX if walltime_get() failed
  */
 uint32_t walltime_get_riot(uint16_t *ms);
 
@@ -123,7 +124,7 @@ uint32_t walltime_get_riot(uint16_t *ms);
  *                  Always set to 0 if the backend does not support millisecond
  *                  resolution.
  *
- * @returns seconds since 01.01.1970
+ * @returns seconds since 01.01.1970 or `(time_t)UINT64_MAX` if walltime_get() failed
  */
 time_t walltime_get_unix(uint16_t *ms);
 
