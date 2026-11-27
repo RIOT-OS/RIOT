@@ -13,5 +13,4 @@ FEATURES_PROVIDED += arduino_spi
 FEATURES_PROVIDED += arduino_uart
 FEATURES_PROVIDED += periph_pwm
 FEATURES_PROVIDED += periph_usbdev
-FEATURES_PROVIDED += tinyusb_device
 FEATURES_PROVIDED += vdd_lc_filter_reg0
