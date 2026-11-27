@@ -32,6 +32,12 @@ extern "C" {
  */
 typedef struct {
     gnrc_pktqueue_t *queue;     /**< the actual packet queue class */
+    const gnrc_pktsnip_t *busy_pkt; /**< packet to which
+                                     *   gnrc_netif_pktq_t::busy_retries
+                                     *   refers */
+    uint8_t busy_retries;       /**< retries of gnrc_netif_pktq_t::busy_pkt
+                                 *   after its transmission was confirmed
+                                 *   with -EBUSY */
 #if CONFIG_GNRC_NETIF_PKTQ_TIMER_US >= 0
     msg_t dequeue_msg;          /**< message for gnrc_netif_pktq_t::dequeue_timer to send */
     xtimer_t dequeue_timer;     /**< timer to schedule next sending of
