@@ -1,0 +1,6 @@
+FEATURES_REQUIRED_ANY += arch_arm|arch_native
+FEATURES_BLACKLIST += arch_arm7
+
+ifeq (llvm,$(TOOLCHAIN))
+  DISABLE_MODULE += cortexm_fpu
+endif
