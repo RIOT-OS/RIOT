@@ -256,6 +256,12 @@ static int _isotp_rcv_sf(struct isotp *isotp, can_frame_t *frame, size_t ae)
     ztimer_remove(ZTIMER_USEC, &isotp->rx_timer);
     isotp->rx.state = ISOTP_IDLE;
 
+    /* A received SF replaces any in-progress reassembly. */
+    if (isotp->rx.snip) {
+        gnrc_pktbuf_release(isotp->rx.snip);
+        isotp->rx.snip = NULL;
+    }
+
     if (ae + SF_PCI_SZ > frame->len) {
         return 1;
     }
@@ -301,6 +307,7 @@ static int _isotp_rcv_ff(struct isotp *isotp, can_frame_t *frame, size_t ae)
     if (isotp->rx.snip) {
         DEBUG("_isotp_rcv_ff: freeing previous rx buf\n");
         gnrc_pktbuf_release(isotp->rx.snip);
+        isotp->rx.snip = NULL;
     }
 
     if (len > MAX_MSG_LENGTH) {
