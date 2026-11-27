@@ -281,6 +281,45 @@ int ieee802154_get_dst(const uint8_t *mhr, uint8_t *dst, le_uint16_t *dst_pan)
     return (int)len;
 }
 
+/**
+ * @brief Whether the Destination PAN ID field is present in the frame
+ *
+ * Frame version 0/1: present if a destination address is present.
+ * Frame version 2:   PAN ID Compression table (802.15.4 2024 Std.,
+ *                    Section 7.2.2.6 PAN ID Compression field, Table 7-2).
+ *
+ * @retval true  if present
+ * @retval false if not present
+ */
+static bool _has_dst_pan(const uint8_t *mhr)
+{
+    ieee802154_dst_addr_mode_t dst_mode = ieee802154_get_dst_mode(mhr);
+    ieee802154_src_addr_mode_t src_mode = ieee802154_get_src_mode(mhr);
+    bool has_pan_comp = ieee802154_has_pan_compression(mhr);
+    bool has_dst = ieee802154_has_dst(mhr);
+    bool has_src = ieee802154_has_src(mhr);
+
+    if (ieee802154_get_frame_version(mhr) < IEEE802154_FCF_VERS_V2) {
+        return has_dst;
+    }
+
+    if (!has_dst && !has_src) {
+        return has_pan_comp;
+    }
+    if (has_dst && !has_src) {
+        return !has_pan_comp;
+    }
+    if (!has_dst && has_src) {
+        return false;
+    }
+    if ((dst_mode == IEEE802154_FCF_DST_ADDR_LONG) &&
+        (src_mode == IEEE802154_FCF_SRC_ADDR_LONG)) {
+        return !has_pan_comp;
+    }
+    /* both present, at least one short address */
+    return true;
+}
+
 int ieee802154_dst_filter(const uint8_t *mhr, uint16_t pan,
                           network_uint16_t short_addr, const eui64_t *ext_addr)
 {
@@ -293,8 +332,9 @@ int ieee802154_dst_filter(const uint8_t *mhr, uint16_t pan,
         return 1; /* No destination address */
     }
 
-    /* filter PAN ID */
-    if ((memcmp(pan_bcast, dst_pan.u8, 2) != 0) &&
+    /* filter PAN ID only if the Destination PAN ID field is present */
+    if (_has_dst_pan(mhr) &&
+        (memcmp(pan_bcast, dst_pan.u8, 2) != 0) &&
         (memcmp(&pan, dst_pan.u8, 2) != 0)) {
         return 1;
     }
@@ -309,6 +349,101 @@ int ieee802154_dst_filter(const uint8_t *mhr, uint16_t pan,
     }
 
     return 1;
+}
+
+bool ieee802154_frame_filter(const uint8_t *mhr, uint16_t panid, network_uint16_t short_addr,
+                             const eui64_t *ext_addr, bool pan_coord)
+{
+    uint8_t type = ieee802154_get_frame_type(mhr);
+    uint8_t version = ieee802154_get_frame_version(mhr);
+
+    /* a) The Frame Type field shall not contain a reserved frame type. */
+    switch (type) {
+        case IEEE802154_FCF_TYPE_BEACON:
+        case IEEE802154_FCF_TYPE_DATA:
+        case IEEE802154_FCF_TYPE_ACK:
+        case IEEE802154_FCF_TYPE_MACCMD:
+            break;
+        /* 0b100: reserved, 0b101 to 0b111: not supported */
+        default:
+            return false;
+    }
+
+    /* b) The Frame Version field shall not contain a reserved value. (reserved is 0b11) */
+    /* TODO Frame version 2 is not supported by the header parsers */
+    if (version >= IEEE802154_FCF_VERS_V2) {
+        return false;
+    }
+
+    /* Addressing Mode fields shall not contain a reserved value */
+    if ((ieee802154_get_dst_mode(mhr) == IEEE802154_FCF_DST_ADDR_RESV) ||
+        (ieee802154_get_src_mode(mhr) == IEEE802154_FCF_SRC_ADDR_RESV)) {
+        return false;
+    }
+
+    bool has_dst = ieee802154_has_dst(mhr);
+
+    if (type == IEEE802154_FCF_TYPE_ACK) {
+        /* Imm-Ack: no addressing fields */
+        if (version != IEEE802154_FCF_VERS_V2) {
+            return true;
+        }
+        /* Enh-Ack without destination fields */
+        if (!has_dst) {
+            return true;
+        }
+        /* Enhanced Ack with destination fields -> normal filtering */
+    }
+
+    /* e) If the frame type indicates that the frame is a Beacon frame... */
+    if (type == IEEE802154_FCF_TYPE_BEACON) {
+        uint8_t src_addr[IEEE802154_LONG_ADDRESS_LEN];
+        le_uint16_t src_pan = { 0 };
+
+        /* Beacon with frame version V0/V1: Source Address and Source PAN ID fields
+         * shall be present, destination Address and destination PAN ID fields shall not */
+        if ((version != IEEE802154_FCF_VERS_V2) &&
+            ((ieee802154_has_src(mhr) == 0) || has_dst ||
+             /* PAN ID Compression would omit the Source PAN ID */
+             ieee802154_has_pan_compression(mhr))) {
+            return false;
+        }
+
+        /* e) ...and the source PAN ID is present, */
+        if ((ieee802154_get_src(mhr, src_addr, &src_pan) > 0) &&
+            /* the source PAN ID shall match macPanId */
+            (byteorder_ltohs(src_pan) != panid) &&
+            /* unless macPanId is equal to the broadcast PAN ID,
+             * in which case the Beacon frame shall be accepted regardless of the source PAN ID.*/
+            (panid != 0xFFFF)) {
+            return false;
+        }
+
+        /* Accept Beacons without destination fields (the usual case) */
+        if (!has_dst) {
+            return true;
+        }
+        /* Enhanced Beacon with destination fields -> normal filtering */
+    }
+
+    /* d4) The device is the PAN coordinator, only source addressing fields are included in
+     *     a Data frame or MAC command and the source PAN ID matches macPanId */
+    if (!has_dst) {
+        if (pan_coord &&
+           ((type == IEEE802154_FCF_TYPE_DATA) || (type == IEEE802154_FCF_TYPE_MACCMD))) {
+            uint8_t src_addr[IEEE802154_LONG_ADDRESS_LEN];
+            le_uint16_t src_pan = { 0 };
+
+            if ((ieee802154_get_src(mhr, src_addr, &src_pan) > 0) &&
+                (byteorder_ltohs(src_pan) == panid)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /* c) / d): Data, MAC command, Enh Ack and Beacon with dst fields */
+    return ieee802154_dst_filter(mhr, panid, short_addr, ext_addr) == 0;
 }
 
 /** @} */
