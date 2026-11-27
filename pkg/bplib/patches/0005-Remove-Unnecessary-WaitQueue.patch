@@ -1,48 +1,40 @@
-From 4a9479c4d1767a1de530d87f537df5359c02db41 Mon Sep 17 00:00:00 2001
-From: Simon Grund <simon.grund@tuhh.de>
-Date: Thu, 19 Feb 2026 20:44:59 +0100
-Subject: [PATCH 5/8] Remove Unnecessary WaitQueue
+From f481cdeb91f764ca953e0b7d9f7ea51861aa09d7 Mon Sep 17 00:00:00 2001
+From: Simon Grund <mail@simongrund.de>
+Date: Wed, 26 Aug 2026 14:53:53 +0200
+Subject: [PATCH 5/9] Remove Unnecessary WaitQueue
 
-was initialized but never used. Same for the cache.
+These are unused especially with the custom storage backend
 ---
- bpa/stor/inc/bplib_stor.h | 2 --
- ci/qm/inc/bplib_qm.h      | 2 +-
+ bpa/stor/inc/bplib_stor.h | 5 ++---
  ci/qm/src/bplib_qm.c      | 6 +++---
- 3 files changed, 4 insertions(+), 6 deletions(-)
+ inc/bplib_inst.h          | 2 +-
+ 3 files changed, 6 insertions(+), 7 deletions(-)
 
 diff --git a/bpa/stor/inc/bplib_stor.h b/bpa/stor/inc/bplib_stor.h
-index 1db8fd03..ee22c343 100644
+index 93a39c3c..ef8736f1 100644
 --- a/bpa/stor/inc/bplib_stor.h
 +++ b/bpa/stor/inc/bplib_stor.h
-@@ -41,8 +41,6 @@
- struct BPLib_BundleCache
+@@ -76,11 +76,10 @@ struct BPLib_BundleCache
  {
      mutex_t lock;
--    BPLib_Bundle_t* InsertBatch[BPLIB_STOR_INSERTBATCHSIZE];
--    size_t InsertBatchSize;
-     /* The load batches are removed for RIOT because they are very implementation dependent
+     int64_t                BundleRowsToDelete[BPLIB_STOR_DISCARDBATCHSIZE];
+-    BPLib_Bundle_t*        InsertBatch[BPLIB_STOR_INSERTBATCHSIZE];
+-    size_t                 InsertBatchSize;
+     /* The load batches are removed for RIOT because they are very implementation dependent.
       * Loading the numbers (which iirc were the row numbers in the blob table) does not really
-      * help if the actual storage implementation uses some other indexing / storage medium.
-diff --git a/ci/qm/inc/bplib_qm.h b/ci/qm/inc/bplib_qm.h
-index 770f8e98..427f6e0c 100644
---- a/ci/qm/inc/bplib_qm.h
-+++ b/ci/qm/inc/bplib_qm.h
-@@ -61,7 +61,7 @@ struct BPLib_Instance
- 
-     /* Queues */
-     BPLib_QM_WaitQueue_t GenericWorkerJobs; /**< Queue of jobs */
--    BPLib_QM_WaitQueue_t BundleCacheList; /**< Queue of bundles in cache */
-+    /*BPLib_QM_WaitQueue_t BundleCacheList; *//**< Queue of bundles in cache */
-     BPLib_QM_WaitQueue_t ContactEgressJobs[BPLIB_MAX_NUM_CONTACTS]; /**< Queue of contact egress jobs */
-     BPLib_QM_WaitQueue_t ChannelEgressJobs[BPLIB_MAX_NUM_CHANNELS]; /**< Queue of channel egress jobs */
- 
+-     * help if the actual storage implementation uses some other indexing / storage medium. */
++     * help if the actual storage implementation uses some other indexing / storage medium.
++     * The same goes for the insert batches */
+     BPLib_STOR_CtUpdateBatch_t CustodyUpdateBatch;
+     int64_t                LastActiveTime;
+     size_t                 BundleCountNotEgressed;  /* Number of bundles in storage that have not been marked as egressed */
 diff --git a/ci/qm/src/bplib_qm.c b/ci/qm/src/bplib_qm.c
-index 6e90fcc5..c2270b4f 100644
+index 8cc9f531..c079ccdb 100644
 --- a/ci/qm/src/bplib_qm.c
 +++ b/ci/qm/src/bplib_qm.c
-@@ -66,10 +66,10 @@ BPLib_Status_t BPLib_QM_QueueTableInit(BPLib_Instance_t* inst, size_t MaxJobs)
-         QueueInit = false;
-     }
+@@ -61,10 +61,10 @@ BPLib_Status_t BPLib_QM_QueueTableInit(BPLib_Instance_t* inst, size_t MaxJobs)
+ 
+     QueueInit = true;
  
 -    if (!BPLib_QM_WaitQueueInit(&(inst->BundleCacheList), sizeof(BPLib_Bundle_t*), MaxJobs))
 +    /*if (!BPLib_QM_WaitQueueInit(&(inst->BundleCacheList), sizeof(BPLib_Bundle_t*), MaxJobs))
@@ -51,17 +43,30 @@ index 6e90fcc5..c2270b4f 100644
 -    }
 +    }*/
  
-     for (i = 0; i < BPLIB_MAX_NUM_CHANNELS; i++)
+     for (i = 0; i < BPLIB_QM_NUM_PRIORITIES; i++)
      {
-@@ -110,7 +110,7 @@ void BPLib_QM_QueueTableDestroy(BPLib_Instance_t* inst)
+@@ -112,7 +112,7 @@ void BPLib_QM_QueueTableDestroy(BPLib_Instance_t* inst)
+     inst->NumWorkers = 0;
  
      /* Queue Cleanup */
-     BPLib_QM_WaitQueueDestroy(&(inst->GenericWorkerJobs));
 -    BPLib_QM_WaitQueueDestroy(&(inst->BundleCacheList));
 +    /*BPLib_QM_WaitQueueDestroy(&(inst->BundleCacheList));*/
-     for (i = 0; i < BPLIB_MAX_NUM_CHANNELS; i++)
+ 
+     for (i = 0; i < BPLIB_QM_NUM_PRIORITIES; i++)
      {
-         BPLib_QM_WaitQueueDestroy(&(inst->ChannelEgressJobs[i]));
+diff --git a/inc/bplib_inst.h b/inc/bplib_inst.h
+index ca220120..55965327 100644
+--- a/inc/bplib_inst.h
++++ b/inc/bplib_inst.h
+@@ -55,7 +55,7 @@ struct BPLib_Instance
+ 
+     /* Queues */
+     BPLib_QM_WaitQueue_t GenericWorkerJobs[BPLIB_QM_NUM_PRIORITIES]; /**< Queue of jobs */
+-    BPLib_QM_WaitQueue_t BundleCacheList; /**< Queue of bundles in cache */
++    /*BPLib_QM_WaitQueue_t BundleCacheList; *//**< Queue of bundles in cache */
+     BPLib_QM_WaitQueue_t ContactEgressJobs[BPLIB_MAX_NUM_CONTACTS]; /**< Queue of contact egress jobs */
+     BPLib_QM_WaitQueue_t ChannelEgressJobs[BPLIB_MAX_NUM_CHANNELS]; /**< Queue of channel egress jobs */
+ 
 -- 
 2.43.0
 
