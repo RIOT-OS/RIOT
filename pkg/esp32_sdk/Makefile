@@ -1,7 +1,7 @@
 PKG_NAME=esp32_sdk
 PKG_URL=https://github.com/espressif/esp-idf
-# v5.4
-PKG_VERSION=c8bb53292d08d6449a09823cf554e62ac839cd8c
+# v5.4.1
+PKG_VERSION=4c2820d377d1375e787bcef612f0c32c1427d183
 PKG_LICENSE=Apache-2.0
 
 # Only check out the components that are actually used by RIOT. The full

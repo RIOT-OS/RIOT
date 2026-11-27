@@ -10,6 +10,7 @@ ESP32_SDK_SRC = \
   components/bootloader_support/src/bootloader_random_$(CPU_FAM).c \
   components/esp_app_format/esp_app_desc.c \
   components/esp_hw_support/clk_ctrl_os.c \
+  components/esp_hw_support/clk_utils.c \
   components/esp_hw_support/esp_clk.c \
   components/esp_hw_support/esp_gpio_reserve.c \
   components/esp_hw_support/periph_ctrl.c \
