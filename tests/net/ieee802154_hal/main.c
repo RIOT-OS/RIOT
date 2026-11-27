@@ -129,8 +129,10 @@ void _rx_done_handler(event_t *event)
     ieee802154_rx_info_t info;
     ieee802154_dev_t* dev = &_radio;
 
-    /* Force transition to IDLE before calling the read function */
-    ieee802154_radio_set_idle(dev, true);
+
+    /* Don't force transition to IDLE before calling the read function
+     * as the radio can be busy transmitting ack */
+    while (ieee802154_radio_set_idle(dev, false) < 0) {}
 
     /* Read packet from internal framebuffer
      *
@@ -339,6 +341,9 @@ static int _init(void)
     res = ieee802154_radio_set_cca_threshold(&_radio, CONFIG_IEEE802154_CCA_THRESH_DEFAULT);
     expect(res >= 0);
 
+    if (ieee802154_radio_has_frame_retrans(&_radio)) {
+        ieee802154_radio_set_frame_retrans(&_radio, CONFIG_IEEE802154_DEFAULT_MAX_FRAME_RETRANS);
+    }
     /* Set the transceiver state to RX_ON in order to receive packets */
     ieee802154_radio_set_rx(&_radio);
     return 0;
