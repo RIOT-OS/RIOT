@@ -16,6 +16,7 @@
  * @}
  */
 
+#include <stdint.h>
 #include <stdio.h>
 #include <strings.h>
 
@@ -33,10 +34,12 @@
 
 #include "test_utils/expect.h"
 #include "xtimer.h"
+#include "ztimer.h"
 
 #define SYMBOL_TIME (16U) /**< 16 us */
 #define ACK_TIMEOUT_TIME (40 * SYMBOL_TIME)
 #define TX_RX_TURNAROUND (12 * SYMBOL_TIME)
+#define RADIO_ON_TIMEOUT_US (10000U)   /**< timeout for confirm_on */
 
 /* the CC2538 takes 193 us to put the transceiver in RX_ON, which officially
  * violates the official TX<->RX turnaround time (192 us for O-QPSK).
@@ -59,6 +62,41 @@ static network_uint16_t short_addr;
 static uint8_t seq;
 
 static ieee802154_dev_t _radio;
+
+static int _set_default_values(void)
+{
+    int res;
+    ieee802154_radio_set_frame_filter_mode(&_radio, IEEE802154_FILTER_ACCEPT);
+
+    uint16_t panid = CONFIG_IEEE802154_DEFAULT_PANID;
+
+    /* Set all IEEE addresses */
+    res = ieee802154_radio_config_addr_filter(&_radio, IEEE802154_AF_SHORT_ADDR, &short_addr);
+    expect(res >= 0);
+    res = ieee802154_radio_config_addr_filter(&_radio, IEEE802154_AF_EXT_ADDR, &ext_addr);
+    expect(res >= 0);
+    res = ieee802154_radio_config_addr_filter(&_radio, IEEE802154_AF_PANID, &panid);
+    expect(res >= 0);
+
+    /* Set PHY configuration */
+    ieee802154_phy_conf_t conf = {  .phy_mode=CONFIG_IEEE802154_DEFAULT_PHY_MODE,
+                                    .channel=CONFIG_IEEE802154_DEFAULT_CHANNEL,
+                                    .pow=CONFIG_IEEE802154_DEFAULT_TXPOWER
+                                 };
+
+    res = ieee802154_radio_config_phy(&_radio, &conf);
+    expect(res >= 0);
+
+    /* ieee802154_radio_set_cca_mode*/
+    res = ieee802154_radio_set_cca_mode(&_radio, IEEE802154_CCA_MODE_ED_THRESHOLD);
+    expect(res >= 0);
+    res = ieee802154_radio_set_cca_threshold(&_radio, CONFIG_IEEE802154_CCA_THRESH_DEFAULT);
+    expect(res >= 0);
+
+    /* Set the transceiver state to RX_ON in order to receive packets */
+    ieee802154_radio_set_rx(&_radio);
+    return 0;
+}
 
 static void _print_packet(size_t size, uint8_t lqi, int16_t rssi)
 {
@@ -310,37 +348,7 @@ static int _init(void)
     expect(res >= 0);
     while (ieee802154_radio_confirm_on(&_radio) == -EAGAIN) {}
 
-    ieee802154_radio_set_frame_filter_mode(&_radio, IEEE802154_FILTER_ACCEPT);
-
-    uint16_t panid = CONFIG_IEEE802154_DEFAULT_PANID;
-
-    /* Set all IEEE addresses */
-    res = ieee802154_radio_config_addr_filter(&_radio,
-                                        IEEE802154_AF_SHORT_ADDR, &short_addr);
-    expect(res >= 0);
-    res = ieee802154_radio_config_addr_filter(&_radio,
-                                        IEEE802154_AF_EXT_ADDR, &ext_addr);
-    expect(res >= 0);
-    res = ieee802154_radio_config_addr_filter(&_radio,
-                                        IEEE802154_AF_PANID, &panid);
-    expect(res >= 0);
-
-    /* Set PHY configuration */
-    ieee802154_phy_conf_t conf = { .phy_mode=CONFIG_IEEE802154_DEFAULT_PHY_MODE,
-                                   .channel=CONFIG_IEEE802154_DEFAULT_CHANNEL,
-                                   .pow=CONFIG_IEEE802154_DEFAULT_TXPOWER};
-
-    res = ieee802154_radio_config_phy(&_radio, &conf);
-    expect(res >= 0);
-
-    /* ieee802154_radio_set_cca_mode*/
-    res = ieee802154_radio_set_cca_mode(&_radio, IEEE802154_CCA_MODE_ED_THRESHOLD);
-    expect(res >= 0);
-    res = ieee802154_radio_set_cca_threshold(&_radio, CONFIG_IEEE802154_CCA_THRESH_DEFAULT);
-    expect(res >= 0);
-
-    /* Set the transceiver state to RX_ON in order to receive packets */
-    ieee802154_radio_set_rx(&_radio);
+    _set_default_values();
     return 0;
 }
 
@@ -413,6 +421,66 @@ int _cca(int argc, char **argv)
         puts("BUSY");
     }
 
+    return 0;
+}
+
+/* wait for confirm_on give up after RADIO_ON_TIMEOUT_US */
+static int _wait_confirm_on(uint32_t *wake_us)
+{
+    int res;
+    uint32_t start = ztimer_now(ZTIMER_USEC);
+
+    while ((res = ieee802154_radio_confirm_on(&_radio)) == -EAGAIN) {
+        if (ztimer_now(ZTIMER_USEC) - start > RADIO_ON_TIMEOUT_US) {
+            return -ETIMEDOUT;
+        }
+    }
+    *wake_us = ztimer_now(ZTIMER_USEC) - start;
+    return res;
+}
+
+static void _restore_after_on(void)
+{
+    if (ieee802154_radio_has_capability(&_radio, IEEE802154_CAP_REG_RETENTION)) {
+        ieee802154_radio_set_rx(&_radio);
+    }
+    else {
+        _set_default_values();
+    }
+}
+
+static int _test_off_on(int argc, char **argv)
+{
+    unsigned cycles = (argc > 1) ? (unsigned)atoi(argv[1]) : 1;
+    uint32_t wake_us;
+    uint32_t max_us = 0;
+    int res = 0;
+
+    for (unsigned i = 0; i < cycles; i++) {
+        if ((res = ieee802154_radio_off(&_radio)) != 0) {
+            puts("Radio not off");
+            expect(res == 0);
+        }
+
+        /* The radio shall be off so you can call this immediately */
+        if ((res = ieee802154_radio_request_on(&_radio)) != 0) {
+            puts("On Request should be valid");
+            expect(res == 0);
+        }
+
+        res = _wait_confirm_on(&wake_us);
+
+        if (res) {
+            puts("Radio should be on");
+            expect(res == 0);
+        }
+        _restore_after_on();
+
+        if (wake_us > max_us) {
+            max_us = wake_us;
+        }
+    }
+    printf("Test succeeded: %u off/on cycles, max wake-up time %" PRIu32 " us\n", cycles, max_us);
     return 0;
 }
 
@@ -636,6 +704,57 @@ static int _config_cca_cmd(int argc, char **argv)
     return res;
 }
 
+static int _set_defaults(int argc, char **argv)
+{
+    (void) argc;
+    (void) argv;
+
+    return _set_default_values();
+}
+
+static int _off(int argc, char **argv)
+{
+    (void) argc;
+    (void) argv;
+
+    int res;
+    if ((res = ieee802154_radio_off(&_radio)) < 0) {
+        printf("Radio turning off failed res=%d \n", res);
+        return 1;
+    }
+    puts("Radio off");
+    return 0;
+}
+
+static int _on(int argc, char **argv)
+{
+    (void) argc;
+    (void) argv;
+
+    int res;
+
+    if ((res = ieee802154_radio_request_on(&_radio)) < 0) {
+        if (res == -EALREADY) {
+            puts("Radio request_on failed; Radio already on");
+        }
+        else {
+            printf("Radio request_on failed res=%d \n", res);
+        }
+        return 1;
+    }
+    puts("Radio requested on");
+
+    uint32_t wake_us;
+    if ((res = _wait_confirm_on(&wake_us)) < 0) {
+        printf("Radio turning on failed res=%d \n", res);
+        return 1;
+    }
+    _restore_after_on();
+
+    printf("Radio on after %" PRIu32 " us\n", wake_us);
+    return 0;
+}
+
 static int _caps_cmd(int argc, char **argv)
 {
     (void) argc;
@@ -744,6 +863,11 @@ static const shell_command_t shell_commands[] = {
     { "print_addr", "Print IEEE802.15.4 addresses", print_addr},
     { "txtsnd", "Send IEEE 802.15.4 packet", txtsnd },
     { "test_states", "Test state changes", _test_states },
+    { "test_off_on", "Test set the radio off then on [cycles]. Radio is in RX afterwards",
+        _test_off_on },
+    { "set_defaults", "Set default values for the radio", _set_defaults },
+    { "off", "turn the radio off", _off },
+    { "on", "turn the radio on and go to RX", _on },
     { "cca", "Perform CCA", _cca },
     { "config_cca", "Config CCA parameters", _config_cca_cmd },
     { "promisc", "Set promiscuos mode", promisc },
