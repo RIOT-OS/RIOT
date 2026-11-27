@@ -5,7 +5,7 @@ from testrunner import run
 
 
 def test(child):
-    match_1 = child.expect("That took")
+    child.expect("That took")
 
 
 if __name__ == "__main__":
