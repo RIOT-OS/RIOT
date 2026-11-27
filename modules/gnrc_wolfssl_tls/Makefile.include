@@ -1,0 +1,2 @@
+INCLUDES += -I$(RIOTBASE)/modules/gnrc_wolfssl_tls
+DIRS += $(RIOTBASE)/modules/gnrc_wolfssl_tls
