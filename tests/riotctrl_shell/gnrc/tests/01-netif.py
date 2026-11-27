@@ -28,7 +28,10 @@ class IfconfigTestShell(
     riotctrl_shell.sys.Reboot,
     riotctrl_shell.netif.TXTSnd,
 ):
-    pass
+    def set_dump_send(self, state: bool):
+        res = self.cmd(f"set_dump_send {"on" if state else "off"}")
+        assert "usage:" not in res
+        return res
 
 
 class TestNetifGNRC(riotctrl_shell_tests.testcase_base.TestBase):
@@ -1128,11 +1131,16 @@ class TestNetifGNRC(riotctrl_shell_tests.testcase_base.TestBase):
         assert stats["IPv6"]["tx"]["packets"] == 0
         assert stats["IPv6"]["tx"]["bytes"] == 0
 
-        res = self.shell.netif_txtsnd(
-            self.eth_pid, "ab:cd:ef:8c:ae:12", '"Hello World!"'
-        )
-        od_parser = riotctrl_shell.od.OdParser()
-        assert b"Hello World!" in od_parser.parse(res)
+        self.shell.set_dump_send(True)
+
+        try:
+            res = self.shell.netif_txtsnd(
+                self.eth_pid, "ab:cd:ef:8c:ae:12", '"Hello World!"'
+            )
+            od_parser = riotctrl_shell.od.OdParser()
+            assert b"Hello World!" in od_parser.parse(res)
+        finally:
+            self.shell.set_dump_send(False)
 
         res = self.shell.ifconfig_stats(self.eth_pid, "l2")
         stats = parser.parse(res)
@@ -1197,30 +1205,36 @@ class TestNetifGNRC(riotctrl_shell_tests.testcase_base.TestBase):
         assert stats["IPv6"]["tx"]["bytes"] == 0
 
     def test_netif_txtsnd(self):
-        with self.assertRaises(RuntimeError) as ctx:
-            res = self.shell.netif_txtsnd("xyz", "foobar", "abcdef")
-        assert "error: invalid interface given" in str(ctx.exception)
 
-        with self.assertRaises(RuntimeError) as ctx:
-            res = self.shell.netif_txtsnd(self.eth_pid, "foobar", "abcdef")
-        assert "error: invalid address given" in str(ctx.exception)
+        self.shell.set_dump_send(True)
 
-        res = self.shell.netif_txtsnd(self.eth_pid, "ab:cd:ef:8c:ae:12", "abcdef")
-        od_parser = riotctrl_shell.od.OdParser()
-        assert f"Sending on interface {self.eth_pid}" in res
-        assert b"abcdef" in od_parser.parse(res)
+        try:
+            with self.assertRaises(RuntimeError) as ctx:
+                res = self.shell.netif_txtsnd("xyz", "foobar", "abcdef")
+            assert "error: invalid interface given" in str(ctx.exception)
 
-        res = self.shell.netif_txtsnd(self.eth_pid, "bcast", '"testing broadcast"')
-        assert b"testing broadcast" in od_parser.parse(res)
-        # ff:ff:ff:ff:ff:ff is the Ethernet broadcast address
-        assert f"Sending on interface {self.eth_pid}" in res
-        assert (b"\xff" * 6) in od_parser.parse(res)
+            with self.assertRaises(RuntimeError) as ctx:
+                res = self.shell.netif_txtsnd(self.eth_pid, "foobar", "abcdef")
+            assert "error: invalid address given" in str(ctx.exception)
 
-        res = self.shell.netif_txtsnd(self.ieee802154_pid, "bcast", '"testing WPAN broadcast"')
-        assert f"Sending on interface {self.ieee802154_pid}" in res
-        assert b"testing WPAN broadcast" in od_parser.parse(res)
-        # ff:ff is the IEEE 802.15.4 broadcast address used by RIOT
-        assert (b"\xff" * 2) in od_parser.parse(res)
+            res = self.shell.netif_txtsnd(self.eth_pid, "ab:cd:ef:8c:ae:12", "abcdef")
+            od_parser = riotctrl_shell.od.OdParser()
+            assert f"Sending on interface {self.eth_pid}" in res
+            assert b"abcdef" in od_parser.parse(res)
+
+            res = self.shell.netif_txtsnd(self.eth_pid, "bcast", '"testing broadcast"')
+            assert b"testing broadcast" in od_parser.parse(res)
+            # ff:ff:ff:ff:ff:ff is the Ethernet broadcast address
+            assert f"Sending on interface {self.eth_pid}" in res
+            assert (b"\xff" * 6) in od_parser.parse(res)
+
+            res = self.shell.netif_txtsnd(self.ieee802154_pid, "bcast", '"testing WPAN broadcast"')
+            assert f"Sending on interface {self.ieee802154_pid}" in res
+            assert b"testing WPAN broadcast" in od_parser.parse(res)
+            # ff:ff is the IEEE 802.15.4 broadcast address used by RIOT
+            assert (b"\xff" * 2) in od_parser.parse(res)
+        finally:
+            self.shell.set_dump_send(False)
 
 
 if __name__ == "__main__":
