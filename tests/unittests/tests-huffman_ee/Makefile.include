@@ -1,0 +1,7 @@
+USEMODULE += huffman_ee
+
+# The tables and the stack needed by the exact builders scale with
+# CONFIG_HUFFMAN_EE_MAX_SYMBOLS. The tests stay below 40 symbols (the
+# Fibonacci case needs 33 to get a 32 bit codeword), so a bound of 64 keeps
+# the unittests inside the 16 KiB main thread stack that native32 has.
+CFLAGS += -DCONFIG_HUFFMAN_EE_MAX_SYMBOLS=64
