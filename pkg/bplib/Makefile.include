@@ -33,6 +33,7 @@ INCLUDES += -isystem$(PKGDIRBASE)/bplib/version/inc
 INCLUDES += -I$(RIOTPKG)/bplib/fwp/include
 INCLUDES += -I$(RIOTPKG)/bplib/nc/include
 INCLUDES += -I$(RIOTPKG)/bplib/init/include
+INCLUDES += -I$(RIOTPKG)/bplib/util/include
 
 # Conditional modules
 ifneq (,$(filter bplib_cla_ble,$(USEMODULE)))
