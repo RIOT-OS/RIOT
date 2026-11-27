@@ -1,0 +1,24 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: RIOT uD3TN port <buildsystem@riot>
+Date: Fri, 27 Nov 2026 13:39:00 +0100
+Subject: [PATCH] Avoid redefining ARRAY_SIZE on RIOT
+
+---
+ include/ud3tn/common.h | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/include/ud3tn/common.h b/include/ud3tn/common.h
+--- a/include/ud3tn/common.h
++++ b/include/ud3tn/common.h
+@@ -34,7 +34,9 @@
+ #define HAS_FLAG(value, flag) (((value) & (flag)) != 0)
+ 
+ #define ARRAY_LENGTH(x) (sizeof(x) / sizeof((x)[0]))
++#ifndef ARRAY_SIZE
+ #define ARRAY_SIZE ARRAY_LENGTH
++#endif
+ 
+ #if defined(__GNUC__) && (__GNUC__ >= 7) && !defined(__clang__)
+ #define fallthrough_ok __attribute__ ((fallthrough))
+-- 
+2.39.0
