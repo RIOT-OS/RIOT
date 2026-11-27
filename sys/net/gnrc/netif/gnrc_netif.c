@@ -1818,9 +1818,11 @@ static netstats_nb_result_t _res_to_nb_result(int res)
 }
 
 static void _tx_done(gnrc_netif_t *netif, gnrc_pktsnip_t *pkt,
-                     gnrc_pktsnip_t *tx_sync, int res, bool push_back)
+                     gnrc_pktsnip_t *tx_sync, int res, bool push_back,
+                     bool requeue)
 {
     (void)push_back; /* only used with IS_USED(MODULE_GNRC_NETIF_PKTQ) */
+    (void)requeue;   /* only used with IS_USED(MODULE_GNRC_NETIF_PKTQ) */
 
     uint32_t err = (res < 0) ? -res : GNRC_NETERR_SUCCESS;
 
@@ -1854,7 +1856,7 @@ static void _tx_done(gnrc_netif_t *netif, gnrc_pktsnip_t *pkt,
     }
 #endif
 #if IS_USED(MODULE_GNRC_NETIF_PKTQ)
-    if (res == -EBUSY) {
+    if (requeue && (res == -EBUSY)) {
         int put_res;
 
         /* Lower layer was busy.
@@ -1868,8 +1870,12 @@ static void _tx_done(gnrc_netif_t *netif, gnrc_pktsnip_t *pkt,
         }
         else {
             put_res = gnrc_netif_pktq_put(netif, pkt);
-            gnrc_netif_pktq_sched_get(netif);
         }
+        /* (re)start the dequeue timer also on push back: for netdevs with
+         * confirm_send(), -EBUSY for a packet sent from the queue is reported
+         * on TX confirmation, typically after the timer started on dequeue
+         * expired */
+        gnrc_netif_pktq_sched_get(netif);
         if (put_res == 0) {
             DEBUG("gnrc_netif: (re-)queued pkt %p\n", (void *)pkt);
             return; /* early return to not release */
@@ -1879,6 +1885,9 @@ static void _tx_done(gnrc_netif_t *netif, gnrc_pktsnip_t *pkt,
                       netif->pid);
             /* If we got here, it means the device was busy and the pkt queue
              * was full. The packet should be dropped here anyway */
+            if (netif->send_queue.busy_pkt == pkt) {
+                netif->send_queue.busy_pkt = NULL;
+            }
             gnrc_pktbuf_release_error(pkt, ENOMEM);
         }
         return;
@@ -1913,7 +1922,42 @@ static void _event_handler_tx_done(event_t *evp)
     netif->tx_pkt = NULL;
     bool push_back = netif->flags & GNRC_NETIF_FLAGS_TX_FROM_PKTQUEUE;
     netif->flags &= ~GNRC_NETIF_FLAGS_TX_FROM_PKTQUEUE;
-    _tx_done(netif, pkt, NULL, res, push_back);
+
+    bool requeue = true;
+#if IS_USED(MODULE_GNRC_NETIF_PKTQ)
+    if (res == -EBUSY) {
+        /* -EBUSY on TX confirmation means that the medium was busy, e.g.
+         * CSMA-CA failed after the lower layer already retried according to
+         * its configuration. Retry the packet from the queue, but only a
+         * limited number of times, so that it does not block the queue for
+         * a long time if the medium stays busy. The counter refers to the
+         * packet stored with it, since a packet sent directly is appended to
+         * the queue and is not necessarily the next one to be sent. */
+        static_assert(CONFIG_GNRC_NETIF_PKTQ_MAX_BUSY_RETRIES <= UINT8_MAX,
+                      "CONFIG_GNRC_NETIF_PKTQ_MAX_BUSY_RETRIES must not exceed UINT8_MAX");
+        /* variable instead of the constant to avoid -Wtype-limits with 0 */
+        unsigned max_retries = CONFIG_GNRC_NETIF_PKTQ_MAX_BUSY_RETRIES;
+        gnrc_netif_pktq_t *q = &netif->send_queue;
+
+        if (q->busy_pkt != pkt) {
+            q->busy_pkt = pkt;
+            q->busy_retries = 0;
+        }
+        if (q->busy_retries < max_retries) {
+            q->busy_retries++;
+        }
+        else {
+            DEBUG("gnrc_netif: medium busy, dropping pkt %p after %u retries\n",
+                  (void *)pkt, (unsigned)q->busy_retries);
+            q->busy_pkt = NULL;
+            requeue = false;
+        }
+    }
+    else if (netif->send_queue.busy_pkt == pkt) {
+        netif->send_queue.busy_pkt = NULL;
+    }
+#endif
+    _tx_done(netif, pkt, NULL, res, push_back, requeue);
 }
 #endif
 
@@ -1929,7 +1973,7 @@ static void _send(gnrc_netif_t *netif, gnrc_pktsnip_t *pkt, bool push_back)
          * Also note: If gnrc_netif_pktq is used, it will (try to) queue the
          * outgoing frame to send it later on.
          * */
-        _tx_done(netif, pkt, NULL, -EBUSY, push_back);
+        _tx_done(netif, pkt, NULL, -EBUSY, push_back, true);
         return;
     }
 #endif
@@ -1988,7 +2032,7 @@ static void _send(gnrc_netif_t *netif, gnrc_pktsnip_t *pkt, bool push_back)
      * that the transmission already completed (res > 0).
      */
     if (gnrc_netif_netdev_legacy_api(netif) || (res != 0)) {
-        _tx_done(netif, pkt, tx_sync, res, push_back);
+        _tx_done(netif, pkt, tx_sync, res, push_back, true);
     }
 #if IS_USED(MODULE_NETDEV_NEW_API)
     else {

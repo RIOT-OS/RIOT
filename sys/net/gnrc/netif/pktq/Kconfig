@@ -12,4 +12,14 @@ config GNRC_NETIF_PKTQ_TIMER_US
         Set to -1 to deactivate dequeuing by timer. For this it has to be ensured
         that none of the notifications by the driver are missed!
 
+config GNRC_NETIF_PKTQ_MAX_BUSY_RETRIES
+    int "Maximum number of retries of a queued packet when the medium is busy"
+    default 3
+    range 0 255
+    help
+        For netdevs implementing confirm_send(), -EBUSY on TX confirmation
+        means that the medium was busy, e.g. CSMA-CA failed. The packet is
+        then retried from the packet queue at most this number of times
+        before it is dropped. With 0, the packet is dropped right away.
+
 endmenu # packet queues for GNRC network interface

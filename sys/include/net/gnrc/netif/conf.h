@@ -77,6 +77,24 @@ extern "C" {
 #endif
 
 /**
+ * @brief       Maximum number of retries of a packet from the packet queue
+ *              after its transmission was confirmed with -EBUSY
+ *
+ * For netdevs implementing netdev_driver_t::confirm_send, -EBUSY on TX
+ * confirmation means that the medium was busy, e.g. CSMA-CA failed after the
+ * lower layer already retried according to its configuration. The packet is
+ * then queued again and retried after @ref CONFIG_GNRC_NETIF_PKTQ_TIMER_US,
+ * but at most this number of times, before it is dropped. The default
+ * corresponds to the default of macMaxFrameRetries of IEEE 802.15.4. With 0,
+ * the packet is dropped right away.
+ *
+ * @see         net_gnrc_netif_pktq
+ */
+#ifndef CONFIG_GNRC_NETIF_PKTQ_MAX_BUSY_RETRIES
+#  define CONFIG_GNRC_NETIF_PKTQ_MAX_BUSY_RETRIES   (3U)
+#endif
+
+/**
  * @brief   Number of multicast addresses needed for @ref net_gnrc_rpl "RPL".
  *
  * @note    Used for calculation of @ref GNRC_NETIF_IPV6_GROUPS_NUMOF
