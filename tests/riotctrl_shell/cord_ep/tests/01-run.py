@@ -19,7 +19,6 @@ import riotctrl_shell.cord_ep
 import riotctrl_shell.od
 
 from riotctrl_shell.sys import Reboot
-from testrunner.spawn import flush_child
 
 import riotctrl_shell_tests.testcase_base
 
@@ -174,7 +173,7 @@ class TestCordEp(riotctrl_shell_tests.testcase_base.TestBase):
     def tearDown(self):
         res = self.shell.reboot()
         assert "Starting riotctrl_shell.cord_ep test" in res
-        flush_child(self.ctrl.term)
+        self.flush_term()
 
     def preload_and_check_response(self, response):
         res = self.shell.response_remote(self.REMOTE_URI)

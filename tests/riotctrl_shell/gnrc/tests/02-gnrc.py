@@ -17,7 +17,6 @@ import unittest
 import riotctrl_shell.gnrc
 import riotctrl_shell.netif
 import riotctrl_shell.sys
-from testrunner import flush_child
 
 import riotctrl_shell_tests.testcase_base
 
@@ -41,7 +40,7 @@ class TestGNRCICMPv6Echo(riotctrl_shell_tests.testcase_base.TestBase):
     def setUp(self):
         self.shell.reboot()
         # in case some board decides to put some "> " into its boot message...
-        flush_child(self.ctrl.term)
+        self.flush_term()
         super().setUp()
         self.parser = riotctrl_shell.gnrc.GNRCICMPv6EchoParser()
 
@@ -133,7 +132,7 @@ class TestGNRCIPv6NIB(riotctrl_shell_tests.testcase_base.TestBase):
     def setUp(self):
         self.shell.reboot()
         # in case some board decides to put some "> " into its boot message...
-        flush_child(self.ctrl.term)
+        self.flush_term()
         super().setUp()
         self.netif_parser = riotctrl_shell.netif.IfconfigListParser()
         self.neigh_parser = riotctrl_shell.gnrc.GNRCIPv6NIBNeighShowParser()
@@ -176,13 +175,13 @@ class TestGNRCIPv6NIB(riotctrl_shell_tests.testcase_base.TestBase):
         with self.assertRaises(RuntimeError):
             self.shell.nib_neigh_add("foobar", "fe80::1")
         # flush help text out
-        flush_child(self.ctrl.term)
+        self.flush_term()
 
         netif = list(self.parse_ifconfig_list())[0]
         with self.assertRaises(RuntimeError):
             self.shell.nib_neigh_add(netif, "foobar")
         # flush help text out
-        flush_child(self.ctrl.term)
+        self.flush_term()
 
         self.shell.nib_neigh_add(netif, "fe80::1")
         neighbors = self.show_neighbors(netif)
@@ -193,7 +192,7 @@ class TestGNRCIPv6NIB(riotctrl_shell_tests.testcase_base.TestBase):
         with self.assertRaises(RuntimeError):
             self.shell.nib_neigh_add(netif, "fe80::1", "foobar")
         # flush help text out
-        flush_child(self.ctrl.term)
+        self.flush_term()
 
         self.shell.nib_neigh_add(netif, "fe80::2", "00:01:02:03:04:05")
         neighbors = self.show_neighbors(netif)
@@ -215,12 +214,12 @@ class TestGNRCIPv6NIB(riotctrl_shell_tests.testcase_base.TestBase):
         with self.assertRaises(RuntimeError):
             self.shell.nib_neigh_del("foobar", "fe80::1")
         # flush help text out
-        flush_child(self.ctrl.term)
+        self.flush_term()
 
         with self.assertRaises(RuntimeError):
             self.shell.nib_neigh_del(netif, "foobar")
         # flush help text out
-        flush_child(self.ctrl.term)
+        self.flush_term()
 
         # check precondition
         neighbors = self.show_neighbors(netif)
@@ -260,13 +259,13 @@ class TestGNRCIPv6NIB(riotctrl_shell_tests.testcase_base.TestBase):
         with self.assertRaises(RuntimeError):
             self.shell.nib_prefix_add("foobar", "2001:db8:1::1")
         # flush help text out
-        flush_child(self.ctrl.term)
+        self.flush_term()
 
         netif = list(self.parse_ifconfig_list())[0]
         with self.assertRaises(RuntimeError):
             self.shell.nib_prefix_add(netif, "foobar")
         # flush help text out
-        flush_child(self.ctrl.term)
+        self.flush_term()
 
         self.shell.nib_prefix_add(netif, "2001:db8:1::1")
         prefixes = self.show_prefixes(netif)
@@ -298,12 +297,12 @@ class TestGNRCIPv6NIB(riotctrl_shell_tests.testcase_base.TestBase):
         with self.assertRaises(RuntimeError):
             self.shell.nib_prefix_del("foobar", "2001:db8:1::1")
         # flush help text out
-        flush_child(self.ctrl.term)
+        self.flush_term()
 
         with self.assertRaises(RuntimeError):
             self.shell.nib_prefix_del(netif, "foobar")
         # flush help text out
-        flush_child(self.ctrl.term)
+        self.flush_term()
 
         # check precondition
         prefixes = self.show_prefixes(netif)
@@ -344,18 +343,18 @@ class TestGNRCIPv6NIB(riotctrl_shell_tests.testcase_base.TestBase):
         with self.assertRaises(RuntimeError):
             self.shell.nib_route_add("foobar", "2001:db8:1::1", "fe80::1")
         # flush help text out
-        flush_child(self.ctrl.term)
+        self.flush_term()
 
         netif = list(self.parse_ifconfig_list())[0]
         with self.assertRaises(RuntimeError):
             self.shell.nib_route_add(netif, "foobar", "fe80::1")
         # flush help text out
-        flush_child(self.ctrl.term)
+        self.flush_term()
 
         with self.assertRaises(RuntimeError):
             self.shell.nib_route_add(netif, "2001:db8:1::1", "foobar")
         # flush help text out
-        flush_child(self.ctrl.term)
+        self.flush_term()
 
         self.shell.nib_route_add(netif, default_route, "fe80::1")
         routes = self.show_routes(netif)
@@ -404,7 +403,7 @@ class TestGNRCIPv6NIB(riotctrl_shell_tests.testcase_base.TestBase):
         with self.assertRaises(RuntimeError):
             self.shell.nib_route_del(netif, "foobar")
         # flush help text out
-        flush_child(self.ctrl.term)
+        self.flush_term()
 
         routes = self.show_routes(netif)
         assert len(routes) == 3
@@ -447,12 +446,12 @@ class TestGNRCIPv6NIB(riotctrl_shell_tests.testcase_base.TestBase):
         with self.assertRaises(RuntimeError):
             self.shell.nib_abr_add("foobar")
         # flush help text out
-        flush_child(self.ctrl.term)
+        self.flush_term()
 
         with self.assertRaises(RuntimeError):
             self.shell.nib_abr_add("2001:db8::affe")
         # flush help text out
-        flush_child(self.ctrl.term)
+        self.flush_term()
 
         netif = list(
             k for k, v in self.parse_ifconfig_list().items() if "6LO" in v["flags"]
@@ -476,7 +475,7 @@ class TestGNRCIPv6NIB(riotctrl_shell_tests.testcase_base.TestBase):
         with self.assertRaises(RuntimeError):
             self.shell.nib_abr_del("foobar")
         # flush help text out
-        flush_child(self.ctrl.term)
+        self.flush_term()
 
         abrs = self.show_abrs()
         assert len(abrs) == 1

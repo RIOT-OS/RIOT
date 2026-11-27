@@ -64,6 +64,7 @@ class TestBase(riotctrl_shell_tests.testcase_base.TestBase):
         self.parser = riotctrl_shell.od.OdParser()
 
     def tearDown(self):
+        self.flush_term()
         self.shell.reset_buf()
 
 

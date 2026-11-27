@@ -20,8 +20,6 @@ import riotctrl_shell.od
 import riotctrl_shell.udp
 import riotctrl_shell.sys
 
-from testrunner.spawn import flush_child
-
 import riotctrl_shell_tests.testcase_base
 
 
@@ -333,7 +331,7 @@ class TestUDPServer(riotctrl_shell_tests.testcase_base.TestBase):
 
     def setUp(self):
         self.shell.reboot()
-        flush_child(self.ctrl.term)
+        self.flush_term()
         super().setUp()
 
     def test_udp_server_start_invalid_port(self):
