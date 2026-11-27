@@ -1,7 +1,7 @@
 XDEBUGGER = XDS110
 
 # End the flash with a pin reset to leave Halt In Boot (SWCU185G, 6.4 and 6.6);
-# set UNIFLASH_POST_FLASH_CMD= to leave the boot to the debugger instead.
+# set UNIFLASH_POST_FLASH_CMD=none to leave the boot to the debugger instead.
 UNIFLASH_POST_FLASH_CMD ?= PinReset
 
 # configure the flash tool
