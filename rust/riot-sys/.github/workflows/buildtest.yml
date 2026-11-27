@@ -27,7 +27,7 @@ jobs:
         echo 'riot-sys = { path = "../", version = "*" }' >> .cargo/config.toml
         echo 'riot-wrappers = { git = "https://github.com/RIOT-OS/rust-riot-wrappers" }' >> .cargo/config.toml
     - name: Build on selected platforms
-      # not going with a 
+      # not going with a
       #
       # strategy:
       #   matrix:

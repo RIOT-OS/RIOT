@@ -288,8 +288,8 @@ impl<'cb> UartDevice<'cb> {
     /// ```
     /// use riot_wrappers::uart::{DataBits, Parity, StopBits, UartDevice};
     /// let mut uart = UartDevice::new_without_rx(0, 115200)
-    ///     .unwrap_or_else(|e| panic!("Error initializing UART: {e:?}"));   
-    /// uart.set_mode(DataBits::Eight, Parity::None, StopBits::One)   
+    ///     .unwrap_or_else(|e| panic!("Error initializing UART: {e:?}"));
+    /// uart.set_mode(DataBits::Eight, Parity::None, StopBits::One)
     ///     .unwrap_or_else(|e| panic!("Error setting UART mode: {e:?}"));
     /// ```
     #[cfg(riot_module_periph_uart_modecfg)]
@@ -327,7 +327,7 @@ impl<'cb> UartDevice<'cb> {
     /// # Arguments
     ///
     /// * `user_callback` - The address pointing to the user defined callback
-    /// * `data` - The newly received data from the `UART`  
+    /// * `data` - The newly received data from the `UART`
     unsafe extern "C" fn new_data_callback<F>(user_callback: *mut c_void, data: u8)
     where
         F: FnMut(u8) + 'cb,
