@@ -1,0 +1,4 @@
+INCLUDES += -isystem$(PKGDIRBASE)/zboss/include
+INCLUDES += -isystem$(PKGDIRBASE)/zboss/osif/include
+
+CFLAGS += -DZB_PLATFORM_RIOT_ARM
