@@ -1,0 +1,4 @@
+config BOARD_INFINEON-PSOC-62
+    bool
+    default y
+    select CPU_MODEL_CY8C624ABZI
