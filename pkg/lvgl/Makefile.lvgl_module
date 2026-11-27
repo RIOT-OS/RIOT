@@ -1,3 +1,7 @@
+ifneq (,$(SRC_DIRS))
+  SRC := $(patsubst ./%,%,$(foreach dir,$(SRC_DIRS),$(wildcard $(dir)/*.c)))
+endif
+
 CFLAGS += -Wno-unused-parameter
 CFLAGS += -Wno-sign-compare
 CFLAGS += -Wno-unused-function
@@ -5,6 +9,7 @@ CFLAGS += -Wno-maybe-uninitialized
 
 ifeq (llvm,$(TOOLCHAIN))
   CFLAGS += -Wno-missing-braces
+  CFLAGS += -Wno-format-nonliteral
 endif
 
 include $(RIOTBASE)/Makefile.base

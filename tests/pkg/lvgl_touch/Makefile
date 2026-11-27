@@ -9,21 +9,23 @@ USEMODULE += lvgl_contrib
 
 # Add touch capabilities
 USEMODULE += lvgl_contrib_touch
-USEMODULE += lvgl_widget_btn
+USEMODULE += lvgl_widget_button
 USEMODULE += lvgl_widget_label
-USEMODULE += lvgl_extra_theme_default
+USEMODULE += lvgl_theme_default
 # uncomment the following to enable growing button (needs more RAM)
-# USEMODULE += lvgl_extra_theme_default_grow
+# USEMODULE += lvgl_theme_default_grow
 
 USEMODULE += random
 
 include $(RIOTBASE)/Makefile.include
 
-# SDL requires more stack
+# SDL and the libraries of the host display require more stack, 64 KiB
+# overflow on native64; LVGL v9 uses about 4.1 KiB of the main stack on a
+# Cortex-M7
 ifneq (,$(filter native native32 native64,$(BOARD)))
-  CFLAGS += -DTHREAD_STACKSIZE_MAIN=64*1024
+  CFLAGS += -DTHREAD_STACKSIZE_MAIN=128*1024
 else ifneq (,$(filter esp%,$(CPU_FAM)))
-  CFLAGS += -DTHREAD_STACKSIZE_MAIN=4*1024
+  CFLAGS += -DTHREAD_STACKSIZE_MAIN=8*1024
 else
-  CFLAGS += -DTHREAD_STACKSIZE_MAIN=2*1024
+  CFLAGS += -DTHREAD_STACKSIZE_MAIN=6*1024
 endif

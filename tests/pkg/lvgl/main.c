@@ -55,9 +55,9 @@ static void sysmon_task(lv_timer_t *param)
     lv_label_set_text_fmt(info_label,
                           "%s%s CPU: %d %%%s\n\n"
                           LV_TXT_COLOR_CMD"%s MEMORY: %d %%"LV_TXT_COLOR_CMD"\n"
-                          "Total: %" PRIu32 " bytes\n"
-                          "Used: %" PRIu32 " bytes\n"
-                          "Free: %" PRIu32 " bytes\n"
+                          "Total: %u bytes\n"
+                          "Used: %u bytes\n"
+                          "Free: %u bytes\n"
                           "Frag: %d %%",
                           LV_TXT_COLOR_CMD,
                           CPU_LABEL_COLOR,
@@ -65,9 +65,9 @@ static void sysmon_task(lv_timer_t *param)
                           LV_TXT_COLOR_CMD,
                           MEM_LABEL_COLOR,
                           mem_used_pct,
-                          mem_mon.total_size,
-                          mem_mon.total_size - mem_mon.free_size,
-                          mem_mon.free_size,
+                          (unsigned)mem_mon.total_size,
+                          (unsigned)(mem_mon.total_size - mem_mon.free_size),
+                          (unsigned)mem_mon.free_size,
                           mem_mon.frag_pct);
 
     /* Force a wakeup of lvgl when each task is called: this ensures an activity
@@ -77,12 +77,26 @@ static void sysmon_task(lv_timer_t *param)
 
 void sysmon_create(void)
 {
-    lv_coord_t hres = lv_disp_get_hor_res(NULL);
-    lv_coord_t vres = lv_disp_get_ver_res(NULL);
+    int32_t hres = lv_display_get_horizontal_resolution(NULL);
+    int32_t vres = lv_display_get_vertical_resolution(NULL);
 
-    win = lv_win_create(lv_scr_act(), 25);
-    lv_win_add_title(win, "System monitor");
-    lv_obj_t * cont = lv_win_get_content(win);
+    /* Create a window: a flex column with a title on top and a content area below */
+    win = lv_obj_create(lv_screen_active());
+    lv_obj_set_size(win, lv_pct(100), lv_pct(100));
+    lv_obj_set_flex_flow(win, LV_FLEX_FLOW_COLUMN);
+    /* The default padding of the theme is too large for small screens */
+    lv_obj_set_style_pad_all(win, LV_DPX(4), 0);
+    lv_obj_set_style_pad_row(win, LV_DPX(4), 0);
+
+    lv_obj_t *title = lv_label_create(win);
+    lv_label_set_text(title, "System monitor");
+
+    lv_obj_t *cont = lv_obj_create(win);
+    lv_obj_set_width(cont, lv_pct(100));
+    lv_obj_set_flex_grow(cont, 1);
+    lv_obj_set_style_pad_all(cont, LV_DPX(4), 0);
+    lv_obj_set_style_pad_column(cont, LV_DPX(8), 0);
+    lv_obj_set_style_border_width(cont, 0, 0);
 
     /* Make the window content responsive */
     lv_obj_set_layout(cont, LV_LAYOUT_FLEX);
