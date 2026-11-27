@@ -300,6 +300,26 @@ static inline void _set_csma_backoff_mask(ieee802154_submac_t *submac, uint8_t b
 #endif
 }
 
+static inline void _set_frame_pending(ieee802154_submac_t *submac, bool pending)
+{
+#if IS_USED(MODULE_IEEE802154_SUBMAC_SOFT_ACK)
+    submac->frame_pending = pending;
+#else
+    (void)submac;
+    (void)pending;
+#endif
+}
+
+static inline uint8_t _get_frame_pending(ieee802154_submac_t *submac)
+{
+#if IS_USED(MODULE_IEEE802154_SUBMAC_SOFT_ACK)
+    return submac->frame_pending;
+#else
+    (void)submac;
+    return 0;
+#endif
+}
+
 static inline void _init_csma(ieee802154_submac_t *submac)
 {
 #if IS_USED(MODULE_IEEE802154_SUBMAC_SOFT_CSMA_CA)
@@ -337,6 +357,28 @@ static bool _has_retrans_left(ieee802154_submac_t *submac)
     }
 
     return _get_retrans(submac) < CONFIG_IEEE802154_DEFAULT_MAX_FRAME_RETRANS;
+}
+
+/*
+ * @brief Check whether the incoming frame is a data request or not.
+ */
+static bool _is_data_request(ieee802154_submac_t *submac, const uint8_t *mhr, size_t frame_len)
+{
+    if ((mhr[0] & IEEE802154_FCF_TYPE_MASK) != IEEE802154_FCF_TYPE_MACCMD) {
+        return false;
+    }
+
+    int hdr_len = ieee802154_get_frame_hdr_len(mhr);
+    if (hdr_len <= 0 || (size_t)hdr_len >= frame_len) {
+        return false;
+    }
+
+    uint8_t cmd_id;
+    if (ieee802154_radio_peek(&submac->dev, &cmd_id, hdr_len, sizeof(cmd_id)) < 0) {
+        return false;
+    }
+
+    return cmd_id == IEEE802154_MACCMD_DATA_REQ;
 }
 
 static ieee802154_submac_fsm_return_t _tx_end(ieee802154_submac_t *submac, int status,
@@ -407,10 +449,9 @@ static ieee802154_submac_fsm_return_t _handle_fsm_ev_request_tx(ieee802154_subma
 }
 
 static ieee802154_submac_fsm_return_t _handle_fsm_ev_tx_ack(ieee802154_submac_t *submac,
-                                                            uint8_t seq_num)
+                                                            uint8_t seq_num, uint8_t pending_bit)
 {
-    /* TODO: set pending bit accordingly, currently always 0 */
-    uint8_t ack[] = { IEEE802154_FCF_TYPE_ACK, 0x00,  seq_num };
+    uint8_t ack[] = { IEEE802154_FCF_TYPE_ACK | pending_bit, 0x00, seq_num };
     iolist_t iolist = {
         .iol_base = ack,
         .iol_len = sizeof(ack),
@@ -480,7 +521,10 @@ static ieee802154_submac_fsm_return_t _fsm_state_rx(ieee802154_submac_t *submac,
             if ((header_snip[0] & IEEE802154_FCF_ACK_REQ) &&
                 (ieee802154_radio_get_frame_filter_mode(dev, &mode) < 0 ||
                  mode == IEEE802154_FILTER_ACCEPT)) {
-                if (_handle_fsm_ev_tx_ack(submac, ieee802154_get_seq(header_snip)) ==
+                uint8_t pending_bit = (_get_frame_pending(submac) &&
+                                       _is_data_request(submac, header_snip, (size_t)rx_len)) ?
+                                       IEEE802154_FCF_FRAME_PEND : 0;
+                if (_handle_fsm_ev_tx_ack(submac, ieee802154_get_seq(header_snip), pending_bit) ==
                     IEEE802154_SUBMAC_FSM_RETURN_TRANSITION) {
                     /* Do not call rx_done yet. ACK must be sent first */
                     return IEEE802154_SUBMAC_FSM_RETURN_TRANSITION;
@@ -1066,6 +1110,8 @@ int ieee802154_submac_init(ieee802154_submac_t *submac, const network_uint16_t *
     memcpy(&submac->short_addr, short_addr, sizeof(network_uint16_t));
     submac->panid = CONFIG_IEEE802154_DEFAULT_PANID;
 
+    _set_frame_pending(submac, false);
+
     submac->tx_pow = CONFIG_IEEE802154_DEFAULT_TXPOWER;
 
     if (ieee802154_radio_has_24_ghz(dev)) {
@@ -1214,6 +1260,33 @@ bool ieee802154_submac_state_is_idle(ieee802154_submac_t *submac)
 bool ieee802154_submac_state_is_rx(ieee802154_submac_t *submac)
 {
     return submac->fsm.fsm_state_cb == _fsm_state_rx;
+}
+
+int ieee802154_submac_config_src_address_match(ieee802154_submac_t *submac,
+                                               ieee802154_src_match_t cmd,
+                                               const void *value)
+{
+    ieee802154_dev_t *dev = &submac->dev;
+
+    if (_does_send_ack(dev)) {
+        if (cmd != IEEE802154_SRC_MATCH_EN &&
+            !ieee802154_radio_has_capability(dev, IEEE802154_CAP_SRC_ADDR_MATCH)) {
+            return -ENOTSUP;
+        }
+        return ieee802154_radio_config_src_address_match(dev, cmd, value);
+    }
+
+    if (cmd != IEEE802154_SRC_MATCH_EN) {
+        return -ENOTSUP;
+    }
+
+    if (value == NULL) {
+        return -EINVAL;
+    }
+
+    bool pending = *((const bool *)value);
+    _set_frame_pending(submac, pending);
+    return 0;
 }
 
 /** @} */
