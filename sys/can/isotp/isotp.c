@@ -333,6 +333,7 @@ static int _isotp_rcv_ff(struct isotp *isotp, can_frame_t *frame, size_t ae)
     }
 
     isotp->rx.sn = 1;
+    isotp->rx.rx_dl = frame->len;
 
     if (isotp->opt.flags & CAN_ISOTP_LISTEN_MODE) {
         isotp->rx.state = ISOTP_WAIT_CF;
@@ -353,7 +354,16 @@ static int _isotp_rcv_cf(struct isotp *isotp, can_frame_t *frame, size_t ae)
         return 1;
     }
 
-    ztimer_remove(ZTIMER_USEC, &isotp->rx_timer);
+        size_t cf_payload = frame->len - (ae + N_PCI_SZ);
+    int is_final = (isotp->rx.idx + cf_payload >= isotp->rx.snip->size);
+
+    if ((frame->len > isotp->rx.rx_dl) ||
+        (!is_final && (frame->len != isotp->rx.rx_dl))) {
+        DEBUG("_isotp_rcv_cf: invalid CAN_DL %u, RX_DL %u\n",
+              (unsigned)frame->len, (unsigned)isotp->rx.rx_dl);
+        return 1;
+    }
+ztimer_remove(ZTIMER_USEC, &isotp->rx_timer);
 
     if ((frame->data[ae] & 0x0F) != isotp->rx.sn) {
         DEBUG("_isotp_rcv_cf: wrong seq number %d, expected %d\n", frame->data[ae] & 0x0F, isotp->rx.sn);
