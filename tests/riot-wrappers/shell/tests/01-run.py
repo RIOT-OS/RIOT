@@ -3,12 +3,16 @@
 import sys
 from testrunner import run
 
+
 def test(child):
     child.expect("> ")
     child.sendline("help")
     # Could also be the other sequence, we're not guaranteeing that
     commands = ["closure", "echo"]
-    helps = ["Run a command that holds a mutable reference", "Print the arguments in separate lines"]
+    helps = [
+        "Run a command that holds a mutable reference",
+        "Print the arguments in separate lines",
+    ]
     command1 = child.expect(commands)
     help1 = child.expect(helps)
     command2 = child.expect(commands)
@@ -27,6 +31,7 @@ def test(child):
     child.expect("> ")
     child.sendline("closure")
     child.expect("New state is 2")
+
 
 if __name__ == "__main__":
     sys.exit(run(test))
