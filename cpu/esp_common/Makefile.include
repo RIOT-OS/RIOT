@@ -15,6 +15,8 @@ PSEUDOMODULES += esp_qemu
 PSEUDOMODULES += esp_spiffs
 PSEUDOMODULES += esp_wifi_any
 PSEUDOMODULES += esp_wifi_ap
+PSEUDOMODULES += esp_wifi_csi
+PSEUDOMODULES += esp_wifi_csi_metadata
 
 # Common includes
 
@@ -76,6 +78,10 @@ endif
 # use 32 priority levels if any WiFi interface or the ETH interface is used
 ifneq (,$(filter esp_wifi_any esp_eth,$(USEMODULE)))
   CFLAGS += -DSCHED_PRIO_LEVELS=32
+endif
+
+ifneq (,$(filter esp_wifi_csi,$(USEMODULE)))
+  CFLAGS += -DCONFIG_ESP32_WIFI_CSI_ENABLED=1
 endif
 
 # The threads for handling the ESP hardware have the priorities from 2 to 4.
