@@ -1,0 +1,1 @@
+INCLUDES += -I$(RIOTCPU)/common/qingke/include

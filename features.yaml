@@ -852,6 +852,9 @@ groups:
             (Similar to ARM's MPU)
     - name: periph_clic
       help: A RISC-V Core-local Interrupt Controller (CLIC) peripheral is present.
+    - name: periph_pfic
+      help: A WCH QingKe Programmable Fast Interrupt Controller (PFIC) peripheral
+            is present.
     - name: periph_plic
       help: A RISC-V Platform-local Interrupt Controller (PLIC) peripheral is present.
     - name: periph_xh3irq
