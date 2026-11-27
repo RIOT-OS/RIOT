@@ -1,7 +1,5 @@
 include ../Makefile.riot-wrappers_common
 
-# name of your application
-APPLICATION = riot-wrappers-test-gnrc-pktbuf
 APPLICATION_RUST_MODULE = riot_wrappers_test_gnrc_pktbuf
 
 USEMODULE += gnrc_pktbuf

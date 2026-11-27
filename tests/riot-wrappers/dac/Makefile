@@ -1,7 +1,5 @@
 include ../Makefile.riot-wrappers_common
 
-# name of your application
-APPLICATION = riot-wrappers-test-dac
 APPLICATION_RUST_MODULE = riot_wrappers_test_dac
 FEATURES_REQUIRED += periph_dac
 
