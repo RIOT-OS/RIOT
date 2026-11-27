@@ -36,4 +36,6 @@ The application comes with 3 Python scripts:
   ```
   will just train the model.
 - `generate_model.py` is used to generate the `model.h` header file from the
-  `model` binary file.
+  `model` binary file. The generated code depends on the version of emlearn,
+  so the emlearn Python package must have the version of the emlearn package
+  used by RIOT.

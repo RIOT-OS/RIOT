@@ -3,7 +3,8 @@
 """
 Generate a binary file from a sample image of the MNIST dataset.
 
-Pixel of the sample are stored as float32, images have size 8x8.
+Pixels of the sample are stored as little endian int16, the features type
+of the model, images have size 8x8.
 """
 
 import os
@@ -26,7 +27,7 @@ def main(args):
     _, data, _, _ = train_test_split(digits.data, digits.target,
                                      random_state=rnd)
     data = data[args.index]
-    np.ndarray.tofile(data.astype('float32'), output_path)
+    np.ndarray.tofile(data.astype('<i2'), output_path)
 
     if args.no_plot is False:
         plt.gray()
