@@ -411,7 +411,7 @@ include $(RIOTMAKE)/toolchain/$(TOOLCHAIN).inc.mk
 # Other than on native, RWX segments in ROM are not actually RWX, as regular
 # store instructions won't write to flash.
 ifeq (,$(filter native native32 native64,$(BOARD)))
-  LINKER_SUPPORTS_NOWARNRWX ?= $(shell LC_ALL=C $(LINK) $(RIOTTOOLS)/testprogs/minimal_linkable.c -o /dev/null -lc -Wall -Wextra -pedantic -Wl,--no-warn-rwx-segments 2> /dev/null && echo 1 || echo 0)
+  LINKER_SUPPORTS_NOWARNRWX ?= $(shell LC_ALL=C $(LINK) -Wl,--help | grep -q -- '--no-warn-rwx-segments' && echo 1 || echo 0)
   ifeq (1,$(LINKER_SUPPORTS_NOWARNRWX))
     LINKFLAGS += -Wl,--no-warn-rwx-segments
   endif
