@@ -1,3 +1,8 @@
+/*
+ * SPDX-FileCopyrightText: 2021 Christian Amsüss
+ * SPDX-License-Identifier: LGPL-2.1-only
+ */
+
 // Workaround for https://github.com/immunant/c2rust/issues/345
 //
 // As these are not really in the call tree of any public RIOT function, making
