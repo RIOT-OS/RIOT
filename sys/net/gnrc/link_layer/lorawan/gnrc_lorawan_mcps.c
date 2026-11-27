@@ -365,7 +365,9 @@ static void _end_of_tx(gnrc_lorawan_t *mac, int type, int status)
     mcps_confirm.type = type;
     mcps_confirm.status = status;
     mcps_confirm.msdu = mac->mcps.msdu;
+    mcps_confirm.context = mac->mcps.context;
     mac->mcps.msdu = NULL;
+    mac->mcps.context = NULL;
     gnrc_lorawan_mcps_confirm(mac, &mcps_confirm);
 }
 
