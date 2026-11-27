@@ -1,0 +1,36 @@
+---
+name: nix
+
+on:
+  pull_request:
+    paths:
+      - 'flake.nix'
+      - 'flake.lock'
+      - 'dist/nix/**'
+      - '.github/workflows/nix.yml'
+  push:
+    branches:
+      - master
+    paths:
+      - 'flake.nix'
+      - 'flake.lock'
+      - 'dist/nix/**'
+      - '.github/workflows/nix.yml'
+  workflow_dispatch:
+
+jobs:
+  flake:
+    name: Check Nix flake
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@main
+
+      - name: Install Nix
+        uses: cachix/install-nix-action@v31
+        with:
+          extra_nix_config: |
+            experimental-features = nix-command flakes
+
+      - name: Check flake
+        run: nix flake check
