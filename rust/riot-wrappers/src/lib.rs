@@ -5,8 +5,8 @@
 //! modules and features), and the individual modules' documentation entries for details.
 //!
 //! [RIOT-OS]: https://www.riot-os.org/
-//! [RIOT's documentation on using Rust]: https://doc.riot-os.org/using-rust.html
-//! [this crate's README file]: https://github.com/RIOT-OS/rust-riot-wrappers
+//! [RIOT's documentation on using Rust]: https://doc.riot-os.org/rust_tutorials/rust_in_riot/
+//! [this crate's README file]: https://github.com/RIOT-OS/RIOT/blob/master/rust/riot-wrappers/README.md
 
 #![no_std]
 // Primarily for documentation, see feature docs

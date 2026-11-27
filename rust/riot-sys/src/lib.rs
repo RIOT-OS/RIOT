@@ -10,7 +10,7 @@
 //! This also contains installation instructions / dependencies.
 //!
 //! [riot-wrappers]: https://crates.io/crates/riot-wrappers
-//! [RIOT's documentation on using it with Rust]: https://doc.riot-os.org/using-rust.html
+//! [RIOT's documentation on using it with Rust]: https://doc.riot-os.org/rust_tutorials/rust_in_riot/
 //!
 //! ## RIOT integration
 //!
@@ -22,7 +22,7 @@
 //!
 //! All the relevant information -- including the location of the actually used
 //! RIOT header files and flags influencing the ABI -- is conveyed to `riot-sys` by passing on the
-//! compiler and the CFLAGS. This can either be done by passing in the path to a "compile commads"
+//! compiler and the CFLAGS. This can either be done by passing in the path to a "compile commands"
 //! file through the `RIOT_COMPILE_COMMANDS` environment variable (accompanied by a
 //! `RIOT_USEMODULES`, as that part of `CFLAGS` is missing from the compile commands), or
 //! alternatively by passing in the C compiler as `RIOT_CC` and the CFLAGS (both their
@@ -51,17 +51,14 @@
 //!
 //! ## Versioning
 //!
-//! `riot-sys` is versioned using SemVer,
-//! and efforts are made to not make breaking changes even while in the 0.x phase.
-//! Note that as it passes on RIOT internals,
-//! any of the SemVer guarantees only hold when built on the *same* RIOT --
-//! once the underlying C code is changed, all bets are off.
-//! Users of `riot-rs` can introspect the `DEP_RIOT_SYS_...` variables
-//! that are available to crates that set `links = "riot-sys"`
-//! to affect the symbols those crates use.
-//! Typical variables to inspect are `DEP_RIOT_SYS_BINDGEN_OUTPUT_FILE`
-//! (to determine whether a symbol is imported in the first place, eg. when RIOT renames something)
-//! and `DEP_RIOT_SYS_CFLAGS` which includes the enabled modules.
+//! As `riot-sys` re-exports components of RIOT that may, as part of its own development, change,
+//! and also changes depending on the precise configuration of RIOT, the version number of
+//! `riot-sys` has relatively little meaning -- it is developed in-tree with RIOT, and it is only
+//! expected to work with the very version of RIOT it is shipped with.
+//!
+//! Nonetheless, it is versioned using SemVer, with the aspiration that unless changes to the RIOT
+//! configuration or C API happen, crates accessing riot-sys can rely on it to only break when its
+//! version number cheanges in a breaking way.
 //!
 //! ### Markers
 //!
@@ -69,7 +66,7 @@
 //!
 //! Some decisions of downstream crates need to depend on whether some feature is around in
 //! RIOT. For many things that's best checked on module level, but some minor items have no
-//! module to mark the feature, and checking for versions by numers is not fine-grained enough,
+//! module to mark the feature, and checking for versions by numbers is not fine-grained enough,
 //! so it's easiest to check for concrete strings in the bindgen output.
 //!
 //! The `build.rs` of this crate contains a list of marker conditions. These lead to `MARKER_foo=1`
