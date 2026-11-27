@@ -37,6 +37,9 @@
                                  DMA_LISR_TEIF0 | DMA_LISR_HTIF0 | \
                                  DMA_LISR_TCIF0)
 #define DMA_EN                  DMA_SxCR_EN
+#define DMA_MEM2MEM             DMA_SxCR_DIR_1
+#define DMA_CIRC                DMA_SxCR_CIRC
+#define DMA_HTIE                DMA_SxCR_HTIE
 #else /* CPU_FAM_STM32F2 || CPU_FAM_STM32F4 || CPU_FAM_STM32F7 */
 #define STM32_DMA_Stream_Type   DMA_Channel_TypeDef
 #if CPU_FAM_STM32L4
@@ -52,6 +55,9 @@
 #endif /* CPU_FAM_STM32F1 || CPU_FAM_STM32F3 || CPU_FAM_STM32L1 */
 #define RCC_MASK_DMA2           RCC_AHBENR_DMA2EN
 #endif /* CPU_FAM_STM32L4 */
+#define DMA_MEM2MEM             DMA_CCR_MEM2MEM
+#define DMA_CIRC                DMA_CCR_CIRC
+#define DMA_HTIE                DMA_CCR_HTIE
 #define PERIPH_ADDR             CPAR
 #define MEM_ADDR                CMAR
 #define NDTR_REG                CNDTR
@@ -88,7 +94,8 @@
 struct dma_ctx {
     STM32_DMA_Stream_Type *stream;
     mutex_t conf_lock;
-    mutex_t sync_lock;
+    dma_cb_t cb;
+    void *ctx;
     uint16_t len;
 };
 
@@ -320,13 +327,16 @@ void dma_init(void)
 {
     for (unsigned i = 0; i < DMA_NUMOF; i++) {
         mutex_init(&dma_ctx[i].conf_lock);
-        mutex_init(&dma_ctx[i].sync_lock);
-        mutex_lock(&dma_ctx[i].sync_lock);
         int stream_n = dma_config[i].stream;
         dma_poweron(stream_n);
         dma_isr_enable(stream_n);
         dma_ctx[i].stream = dma_stream(stream_n);
     }
+}
+
+static void _unlock(void *arg)
+{
+    mutex_unlock(arg);
 }
 
 int dma_transfer(dma_t dma, int chan, const volatile void *src, volatile void *dst, size_t len,
@@ -336,9 +346,13 @@ int dma_transfer(dma_t dma, int chan, const volatile void *src, volatile void *d
     if (ret != 0) {
         return ret;
     }
+
+    mutex_t lock = MUTEX_INIT_LOCKED;
+    dma_set_cb(dma, _unlock, &lock);
     dma_start(dma);
-    dma_wait(dma);
+    mutex_lock(&lock);
     dma_stop(dma);
+    dma_set_cb(dma, NULL, NULL);
 
     return len;
 }
@@ -370,7 +384,16 @@ void dma_release(dma_t dma)
     /* unblock STOP mode */
     pm_unblock(STM32_PM_STOP);
 #endif
+    dma_set_cb(dma, NULL, NULL);
     mutex_unlock(&dma_ctx[dma].conf_lock);
+}
+
+void dma_set_cb(dma_t dma, dma_cb_t cb, void *ctx)
+{
+    assert(dma < DMA_NUMOF);
+
+    dma_ctx[dma].cb = cb;
+    dma_ctx[dma].ctx = ctx;
 }
 
 void dma_setup(dma_t dma, int chan, void *periph_addr, dma_mode_t mode,
@@ -617,16 +640,49 @@ void dma_stop(dma_t dma)
     stream->CONTROL_REG &= ~(uint32_t)DMA_EN;
 }
 
-void dma_wait(dma_t dma)
+void dma_enable_loop(dma_t dma)
 {
-    mutex_lock(&dma_ctx[dma].sync_lock);
+    assert(dma < DMA_NUMOF);
+
+    STM32_DMA_Stream_Type *stream = dma_ctx[dma].stream;
+
+    /* DMA stream needs to be disabled to configure */
+    assert(!(stream->CONTROL_REG & DMA_EN));
+
+    /* Circular mode must not be used in memory-to-memory mode */
+    assert(!(stream->CONTROL_REG & DMA_MEM2MEM));
+
+    stream->CONTROL_REG |= (uint32_t)(DMA_CIRC | DMA_HTIE);
+}
+
+void dma_disable_loop(dma_t dma)
+{
+    assert(dma < DMA_NUMOF);
+
+    STM32_DMA_Stream_Type *stream = dma_ctx[dma].stream;
+
+    /* DMA stream needs to be disabled to configure */
+    assert(!(stream->CONTROL_REG & DMA_EN));
+
+    stream->CONTROL_REG &= ~(uint32_t)(DMA_CIRC | DMA_HTIE);
+}
+
+uint16_t dma_get_remaining(dma_t dma)
+{
+    assert(dma < DMA_NUMOF);
+
+    STM32_DMA_Stream_Type *stream = dma_ctx[dma].stream;
+
+    return (uint16_t)stream->NDTR_REG;
 }
 
 void dma_isr_handler(dma_t dma)
 {
     dma_clear_all_flags(dma);
 
-    mutex_unlock(&dma_ctx[dma].sync_lock);
+    if (dma_ctx[dma].cb) {
+        dma_ctx[dma].cb(dma_ctx[dma].ctx);
+    }
 
     cortexm_isr_end();
 }
@@ -739,7 +795,9 @@ static void shared_isr(uint8_t *streams, size_t nb)
         dma_t dma = streams[i];
         if (dma_is_isr(dma)) {
             dma_clear_all_flags(dma);
-            mutex_unlock(&dma_ctx[dma].sync_lock);
+            if (dma_ctx[dma].cb) {
+                dma_ctx[dma].cb(dma_ctx[dma].ctx);
+            }
         }
     }
 

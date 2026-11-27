@@ -73,6 +73,43 @@ extern "C" {
 #define LSM6DSXX_PARAM_ADDR  (0x6A)
 /** @} */
 
+/**
+ * @name    PDM microphone configuration
+ *
+ * The board has two MP34DT01-M PDM microphones on one clock and data line.
+ * @{
+ */
+/**
+ * @brief   GPIO pin for the data line
+ */
+#ifndef PDM_DIN_PIN
+#  define PDM_DIN_PIN GPIO_PIN(PORT_E, 7)
+#endif
+
+/**
+ * @brief   GPIO pin for the clock
+ */
+#ifndef PDM_CLK_PIN
+#  define PDM_CLK_PIN GPIO_PIN(PORT_E, 9)
+#endif
+
+/**
+ * @brief   Minimum clock frequency of the MP34DT01-M in normal mode
+ * @see     https://www.st.com/resource/en/datasheet/mp34dt01-m.pdf
+ */
+#ifndef PDM_MIC_CLK_MIN_HZ
+#  define PDM_MIC_CLK_MIN_HZ 1000000
+#endif
+
+/**
+ * @brief   Maximum clock frequency of the MP34DT01-M in normal mode
+ * @see     https://www.st.com/resource/en/datasheet/mp34dt01-m.pdf
+ */
+#ifndef PDM_MIC_CLK_MAX_HZ
+#  define PDM_MIC_CLK_MAX_HZ 3250000
+#endif
+/** @} */
+
 #ifdef __cplusplus
 }
 #endif

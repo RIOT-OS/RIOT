@@ -98,4 +98,9 @@ ifneq (,$(filter periph_sdmmc,$(FEATURES_USED)))
   FEATURES_OPTIONAL += periph_dma
 endif
 
+# periph_pdm uses DMA to read the samples from the DFSDM
+ifneq (,$(filter periph_pdm,$(FEATURES_USED)))
+  FEATURES_REQUIRED += periph_dma
+endif
+
 include $(RIOTCPU)/cortexm_common/Makefile.dep
