@@ -111,8 +111,10 @@ class TestSelf(riotctrl_shell_tests.testcase_base.TestBase):
             self.shell.payload_remote("[2001:::db8:1]:5683")
         assert "error: unable to parse address-port-pair" in str(ctx.exception)
         res = self.shell.payload_remote("[2001:db8::1]:5683")
-        assert "success: set payload remote to [2001:db8::1%5]:5683" in res
+        assert "success: set payload remote to [2001:db8::1]:5683" in res
         res = self.shell.payload_remote("[2001:db8::1]:52213")
+        assert "success: set payload remote to [2001:db8::1]:52213" in res
+        res = self.shell.payload_remote("[2001:db8::1%5]:52213")
         assert "success: set payload remote to [2001:db8::1%5]:52213" in res
 
     def test_trigger_receive(self):
@@ -368,7 +370,7 @@ class TestUDPServer(riotctrl_shell_tests.testcase_base.TestBase):
 
     def _test_udp_server_check_output(self, summarize=False):
         self.shell.preload_payload(b"abcdef")
-        self.shell.payload_remote("[2001:db8::1]:12345")
+        self.shell.payload_remote("[2001:db8::1%5]:12345")
 
         self.shell.trigger_receive()
         lost_perc = self.shell.udp_server_check_output()
@@ -383,7 +385,7 @@ class TestUDPServer(riotctrl_shell_tests.testcase_base.TestBase):
 
         self.shell.reset_payload()
         self.shell.preload_payload(b"0123456789")
-        self.shell.payload_remote("[2001:db8::2]:12349")
+        self.shell.payload_remote("[2001:db8::2%5]:12349")
 
         self.shell.trigger_receive(count=2)
         lost_perc = self.shell.udp_server_check_output(2)
@@ -391,12 +393,21 @@ class TestUDPServer(riotctrl_shell_tests.testcase_base.TestBase):
 
         self.shell.reset_payload()
         self.shell.preload_payload(b"xyzab")
-        self.shell.payload_remote("[2001:db8::3]:12298")
+        self.shell.payload_remote("[2001:db8::3%5]:12298")
 
         self.shell.trigger_receive(count=10, delay_us=100_000)
         lost_perc = self.shell.udp_server_check_output(10, 100_000)
         assert lost_perc == 0
 
+        self.shell.reset_payload()
+        self.shell.preload_payload(b"hello")
+        self.shell.payload_remote("[2001:db8::4%5]:12336")
+
+        self.shell.trigger_receive(count=1, delay_us=1)
+        lost_perc = self.shell.udp_server_check_output(1, 0)
+        assert lost_perc == 0
+
+        # check without zone-id
         self.shell.reset_payload()
         self.shell.preload_payload(b"hello")
         self.shell.payload_remote("[2001:db8::4]:12336")
@@ -407,7 +418,7 @@ class TestUDPServer(riotctrl_shell_tests.testcase_base.TestBase):
 
         self.shell.reset_payload()
         self.shell.preload_payload(b"let's emulate loss")
-        self.shell.payload_remote("[2001:db8::5]:12362")
+        self.shell.payload_remote("[2001:db8::5%5]:12362")
 
         # restart server for last test to at least visually check if conditions
         # for output after restart apply (e.g. counter reset); the parser itself

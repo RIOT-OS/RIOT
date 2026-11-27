@@ -192,11 +192,11 @@ static int _set_payload_remote(int argc, char **argv)
         return 1;
     }
 
+    memset(&_payload_remote, 0, sizeof(_payload_remote));
     if (sock_udp_str2ep(&_payload_remote, argv[1]) != 0) {
         puts("error: unable to parse address-port-pair");
         return 1;
     }
-    _payload_remote.netif = NETIF_ID;
 
     static char addr_str[IPV6_ADDR_MAX_STR_LEN];
     uint16_t port;

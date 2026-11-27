@@ -215,7 +215,7 @@ class UDPServer(ShellInteraction):
                 [
                     pexpect.TIMEOUT,
                     r"Packets received:\s+\d",
-                    r"Received UDP data from \[([0-9a-f:]+%.+|[0-9.]+)\]:\d+",
+                    r"Received UDP data from \[([0-9a-f:]+(%.+)?|[0-9.]+)\]:\d+",
                 ],
                 timeout=timeout,
             )
