@@ -20,7 +20,6 @@
 #include "cc2538_rf.h"
 #include "init_dev.h"
 #include "net/netdev/ieee802154_submac.h"
-#include "shell.h"
 #include "test_utils/netdev_ieee802154_minimal.h"
 
 static netdev_ieee802154_submac_t cc2538_rf;
@@ -59,11 +58,7 @@ int main(void)
         return 1;
     }
 
-    /* start the shell */
     puts("Initialization successful - starting the shell now");
-
-    char line_buf[SHELL_DEFAULT_BUFSIZE];
-    shell_run(NULL, line_buf, SHELL_DEFAULT_BUFSIZE);
-
+    /* shell starts implicitly after returning */
     return 0;
 }

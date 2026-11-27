@@ -340,14 +340,11 @@ static int cmd_test_ztimer_rmutex_lock_timeout_short_unlocked(int argc,
 SHELL_COMMAND(t4, shell_help_output, cmd_test_ztimer_rmutex_lock_timeout_short_unlocked);
 
 /**
- * @brief   main function starting shell
+ * @brief   main function
  *
  * @return 0 on success
  */
 int main(void)
 {
-    char line_buf[SHELL_DEFAULT_BUFSIZE];
-    shell_run(NULL, line_buf, SHELL_DEFAULT_BUFSIZE);
-
     return 0;
 }
