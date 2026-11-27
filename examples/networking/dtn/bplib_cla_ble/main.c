@@ -107,9 +107,9 @@ static void _config_nc(void)
 
 int main(void)
 {
-    int rv = bplib_init();
+    BPLib_Status_t rv = bplib_init();
     if (rv != 0) {
-        printf("Error Initializing bplib %i\n", rv);
+        printf("Error Initializing bplib %"PRIi32"\n", rv);
         return 1;
     }
 
@@ -117,19 +117,17 @@ int main(void)
 
     rv = bplib_cla_ble_start(0, BPLIB_EXAMPLE_ROLE_CLIENT);
     if (rv != 0) {
-        printf("BLE CLA failed to initialize, error %i\n", rv);
+        printf("BLE CLA failed to initialize, error %"PRIi32"\n", rv);
         if (rv == -EINVAL) {
             printf("Is your MAC address formatted correctly?\n");
         }
     }
 
     /* Add and start the application level I/O socket */
-    BPLib_PI_AddApplication(0);
-    BPLib_PI_StartApplication(0);
+    bplib_channel_set_state(0, BPLIB_NC_APP_STATE_STARTED);
 
     /* Let bplib know the contact started */
-    BPLib_CLA_ContactSetup(0);
-    BPLib_CLA_ContactStart(0);
+    bplib_contact_set_state(0, BPLIB_CLA_STARTED);
 
     thread_create(stack_egress, sizeof(stack_egress),
         THREAD_PRIORITY_MAIN - 1, 0, _poll_bp,
@@ -142,11 +140,9 @@ int main(void)
      * in production, since this includes some measures to push bundles not yet sent, but queued,
      * back into storage. This is not reachable here due to the shell. */
     bplib_cla_ble_stop();
-    BPLib_CLA_ContactStop(0);
-    BPLib_CLA_ContactTeardown(&bplib_instance_data.BPLibInst, 0);
+    bplib_contact_set_state(0, BPLIB_CLA_TORNDOWN);
 
-    BPLib_PI_StopApplication(0);
-    BPLib_PI_RemoveApplication(&bplib_instance_data.BPLibInst, 0);
+    bplib_channel_set_state(0, BPLIB_NC_APP_STATE_REMOVED);
 
     bplib_terminate();
 }
