@@ -5,12 +5,6 @@ RIOTBASE ?= $(CURDIR)/../../../..
 
 USEPKG += ud3tn
 
-USEMODULE += auto_init_gnrc_netif
-USEMODULE += gnrc_ipv6_default
-USEMODULE += shell
-USEMODULE += shell_cmds_default
-USEMODULE += ps
-
 # Select NODE_A, NODE_B, or NODE_C and adapt the peer addresses in main.c.
 #CFLAGS += -DNODE_A
 CFLAGS += -DISR_STACKSIZE=2048
