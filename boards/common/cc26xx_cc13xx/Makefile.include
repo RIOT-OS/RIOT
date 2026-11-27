@@ -24,21 +24,25 @@ OPENOCD_DEBUG_ADAPTER ?= xds110
 # at all...
 OPENOCD_CMD_RESET_HALT ?= -c 'halt'
 
-ifneq (,$(filter cc13x0%,$(CPU_MODEL)))
-  DEFAULT_OPENOCD_CONFIG := $(RIOTBASE)/boards/common/cc26xx_cc13xx/dist/openocd_cc13x0.cfg
-  DEFAULT_JLINK_DEVICE := CC13xx
+# CPU_MODEL can be a family name (cc26x0f128) or a chip name (cc1312r1f3):
+# the family comes from CPU, the model only tells a CC13xx from a CC26xx
+ifeq (cc26x0_cc13x0,$(CPU))
+  ifneq (,$(filter cc13%,$(CPU_MODEL)))
+    DEFAULT_OPENOCD_CONFIG := $(RIOTBASE)/boards/common/cc26xx_cc13xx/dist/openocd_cc13x0.cfg
+    DEFAULT_JLINK_DEVICE := CC13xx
+  else ifneq (,$(filter cc26%,$(CPU_MODEL)))
+    DEFAULT_OPENOCD_CONFIG := $(RIOTBASE)/boards/common/cc26xx_cc13xx/dist/openocd_cc26x0.cfg
+    DEFAULT_JLINK_DEVICE := CC26xx
+  endif
 endif
-ifneq (,$(filter cc13x2%,$(CPU_MODEL)))
-  DEFAULT_OPENOCD_CONFIG := $(RIOTBASE)/boards/common/cc26xx_cc13xx/dist/openocd_cc13x2.cfg
-  DEFAULT_JLINK_DEVICE := CC13xx
-endif
-ifneq (,$(filter cc26x0%,$(CPU_MODEL)))
-  DEFAULT_OPENOCD_CONFIG := $(RIOTBASE)/boards/common/cc26xx_cc13xx/dist/openocd_cc26x0.cfg
-  DEFAULT_JLINK_DEVICE := CC26xx
-endif
-ifneq (,$(filter cc26x2%,$(CPU_MODEL)))
-  DEFAULT_OPENOCD_CONFIG := $(RIOTBASE)/boards/common/cc26xx_cc13xx/dist/openocd_cc26x2.cfg
-  DEFAULT_JLINK_DEVICE := CC26xx
+ifeq (cc26x2_cc13x2,$(CPU))
+  ifneq (,$(filter cc13%,$(CPU_MODEL)))
+    DEFAULT_OPENOCD_CONFIG := $(RIOTBASE)/boards/common/cc26xx_cc13xx/dist/openocd_cc13x2.cfg
+    DEFAULT_JLINK_DEVICE := CC13xx
+  else ifneq (,$(filter cc26%,$(CPU_MODEL)))
+    DEFAULT_OPENOCD_CONFIG := $(RIOTBASE)/boards/common/cc26xx_cc13xx/dist/openocd_cc26x2.cfg
+    DEFAULT_JLINK_DEVICE := CC26xx
+  endif
 endif
 
 # if no openocd specific configuration file, check for default locations:
