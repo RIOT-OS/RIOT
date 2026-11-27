@@ -439,32 +439,6 @@ void unicoap_print_resource(const unicoap_resource_t* resource);
  * @{
  */
 /**
- * @brief Builds a string in Constrained RESTful Environments (CoRE) Link Format
- *
- * You use this method to build a stringified list of resources registered with `unicoap`.
- * To register a resource, use @ref unicoap_listener_register or @ref net_unicoap_server_resource_declarations.
- * The string generated contains only resources available using the specified transport. When
- * handling a request destined for `/.well-known/core`, you should call this method with the
- * transport you received the request over.
- *
- * **Example**:
- * ```
- * </sensors/temp>;rt="temperature-c",
- * </sensors/light>;rt="light-lux"
- * ```
- *
- * @see [Constrained RESTful Environments (CoRE) Link Format](https://datatracker.ietf.org/doc/html/rfc6690)
- *
- * @param[in,out] buffer The buffer that will contain the built string in CoRE Link Format
- * @param capacity The capacity @p buffer in bytes
- * @param proto The `unicoap` protocol number of the transport
- *
- * @returns Length of encoded resource list in bytes or negative integer on error
- */
-ssize_t unicoap_resource_core_link_format_build(char* buffer, size_t capacity,
-                                                unicoap_proto_t proto);
-
-/**
  * @brief   Context information required to write a resource link
  */
 typedef struct {
