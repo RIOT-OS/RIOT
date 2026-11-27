@@ -711,7 +711,7 @@ static ieee802154_submac_fsm_return_t _fsm_state_wait_for_ack(ieee802154_submac_
     case IEEE802154_FSM_EV_RX_DONE:
         assert(!ieee802154_radio_has_irq_ack_timeout(&submac->dev));
         if ((ieee802154_radio_read(&submac->dev, ack, sizeof(ack), NULL) == (int)sizeof(ack)) &&
-            (ack[0] & IEEE802154_FCF_TYPE_MASK) == IEEE802154_FCF_TYPE_ACK) {
+             ieee802154_get_frame_type(ack) == IEEE802154_FCF_TYPE_ACK) {
             ieee802154_submac_ack_timer_cancel(submac);
             ieee802154_tx_info_t tx_info;
             tx_info.retrans = _get_retrans(submac);
@@ -834,7 +834,7 @@ int ieee802154_send(ieee802154_submac_t *submac, const iolist_t *iolist)
     submac->psdu = iolist;
     _set_csma_retries_nb(submac, 0);
     _set_csma_backoff_mask(submac, (1 << _get_csma_be_min(submac)) - 1);
-    submac->tx_ftype = buf[0] & IEEE802154_FCF_TYPE_MASK;
+    submac->tx_ftype = ieee802154_get_frame_type(buf);
 
     int res = ieee802154_submac_process_ev(submac, IEEE802154_FSM_EV_REQUEST_TX);
 

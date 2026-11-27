@@ -282,7 +282,7 @@ static void submac_rx_done(ieee802154_submac_t *submac)
     }
     dst_len = ieee802154_get_dst(buffer, dst, &dst_pan);
     src_len = ieee802154_get_src(buffer, src, &src_pan);
-    switch (buffer[0] & IEEE802154_FCF_TYPE_MASK) {
+    switch (ieee802154_get_frame_type(buffer)) {
     case IEEE802154_FCF_TYPE_BEACON:
         puts("BEACON");
         break;
@@ -334,7 +334,7 @@ static void submac_rx_done(ieee802154_submac_t *submac)
         puts("0");
     }
     printf("Version: ");
-    printf("%u, ", (unsigned)((buffer[1] & IEEE802154_FCF_VERS_MASK) >> 4));
+    printf("%u, ", (unsigned)(ieee802154_get_frame_version(buffer) >> 4));
     printf("Seq.: %u\n", (unsigned)ieee802154_get_seq(buffer));
     od_hex_dump(buffer + mhr_len, data_len - mhr_len, 0);
     printf("txt (%" PRIuSIZE " chars): ", data_len - mhr_len);
