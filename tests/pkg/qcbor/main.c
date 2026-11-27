@@ -114,7 +114,7 @@ static void test_qcbor_decode(void)
     TEST_ASSERT_EQUAL_INT(QCBOR_TYPE_TRUE, cbor_item.uDataType);
     uint64_t val;
     /* trigger the use of `feclearexcept` and `fetestexcept` */
-    QCBORDecode_GetUInt64ConvertAll(&decode_context, QCBOR_TYPE_FLOAT, &val);
+    QCBORDecode_GetUInt64ConvertAll(&decode_context, QCBOR_CONVERT_TYPE_FLOAT, &val);
     TEST_ASSERT_EQUAL_INT(2, val);
     error = QCBORDecode_Finish(&decode_context);
     TEST_ASSERT_EQUAL_INT(QCBOR_SUCCESS, error);

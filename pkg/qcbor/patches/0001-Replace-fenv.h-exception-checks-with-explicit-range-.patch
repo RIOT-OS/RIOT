@@ -1,0 +1,133 @@
+From 7765cda28b6fa553166d644a314b426725581ff2 Mon Sep 17 00:00:00 2001
+From: crasbe <crasbe@gmail.com>
+Date: Wed, 25 Nov 2026 19:02:04 +0100
+Subject: [PATCH] Replace fenv.h exception checks with explicit range checks
+
+The float to integer conversions used feclearexcept() and fetestexcept()
+to detect out-of-range values. This is not portable:
+
+- Some C libraries do not implement these functions (e.g. newlib for
+  some ESP variants) or only define the FE_* macros if the target has a
+  hardware FPU (e.g. picolibc, newlib for RISC-V).
+- On targets using software floating-point emulation, the exception
+  flags are usually never set, so out-of-range values were silently
+  converted to wrong results.
+
+Replace them by explicit range checks, which work the same on all
+platforms. While at it:
+
+- Use llroundf() instead of lroundf() for float to int64_t, as long is
+  only 32 bit wide on many platforms, so values >= 2^31 failed.
+- Fix the upper bound check for float to uint64_t: (float)(UINT64_MAX -
+  0x7ff) rounds up to 2^64, so 2^64 itself passed the check and was
+  converted to uint64_t, which is undefined behavior.
+
+This patch can be removed once
+https://github.com/laurencelundblade/QCBOR/pull/462 is merged.
+
+Assisted-By: Claude Code Opus 5.5
+---
+ src/qcbor_decode.c | 50 +++++++++++++++++++---------------------------
+ 1 file changed, 20 insertions(+), 30 deletions(-)
+
+diff --git a/src/qcbor_decode.c b/src/qcbor_decode.c
+index d8af20c..2ff7cf4 100644
+--- a/src/qcbor_decode.c
++++ b/src/qcbor_decode.c
+@@ -41,7 +41,6 @@ IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ #include <math.h> /* For isnan(), llround(), llroudf(), round(), roundf(),
+                    * pow(), exp2()
+                    */
+-#include <fenv.h> /* feclearexcept(), fetestexcept() */
+ 
+ #endif /* QCBOR_DISABLE_FLOAT_HW_USE */
+ 
+@@ -5472,17 +5471,16 @@ QCBOR_Private_ConvertInt64(const QCBORItem *pItem,
+          /* https://pubs.opengroup.org/onlinepubs/009695399/functions/llround.html
+           * http://www.cplusplus.com/reference/cmath/llround/
+           */
+-         /* Not interested in FE_INEXACT */
+-         feclearexcept(FE_INVALID|FE_OVERFLOW|FE_UNDERFLOW|FE_DIVBYZERO);
+-         *pnValue = lroundf(pItem->val.fnum);
+-         if(fetestexcept(FE_INVALID|FE_OVERFLOW|FE_UNDERFLOW|FE_DIVBYZERO)) {
+-            /* llround() shouldn't result in divide by zero, but catch
+-             * it here in case it unexpectedly does.  Don't try to
+-             * distinguish between the various exceptions because it seems
+-             * they vary by CPU, compiler and OS.
+-             */
++         /* Check the range explicitly instead of relying on the
++          * floating-point exception flags from <fenv.h>. These are not
++          * available or not functional on all platforms, e.g. on targets
++          * using software floating-point emulation. -0x1p63f and 0x1p63f
++          * (-2^63 and 2^63) are exactly representable as float.
++          */
++         if(!(pItem->val.fnum >= -0x1p63f && pItem->val.fnum < 0x1p63f)) {
+             return QCBOR_ERR_FLOAT_EXCEPTION;
+          }
++         *pnValue = llroundf(pItem->val.fnum);
+          break;
+ 
+       case QCBOR_TYPE_DOUBLE:
+@@ -5500,17 +5498,17 @@ QCBOR_Private_ConvertInt64(const QCBORItem *pItem,
+          /* https://pubs.opengroup.org/onlinepubs/009695399/functions/llround.html
+           * http://www.cplusplus.com/reference/cmath/llround/
+           */
+-         /* Not interested in FE_INEXACT */
+-         feclearexcept(FE_INVALID|FE_OVERFLOW|FE_UNDERFLOW|FE_DIVBYZERO);
+-         *pnValue = llround(pItem->val.dfnum);
+-         if(fetestexcept(FE_INVALID|FE_OVERFLOW|FE_UNDERFLOW|FE_DIVBYZERO)) {
+-            /* llround() shouldn't result in divide by zero, but catch
+-             * it here in case it unexpectedly does.  Don't try to
+-             * distinguish between the various exceptions because it seems
+-             * they vary by CPU, compiler and OS.
+-             */
++         /* Check the range explicitly instead of relying on the
++          * floating-point exception flags from <fenv.h>. These are not
++          * available or not functional on all platforms, e.g. on targets
++          * using software floating-point emulation. -0x1p63 and 0x1p63
++          * (-2^63 and 2^63) are exactly representable as double. There is
++          * no double in [2^63 - 0.5, 2^63), so llround() can't overflow.
++          */
++         if(!(pItem->val.dfnum >= -0x1p63 && pItem->val.dfnum < 0x1p63)) {
+             return QCBOR_ERR_FLOAT_EXCEPTION;
+          }
++         *pnValue = llround(pItem->val.dfnum);
+          break;
+ 
+ #else /* ! QCBOR_DISABLE_FLOAT_HW_USE */
+@@ -5883,7 +5881,6 @@ QCBOR_Private_ConvertUInt64(const QCBORItem *pItem,
+             // Can't use llround here because it will not convert values
+             // greater than INT64_MAX and less than UINT64_MAX that
+             // need to be converted so it is more complicated.
+-            feclearexcept(FE_INVALID|FE_OVERFLOW|FE_UNDERFLOW|FE_DIVBYZERO);
+             if(pItem->uDataType == QCBOR_TYPE_DOUBLE) {
+                if(isnan(pItem->val.dfnum)) {
+                   return QCBOR_ERR_FLOAT_EXCEPTION;
+@@ -5905,21 +5902,14 @@ QCBOR_Private_ConvertUInt64(const QCBORItem *pItem,
+                   return QCBOR_ERR_NUMBER_SIGN_CONVERSION;
+                } else {
+                   float fRounded = roundf(pItem->val.fnum);
+-                  // See discussion in DecodeDateEpoch() for
+-                  // explanation of - 0x7ff
+-                  if(fRounded > (float)(UINT64_MAX- 0x7ff)) {
++                  // (float)(UINT64_MAX - 0x7ff) rounds up to 2^64, which
++                  // is out of range, so compare against 2^64 directly.
++                  if(fRounded >= 0x1p64f) {
+                      return QCBOR_ERR_CONVERSION_UNDER_OVER_FLOW;
+                   }
+                   *puValue = (uint64_t)fRounded;
+                }
+             }
+-            if(fetestexcept(FE_INVALID|FE_OVERFLOW|FE_UNDERFLOW|FE_DIVBYZERO)) {
+-               // round() and roundf() shouldn't result in exceptions here, but
+-               // catch them to be robust and thorough. Don't try to
+-               // distinguish between the various exceptions because it seems
+-               // they vary by CPU, compiler and OS.
+-               return QCBOR_ERR_FLOAT_EXCEPTION;
+-            }
+ 
+          } else {
+             return QCBOR_ERR_UNEXPECTED_TYPE;
+-- 
+2.43.0
+
