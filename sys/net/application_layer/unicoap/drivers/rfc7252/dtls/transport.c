@@ -303,19 +303,22 @@ static int _add_socket(event_queue_t* queue, sock_dtls_t* socket, sock_udp_t* ba
 
 int unicoap_init_dtls(event_queue_t* queue)
 {
-    sock_udp_ep_t local = {
-    /* FIXME: Once the problems with IPv4/IPv6 dual stack use in RIOT are fixed, adapt these lines
-         *        (and e.g. use AF_UNSPEC) */
-#if defined(SOCK_HAS_IPV6)
-        .family = AF_INET6,
-#elif defined(SOCK_HAS_IPV4)
-        .family = AF_INET,
-#endif
-        .netif = SOCK_ADDR_ANY_NETIF,
-        .port = CONFIG_UNICOAP_DTLS_PORT
-    };
+    if (IS_USED(MODULE_UNICOAP_DRIVER_DTLS_INIT_DEFAULT) && CONFIG_UNICOAP_DTLS_PORT > 0) {
+        sock_udp_ep_t local = {
+        /* FIXME: Once the problems with IPv4/IPv6 dual stack use in RIOT are fixed, adapt these lines
+            *        (and e.g. use AF_UNSPEC) */
+    #if defined(SOCK_HAS_IPV6)
+            .family = AF_INET6,
+    #elif defined(SOCK_HAS_IPV4)
+            .family = AF_INET,
+    #endif
+            .netif = SOCK_ADDR_ANY_NETIF,
+            .port = CONFIG_UNICOAP_DTLS_PORT
+        };
 
-    return _add_socket(queue, &_dtls_socket, &_dtls_base_socket, &local);
+        return _add_socket(queue, &_dtls_socket, &_dtls_base_socket, &local);
+    }
+    return 0;
 }
 
 sock_dtls_t* unicoap_transport_dtls_get_socket(void)
