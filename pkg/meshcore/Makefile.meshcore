@@ -1,0 +1,12 @@
+MODULE = meshcore
+
+# armstubs.cpp only provides stubs of the C library for the Arduino cores
+SRCXX = Dispatcher.cpp Identity.cpp Mesh.cpp Packet.cpp Utils.cpp
+
+# The MeshCore sources are not built with the warnings enabled by RIOT
+CXXEXFLAGS += -Wno-unused-parameter
+CXXEXFLAGS += -Wno-unused-variable
+CXXEXFLAGS += -Wno-sign-compare
+CXXEXFLAGS += -Wno-reorder
+
+include $(RIOTBASE)/Makefile.base

@@ -23,6 +23,7 @@
 #include "macros/units.h"
 #include "net/lora.h"
 #include "periph/spi.h"
+#include "timex.h"
 
 #include "sx126x.h"
 #include "sx126x_regs.h"
@@ -266,22 +267,61 @@ void sx126x_setup(sx126x_t *dev, const sx126x_params_t *params, uint8_t index)
     netdev_register(&dev->netdev, NETDEV_SX126X, index);
 }
 
-static const uint16_t _bw_khz[3] = {
-    [LORA_BW_125_KHZ] = 125,
-    [LORA_BW_250_KHZ] = 250,
-    [LORA_BW_500_KHZ] = 500,
+/* Codes of the LoRa bandwidths, indexed by LORA_BW_*: the 2.4 GHz bandwidths,
+ * from LORA_BW_200_KHZ to LORA_BW_1600_KHZ, are not supported by the SX126x */
+static const sx126x_lora_bw_t _bandwidths[] = {
+    [LORA_BW_125_KHZ]   = SX126X_LORA_BW_125,
+    [LORA_BW_250_KHZ]   = SX126X_LORA_BW_250,
+    [LORA_BW_500_KHZ]   = SX126X_LORA_BW_500,
+    [LORA_BW_7_8_KHZ]   = SX126X_LORA_BW_007,
+    [LORA_BW_10_4_KHZ]  = SX126X_LORA_BW_010,
+    [LORA_BW_15_6_KHZ]  = SX126X_LORA_BW_015,
+    [LORA_BW_20_8_KHZ]  = SX126X_LORA_BW_020,
+    [LORA_BW_31_25_KHZ] = SX126X_LORA_BW_031,
+    [LORA_BW_41_7_KHZ]  = SX126X_LORA_BW_041,
+    [LORA_BW_62_5_KHZ]  = SX126X_LORA_BW_062,
 };
+
+static bool _is_2g4_bandwidth(uint8_t bandwidth)
+{
+    return (bandwidth >= LORA_BW_200_KHZ) && (bandwidth <= LORA_BW_1600_KHZ);
+}
+
+bool sx126x_bandwidth_is_supported(const sx126x_t *dev, uint8_t bandwidth)
+{
+    if ((bandwidth >= ARRAY_SIZE(_bandwidths)) || _is_2g4_bandwidth(bandwidth)) {
+        return false;
+    }
+    /* The LLCC68 only supports the bandwidths of 125, 250 and 500 kHz */
+    if (sx126x_is_llcc68(dev)) {
+        return (bandwidth == LORA_BW_125_KHZ) || (bandwidth == LORA_BW_250_KHZ) ||
+               (bandwidth == LORA_BW_500_KHZ);
+    }
+    return true;
+}
+
+static uint32_t _bandwidth_hz(const sx126x_t *dev)
+{
+    return lora_bw_to_hz(sx126x_get_bandwidth(dev));
+}
 
 static uint8_t _compute_ldro(sx126x_t *dev)
 {
-    uint32_t symbol_len =
-        (uint32_t)(1 << dev->mod_params.sf) / _bw_khz[dev->mod_params.bw - SX126X_LORA_BW_125];
+    /* The low data rate optimization is required when a symbol lasts at
+     * least 16 ms */
+    uint32_t symbol_len_ms = ((1UL << dev->mod_params.sf) * MS_PER_SEC) / _bandwidth_hz(dev);
 
-    if (symbol_len >= 16) {
+    if (symbol_len_ms >= 16) {
         return 0x01;
     }
 
     return 0x00;
+}
+
+int sx126x_symbol_to_msec(sx126x_t *dev, uint16_t symbols)
+{
+    /* Refer section 6.1.4 LoRa Time-on-Air in SX1268 datasheet */
+    return ((uint64_t)symbols * (1UL << dev->mod_params.sf) * MS_PER_SEC) / _bandwidth_hz(dev);
 }
 
 static void sx126x_init_default_config(sx126x_t *dev)
@@ -294,7 +334,8 @@ static void sx126x_init_default_config(sx126x_t *dev)
     sx126x_set_lora_sync_word(dev, CONFIG_SX126X_DEFAULT_SYNC_WORD);
 #endif
 
-    dev->mod_params.bw = (sx126x_lora_bw_t)(CONFIG_LORA_BW_DEFAULT + SX126X_LORA_BW_125);
+    assert(sx126x_bandwidth_is_supported(dev, CONFIG_LORA_BW_DEFAULT));
+    dev->mod_params.bw = _bandwidths[CONFIG_LORA_BW_DEFAULT];
     dev->mod_params.sf = (sx126x_lora_sf_t)CONFIG_LORA_SF_DEFAULT;
     dev->mod_params.cr = (sx126x_lora_cr_t)CONFIG_LORA_CR_DEFAULT;
     dev->mod_params.ldro = _compute_ldro(dev);
@@ -543,13 +584,19 @@ void sx126x_set_channel(sx126x_t *dev, uint32_t freq)
 uint8_t sx126x_get_bandwidth(const sx126x_t *dev)
 {
     DEBUG("[sx126x]: sx126x_get_bandwidth \n");
-    return dev->mod_params.bw - SX126X_LORA_BW_125;
+    for (uint8_t bw = 0; bw < ARRAY_SIZE(_bandwidths); bw++) {
+        if (!_is_2g4_bandwidth(bw) && (_bandwidths[bw] == dev->mod_params.bw)) {
+            return bw;
+        }
+    }
+    return LORA_BW_125_KHZ;
 }
 
 void sx126x_set_bandwidth(sx126x_t *dev, uint8_t bandwidth)
 {
     DEBUG("[sx126x]: sx126x_set_bandwidth %02x\n", bandwidth);
-    dev->mod_params.bw = bandwidth + SX126X_LORA_BW_125;
+    assert(sx126x_bandwidth_is_supported(dev, bandwidth));
+    dev->mod_params.bw = _bandwidths[bandwidth];
     dev->mod_params.ldro = _compute_ldro(dev);
     sx126x_set_lora_mod_params(dev, &dev->mod_params);
 }

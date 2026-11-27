@@ -1,0 +1,24 @@
+FEATURES_REQUIRED += cpp
+
+USEMODULE += meshcore_contrib
+USEMODULE += meshcore_ed25519
+USEMODULE += meshcore_helpers
+USEMODULE += cpp_new_delete
+
+# Cryptography
+USEMODULE += crypto_aes_128
+USEMODULE += hashes
+USEPKG += monocypher
+USEMODULE += monocypher_optional
+
+FEATURES_OPTIONAL += periph_hwrng
+
+USEMODULE += core_thread_flags
+USEMODULE += random
+USEMODULE += ztimer_msec
+USEMODULE += ztimer_sec
+
+# The node stores its settings in the EEPROM, when the board has one
+ifneq (,$(filter meshcore_node,$(USEMODULE)))
+  FEATURES_OPTIONAL += periph_eeprom
+endif

@@ -1,0 +1,12 @@
+MODULE = meshcore_helpers
+
+SRCXX = AdvertDataHelpers.cpp StaticPoolPacketManager.cpp
+
+# The MeshCore sources are not built with the warnings enabled by RIOT
+CXXEXFLAGS += -Wno-unused-parameter
+CXXEXFLAGS += -Wno-unused-variable
+CXXEXFLAGS += -Wno-sign-compare
+CXXEXFLAGS += -Wno-reorder
+CXXEXFLAGS += -Wno-format
+
+include $(RIOTBASE)/Makefile.base

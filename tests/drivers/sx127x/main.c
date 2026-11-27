@@ -23,6 +23,7 @@
 #include <string.h>
 #include <inttypes.h>
 
+#include "container.h"
 #include "thread.h"
 #include "shell.h"
 
@@ -43,6 +44,26 @@
 
 #define MSG_TYPE_ISR            (0x3456)
 
+/* Bandwidths that can be set with the shell, in kHz: only the SX1276
+ * supports 62.5 kHz */
+#ifdef MODULE_SX1276
+#  define SX127X_BANDWIDTHS     "62.5, 125, 250, 500"
+#else
+#  define SX127X_BANDWIDTHS     "125, 250, 500"
+#endif
+
+static const struct {
+    const char *name;
+    uint8_t bw;
+} _bandwidths[] = {
+#ifdef MODULE_SX1276
+    { "62.5", LORA_BW_62_5_KHZ },
+#endif
+    { "125", LORA_BW_125_KHZ },
+    { "250", LORA_BW_250_KHZ },
+    { "500", LORA_BW_500_KHZ },
+};
+
 static char stack[SX127X_STACKSIZE];
 static kernel_pid_t _recv_pid;
 
@@ -54,37 +75,27 @@ int lora_setup_cmd(int argc, char **argv)
 
     if (argc < 4) {
         puts("usage: setup "
-             "<bandwidth (125, 250, 500)> "
+             "<bandwidth (" SX127X_BANDWIDTHS ")> "
              "<spreading factor (7..12)> "
              "<code rate (5..8)>");
         return -1;
     }
 
     /* Check bandwidth value */
-    int bw = atoi(argv[1]);
-    uint8_t lora_bw;
+    unsigned idx;
 
-    switch (bw) {
-    case 125:
-        puts("setup: setting 125KHz bandwidth");
-        lora_bw = LORA_BW_125_KHZ;
-        break;
-
-    case 250:
-        puts("setup: setting 250KHz bandwidth");
-        lora_bw = LORA_BW_250_KHZ;
-        break;
-
-    case 500:
-        puts("setup: setting 500KHz bandwidth");
-        lora_bw = LORA_BW_500_KHZ;
-        break;
-
-    default:
+    for (idx = 0; idx < ARRAY_SIZE(_bandwidths); idx++) {
+        if (strcmp(argv[1], _bandwidths[idx].name) == 0) {
+            break;
+        }
+    }
+    if (idx == ARRAY_SIZE(_bandwidths)) {
         puts("[Error] setup: invalid bandwidth value given, "
-             "only 125, 250 or 500 allowed.");
+             "only " SX127X_BANDWIDTHS " allowed.");
         return -1;
     }
+    printf("setup: setting %sKHz bandwidth\n", _bandwidths[idx].name);
+    uint8_t lora_bw = _bandwidths[idx].bw;
 
     /* Check spreading factor value */
     uint8_t lora_sf = atoi(argv[2]);

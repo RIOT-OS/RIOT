@@ -21,6 +21,7 @@
 #include <string.h>
 
 #include "architecture.h"
+#include "container.h"
 #include "msg.h"
 #include "thread.h"
 #include "shell.h"
@@ -37,6 +38,23 @@
 #define SX126X_STACKSIZE        (THREAD_STACKSIZE_DEFAULT)
 #define SX126X_MSG_TYPE_ISR     (0x3456)
 #define SX126X_MAX_PAYLOAD_LEN  (128U)
+
+/* Bandwidths that can be set with the shell, in kHz */
+static const struct {
+    const char *name;
+    uint8_t bw;
+} _bandwidths[] = {
+    { "7.8", LORA_BW_7_8_KHZ },
+    { "10.4", LORA_BW_10_4_KHZ },
+    { "15.6", LORA_BW_15_6_KHZ },
+    { "20.8", LORA_BW_20_8_KHZ },
+    { "31.25", LORA_BW_31_25_KHZ },
+    { "41.7", LORA_BW_41_7_KHZ },
+    { "62.5", LORA_BW_62_5_KHZ },
+    { "125", LORA_BW_125_KHZ },
+    { "250", LORA_BW_250_KHZ },
+    { "500", LORA_BW_500_KHZ },
+};
 
 static char stack[SX126X_STACKSIZE];
 static kernel_pid_t _recv_pid;
@@ -136,21 +154,7 @@ static int sx126x_get_cmd(netdev_t *netdev, int argc, char **argv)
     else if (!strcmp("bw", argv[2])) {
         uint8_t bw;
         netdev->driver->get(netdev, NETOPT_BANDWIDTH, &bw, sizeof(uint8_t));
-        uint16_t bw_val = 0;
-        switch (bw) {
-        case LORA_BW_125_KHZ:
-            bw_val = 125;
-            break;
-        case LORA_BW_250_KHZ:
-            bw_val = 250;
-            break;
-        case LORA_BW_500_KHZ:
-            bw_val = 500;
-            break;
-        default:
-            break;
-        }
-        printf("Bandwidth: %ukHz\n", bw_val);
+        printf("Bandwidth: %" PRIu32 "Hz\n", lora_bw_to_hz(bw));
     }
     else if (!strcmp("sf", argv[2])) {
         uint8_t sf;
@@ -194,18 +198,15 @@ static int sx126x_set_cmd(netdev_t *netdev, int argc, char **argv)
         ret = netdev->driver->set(netdev, NETOPT_CHANNEL_FREQUENCY, &freq, sizeof(uint32_t));
     }
     else if (!strcmp("bw", argv[2])) {
-        uint8_t bw;
-        if (!strcmp("125", argv[3])) {
-            bw = LORA_BW_125_KHZ;
+        uint8_t bw = UINT8_MAX;
+        for (unsigned i = 0; i < ARRAY_SIZE(_bandwidths); i++) {
+            if (!strcmp(_bandwidths[i].name, argv[3])) {
+                bw = _bandwidths[i].bw;
+            }
         }
-        else if (!strcmp("250", argv[3])) {
-            bw = LORA_BW_250_KHZ;
-        }
-        else if (!strcmp("500", argv[3])) {
-            bw = LORA_BW_500_KHZ;
-        }
-        else {
-            puts("invalid bandwidth, use 125, 250 or 500");
+        if (bw == UINT8_MAX) {
+            puts("invalid bandwidth, use 7.8, 10.4, 15.6, 20.8, 31.25, 41.7, 62.5, 125, "
+                 "250 or 500");
             return -1;
         }
         ret = netdev->driver->set(netdev, NETOPT_BANDWIDTH, &bw, sizeof(uint8_t));
