@@ -6,7 +6,7 @@
 #ifndef HAL_TYPES_H_INCLUDED
 #define HAL_TYPES_H_INCLUDED
 
-#include "platform/riot/simple_queue.h"
+#include "platform/posix/simple_queue.h"
 
 #include <fcntl.h>
 #include "thread.h"
