@@ -1,0 +1,7 @@
+INCLUDES += -I$(RIOTBASE)/pkg/zenoh-pico/include
+INCLUDES += -I$(PKGDIRBASE)/zenoh-pico/include
+
+# use the platform defined in zenoh_generic_platform.h
+CFLAGS += -DZENOH_GENERIC
+
+DIRS += $(RIOTBASE)/pkg/zenoh-pico/contrib
