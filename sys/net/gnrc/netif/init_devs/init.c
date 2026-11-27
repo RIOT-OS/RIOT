@@ -82,6 +82,11 @@ void gnrc_netif_init_devs(void)
         auto_init_esp_eth();
     }
 
+    if (IS_USED(MODULE_KSZ8851)) {
+        extern void auto_init_ksz8851(void);
+        auto_init_ksz8851();
+    }
+
     if (IS_USED(MODULE_ESP_IEEE802154)) {
         extern void auto_init_esp_ieee802154(void);
         auto_init_esp_ieee802154();
@@ -201,5 +206,4 @@ void gnrc_netif_init_devs(void)
         extern void auto_init_w5500(void);
         auto_init_w5500();
     }
-
 }
