@@ -123,9 +123,9 @@ static const spi_conf_t spi_config[] = {
 /** @} */
 
 /**
- *  * @name    I2C configuration
- *   * @{
- *    */
+ * @name    I2C configuration
+ * @{
+ */
 static const i2c_conf_t i2c_config[] = {
     {
         .dev = NRF_TWIM2_S,

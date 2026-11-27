@@ -274,7 +274,7 @@ typedef struct usbdev_driver {
      *
      * This initializes the USB device but must not enable the USB pull up.
      *
-     * @param[in]   dev     USB device descriptor
+     * @param[in]   usbdev  USB device descriptor
      */
     void (*init)(usbdev_t *usbdev);
 
@@ -297,7 +297,7 @@ typedef struct usbdev_driver {
     /**
      * @brief   Get an option value from a given usb device
      *
-     * @param[in]   dev     USB device descriptor
+     * @param[in]   usbdev  USB device descriptor
      * @param[in]   opt     option type
      * @param[out]  value   pointer to store the option's value in
      * @param[in]   max_len maximal amount of byte that fit into @p value
@@ -311,7 +311,7 @@ typedef struct usbdev_driver {
     /**
      * @brief   Set an option value for a given usb device
      *
-     * @param[in] dev       USB device descriptor
+     * @param[in] usbdev    USB device descriptor
      * @param[in] opt       option type
      * @param[in] value     value to set
      * @param[in] value_len the length of @p value
