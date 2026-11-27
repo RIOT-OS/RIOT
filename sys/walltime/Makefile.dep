@@ -1,6 +1,11 @@
 USEMODULE += rtc_utils
 USEMODULE += fmt
 
+ifeq (,$(filter walltime_impl_%,$(USEMODULE)))
+  # the fallback implementation is based on ztimer_msec
+  USEMODULE += ztimer_msec
+endif
+
 ifneq (,$(filter walltime_impl_ds1307,$(USEMODULE)))
   USEMODULE += ds1307
 endif

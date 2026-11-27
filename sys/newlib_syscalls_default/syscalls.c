@@ -40,17 +40,17 @@
 #include "thread.h"
 
 #if MODULE_VFS
-#include "vfs.h"
+#  include "vfs.h"
 #endif
 
-#ifdef MODULE_XTIMER
-#include <sys/time.h>
-#include "div.h"
-#include "xtimer.h"
+#if IS_USED(MODULE_LIBC_GETTIMEOFDAY)
+#  include <sys/time.h>
+#  include "time_units.h"
+#  include "walltime.h"
 #endif
 
 #ifndef NUM_HEAPS
-#define NUM_HEAPS 1
+#  define NUM_HEAPS 1
 #endif
 
 #ifdef __MSP430__
@@ -623,14 +623,37 @@ int _kill(pid_t pid, int sig)
     return -1;
 }
 
-#if (IS_USED(MODULE_LIBC_GETTIMEOFDAY))
+#if IS_USED(MODULE_LIBC_GETTIMEOFDAY)
+/**
+ * @brief   Get the current wall-clock time
+ *
+ * The time is obtained from the @ref sys_walltime module, so it is only
+ * meaningful once the wall-clock time has been set (e.g. via an RTC that
+ * keeps the time or via @ref walltime_set).
+ *
+ * @note If no RTC is present, walltime will fall back to 01.01.2020 as
+ *       the start of the Epoch.
+ *
+ * @param[in]   r       reent structure, used to set errno
+ * @param[out]  tp      the current time since the Epoch (01.01.1970)
+ * @param[in]   tzp     ignored, obsolete
+ *
+ * @retval  0 on success
+ * @retval  -1 on error, errno is set to the error code returned by
+ *          @ref walltime_get
+ */
 int _gettimeofday_r(struct _reent *r, struct timeval *restrict tp, void *restrict tzp)
 {
     (void)tzp;
-    (void)r;
-    uint64_t now = xtimer_now_usec64();
-    tp->tv_sec = div_u64_by_1000000(now);
-    tp->tv_usec = now - (tp->tv_sec * US_PER_SEC);
+    struct tm now;
+    uint16_t ms;
+    int res = walltime_get(&now, &ms);
+    if (res < 0) {
+        r->_errno = -res;
+        return -1;
+    }
+    tp->tv_sec = mktime(&now);
+    tp->tv_usec = ms * US_PER_MS;
     return 0;
 }
 #endif

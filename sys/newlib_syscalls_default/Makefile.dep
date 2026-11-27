@@ -1,0 +1,5 @@
+USEMODULE += div
+
+ifneq (,$(filter libc_gettimeofday,$(USEMODULE)))
+  USEMODULE += walltime_default
+endif

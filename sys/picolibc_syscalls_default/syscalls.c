@@ -24,11 +24,18 @@
 
 #include "irq.h"
 #include "log.h"
+#include "modules.h"
 #include "periph/pm.h"
 #include "stdio_base.h"
 
+#if IS_USED(MODULE_LIBC_GETTIMEOFDAY)
+#  include <sys/time.h>
+#  include "time_units.h"
+#  include "walltime.h"
+#endif
+
 #ifndef NUM_HEAPS
-#define NUM_HEAPS 1
+#  define NUM_HEAPS 1
 #endif
 
 /**
@@ -411,6 +418,40 @@ int close(int fd)
     return -1;
 #endif
 }
+
+#if IS_USED(MODULE_LIBC_GETTIMEOFDAY)
+/**
+ * @brief   Get the current wall-clock time
+ *
+ * The time is obtained from the @ref sys_walltime module, so it is only
+ * meaningful once the wall-clock time has been set (e.g. via an RTC that
+ * keeps the time or via @ref walltime_set).
+ *
+ * @note If no RTC is present, walltime will fall back to 01.01.2020 as
+ *       the start of the Epoch.
+ *
+ * @param[out]  tp      the current time since the Epoch (01.01.1970)
+ * @param[in]   tzp     ignored, obsolete
+ *
+ * @retval  0 on success
+ * @retval  -1 on error, errno is set to the error code returned by
+ *          @ref walltime_get
+ */
+int gettimeofday(struct timeval *restrict tp, void *restrict tzp)
+{
+    (void)tzp;
+    struct tm now;
+    uint16_t ms;
+    int res = walltime_get(&now, &ms);
+    if (res < 0) {
+        errno = -res;
+        return -1;
+    }
+    tp->tv_sec = mktime(&now);
+    tp->tv_usec = ms * US_PER_MS;
+    return 0;
+}
+#endif
 
 /**
  * Current process times (not implemented).

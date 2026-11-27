@@ -29,8 +29,8 @@ __attribute__((weak))
 int walltime_impl_get(struct tm *time, uint16_t *ms)
 {
     uint32_t now = ztimer_now(ZTIMER_MSEC);
-    now = now / 1000 + ztimer_offset;
     *ms = now % 1000;
+    now = now / 1000 + ztimer_offset;
 
     rtc_localtime(now, time);
 
