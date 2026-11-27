@@ -272,7 +272,7 @@ void add_route(const char *sink_id, const char *peer_ip, const char *peer_port,
          peer_eid, peer_cla, dest_eid,
          CONTACT_START_S, CONTACT_END_S, CONTACT_RATE_BYTES_PER_S);
 
-        // printf(config_cmd); -Wformat-security
+         printf("%s", config_cmd); /*-Wformat-security*/
 
         const size_t cmd_len = strlen(config_cmd);
         const size_t payload_len = cmd_len + 1;
