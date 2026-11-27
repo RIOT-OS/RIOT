@@ -321,7 +321,7 @@ int can_router_dispatch_rx_indic(can_pkt_t *pkt)
     filter_el_t *el;
     LL_FOREACH(table[pkt->entry.ifnum], entry) {
         el = container_of(entry, filter_el_t, entry);
-        if ((pkt->frame.can_id & el->mask) == el->can_id) {
+        if ((pkt->frame.can_id & el->mask) == (el->can_id & el->mask)) {
             DEBUG("can_router_dispatch_rx_indic: found el=%p, data=%p\n",
                   (void *)el, (void *)el->data);
             DEBUG("can_router_dispatch_rx_indic: rx_ind to pid: %"
