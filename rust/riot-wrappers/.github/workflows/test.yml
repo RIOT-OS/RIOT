@@ -1,0 +1,168 @@
+# Ideally this should be replaced with a call out to Murdock; until that is
+# practical, building representative examples.
+
+# Ad RUSTFLAGS=-Dwarnings: While this is generally discouraged (for it means
+# that new Rust versions break CI), in this case we don't get new Rust versions
+# all the time but only on riotdocker updates, and that's a good time to
+# reflect on whether the new warnings make sense or not.
+
+name: test
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  examples-and-tests:
+    runs-on: ubuntu-latest
+    container: riot/riotbuild
+    strategy:
+      matrix:
+        # This is the subset of `make -f makefiles/app_dirs.inc.mk
+        # info-applications` that is probably relevant; more is covered when
+        # riot-wrappers are updated in RIOT.
+        example: [examples/lang_support/official/rust-hello-world, examples/lang_support/official/rust-gcoap, examples/lang_support/official/rust-async, tests/rust_minimal, tests/rust_libs]
+        # native32/64 excluded until RIOT is updated to the riot-sys 0.8 branch and can thus unblock native tests from its tests
+        board: [sltb001a, samr21-xpro, stk3700, stm32f429i-disc1, usb-kw41z]
+    steps:
+    # common steps start here
+    - name: Check out riot-wrappers
+      uses: actions/checkout@v3
+    - name: Check out RIOT
+      uses: actions/checkout@v3
+      with:
+        repository: RIOT-OS/RIOT
+        path: RIOT
+    # common steps end here
+    - name: Patch .cargo/config.toml to use current checkout
+      run: |
+        set -x
+        cd RIOT
+        rm -f .cargo/config.toml
+        mkdir -p .cargo # Keep working if RIOT ever decides it doesn't need overrides any more
+        echo '[patch.crates-io]' >> .cargo/config.toml
+        echo 'riot-wrappers = { path = "../", version = "*" }' >> .cargo/config.toml
+        echo 'riot-sys = { git = "https://github.com/RIOT-OS/rust-riot-sys" }' >> .cargo/config.toml
+    - name: Pull cargo updates
+      # No sense in running this in parallel -- this will download the index
+      # and all relevant crates once, and after that, just make some notes in Cargo.lock
+      run: |
+        set -x
+        # It is important to cd in early, for otherwise the patch.crates-io
+        # will not catch on during the update
+        cd RIOT
+        for MANIF in $(find -name Cargo.toml)
+        do
+            echo "::group::Updating ${MANIF}"
+            cargo update -p riot-sys -p riot-wrappers --aggressive --manifest-path $MANIF
+            cargo fetch --manifest-path $MANIF
+            cargo tree --manifest-path $MANIF
+            echo "::endgroup::"
+        done
+
+    - name: Build the example
+      run: |
+        RUSTFLAGS=-Dwarnings make all BOARD=${{ matrix.board }} -C RIOT/${{ matrix.example }}
+
+  enumerate-wrappers-tests:
+    runs-on: ubuntu-latest
+    outputs:
+      list:  ${{ steps.enumerate.outputs.tests }}
+    steps:
+    - name: Check out riot-wrappers
+      uses: actions/checkout@v3
+    - name: List tests in riot-wrappers
+      id: enumerate
+      run: |
+        echo "tests=[$(ls -d tests/*/ -1 | sed 's/.*/\"&\"/' | tr '\n' ',' | sed 's/,$//')]" >> "${GITHUB_OUTPUT}"
+        cat "${GITHUB_OUTPUT}"
+    - name: Set job summary
+      run: |
+        # This doubles as a check to see that our JSON is right
+        echo 'Local tests were enumerated to be `${{ toJSON(fromJSON( steps.enumerate.outputs.tests )) }}`' >> $GITHUB_STEP_SUMMARY
+
+  wrappers-tests:
+    runs-on: ubuntu-latest
+    needs: enumerate-wrappers-tests
+    container: riot/riotbuild
+    strategy:
+      matrix:
+        board: [native32, native64, sltb001a, samr21-xpro, stk3700, stm32f429i-disc1, usb-kw41z]
+        testdir: ${{ fromJSON(needs.enumerate-wrappers-tests.outputs.list) }}
+    steps:
+    # common steps start here (kept in sync even though we wouldn't need to patch RIOT's .cargo/config.toml)
+    - name: Check out riot-wrappers
+      uses: actions/checkout@v3
+    - name: Check out RIOT
+      uses: actions/checkout@v3
+      with:
+        repository: RIOT-OS/RIOT
+        path: RIOT
+    # common steps end here
+
+    - name: Patch local .cargo/config.toml to use current checkout
+      run: |
+        mkdir .cargo
+        echo '[patch.crates-io]' >> .cargo/config.toml
+        echo 'riot-wrappers = { path = ".", version = "*" }' >> .cargo/config.toml
+        echo 'riot-sys = { git = "https://github.com/RIOT-OS/rust-riot-sys" }' >> .cargo/config.toml
+
+    - name: Build and run test
+      run: |
+        set -x
+        export RIOTBASE=$(pwd)/RIOT
+        cd ${{ matrix.testdir }}
+        if BOARDS=${{ matrix.board }} make info-boards-supported | grep -q .
+        then
+          BOARD=${{ matrix.board }} RUSTFLAGS=-Dwarnings make all
+
+          if echo "${{ matrix.board }}" | grep -q ^native && make test/available BOARD=${{ matrix.board }}
+          then
+            echo
+            echo "Testing ${D}"
+            echo
+
+            if make BOARD=${{ matrix.board }} info-modules |grep -q netdev_tap; then
+              # Seems we can't have tap interfaces on GitHub actions, aborting.
+              echo "Board requires tap interface, skipping."
+              exit 0
+            fi
+            make all test BOARD=${{ matrix.board }}
+          fi
+        else
+          echo "Board is not supported for this test, skipping."
+        fi
+
+  rustfmt:
+    runs-on: ubuntu-latest
+    container: docker.io/rust
+    steps:
+    - uses: actions/checkout@v3
+      with:
+        fetch-depth: 0
+    - name: Add rustfmt component
+      run: rustup component add rustfmt
+    - name: Run cargo-fmt
+      run: cargo fmt --check
+
+  typos:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: crate-ci/typos@master
+
+  audit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: EmbarkStudios/cargo-deny-action@v2
+
+  all-done:
+    needs: [rustfmt, wrappers-tests, examples-and-tests]
+
+    # It'd suffice to just do "needs", but GitHub actions insist to have steps
+    runs-on: ubuntu-latest
+    steps:
+    - run: echo "All done"

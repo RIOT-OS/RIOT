@@ -1,0 +1,14 @@
+[package]
+name = "riot-wrappers-test-leds"
+version = "0.1.0"
+authors = ["Christian Amsüss <chrysn@fsfe.org>"]
+edition = "2021"
+publish = false
+
+[lib]
+crate-type = ["staticlib"]
+
+[dependencies]
+riot-wrappers = { version = "*", features = [ "set_panic_handler" ] }
+riot-sys = "*"
+embedded-hal = "0.2.4"

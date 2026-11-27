@@ -197,7 +197,6 @@ for c in \
          rustup \
          cargo \
          rustc \
-         c2rust \
          node \
          npm \
          ; do
