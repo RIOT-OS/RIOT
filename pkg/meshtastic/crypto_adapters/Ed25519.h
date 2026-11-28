@@ -23,19 +23,27 @@
 #ifndef CRYPTO_ED25519_h
 #define CRYPTO_ED25519_h
 
+#include <monocypher-ed25519.h>
+
 #include "BigNumberUtil.h"
 #include "SHA512.h"
 
-class Ed25519
-{
+class Ed25519 {
 public:
-    // static void sign(uint8_t signature[64], const uint8_t privateKey[32],
-    //                  const uint8_t publicKey[32], const void *message,
-    //                  size_t len);
+    static void sign(uint8_t signature[64], const uint8_t privateKey[32],
+                     const uint8_t publicKey[32], const void *message, size_t len)
+    {
+        crypto_ed25519_sign(signature, privateKey, (uint8_t *)message, len);
+    }
     static bool verify(const uint8_t signature[64], const uint8_t publicKey[32],
-                       const void *message, size_t len);
+                       const void *message, size_t len)
+    {
+        return crypto_ed25519_check(signature, publicKey, (const uint8_t *)message, len) == 0;
+    }
 
-    // static void generatePrivateKey(uint8_t privateKey[32]);
+    // static void generatePrivateKey(uint8_t privateKey[32]){
+
+    // }
     // static void derivePublicKey(uint8_t publicKey[32], const uint8_t privateKey[32]);
 
 protected:
@@ -44,8 +52,7 @@ protected:
     ~Ed25519();
 
     // Curve point represented in extended homogeneous coordinates.
-    struct Point
-    {
+    struct Point {
         limb_t x[32 / sizeof(limb_t)];
         limb_t y[32 / sizeof(limb_t)];
         limb_t z[32 / sizeof(limb_t)];
