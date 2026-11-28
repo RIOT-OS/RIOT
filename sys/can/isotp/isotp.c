@@ -332,6 +332,8 @@ static int _isotp_rcv_ff(struct isotp *isotp, can_frame_t *frame, size_t ae)
         DEBUG("\n");
     }
 
+    isotp->rx.can_dl = frame->len;
+
     isotp->rx.sn = 1;
 
     if (isotp->opt.flags & CAN_ISOTP_LISTEN_MODE) {
@@ -350,6 +352,18 @@ static int _isotp_rcv_cf(struct isotp *isotp, can_frame_t *frame, size_t ae)
     DEBUG("_isotp_rcv_cf: state=%d\n", isotp->rx.state);
 
     if (isotp->rx.state != ISOTP_WAIT_CF) {
+        return 1;
+    }
+
+    /* A frame longer than the FF's CAN_DL is invalid even if it completes
+     * the message; a shorter frame is valid only if it carries all
+     * remaining bytes (the last CF may be truncated). */
+    if (frame->len > isotp->rx.can_dl) {
+        return 1;
+    }
+
+    if ((frame->len < isotp->rx.can_dl) &&
+        (isotp->rx.idx + (frame->len - (ae + N_PCI_SZ)) < isotp->rx.snip->size)) {
         return 1;
     }
 
