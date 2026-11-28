@@ -1,0 +1,15 @@
+# adapter folders (header files)
+INCLUDES += -I$(RIOTPKG)/meshtastic/crypto_adapters
+# adapter folders (source files)
+DIRS += $(RIOTPKG)/meshtastic/crypto_adapters
+
+# rweather's crypto library (headers)
+INCLUDES += -I$(RIOTPKG)/meshtastic/crypto_original
+# adapter folders (source files)
+DIRS += $(RIOTPKG)/meshtastic/crypto_original
+
+
+# upstream branch folders
+INCLUDES += -isystem$(PKGDIRBASE)/meshtastic/src
+INCLUDES += -isystem$(PKGDIRBASE)/meshtastic/src/third_party
+INCLUDES += -isystem$(PKGDIRBASE)/meshtastic/src/generated

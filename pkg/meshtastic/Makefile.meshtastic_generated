@@ -1,0 +1,9 @@
+MODULE = meshtastic_generated
+
+SRCXX = config.pb.cpp
+SRCXX += leafdata.pb.cpp
+SRCXX += portnums.pb.cpp
+
+
+
+include $(RIOTBASE)/Makefile.base

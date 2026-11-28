@@ -1,0 +1,29 @@
+FEATURES_REQUIRED += cpp
+
+# add .cpp files
+USEMODULE += meshtastic
+USEMODULE += meshtastic_generated
+USEMODULE += meshtastic_third_party
+USEMODULE += crypto_original
+USEMODULE += crypto_adapters
+USEMODULE += cpp_new_delete
+
+# Cryptography
+USEMODULE += crypto_aes_128 crypto_aes_256
+USEMODULE += hashes
+USEPKG += monocypher
+USEPKG += nanopb
+USEPKG += radiolib
+USEMODULE += monocypher_optional
+
+FEATURES_OPTIONAL += periph_hwrng
+
+USEMODULE += core_thread_flags
+USEMODULE += random
+USEMODULE += ztimer_msec
+USEMODULE += ztimer_sec
+
+# The node stores its settings in the EEPROM, when the board has one
+ifneq (,$(filter meshtastic_node,$(USEMODULE)))
+  FEATURES_OPTIONAL += periph_eeprom
+endif
