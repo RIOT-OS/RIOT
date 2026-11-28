@@ -332,7 +332,7 @@ static int _isotp_rcv_ff(struct isotp *isotp, can_frame_t *frame, size_t ae)
         DEBUG("\n");
     }
 
-    isotp->rx.ll_dl = frame->len;
+    isotp->rx.can_dl = frame->len;
 
     isotp->rx.sn = 1;
 
@@ -355,13 +355,15 @@ static int _isotp_rcv_cf(struct isotp *isotp, can_frame_t *frame, size_t ae)
         return 1;
     }
 
-    /* Every CF must respect the FF's CAN_DL (ISO 15765-2:2016 9.6.4.1): a
-     * non-final CF must match it exactly, and even the last CF may only be
-     * shorter, never longer.  An invalid frame is ignored (10.4.3), so the
-     * ongoing reception is left untouched. */
-    if ((frame->len > isotp->rx.ll_dl) ||
-        ((frame->len != isotp->rx.ll_dl) &&
-         (isotp->rx.idx + (frame->len - (ae + N_PCI_SZ)) < isotp->rx.snip->size))) {
+    /* A frame longer than the FF's CAN_DL is invalid even if it completes
+     * the message; a shorter frame is valid only if it carries all
+     * remaining bytes (the last CF may be truncated). */
+    if (frame->len > isotp->rx.can_dl) {
+        return 1;
+    }
+
+    if ((frame->len < isotp->rx.can_dl) &&
+        (isotp->rx.idx + (frame->len - (ae + N_PCI_SZ)) < isotp->rx.snip->size)) {
         return 1;
     }
 
