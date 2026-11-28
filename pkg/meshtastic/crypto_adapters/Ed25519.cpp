@@ -26,7 +26,7 @@
 #include "RNG.h"
 #include "utility/LimbUtil.h"
 #include <string.h>
-
+#include <monocypher-ed25519.h>
 
 /**
  * \class Ed25519 Ed25519.h <Ed25519.h>
@@ -134,6 +134,27 @@ static bool isCanonicalS(const uint8_t s[32])
     return BigNumberUtil::sub_P(diff, S, numQ, NUM_LIMBS_256BIT) != 0;
 }
 
+/**
+ * \brief Verifies a signature using a specific Ed25519 public key.
+ *
+ * \param signature The signature value to be verified.
+ * \param publicKey The public key to use to verify the signature.
+ * \param message The message whose signature is to be verified.
+ * \param len The length of the \a message to be verified.
+ *
+ * \return Returns true if the \a signature is valid for \a message;
+ * or false if the \a signature is not valid.
+ *
+ * A signature whose S half is not below the group order is not valid
+ * (RFC 8032, section 5.1.7).
+ *
+ * \sa sign()
+ */
+bool Ed25519::verify(const uint8_t *signature, const uint8_t *public_key,
+                       const void *message, size_t len)
+{
+    return crypto_ed25519_check(signature, public_key, (const uint8_t *)message, len) == 0;
+}
 
 
 /**
